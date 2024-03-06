@@ -316,17 +316,17 @@ object Utilities {
         return metadata
     }
 
-    fun isFreshInstall(context: Context): Boolean {
+    fun isFreshInstall(ctx: Context): Boolean {
         try {
             with(
                 if (isAtleastT()) {
-                    context.packageManager.getPackageInfo(
-                        context.packageName,
+                    ctx.packageManager.getPackageInfo(
+                        ctx.packageName,
                         PackageManager.PackageInfoFlags.of(PackageManager.GET_META_DATA.toLong())
                     )
                 } else {
-                    context.packageManager.getPackageInfo(
-                        context.packageName,
+                    ctx.packageManager.getPackageInfo(
+                        ctx.packageName,
                         PackageManager.GET_META_DATA
                     )
                 }
@@ -337,7 +337,7 @@ object Utilities {
             // assign value as true as the package name not found, should not be the
             // case but some devices seems to return package not found immediately
             // after install
-            Log.w(LOG_TAG_APP_DB, "Application not available ${context.packageName}" + e.message, e)
+            Log.w(LOG_TAG_APP_DB, "app not found ${ctx.packageName}" + e.message, e)
             return true
         }
     }
@@ -407,20 +407,20 @@ object Utilities {
         }
     }
 
-    fun getIcon(context: Context, packageName: String, appName: String?): Drawable? {
+    fun getIcon(ctx: Context, packageName: String, appName: String? = null): Drawable? {
         if (!isValidAppName(appName, packageName)) {
-            return getDefaultIcon(context)
+            return getDefaultIcon(ctx)
         }
 
         return try {
-            context.packageManager.getApplicationIcon(packageName)
+            ctx.packageManager.getApplicationIcon(packageName)
         } catch (e: PackageManager.NameNotFoundException) {
             // Not adding exception details in logs.
             Log.e(
                 LOG_TAG_FIREWALL,
                 "Application Icon not available for package: $packageName" + e.message
             )
-            getDefaultIcon(context)
+            getDefaultIcon(ctx)
         }
     }
 
@@ -432,8 +432,8 @@ object Utilities {
         return AppCompatResources.getDrawable(context, R.drawable.default_app_icon)
     }
 
-    fun delay(ms: Long, lifecycleScope: LifecycleCoroutineScope, updateUi: () -> Unit) {
-        lifecycleScope.launch {
+    fun delay(ms: Long, scope: LifecycleCoroutineScope, updateUi: () -> Unit) {
+        scope.launch {
             kotlinx.coroutines.delay(ms)
             try {
                 updateUi()
@@ -443,9 +443,9 @@ object Utilities {
         }
     }
 
-    fun getPackageInfoForUid(context: Context, uid: Int): Array<out String>? {
+    fun getPackageInfoForUid(ctx: Context, uid: Int): Array<out String>? {
         try {
-            return context.packageManager.getPackagesForUid(uid)
+            return ctx.packageManager.getPackagesForUid(uid)
         } catch (e: PackageManager.NameNotFoundException) {
             Log.w(Logger.LOG_TAG_FIREWALL_LOG, "Package Not Found: " + e.message)
         } catch (e: SecurityException) {
@@ -494,15 +494,15 @@ object Utilities {
         return BuildConfig.FLAVOR_releaseType == FLAVOR_HEADLESS
     }
 
-    fun getApplicationInfo(context: Context, packageName: String): ApplicationInfo? {
+    fun getApplicationInfo(ctx: Context, packageName: String): ApplicationInfo? {
         return try {
             if (isAtleastT()) {
-                context.packageManager.getApplicationInfo(
+                ctx.packageManager.getApplicationInfo(
                     packageName,
                     PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong())
                 )
             } else {
-                context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+                ctx.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
             }
         } catch (e: PackageManager.NameNotFoundException) {
             Log.w(LOG_TAG_FIREWALL, "no app info for package name: $packageName")

@@ -42,7 +42,7 @@ class IPTracker
 internal constructor(
     private val connectionTrackerRepository: ConnectionTrackerRepository,
     private val rethinkLogRepository: RethinkLogRepository,
-    private val context: Context
+    private val ctx: Context
 ) : KoinComponent {
 
     companion object {
@@ -67,7 +67,7 @@ internal constructor(
         val serverAddress = convertIpV6ToIpv4IfNeeded(connTrackerMetaData.destIP)
         connTracker.dnsQuery = connTrackerMetaData.query
 
-        val countryCode: String? = getCountryCode(serverAddress, context)
+        val countryCode: String? = getCountryCode(serverAddress, ctx)
         connTracker.flag = getFlag(countryCode)
 
         connTracker.appName = fetchApplicationName(connTracker.uid)
@@ -90,7 +90,7 @@ internal constructor(
         val serverAddress = convertIpV6ToIpv4IfNeeded(connTrackerMetaData.destIP)
         rlog.dnsQuery = connTrackerMetaData.query
 
-        val countryCode: String? = getCountryCode(serverAddress, context)
+        val countryCode: String? = getCountryCode(serverAddress, ctx)
         rlog.flag = getFlag(countryCode)
 
         rlog.appName = fetchApplicationName(rlog.uid)
@@ -103,7 +103,7 @@ internal constructor(
             return s
         }
         val serverAddress = convertIpV6ToIpv4IfNeeded(s.targetIp)
-        val countryCode: String? = getCountryCode(serverAddress, context)
+        val countryCode: String? = getCountryCode(serverAddress, ctx)
         s.flag = getFlag(countryCode)
         return s
     }
@@ -143,48 +143,40 @@ internal constructor(
         }
     }
 
-    private suspend fun fetchApplicationName(_uid: Int): String {
-        // Returns the app id (base uid) for a given uid, stripping out the user id from it.
-        // http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/os/UserHandle.java#224
-        val uid = _uid % PER_USER_RANGE
-
+    private suspend fun fetchApplicationName(uid: Int): String {
         if (uid == INVALID_UID) {
-            return context.getString(R.string.network_log_app_name_unknown)
+            return ctx.getString(R.string.network_log_app_name_unknown)
         }
 
-        val packageNameList = getPackageInfoForUid(context, uid)
+        val pkgs = getPackageInfoForUid(ctx, uid)
 
         val appName: String =
-            if (packageNameList != null && packageNameList.isNotEmpty()) {
-                val packageName = packageNameList[0]
-                getValidAppName(uid, packageName)
+            if (pkgs != null && pkgs.isNotEmpty()) {
+                appNameForUidOrPackage(uid, pkgs[0])
             } else { // For UNKNOWN or Non-App.
-                val fileSystemUID = AndroidUidConfig.fromFileSystemUid(uid)
+                val androidUidConfig = AndroidUidConfig.fromFileSystemUid(uid)
                 Log.i(
                     LOG_TAG_FIREWALL_LOG,
-                    "App name for the uid: ${uid}, AndroidUid: ${fileSystemUID.uid}, fileName: ${fileSystemUID.name}"
+                    "android-uid for ${uid} is uid: ${androidUidConfig.uid}, n: ${androidUidConfig.name}"
                 )
 
-                if (fileSystemUID.uid == INVALID_UID) {
-                    context.getString(R.string.network_log_app_name_unnamed, uid.toString())
+                if (androidUidConfig.uid == INVALID_UID) {
+                    ctx.getString(R.string.network_log_app_name_unnamed, uid.toString())
                 } else {
-                    fileSystemUID.name
+                    androidUidConfig.name
                 }
             }
         return appName
     }
 
-    private suspend fun getValidAppName(uid: Int, packageName: String): String {
+    private suspend fun appNameForUidOrPackage(uid: Int, packageName: String): String {
         var appName = FirewallManager.getAppNameByUid(uid)
 
         if (appName.isNullOrEmpty()) {
-            val appInfo = Utilities.getApplicationInfo(context, packageName) ?: return ""
+            val appInfo = Utilities.getApplicationInfo(ctx, packageName) ?: return ""
 
-            Log.i(
-                LOG_TAG_FIREWALL_LOG,
-                "app, $appName, in PackageManager's list not tracked by FirewallManager"
-            )
-            appName = context.packageManager.getApplicationLabel(appInfo).toString()
+            Log.i(LOG_TAG_FIREWALL_LOG, "app, $appName, not tracked by FirewallManager")
+            appName = ctx.packageManager.getApplicationLabel(appInfo).toString()
         }
         return appName
     }

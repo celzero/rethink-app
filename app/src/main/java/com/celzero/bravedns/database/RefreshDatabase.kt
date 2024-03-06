@@ -66,7 +66,7 @@ import kotlin.random.Random
 
 class RefreshDatabase
 internal constructor(
-    private var context: Context,
+    private var ctx: Context,
     private val connTrackerRepository: ConnectionTrackerRepository,
     private val dnsLogRepository: DnsLogRepository,
     private val persistentState: PersistentState
@@ -137,7 +137,7 @@ internal constructor(
                 return
             }
             latestRefreshTime = current
-            val pm = context.packageManager ?: return
+            val pm = ctx.packageManager ?: return
 
             val fm = FirewallManager.load()
             val ipm = IpRulesManager.load()
@@ -295,7 +295,7 @@ internal constructor(
         apps.forEach {
             // no need to avoid adding Rethink app to the database, so commenting the below line
             // if (it.packageName == context.applicationContext.packageName) return@forEach
-            val ai = Utilities.getApplicationInfo(context, it.packageName) ?: return@forEach
+            val ai = Utilities.getApplicationInfo(ctx, it.packageName) ?: return@forEach
             insertApp(ai)
         }
         maybeSendNewAppNotification(apps)
@@ -306,7 +306,7 @@ internal constructor(
 
         apps.forEach { old ->
             // get the latest app info from package manager against existing package name
-            val newinfo = Utilities.getApplicationInfo(context, old.packageName) ?: return@forEach
+            val newinfo = Utilities.getApplicationInfo(ctx, old.packageName) ?: return@forEach
             updateApp(old.uid, newinfo.uid, old.packageName)
         }
     }
@@ -364,10 +364,10 @@ internal constructor(
     }
 
     private fun fetchApplicationInfo(uid: Int): ApplicationInfo? {
-        val pkgs = Utilities.getPackageInfoForUid(context, uid)
+        val pkgs = Utilities.getPackageInfoForUid(ctx, uid)
         // return the first appinfo for a given uid (there could be multiple)
         pkgs?.forEach {
-            return Utilities.getApplicationInfo(context, it) ?: return@forEach
+            return Utilities.getApplicationInfo(ctx, it) ?: return@forEach
         }
         return null
     }
@@ -417,30 +417,28 @@ internal constructor(
     }
 
     private suspend fun insertUnknownApp(uid: Int) {
-        val appDetail = AndroidUidConfig.fromFileSystemUid(uid)
-        val appInfo = AppInfo(null)
+        val androidUidConfig = AndroidUidConfig.fromFileSystemUid(uid)
+        val newAppInfo = AppInfo(null)
 
-        val appName =
-            if (appDetail.uid == Constants.INVALID_UID) {
-                appInfo.isSystemApp = false
-                context.getString(R.string.network_log_app_name_unnamed, uid.toString())
+        newAppInfo.appName =
+            if (androidUidConfig.uid == Constants.INVALID_UID) {
+                newAppInfo.isSystemApp = false
+                ctx.getString(R.string.network_log_app_name_unnamed, uid.toString())
             } else {
-                appInfo.isSystemApp = true
-                appDetail.name
+                newAppInfo.isSystemApp = true
+                androidUidConfig.name
             }
+        newAppInfo.packageName = "no_package_$uid"
+        newAppInfo.appCategory = ctx.getString(FirewallManager.CategoryConstants.NON_APP.nameResId)
+        newAppInfo.uid = uid
 
-        appInfo.appName = appName
-        appInfo.packageName = "no_package_$uid"
-        appInfo.appCategory = context.getString(FirewallManager.CategoryConstants.NON_APP.nameResId)
-
-        appInfo.uid = uid
         if (persistentState.getBlockNewlyInstalledApp()) {
-            appInfo.firewallStatus = FirewallManager.FirewallStatus.NONE.id
-            appInfo.connectionStatus = FirewallManager.ConnectionStatus.BOTH.id
+            newAppInfo.firewallStatus = FirewallManager.FirewallStatus.NONE.id
+            newAppInfo.connectionStatus = FirewallManager.ConnectionStatus.BOTH.id
         }
 
-        FirewallManager.persistAppInfo(appInfo)
-        ProxyManager.addNewApp(appInfo)
+        FirewallManager.persistAppInfo(newAppInfo)
+        ProxyManager.addNewApp(newAppInfo)
     }
 
     private suspend fun updateApp(oldUid: Int, newUid: Int, pkg: String) {
@@ -449,7 +447,7 @@ internal constructor(
     }
 
     private suspend fun insertApp(ai: ApplicationInfo) {
-        val appName = context.packageManager.getApplicationLabel(ai).toString()
+        val appName = ctx.packageManager.getApplicationLabel(ai).toString()
         val isSystemApp = isSystemApp(ai)
         val entry = AppInfo(null)
 
@@ -497,36 +495,36 @@ internal constructor(
         if (!persistentState.getBlockNewlyInstalledApp()) return
 
         val notificationManager =
-            context.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
+            ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         if (DEBUG) Log.d(Logger.LOG_TAG_VPN, "Number of new apps: $appSize, show notification")
 
-        val intent = Intent(context, NotificationHandlerDialog::class.java)
+        val intent = Intent(ctx, NotificationHandlerDialog::class.java)
         intent.putExtra(
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE
         )
 
         val pendingIntent =
-            getActivityPendingIntent(context, intent, PendingIntent.FLAG_ONE_SHOT, mutable = false)
+            getActivityPendingIntent(ctx, intent, PendingIntent.FLAG_ONE_SHOT, mutable = false)
 
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
-            val name: CharSequence = context.getString(R.string.notif_channel_firewall_alerts)
+            val name: CharSequence = ctx.getString(R.string.notif_channel_firewall_alerts)
             val description =
-                context.resources.getString(R.string.notif_channel_desc_firewall_alerts)
+                ctx.resources.getString(R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
             notificationManager.createNotificationChannel(channel)
-            builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
+            builder = NotificationCompat.Builder(ctx, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         } else {
-            builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
+            builder = NotificationCompat.Builder(ctx, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         }
 
         val contentTitle: String =
-            context.resources.getString(R.string.new_app_bulk_notification_title)
+            ctx.resources.getString(R.string.new_app_bulk_notification_title)
         val contentText: String =
-            context.resources.getString(
+            ctx.resources.getString(
                 R.string.new_app_bulk_notification_content,
                 appSize.toString()
             )
@@ -539,7 +537,7 @@ internal constructor(
 
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         builder.color =
-            ContextCompat.getColor(context, UIUtils.getAccentColor(persistentState.theme))
+            ContextCompat.getColor(ctx, UIUtils.getAccentColor(persistentState.theme))
 
         // Secret notifications are not shown on the lock screen.  No need for this app to show
         // there.
@@ -567,19 +565,19 @@ internal constructor(
             app.packageName = FirewallManager.getPackageNameByUid(app.uid) ?: ""
         }
 
-        val appInfo = Utilities.getApplicationInfo(context, app.packageName)
+        val appInfo = Utilities.getApplicationInfo(ctx, app.packageName)
         val appName =
             if (appInfo == null) {
                 app.uid
             } else {
-                context.packageManager.getApplicationLabel(appInfo).toString()
+                ctx.packageManager.getApplicationLabel(appInfo).toString()
             }
 
         val notificationManager =
-            context.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
+            ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         if (DEBUG) Log.d(Logger.LOG_TAG_VPN, "New app installed: $appName, show notification")
 
-        val intent = Intent(context, NotificationHandlerDialog::class.java)
+        val intent = Intent(ctx, NotificationHandlerDialog::class.java)
         intent.putExtra(
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE
@@ -587,7 +585,7 @@ internal constructor(
 
         val pendingIntent =
             getActivityPendingIntent(
-                context,
+                ctx,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT,
                 mutable = false
@@ -595,21 +593,21 @@ internal constructor(
 
         val builder: NotificationCompat.Builder
         if (isAtleastO()) {
-            val name: CharSequence = context.getString(R.string.notif_channel_firewall_alerts)
+            val name: CharSequence = ctx.getString(R.string.notif_channel_firewall_alerts)
             val description =
-                context.resources.getString(R.string.notif_channel_desc_firewall_alerts)
+                ctx.resources.getString(R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
             notificationManager.createNotificationChannel(channel)
-            builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
+            builder = NotificationCompat.Builder(ctx, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         } else {
-            builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
+            builder = NotificationCompat.Builder(ctx, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         }
 
-        val contentTitle: String = context.resources.getString(R.string.lbl_action_required)
+        val contentTitle: String = ctx.resources.getString(R.string.lbl_action_required)
         val contentText: String =
-            context.resources.getString(R.string.new_app_notification_content, appName)
+            ctx.resources.getString(R.string.new_app_notification_content, appName)
 
         builder
             .setSmallIcon(R.drawable.ic_notification_icon)
@@ -619,11 +617,11 @@ internal constructor(
 
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         builder.color =
-            ContextCompat.getColor(context, UIUtils.getAccentColor(persistentState.theme))
+            ContextCompat.getColor(ctx, UIUtils.getAccentColor(persistentState.theme))
 
         val openIntent1 =
             makeNewAppVpnIntent(
-                context,
+                ctx,
                 Constants.NOTIF_ACTION_NEW_APP_ALLOW,
                 app.uid,
                 PENDING_INTENT_REQUEST_CODE_ALLOW
@@ -631,7 +629,7 @@ internal constructor(
 
         val openIntent2 =
             makeNewAppVpnIntent(
-                context,
+                ctx,
                 Constants.NOTIF_ACTION_NEW_APP_DENY,
                 app.uid,
                 PENDING_INTENT_REQUEST_CODE_DENY
@@ -639,13 +637,13 @@ internal constructor(
         val notificationAction: NotificationCompat.Action =
             NotificationCompat.Action(
                 0,
-                context.resources.getString(R.string.allow).uppercase(),
+                ctx.resources.getString(R.string.allow).uppercase(),
                 openIntent1
             )
         val notificationAction2: NotificationCompat.Action =
             NotificationCompat.Action(
                 0,
-                context.resources.getString(R.string.new_app_notification_action_deny).uppercase(),
+                ctx.resources.getString(R.string.new_app_notification_action_deny).uppercase(),
                 openIntent2
             )
         builder.addAction(notificationAction)
@@ -659,29 +657,29 @@ internal constructor(
     }
 
     private fun notifyEmptyFirewallRules() {
-        val intent = Intent(context, HomeScreenActivity::class.java)
-        val nm = context.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
+        val intent = Intent(ctx, HomeScreenActivity::class.java)
+        val nm = ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         val pendingIntent =
             Utilities.getActivityPendingIntent(
-                context,
+                ctx,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT,
                 mutable = false
             )
         if (isAtleastO()) {
-            val name: CharSequence = context.getString(R.string.notif_channel_firewall_alerts)
+            val name: CharSequence = ctx.getString(R.string.notif_channel_firewall_alerts)
             val description =
-                context.resources.getString(R.string.notif_channel_desc_firewall_alerts)
+                ctx.resources.getString(R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
             nm.createNotificationChannel(channel)
         }
         var builder: NotificationCompat.Builder =
-            NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
+            NotificationCompat.Builder(ctx, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
 
-        val contentTitle = context.resources.getString(R.string.rules_load_failure_heading)
-        val contentText = context.resources.getString(R.string.rules_load_failure_desc)
+        val contentTitle = ctx.resources.getString(R.string.rules_load_failure_heading)
+        val contentText = ctx.resources.getString(R.string.rules_load_failure_desc)
         builder
             .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(contentTitle)
@@ -689,13 +687,13 @@ internal constructor(
             .setContentText(contentText)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         builder.color =
-            ContextCompat.getColor(context, UIUtils.getAccentColor(persistentState.theme))
+            ContextCompat.getColor(ctx, UIUtils.getAccentColor(persistentState.theme))
         val openIntent =
             makeVpnIntent(NOTIF_ID_LOAD_RULES_FAIL, Constants.NOTIF_ACTION_RULES_FAILURE)
         val notificationAction: NotificationCompat.Action =
             NotificationCompat.Action(
                 0,
-                context.resources.getString(R.string.rules_load_failure_reload),
+                ctx.resources.getString(R.string.rules_load_failure_reload),
                 openIntent
             )
         builder.addAction(notificationAction)
@@ -710,10 +708,10 @@ internal constructor(
     }
     // keep in sync with BraveVPNServie#makeVpnIntent
     private fun makeVpnIntent(id: Int, extra: String): PendingIntent {
-        val intent = Intent(context, NotificationActionReceiver::class.java)
+        val intent = Intent(ctx, NotificationActionReceiver::class.java)
         intent.putExtra(Constants.NOTIFICATION_ACTION, extra)
         return Utilities.getBroadcastPendingIntent(
-            context,
+            ctx,
             id,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT,
@@ -759,25 +757,25 @@ internal constructor(
         }
 
         if (isSystemComponent(ai)) {
-            return context.getString(FirewallManager.CategoryConstants.SYSTEM_COMPONENT.nameResId)
+            return ctx.getString(FirewallManager.CategoryConstants.SYSTEM_COMPONENT.nameResId)
         }
 
         if (isSystemApp(ai)) {
-            return context.getString(FirewallManager.CategoryConstants.SYSTEM_APP.nameResId)
+            return ctx.getString(FirewallManager.CategoryConstants.SYSTEM_APP.nameResId)
         }
 
         if (isAtleastO()) {
             return replaceUnderscore(appInfoCategory(ai))
         }
 
-        return context.getString(FirewallManager.CategoryConstants.INSTALLED.nameResId)
+        return ctx.getString(FirewallManager.CategoryConstants.INSTALLED.nameResId)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun appInfoCategory(ai: ApplicationInfo): String {
-        val cat = ApplicationInfo.getCategoryTitle(context, ai.category)
+        val cat = ApplicationInfo.getCategoryTitle(ctx, ai.category)
         return cat?.toString()
-            ?: context.getString(FirewallManager.CategoryConstants.OTHER.nameResId)
+            ?: ctx.getString(FirewallManager.CategoryConstants.OTHER.nameResId)
     }
 
     private fun replaceUnderscore(s: String): String {

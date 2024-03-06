@@ -42,7 +42,7 @@ object PauseTimer {
 
     fun start(durationMs: Long) {
         if (DEBUG) Log.d(LOG_TAG_UI, "timer started, duration: $durationMs")
-        CoroutineScope(Dispatchers.Main).launch {
+        io {
             try {
                 setCountdown(durationMs)
                 while (countdownMs.get() > 0L) {
@@ -83,5 +83,9 @@ object PauseTimer {
 
     fun getPauseCountDownObserver(): MutableLiveData<Long> {
         return pauseCountDownTimer
+    }
+
+    private fun io(f: suspend () -> Unit) = CoroutineScope(Dispatchers.IO).launch {
+        f()
     }
 }

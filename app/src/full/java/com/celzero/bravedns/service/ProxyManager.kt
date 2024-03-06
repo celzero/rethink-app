@@ -304,7 +304,4 @@ object ProxyManager : KoinComponent {
             ipnProxyId != Backend.Exit
     }
 
-    private fun io(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch { f() }
-    }
 }
