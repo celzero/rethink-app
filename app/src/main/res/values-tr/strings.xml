@@ -214,9 +214,9 @@
   <string name="dns_query_clear_logs_title" translatable="true">Tüm DNS günlükleri silinsin mi?</string>
   <string name="dns_query_clear_logs_message" translatable="true">Bu, cihazdaki DNS günlüklerini siler. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?</string>
   <string name="bsct_app_info" translatable="true">Uygulama Bilgisi</string>
-  <string name="bsct_block_ip" translatable="true">&lt;u&gt;Bu uygulama &lt;/ u&gt; için &lt; u&gt; bu IP'ye &lt;/u&gt; engelleyin, güvenin</string>
-  <string name="bsct_block_domain" translatable="true">&lt;u&gt; Bu uygulama &lt;/ u &gt; için &lt; u&gt; alan adlarını &lt;/u&gt; engelleyin, güvenin</string>
-  <string name="bsct_block" translatable="true">&lt;u&gt;Bu uygulamayı &lt;/u&gt; engelleyin, atlayın, hariç tutun, izole edin</string>
+  <string name="bsct_block_ip" translatable="true">&lt;u>Bu uygulama&lt;/u></string> için &lt;u>bu IP&lt;/u>'yi engelleyin ve güvenin</string>
+  <string name="bsct_block_domain" translatable="true">&lt;u>Bu uygulama&lt;/u></string> için &lt;u>alan(lar)a&lt;/u> engelleyin ve güvenin</string>
+  <string name="bsct_block" translatable="true">&lt;u>Bu uygulamayı&lt;/u></string> engelleyin, atlayın, hariç tutun, izole edin</string>
   <string name="bsct_conn_block_desc" translatable="true">%1$s, %2$s tarafından engellendi</string>
   <string name="bsct_conn_block_desc_device" translatable="true">cihazda %1$s engellendi</string>
   <string name="bsct_conn_desc_allowed" translatable="true">%1$s %2$s tarihinde izin verildi</string>
@@ -276,7 +276,7 @@
   <string name="configure_dns_connection_name" translatable="true">%1$s ile bağlantı kuruldu</string>
   <string name="configure_dns_crypt" translatable="true">DNSCrypt: %1$s çözümleyici</string>
   <string name="http_proxy_dialog_heading" translatable="true">Http(S) CONNECT Proxy'sini Ayarla</string>
-  <string name="http_proxy_dialog_desc" translatable="true">Formun kurulum URL'si, &lt;protocol &gt;://&lt; username &gt;:&lt; password &gt;@&lt; domain - or - ip &gt;:&lt;port &gt;&lt;path&gt;. Örnek: http://proxy.example.com:8080/</string>
+  <string name="http_proxy_dialog_desc" translatable="true">Formun kurulum URL'si, &lt;protokol>://&lt;kullanıcı adı>:&lt;şifre>@&lt;alan-or-ip>:&lt;port>&lt; yol>. Örnek: http://proxy.example.com:8080/</string>
   <string name="download_update_dialog_title" translatable="true">Yeni Güncelleme!</string>
   <string name="download_update_dialog_message" translatable="true">Uygulamanın yeni bir sürümü web sitesinden indirilebilir. Devam etmek istiyor musunuz?</string>
   <string name="download_update_dialog_message_ok_title" translatable="true">Güncel!</string>
@@ -362,11 +362,11 @@
   <string name="orbot_stop_dialog_negative" translatable="true">Orbot'u durdur</string>
   <string name="orbot_stop_dialog_neutral" translatable="true">DNS'yi değiştir</string>
   <string name="orbot_title" translatable="true">Orbot ve Proxy'ler</string>
-  <string name="orbot_explanation" translatable="true">
-            Orbot, diğer uygulamaların interneti daha güvenli bir şekilde kullanmasını sağlayan ücretsiz bir proxy uygulamasıdır.
-            \ nOrbot, İnternet trafiğinizi şifrelemek için &lt;u&gt;Tor&lt;/ u&gt; kullanır, bu da sansürü&lt;u&gt;atlamanıza &lt;/ u&gt; ve kişisel özgürlüğü ve gizliliği tehdit eden &lt;u&gt;ağ gözetimi&lt;/ u&gt; biçimlerine karşı savunmanıza yardımcı olur.
-            \n&lt;u&gt;TCP Proxy&lt;/ u&gt;: Yalnızca &lt;i&gt;dahil &lt;/i&gt; uygulamaların TCP bağlantılarını Orbot'a yönlendirmeyi yeniden düşünün.
-        \n&lt;u&gt;HTTP Proxy&lt;/ u &gt;: Orbot'a &lt;i&gt; HTTP CONNECT tüneli kurar&lt;/ i&gt; ve yalnızca &lt;i&gt;dahil &lt;/i&gt; uygulamaların TCP bağlantılarını iletir.</string>
+  <string name="orbot_explanation" translatable = "true">
+            Orbot, diğer uygulamaların İnternet'i daha &lt;u>güvenli&lt;/u> kullanmasını sağlayan ücretsiz bir proxy uygulamasıdır.
+            \nOrbot, İnternet trafiğinizi şifrelemek için &lt;u>Tor&lt;/u>'u kullanır; bu da &lt;u>sansürü atlamanıza&lt;/u> ve kişisel özgürlüğünüzü tehdit eden &lt;u>ağ gözetleme&lt;/u> biçimlerine karşı savunmanıza yardımcı olur. mahremiyet.
+            \n&lt;u>TCP Proxy&lt;/u>: Rethink, yalnızca &lt;i>dahil edilen&lt;/i> uygulamaların TCP bağlantılarını Orbot'a iletir.
+        \n&lt;u>HTTP Proxy&lt;/u>: Orbot'a HTTP CONNECT tünelini yeniden &lt;i>kurar&lt;/i> ve yalnızca &lt;i>dahil&lt;/i> uygulamaların TCP bağlantılarını iletir.</string>
   <string name="orbot_install_dialog_title" translatable="true">Orbot kurulsun mu?</string>
   <string name="orbot_install_dialog_message" translatable="true">Orbot, Tor'un özelliklerini ve işlevselliğini Android'e getiriyor.</string>
   <string name="orbot_install_dialog_positive" translatable="true">Yükle</string>
@@ -549,13 +549,13 @@
   <string name="about_bravedns_explantion" translatable="true">Android cihazınızda uygulama etkinliğini izlemenin, İnternet sansürünü ve güvenlik duvarı uygulamalarını aşmanın en kolay yolu yeniden düşünmektir. </string>
   <string name="about_bravedns_whoarewe" translatable="true">Rethink, Amazon, IBM ve Scientific Games'ten eski mühendisler tarafından yönetilen ücretsiz ve açık kaynaklı bir projedir.</string>
   <string name="about_bravedns_toreport_text" translatable="true">yardım ve geri bildirim</string>
-  <string name="about_bug_report_desc" translatable="true">e - posta kilitlenme günlükleri</string>
+  <string name="about_bug_report_desc" translatable="true">e-posta kilitlenme günlükleri</string>
   <string name="about_join_telegram" translatable="true">Telegram</string>
   <string name="about_bug_report" translatable="true">Hata raporu</string>
-  <string name="about_bug_report_dialog_positive_btn" translatable="true">E - posta gönder</string>
+  <string name="about_bug_report_dialog_positive_btn" translatable="true">E-posta gönder</string>
   <string name="about_bug_no_log_dialog_title" translatable="true">Hata raporu</string>
   <string name="about_bug_no_log_dialog_message" translatable="true">Çökme günlükleri getirilemedi. Hatanızı manuel olarak bildirmek ister misiniz?</string>
-  <string name="about_bug_no_log_dialog_positive_btn" translatable="true">E - posta gönder</string>
+  <string name="about_bug_no_log_dialog_positive_btn" translatable="true">E-posta gönder</string>
   <string name="about_web" translatable="true">bağlantılar</string>
   <string name="about_website" translatable="true">Rethinkdns.com adresini ziyaret edin</string>
   <string name="about_github" translatable="true">GitHub'a katkıda bulunun</string>
@@ -565,7 +565,7 @@
   <string name="about_connect" translatable="true">iletişim</string>
   <string name="about_sponsor_link_text" translatable="true">Sponsor</string>
   <string name="about_app" translatable="true">uygulama</string>
-  <string name="about_email" translatable="true">Bize e - posta gönderin</string>
+  <string name="about_email" translatable="true">Bize e-posta gönderin</string>
   <string name="about_settings" translatable="true">sistem</string>
   <string name="about_settings_app_info" translatable="true">Uygulama Bilgisi</string>
   <string name="about_settings_vpn_profile" translatable="true">VPN Profili</string>
@@ -581,8 +581,8 @@
   <string name="about_mail_to_string" translatable="true">mailto:</string>
   <string name="about_mail_subject" translatable="true">[Yeniden düşünün]:</string>
   <string name="about_mail_bugreport_subject" translatable="true">[Rethink]: Hata raporu</string>
-  <string name="about_mail_bugreport_text" translatable="true">Bu e - postayı şu adrese gönderin: hello@celzero.com</string>
-  <string name="about_mail_bugreport_share_title" translatable="true">E - posta sağlayıcısı seçin</string>
+  <string name="about_mail_bugreport_text" translatable="true">Bu e-postayı şu adrese gönderin: hello@celzero.com</string>
+  <string name="about_mail_bugreport_share_title" translatable="true">E-posta sağlayıcısı seçin</string>
   <string name="about_telegram_link" translatable="false">https://telegram.me/rethinkdns</string>
   <string name="about_docs_link" translatable="false">https://docs.rethinkdns.com/</string>
   <string name="about_faq_link" translatable="false">https://www.rethinkdns.com/faq</string>
@@ -951,8 +951,8 @@
   <!-- app info bottom sheet -->
   <string name="bsac_title_desc" translatable="true">Kurallar yalnızca bu uygulama için geçerlidir.</string>
   <!-- DNS logs bottom sheet -->
-  <string name="bsdl_block_desc" translatable="true">&lt;u&gt;Bu alan adını&lt;/ u&gt; engelle, güven</string>
-  <string name="bsdl_blocked_desc" translatable="true">%1$s, %2$s tarafından engellendi</string>
+  <string name="bsdl_block_desc" translatable="true">Bu alan adını &lt;u>engelle,güven&lt;/u></string>
+    <string name="bsdl_blocked_desc" translatable="true">%1$s, %2$s tarafından engellendi</string>
   <!-- app config -->
   <string name="network_dns" translatable="true">Sistem DNS'si</string>
   <!-- custom download -->
