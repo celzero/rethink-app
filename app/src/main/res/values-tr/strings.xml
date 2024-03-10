@@ -214,9 +214,9 @@
   <string name="dns_query_clear_logs_title" translatable="true">Tüm DNS günlükleri silinsin mi?</string>
   <string name="dns_query_clear_logs_message" translatable="true">Bu, cihazdaki DNS günlüklerini siler. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?</string>
   <string name="bsct_app_info" translatable="true">Uygulama Bilgisi</string>
-  <string name="bsct_block_ip" translatable="true">&lt;u>Bu uygulama&lt;/u></string> için &lt;u>bu IP&lt;/u>'yi engelleyin ve güvenin</string>
-  <string name="bsct_block_domain" translatable="true">&lt;u>Bu uygulama&lt;/u></string> için &lt;u>alan(lar)a&lt;/u> engelleyin ve güvenin</string>
-  <string name="bsct_block" translatable="true">&lt;u>Bu uygulamayı&lt;/u></string> engelleyin, atlayın, hariç tutun, izole edin</string>
+  <string name="bsct_block_ip" translatable="true">&lt;u>Bu uygulama&lt;/u> için &lt;u>bu IP&lt;/u>'yi engelleyin ve güvenin</string>
+  <string name="bsct_block_domain" translatable="true">&lt;u>Bu uygulama&lt;/u> için &lt;u>alan(lar)a&lt;/u> engelleyin ve güvenin</string>
+  <string name="bsct_block" translatable="true">&lt;u>Bu uygulamayı&lt;/u> engelleyin, atlayın, hariç tutun, izole edin</string>
   <string name="bsct_conn_block_desc" translatable="true">%1$s, %2$s tarafından engellendi</string>
   <string name="bsct_conn_block_desc_device" translatable="true">cihazda %1$s engellendi</string>
   <string name="bsct_conn_desc_allowed" translatable="true">%1$s %2$s tarihinde izin verildi</string>
