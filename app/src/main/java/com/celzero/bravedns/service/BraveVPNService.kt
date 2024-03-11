@@ -28,6 +28,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.VpnService
@@ -35,8 +36,6 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock.elapsedRealtime
-import android.os.UserHandle
-import android.os.UserManager
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
@@ -81,6 +80,7 @@ import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.isAtleastU
 import com.celzero.bravedns.util.Utilities.isMissingOrInvalidUid
 import com.celzero.bravedns.util.Utilities.isNetworkSame
 import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
@@ -90,17 +90,6 @@ import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import intra.Bridge
 import intra.SocketSummary
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
-import rnet.ServerSummary
-import rnet.Tab
 import java.io.IOException
 import java.net.InetAddress
 import java.net.SocketException
@@ -112,6 +101,17 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import rnet.ServerSummary
+import rnet.Tab
 
 class BraveVPNService :
     VpnService(), ConnectionMonitor.NetworkListener, Bridge, OnSharedPreferenceChangeListener {
@@ -1175,7 +1175,15 @@ class BraveVPNService :
                 updateNotificationBuilder().build(),
                 FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
             )*/
-            startForeground(SERVICE_ID, updateNotificationBuilder())
+            if (isAtleastU()) {
+                startForeground(
+                    SERVICE_ID,
+                    updateNotificationBuilder(),
+                    FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
+                )
+            } else {
+                startForeground(SERVICE_ID, updateNotificationBuilder())
+            }
             // this should always be set before ConnectionMonitor is init-d
             // see restartVpn and updateTun which expect this to be the case
             persistentState.setVpnEnabled(true)
