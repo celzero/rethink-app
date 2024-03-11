@@ -98,6 +98,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 
     compileOptions {
@@ -147,7 +148,7 @@ android {
             vectorDrawables.useSupportLibrary = true
         }
     }
-    lintOptions {
+    lint {
         abortOnError false
     }
 
