@@ -24,6 +24,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.DataUsageSummary
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
@@ -192,7 +193,7 @@ class SummaryStatisticsViewModel(
                 .cachedIn(viewModelScope)
         }
 
-    suspend fun totalUsage(): SummaryStatisticsFragment.DataUsage {
+    suspend fun totalUsage(): DataUsageSummary {
         val to = startTime.value ?: 0L
         return connectionTrackerDAO.getTotalUsages(to, ConnectionTracker.ConnType.METERED.value)
     }

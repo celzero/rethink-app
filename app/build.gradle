@@ -135,6 +135,7 @@ android {
         }
         headless {
             dimension "releaseType"
+            minSdkVersion 31
             // stackoverflow.com/a/60560178
             // buildConfigField 'string', 'timestamp', '1662384683026'
         }
@@ -198,7 +199,6 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     ksp "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
-    download "androidx.room:room-paging:$room_version"
     implementation "androidx.room:room-paging:$room_version"
 
     fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
@@ -217,6 +217,7 @@ dependencies {
     fullImplementation 'com.squareup.retrofit2:retrofit:2.9.0'
     fullImplementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
+    implementation 'com.squareup.okio:okio-jvm:3.6.0'
     // Glide
     fullImplementation('com.github.bumptech.glide:glide:4.16.0') {
         exclude group: 'glide-parent'
@@ -224,6 +225,7 @@ dependencies {
     fullImplementation('com.github.bumptech.glide:okhttp3-integration:4.16.0') {
         exclude group: 'glide-parent'
     }
+
     // Ref: https://stackoverflow.com/a/46638213
     kspFull 'com.github.bumptech.glide:compiler:4.15.1'
 

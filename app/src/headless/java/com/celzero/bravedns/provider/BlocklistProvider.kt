@@ -24,7 +24,7 @@ import com.celzero.bravedns.database.RethinkLocalFileTag
 import com.celzero.bravedns.database.RethinkLocalFileTagRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_PROVIDER
+import com.celzero.bravedns.util.Logger.Companion.LOG_PROVIDER
 import org.koin.android.ext.android.inject
 
 class BlocklistProvider : ContentProvider() {

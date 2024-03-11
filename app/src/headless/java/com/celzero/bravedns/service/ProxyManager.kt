@@ -24,15 +24,36 @@ object ProxyManager : KoinComponent {
     const val ID_TCP_BASE = "TCP"
     const val ID_S5_BASE = "S5"
     const val ID_HTTP_BASE = "HTTP"
-    const val ID_SYSTEM = "SYSTEM"
 
-    suspend fun load() {}
+    enum class ProxyMode(val value: Int) {
+        SOCKS5(0),
+        HTTP(1),
+        ORBOT_SOCKS5(2),
+        ORBOT_HTTP(3);
+
+        companion object {
+            fun get(v: Int?): ProxyMode? {
+                if (v == null) return null
+                return when (v) {
+                    SOCKS5.value -> SOCKS5
+                    HTTP.value -> HTTP
+                    ORBOT_SOCKS5.value -> ORBOT_SOCKS5
+                    ORBOT_HTTP.value -> ORBOT_HTTP
+                    else -> null
+                }
+            }
+        }
+    }
+
+    fun load() {}
+
+    fun clear() {}
 
     fun getProxyMapping(): MutableSet<FirewallManager.AppInfoTuple> {
         return mutableSetOf()
     }
 
-    fun addNewApp(appInfo: AppInfo, proxyId: String = "", proxyName: String = "") {}
+    fun addNewApp(appInfo: AppInfo?, proxyId: String = "", proxyName: String = "") {}
 
     fun deleteApp(appInfo: AppInfo, proxyId: String = "", proxyName: String = "") {}
 
@@ -42,7 +63,13 @@ object ProxyManager : KoinComponent {
         return ""
     }
 
-    fun isProxyActive(proxyId: String): Boolean {
+    fun purgeDupsBeforeRefresh() {}
+
+    fun deleteMappings(m: Collection<FirewallManager.AppInfoTuple>) {}
+
+    fun addMappings(m: Collection<AppInfo?>) {}
+
+    fun isIpnProxy(ipnProxyId: String): Boolean {
         return false
     }
 }

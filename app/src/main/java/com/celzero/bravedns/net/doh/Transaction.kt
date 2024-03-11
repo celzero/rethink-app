@@ -49,7 +49,7 @@ class Transaction {
 
         companion object {
             fun fromId(id: Long): Status {
-                for (status in entries) {
+                for (status in enumValues<Status>()) {
                     if (status.id == id) {
                         return status
                     }

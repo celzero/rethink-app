@@ -25,7 +25,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.data.DataUsage
-import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
+import com.celzero.bravedns.data.DataUsageSummary
 import com.celzero.bravedns.util.Constants.Companion.MAX_LOGS
 
 @Dao
@@ -268,5 +268,5 @@ interface ConnectionTrackerDAO {
     @Query(
         "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, ict.meteredDataUsage as meteredDataUsage from ConnectionTracker as ct join (select sum(downloadBytes + uploadBytes) as meteredDataUsage from ConnectionTracker where connType like :meteredTxt and timeStamp > :to) as ict where timeStamp > :to"
     )
-    fun getTotalUsages(to: Long, meteredTxt: String): SummaryStatisticsFragment.DataUsage
+    fun getTotalUsages(to: Long, meteredTxt: String): DataUsageSummary
 }

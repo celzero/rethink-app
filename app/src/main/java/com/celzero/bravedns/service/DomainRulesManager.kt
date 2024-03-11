@@ -93,7 +93,7 @@ object DomainRulesManager : KoinComponent {
     }
 
     // update the cache with the domain and its status based on the domain type
-    private fun updateTrie(cd: CustomDomain) {
+    fun updateTrie(cd: CustomDomain) {
         val key = mkTrieKey(cd.domain, cd.uid)
         trie.set(key, cd.status.toString())
     }

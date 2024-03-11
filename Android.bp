@@ -52,20 +52,16 @@ android_app {
         "androidx.work_work-runtime-ktx",
         "com.google.android.material_material",
         "firestack",
-        "gson-prebuilt-jar",
+        "gson",
         "guava",
         "ipaddress",
         "koin-android",
         "koin-core",
         "krate",
+        "okio-lib",
     ],
 	
 	use_embedded_native_libs: true
-}
-
-android_library_import {
-    name: "androidx.room_room-paging",
-    aars: ["app/libs/room-paging*.aar"],
 }
 
 android_library_import {

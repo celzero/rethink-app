@@ -25,21 +25,15 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-private val RootModule = module {
-    single<ContentResolver> { androidContext().contentResolver }
-}
+private val rootModule = module { single<ContentResolver> { androidContext().contentResolver } }
 
-private val orbotHelperModule = module {
-    single { OrbotHelper(androidContext(), get(), get()) }
-}
+private val schedulerModule = module { single { ScheduleManager(androidContext()) } }
 
-private val schedulerModule = module {
-    single { ScheduleManager(androidContext()) }
-}
+private val orbotHelperModule = module { single { OrbotHelper(androidContext(), get(), get()) } }
 
 val AppModules: List<Module> by lazy {
     mutableListOf<Module>().apply {
-        add(RootModule)
+        add(rootModule)
         addAll(DatabaseModule.modules)
         addAll(DataModule.modules)
         add(schedulerModule)

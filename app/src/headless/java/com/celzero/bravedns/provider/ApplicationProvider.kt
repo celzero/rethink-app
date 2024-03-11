@@ -25,7 +25,7 @@ import android.util.Log
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,7 +61,7 @@ class ApplicationProvider : ContentProvider() {
         sortOrder: String?
     ): Cursor {
         if (!isValidRequest(uri)) {
-            Log.e(LoggerConstants.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
+            Log.e(Logger.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("Invalid URI, cannot update without ID$uri")
         }
         return appInfoRepository.getAppsCursor()
@@ -79,31 +79,31 @@ class ApplicationProvider : ContentProvider() {
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
         if (!isValidRequest(uri)) {
-            Log.e(LoggerConstants.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
+            Log.e(Logger.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("invalid uri, cannot update without ID$uri")
         }
         val appInfo = AppInfo(values)
 
         val id = appInfoRepository.cpInsert(appInfo)
         // update the app info cache
-        CoroutineScope(Dispatchers.IO).launch { FirewallManager.reloadAppList() }
+        CoroutineScope(Dispatchers.IO).launch { FirewallManager.load() }
         context?.contentResolver?.notifyChange(uri, null)
         return ContentUris.withAppendedId(uri, id)
     }
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
         if (!isValidRequest(uri)) {
-            Log.e(LoggerConstants.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
+            Log.e(Logger.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("Invalid URI, cannot update without ID$uri")
         }
         Log.i(
-            LoggerConstants.LOG_PROVIDER,
+            Logger.LOG_PROVIDER,
             "request to delete app, parameters $uri, $selection, $selectionArgs"
         )
         val id = ContentUris.parseId(uri).toInt()
         val count = appInfoRepository.cpDelete(id)
         // update the app info cache
-        CoroutineScope(Dispatchers.IO).launch { FirewallManager.reloadAppList() }
+        CoroutineScope(Dispatchers.IO).launch { FirewallManager.load() }
         context?.contentResolver?.notifyChange(uri, null)
         return count
     }
@@ -115,7 +115,7 @@ class ApplicationProvider : ContentProvider() {
         selectionArgs: Array<out String>?
     ): Int {
         if (!isValidRequest(uri)) {
-            Log.e(LoggerConstants.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
+            Log.e(Logger.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("invalid uri, cannot update without ID$uri")
         }
 
@@ -126,14 +126,14 @@ class ApplicationProvider : ContentProvider() {
             val count = appInfoRepository.cpUpdate(appInfo)
             context.contentResolver?.notifyChange(uri, null)
             // update the app info cache
-            CoroutineScope(Dispatchers.IO).launch { FirewallManager.reloadAppList() }
+            CoroutineScope(Dispatchers.IO).launch { FirewallManager.load() }
             return count
         } else if (selectionClause.contains("uid") || selectionClause.contains("packageName")) {
             val c = selectionClause.count { it == '?' }
             // if the selection clause contains uid or packageName, then the selectionArgs should
             // contain the values for the same.
             if (c != (selectionArgs?.size ?: 0)) {
-                Log.e(LoggerConstants.LOG_PROVIDER, "invalid selection clause: $selectionClause")
+                Log.e(Logger.LOG_PROVIDER, "invalid selection clause: $selectionClause")
                 throw java.lang.IllegalArgumentException(
                     "invalid selection clause: $selectionClause"
                 )
@@ -144,16 +144,16 @@ class ApplicationProvider : ContentProvider() {
                 clause = clause.replaceFirst("?", selectionArgs?.get(i) ?: "")
             }
             Log.i(
-                LoggerConstants.LOG_PROVIDER,
+                Logger.LOG_PROVIDER,
                 "selection ${appInfo.appName}, ${appInfo.uid}, ${appInfo.firewallStatus} clause: $clause"
             )
             val count = appInfoRepository.cpUpdate(appInfo, clause)
             // update the app info cache
-            CoroutineScope(Dispatchers.IO).launch { FirewallManager.reloadAppList() }
+            CoroutineScope(Dispatchers.IO).launch { FirewallManager.load() }
             context.contentResolver?.notifyChange(uri, null)
             return count
         } else {
-            Log.e(LoggerConstants.LOG_PROVIDER, "invalid selection clause: $selectionClause")
+            Log.e(Logger.LOG_PROVIDER, "invalid selection clause: $selectionClause")
             throw java.lang.IllegalArgumentException("invalid selection clause: $selectionClause")
         }
     }
@@ -162,7 +162,7 @@ class ApplicationProvider : ContentProvider() {
         // check the calling package
         if (callingPackage != RESOLVER_PACKAGE_NAME) {
             Log.e(
-                LoggerConstants.LOG_PROVIDER,
+                Logger.LOG_PROVIDER,
                 "request received from unknown package: $callingPackage"
             )
             return false
