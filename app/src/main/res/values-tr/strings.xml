@@ -136,29 +136,29 @@
     <string name="bypass_dns_firewall" translatable="true">dns ve güvenlik duvarını atla</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">
       Uyarı: Yeniden düşünme devre dışı bırakıldı
-      </string>
+    </string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">
       Koruma ayarını değiştirmek için dokunun
     </string>
     <string name="dns_mode_notification_title" translatable="true">
           Korunuyor! Hızlı ve Güvenli DNS'ye bağlandı.
-      </string>
+    </string>
     <string name="firewall_mode_notification_title" translatable="true">
           Korunuyor! Güvenlik Duvarı'na bağlandı.
-      </string>
+    </string>
     <string name="hybrid_mode_notification_title" translatable="true">
           Korunuyor! DNS + Güvenlik Duvarı'na bağlandı.
-      </string>
+    </string>
     <string name="pause_mode_notification_title" translatable="true">Duraklatıldı! Engellenen uygulamalar güvenlik duvarı oluşturmaya devam edecek.</string>
     <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">
       bekleniyor
-      </string>
+    </string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">
       başarısız
-      </string>
+    </string>
     <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">
       korumalı
-      </string>
+    </string>
     <string name="failed_using_default" translatable="true">Başarısız: yedek DNS kullanılıyor</string>
     <string name="status_app_error" translatable="true">uygulama hatası</string>
     <string name="status_dns_error" translatable="true">dns hatası</string>
@@ -952,7 +952,7 @@
     <string name="bsac_title_desc" translatable="true">Kurallar yalnızca bu uygulama için geçerlidir.</string>
     <!-- DNS logs bottom sheet -->
     <string name="bsdl_block_desc" translatable="true">Bu alan adını &lt;u>engelle,güven&lt;/u></string>
-      <string name="bsdl_blocked_desc" translatable="true">%1$s, %2$s tarafından engellendi</string>
+    <string name="bsdl_blocked_desc" translatable="true">%1$s, %2$s tarafından engellendi</string>
     <!-- app config -->
     <string name="network_dns" translatable="true">Sistem DNS'si</string>
     <!-- custom download -->
