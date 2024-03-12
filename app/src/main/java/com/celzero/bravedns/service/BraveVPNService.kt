@@ -184,7 +184,6 @@ class BraveVPNService :
     private var excludedApps: MutableSet<String> = mutableSetOf()
 
     var underlyingNetworks: ConnectionMonitor.UnderlyingNetworks? = null
-    private var previousSetMtu: Int = 0
 
     private var accessibilityListener: AccessibilityManager.AccessibilityStateChangeListener? = null
 
@@ -1235,9 +1234,7 @@ class BraveVPNService :
     }
 
     private fun mtu(): Int {
-        val minMtu = underlyingNetworks?.minMtu ?: VPN_INTERFACE_MTU
-        previousSetMtu = minMtu // store the value to avoid re-setting the same value
-        return minMtu
+        return underlyingNetworks?.minMtu ?: VPN_INTERFACE_MTU
     }
 
     private fun startOrbotAsyncIfNeeded() {
@@ -1692,7 +1689,7 @@ class BraveVPNService :
 
     override fun onNetworkConnected(newNetworks: ConnectionMonitor.UnderlyingNetworks) {
         val isRoutesChanged = isUnderlyingRoutesChanged(underlyingNetworks, newNetworks)
-        val isMtuChanged = isMtuChanged()
+        val isMtuChanged = isMtuChanged(underlyingNetworks, newNetworks)
         underlyingNetworks = newNetworks
         Log.i(
             LOG_TAG_VPN,
@@ -1729,9 +1726,7 @@ class BraveVPNService :
 
     private fun setRoute() {
         logd("set route")
-        // avoid calling setRoute as there is a unknown crash in go-vpn-adapter
-        // to prevent that, do not set route on route changes, always set route
-        // to v4, v6 routes regardless of the route changes
+        // go / netstack is always routing dual-stack, regardless
         // io("setRoute") { vpnAdapter?.setRoute(createNewTunnelOptsObj()) }
     }
 
@@ -1761,8 +1756,15 @@ class BraveVPNService :
         return old6 != new6 || old4 != new4
     }
 
-    private fun isMtuChanged(): Boolean {
-        return previousSetMtu != underlyingNetworks?.minMtu
+    private fun isMtuChanged(
+        old: ConnectionMonitor.UnderlyingNetworks?,
+        new: ConnectionMonitor.UnderlyingNetworks
+    ): Boolean {
+        return if (old == null) {
+            return true
+        } else {
+            new.minMtu != old.minMtu
+        }
     }
 
     private fun setNetworkAndDefaultDnsIfNeeded() {
