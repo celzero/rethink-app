@@ -53,7 +53,7 @@ android {
     defaultConfig {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
-        targetSdkVersion 33
+        targetSdkVersion 34
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -98,6 +98,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 
     compileOptions {
@@ -134,6 +135,7 @@ android {
         }
         headless {
             dimension "releaseType"
+            minSdkVersion 31
             // stackoverflow.com/a/60560178
             // buildConfigField 'string', 'timestamp', '1662384683026'
         }
@@ -147,7 +149,7 @@ android {
             vectorDrawables.useSupportLibrary = true
         }
     }
-    lintOptions {
+    lint {
         abortOnError false
     }
 
@@ -179,7 +181,7 @@ dependencies {
     // included to fix issues with Android 6 support, issue#563
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
-    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10'
+    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.21'
     fullImplementation 'androidx.appcompat:appcompat:1.6.1'
     fullImplementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
@@ -190,19 +192,18 @@ dependencies {
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
     // LiveData
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
 
     implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation "androidx.room:room-runtime:$room_version"
     ksp "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
-    download "androidx.room:room-paging:$room_version"
     implementation "androidx.room:room-paging:$room_version"
 
     fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
-    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
+    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
+    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
 
     // Pagers Views
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
@@ -210,12 +211,13 @@ dependencies {
     implementation 'com.google.android.material:material:1.11.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.0.0'
 
-    fullImplementation 'com.squareup.okhttp3:okhttp:4.11.0'
-    fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.11.0'
+    fullImplementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.12.0'
 
     fullImplementation 'com.squareup.retrofit2:retrofit:2.9.0'
     fullImplementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
+    implementation 'com.squareup.okio:okio-jvm:3.6.0'
     // Glide
     fullImplementation('com.github.bumptech.glide:glide:4.16.0') {
         exclude group: 'glide-parent'
@@ -223,6 +225,7 @@ dependencies {
     fullImplementation('com.github.bumptech.glide:okhttp3-integration:4.16.0') {
         exclude group: 'glide-parent'
     }
+
     // Ref: https://stackoverflow.com/a/46638213
     kspFull 'com.github.bumptech.glide:compiler:4.15.1'
 
@@ -230,11 +233,11 @@ dependencies {
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
 
     // Koin core
-    download 'io.insert-koin:koin-core:3.2.0'
-    implementation 'io.insert-koin:koin-core:3.4.3'
+    download 'io.insert-koin:koin-core:3.5.0'
+    implementation 'io.insert-koin:koin-core:3.5.0'
     // Koin main (Scope, ViewModel ...)
-    download 'io.insert-koin:koin-android:3.2.0'
-    implementation 'io.insert-koin:koin-android:3.4.3'
+    download 'io.insert-koin:koin-android:3.5.0'
+    implementation 'io.insert-koin:koin-android:3.5.0'
 
     download 'hu.autsoft:krate:2.0.0'
     implementation 'hu.autsoft:krate:2.0.0'
@@ -267,8 +270,8 @@ dependencies {
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
 
-    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.7.6'
-    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.7.6'
+    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
+    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 

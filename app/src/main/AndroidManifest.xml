@@ -6,8 +6,10 @@
     android:versionName="v055c"> <!-- 34(v055c) -->
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <!-- https://developer.android.com/about/versions/13/behavior-changes-all#notification-permission -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -35,7 +37,8 @@
         android:largeHeap="true"
         android:memtagMode="off"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true">
+        android:supportsRtl="true"
+        tools:ignore="ForegroundServicePermission">
 
         <activity
             android:name=".ui.PrepareVpnActivity"
@@ -46,6 +49,7 @@
         <service
             android:name=".service.BraveVPNService"
             android:exported="true"
+            android:foregroundServiceType="systemExempted"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:stopWithTask="false">
             <intent-filter>

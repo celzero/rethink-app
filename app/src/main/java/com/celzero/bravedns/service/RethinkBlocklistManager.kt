@@ -244,7 +244,7 @@ object RethinkBlocklistManager : KoinComponent {
                     }
                 }
                 dbFileTagRemote.add(r)
-                // if (DEBUG) Log.d(LoggerConstants.LOG_TAG_DNS, "Remote file tag: $r")
+                // if (DEBUG) Log.d(Logger.LOG_TAG_DNS, "Remote file tag: $r")
                 Log.i(
                     Logger.LOG_TAG_DNS,
                     "Remote file tag: ${r.group}, ${r.pack}, ${r.simpleTagId}, ${r.level}, ${r.value}, ${r.entries}, ${r.isSelected}, ${r.show}, ${r.subg}, ${r.uname}, ${r.url}, ${r.vname}"

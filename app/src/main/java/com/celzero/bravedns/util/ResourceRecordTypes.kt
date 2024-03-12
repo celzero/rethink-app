@@ -123,8 +123,9 @@ enum class ResourceRecordTypes(val value: Int, val desc: String) {
         }
 
         fun getHandledTypes(): Set<String> {
-            val list =
-                entries.filter { it == A || it == AAAA || it == CNAME || it == HTTPS || it == SVCB }
+            val list = enumValues<ResourceRecordTypes>().filter {
+                it == A || it == AAAA || it == CNAME || it == HTTPS || it == SVCB
+            }
             return list.map { it.desc }.toSet()
         }
     }

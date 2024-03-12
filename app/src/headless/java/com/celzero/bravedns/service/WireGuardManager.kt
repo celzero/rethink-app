@@ -29,17 +29,53 @@ object WireguardManager : KoinComponent {
 
     const val INVALID_CONF_ID = -1
 
-    fun getActiveConfigs(): List<Config> {
-        return emptyList()
-    }
+    fun load() {}
 
     fun disableConfig(proxyId: String) {}
-
-    fun disableConfig(configFiles: WgConfigFiles) {}
 
     fun getSecWarpConfig(): Config? {
         return null
     }
+
+    fun getConfigById(id: Int): Config? {
+        return null
+    }
+
+    fun restoreProcessDeleteWireGuardEntries() {}
+
+    fun getEnabledConfigs(): List<Config> {
+        return emptyList()
+    }
+
+    fun getOneWireGuardProxyId(): Int? {
+        return null
+    }
+
+    fun oneWireGuardEnabled(): Boolean {
+        return false
+    }
+
+    fun catchAllEnabled(): Boolean {
+        return false
+    }
+
+    fun getCatchAllWireGuardProxyId(): Int? {
+        return null
+    }
+
+    fun canRouteIp(configId: Int?, ip: String?): Boolean {
+        return false
+    }
+
+    fun getConfigIdForApp(uid: Int): WgConfigFiles? {
+        return null
+    }
+
+    fun getActiveConfigs(): List<Config> {
+        return emptyList()
+    }
+
+    fun disableConfig(configFiles: WgConfigFiles) {}
 
     fun getActiveConfigIdForApp(uid: Int): Int {
         return INVALID_CONF_ID
@@ -48,10 +84,4 @@ object WireguardManager : KoinComponent {
     fun isConfigActive(configId: String): Boolean {
         return false
     }
-
-    fun getConfigById(id: Int): Config? {
-        return null
-    }
-
-    fun restoreProcessDeleteWireGuardEntries() {}
 }

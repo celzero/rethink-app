@@ -478,6 +478,10 @@ object Utilities {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
     }
 
+    fun isAtleastU(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+    }
+
     fun isFdroidFlavour(): Boolean {
         return BuildConfig.FLAVOR_releaseChannel == FLAVOR_FDROID
     }

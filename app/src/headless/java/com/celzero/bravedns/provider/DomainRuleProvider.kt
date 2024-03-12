@@ -27,7 +27,7 @@ import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -63,13 +63,13 @@ class DomainRuleProvider : ContentProvider() {
         sortOrder: String?
     ): Cursor {
         if (!isValidRequest(uri)) {
-            Log.e(LoggerConstants.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
+            Log.e(Logger.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("Invalid URI, cannot update without ID$uri")
         }
 
         if (DEBUG)
             Log.d(
-                LoggerConstants.LOG_PROVIDER,
+                Logger.LOG_PROVIDER,
                 "insert blocklists with uri: $uri, projection: $projection, selection: $selection, selectionArgs: $selectionArgs, sortOrder: $sortOrder"
             )
         return customDomainRepository.getRulesCursor()
@@ -87,14 +87,14 @@ class DomainRuleProvider : ContentProvider() {
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
         if (!isValidRequest(uri)) {
-            Log.e(LoggerConstants.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
+            Log.e(Logger.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("invalid uri, cannot update without ID$uri")
         }
         val customDomain = CustomDomain(values)
 
         if (DEBUG)
             Log.d(
-                LoggerConstants.LOG_PROVIDER,
+                Logger.LOG_PROVIDER,
                 "insert blocklists with uri: $uri, values: $values, obj: ${customDomain.domain}, ${customDomain.uid}, ${customDomain.status}"
             )
         val id = customDomainRepository.cpInsert(customDomain)
@@ -104,17 +104,17 @@ class DomainRuleProvider : ContentProvider() {
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
         if (!isValidRequest(uri)) {
-            Log.e(LoggerConstants.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
+            Log.e(Logger.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("Invalid URI, cannot update without ID$uri")
         }
 
         if (selection.isNullOrEmpty()) {
-            Log.e(LoggerConstants.LOG_PROVIDER, "invalid selection clause: $selection")
+            Log.e(Logger.LOG_PROVIDER, "invalid selection clause: $selection")
             throw java.lang.IllegalArgumentException("invalid selection clause: $selection")
         }
 
         Log.i(
-            LoggerConstants.LOG_PROVIDER,
+            Logger.LOG_PROVIDER,
             "request to delete app, parameters $uri, $selection, $selectionArgs"
         )
 
@@ -127,7 +127,7 @@ class DomainRuleProvider : ContentProvider() {
 
         if (domain.isNullOrEmpty()) {
             Log.e(
-                LoggerConstants.LOG_PROVIDER,
+                Logger.LOG_PROVIDER,
                 "required domain name on selection clause: $selection"
             )
             throw java.lang.IllegalArgumentException(
@@ -140,7 +140,7 @@ class DomainRuleProvider : ContentProvider() {
                 selectionArgs?.get(1)?.toInt()
             } else {
                 Log.e(
-                    LoggerConstants.LOG_PROVIDER,
+                    Logger.LOG_PROVIDER,
                     "required domain name on selection clause: $selection"
                 )
                 throw java.lang.IllegalArgumentException(
@@ -163,7 +163,7 @@ class DomainRuleProvider : ContentProvider() {
         selectionArgs: Array<out String>?
     ): Int {
         if (!isValidRequest(uri)) {
-            Log.e(LoggerConstants.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
+            Log.e(Logger.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("invalid uri, cannot update without ID$uri")
         }
 
@@ -173,14 +173,14 @@ class DomainRuleProvider : ContentProvider() {
         if (selectionClause.isNullOrEmpty()) {
             val count = customDomainRepository.cpUpdate(customDomain)
             context.contentResolver?.notifyChange(uri, null)
-            CoroutineScope(Dispatchers.IO).launch { DomainRulesManager.updateCache(customDomain) }
+            CoroutineScope(Dispatchers.IO).launch { DomainRulesManager.updateTrie(customDomain) }
             return count
         } else if (selectionClause.contains("uid") || selectionClause.contains("packageName")) {
             val c = selectionClause.count { it == '?' }
             // if the selection clause contains uid or packageName, then the selectionArgs should
             // contain the values for the same.
             if (c != (selectionArgs?.size ?: 0)) {
-                Log.e(LoggerConstants.LOG_PROVIDER, "invalid selection clause: $selectionClause")
+                Log.e(Logger.LOG_PROVIDER, "invalid selection clause: $selectionClause")
                 throw java.lang.IllegalArgumentException(
                     "invalid selection clause: $selectionClause"
                 )
@@ -192,15 +192,15 @@ class DomainRuleProvider : ContentProvider() {
             }
             if (DEBUG)
                 Log.d(
-                    LoggerConstants.LOG_PROVIDER,
+                    Logger.LOG_PROVIDER,
                     "selection ${customDomain.domain}, ${customDomain.uid}, ${customDomain.status} clause: $clause"
                 )
             val count = customDomainRepository.cpUpdate(customDomain, clause)
-            CoroutineScope(Dispatchers.IO).launch { DomainRulesManager.updateCache(customDomain) }
+            CoroutineScope(Dispatchers.IO).launch { DomainRulesManager.updateTrie(customDomain) }
             context.contentResolver?.notifyChange(uri, null)
             return count
         } else {
-            Log.e(LoggerConstants.LOG_PROVIDER, "invalid selection clause: $selectionClause")
+            Log.e(Logger.LOG_PROVIDER, "invalid selection clause: $selectionClause")
             throw java.lang.IllegalArgumentException("invalid selection clause: $selectionClause")
         }
     }
@@ -209,7 +209,7 @@ class DomainRuleProvider : ContentProvider() {
         // check the calling package
         if (callingPackage != RESOLVER_PACKAGE_NAME) {
             Log.e(
-                LoggerConstants.LOG_PROVIDER,
+                Logger.LOG_PROVIDER,
                 "request received from unknown package: $callingPackage"
             )
             return false

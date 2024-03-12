@@ -25,6 +25,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.DataUsageSummary
 import com.celzero.bravedns.databinding.FragmentSummaryStatisticsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
@@ -49,13 +50,6 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     private val persistentState by inject<PersistentState>()
 
     private var isVpnActive: Boolean = false
-
-    data class DataUsage(
-        val totalDownload: Long,
-        val totalUpload: Long,
-        val connectionsCount: Int,
-        val meteredDataUsage: Long
-    )
 
     enum class SummaryStatisticsType(val tid: Int) {
         MOST_CONNECTED_APPS(0),
@@ -133,7 +127,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
     }
 
-    private fun setTotalUsagesUi(dataUsage: DataUsage) {
+    private fun setTotalUsagesUi(dataUsage: DataUsageSummary) {
         val unmeteredUsage = (dataUsage.totalDownload + dataUsage.totalUpload)
         val totalUsage = unmeteredUsage + dataUsage.meteredDataUsage
 
