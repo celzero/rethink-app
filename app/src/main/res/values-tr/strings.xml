@@ -8,10 +8,7 @@
     <string name="settings_title_desc" translatable="true">Son derece özelleştirilebilir bir DNS ve Güvenlik Duvarı</string>
     <string name="about_title_desc" translatable="true">Ağ güvenliği tehditlerini tespit edin ve engelleyin</string>
     <string name="txt_home" translatable="true">Ana Sayfa</string>
-    <string name="accessibility_service_description" translatable="true">
-          Rethink, arka plan uygulamalarını algılamak ve güvenlik duvarı oluşturmak için erişilebilirlik hizmetini kullanır.
-          Rethink herhangi bir bilgi toplamaz veya satmaz.
-      </string>
+    <string name="accessibility_service_description" translatable="true">Rethink, arka plan uygulamalarını algılamak ve güvenlik duvarı oluşturmak için erişilebilirlik hizmetini kullanır. Rethink herhangi bir bilgi toplamaz veya satmaz.</string>
     <string name="next" translatable="true">Sonraki</string>
     <string name="skip" translatable="true">Atla</string>
     <string name="finish" translatable="true">Bitir</string>
@@ -127,38 +124,22 @@
       <item>Evrensel Bypass</item>
       <item>Hariç tut</item>
     </string-array>
-    <string name="allow" translatable="true">izin vermek</string>
-    <string name="block" translatable="true">blok</string>
-    <string name="bypass_universal" translatable="true">bypass universal</string>
-    <string name="exclude" translatable="true">ekarte etmek</string>
-    <string name="isolate" translatable="true">yal? tmak</string>
-    <string name="untracked" translatable="true">izlenmeyen</string>
+    <string name="allow" translatable="true">izin ver</string>
+    <string name="block" translatable="true">blokla</string>
+    <string name="bypass_universal" translatable="true">baypass et</string>
+    <string name="exclude" translatable="true">hariç tut</string>
+    <string name="isolate" translatable="true">izole et</string>
+    <string name="untracked" translatable="true">izlenmemiş</string>
     <string name="bypass_dns_firewall" translatable="true">dns ve güvenlik duvarını atla</string>
-    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">
-        Uyarı: Yeniden düşünme devre dışı bırakıldı
-      </string>
-    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">
-        Koruma ayarını değiştirmek için dokunun
-      </string>
-    <string name="dns_mode_notification_title" translatable="true">
-            Korunuyor! Hızlı ve Güvenli DNS'ye bağlandı.
-      </string>
-    <string name="firewall_mode_notification_title" translatable="true">
-            Korunuyor! Güvenlik Duvarı'na bağlandı.
-      </string>
-    <string name="hybrid_mode_notification_title" translatable="true">
-            Korunuyor! DNS + Güvenlik Duvarı'na bağlandı.
-      </string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Uyarı: Yeniden düşünme devre dışı bırakıldı</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Koruma ayarını değiştirmek için dokunun</string>
+    <string name="dns_mode_notification_title" translatable="true">Korunuyor! Hızlı ve Güvenli DNS'ye bağlandı.</string>
+    <string name="firewall_mode_notification_title" translatable="true">Korunuyor! Güvenlik Duvarı'na bağlandı.</string>
+    <string name="hybrid_mode_notification_title" translatable="true">Korunuyor! DNS + Güvenlik Duvarı'na bağlandı.</string>
     <string name="pause_mode_notification_title" translatable="true">Duraklatıldı! Engellenen uygulamalar güvenlik duvarı oluşturmaya devam edecek.</string>
-    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">
-        bekleniyor
-      </string>
-    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">
-        başarısız
-      </string>
-    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">
-        korumalı
-      </string>
+    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">bekleniyor</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">başarısız</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">korumalı</string>
     <string name="failed_using_default" translatable="true">Başarısız: yedek DNS kullanılıyor</string>
     <string name="status_app_error" translatable="true">uygulama hatası</string>
     <string name="status_dns_error" translatable="true">dns hatası</string>
@@ -175,19 +156,12 @@
     <string name="status_protected_with_proxy" translatable="true">proxy ile korunuyor</string>
     <string name="status_protected_with_wg" translatable="true">kablo koruyucusu ile korunur</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">kablo koruyucusu ve özel dns ile korunmaktadır</string>
-    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">
-        özel dns etkin
-        </string>
-    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">
-        korunmuyor
-        </string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">özel dns etkin</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">korunmuyor</string>
     <string name="dns_explanation_dns_connected" translatable="true">RethinkDNS'ye bağlandı</string>
     <string name="dns_explanation_firewall_connected" translatable="true">Güvenlik Duvarı'na bağlandı</string>
-    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">
-            RethinkDNS ve Güvenlik Duvarı'na bağlandı
-        </string>
-    <string name="universal_firewall_explanation" translatable="true">Cihaz kilitlendiğinde veya belirli bir uygulama kullanılmadığında güvenlik duvarı gibi cihaz olaylarına dayalı olarak tüm uygulamalara güvenlik duvarı kuralları uygulayın.
-        </string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">RethinkDNS ve Güvenlik Duvarı'na bağlandı</string>
+    <string name="universal_firewall_explanation" translatable="true">Cihaz kilitlendiğinde veya belirli bir uygulama kullanılmadığında güvenlik duvarı gibi cihaz olaylarına dayalı olarak tüm uygulamalara güvenlik duvarı kuralları uygulayın.</string>
     <string name="notification_action_resume_vpn" translatable="true">DEVAM ET</string>
     <string name="notification_action_pause_vpn" translatable="true">DURAKLAT</string>
     <string name="notification_action_stop_vpn" translatable="true">DURDUR</string>
@@ -202,13 +176,11 @@
     <string name="dns_mode_info_explanation_new" translatable="true">DNS isteklerini izleyin, engelleyin ve şifreleyin.</string>
     <string name="dns_firewall_mode_info_explanation_new" translatable="true">Yukarıdakilerin tümü + İnternet sansürünü atlamak.</string>
     <string name="alert_permission_accessibility" translatable="true">İzin - Erişilebilirlik</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Yeniden Düşünme, hangi uygulamaların kullanımda (ön plan) olduğunu ve hangi uygulamaların kullanımda (arka plan) olmadığını izlemek için erişilebilirlik hizmetini kullanır.\n\ nYeniden Düşünme, herhangi bir şekilde herhangi bir bilgi toplamaz veya sizi gözetlemez.</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Erişilebilirlik hizmetinin durduğunu veya çöktüğünü yeniden düşünün.
-      <i>
-        <b>Ayarlara Git ve Durdurmaya Zorla</b>
-      </i> Kullanmak için yeniden düşünün ve yeniden başlatın
-      <i>Kullanılmayan herhangi bir uygulamayı engelleyin</i> özellik.\n\ nDüşün, hangi uygulamaların kullanımda (ön plan) olduğunu ve hangi uygulamaların kullanılmadığını (arka plan) izlemek için erişilebilirlik hizmetini kullanır.
-    </string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">RethinkDNS, hangi uygulamaların kullanımda (ön plan) olduğunu ve hangi uygulamaların kullanımda (arka plan) olmadığını izlemek için erişilebilirlik hizmetini kullanır.\n\ nRethinkDNS, herhangi bir şekilde herhangi bir bilgi toplamaz veya sizi gözetlemez.</string>
+    <string name="alert_permission_accessibility" translatable="true">İzin - Erişilebilirlik</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink, hangi uygulamaların kullanımda olduğunu (ön plan) ve hangi uygulamaların kullanımda olmadığını (arka planda) izlemek için erişilebilirlik hizmetini kullanır.\n\nRethink herhangi bir bilgi toplamaz veya herhangi bir şekilde sizi gözetlemek.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Erişilebilirlik hizmetinin durdurulduğunu veya kilitlendiğini yeniden düşünün. <i><b>Ayarlara Git ve Durdurmaya Zorla</b></i> <i>Kullanılmayan uygulamaları engelle</i> özelliğini kullanmak için yeniden düşünün ve yeniden başlatın.\n\nRethink, izleme için erişilebilirlik hizmetini kullanır hangi uygulamaların kullanımda olduğu (ön planda) ve hangilerinin kullanımda olmadığı (arka planda).</string>
+    <string name="alert_firewall_accessibility_ Exception" translatable="true">Erişilebilirlik Ayarları açılırken hata oluştu. Daha sonra tekrar deneyin!</string>
     <string name="alert_firewall_accessibility_exception" translatable="true">Erişilebilirlik Ayarları açılamadı. Daha sonra tekrar deneyin!</string>
     <string name="brave_dns_connect_mode_change_firewall" translatable="true">Mod'u seçin.</string>
     <string name="brave_dns_connect_mode_change_dns" translatable="true">Mod'u seçin.</string>
@@ -226,23 +198,13 @@
     <string name="bsct_conn_block_desc_device" translatable="true">cihazda %1$s engellendi</string>
     <string name="bsct_conn_desc_allowed" translatable="true">%1$s %2$s tarihinde izin verildi</string>
     <string name="bsct_conn_desc_blocked" translatable="true">%1$s %2$s tarihinde engellendi</string>
-    <string name="bsct_conn_rule_explanation" translatable="true">
-          &lt;u>#1&lt;/u>: Bir uygulamanın İnternet'e bağlanmasını engeller.
-          \n &lt;u>#2&lt;/u>: Herhangi bir uygulamanın belirli bir IP'ye bağlanmasını engeller.
-          \n &lt;u>#3&lt;/u>: Cihaz kilitlendiğinde tüm bağlantıları engeller (Evrensel Güvenlik Duvarı).
-          \n &lt;u>#4&lt;/u>: Kullanılmayan tüm uygulamaları engeller (Evrensel Güvenlik Duvarı).
-          \n &lt;u>#5&lt;/u>: Kaynak uygulama bilinmediğinde bağlantıları engeller (Evrensel Güvenlik Duvarı).
-          \n &lt;u>#6&lt;/u>: DNS (Evrensel Güvenlik Duvarı) hariç tüm UDP trafiğini engeller.
-          \n &lt;u>#7&lt;/u>: DNS atlandığında bağlantıları engelle (Evrensel Güvenlik Duvarı).
-          </string>
+    <string name="bsct_conn_rule_explanation" translatable="true">&lt;u>#1&lt;/u>: Bir uygulamanın İnternet'e bağlanmasını engeller.\n &lt;u>#2&lt;/u>: Herhangi bir uygulamanın belirli bir IP'ye bağlanmasını engeller.\n &lt;u>#3&lt;/u>: Cihaz kilitlendiğinde tüm bağlantıları engeller (Evrensel Güvenlik Duvarı).\n &lt;u>#4&lt;/u>: Kullanılmayan tüm uygulamaları engeller (Evrensel Güvenlik Duvarı).\n &lt;u>#5&lt;/u>: Kaynak uygulama bilinmediğinde bağlantıları engeller (Evrensel Güvenlik Duvarı).\n &lt;u>#6&lt;/u>: DNS (Evrensel Güvenlik Duvarı) hariç tüm UDP trafiğini engeller.\n &lt;u>#7&lt;/u>: DNS atlandığında bağlantıları engelle (Evrensel Güvenlik Duvarı).</string>
     <string name="always_on_dialog_heading" translatable="true">Her Zaman Açık VPN'i Devre Dışı Bırak</string>
     <string name="always_on_dialog" translatable="true">Bu cihazda \" Always - On VPN \" etkin. Yeniden Düşünmeyi başlatmak için lütfen Ayarlar uygulamasına gidin ve \" Her zaman açık VPN \"i devre dışı bırakın.</string>
     <string name="always_on_dialog_positive_btn" translatable="true">Ayarlara Git</string>
     <string name="always_on_dialog_stop_heading" translatable="true">Her zaman açık VPN</string>
     <string name="always_on_dialog_stop_message" translatable="true">Yeniden Düşünmek için her zaman açık VPN etkinleştirilmiştir. Yine de Yeniden Düşünmeyi durdurmak istediğinizden emin misiniz?</string>
-    <string name="always_on_dialog_lockdown_stop_message" translatable="true">VPN'i şurada yeniden düşünün:
-      <i>Tecrit</i> mode. Durdurulması, bu kullanıcı profilinde İnternet bağlantısının kaybına neden olacaktır. Yine de devam etmek istiyor musunuz?
-    </string>
+    <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink, VPN'yi <i>Kilitleme</i> modunda çalıştırıyor. Bunu durdurmak, bu kullanıcı profilinde İnternet bağlantısının kesilmesine neden olur. Yine de devam etmek istiyor musunuz?</string>
     <string name="always_on_dialog_positive" translatable="true">Durdur</string>
     <string name="always_on_dialog_neutral" translatable="true">Ayarlar</string>
     <string name="private_dns_dialog_heading" translatable="true">Özel DNS'yi kapat</string>
@@ -273,17 +235,9 @@
     <string name="local_blocklist_redownload_desc" translatable="true">Cihazdaki engel listeleri zaten en son v%1$s sürümünde.</string>
     <string name="blocklist_update_check_failure" translatable="true">Bir hata oluştu. Daha sonra tekrar deneyin!</string>
     <string name="blocklist_update_check_not_required" translatable="true">Engel listeleri zaten en son sürümde.</string>
-    <string name="refresh_complete" translatable="true">
-      <!-- use dc_refresh_toast --> Uygulama listesi yeniden senkronizasyonu tamamlandı.
-    </string>
-    <string name="show_logs_disabled_network_message" translatable="true">Bağlantı günlüğü devre dışı bırakıldı. Yeniden etkinleştirmek için, goto
-      <i>Ayarlar</i> ve açın
-      <i>Cihaz üzerinde günlüğe kaydetmeyi etkinleştirin.</i>
-    </string>
-    <string name="show_logs_disabled_dns_message" translatable="true">DNS istek kaydı devre dışı bırakıldı. Yeniden etkinleştirmek için, goto
-      <i>Ayarlar</i> ve açın
-      <i>Cihaz üzerinde günlüğe kaydetmeyi etkinleştirin.</i>
-    </string>
+    <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast --> Uygulama listesi yeniden senkronizasyonu tamamlandı.</string>
+    <string name="show_logs_disabled_network_message" translatable="true">Bağlantı günlüğü devre dışı bırakıldı. Yeniden etkinleştirmek için <i>Ayarlar</i>'a gidin ve <i>Cihazdaki günlük kaydını etkinleştir</i></string> seçeneğini açın.
+    <string name="show_logs_disabled_dns_message" translatable="true">DNS istek günlüğü devre dışı bırakıldı. Yeniden etkinleştirmek için <i>Ayarlar</i>'a gidin ve <i>Cihazdaki günlük kaydını etkinleştir</i></string> seçeneğini açın.
     <string name="configure_dns_connected_doh_status" translatable="true">Https üzerinden DNS</string>
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
     <string name="configure_dns_connected_dns_proxy_status" translatable="true">DNS Proxy</string>
@@ -300,24 +254,12 @@
     <string name="download_update_dialog_failure_message" translatable="true">Sunucularımız kapalı veya bağlantı kurulamadı. Lütfen bir süre sonra tekrar deneyin.</string>
     <string name="download_update_dialog_trylater_title" translatable="true">Şu anda güncellenemiyor</string>
     <string name="download_update_dialog_trylater_message" translatable="true">Güncelleme şu anda yürütülemiyor, lütfen daha sonra tekrar deneyin.</string>
-    <string name="search_firewall_network_log" translatable="true">
-      <font size="12">Uygulamaları, IP'leri, alan adlarını arayın</font>
-    </string>
-    <string name="search_firewall_all_apps" translatable="true">
-      <font size="12">Uygulamaları kullanıcı kimliği, ada göre ara</font>
-    </string>
-    <string name="search_dns_logs" translatable="true">
-      <font size="12">Alan adlarını veya IP'leri arayın</font>
-    </string>
-    <string name="search_universal_ips" translatable="true">
-      <font size="12">IP'lerde ara</font>
-    </string>
-    <string name="search_custom_domains" translatable="true">
-      <font size="12">Alan adlarını ara</font>
-    </string>
-    <string name="search_rethinkplus_file_tag" translatable="true">
-      <font size="12">Engel listelerinde ara</font>
-    </string>
+    <string name="search_firewall_network_log" translatable="true"><font size="12">Uygulamaları, IP'leri, alan adlarını arayın</font></string>
+    <string name="search_firewall_all_apps" translatable="true"><font size="12">Uygulamaları kullanıcı kimliği, ada göre ara</font></string>
+    <string name="search_dns_logs" translatable="true"><font size="12">Alan adlarını veya IP'leri arayın</font></string>
+    <string name="search_universal_ips" translatable="true"><font size="12">IP'lerde ara</font></string>
+    <string name="search_custom_domains" translatable="true"><font size="12">Alan adlarını ara</font></string>
+    <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Engel listelerinde ara</font></string>
     <string name="search_proxy_add_apps" translatable="true">Uygulamaları ada göre ara</string>
     <string name="app_mode_dns_low_battery" translatable="true">DNS (pil tasarrufu)</string>
     <string name="app_mode_dns" translatable="true">DNS</string>
@@ -332,9 +274,7 @@
     <string name="settings_enable_logs_desc" translatable="true">DNS ve Güvenlik Duvarı günlüklerini yerel olarak cihazda saklayın.</string>
     <string name="settings_enable_logs" translatable="true">Cihazda günlüğe kaydetmeyi etkinleştir</string>
     <string name="app_mode_choose" translatable="true">Mod seç</string>
-    <string name="whats_new_version_update" translatable="true">
-      <![CDATA[<b>Chirayu Desai</b><br><br> 1. <i>Yeni özellik</i>: <i>Oblivious DNS - over -</i> https anonimleştirme desteği.<br> 2. <i>Yeni özellik</i>: <i>DNS - over - TLS</i> desteği.<br> 3. <i>Yeni özellik</i>: Basit ve Gelişmiş WireGuard modları.<br> 4. <i>Yeni özellik</i>: İstatistikler ekranında bant genişliğini gösterin.<br> 5. <i>Yeni özellik</i>: <i>VPN Kilitleme</i> modunda bile Orbot dahil tüm proxy'leri destekleyin.<br> 6. <i>Yeni özellik</i>: Rethink'i kullanarak Rethink'in ağ trafiğini izleyin!<br> 7. <i>Yeni özellik</i>: DNS'yi WireGuard gibi etkin proxy'ler üzerinden iletin.<br> 8. <i>Yeni özellik</i>: Cihazlar arasında aynı sürüm yedekleme ve geri yükleme.<br> 9. Geliştirilmiş <i>hata raporu</i> oluşturma.<br> 10. Çift yığın IP ağlarının daha iyi kullanımı.<br> 11. <i>Hata düzeltme</i>: Çok noktaya yayın DNS işleminde küçük hata düzeltmeleri.<br> 12. <i>Hata giderme</i>: WireGuard VPN'leri için otomatik kurtarma bağlantısı.<br> 13. <i>Hata düzeltme</i>: Yanlış engellenen uygulama bildirimlerini düzeltin.<br><br> <a href="https://svc.rethinkdns.com/r/translate">Bu uygulamanın çevrilmesine yardımcı olun</a>]]>
-    </string>
+    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Chirayu Desai</b><br><br> 1. <i>Yeni özellik</i>: <i>Oblivious DNS - over -</i> https anonimleştirme desteği.<br> 2. <i>Yeni özellik</i>: <i>DNS - over - TLS</i> desteği.<br> 3. <i>Yeni özellik</i>: Basit ve Gelişmiş WireGuard modları.<br> 4. <i>Yeni özellik</i>: İstatistikler ekranında bant genişliğini gösterin.<br> 5. <i>Yeni özellik</i>: <i>VPN Kilitleme</i> modunda bile Orbot dahil tüm proxy'leri destekleyin.<br> 6. <i>Yeni özellik</i>: Rethink'i kullanarak Rethink'in ağ trafiğini izleyin!<br> 7. <i>Yeni özellik</i>: DNS'yi WireGuard gibi etkin proxy'ler üzerinden iletin.<br> 8. <i>Yeni özellik</i>: Cihazlar arasında aynı sürüm yedekleme ve geri yükleme.<br> 9. Geliştirilmiş <i>hata raporu</i> oluşturma.<br> 10. Çift yığın IP ağlarının daha iyi kullanımı.<br> 11. <i>Hata düzeltme</i>: Çok noktaya yayın DNS işleminde küçük hata düzeltmeleri.<br> 12. <i>Hata giderme</i>: WireGuard VPN'leri için otomatik kurtarma bağlantısı.<br> 13. <i>Hata düzeltme</i>: Yanlış engellenen uygulama bildirimlerini düzeltin.<br><br> <a href="https://svc.rethinkdns.com/r/translate">Bu uygulamanın çevrilmesine yardımcı olun</a>]]></string>
     <string name="connection_http3" translatable="true">HTTP3</string>
     <string name="relative_time_today" translatable="true">Bugün</string>
     <string name="relative_time_yesterday" translatable="true">Dün</string>
@@ -347,9 +287,7 @@
     <string name="settings_allow_lan_desc" translatable="true">Rethink \' in VPN tünelinden lan, loopback, multicast, link - local rotalarını hariç tutun.</string>
     <string name="settings_allow_bypass_heading" translatable="true">Ağ görünürlüğünü etkinleştir</string>
     <string name="settings_allow_bypass_desc" translatable="true">Talepte bulunan uygulamaların mevcut tüm ağlara erişmesine izin verin. Bu uygulamalar, talep üzerine Rethink \'in VPN tünelini atlayabilir. Zoom ve Meet gibi bazı sesli/görüntülü konferans uygulamalarının düzgün çalışması gerekebilir.</string>
-    <string name="settings_lock_down_mode_desc" translatable="true">VPN tecrit modundayken bazı seçenekler devre dışı bırakılır.
-      <u>VPN ayarlarına göz atın</u>.
-    </string>
+    <string name="settings_lock_down_mode_desc" translatable="true">VPN tecrit modundayken bazı seçenekler devre dışı bırakılır.<u>VPN ayarlarına göz atın</u>.</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">VPN yalnızca DNS modunda çalışırken proxy'ler kurulamaz.</string>
     <string name="settings_proxy_header" translatable="true">vekil sunucu</string>
     <string name="settings_socks5_heading" translatable="true">SOCKS5 Proxy Kurulumu</string>
@@ -380,11 +318,7 @@
     <string name="orbot_stop_dialog_negative" translatable="true">Orbot'u durdur</string>
     <string name="orbot_stop_dialog_neutral" translatable="true">DNS'yi değiştir</string>
     <string name="orbot_title" translatable="true">Orbot ve Proxy'ler</string>
-    <string name="orbot_explanation" translatable = "true">
-              Orbot, diğer uygulamaların İnternet'i daha &lt;u>güvenli&lt;/u> kullanmasını sağlayan ücretsiz bir proxy uygulamasıdır.
-              \nOrbot, İnternet trafiğinizi şifrelemek için &lt;u>Tor&lt;/u>'u kullanır; bu da &lt;u>sansürü atlamanıza&lt;/u> ve kişisel özgürlüğünüzü tehdit eden &lt;u>ağ gözetleme&lt;/u> biçimlerine karşı savunmanıza yardımcı olur. mahremiyet.
-              \n&lt;u>TCP Proxy&lt;/u>: Rethink, yalnızca &lt;i>dahil edilen&lt;/i> uygulamaların TCP bağlantılarını Orbot'a iletir.
-          \n&lt;u>HTTP Proxy&lt;/u>: Orbot'a HTTP CONNECT tünelini yeniden &lt;i>kurar&lt;/i> ve yalnızca &lt;i>dahil&lt;/i> uygulamaların TCP bağlantılarını iletir.</string>
+    <string name="orbot_explanation" translatable="true">Orbot, diğer uygulamaların İnternet'i daha &lt;u>güvenli&lt;/u> bir şekilde kullanmasını sağlayan ücretsiz bir proxy uygulamasıdır. \Orbot, İnternet trafiğinizi şifrelemek için &lt;u>Tor&lt;/u> kullanır, bu da &lt;u>sansürü&lt;/u> atlamanıza ve kişisel özgürlüğü ve gizliliği tehdit eden &lt;u>ağ gözetimi&lt;/u> biçimlerine karşı savunma yapmanıza yardımcı olur.\n&lt;u>TCP Proxy&lt;/u>: Rethink yalnızca &lt;i>dahil&lt;/i> uygulamaların TCP bağlantılarını Orbot'a iletir.\n&lt;u>HTTP Proxy&lt;/u>: Rethink &lt;i>Orbot'a HTTP CONNECT tüneli kurar&lt;/i> ve yalnızca &lt;i>dahil&lt;/i> uygulamalarının TCP bağlantılarını iletir.</string>
     <string name="orbot_install_dialog_title" translatable="true">Orbot kurulsun mu?</string>
     <string name="orbot_install_dialog_message" translatable="true">Orbot, Tor'un özelliklerini ve işlevselliğini Android'e getiriyor.</string>
     <string name="orbot_install_dialog_positive" translatable="true">Yükle</string>
@@ -408,15 +342,11 @@
     <string name="settings_autostart_bootup_heading" translatable="true">Açılışta otomatik başlatma (deneysel)</string>
     <string name="settings_autostart_bootup_desc" translatable="true">Cihaz açıldığında, kapatılmadan önce çalışıp çalışmadığını yeniden düşünün.</string>
     <string name="settings_network_all_networks" translatable="true">Mevcut tüm ağları kullan (deneysel)</string>
-    <string name="settings_network_all_networks_desc" translatable="true">Etkinleştirildiğinde, Rethink internete bağlanmak için mevcut tüm ağları kullanır. Değilse, kabul edilen ağı kullanır
-      <i>aktif</i> by Android.
-    </string>
+    <string name="settings_network_all_networks_desc" translatable="true">Etkinleştirildiğinde, Rethink internete bağlanmak için mevcut tüm ağları kullanır. Değilse, kabul edilen ağı kullanır<i>aktif</i> by Android.</string>
     <string name="settings_check_update_heading" translatable="true">Uygulama güncellemelerini kontrol edin</string>
     <string name="settings_check_update_desc" translatable="true">Uygulama güncellemelerini haftada bir kez otomatik olarak kontrol edin.</string>
     <string name="settings_custom_downloader_heading" translatable="true">Uygulama içi indiriciyi kullanın</string>
-    <string name="settings_custom_downloader_desc" translatable="true">Devre dışı bırakılırsa, Android yerleşiktir
-      <i>İndirme Yöneticisi</i> kullanılır
-    </string>
+    <string name="settings_custom_downloader_desc" translatable="true">Devre dışı bırakılırsa, Android yerleşiktir<i>İndirme Yöneticisi</i> kullanılır</string>
     <string name="settings_import_export_heading" translatable="true">Yedekleme ve Geri Yükleme</string>
     <string name="settings_import_export_desc" translatable="true">Uygulama verilerini ve ayarlarını manuel olarak yedekleyin veya geri yükleyin.</string>
     <string name="settings_app_notification_a13_heading" translatable="true">Uygulama Bildirimi</string>
@@ -431,9 +361,7 @@
     <string name="settings_rinr_desc_disabled" translatable="true">Engel listesi indirmeleri, bağlantı kontrolleri, DNS bağlantıları gibi kendi trafiğini yeniden tünele yönlendirin.</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Routing Rethink \'in tünelden kendi trafiğini yönlendirmesi. Ne yaptığınızı bilmiyorsanız kapatın.</string>
     <string name="settings_rinr_dialog_title" translatable="true">Geri döngü (deneysel)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Ayrıca etkinleştirir
-      <!--settings_network_all_networks--> %1$s ayarı. Devam etmek istiyor musunuz?
-    </string>
+    <string name="settings_rinr_dialog_desc" translatable="true">Ayrıca etkinleştirir<!--settings_network_all_networks--> %1$s ayarı. Devam etmek istiyor musunuz?</string>
     <string name="settings_gologger_dialog_option_1" translatable="false">Ayrıntılı</string>
     <string name="settings_gologger_dialog_option_2" translatable="false">Hata ayıklama</string>
     <string name="settings_gologger_dialog_option_3" translatable="false">Bilgi (varsayılan)</string>
@@ -564,16 +492,11 @@
     <string name="dc_local_block_desc_1" translatable="true">195 'ten fazla engel listesi arasından seçim yapın. Engel listelerini indirmek veya yapılandırmak için buraya tıklayın.</string>
     <string name="dc_custom_block_heading" translatable="true">Alan kuralları</string>
     <string name="dc_dns_website_heading" translatable="true">DNS günlüklerinde web sitesi simgesini göster (deneysel)</string>
-    <string name="dc_dns_website_desc" translatable="true">Şuradan web sitesi simgelerini getirir:
-      <i>nextdns.io</i> ve
-      <i>duckduckgo.com</i>. Disk alanında 350 mb'a kadar tüketir
-    </string>
+    <string name="dc_dns_website_desc" translatable="true">Şuradan web sitesi simgelerini getirir:<i>nextdns.io</i> ve<i>duckduckgo.com</i>. Disk alanında 350 mb'a kadar tüketir</string>
     <string name="dc_dns_leaks_heading" translatable="true">DNS sızıntılarını önleyin</string>
     <string name="dc_dns_leaks_desc" translatable="true">Etkinleştirildiğinde, Rethink 53 numaralı bağlantı noktasındaki tüm paketleri yakalar ve kullanıcı tarafından ayarlanan bir DNS uç noktasına iletir</string>
     <string name="dc_check_update_heading" translatable="true">Engel listesi güncellemelerini sor</string>
-    <string name="dc_check_update_desc" translatable="true">Engel listesi güncellemelerini her seferinde bir kez kontrol edin
-      <i>üç</i> gün
-    </string>
+    <string name="dc_check_update_desc" translatable="true">Engel listesi güncellemelerini her seferinde bir kez kontrol edin<i>üç</i>gün</string>
     <!-- About fragment -->
     <string name="about_bravedns_explantion" translatable="true">Android cihazınızda uygulama etkinliğini izlemenin, İnternet sansürünü ve güvenlik duvarı uygulamalarını aşmanın en kolay yolu yeniden düşünmektir. </string>
     <string name="about_bravedns_whoarewe" translatable="true">Rethink, Amazon, IBM ve Scientific Games'ten eski mühendisler tarafından yönetilen ücretsiz ve açık kaynaklı bir projedir.</string>
@@ -638,9 +561,7 @@
     <string name="collecting_logs_progress_text" translatable="true">Yakalanıyor…</string>
     <string name="logs_disclaimer" translatable="true">İlk 20.000 karakter gösteriliyor</string>
     <string name="contributors_dialog_title" translatable="true">Yazarlar</string>
-    <string name="contributors_list" translatable="true">
-      <![CDATA[<i>Rethink Açık Kaynak Projesi</i>, varlığını gelişimine sayısız saat ayıran bu gönüllülere borçludur.<br> <br>🛡️ Android uygulaması <br> <a href="https://github.com/BayLee4"></a>BayLee4<br> <a href="https://github.com/Ch4t4r"></a>Ch4t4r HrBDev<br> <a href="https://github.com/HrBDev"></a>hussainmohd<br> <a href="https://github.com/hussainmohd-a"></a>-<br> <a href="https://github.com/ignoramous"></a>a<br> <a href="https://github.com/markwmuller"></a>ignoramous<br> <a href="https://github.com/Mygod"></a>markwmuller<br> <a href="https://github.com/Uldiniad"></a>Mygod<br> <a href="https://github.com/Poussinou"></a>Uldiniad<br> <a href="https://github.com/pjosingh"></a>Poussinou pjosingh<br> <br>🚂 Network engine <br> <a href="https://github.com/alalamav"></a>alalamav<br> <a href="https://github.com/bemasc"></a>bemasc<br> <a href="https://github.com/dmcardle"></a>dmcardle<br> <a href="https://github.com/fortuna">fortuna</a><br> <a href="https://github.com/ignoramous"></a>ignoramous<br> <a href="https://github.com/PeterDaveHello"></a>PeterDaveHello santhosh<br> <a href="https://github.com/santhosh-ponnusamy"></a>-<br> <a href="https://github.com/SeanBurford"></a>ponnusamy SeanBurford<br> <br>📚 <br> <a href="https://github.com/ahmed-tasaly"></a>Resolver<br> <a href="https://github.com/amithm7"></a>ahmed<br> <a href="https://github.com/arfshl"></a>-<br> <a href="https://github.com/badmojr"></a>tasaly<br> <a href="https://github.com/bongochong"></a>amithm7 arfshl<br> <a href="https://github.com/elliotwutingfeng"></a>badmojr<br> <a href="https://github.com/georgyo"></a>bongochong<br> <a href="https://github.com/GiddyGoatGaming"></a>elliotwutingfeng<br> <a href="https://github.com/Harish-Narayan"></a>georgyo<br> <a href="https://github.com/ignoramous"></a>GiddyGoatGaming<br> <a href="https://github.com/JakeChampion"></a>Harish<br> <a href="https://github.com/MasterKia"></a>-<br> <a href="https://github.com/mtxadmin"></a>Narayan ignoramous<br> <a href="https://github.com/neneeen"></a>JakeChampion<br> <a href="https://github.com/PeterDaveHello"></a>MasterKia<br> <a href="https://github.com/santhosh-ponnusamy"></a>mtxadmin<br> <a href="https://github.com/shruuub"></a>neneeen<br> <a href="https://github.com/shuvashish76"></a>PeterDaveHello santhosh - <br> <br><br>ponnusamy shruuub shashish76<a href="https://t.me/amithm7"> </a>⚜ <br> <a href="https://t.me/TronSlayer"></a>Community<br> <a href="https://t.me/ppatra"></a>mods<br> <a href="https://t.me/InFamous23"></a>amithm7<br> <a href="https://t.me/TheTr1ckst3r"> </a><br> <a href="https://t.me/Ch4t4r">Andersen</a><br> <a href="https://t.me/Billi_ance"></a>ppatra InFamous23 TheTr1ckst3r Ch4t4r<br> <a href="https://t.me/kaliangel"></a>Billi_ance<br> <a href="https://github.com/PoneyClairDeLune"></a>kaliangel<br> <br>📌 PoneyClairDeLune Geo-IP <br> <a href="https://db-ip.com">db-ip.com</a><br> <br>❇ Translations <br> <a href="https://weblate.org/en/">Weblate</a><br> <br>🦆 <br> <a href="https://github.com/celzero/rethink-app/issues/346">Icons Icons</a><br> <br>📦 Build servers <br> <a href="https://jitpack.io/">JitPack</a><br> <a href="https://github.com/">GitHub</a><br> ]]>
-    </string>
+    <string name="contributors_list" translatable="true"><![CDATA[<i>Rethink Açık Kaynak Projesi</i>, varlığını gelişimine sayısız saat ayıran bu gönüllülere borçludur.<br> <br>🛡️ Android uygulaması <br> <a href="https://github.com/BayLee4"></a>BayLee4<br> <a href="https://github.com/Ch4t4r"></a>Ch4t4r HrBDev<br> <a href="https://github.com/HrBDev"></a>hussainmohd<br> <a href="https://github.com/hussainmohd-a"></a>-<br> <a href="https://github.com/ignoramous"></a>a<br> <a href="https://github.com/markwmuller"></a>ignoramous<br> <a href="https://github.com/Mygod"></a>markwmuller<br> <a href="https://github.com/Uldiniad"></a>Mygod<br> <a href="https://github.com/Poussinou"></a>Uldiniad<br> <a href="https://github.com/pjosingh"></a>Poussinou pjosingh<br> <br>🚂 Network engine <br> <a href="https://github.com/alalamav"></a>alalamav<br> <a href="https://github.com/bemasc"></a>bemasc<br> <a href="https://github.com/dmcardle"></a>dmcardle<br> <a href="https://github.com/fortuna">fortuna</a><br> <a href="https://github.com/ignoramous"></a>ignoramous<br> <a href="https://github.com/PeterDaveHello"></a>PeterDaveHello santhosh<br> <a href="https://github.com/santhosh-ponnusamy"></a>-<br> <a href="https://github.com/SeanBurford"></a>ponnusamy SeanBurford<br> <br>📚 <br> <a href="https://github.com/ahmed-tasaly"></a>Resolver<br> <a href="https://github.com/amithm7"></a>ahmed<br> <a href="https://github.com/arfshl"></a>-<br> <a href="https://github.com/badmojr"></a>tasaly<br> <a href="https://github.com/bongochong"></a>amithm7 arfshl<br> <a href="https://github.com/elliotwutingfeng"></a>badmojr<br> <a href="https://github.com/georgyo"></a>bongochong<br> <a href="https://github.com/GiddyGoatGaming"></a>elliotwutingfeng<br> <a href="https://github.com/Harish-Narayan"></a>georgyo<br> <a href="https://github.com/ignoramous"></a>GiddyGoatGaming<br> <a href="https://github.com/JakeChampion"></a>Harish<br> <a href="https://github.com/MasterKia"></a>-<br> <a href="https://github.com/mtxadmin"></a>Narayan ignoramous<br> <a href="https://github.com/neneeen"></a>JakeChampion<br> <a href="https://github.com/PeterDaveHello"></a>MasterKia<br> <a href="https://github.com/santhosh-ponnusamy"></a>mtxadmin<br> <a href="https://github.com/shruuub"></a>neneeen<br> <a href="https://github.com/shuvashish76"></a>PeterDaveHello santhosh - <br> <br><br>ponnusamy shruuub shashish76<a href="https://t.me/amithm7"> </a>⚜ <br> <a href="https://t.me/TronSlayer"></a>Community<br> <a href="https://t.me/ppatra"></a>mods<br> <a href="https://t.me/InFamous23"></a>amithm7<br> <a href="https://t.me/TheTr1ckst3r"> </a><br> <a href="https://t.me/Ch4t4r">Andersen</a><br> <a href="https://t.me/Billi_ance"></a>ppatra InFamous23 TheTr1ckst3r Ch4t4r<br> <a href="https://t.me/kaliangel"></a>Billi_ance<br> <a href="https://github.com/PoneyClairDeLune"></a>kaliangel<br> <br>📌 PoneyClairDeLune Geo-IP <br> <a href="https://db-ip.com">db-ip.com</a><br> <br>❇ Translations <br> <a href="https://weblate.org/en/">Weblate</a><br> <br>🦆 <br> <a href="https://github.com/celzero/rethink-app/issues/346">Icons Icons</a><br> <br>📦 Build servers <br> <a href="https://jitpack.io/">JitPack</a><br> <a href="https://github.com/">GitHub</a><br> ]]></string>
     <!-- Configure DNS Fragment string == cd -->
     <string name="cd_dns_crypt_title" translatable="true">çözümleyiciler</string>
     <string name="cd_custom_doh_dialog_title" translatable="true">Özel Sunucu URL'si</string>
@@ -684,22 +605,12 @@
     <string name="ctbs_dialog_negative_btn" translatable="true">Geri Dön</string>
     <!-- DNS Log fragment -->
     <string name="dns_log_dialog_positive" translatable="true">Günlükleri sil</string>
-    <string name="dns_btm_sheet_dialog_message" translatable="true">
-      <Data>
-        <![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s engel listesi</h3> %3$s.<br><br>]]>
-      </Data>
-    </string>
-    <string name="dns_btm_sheet_dialog_ips" translatable="true">
-      <Data>
-        <![CDATA[ %1$s %2$s <br>]]>
-      </Data>
-    </string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s engel listesi</h3> %3$s.<br><br>]]></Data></string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"><Data><![CDATA[ %1$s %2$s <br>]]></Data></string>
     <string name="dns_btm_sheet_chip" translatable="true">+%1$s Diğer IP'ler</string>
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">Cevap Yok</string>
     <!-- DNS log bottom sheet -->
-    <string name="dns_btm_resolved_crypt" translatable="true">çözüldü
-      <u>anonim olarak</u> %1$s by %2$s via %3$s
-    </string>
+    <string name="dns_btm_resolved_crypt" translatable="true">çözüldü<u>anonim olarak</u> %1$s by %2$s via %3$s</string>
     <string name="dns_btm_resolved_doh" translatable="true">%1$s, %2$s tarafından çözüldü</string>
     <string name="dns_btm_resolved_doh_no_server" translatable="true">çözüldü %1$s</string>
     <string name="dns_btm_latency_ms" translatable="true">%1 $sms</string>
@@ -769,47 +680,25 @@
     <string name="fapps_info_dialog_positive_btn" translatable="true">Tamam</string>
     <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Ölçülmemiş olarak izin ver</string>
     <string name="fapps_unmetered_block_dialog_title" translatable="true">Ölçülmemiş üzerinde engelle</string>
-    <string name="fapps_unmetered_block_dialog_message" translatable="true">Ölçülmemiş (WiFi) ağdaki bağlantıları engelleyin
-      <i>listelenmiş</i> uygulamalar?
-    </string>
-    <string name="fapps_unmetered_unblock_dialog_message">Ölçülmemiş (WiFi) ağda bağlantılara izin ver
-      <i>listelenmiş</i> uygulamalar?
-    </string>
+    <string name="fapps_unmetered_block_dialog_message" translatable="true">Ölçülmemiş (WiFi) ağdaki bağlantıları engelleyin<i>listelenmiş</i> uygulamalar?</string>
+    <string name="fapps_unmetered_unblock_dialog_message">Ölçülmemiş (WiFi) ağda bağlantılara izin ver<i>listelenmiş</i> uygulamalar?</string>
     <string name="fapps_metered_block_dialog_title" translatable="true">Ölçülen üzerinde engelle</string>
-    <string name="fapps_metered_block_dialog_message" translatable="true">Şunun için ölçülü (mobil) ağdaki bağlantıları engelle:
-      <i>listelenmiş</i> uygulamalar?
-    </string>
+    <string name="fapps_metered_block_dialog_message" translatable="true">Şunun için ölçülü (mobil) ağdaki bağlantıları engelle:<i>listelenmiş</i> uygulamalar?</string>
     <string name="fapps_metered_unblock_dialog_title" translatable="true">Ölçüme izin ver</string>
-    <string name="fapps_metered_unblock_dialog_message" translatable="true">Ölçülü (mobil) ağdaki bağlantılara izin ver
-      <i>listelenmiş</i> uygulamalar?
-    </string>
+    <string name="fapps_metered_unblock_dialog_message" translatable="true">Ölçülü (mobil) ağdaki bağlantılara izin ver<i>listelenmiş</i> uygulamalar?</string>
     <string name="fapps_bypass_block_dialog_title" translatable="true">Uygulamaları atla</string>
-    <string name="fapps_bypass_block_dialog_message" translatable="true">Aşağıdakiler için Evrensel güvenlik duvarı kurallarını atlayın
-      <i>listelenmiş</i> uygulamalar?
-    </string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true">Aşağıdakiler için Evrensel güvenlik duvarı kurallarını atlayın<i>listelenmiş</i> uygulamalar?</string>
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Uygulamaları atla</string>
-    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Evrensel DNS ve güvenlik duvarı kurallarını atlayın
-      <i>listelenmiş</i> uygulamalar?
-    </string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Evrensel DNS ve güvenlik duvarı kurallarını atlayın<i>listelenmiş</i> uygulamalar?</string>
     <string name="fapps_unblock_dialog_title" translatable="true">Uygulamalara izin ver</string>
-    <string name="fapps_unblock_dialog_message" translatable="true">Şunun için bağlantılara izin ver
-      <i>listelenmiş</i> uygulamalar?
-    </string>
+    <string name="fapps_unblock_dialog_message" translatable="true">Şunun için bağlantılara izin ver<i>listelenmiş</i> uygulamalar?</string>
     <string name="fapps_exclude_block_dialog_title" translatable="true">Uygulamaları hariç tut</string>
-    <string name="fapps_exclude_block_dialog_message" translatable="true">Hariç tut
-      <i>listelenmiş</i> dNS ve Güvenlik Duvarı'ndan uygulamalar?
-    </string>
+    <string name="fapps_exclude_block_dialog_message" translatable="true">Hariç tut<i>listelenmiş</i> dNS ve Güvenlik Duvarı'ndan uygulamalar?</string>
     <string name="fapps_isolate_block_dialog_title" translatable="true">Uygulamaları izole edin</string>
-    <string name="fapps_isolate_block_dialog_message" translatable="true">İzole et
-      <i>listelenmiş</i> uygulamalar?
-    </string>
+    <string name="fapps_isolate_block_dialog_message" translatable="true">İzole et<i>listelenmiş</i> uygulamalar?</string>
     <string name="fapps_firewall_filter_hint" translatable="true">Tüm uygulamalar gösteriliyor</string>
-    <string name="fapps_firewall_filter_desc" translatable="true">
-      <![CDATA[<u>%1$s</u> %2$s uygulama gösteriliyor]]>
-    </string>
-    <string name="fapps_firewall_filter_desc_category" translatable="true">
-      <![CDATA[<u>%1$s</u> %2$s uygulama şu kategorilerde gösteriliyor: %3$s]]>
-    </string>
+    <string name="fapps_firewall_filter_desc" translatable="true"><![CDATA[<u>%1$s</u> %2$s uygulama gösteriliyor]]></string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true"><![CDATA[<u>%1$s</u> %2$s uygulama şu kategorilerde gösteriliyor: %3$s]]></string>
     <!-- Unicode -->
     <string name="unicode_warning_sign" translatable="false">\u26a0</string>
     <string name="unicode_x_sign" translatable="false">\u274c</string>
@@ -846,10 +735,7 @@
     <string name="other_dns_list_tab2" translatable="true">Dnscrypt</string>
     <string name="other_dns_list_tab3" translatable="true">Dns Proxy</string>
     <!-- Home screen bottom sheet -->
-    <string name="hs_btm_sheet_lock_down" translatable="true">VPN açıkken modlar değiştirilemez
-      <i>tecrit</i>. Dokunmak için
-      <u>vPN ayarlarını düzenle</u>.
-    </string>
+    <string name="hs_btm_sheet_lock_down" translatable="true">VPN açıkken modlar değiştirilemez<i>tecrit</i>. Dokunmak için<u>VPN ayarlarını düzenle</u>.</string>
     <!-- Firewall rules -->
     <string name="firewall_rule_no_rule" translatable="true">Kural Yok</string>
     <string name="firewall_rule_block_app" translatable="true">Uygulama Engellendi</string>
@@ -881,87 +767,33 @@
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Güvenilir Etki Alanı (UNIV)</string>
     <string name="firewall_rule_proxied" translatable="true">Vekaleten</string>
     <string name="firewall_rule_no_rule_desc" translatable="true">Bu bağlantıyla eşleşen güvenlik duvarı kuralı yok.</string>
-    <string name="firewall_rule_block_app_desc" translatable="true">
-      <![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı bu <i>uygulamayı</i> engelledi.<br><br> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_new_app_desc" translatable="true">
-      <![CDATA[Bu uygulama <i>ilk</i> kez bağlantı kurdu.<br><br> Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">
-      <![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, <i>Ölçülmemiş</i> ağa bağlanmaya çalışırken bu <i>uygulamayı</i> engelledi.<br><br> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_block_app_mobile_desc" translatable="true">
-      <![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, <i>Metered</i> ağına bağlanmaya çalışırken bu <i>uygulamayı</i> engelledi.<br><br> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">
-      <![CDATA[Kullanıcı tarafından ayarlanan evrensel bir güvenlik duvarı kuralı, <i>Metered</i> (Mobil) ağa bağlanmaya çalışırken bu <i>uygulamayı</i> engelledi.<br><br> Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_isolate_desc" translatable="true">
-      <![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, bu <i>uygulamanın</i> <i>atlanan IP'ler dışındaki IP'lere</i> bağlanmasını engelledi.<br><br> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">
-      <![CDATA[<i>Kaynak uygulama</i> <i>dns ve güvenlik duvarı kurallarını atlayacak şekilde</i> ayarlandığı için bu bağlantıya izin verildi.<br><br> Değiştirmek için <i>Uygulamaya özgü Güvenlik Duvarı</i> ekranına gidin.]]>
-    </string>
-    <string name="firewall_rule_block_ip_univ_desc" translatable="true">
-      <![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, <i>hedef IP / Bağlantı Noktasını</i> engelledi.<br><br> Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_block_ip_desc" translatable="true">
-      <![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı <i>hedef IP'yi</i> engelledi.<br><br> Değiştirmek için <i>Uygulamaya özgü Güvenlik Duvarı</i> ekranına gidin.]]>
-    </string>
-    <string name="firewall_rule_trusted_ip_desc" translatable="true">
-      <![CDATA[<i>Hedef IP Güvenilir IP</i> olarak ayarlandığı için bu bağlantıya izin verildi.<br><br> Değiştirmek için <i>Uygulamaya özgü Güvenlik Duvarı</i> ekranına gidin.]]>
-    </string>
-    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">
-      <![CDATA[<i>Hedef IP </i> tüm evrensel güvenlik duvarı kurallarını atlayacak şekilde ayarlandığından bu bağlantıya izin verildi. Değiştirmek için < i > Evrensel </i> sekmesindeki <i> IP Kuralları < i> bölümüne gidin.]]>
-    </string>
-    <string name="firewall_rule_device_lock_desc" translatable="true">
-      <![CDATA[Bu bağlantı, o sırada <i>cihaz kilitlendiği için güvenlik duvarına bağlandı</i>.<br><br> Bu davranışı değiştirmek için <i>Evrensel</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_foreground_desc" translatable="true">
-      <![CDATA[Kaynak uygulama <i>ön planda olmadığı</i> için bu bağlantı güvenlik duvarına bağlandı.<br><br> Bu davranışı değiştirmek için <i>Evrensel</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_unknown_desc" translatable="true">
-      <![CDATA[<i>Kaynak uygulama</i> belirlenemediği için bu bağlantı güvenlik duvarıyla desteklendi.<br><br> Bu davranışı değiştirmek için <i>Evrensel</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_block_udp_ntp_desc" translatable="true">
-      <![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı bu <i>UDP</i> bağlantısını engelledi.<br><br> Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">
-      <![CDATA[<i>Kaynak uygulama</i> kullanıcı tarafından tercih edilen DNS'yi atladığı için bu bağlantı engellendi.<br><br> Bu davranışı değiştirmek için <i>Evrensel</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">
-      <![CDATA[<i>Kaynak uygulama</i> <i>evrensel güvenlik duvarı kurallarını atlayacak şekilde</i> ayarlandığı için bu bağlantıya izin verildi.<br><br> Değiştirmek için <i>Uygulamaya özgü Güvenlik Duvarı</i> ekranına gidin.]]>
-    </string>
-    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">
-      <![CDATA[Bu DNS bağlantısı vekil sunucuya aktarıldı ve kullanıcının tercih ettiği DNS uç noktasına iletildi.<br><br> Devre dışı bırakmayı değiştirmek için DNS <i>Yapılandırma</i> ekranından DNS <i>sızıntılarını önleyin</i>.]]>
-    </string>
-    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true">
-      <![CDATA[Orbot aracılığıyla <i>tek tıklamayla</i> Tor - as - a - proxy kurulumu devam ettiği için bu bağlantıya izin verildi.]]>
-    </string>
-    <string name="firewall_rule_block_http_desc" translatable="true">
-      <![CDATA[Bu bağlantı, muhtemelen <i>güvenli olmayan http</i> kullandığı için engellendi.<br><br> Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_global_lockdown_desc" translatable="true">
-      <![CDATA[Evrensel kilitleme ayarlandığı için bu bağlantı engellendi.<br><br> Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">
-      <![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı <i>etki alanını</i> engelledi.<br><br> Değiştirmek için <i>Uygulamaya özgü Güvenlik Duvarı</i> ekranına gidin.]]>
-    </string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">
-      <![CDATA[Etki alanı Güvenilir <i>etki alanı</i> olarak ayarlandığı için bu bağlantıya izin verildi.<br><br> Değiştirmek için <i>Uygulamaya özgü Güvenlik Duvarı</i> ekranına gidin.]]>
-    </string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">
-      <![CDATA[<i>Etki alanı</i>, kullanıcının tercih ettiği DNS tarafından engellendiği için bu bağlantı engellendi.<br><br> Bu davranışı değiştirmek için <i>DNS'yi Yapılandır</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">
-      <![CDATA[Bu bağlantı, etki alanı Evrensel <i>etki alanı</i> kurallarında engellenmiş olarak ayarlandığı için engellendi.<br><br> Bu davranışı değiştirmek için <i>DNS'yi Yapılandır</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">
-      <![CDATA[Etki alanı Evrensel <i>etki alanı</i> kurallarında güvenilir olarak ayarlandığı için bu bağlantıya izin verildi.<br><br> Bu davranışı değiştirmek için <i>DNS'yi Yapılandır</i> sekmesine gidin.]]>
-    </string>
-    <string name="firewall_rule_proxied_desc" translatable="true">
-      <![CDATA[Bu bağlantı, kullanıcının tercih ettiği Proxy'ye iletildi.<br><br> Değiştirmek için <i>Yapılandır</i> ekranından <i>Proxy'ye</i> gidin.]]>
-    </string>
+    <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı bu <i>uygulamayı</i> engelledi.<br><br> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_new_app_desc" translatable="true"><![CDATA[Bu uygulama <i>ilk</i> kez bağlantı kurdu.<br><br> Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, <i>Ölçülmemiş</i> ağa bağlanmaya çalışırken bu <i>uygulamayı</i> engelledi.<br><br> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true"><![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, <i>Metered</i> ağına bağlanmaya çalışırken bu <i>uygulamayı</i> engelledi.<br><br> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><![CDATA[Kullanıcı tarafından ayarlanan evrensel bir güvenlik duvarı kuralı, <i>Metered</i> (Mobil) ağa bağlanmaya çalışırken bu <i>uygulamayı</i> engelledi.<br><br> Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_isolate_desc" translatable="true"><![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, bu <i>uygulamanın</i> <i>atlanan IP'ler dışındaki IP'lere</i> bağlanmasını engelledi.<br><br> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[<i>Kaynak uygulama</i> <i>dns ve güvenlik duvarı kurallarını atlayacak şekilde</i> ayarlandığı için bu bağlantıya izin verildi.<br><br> Değiştirmek için <i>Uygulamaya özgü Güvenlik Duvarı</i> ekranına gidin.]]></string>
+    <string name="firewall_rule_block_ip_univ_desc" translatable="true"><![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, <i>hedef IP / Bağlantı Noktasını</i> engelledi.<br><br> Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_block_ip_desc" translatable="true"><![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı <i>hedef IP'yi</i> engelledi.<br><br> Değiştirmek için <i>Uygulamaya özgü Güvenlik Duvarı</i> ekranına gidin.]]></string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true"><![CDATA[<i>Hedef IP Güvenilir IP</i> olarak ayarlandığı için bu bağlantıya izin verildi.<br><br> Değiştirmek için <i>Uygulamaya özgü Güvenlik Duvarı</i> ekranına gidin.]]></string>
+    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><![CDATA[<i>Hedef IP </i> tüm evrensel güvenlik duvarı kurallarını atlayacak şekilde ayarlandığından bu bağlantıya izin verildi. Değiştirmek için < i > Evrensel </i> sekmesindeki <i> IP Kuralları < i> bölümüne gidin.]]></string>
+    <string name="firewall_rule_device_lock_desc" translatable="true"><![CDATA[Bu bağlantı, o sırada <i>cihaz kilitlendiği için güvenlik duvarına bağlandı</i>.<br><br> Bu davranışı değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_foreground_desc" translatable="true"><![CDATA[Kaynak uygulama <i>ön planda olmadığı</i> için bu bağlantı güvenlik duvarına bağlandı.<br><br> Bu davranışı değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_unknown_desc" translatable="true"><![CDATA[<i>Kaynak uygulama</i> belirlenemediği için bu bağlantı güvenlik duvarıyla desteklendi.<br><br> Bu davranışı değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_block_udp_ntp_desc" translatable="true"><![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı bu <i>UDP</i> bağlantısını engelledi.<br><br> Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true"><![CDATA[<i>Kaynak uygulama</i> kullanıcı tarafından tercih edilen DNS'yi atladığı için bu bağlantı engellendi.<br><br> Bu davranışı değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true"><![CDATA[<i>Kaynak uygulama</i> <i>evrensel güvenlik duvarı kurallarını atlayacak şekilde</i> ayarlandığı için bu bağlantıya izin verildi.<br><br> Değiştirmek için <i>Uygulamaya özgü Güvenlik Duvarı</i> ekranına gidin.]]></string>
+    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true"><![CDATA[Bu DNS bağlantısı vekil sunucuya aktarıldı ve kullanıcının tercih ettiği DNS uç noktasına iletildi.<br><br> Devre dışı bırakmayı değiştirmek için DNS <i>Yapılandırma</i> ekranından DNS <i>sızıntılarını önleyin</i>.]]></string>
+    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true"><![CDATA[Orbot aracılığıyla <i>tek tıklamayla</i> Tor - as - a - proxy kurulumu devam ettiği için bu bağlantıya izin verildi.]]></string>
+    <string name="firewall_rule_block_http_desc" translatable="true"><![CDATA[Bu bağlantı, muhtemelen <i>güvenli olmayan http</i> kullandığı için engellendi.<br><br> Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_global_lockdown_desc" translatable="true"><![CDATA[Evrensel kilitleme ayarlandığı için bu bağlantı engellendi.<br><br> Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_block_domain_desc" translatable="true"><![CDATA[Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı <i>etki alanını</i> engelledi.<br><br> Değiştirmek için <i>Uygulamaya özgü Güvenlik Duvarı</i> ekranına gidin.]]></string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[Etki alanı Güvenilir <i>etki alanı</i> olarak ayarlandığı için bu bağlantıya izin verildi.<br><br> Değiştirmek için <i>Uygulamaya özgü Güvenlik Duvarı</i> ekranına gidin.]]></string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[<i>Etki alanı</i>, kullanıcının tercih ettiği DNS tarafından engellendiği için bu bağlantı engellendi.<br><br> Bu davranışı değiştirmek için <i>DNS'yi Yapılandır</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[Bu bağlantı, etki alanı Evrensel <i>etki alanı</i> kurallarında engellenmiş olarak ayarlandığı için engellendi.<br><br> Bu davranışı değiştirmek için <i>DNS'yi Yapılandır</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Etki alanı Evrensel <i>etki alanı</i> kurallarında güvenilir olarak ayarlandığı için bu bağlantıya izin verildi.<br><br> Bu davranışı değiştirmek için <i>DNS'yi Yapılandır</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[Bu bağlantı, kullanıcının tercih ettiği Proxy'ye iletildi.<br><br> Değiştirmek için <i>Yapılandır</i> ekranından <i>Proxy'ye</i> gidin.]]></string>
     <!-- New app install Notification -->
     <string name="new_app_bulk_notification_title" translatable="true">Dikkat</string>
     <string name="new_app_bulk_notification_content" translatable="true">Engellenen %1$s yeni uygulamayı yeniden düşünün. Görüntülemek veya değiştirmek için dokunun.</string>
@@ -1038,9 +870,7 @@
     <string name="ada_noapp_dialog_title" translatable="true">Böyle bir uygulama yok</string>
     <string name="ada_noapp_dialog_message" translatable="true">Uygulama bilgileri eksik. Belki de bu uygulama kaldırılmıştır?</string>
     <string name="ada_noapp_dialog_positive" translatable="true">Tamam</string>
-    <string name="ada_firewall_status" translatable="true">
-      <![CDATA[Bu uygulama <b><i>%1$s</i></b>.]]>
-    </string>
+    <string name="ada_firewall_status" translatable="true"><![CDATA[Bu uygulama <b><i>%1$s</i></b>.]]></string>
     <string name="ada_ip_connection_count" translatable="true">%1$s IP adresine/adreslerine bağlandı</string>
     <string name="ada_ip_connection_count_zero" translatable="true">0 IP adresi</string>
     <string name="ada_ip_no_connection" translatable="true">Bu uygulama için ağ kaydı yok.</string>
@@ -1102,15 +932,9 @@
     <string name="rt_download_desc" translatable="true">Bu özelliği kullanmak için engel listelerini (yaklaşık 60 MB) indirin.</string>
     <string name="radio_sky_btn" translatable="true">⛅ Gökyüzü</string>
     <string name="radio_max_btn" translatable="true">🪂 Maks.</string>
-    <string name="rt_filter_hint" translatable="true">Gösteriliyor
-      <u>tümü</u> engel listeleri
-    </string>
-    <string name="rt_filter_desc" translatable="true">
-      <![CDATA[<u>%1$s</u> engel listesi gösteriliyor]]>
-    </string>
-    <string name="rt_filter_desc_subgroups" translatable="true">
-      <![CDATA[Şu grupta <u>%1$s</u> engel listesi gösteriliyor: %2$s ve alt grup: %3$s]]>
-    </string>
+    <string name="rt_filter_hint" translatable="true">Gösteriliyor<u>tümü</u> engel listeleri</string>
+    <string name="rt_filter_desc" translatable="true"><![CDATA[<u>%1$s</u> engel listesi gösteriliyor]]></string>
+    <string name="rt_filter_desc_subgroups" translatable="true"><![CDATA[Şu grupta <u>%1$s</u> engel listesi gösteriliyor: %2$s ve alt grup: %3$s]]></string>
     <string name="rethink_sky_desc" translatable="true">280 'den fazla konum; daha yüksek çalışma süresi; cloudflare.com'da çalışan saplama çözümleyici</string>
     <string name="rethink_max_desc" translatable="true">50 'den fazla konum; daha özel; fly.io üzerinde çalışan özyinelemeli çözümleyici</string>
     <!-- rethink bottomsheet filter -->
