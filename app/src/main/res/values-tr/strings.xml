@@ -9,9 +9,9 @@
     <string name="about_title_desc" translatable="true">Ağ güvenliği tehditlerini tespit edin ve engelleyin</string>
     <string name="txt_home" translatable="true">Ana Sayfa</string>
     <string name="accessibility_service_description" translatable="true">
-          Rethink, arka plan uygulamalarını algılamak ve güvenlik duvarı oluşturmak için erişilebilirlik hizmetini kullanır.
-          Rethink herhangi bir bilgi toplamaz veya satmaz.
-      </string>
+        Rethink, arka plan uygulamalarını algılamak ve güvenlik duvarı oluşturmak için erişilebilirlik hizmetini kullanır.
+        Rethink herhangi bir bilgi toplamaz veya satmaz.
+    </string>
     <string name="next" translatable="true">Sonraki</string>
     <string name="skip" translatable="true">Atla</string>
     <string name="finish" translatable="true">Bitir</string>
@@ -118,14 +118,14 @@
     <string name="slide_1_desc" translatable="true">Rethink, Mozilla Builders MVP programı tarafından desteklenen açık kaynaklı bir yazılımdır.</string>
     <string name="rdns_plus" translatable="false">RDNS Plus</string>
     <string-array name="firewall_rules">
-      <item>İzin ver</item>
-      <item>Blok</item>
-      <item>Blok (ölçülmemiş)</item>
-      <item>Blok (ölçülü)</item>
-      <item>İzole et</item>
-      <item>DNS ve Güvenlik Duvarını Atlayın</item>
-      <item>Evrensel Bypass</item>
-      <item>Hariç tut</item>
+        <item>İzin ver</item>
+        <item>Blok</item>
+        <item>Blok (ölçülmemiş)</item>
+        <item>Blok (ölçülü)</item>
+        <item>İzole et</item>
+        <item>DNS ve Güvenlik Duvarını Atlayın</item>
+        <item>Evrensel Bypass</item>
+        <item>Hariç tut</item>
     </string-array>
     <string name="allow" translatable="true">izin vermek</string>
     <string name="block" translatable="true">blok</string>
@@ -214,22 +214,22 @@
     <string name="dns_query_clear_logs_title" translatable="true">Tüm DNS günlükleri silinsin mi?</string>
     <string name="dns_query_clear_logs_message" translatable="true">Bu, cihazdaki DNS günlüklerini siler. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?</string>
     <string name="bsct_app_info" translatable="true">Uygulama Bilgisi</string>
-    <string name="bsct_block_ip" translatable="true">&lt;u>Bu uygulama&lt;/u></string> için &lt;u>bu IP&lt;/u>'yi engelleyin ve güvenin</string>
-    <string name="bsct_block_domain" translatable="true">&lt;u>Bu uygulama&lt;/u></string> için &lt;u>alan(lar)a&lt;/u> engelleyin ve güvenin</string>
-    <string name="bsct_block" translatable="true">&lt;u>Bu uygulamayı&lt;/u></string> engelleyin, atlayın, hariç tutun, izole edin</string>
+    <string name="bsct_block_ip" translatable="true">&lt;u>Bu uygulama&lt;/u> için &lt;u>bu IP&lt;/u>'yi engelleyin ve güvenin</string>
+    <string name="bsct_block_domain" translatable="true">&lt;u>Bu uygulama&lt;/u> için &lt;u>alan(lar)a&lt;/u> engelleyin ve güvenin</string>
+    <string name="bsct_block" translatable="true">&lt;u>Bu uygulamayı&lt;/u> engelleyin, atlayın, hariç tutun, izole edin</string>
     <string name="bsct_conn_block_desc" translatable="true">%1$s, %2$s tarafından engellendi</string>
     <string name="bsct_conn_block_desc_device" translatable="true">cihazda %1$s engellendi</string>
     <string name="bsct_conn_desc_allowed" translatable="true">%1$s %2$s tarihinde izin verildi</string>
     <string name="bsct_conn_desc_blocked" translatable="true">%1$s %2$s tarihinde engellendi</string>
     <string name="bsct_conn_rule_explanation" translatable="true">
-          &lt;u>#1&lt;/u>: Bir uygulamanın İnternet'e bağlanmasını engeller.
-          \n &lt;u>#2&lt;/u>: Herhangi bir uygulamanın belirli bir IP'ye bağlanmasını engeller.
-          \n &lt;u>#3&lt;/u>: Cihaz kilitlendiğinde tüm bağlantıları engeller (Evrensel Güvenlik Duvarı).
-          \n &lt;u>#4&lt;/u>: Kullanılmayan tüm uygulamaları engeller (Evrensel Güvenlik Duvarı).
-          \n &lt;u>#5&lt;/u>: Kaynak uygulama bilinmediğinde bağlantıları engeller (Evrensel Güvenlik Duvarı).
-          \n &lt;u>#6&lt;/u>: DNS (Evrensel Güvenlik Duvarı) hariç tüm UDP trafiğini engeller.
-          \n &lt;u>#7&lt;/u>: DNS atlandığında bağlantıları engelle (Evrensel Güvenlik Duvarı).
-          </string>
+        &lt;u>#1&lt;/u>: Bir uygulamanın İnternet'e bağlanmasını engeller.
+        \n &lt;u>#2&lt;/u>: Herhangi bir uygulamanın belirli bir IP'ye bağlanmasını engeller.
+        \n &lt;u>#3&lt;/u>: Cihaz kilitlendiğinde tüm bağlantıları engeller (Evrensel Güvenlik Duvarı).
+        \n &lt;u>#4&lt;/u>: Kullanılmayan tüm uygulamaları engeller (Evrensel Güvenlik Duvarı).
+        \n &lt;u>#5&lt;/u>: Kaynak uygulama bilinmediğinde bağlantıları engeller (Evrensel Güvenlik Duvarı).
+        \n &lt;u>#6&lt;/u>: DNS (Evrensel Güvenlik Duvarı) hariç tüm UDP trafiğini engeller.
+        \n &lt;u>#7&lt;/u>: DNS atlandığında bağlantıları engelle (Evrensel Güvenlik Duvarı).
+        </string>
     <string name="always_on_dialog_heading" translatable="true">Her Zaman Açık VPN'i Devre Dışı Bırak</string>
     <string name="always_on_dialog" translatable="true">Bu cihazda \" Always - On VPN \" etkin. Yeniden Düşünmeyi başlatmak için lütfen Ayarlar uygulamasına gidin ve \" Her zaman açık VPN \"i devre dışı bırakın.</string>
     <string name="always_on_dialog_positive_btn" translatable="true">Ayarlara Git</string>
@@ -363,10 +363,10 @@
     <string name="orbot_stop_dialog_neutral" translatable="true">DNS'yi değiştir</string>
     <string name="orbot_title" translatable="true">Orbot ve Proxy'ler</string>
     <string name="orbot_explanation" translatable = "true">
-              Orbot, diğer uygulamaların İnternet'i daha &lt;u>güvenli&lt;/u> kullanmasını sağlayan ücretsiz bir proxy uygulamasıdır.
-              \nOrbot, İnternet trafiğinizi şifrelemek için &lt;u>Tor&lt;/u>'u kullanır; bu da &lt;u>sansürü atlamanıza&lt;/u> ve kişisel özgürlüğünüzü tehdit eden &lt;u>ağ gözetleme&lt;/u> biçimlerine karşı savunmanıza yardımcı olur. mahremiyet.
-              \n&lt;u>TCP Proxy&lt;/u>: Rethink, yalnızca &lt;i>dahil edilen&lt;/i> uygulamaların TCP bağlantılarını Orbot'a iletir.
-          \n&lt;u>HTTP Proxy&lt;/u>: Orbot'a HTTP CONNECT tünelini yeniden &lt;i>kurar&lt;/i> ve yalnızca &lt;i>dahil&lt;/i> uygulamaların TCP bağlantılarını iletir.</string>
+            Orbot, diğer uygulamaların İnternet'i daha &lt;u>güvenli&lt;/u> kullanmasını sağlayan ücretsiz bir proxy uygulamasıdır.
+            \nOrbot, İnternet trafiğinizi şifrelemek için &lt;u>Tor&lt;/u>'u kullanır; bu da &lt;u>sansürü atlamanıza&lt;/u> ve kişisel özgürlüğünüzü tehdit eden &lt;u>ağ gözetleme&lt;/u> biçimlerine karşı savunmanıza yardımcı olur. mahremiyet.
+            \n&lt;u>TCP Proxy&lt;/u>: Rethink, yalnızca &lt;i>dahil edilen&lt;/i> uygulamaların TCP bağlantılarını Orbot'a iletir.
+        \n&lt;u>HTTP Proxy&lt;/u>: Orbot'a HTTP CONNECT tünelini yeniden &lt;i>kurar&lt;/i> ve yalnızca &lt;i>dahil&lt;/i> uygulamaların TCP bağlantılarını iletir.</string>
     <string name="orbot_install_dialog_title" translatable="true">Orbot kurulsun mu?</string>
     <string name="orbot_install_dialog_message" translatable="true">Orbot, Tor'un özelliklerini ve işlevselliğini Android'e getiriyor.</string>
     <string name="orbot_install_dialog_positive" translatable="true">Yükle</string>
