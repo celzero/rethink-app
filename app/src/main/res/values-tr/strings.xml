@@ -168,9 +168,7 @@
     <string name="dns_firewall_mode_info_explanation_new" translatable="true">Yukarıdakilerin tümü + İnternet sansürünü atlamak.</string>
     <string name="alert_permission_accessibility" translatable="true">İzin - Erişilebilirlik</string>
     <string name="alert_firewall_accessibility_explanation" translatable="true">RethinkDNS, hangi uygulamaların kullanımda (ön plan) olduğunu ve hangi uygulamaların kullanımda (arka plan) olmadığını izlemek için erişilebilirlik hizmetini kullanır.\n\ nRethinkDNS, herhangi bir şekilde herhangi bir bilgi toplamaz veya sizi gözetlemez.</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink, hangi uygulamaların kullanımda olduğunu (ön plan) ve hangi uygulamaların kullanımda olmadığını (arka planda) izlemek için erişilebilirlik hizmetini kullanır.\n\nRethink herhangi bir bilgi toplamaz veya herhangi bir şekilde sizi gözetlemek.</string>
     <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Erişilebilirlik hizmetinin durdurulduğunu veya kilitlendiğini yeniden düşünün.<i><b>Ayarlara Git ve Durdurmaya Zorla</b></i><i>Kullanılmayan uygulamaları engelle</i> özelliğini kullanmak için yeniden düşünün ve yeniden başlatın.\n\nRethink, izleme için erişilebilirlik hizmetini kullanır hangi uygulamaların kullanımda olduğu (ön planda) ve hangilerinin kullanımda olmadığı (arka planda).</string>
-    <string name="alert_firewall_accessibility_ Exception" translatable="true">Erişilebilirlik Ayarları açılırken hata oluştu. Daha sonra tekrar deneyin!</string>
     <string name="alert_firewall_accessibility_exception" translatable="true">Erişilebilirlik Ayarları açılamadı. Daha sonra tekrar deneyin!</string>
     <string name="brave_dns_connect_mode_change_firewall" translatable="true">Mod'u seçin.</string>
     <string name="brave_dns_connect_mode_change_dns" translatable="true">Mod'u seçin.</string>
