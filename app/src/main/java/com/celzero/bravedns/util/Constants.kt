@@ -284,11 +284,12 @@ class Constants {
         const val BLOCK_FREE_DNS_MAX = "https://max.rethinkdns.com/dns-query"
         const val BLOCK_FREE_DNS_SKY = "https://sky.rethinkdns.com/dns-query"
 
+        // all fallback dns servers should have the corresponding ip address in servers.xml
         val DEFAULT_DNS_LIST =
             listOf(
                 DefaultDnsServer(0, "None", "", "None"),
                 DefaultDnsServer(1, "Rethink", "https://zero.rethinkdns.com/dns-query", "DoH"),
-                DefaultDnsServer(2, "Google", "https://dns.google.com/dns-query", "DoH"),
+                DefaultDnsServer(2, "Google", "https://dns.google/dns-query", "DoH"),
                 DefaultDnsServer(3, "Cloudflare", "https://cloudflare-dns.com/dns-query", "DoH")
             )
 
