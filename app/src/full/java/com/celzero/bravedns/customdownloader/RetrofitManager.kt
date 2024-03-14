@@ -18,13 +18,13 @@ package com.celzero.bravedns.customdownloader
 import android.util.Log
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Logger
+import java.net.InetAddress
+import java.util.concurrent.TimeUnit
 import okhttp3.Dns
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
 import retrofit2.Retrofit
-import java.net.InetAddress
-import java.util.concurrent.TimeUnit
 
 class RetrofitManager {
 
@@ -37,35 +37,41 @@ class RetrofitManager {
             FALLBACK_DNS
         }
 
-        fun getBlocklistBaseBuilder(): Retrofit.Builder {
-            return Retrofit.Builder().baseUrl(Constants.DOWNLOAD_BASE_URL).client(okHttpClient())
+        fun getBlocklistBaseBuilder(dnsId: Int): Retrofit.Builder {
+            return Retrofit.Builder()
+                .baseUrl(Constants.DOWNLOAD_BASE_URL)
+                .client(okHttpClient(dnsId))
         }
 
-        fun getWarpBaseBuilder(): Retrofit.Builder {
-            return Retrofit.Builder().baseUrl(Constants.DOWNLOAD_BASE_URL).client(okHttpClient())
+        fun getWarpBaseBuilder(dnsId: Int): Retrofit.Builder {
+            return Retrofit.Builder()
+                .baseUrl(Constants.DOWNLOAD_BASE_URL)
+                .client(okHttpClient(dnsId))
         }
 
-        fun getTcpProxyBaseBuilder(): Retrofit.Builder {
-            return Retrofit.Builder().baseUrl(Constants.TCP_PROXY_BASE_URL).client(okHttpClient())
+        fun getTcpProxyBaseBuilder(dnsId: Int): Retrofit.Builder {
+            return Retrofit.Builder()
+                .baseUrl(Constants.TCP_PROXY_BASE_URL)
+                .client(okHttpClient(dnsId))
         }
 
-        fun okHttpClient(): OkHttpClient {
+        fun okHttpClient(dnsId: Int = 0): OkHttpClient {
             val b = OkHttpClient.Builder()
             b.connectTimeout(1, TimeUnit.MINUTES)
             b.readTimeout(20, TimeUnit.MINUTES)
             b.writeTimeout(5, TimeUnit.MINUTES)
             b.retryOnConnectionFailure(true)
             // If unset, the system-wide default DNS will be used.
-            customDns(b.build())?.let { b.dns(it) }
+            customDns(dnsId, b.build())?.let { b.dns(it) }
             return b.build()
         }
 
         // As of now, quad9 is used as default dns in okhttp client.
-        private fun customDns(bootstrapClient: OkHttpClient): Dns? {
-            enumValues<OkHttpDnsType>().forEach {
+        private fun customDns(dnsId: Int, bootstrapClient: OkHttpClient): Dns? {
+            enumValues<OkHttpDnsType>().forEach { _ ->
                 try {
-                    when (it) {
-                        OkHttpDnsType.DEFAULT -> {
+                    when (dnsId) {
+                        OkHttpDnsType.DEFAULT.ordinal -> {
                             return DnsOverHttps.Builder()
                                 .client(bootstrapClient)
                                 .url("https://dns.quad9.net/dns-query".toHttpUrl())
@@ -78,7 +84,7 @@ class RetrofitManager {
                                 .includeIPv6(true)
                                 .build()
                         }
-                        OkHttpDnsType.CLOUDFLARE -> {
+                        OkHttpDnsType.CLOUDFLARE.ordinal -> {
                             return DnsOverHttps.Builder()
                                 .client(bootstrapClient)
                                 .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
@@ -91,7 +97,7 @@ class RetrofitManager {
                                 .includeIPv6(true)
                                 .build()
                         }
-                        OkHttpDnsType.GOOGLE -> {
+                        OkHttpDnsType.GOOGLE.ordinal -> {
                             return DnsOverHttps.Builder()
                                 .client(bootstrapClient)
                                 .url("https://dns.google/dns-query".toHttpUrl())
@@ -104,10 +110,10 @@ class RetrofitManager {
                                 .includeIPv6(true)
                                 .build()
                         }
-                        OkHttpDnsType.SYSTEM_DNS -> {
+                        OkHttpDnsType.SYSTEM_DNS.ordinal -> {
                             return Dns.SYSTEM
                         }
-                        OkHttpDnsType.FALLBACK_DNS -> {
+                        OkHttpDnsType.FALLBACK_DNS.ordinal -> {
                             // todo: return retrieved system dns
                             return null
                         }

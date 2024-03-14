@@ -26,10 +26,10 @@ import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DOWNLOAD
+import java.util.concurrent.TimeUnit
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
 
 class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
     CoroutineWorker(context, workerParameters), KoinComponent {
@@ -70,11 +70,11 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
         }
     }
 
-    private suspend fun getPaymentStatusFromServer(): TcpProxyHelper.PaymentStatus {
+    private suspend fun getPaymentStatusFromServer(retryCount: Int = 0): TcpProxyHelper.PaymentStatus {
         var paymentStatus = TcpProxyHelper.PaymentStatus.INITIATED
         try {
             val retrofit =
-                RetrofitManager.getTcpProxyBaseBuilder()
+                RetrofitManager.getTcpProxyBaseBuilder(retryCount)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(ITcpProxy::class.java)
@@ -92,7 +92,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                 val status = jsonObject.optString(JSON_STATUS, "")
                 val paymentStatusString = jsonObject.optString(JSON_PAYMENT_STATUS, "")
                 paymentStatus =
-                    TcpProxyHelper.PaymentStatus.values().find { it.name == paymentStatusString }
+                    TcpProxyHelper.PaymentStatus.entries.find { it.name == paymentStatusString }
                         ?: TcpProxyHelper.PaymentStatus.NOT_PAID
                 Log.i(
                     Logger.LOG_TAG_PROXY,
@@ -101,6 +101,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                 if (paymentStatus.isPaid() || paymentStatus.isFailed()) {
                     TcpProxyHelper.updatePaymentStatus(paymentStatus)
                 }
+                return paymentStatus
             } else {
                 Log.w(
                     Logger.LOG_TAG_PROXY,
@@ -114,6 +115,16 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                 e
             )
         }
-        return paymentStatus
+        return if (isRetryRequired(retryCount) && paymentStatus == TcpProxyHelper.PaymentStatus.INITIATED) {
+            Log.i(LOG_TAG_DOWNLOAD, "retrying the downloadRemoteBlocklist")
+            getPaymentStatusFromServer(retryCount + 1)
+        } else {
+            Log.i(LOG_TAG_DOWNLOAD, "retry count exceeded, returning null")
+            return paymentStatus
+        }
+    }
+
+    private fun isRetryRequired(retryCount: Int): Boolean {
+        return retryCount < RetrofitManager.Companion.OkHttpDnsType.entries.size - 1
     }
 }
