@@ -511,37 +511,38 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
     }
 
-    private var retryCountForDnsStatus: Int = 0
-
     private fun updateUiWithDnsStates(dnsName: String) {
+        val preferredId = if (appConfig.isSystemDns()) Backend.System else Backend.Preferred
         // get the status from go to check if the dns transport is added or not
         val id =
-            if (WireguardManager.oneWireGuardEnabled()) {
-                val id = WireguardManager.getOneWireGuardProxyId() ?: Backend.Preferred
-                "${ProxyManager.ID_WG_BASE}${id}"
+            if (WireguardManager.oneWireGuardEnabled() && persistentState.proxyDns) {
+                val id = WireguardManager.getOneWireGuardProxyId()
+                if (id == null) {
+                    preferredId
+                } else {
+                    "${ProxyManager.ID_WG_BASE}${id}"
+                }
             } else {
-                Backend.Preferred
+                preferredId
             }
 
         if (VpnController.isOn()) {
-            val status = VpnController.getDnsStatus(id)
-            // status null means the dns transport is not available / different id is usedE
-            if (status == null) {
-                if (retryCountForDnsStatus < 5) {
-                    retryCountForDnsStatus++
-                    delay(TimeUnit.SECONDS.toMillis(1), lifecycleScope) {
-                        if (isAdded) {
-                            updateUiWithDnsStates(dnsName)
+            ui("dnsStatusCheck") {
+                repeat(5) {
+                    val status = VpnController.getDnsStatus(id)
+                    if (status != null) {
+                        if (status == Backend.TOK) {
+                            b.fhsCardDnsLatency.visibility = View.VISIBLE
+                            b.fhsCardDnsFailure.visibility = View.GONE
+                            return@ui
                         }
                     }
+                    // status null means the dns transport is not available / different id is used
+                    kotlinx.coroutines.delay(1000L)
                 }
                 b.fhsCardDnsLatency.visibility = View.GONE
                 b.fhsCardDnsFailure.visibility = View.VISIBLE
                 b.fhsCardDnsFailure.text = getString(R.string.failed_using_default)
-                b.fhsCardDnsLatency.isSelected = true
-            } else {
-                b.fhsCardDnsLatency.visibility = View.VISIBLE
-                b.fhsCardDnsFailure.visibility = View.GONE
             }
         }
         b.fhsCardDnsConnectedDns.text = dnsName
