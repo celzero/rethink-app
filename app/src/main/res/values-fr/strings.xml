@@ -1010,4 +1010,8 @@
     <string name="wireguard_disable_failure" translatable="true">\"Always-on WireGuard\" ne peut pas être désactivé</string>
     <string name="wireguard_disable_title" translatable="true">Arrêter WireGuard</string>
     <string name="wireguard_disable_message" translatable="true">Arrêter tous les VPN WireGuard actifs ?</string>
+    <string name="remaining_apps_dialog_title" translatable="true">Inclure les applications restantes</string>
+    <string name="lbl_remaining_apps" translatable="true">Applications restantes</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">Inclure les applications %1$s</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">Exclure les applications %1$s</string>
 </resources>
