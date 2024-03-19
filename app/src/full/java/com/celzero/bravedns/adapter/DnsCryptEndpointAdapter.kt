@@ -39,6 +39,8 @@ import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -50,8 +52,10 @@ class DnsCryptEndpointAdapter(
     PagingDataAdapter<DnsCryptEndpoint, DnsCryptEndpointAdapter.DnsCryptEndpointViewHolder>(
         DIFF_CALLBACK
     ) {
+    var statusCheckJob: Job = Job()
 
     companion object {
+        private const val DELAY = 1000L
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<DnsCryptEndpoint>() {
 
@@ -115,9 +119,7 @@ class DnsCryptEndpointAdapter(
             b.dnsCryptEndpointListActionImage.isChecked = endpoint.isSelected
 
             if (endpoint.isSelected) {
-                // update the status after 1 second
-                val scope = (context as LifecycleOwner).lifecycleScope
-                Utilities.delay(1000L, scope) { updateSelectedStatus() }
+                keepSelectedStatusUpdated()
             } else {
                 b.dnsCryptEndpointListUrlExplanation.text = ""
             }
@@ -133,7 +135,26 @@ class DnsCryptEndpointAdapter(
             }
         }
 
+        private fun keepSelectedStatusUpdated() {
+            statusCheckJob = ui {
+                while (true) {
+                    updateSelectedStatus()
+                    delay(DELAY)
+                }
+            }
+        }
+
         private fun updateSelectedStatus() {
+            // if the view is not active then cancel the job
+            if (
+                !lifecycleOwner.lifecycle.currentState.isAtLeast(
+                    androidx.lifecycle.Lifecycle.State.STARTED
+                )
+            ) {
+                statusCheckJob.cancel()
+                return
+            }
+
             // always use the id as Dnsx.Preffered as it is the primary dns id for now
             val state = VpnController.getDnsStatus(Backend.Preferred)
             val status = UIUtils.getDnsStatusStringRes(state)
@@ -217,6 +238,8 @@ class DnsCryptEndpointAdapter(
                 endpoint.isSelected = true
                 appConfig.handleDnscryptChanges(endpoint)
             }
+            // cancel the current job, new job will be created when the view is active
+            statusCheckJob.cancel()
         }
 
         private fun deleteEndpoint(id: Int) {
@@ -234,6 +257,10 @@ class DnsCryptEndpointAdapter(
 
         private suspend fun uiCtx(f: suspend () -> Unit) {
             withContext(Dispatchers.Main) { f() }
+        }
+
+        private fun ui(f: suspend () -> Unit): Job {
+            return lifecycleOwner.lifecycleScope.launch(Dispatchers.Main) { f() }
         }
 
         private fun io(f: suspend () -> Unit) {

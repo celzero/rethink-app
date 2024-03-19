@@ -17,7 +17,6 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,13 +40,17 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class OneWgConfigAdapter(private val context: Context) :
+class OneWgConfigAdapter(private val context: Context, private val lifecycleOwner: LifecycleOwner) :
     PagingDataAdapter<WgConfigFiles, OneWgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
 
+    private var statusCheckJob: Job = Job()
     companion object {
+        private const val DELAY = 1000L
 
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
@@ -94,6 +97,25 @@ class OneWgConfigAdapter(private val context: Context) :
             b.oneWgCheck.isChecked = config.isActive
             updateStatus(config)
             setupClickListeners(config)
+            if (config.oneWireGuard) {
+                keepStatusUpdated(config)
+            } else {
+                statusCheckJob.cancel()
+                b.interfaceDetailCard.strokeWidth = 0
+                b.interfaceAppsCount.visibility = View.GONE
+                b.oneWgCheck.isChecked = false
+                b.interfaceStatus.text =
+                    context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
+            }
+        }
+
+        private fun keepStatusUpdated(config: WgConfigFiles) {
+            statusCheckJob = ui {
+                while (true) {
+                    updateStatus(config)
+                    delay(DELAY)
+                }
+            }
         }
 
         private fun updateStatus(config: WgConfigFiles) {
@@ -114,6 +136,16 @@ class OneWgConfigAdapter(private val context: Context) :
         }
 
         private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, apps: String) {
+            // if the view is not active then cancel the job
+            if (
+                !lifecycleOwner.lifecycle.currentState.isAtLeast(
+                    androidx.lifecycle.Lifecycle.State.STARTED
+                )
+            ) {
+                statusCheckJob.cancel()
+                return
+            }
+
             val appsCount = context.getString(R.string.firewall_card_status_active, apps)
             if (config.isActive) {
                 b.interfaceDetailCard.strokeColor = fetchColor(context, R.color.accentGood)
@@ -127,7 +159,9 @@ class OneWgConfigAdapter(private val context: Context) :
                     if (statusId == Backend.TOK) {
                         b.interfaceDetailCard.strokeColor =
                             fetchColor(context, R.attr.chipTextPositive)
-                    } else if (statusId == Backend.TUP) {
+                        // cancel the job, as the status is connected
+                        statusCheckJob.cancel()
+                    } else if (statusId == Backend.TUP || statusId == Backend.TZZ) {
                         b.interfaceDetailCard.strokeColor =
                             fetchColor(context, R.attr.chipTextNeutral)
                     } else {
@@ -141,7 +175,7 @@ class OneWgConfigAdapter(private val context: Context) :
                         context.getString(
                             R.string.about_version_install_source,
                             context
-                                .getString(R.string.status_failing)
+                                .getString(R.string.status_waiting)
                                 .replaceFirstChar(Char::titlecase),
                             appsCount
                         )
@@ -158,13 +192,8 @@ class OneWgConfigAdapter(private val context: Context) :
         fun setupClickListeners(config: WgConfigFiles) {
             b.interfaceDetailCard.setOnClickListener { launchConfigDetail(config.id) }
 
-            // b.oneWgCheck.setOnCheckedChangeListener(null)
             b.oneWgCheck.setOnClickListener {
                 val isChecked = b.oneWgCheck.isChecked
-                Log.d(
-                    "OneWgConfigAdapter",
-                    "Switch checked: $isChecked, ${b.oneWgCheck.isChecked} W: ${WireguardManager.canEnableConfig(config)}"
-                )
                 io {
                     if (isChecked) {
                         if (WireguardManager.canEnableConfig(config)) {
@@ -205,7 +234,11 @@ class OneWgConfigAdapter(private val context: Context) :
         withContext(Dispatchers.Main) { f() }
     }
 
+    private fun ui(f: suspend () -> Unit): Job {
+        return lifecycleOwner.lifecycleScope.launch(Dispatchers.Main) { f() }
+    }
+
     private fun io(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
+        lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }

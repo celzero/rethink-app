@@ -44,8 +44,9 @@ import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class RethinkEndpointAdapter(
     private val context: Context,
@@ -56,7 +57,9 @@ class RethinkEndpointAdapter(
         DIFF_CALLBACK
     ) {
 
+    var statusCheckJob: Job = Job()
     companion object {
+        private const val DELAY = 1000L
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<RethinkDnsEndpoint>() {
                 override fun areItemsTheSame(
@@ -108,8 +111,6 @@ class RethinkEndpointAdapter(
 
         private fun displayDetails(endpoint: RethinkDnsEndpoint) {
             b.rethinkEndpointListUrlName.text = endpoint.name
-            // set empty for now, will be updated later, see updateBlocklistStatusText()
-            b.rethinkEndpointListUrlExplanation.text = ""
             b.rethinkEndpointListCheckImage.isChecked = endpoint.isActive
             Log.i(
                 LOG_TAG_DNS,
@@ -120,16 +121,31 @@ class RethinkEndpointAdapter(
             showIcon(endpoint)
 
             if (endpoint.isActive) {
-                // update the status after 1 second
-                val scope = (context as LifecycleOwner).lifecycleScope
-                Utilities.delay(1000L, scope) { updateBlocklistStatusText(endpoint) }
+                keepSelectedStatusUpdated(endpoint)
             } else {
-                updateBlocklistStatusText(endpoint)
+                b.rethinkEndpointListUrlExplanation.text = ""
+            }
+        }
+
+        private fun keepSelectedStatusUpdated(endpoint: RethinkDnsEndpoint) {
+            ui {
+                while (true) {
+                    updateBlocklistStatusText(endpoint)
+                    delay(DELAY)
+                }
             }
         }
 
         private fun updateBlocklistStatusText(endpoint: RethinkDnsEndpoint) {
-            if (!endpoint.isActive) return
+            // if the view is not active then cancel the job
+            if (
+                !lifecycleOwner.lifecycle.currentState.isAtLeast(
+                    androidx.lifecycle.Lifecycle.State.STARTED
+                )
+            ) {
+                statusCheckJob.cancel()
+                return
+            }
 
             val state = VpnController.getDnsStatus(Backend.Preferred)
             val status = UIUtils.getDnsStatusStringRes(state)
@@ -174,6 +190,8 @@ class RethinkEndpointAdapter(
                 endpoint.isActive = true
                 appConfig.handleRethinkChanges(endpoint)
             }
+            // cancel the current job, new job will be created when the view is active
+            statusCheckJob.cancel()
         }
 
         private fun showDohMetadataDialog(endpoint: RethinkDnsEndpoint) {
@@ -222,8 +240,8 @@ class RethinkEndpointAdapter(
             context.startActivity(intent)
         }
 
-        private suspend fun uiCtx(f: suspend () -> Unit) {
-            withContext(Dispatchers.Main) { f() }
+        private fun ui(f: suspend () -> Unit) {
+            lifecycleOwner.lifecycleScope.launch(Dispatchers.Main) { f() }
         }
 
         private fun io(f: suspend () -> Unit) {

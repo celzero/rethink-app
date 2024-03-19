@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -37,10 +38,16 @@ import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class WgConfigAdapter(private val context: Context) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
+
+    private var configs: MutableMap<Int, Job> = mutableMapOf()
+    private var lifecycleOwner: LifecycleOwner? = null
 
     companion object {
         private const val DELAY = 1000L
@@ -80,7 +87,16 @@ class WgConfigAdapter(private val context: Context) :
                 parent,
                 false
             )
+        lifecycleOwner = parent.findViewTreeLifecycleOwner()
         return WgInterfaceViewHolder(itemBinding)
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        configs.values.forEach {
+            it.cancel()
+        }
+        configs.clear()
     }
 
     inner class WgInterfaceViewHolder(private val b: ListItemWgGeneralInterfaceBinding) :
@@ -89,14 +105,69 @@ class WgConfigAdapter(private val context: Context) :
         fun update(config: WgConfigFiles) {
             b.interfaceNameText.text = config.name
             b.interfaceSwitch.isChecked = config.isActive
-            updateStatus(config)
             setupClickListeners(config)
+            updateStatusJob(config)
+        }
+
+        private fun updateStatusJob(config: WgConfigFiles) {
+            if (config.isActive) {
+                val job = updateProxyStatusContinuously(config)
+                if (job != null) {
+                    // cancel the job if it already exists for the same config
+                    cancelJobIfAny(config.id)
+                    configs[config.id] = job
+                }
+            } else {
+                b.interfaceCatchAll.visibility = View.GONE
+                b.interfaceLockdown.visibility = View.GONE
+                b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.background)
+                b.interfaceDetailCard.strokeWidth = 0
+                b.interfaceSwitch.isChecked = false
+                b.interfaceStatus.text =
+                    context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
+                // cancel the job if it already exists for the config, as the config is disabled
+                cancelJobIfAny(config.id)
+            }
+        }
+
+        private fun updateProxyStatusContinuously(config: WgConfigFiles): Job? {
+            return ui {
+                while (true) {
+                    updateStatus(config)
+                    delay(DELAY)
+                }
+            }
+        }
+
+        private fun cancelJobIfAny(id: Int) {
+            val job = configs[id]
+            job?.cancel()
+            configs.remove(id)
+        }
+
+        private fun cancelAllJobs() {
+            configs.values.forEach {
+                it.cancel()
+            }
+            configs.clear()
         }
 
         private fun updateStatus(config: WgConfigFiles) {
             val id = ProxyManager.ID_WG_BASE + config.id
             val appsCount = ProxyManager.getAppCountForProxy(id)
             val statusId = VpnController.getProxyStatusById(id)
+
+            // if the view is not active then cancel the job
+            if (
+                lifecycleOwner != null &&
+                    lifecycleOwner
+                        ?.lifecycle
+                        ?.currentState
+                        ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
+            ) {
+                cancelAllJobs()
+                return
+            }
             updateUi(config, appsCount)
             updateStatusUi(config, statusId)
         }
@@ -131,8 +202,6 @@ class WgConfigAdapter(private val context: Context) :
         }
 
         private fun updateStatusUi(config: WgConfigFiles, statusId: Long?) {
-            if (context !is LifecycleOwner) return
-
             if (config.isActive) {
                 b.interfaceSwitch.isChecked = true
                 b.interfaceDetailCard.strokeWidth = 2
@@ -142,7 +211,8 @@ class WgConfigAdapter(private val context: Context) :
                     if (statusId == Backend.TOK) {
                         b.interfaceDetailCard.strokeColor =
                             UIUtils.fetchColor(context, R.attr.accentGood)
-                    } else if (statusId == Backend.TUP) {
+                        cancelJobIfAny(config.id)
+                    } else if (statusId == Backend.TUP || statusId == Backend.TZZ) {
                         b.interfaceDetailCard.strokeColor =
                             UIUtils.fetchColor(context, R.attr.chipTextNeutral)
                     } else {
@@ -155,7 +225,7 @@ class WgConfigAdapter(private val context: Context) :
                     b.interfaceDetailCard.strokeColor =
                         UIUtils.fetchColor(context, R.attr.accentBad)
                     b.interfaceStatus.text =
-                        context.getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
+                        context.getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
                 }
             } else {
                 b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.background)
@@ -171,12 +241,9 @@ class WgConfigAdapter(private val context: Context) :
 
             b.interfaceSwitch.setOnCheckedChangeListener(null)
             b.interfaceSwitch.setOnClickListener {
-                val scope = (context as LifecycleOwner).lifecycleScope
                 if (b.interfaceSwitch.isChecked) {
                     if (WireguardManager.canEnableConfig(config)) {
                         WireguardManager.enableConfig(config)
-                        // update the status after 1 second
-                        delay(DELAY, scope) { updateStatus(config) }
                     } else {
                         Utilities.showToastUiCentered(
                             context,
@@ -188,8 +255,6 @@ class WgConfigAdapter(private val context: Context) :
                 } else {
                     if (WireguardManager.canDisableConfig(config)) {
                         WireguardManager.disableConfig(config)
-                        // update the status after 1 second
-                        delay(DELAY, scope) { updateStatus(config) }
                     } else {
                         Utilities.showToastUiCentered(
                             context,
@@ -211,5 +276,12 @@ class WgConfigAdapter(private val context: Context) :
             )
             context.startActivity(intent)
         }
+    }
+
+    private fun ui(f: suspend () -> Unit): Job? {
+        if (lifecycleOwner == null) {
+            return null
+        }
+        return lifecycleOwner?.lifecycleScope?.launch(Dispatchers.Main) { f() }
     }
 }

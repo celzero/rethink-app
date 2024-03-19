@@ -42,6 +42,7 @@ import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -51,7 +52,10 @@ class DohEndpointAdapter(
     private val appConfig: AppConfig
 ) : PagingDataAdapter<DoHEndpoint, DohEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
 
+    var statusCheckJob: Job = Job()
+
     companion object {
+        private const val DELAY = 1000L
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<DoHEndpoint>() {
                 override fun areItemsTheSame(
@@ -108,23 +112,41 @@ class DohEndpointAdapter(
                         context.getString(R.string.lbl_insecure)
                     )
             }
-            b.endpointDesc.text = ""
             b.endpointCheck.isChecked = endpoint.isSelected
             Log.i(
                 LOG_TAG_DNS,
                 "connected to doh: ${endpoint.dohName} isSelected? ${endpoint.isSelected}"
             )
             if (endpoint.isSelected) {
-                // update the status after 1 second
-                val scope = (context as LifecycleOwner).lifecycleScope
-                Utilities.delay(1000L, scope) { updateSelectedStatus() }
+                keepSelectedStatusUpdated()
+            } else {
+                b.endpointDesc.text = ""
             }
 
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)
         }
 
+        private fun keepSelectedStatusUpdated() {
+            statusCheckJob = ui {
+                while (true) {
+                    updateSelectedStatus()
+                    delay(DELAY)
+                }
+            }
+        }
+
         private fun updateSelectedStatus() {
+            // if the view is not active then cancel the job
+            if (
+                !lifecycleOwner.lifecycle.currentState.isAtLeast(
+                    androidx.lifecycle.Lifecycle.State.STARTED
+                )
+            ) {
+                statusCheckJob.cancel()
+                return
+            }
+
             // always use the id as Dnsx.Preffered as it is the primary dns id for now
             val state = VpnController.getDnsStatus(Backend.Preferred)
             val status = getDnsStatusStringRes(state)
@@ -153,6 +175,8 @@ class DohEndpointAdapter(
                 endpoint.isSelected = true
                 appConfig.handleDoHChanges(endpoint)
             }
+            // cancel the current job, new job will be created when the view is active
+            statusCheckJob.cancel()
         }
 
         private fun deleteEndpoint(id: Int) {
@@ -230,6 +254,10 @@ class DohEndpointAdapter(
 
         private suspend fun uiCtx(f: suspend () -> Unit) {
             withContext(Dispatchers.Main) { f() }
+        }
+
+        private fun ui(f: suspend () -> Unit): Job {
+            return lifecycleOwner.lifecycleScope.launch(Dispatchers.Main) { f() }
         }
 
         private fun io(f: suspend () -> Unit) {
