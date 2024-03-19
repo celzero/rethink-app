@@ -82,12 +82,6 @@ class WgPeersAdapter(
                 b.persistentKeepaliveText.visibility = View.GONE
                 b.persistentKeepaliveLabel.visibility = View.GONE
             }
-            if (wgPeer.getPreSharedKey().isPresent) {
-                b.preSharedKeyText.text = wgPeer.getPreSharedKey().get().base64()
-            } else {
-                b.preSharedKeyText.visibility = View.GONE
-                b.preSharedKeyLabel.visibility = View.GONE
-            }
             b.publicKeyText.text = wgPeer.getPublicKey().base64()
 
             b.peerEdit.setOnClickListener { openEditPeerDialog(wgPeer) }
