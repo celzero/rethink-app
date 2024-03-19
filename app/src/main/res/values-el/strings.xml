@@ -42,7 +42,7 @@
     <string name="lbl_private" translatable="true">private</string>
     <string name="lbl_secure" translatable="true">ασφαλής</string>
     <string name="slide_2_title" translatable="true">Καλώς ήρθατε</string>
-    <string name="slide_1_title" translatable="true">Ελεύθερος και Ανοιχτός Κώδικας</string>
+    <string name="slide_1_title" translatable="true">Ελεύθερο και ανοιχτό λογισμικό</string>
     <string name="allow" translatable="true">επιτρέψτε</string>
     <string name="bypass_universal" translatable="true">γενική παράκαμψη</string>
     <string name="exclude" translatable="true">αποκλείστε το</string>
@@ -90,4 +90,10 @@
     <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">αναμονή</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">αποτυχία</string>
     <string name="status_protected_with_tor" translatable="true">προστατεύεται με tor</string>
+    <string name="lbl_domain" translatable="true">Τομέας</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="firewall_mode_info_title" translatable="true">Τείχος προστασίας</string>
+    <string name="always_on_dialog_positive" translatable="true">Διακοπή</string>
+    <string name="always_on_dialog_neutral" translatable="true">Ρυθμίσεις</string>
 </resources>

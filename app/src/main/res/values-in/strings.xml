@@ -998,4 +998,5 @@
     <string name="one_wg_apps_added" translatable="true">Rutekan semua aplikasi</string>
     <string name="lbl_status" translatable="true">Status</string>
     <string name="lbl_starting" translatable="true">Memulai</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">Penguncian Penuh</string>
 </resources>

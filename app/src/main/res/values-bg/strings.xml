@@ -69,4 +69,12 @@
     <string name="dns_mode_info_explanation_new">Наблюдение, блокиране и криптиране на DNS заявки.</string>
     <string name="dns_firewall_mode_info_explanation_new">Всичко гореизброено + заобикаляне на интернет цензурата.</string>
     <string name="alert_permission_accessibility">Разрешение - Достъпност</string>
+    <string name="lbl_cache" translatable="true">Кеш памет</string>
+    <string name="lbl_status" translatable="true">Статус</string>
+    <string name="lbl_remove" translatable="true">Премахване</string>
+    <string name="lbl_last" translatable="true">Последен</string>
+    <string name="lbl_starting" translatable="true">Стартиране</string>
+    <string name="lbl_stopped" translatable="true">Спрян</string>
+    <string name="lbl_private" translatable="true">поверително</string>
+    <string name="lbl_secure" translatable="true">защитен</string>
 </resources>
