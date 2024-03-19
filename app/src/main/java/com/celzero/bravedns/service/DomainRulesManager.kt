@@ -21,7 +21,6 @@ import android.util.Patterns
 import androidx.lifecycle.LiveData
 import backend.Backend
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.util.Constants
@@ -39,8 +38,11 @@ object DomainRulesManager : KoinComponent {
     private val db by inject<CustomDomainRepository>()
 
     private var trie: backend.RadixTree = Backend.newRadixTree()
+    // fixme: find a better way to handle trusted domains without using two data structures
     // map to store the trusted domains with set of uids
     private val trustedMap: MutableMap<String, Set<Int>> = ConcurrentHashMap()
+    // even though we have trustedMap, we need to keep the trie for wildcard matching
+    private var trustedTrie: backend.RadixTree = Backend.newRadixTree()
 
     // regex to check if url is valid wildcard domain
     // valid wildcard domain: *.example.com, *.example.co.in, *.do-main.com
@@ -93,7 +95,7 @@ object DomainRulesManager : KoinComponent {
     }
 
     // update the cache with the domain and its status based on the domain type
-    fun updateTrie(cd: CustomDomain) {
+    private fun updateTrie(cd: CustomDomain) {
         val key = mkTrieKey(cd.domain, cd.uid)
         trie.set(key, cd.status.toString())
     }
@@ -105,8 +107,15 @@ object DomainRulesManager : KoinComponent {
         return domain.lowercase(Locale.ROOT) + "," + uid
     }
 
+    private fun mkTrieKey(d: String): String {
+        // *.google.co.uk -> .google.co.uk
+        val domain = d.removePrefix("*")
+        return domain.lowercase(Locale.ROOT)
+    }
+
     suspend fun load(): Long {
         trie.clear()
+        trustedTrie.clear()
         trustedMap.clear()
         db.getAllCustomDomains().forEach { cd ->
             val key = mkTrieKey(cd.domain, cd.uid)
@@ -119,6 +128,8 @@ object DomainRulesManager : KoinComponent {
     private fun maybeAddToTrustedMap(cd: CustomDomain) {
         if (cd.status == Status.TRUST.id) {
             val domain = cd.domain.lowercase(Locale.ROOT)
+            val key = mkTrieKey(domain)
+            trustedTrie.set(key, cd.status.toString())
             trustedMap[cd.domain] = trustedMap.getOrDefault(domain, emptySet()).plus(cd.uid)
         }
     }
@@ -167,9 +178,7 @@ object DomainRulesManager : KoinComponent {
             return false
         }
         val domain = d.lowercase(Locale.ROOT)
-        val match = trustedMap.containsKey(domain)
-        if (DEBUG) Log.d(LOG_TAG_DNS, "isDomainTrusted: $domain: $match")
-        return match
+        return trustedTrie.hasAny(domain)
     }
 
     suspend fun trust(cd: CustomDomain) {
@@ -230,6 +239,13 @@ object DomainRulesManager : KoinComponent {
         } else {
             trustedMap[d] = trustedMap.getOrDefault(d, emptySet()).minus(uid)
         }
+        if (trustedMap[d] == null) {
+            val key = mkTrieKey(d)
+            trustedTrie.del(key)
+        } else {
+            val key = mkTrieKey(d)
+            trustedTrie.set(key, status.toString())
+        }
     }
 
     suspend fun updateDomainRule(
@@ -269,6 +285,8 @@ object DomainRulesManager : KoinComponent {
         val trustedUids = trustedMap.getOrDefault(d, emptySet()).minus(uid)
         if (trustedUids.isEmpty()) {
             trustedMap.remove(d)
+            val key = mkTrieKey(d)
+            trustedTrie.del(key)
         } else {
             trustedMap[d] = trustedUids
         }
@@ -279,6 +297,8 @@ object DomainRulesManager : KoinComponent {
             val newUids = uids.minus(uid)
             if (newUids.isEmpty()) {
                 trustedMap.remove(domain)
+                val key = mkTrieKey(domain)
+                trustedTrie.del(key)
             } else {
                 trustedMap[domain] = newUids
             }
@@ -296,6 +316,7 @@ object DomainRulesManager : KoinComponent {
         db.deleteAllRules()
         trie.clear()
         trustedMap.clear()
+        trustedTrie.clear()
     }
 
     private fun removeFromTrie(cd: CustomDomain) {
