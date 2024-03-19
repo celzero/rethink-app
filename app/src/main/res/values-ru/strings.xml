@@ -376,7 +376,7 @@
     <string name="notif_download_cancel_content">Загрузка отменена.</string>
     <string name="bsdl_blocked_desc">заблокирован %1$s по %2$s</string>
     <string name="rbl_parental_control">Родительский контроль</string>
-    <string name="radio_sky_btn">⛅ Скорость</string>
+    <string name="radio_sky_btn">⛅ Быстрый сервер</string>
     <string name="brbs_title">Резервное копирование и восстановление</string>
     <string name="rt_dialog_title">Сохранить изменения</string>
     <string name="radio_max_btn">🪂 Приватный сервер</string>
@@ -435,7 +435,7 @@
     <string name="dc_check_update_heading">Уведомление об обновлении списка блокировки</string>
     <string name="dc_check_update_desc">Проверять обновления списков блокировки каждые <i>три</i> дня</string>
     <string name="dc_dns_website_desc">Получает иконки сайтов с <i>nextdns.io</i> и <i>duckduckgo.com</i>. Потребляет до 350 мб дискового пространства</string>
-    <string name="dc_local_block_heading">Блокирующие списки на устройствах</string>
+    <string name="dc_local_block_heading">Списки блокировки на устройстве</string>
     <string name="dc_dns_leaks_heading">Предотвращение утечек DNS</string>
     <string name="about_bravedns_explantion">Rethink — это самый простой способ обходить интернет-цензуру, отслеживать и блокировать сетевую активность приложений на вашем Android устройстве.</string>
     <string name="about_bug_no_log_dialog_positive_btn">Отправить письмо</string>
@@ -584,7 +584,7 @@
     <string name="dc_entries">%1$s строк »</string>
     <string name="dc_local_block_desc_1">Выбирайте из 195+ списков блокировок. Нажмите здесь, чтобы загрузить их или настроить.</string>
     <string name="dc_dns_website_heading">Показывать значок веб-сайта в журналах DNS (экспериментально)</string>
-    <string name="about_bravedns_toreport_text">помощь и отзывы</string>
+    <string name="about_bravedns_toreport_text">Помощь и отзывы</string>
     <string name="about_bug_report_desc">Отправить журнал ошибок по email</string>
     <string name="about_bug_report">Сообщить об ошибке</string>
     <string name="about_bug_report_dialog_positive_btn">Отправить письмо</string>
