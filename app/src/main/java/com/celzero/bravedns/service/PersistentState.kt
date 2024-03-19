@@ -271,6 +271,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // route rethink in rethink
     var routeRethinkInRethink by booleanPref("route_rethink_in_rethink").withDefault<Boolean>(false)
 
+    // proxy dns requests over proxy
+    var proxyDns by booleanPref("proxy_dns").withDefault<Boolean>(true)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()

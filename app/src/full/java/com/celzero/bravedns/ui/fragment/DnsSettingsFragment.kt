@@ -103,6 +103,8 @@ class DnsSettingsFragment :
         b.dcAlgSwitch.isChecked = persistentState.enableDnsAlg
         // enable dns caching in tunnel
         b.dcEnableCacheSwitch.isChecked = persistentState.enableDnsCache
+        // proxy dns
+        b.dcProxyDnsSwitch.isChecked = !persistentState.proxyDns
 
         b.connectedStatusTitle.text = getConnectedDnsType()
     }
@@ -149,10 +151,9 @@ class DnsSettingsFragment :
     }
 
     private fun updateConnectedStatus(connectedDns: String) {
-        val oneWg = oneWireGuard()
-        if (oneWg) {
-            b.connectedStatusTitleUrl.text = resources.getString(R.string.lbl_wireguard)
-            b.connectedStatusTitle.text = ""
+        if (WireguardManager.oneWireGuardEnabled()) {
+            b.connectedStatusTitleUrl.text = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
+            b.connectedStatusTitle.text = resources.getString(R.string.lbl_wireguard)
             disableAllDns()
             b.wireguardRb.isEnabled = true
             return
@@ -204,8 +205,7 @@ class DnsSettingsFragment :
     }
 
     private fun updateSelectedDns() {
-        val oneWg = oneWireGuard()
-        if (oneWg) {
+        if (WireguardManager.oneWireGuardEnabled()) {
             b.wireguardRb.visibility = View.VISIBLE
             b.wireguardRb.isChecked = true
             b.wireguardRb.isEnabled = true
@@ -239,10 +239,6 @@ class DnsSettingsFragment :
         b.rethinkPlusDnsRb.isClickable = false
         b.customDnsRb.isClickable = false
         b.networkDnsRb.isClickable = false
-    }
-
-    private fun oneWireGuard(): Boolean {
-        return WireguardManager.oneWireGuardEnabled()
     }
 
     private fun getConnectedDnsType(): String {
@@ -356,6 +352,14 @@ class DnsSettingsFragment :
             persistentState.enableDnsCache = b
         }
 
+        b.dcProxyDnsSwitch.setOnCheckedChangeListener { _, b ->
+            persistentState.proxyDns = !b
+        }
+
+        b.dcProxyDnsRl.setOnClickListener {
+            b.dcProxyDnsSwitch.isChecked = !b.dcProxyDnsSwitch.isChecked
+        }
+
         b.dcRefresh.setOnClickListener {
             b.dcRefresh.isEnabled = false
             b.dcRefresh.animation = animation
@@ -425,10 +429,6 @@ class DnsSettingsFragment :
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
-    }
-
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
     }
 
     override fun onBtmSheetDismiss() {
