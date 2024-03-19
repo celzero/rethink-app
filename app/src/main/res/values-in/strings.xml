@@ -307,7 +307,7 @@
     <string name="lbbs_redownload">Unduh ulang daftar blokir</string>
     <string name="lbbs_download">Perbaharui daftar blokir</string>
     <string name="search_rethinkplus_file_tag"><font size="12">Cari daftar blokir</font></string>
-    <string name="about_mozilla">Rethink didukung oleh Mozilla Builders, OSOM Products Inc, dan FOSS United Foundation.</string>
+    <string name="about_mozilla">Rethink didukung oleh Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
     <string name="apps_info_title">Aplikasi</string>
     <string name="search_dns_logs"><font size="12">Mencari nama-nama domain atau IP</font></string>
     <string name="settings_https_disabled_error">Terhubung ke %1$s. Silahkan tutup dulu.</string>
@@ -330,7 +330,7 @@
     <string name="dns_proxy_remove_dialog_title">Hapus Proksi DNS\?</string>
     <string name="about_email">Email kami</string>
     <string name="fapps_firewall_filter_desc">Menampilkan <u>%1$s</u> %2$s aplikasi</string>
-    <string name="cd_dialog_title">Menambah domain</string>
+    <string name="cd_dialog_title">Tambahkan aturan domain</string>
     <string name="category_name_sys_components">Komponen-komponen Sistem</string>
     <string name="firewall_rule_block_udp_ntp_desc">Aturan firewall yang ditetapkan \"Pengguna\" memblokir koneksi<i>UDP</i>.<br/><br/> Untuk mengubahnya kunjungi tab<i>Universal</i>.</string>
     <string name="rt_chip_check_update">Periksa pembaruan</string>
@@ -351,7 +351,7 @@
 \n
 \nRethink menggunakan layanan aksesibilitas untuk mengawasi aplikasi yang sedang digunakan (latar depan) dan aplikasi yang tidak digunakan (latar belakang).</string>
     <string name="firewall_act_universal_tab">universal</string>
-    <string name="cd_dialog_error_invalid_domain">URL (domain) tidak valid.</string>
+    <string name="cd_dialog_error_invalid_domain">URL atau nama domain tidak valid</string>
     <string name="settings_socks5_dialog_hint_username">Nama pengguna (tidak wajib)</string>
     <string name="settings_theme_dialog_themes_3">Gelap</string>
     <string name="lbl_proceed">Melanjutkan</string>
@@ -401,7 +401,7 @@
     <string name="firewall_status_whitelisted">Aturan firewall universal dilewati (di-bypass)</string>
     <string name="vpn_profile_error">Tidak dapat membuka konfigurasi profil VPN.</string>
     <string name="settings_socks_forwarding_desc">Meneruskan ke %1$s:%2$s, %3$s</string>
-    <string name="refresh_complete">Sinkronisasi ulang daftar aplikasi selesai.</string>
+    <string name="refresh_complete"><!-- use dc_refresh_toast -->Sinkronisasi ulang daftar aplikasi selesai.</string>
     <string name="app_mode_dns_firewall">DNS dan Firewall (bawaan)</string>
     <string name="settings_socks5_vpn_disabled_error">Mulai Rethink untuk melanjutkan.</string>
     <string name="settings_http_proxy_desc">Meneruskan ke %1$s</string>
@@ -706,9 +706,9 @@
     <string name="fapps_firewall_filter_hint">Menampilkan semua aplikasi</string>
     <string name="accessibility_notification_content">layanan aksesibilitas Rethink telah berhenti atau macet. Tidak lagi memblokir aplikasi latar belakang. Ketuk untuk mengaktifkan kembali.</string>
     <string name="firewall_rule_block_dns_bypass_desc">Sambungan ini diblokir dikarenakan <i>sumber aplikasi</i> tersebut telah memintaskan DNS pilihan pengguna.<br/><br/> Untuk mengubah setingan ini, buka tab <i>Universal</i>.</string>
-    <string name="cd_dialog_desc">URL khusus (domain) atau wild card untuk mengizinkan atau memblokir. misalnya, *.test.com, test.com/test</string>
+    <string name="cd_dialog_desc">URL khusus atau sebuah nama domain dengan opsi wildcard. Misalnya, *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Memasukkan %1$s</string>
-    <string name="cd_dialog_error_invalid_wildcard">Wildcard tidak valid.</string>
+    <string name="cd_dialog_error_invalid_wildcard">URL Wildcard atau nama domain tidak valid</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ci_no_rule_initial">N</string>
     <string name="ada_firewall_title">aturan firewall untuk aplikasi ini</string>
@@ -834,10 +834,10 @@
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Domain Tepercaya (Universal)</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">akan mengabaikan aturan dns &amp; firewall universal</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Lewati DNS &amp; Firewall</string>
-    <string name="dc_refresh_toast" translatable="true">Penyegaran DNS selesai</string>
+    <string name="dc_refresh_toast" translatable="true">Penyegaran selesai</string>
     <string name="dc_setting_dns_cache_heading" translatable="true">Penguat DNS</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Menggabungkan permintaan, menyimpan tembolok (cache), menanggapi kesalahan dengan tangguh</string>
-    <string name="brbs_backup_restore_desc" translatable="true">Tidak berfungsi di berbagai versi aplikasi atau perangkat</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Tidak berfungsi di semua versi aplikasi</string>
     <string name="ada_app_firewall" translatable="true">Firewall</string>
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">Aplikasi yang Dipintaskan/Di-Bypass</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS Diblokir</string>
@@ -975,4 +975,27 @@
     <string name="crypt_quad9_desc" translatable="true">Quad9 (seluruh dunia) dnssec/tanpa-riwayat/tanpa–filter/ecs 9.9.9.12 – 149.112.112.12</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Membuat notifikasi tetap</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Pemberitahuan Terus-menerus</string>
+    <string name="lbl_cache" translatable="true">Cache</string>
+    <string name="lbl_remove" translatable="true">Hapus</string>
+    <string name="lbl_last" translatable="true">Terakhir</string>
+    <string name="lbl_overall" translatable="true">Keseluruhan</string>
+    <string name="lbl_stopped" translatable="true">Terhenti</string>
+    <string name="lbl_private" translatable="true">Pribadi</string>
+    <string name="lbl_secure" translatable="true">aman</string>
+    <string name="lbl_anonymous" translatable="true">anonim</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="failed_using_default" translatable="true">Gagal: menggunakan DNS cadangan</string>
+    <string name="orbot_no_app_toast" translatable="true">Tambahkan setidaknya satu aplikasi untuk mengaktifkan Orbot</string>
+    <string name="settings_rinr_heading" translatable="true">Putar Balik (eksperimental)</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Rutekan Lalu lintas Rethink sendiri, seperti unduhan daftar blokir, pemeriksaan konektivitas, koneksi DNS, kembali ke terowongan.</string>
+    <string name="settings_rinr_dialog_title" translatable="true">Putar Balik (eksperimental)</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">Ini juga akan mengaktifkan pengaturan<!--settings_network_all_networks--> %1$s. Apakah Anda ingin melanjutkan?</string>
+    <string name="cd_dialog_edit_title" translatable="true">Edit aturan nama domain</string>
+    <string name="cd_toast_edit" translatable="true">Disunting</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">Rutekan lalu lintas mandiri dari rethink melalui terowongan. Kecuali Anda tahu apa yang Anda lakukan, matikan.</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Hapus titik akhir DoT?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Hapus DNS di titik akhir TLS dari konfigurasi yang disimpan.</string>
+    <string name="one_wg_apps_added" translatable="true">Rutekan semua aplikasi</string>
+    <string name="lbl_status" translatable="true">Status</string>
+    <string name="lbl_starting" translatable="true">Memulai</string>
 </resources>
