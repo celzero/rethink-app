@@ -979,4 +979,14 @@
     <string name="settings_app_notification_persistent_heading" translatable="true">Постоянное уведомление</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">Удалить конечную точку DoT?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Удалить DNS через конечную точку TLS из сохраненной конфигурации.</string>
+    <string name="lbl_cache" translatable="true">Кэш</string>
+    <string name="lbl_status" translatable="true">Статус</string>
+    <string name="lbl_remove" translatable="true">Убрать</string>
+    <string name="lbl_last" translatable="true">Последний</string>
+    <string name="lbl_starting" translatable="true">Начало</string>
+    <string name="lbl_overall" translatable="true">Всего</string>
+    <string name="lbl_anonymous" translatable="true">анонимные</string>
+    <string name="lbl_stopped" translatable="true">Остановлено</string>
+    <string name="lbl_private" translatable="true">частные</string>
+    <string name="lbl_secure" translatable="true">безопасные</string>
 </resources>
