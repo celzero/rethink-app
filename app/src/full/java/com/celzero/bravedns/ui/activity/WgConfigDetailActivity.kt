@@ -285,7 +285,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         val id = ProxyManager.ID_WG_BASE + configId
         b.applicationsBtn.isEnabled = true
         mappingViewModel.getAppCountById(id).observe(this) {
-            b.applicationsBtn.text = getString(R.string.add_remove_apps, it.toString())
+            if (it == 0) {
+                b.applicationsBtn.setTextColor(UIUtils.fetchColor(this, R.attr.accentBad))
+            }
+             b.applicationsBtn.text = getString(R.string.add_remove_apps, it.toString())
         }
     }
 
