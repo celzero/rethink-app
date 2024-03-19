@@ -2,9 +2,9 @@
 <resources>
     <string name="app_name">RethinkDNS</string>
     <string name="settings_title_desc">DNS и Firewall с много възможности за персонализиране</string>
-    <string name="accessibility_service_description">RethinkDNS използва услугата за достъпност при засичането и блокирането на приложенията на заден план. RethinkDNS не събира или продава никаква информация.</string>
-    <string name="slide_2_desc">RethinkDNS е най-лесният начин да наблюдавате мрежовата активност, да заобиколите интернет цензурата и приложенията за защитна стена на вашето устройство с Android.</string>
-    <string name="slide_1_desc">RethinkDNS е софтуер с отворен код, поддържан от програмата Mozilla Builders MVP.</string>
+    <string name="accessibility_service_description">Rethink използва услугата за достъпност при засичането и блокирането на приложенията на заден план. Rethink не събира или продава никаква информация.</string>
+    <string name="slide_2_desc">Rethink е най-лесният начин да наблюдавате мрежовата активност, да заобиколите интернет цензурата и приложенията за защитна стена на вашето устройство с Android.</string>
+    <string name="slide_1_desc">Rethink е софтуер с отворен код, поддържан от програмата Mozilla Builders MVP.</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Натисни за промяна на настройките за защита</string>
     <string name="pause_mode_notification_title">На пауза! Блокираните приложения ще продължат да бъдат защитени със защитна стена.</string>
     <string name="dns_mode_notification_title">Защитен! Свързан към Бърз и Сигурен DNS.</string>
@@ -21,9 +21,9 @@
     <string name="firewall_mode_info_title">Защитна стена</string>
     <string name="firewall_mode_info_explanation_new">Наблюдавайте мрежовата активност и защитната стена за всяко приложение или IP адрес.</string>
     <string name="hybrid_mode_info_title">DNS + защитна стена</string>
-    <string name="alert_firewall_accessibility_explanation">RethinkDNS използва услуга за достъпност, за да проследява кои приложения се използват (на преден план) спрямо тези, които не се използват (на заден план).
+    <string name="alert_firewall_accessibility_explanation">Rethink използва услуга за достъпност, за да проследява кои приложения се използват (на преден план) спрямо тези, които не се използват (на заден план).
 \n
-\nRethinkDNS не събира никаква информация и не ви шпионира по никакъв начин.</string>
+\nRethink не събира никаква информация и не ви шпионира по никакъв начин.</string>
     <string name="app_name_small_case">rethink</string>
     <string name="title_about">За Rethink</string>
     <string name="title_settings">Настройки</string>
@@ -31,8 +31,8 @@
     <string name="pause_title_desc">на пауза…</string>
     <string name="about_title_desc">Засичай и блокирай мрежови заплахи</string>
     <string name="txt_home">Начало</string>
-    <string name="next">След.</string>
-    <string name="skip">Пропусни</string>
+    <string name="next">Следващ</string>
+    <string name="skip">Пропускане</string>
     <string name="finish">Завърши</string>
     <string name="slide_2_title">Добре дошли</string>
     <string name="slide_1_title">Безплатен и с отворен код</string>
@@ -42,8 +42,8 @@
     <string name="bypass_universal">универсален байпас</string>
     <string name="exclude">изключение</string>
     <string name="isolate">изолирай</string>
-    <string name="untracked">не следи</string>
-    <string name="warning_title" description="Status indicator text shown in a warning notification.">Внимание: RethinkDNS бе деактивиран</string>
+    <string name="untracked">без следи</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">Внимание: Rethink бе деактивиран</string>
     <string name="firewall_mode_notification_title">Защитен! Свързан към Firewall.</string>
     <string name="hybrid_mode_notification_title">Защитен! Свързан към DNS + Firewall.</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">чакане</string>
@@ -77,4 +77,118 @@
     <string name="lbl_stopped" translatable="true">Спрян</string>
     <string name="lbl_private" translatable="true">поверително</string>
     <string name="lbl_secure" translatable="true">защитен</string>
+    <string name="lbl_overall" translatable="true">Като цяло</string>
+    <string name="lbl_anonymous" translatable="true">анонимен</string>
+    <string name="failed_using_default" translatable="true">Неуспешно: използване на резервен DNS</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">Неуспешно отваряне на настройките за достъпност. Опитайте отново по-късно!</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">Изберете режим.</string>
+    <string name="brave_dns_connect_mode_change_dns" translatable="true">Изберете режим.</string>
+    <string name="bsct_block_domain" translatable="true">Блокирайте, доверете се на <u>домейн(и)</u> за <u>това приложение</u></string>
+    <string name="always_on_dialog_heading" translatable="true">Деактивиране на винаги включената VPN услуга</string>
+    <string name="always_on_dialog" translatable="true">\"Always-On VPN\" е активирана на това устройство. За да стартирате Rethink, моля, отидете в приложението \"Настройки\" и деактивирайте \"Always-on VPN\".</string>
+    <string name="always_on_dialog_positive_btn" translatable="true">Отидете в настройките</string>
+    <string name="always_on_dialog_stop_message" translatable="true">Винаги включената VPN услуга е активирана за Rethink. Сигурни ли сте, че все пак искате да спрете Rethink?</string>
+    <string name="private_dns_dialog_heading" translatable="true">Изключване на Private DNS</string>
+    <string name="firewall_act_universal_tab" translatable="true">Универсален</string>
+    <string name="firewall_act_network_monitor_tab" translatable="true">Мрежови дневници</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Изтриване на DoT крайна точка?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Изтрийте крайната точка на DNS през TLS от запазената конфигурация.</string>
+    <string name="dns_crypt_url_remove_dialog_message" translatable="true">Изтриване на DNSCrypt резолвера от запазената конфигурация.</string>
+    <string name="lbl_rules" translatable="true">правила</string>
+    <string name="lbl_configure" translatable="true">Конфигуриране</string>
+    <string name="lbl_logs" translatable="true">логове</string>
+    <string name="bsct_block_ip" translatable="true">Блокирайте, доверете се <u>този IP</u> за <u>това приложение</u></string>
+    <string name="lbl_maybe_blocked" translatable="true">Може би е блокиран</string>
+    <string name="lbl_network" translatable="true">мрежа</string>
+    <string name="bypass_dns_firewall" translatable="true">заобикаляне на DNS и защитна стена</string>
+    <string name="private_dns_dialog_positive" translatable="true">Отидете в настройките</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Изтриване на DNSCrypt resolver?</string>
+    <string name="doh_custom_url_remove_dialog_message" translatable="true">Изтриване на крайната точка DNS over Https от запазената конфигурация.</string>
+    <string name="always_on_dialog_positive" translatable="true">Спиране</string>
+    <string name="always_on_dialog_stop_heading" translatable="true">Винаги активна VPN услуга</string>
+    <string name="always_on_dialog_neutral" translatable="true">Настройки</string>
+    <string name="dns_act_configure_tab" translatable="true">Конфигурирай</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">Изтриване на крайната точка DoH?</string>
+    <string name="lbl_import" translatable="true">Внеси</string>
+    <string name="lbl_public_key" translatable="true">Публичен ключ</string>
+    <string name="lbl_applications" translatable="true">Приложения</string>
+    <string name="lbl_wireguard" translatable="true">Заместващ Знак</string>
+    <string name="lbl_proceed" translatable="true">Продължете</string>
+    <string name="lbl_private_key" translatable="true">Частен ключ</string>
+    <string name="lbl_generated" translatable="true">(генериран)</string>
+    <string name="lbl_random" translatable="true">(случаен)</string>
+    <string name="lbl_auto" translatable="true">(автоматичено)</string>
+    <string name="lbl_include" translatable="true">Включвай</string>
+    <string name="lbl_select_all" translatable="true">Избор всички</string>
+    <string name="lbl_active" translatable="true">Активен</string>
+    <string name="lbl_inactive" translatable="true">Неактивен</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="lbl_listen_port" translatable="true">Търсене на порт</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_slow" translatable="true">бавено</string>
+    <string name="lbl_very" translatable="true">много</string>
+    <string name="lbl_add" translatable="true">добавяне</string>
+    <string name="lbl_app_wise" translatable="true">на приложение</string>
+    <string name="lbl_min" translatable="true">мин.</string>
+    <string name="lbl_hour" translatable="true">час</string>
+    <string name="lbl_day" translatable="true">ден</string>
+    <string name="lbl_preshared_key" translatable="true">Предварително споделен ключ</string>
+    <string name="lbl_insecure" translatable="true">(несигурен)</string>
+    <string name="lbl_sec" translatable="true">секунда</string>
+    <string name="lbl_optional" translatable="true">(по избор)</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Постоянно поддържане на активността</string>
+    <string name="lbl_allowed_ips" translatable="true">Разрешени IP адреси</string>
+    <string name="lbl_save" translatable="true">запази</string>
+    <string name="bsct_app_info" translatable="true">Информация за приложението</string>
+    <string name="univ_firewall_dialog_title" translatable="true">Изтриване на IP правило?</string>
+    <string name="univ_firewall_dialog_message" translatable="true">Изтриването на това правило ще позволи на всяко приложение да се свързва с този IP адрес. Искате ли да продължите?</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Изтриване на релето DNSCrypt от запазената конфигурация.</string>
+    <string name="lbl_blocked" translatable="true">Блокирани</string>
+    <string name="lbl_cancel" translatable="true">Отказ</string>
+    <string name="lbl_apply" translatable="true">Приложи</string>
+    <string name="lbl_disabled" translatable="true">Деактивирано</string>
+    <string name="lbl_domain" translatable="true">Домейн</string>
+    <string name="lbl_wildcard" translatable="true">Заместващ знак</string>
+    <string name="lbl_dismiss" translatable="true">Пренебрегване</string>
+    <string name="lbl_all" translatable="true">Всички</string>
+    <string name="lbl_allowed" translatable="true">Разрешени</string>
+    <string name="lbl_action_required" translatable="true">Необходими действия</string>
+    <string name="custom_url_error_invalid_url" translatable="true">Невалиден URL</string>
+    <string name="conn_track_clear_logs_message" translatable="true">По този начин се изтриват само мрежовите логове, но не и правилата на защитната стена. Тази операция не може да бъде върната. Искате ли да продължите?</string>
+    <string name="conn_track_clear_logs_title" translatable="true">Изтриване на всички мрежови логове?</string>
+    <string name="bsct_block" translatable="true">Блокиране, заобикаляне, изключване, изолиране <u>това приложение</u></string>
+    <string name="bsct_conn_block_desc" translatable="true">блокиран %1$s от %2$s</string>
+    <string name="bsct_conn_block_desc_device" translatable="true">блокиран %1$s на устройството</string>
+    <string name="dns_crypt_url_remove_success" translatable="true">Изтрит DNSCrypt резолвер.</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Изтриване на DNSCrypt Relay?</string>
+    <string name="lbl_create" translatable="true">Създай</string>
+    <string name="lbl_addresses" translatable="true">Адреси</string>
+    <string name="lbl_qr_code" translatable="true">QR код</string>
+    <string name="lbl_ip_rules" translatable="true">Правила за IP</string>
+    <string name="lbl_dns_servers" translatable="true">Сървър на DNS</string>
+    <string name="lbl_domain_rules" translatable="true">Правила на домейна</string>
+    <string name="lbl_delete" translatable="true">Изтрий</string>
+    <string name="lbl_fast" translatable="true">бързо</string>
+    <string name="default_dns_name" translatable="true">RDNS по подразбиране</string>
+    <string name="dns_query_clear_logs_title" translatable="true">Изтриване на всички логове на DNS?</string>
+    <string name="dns_query_clear_logs_message" translatable="true">По този начин се изтриват DNS дневниците на устройството. Тази операция не може да бъде върната. Искате ли да продължите?</string>
+    <string name="bsct_conn_desc_allowed" translatable="true">разрешено на %1$s %2$s</string>
+    <string name="bsct_conn_desc_blocked" translatable="true">блокирани на %1$s %2$s</string>
+    <string name="always_on_dialog_lockdown_stop_message" translatable="true">RethinkDNS работи с VPN в режим <i>Lockdown</i>. Спирането му ще доведе до загуба на интернет свързаност на този потребителски профил. Искате ли все пак да продължите?</string>
+    <string name="private_dns_dialog_desc" translatable="true">DNS настройките на Rethink са заменени от Private DNS на Android.
+\n
+\nЗа да използвате DNS на Rethink, отидете в Настройки на Android и изключете \"Private DNS\".</string>
+    <string name="doh_custom_url_remove_success" translatable="true">Крайната точка е изтрита.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Услугата за достъпност RethinkDNS е спряна или се е сринала. <i><b>Влезте в Настройки и Насилствено спрете</b></i> RethinkDNS и го стартирайте отново, за да използвате <i>Блокирайте всяко приложение, което не се използва</i> функция.
+\n
+\nRethinkDNS използва услугата за достъпност, за да следи кои приложения се използват (на преден план) спрямо тези, които не се използват (на заден план).</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Блокира дадено приложение да се свързва с интернет.
+\n <u>#2</u>: Блокира всяко приложение да се свързва с определен IP адрес.
+\n <u>#3</u>: Блокира всички връзки, когато устройството е заключено (универсална защитна стена).
+\n <u>#4</u>: Блокира всяко приложение, което не се използва (универсална защитна стена).
+\n <u>#5</u>: Блокира връзките, когато източникът на приложението е неизвестен (Universal Firewall).
+\n <u>#6</u>: Блокира целия UDP трафик с изключение на DNS (универсална защитна стена).
+\n <u>#7</u>: Блокиране на връзки, когато DNS е заобиколен (Universal Firewall).</string>
 </resources>
