@@ -841,7 +841,7 @@
     <string name="ada_app_firewall" translatable="true">Firewall</string>
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">Aplikasi yang Dipintaskan/Di-Bypass</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS Diblokir</string>
-    <string name="firewall_rule_domain_blocked_univ" translatable="true">Daerah (Universal)</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">Domain (Universal)</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true">Sambungan ini diblokir karena <i>domain</i> diblokir oleh DNS pilihan pengguna.<br/><br/> Untuk mengubah perilaku ini, buka tab <i>Konfigurasi DNS</i>.</string>
     <string name="lbl_maybe_blocked" translatable="true">Mungkin Diblokir</string>
     <string name="lbl_network" translatable="true">jaringan</string>
@@ -922,7 +922,7 @@
     <string name="settings_go_log_desc" translatable="true">Untuk tujuan debugging</string>
     <string name="cleanbrowsing_family_dns_desc" translatable="true">Filter keluarga memblokir akses ke semua situs dewasa, pornografi, dan situs seksual eksplisit. Ini juga akan memblokir domain proksi dan VPN yang dapat digunakan untuk melewati filter. Situs yang berisi konten campuran, seperti Reddit, juga diblokir. Google, Bing, dan YouTube disetel ke mode aman.</string>
     <string name="logs_disclaimer" translatable="true">Menunjukkan karakter 20,000 pertama</string>
-    <string name="import_error" translatable="true">Gagal mengimpor terowongan: %s</string>
+    <string name="import_error" translatable="true">Gagal mengimpor tunnel: %s</string>
     <string name="bad_config_reason_unknown_attribute" translatable="true">Atribut tidak dikenal</string>
     <string name="app_ip_domain_rules_desc" translatable="true">Modifikasi tiap IP aplikasi / Aturan domain.</string>
     <string name="bad_config_reason_missing_attribute" translatable="true">Atribut hilang</string>
@@ -948,15 +948,15 @@
     <string name="crypt_cleanbrowsing_family_desc" translatable="true">Memblokir akses ke semua situs dewasa, pornografi, dan situs seksual eksplisit. Itu juga memblokir domain proksi dan VPN yang digunakan untuk melewati filter. Situs konten campuran (seperti Reddit) juga diblokir. Google, Bing dan Youtube diatur ke Safe Mode.</string>
     <string name="bad_config_reason_unknown_section" translatable="true">Bagian yang tidak diketahui</string>
     <string name="crypt_relay_netherlands" translatable="true">Penghubung DNS anonim yang dihosting di Belanda</string>
-    <string name="invalid_file_error" translatable="true">File yang tidak valid</string>
-    <string name="include_all_app_wg_dialog_desc">Bungkus semua aplikasi melalui terowongan ini\?</string>
+    <string name="invalid_file_error" translatable="true">File tidak valid</string>
+    <string name="include_all_app_wg_dialog_desc">Gunakan VPN WireGuard untuk semua aplikasi?</string>
     <string name="key_length_error" translatable="true">Panjang kunci salah</string>
     <string name="config_delete_dialog_title">Hapus Konfigurasi</string>
     <string name="logs_card_duration" translatable="true">sejak %1$s</string>
     <string name="cleanbrowsing_adult_dns_desc" translatable="true">Filter dewasa memblokir akses ke semua situs dewasa, pornografi, dan situs seksual eksplisit. Itu tidak memblokir proksi atau VPN, juga tidak memblokir situs web konten campuran. Situs seperti Reddit diizinkan. Google dan Bing akan disetel ke mode aman.</string>
-    <string name="config_delete_dialog_desc">Apakah Anda yakin ingin menghapus konfigurasi ini\?</string>
+    <string name="config_delete_dialog_desc">Apakah Anda yakin ingin menghapus konfigurasi VPN WireGuard?</string>
     <string name="parse_error_reason" translatable="true">Tidak dapat menguraikan %1$s \"%2$s\"</string>
-    <string name="parse_error_generic" translatable="true">garis</string>
+    <string name="parse_error_generic" translatable="true">baris</string>
     <string name="generic_error" translatable="true">Kesalahan \"%s\" tidak diketahui</string>
     <string name="app_ip_domain_rules" translatable="true">Per aplikasi IP / Aturan domain</string>
     <string name="bad_config_error" translatable="true">%1$s dalam %2$s</string>
@@ -969,7 +969,7 @@
     <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS dengan pencarian aman dan pemblokiran konten dewasa.</string>
     <string name="bad_config_reason_syntax_error" translatable="true">Kesalahan sintaks</string>
     <string name="crypt_relay_france" translatable="true">Penghubung DNS anonim yang dihosting di Paris, Prancis yang disediakan oleh https://cryptostrom.is/.</string>
-    <string name="lbl_listen_port" translatable="true">Pelabuhan (port) dengar</string>
+    <string name="lbl_listen_port" translatable="true">Dengar port</string>
     <string name="wireguard_connection_error">VPN WireGuard gagal terhubung</string>
     <string name="illegal_filename_error" translatable="true">Nama berkas ilegal \"%s\"</string>
     <string name="crypt_quad9_desc" translatable="true">Quad9 (seluruh dunia) dnssec/tanpa-riwayat/tanpa–filter/ecs 9.9.9.12 – 149.112.112.12</string>
@@ -987,7 +987,7 @@
     <string name="failed_using_default" translatable="true">Gagal: menggunakan DNS cadangan</string>
     <string name="orbot_no_app_toast" translatable="true">Tambahkan setidaknya satu aplikasi untuk mengaktifkan Orbot</string>
     <string name="settings_rinr_heading" translatable="true">Putar Balik (eksperimental)</string>
-    <string name="settings_rinr_desc_disabled" translatable="true">Rutekan Lalu lintas Rethink sendiri, seperti unduhan daftar blokir, pemeriksaan konektivitas, koneksi DNS, kembali ke terowongan.</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Rutekan Lalu lintas Rethink sendiri, seperti unduhan daftar blokir, pemeriksaan konektivitas, koneksi DNS, kembali ke tunnel.</string>
     <string name="settings_rinr_dialog_title" translatable="true">Putar Balik (eksperimental)</string>
     <string name="settings_rinr_dialog_desc" translatable="true">Ini juga akan mengaktifkan pengaturan<!--settings_network_all_networks--> %1$s. Apakah Anda ingin melanjutkan?</string>
     <string name="cd_dialog_edit_title" translatable="true">Edit aturan nama domain</string>
@@ -1005,7 +1005,7 @@
     <string name="lbl_remaining_apps" translatable="true">Aplikasi yang tersisa</string>
     <string name="one_wg_dialog_desc" translatable="true">Seluruh koneksi dari semua aplikasi, termasuk DNS, akan dirutekan dengan lajur tunggal, yaitu VPN WireGuard yang aktif. Seluruh aktivitas VPN WireGuard yang lain akan dihentikan.</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Semua koneksi dan aplikasi yang tidak dirutekan oleh VPN WireGuard akan dirutekan melalui VPN ini.</string>
-    <string name="catch_all_wg_dialog_title" translatable="true">Selalu Menyala</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">Selalu aktif</string>
     <string name="wg_lockdown_dialog_desc" translatable="true">Aplikasi yang dipilih hanya akan dirutekan melalui jalur VPN WireGuard, terlepas apakah VPN tersambung atau gagal terhubung.</string>
     <string name="one_wg_error_toast" translatable="true">Untuk beralih ke mode lanjutan, hentikan WireGuard dalam mode Sederhana</string>
     <string name="wireguard_disable_failure" translatable="true">\"Selalu hidupkan WireGuard\" tidak dapat dimatikan</string>
