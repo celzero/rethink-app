@@ -59,6 +59,10 @@ class ProxyAppMappingRepository(
         proxyApplicationMappingDAO.updateProxyForAllApps(proxyId, proxyName)
     }
 
+    suspend fun updateProxyNameForProxyId(proxyId: String, proxyName: String) {
+        proxyApplicationMappingDAO.updateProxyNameForProxyId(proxyId, proxyName)
+    }
+
     suspend fun updateProxyForUnselectedApps(proxyId: String, proxyName: String) {
         return proxyApplicationMappingDAO.updateProxyForUnselectedApps(proxyId, proxyName)
     }

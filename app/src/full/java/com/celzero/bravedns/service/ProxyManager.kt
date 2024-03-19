@@ -151,6 +151,10 @@ object ProxyManager : KoinComponent {
         Log.i(LOG_TAG_PROXY, "added all apps to proxy: $proxyId")
     }
 
+    suspend fun updateProxyNameForProxyId(proxyId: String, proxyName: String) {
+        db.updateProxyNameForProxyId(proxyId, proxyName)
+    }
+
     suspend fun setProxyIdForUnselectedApps(proxyId: String, proxyName: String) {
         // ID_NONE or empty proxy-id is not allowed
         if (!isValidProxyPrefix(proxyId)) {
