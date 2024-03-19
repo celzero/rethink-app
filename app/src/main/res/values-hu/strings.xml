@@ -1,5 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">RethinkDNS</string>
-    <string name="title_about" translatable="true">About</string>
+    <string name="title_about" translatable="true">Rólunk</string>
+    <string name="about_title_desc" translatable="true">Hálózatbiztonsági fenyegetések észlelése és blokkolása</string>
+    <string name="lbl_rules" translatable="true">szabályok</string>
+    <string name="title_settings" translatable="true">Beállítások</string>
+    <string name="pause_title_desc" translatable="true">Pihenés…</string>
+    <string name="txt_home" translatable="true">Kezdőlap</string>
+    <string name="settings_title_desc" translatable="true">Egy gondosan testreszabható DNS és tűzfal</string>
+    <string name="lbl_maybe_blocked" translatable="true">Talán blokkolva</string>
+    <string name="lbl_domain" translatable="true">Domain</string>
+    <string name="lbl_wildcard" translatable="true">Wildcard</string>
+    <string name="lbl_logs" translatable="true">Naplók</string>
+    <string name="lbl_create" translatable="true">Létrehozás</string>
+    <string name="lbl_qr_code" translatable="true">QR-kód</string>
+    <string name="lbl_import" translatable="true">Importálás</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_public_key" translatable="true">Nyilvános kulcs</string>
+    <string name="lbl_addresses" translatable="true">Címek</string>
+    <string name="lbl_dns_servers" translatable="true">DNS Szerverek</string>
+    <string name="lbl_applications" translatable="true">Alkalmazások</string>
+    <string name="lbl_ip_rules" translatable="true">IP szabályok</string>
+    <string name="accessibility_service_description" translatable="true">A RethinkDNS a Kisegítő lehetőségeket használja a háttérben futó alkalmazások észlelésére és tűzfalazására. A RethinkDNS nem gyűjt vagy ad el semmilyen információt.</string>
+    <string name="skip" translatable="true">Kihagy</string>
+    <string name="finish" translatable="true">Befejezés</string>
+    <string name="lbl_cancel" translatable="true">Mégse</string>
+    <string name="lbl_apply" translatable="true">Alkalmazás</string>
+    <string name="lbl_dismiss" translatable="true">Elvetés</string>
+    <string name="lbl_disabled" translatable="true">Tiltva</string>
+    <string name="title_statistics" translatable="true">Statisztika</string>
+    <string name="next" translatable="true">Következő</string>
+    <string name="lbl_all" translatable="true">Mind</string>
+    <string name="lbl_allowed" translatable="true">Engedélyezve</string>
+    <string name="lbl_blocked" translatable="true">Blokkolt</string>
+    <string name="lbl_domain_rules" translatable="true">Domain szabályok</string>
+    <string name="lbl_action_required" translatable="true">Beavatkozás szükséges</string>
+    <string name="lbl_configure" translatable="true">Beállít</string>
+    <string name="lbl_network" translatable="true">hálózat</string>
+    <string name="lbl_proceed" translatable="true">Folytatás</string>
+    <string name="lbl_delete" translatable="true">Törlés</string>
+    <string name="lbl_private_key" translatable="true">Privát kulcs</string>
+    <string name="lbl_generated" translatable="true">(generált)</string>
+    <string name="lbl_random" translatable="true">(véletlenszerű)</string>
 </resources>

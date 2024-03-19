@@ -978,4 +978,14 @@
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">evrensel dns ve güvenlik duvarı kurallarını atlayacaktır</string>
     <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
     <string name="lbl_random" translatable="true">(rastgele)</string>
+    <string name="lbl_remove" translatable="true">Kaldır</string>
+    <string name="lbl_last" translatable="true">Son</string>
+    <string name="lbl_stopped" translatable="true">Durduruldu</string>
+    <string name="lbl_private" translatable="true">özel</string>
+    <string name="lbl_secure" translatable="true">güvenli</string>
+    <string name="lbl_anonymous" translatable="true">anonim</string>
+    <string name="lbl_cache" translatable="true">Önbellek</string>
+    <string name="lbl_status" translatable="true">Durum</string>
+    <string name="lbl_starting" translatable="true">Başlatılıyor</string>
+    <string name="lbl_overall" translatable="true">Etraflı</string>
 </resources>

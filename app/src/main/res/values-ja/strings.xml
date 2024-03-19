@@ -620,7 +620,7 @@
     <string name="lbl_auto" translatable="true">(自動)</string>
     <string name="lbl_slow" translatable="true">遅い</string>
     <string name="lbl_day" translatable="true">日</string>
-    <string name="lbl_fast" translatable="true">早い</string>
+    <string name="lbl_fast" translatable="true">高速</string>
     <string name="lbl_inactive" translatable="true">活動していません</string>
     <string name="lbl_addresses" translatable="true">アドレス</string>
     <string name="lbl_active" translatable="true">活動中</string>
@@ -643,4 +643,6 @@
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
     <string name="lbl_sec" translatable="true">秒</string>
     <string name="status_protected_with_wg" translatable="true">WireGuard で保護されています</string>
+    <string name="lbl_dismiss" translatable="true">却下する</string>
+    <string name="lbl_cache" translatable="true">キャッシュ</string>
 </resources>
