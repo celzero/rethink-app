@@ -878,8 +878,8 @@
     <string name="lbl_addresses" translatable="true">Adresses</string>
     <string name="lbl_active" translatable="true">Actif</string>
     <string name="lbl_dns_servers" translatable="true">Serveurs DNS</string>
-    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">pays les plus contactés</string>
-    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">pays les plus bloqués</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Pays les plus contactés</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Pays les plus bloqués</string>
     <string name="lbl_app_wise" translatable="true">par application</string>
     <string name="status_protected_with_wg" translatable="true">protégé avec wireguard</string>
     <string name="lbl_public_key" translatable="true">Clé publique</string>
@@ -888,12 +888,12 @@
     <string name="bad_config_reason_unknown_section" translatable="true">Section inconnue</string>
     <string name="lbl_applications" translatable="true">Applications</string>
     <string name="lbl_include" translatable="true">Inclure</string>
-    <string name="key_length_error" translatable="true">Taille de clé incorrecte</string>
+    <string name="key_length_error" translatable="true">Longueur de clé incorrecte</string>
     <string name="lbl_very" translatable="true">très</string>
     <string name="lbl_select_all" translatable="true">Tout sélectionner</string>
     <string name="lbl_create" translatable="true">Créer</string>
     <string name="http_proxy_dialog_desc" translatable="true">Configuration de l\'URL de forme, &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Exemple: http://proxy.example.com:8080/</string>
-    <string name="status_protected_with_wg_private_dns" translatable="true">Protégé avec Wireguard &amp; DNS privé</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">Protégé par Wireguard &amp; DNS privé</string>
     <string name="bad_config_reason_syntax_error" translatable="true">Erreur de syntaxe</string>
     <string name="lbl_listen_port" translatable="true">Port d\'écoute</string>
     <string name="lbl_random" translatable="true">(aléatoire)</string>
@@ -921,16 +921,16 @@
     <string name="cloudflare_family_dns_desc" translatable="true">Bloque les logiciels malveillants et le contenu pour adultes. Utilise le point de terminaison DNS 1.1.1.3 de Cloudflare.</string>
     <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no-log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112.112.112</string>
     <string name="lbl_save" translatable="true">enregistrer</string>
-    <string name="cd_deleted_toast" translatable="true">Toutes les règles de domaine supprimées</string>
+    <string name="cd_deleted_toast" translatable="true">Toutes les règles de domaine ont étés supprimées</string>
     <string name="lbl_optional" translatable="true">(facultatif)</string>
-    <string name="settings_go_log_desc" translatable="true">Pour du débogage</string>
+    <string name="settings_go_log_desc" translatable="true">À des fins de débogage</string>
     <string name="cleanbrowsing_family_dns_desc" translatable="true">Le filtre familial bloque l\'accès à tous les sites pour adultes, pornographiques et explicites. Il bloque également les domaines proxy et VPN qui pourraient être utilisés pour contourner nos filtres. Les sites à contenu mixte (comme Reddit) sont également bloqués. Google, Bing et Youtube sont configurés en mode SafeSearch.</string>
     <string name="logs_disclaimer" translatable="true">Afficher les 20.000 premiers caractères</string>
     <string name="import_error" translatable="true">Impossible d\'importer un tunnel : %s</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Configuration WARP invalide</string>
     <string name="app_ip_domain_rules_desc" translatable="true">Modifier par application IP / Règles de domaine.</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
-    <string name="wireguard_disclaimer">Il s\'agit d\'un WireGuard expérimental en tant que proxy TCP et UDP. Alors que le trafic DNS est transféré vers %1$s, le trafic ICMP (ex : ping) est envoyé au réseau sous-jacent.</string>
+    <string name="wireguard_disclaimer">Le DNS est transmis à %1$s, ICMP (ex : ping) est envoyé au réseau sous-jacent.</string>
     <string name="bad_config_explanation_positive_number" translatable="true">: Doit être positif</string>
     <string name="wireguard_no_config_msg">Pas de configurations WireGuard</string>
     <string name="new_warp_error_toast" translatable="true">Impossible de récupérer la configuration WARP</string>
@@ -965,7 +965,7 @@
     <string name="no_configs_error" translatable="true">Aucune configuration trouvée</string>
     <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS avec la recherche sécuritaire et le blocage des contenus adultes.</string>
     <string name="crypt_relay_france" translatable="true">Relais DNS anonyme hébergé à Paris, France fourni par https://cryptostrom.is/.</string>
-    <string name="wireguard_connection_error">Problème de connexion à la configuration WireGuard</string>
+    <string name="wireguard_connection_error">WireGuard VPN ne parvient pas à se connecter</string>
     <string name="illegal_filename_error" translatable="true">Nom de fichier illégal “%s”</string>
     <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
     <string name="parse_error_inet_endpoint" translatable="true">Serveur distant</string>
@@ -974,4 +974,40 @@
     <string name="lbl_persistent_keepalive" translatable="true">Keepalive persistant</string>
     <string name="parse_error_reason" translatable="true">Impossible d\'analyser %1$s “%2$s”</string>
     <string name="lbl_insecure" translatable="true">(non sécurisé)</string>
+    <string name="lbl_stopped" translatable="true">Arrêté</string>
+    <string name="lbl_private" translatable="true">Privé</string>
+    <string name="lbl_secure" translatable="true">Sécurisé</string>
+    <string name="lbl_peer" translatable="true">Pair</string>
+    <string name="failed_using_default" translatable="true">Échec : utilisation du DNS de secours</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Supprimer le point de terminaison DoT ?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Supprimer le point de terminaison DNS over TLS de la configuration enregistrée.</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Acheminez le propre trafic de Rethink, comme les téléchargements de listes de blocage, les vérifications de connectivité, les connexions DNS, dans le tunnel.</string>
+    <string name="settings_rinr_dialog_title" translatable="true">Loopback (expérimental)</string>
+    <string name="cd_toast_edit" translatable="true">Modifié</string>
+    <string name="one_wg_apps_added" translatable="true">Routage de toutes les applications</string>
+    <string name="lbl_cache" translatable="true">Cache</string>
+    <string name="settings_rinr_heading" translatable="true">Loopback (expérimental)</string>
+    <string name="orbot_no_app_toast" translatable="true">Ajoutez au moins une application pour activer Orbot</string>
+    <string name="lbl_status" translatable="true">Statut</string>
+    <string name="lbl_remove" translatable="true">Retirer</string>
+    <string name="lbl_last" translatable="true">Dernier</string>
+    <string name="lbl_starting" translatable="true">Démarrage</string>
+    <string name="lbl_anonymous" translatable="true">Anonyme</string>
+    <string name="lbl_overall" translatable="true">Vue d\'ensemble</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">Confinement</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Les applications sélectionnées seront uniquement acheminées via ce VPN WireGuard, que le VPN soit rompu ou connecté.</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">Toujours en marche</string>
+    <string name="routing_remaining_apps" translatable="true">Routage des applications restantes</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">Routage du trafic propre à Rethink à travers le tunnel. À moins que vous sachiez ce que vous faites, désactivez cette fonction.</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">Active également le réglage <!--settings_network_all_networks--> %1$s. Voulez-vous poursuivre ?</string>
+    <string name="one_wg_dialog_desc" translatable="true">Toutes les connexions de toutes les applications, y compris les DNS, seront acheminées vers un seul VPN WireGuard actif. Les autres VPN actifs de WireGuard, s\'il y en a, seront arrêtés.</string>
+    <string name="cd_dialog_edit_title" translatable="true">Modifier la règle du domaine</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">Toutes les connexions et applications qui ne sont pas acheminées par d\'autres VPN de WireGuard seront acheminées par celui-ci.</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Inclure toutes les applications restantes non acheminées par un autre proxy</string>
+    <string name="firewall_rule_proxied" translatable="true">Mandaté</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">partie de %1$s</string>
+    <string name="one_wg_error_toast" translatable="true">Pour passer en mode avancé, arrêtez WireGuard en mode simple</string>
+    <string name="wireguard_disable_failure" translatable="true">\"Always-on WireGuard\" ne peut pas être désactivé</string>
+    <string name="wireguard_disable_title" translatable="true">Arrêter WireGuard</string>
+    <string name="wireguard_disable_message" translatable="true">Arrêter tous les VPN WireGuard actifs ?</string>
 </resources>
