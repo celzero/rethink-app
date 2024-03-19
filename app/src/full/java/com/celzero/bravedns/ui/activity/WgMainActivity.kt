@@ -215,7 +215,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
         val layoutManager = LinearLayoutManager(this)
         b.oneWgInterfaceList.layoutManager = layoutManager
 
-        oneWgConfigAdapter = OneWgConfigAdapter(this)
+        oneWgConfigAdapter = OneWgConfigAdapter(this, this)
         wgConfigViewModel.interfaces.observe(this) { oneWgConfigAdapter?.submitData(lifecycle, it) }
         b.oneWgInterfaceList.adapter = oneWgConfigAdapter
     }
