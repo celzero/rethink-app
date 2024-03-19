@@ -24,10 +24,12 @@ import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpRepository
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_FIREWALL
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import inet.ipaddr.HostName
+import inet.ipaddr.AddressStringException
+import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -42,7 +44,7 @@ object IpRulesManager : KoinComponent {
     private var iptree = Backend.newIpTree()
 
     // key-value object for ip look-up
-    data class CacheKey(val hostName: HostName, val uid: Int)
+    data class CacheKey(val ipNetPort: String, val uid: Int)
 
     // stores the response for the look-up request from the BraveVpnService
     // especially useful for storing results of subnetMatch() function as it is expensive
@@ -98,9 +100,11 @@ object IpRulesManager : KoinComponent {
     suspend fun load(): Long {
         iptree.clear()
         db.getIpRules().forEach {
-            val ipstr = it.getCustomIpAddress().toNormalizedString()
-            val k = treeKey(ipstr)
-            val v = treeVal(it.uid, it.port, it.status)
+            val pair = it.getCustomIpAddress()
+            val ipaddr = pair.first
+            val port = pair.second
+            val k = normalize(ipaddr)
+            val v = treeVal(it.uid, port, it.status)
             if (!k.isNullOrEmpty()) {
                 try {
                     logd("iptree.add($k, $v)")
@@ -117,8 +121,15 @@ object IpRulesManager : KoinComponent {
         return db.getCustomIpsLiveData()
     }
 
-    private fun treeKey(ipstr: String): String? {
+    private fun normalize(ipaddr: IPAddress?): String? {
+        if (ipaddr == null) return null
+        return treeKey(ipaddr.toNormalizedString())
+    }
+
+    private fun treeKey(ipstr: String?): String? {
+        if (ipstr == null) return null
         // "192/8" -> 0.0.0.192/32
+        // "192.0.0.0" -> 192.0.0.0/32
         // "*.*" -> 0.0.0.0/0
         // "*.*.*.*" -> 0.0.0.0/0
         // "0/24" -> 0.0.0.0/24
@@ -134,7 +145,13 @@ object IpRulesManager : KoinComponent {
         // 1.2.*.4 returns null
         // 1.2.252-255.* returns 1.2.252.0/22
         // 1.2.3.4/x returns the same address
-        return ipaddr(ipstr)?.asAddress()?.assignPrefixForSingleBlock()?.toCanonicalString()
+        val pair = hostAddr(ipstr)
+        val ipAddr = pair.first
+        return if (ipstr.contains("*")) {
+            ipAddr.assignPrefixForSingleBlock()?.toCanonicalString()
+        } else {
+            ipAddr.toNormalizedString()
+        }
     }
 
     private fun treeValLike(uid: Int, port: Int): String {
@@ -181,7 +198,8 @@ object IpRulesManager : KoinComponent {
 
     private suspend fun updateRule(uid: Int, ipaddr: String, port: Int, status: IpRuleStatus) {
         Log.i(LOG_TAG_FIREWALL, "ip rule, update: $ipaddr for uid: $uid; status: ${status.name}")
-        val c = makeCustomIp(uid, ipaddr, port, status)
+        // ipaddr is expected to be normalized
+        val c = makeCustomIp2(uid, ipaddr, port, status)
         db.update(c)
         val k = treeKey(ipaddr)
         if (!k.isNullOrEmpty()) {
@@ -203,13 +221,14 @@ object IpRulesManager : KoinComponent {
         return updateRule(c.uid, c.ipAddress, c.port, IpRuleStatus.NONE)
     }
 
-    suspend fun updateBlock(customIp: CustomIp) {
-        return updateRule(customIp.uid, customIp.ipAddress, customIp.port, IpRuleStatus.BLOCK)
+    suspend fun updateBlock(c: CustomIp) {
+        return updateRule(c.uid, c.ipAddress, c.port, IpRuleStatus.BLOCK)
     }
 
     fun hasRule(uid: Int, ipstr: String, port: Int): IpRuleStatus {
-        val ip = ipaddr(ipstr, port) ?: return IpRuleStatus.NONE
-        val ck = CacheKey(ip, uid)
+        val pair = hostAddr(ipstr, port)
+        val ipNetPort = joinIpNetPort(normalize(pair.first) + pair.second)
+        val ck = CacheKey(ipNetPort, uid)
 
         resultsCache.getIfPresent(ck)?.let {
             // return only if both ip and app(uid) matches
@@ -249,17 +268,10 @@ object IpRulesManager : KoinComponent {
         return IpRuleStatus.NONE
     }
 
-    fun ipaddr(ipstr: String, port: Int? = null): HostName? {
-        return try {
-            if (port == null) {
-                HostName(ipstr)
-            } else {
-                HostName(IPAddressString(ipstr).address, port)
-            }
-        } catch (e: Exception) {
-            Log.e(LOG_TAG_FIREWALL, "err ip-rule($ipstr, $port): ${e.message}")
-            null
-        }
+    private fun hostAddr(ipstr: String, p: Int? = null): Pair<IPAddress, Int> {
+        val ip: IPAddress = IPAddressString(ipstr).address
+        val port: Int = p ?: 0
+        return Pair(ip, port)
     }
 
     fun getMostSpecificRuleMatch(uid: Int, ipstr: String, port: Int = 0): IpRuleStatus {
@@ -284,6 +296,8 @@ object IpRulesManager : KoinComponent {
             // rules at the end of the list have higher precedence as they're more specific
             // (think: 0.0.0.0/0 vs 1.1.1.1/32)
             val x = iptree.valuesLike(k, vlike)
+            // ex: uid: 10169, k: 142.250.67.78, vlike: 10169:443 => x: 10169:443:0
+            // (10169:443:0) => (uid : port : rule[0->none, 1-> block, 2 -> trust, 3 -> bypass])
             logd("getMostSpecificRouteMatch: $uid, $k, $vlike => $x")
             return treeValsFromCsv(x)
                 .map { treeValStatus(it) }
@@ -294,10 +308,12 @@ object IpRulesManager : KoinComponent {
 
     suspend fun deleteRulesByUid(uid: Int) {
         db.getRulesByUid(uid).forEach {
-            val ipstr = it.getCustomIpAddress().toNormalizedString()
-            val k = treeKey(ipstr)
+            val pair = it.getCustomIpAddress()
+            val ipaddr = pair.first
+            val port = pair.second
+            val k = normalize(ipaddr)
             if (!k.isNullOrEmpty()) {
-                iptree.esc(k, treeVal(it.uid, it.port, it.status))
+                iptree.esc(k, treeVal(it.uid, port, it.status))
             }
         }
         db.deleteRulesByUid(uid)
@@ -310,7 +326,7 @@ object IpRulesManager : KoinComponent {
         resultsCache.invalidateAll()
     }
 
-    private fun makeCustomIp(
+    private fun makeCustomIp2(
         uid: Int,
         ipAddress: String,
         port: Int?,
@@ -318,7 +334,7 @@ object IpRulesManager : KoinComponent {
         wildcard: Boolean = false
     ): CustomIp {
         val customIp = CustomIp()
-        customIp.setCustomIpAddress(ipAddress)
+        customIp.ipAddress = ipAddress // empty for port-only rules, always normalized
         customIp.port = port ?: Constants.UNSPECIFIED_PORT
         customIp.protocol = ""
         customIp.isActive = true
@@ -326,9 +342,12 @@ object IpRulesManager : KoinComponent {
         customIp.wildcard = wildcard
         customIp.modifiedDateTime = System.currentTimeMillis()
 
+        val pair = customIp.getCustomIpAddress()
+        val ipaddr = pair.first
+        val port = pair.second
         // TODO: is this needed in database?
         customIp.ruleType =
-            if (customIp.getCustomIpAddress().asAddress()?.isIPv6 == true) {
+            if (ipaddr.isIPv6) {
                 IPRuleType.IPV6.id
             } else {
                 IPRuleType.IPV4.id
@@ -337,14 +356,73 @@ object IpRulesManager : KoinComponent {
         return customIp
     }
 
-    suspend fun addIpRule(uid: Int, ipstr: String, port: Int?, status: IpRuleStatus) {
+    // chances of null pointer exception while converting the string object to
+    // IPAddress().address ref: https://seancfoley.github.io/IPAddress/
+    private fun padAndNormalize(ipaddr: IPAddress): String {
+        var ipStr: String = ipaddr.toNormalizedString()
+        try {
+            if (ipaddr.isIPv4) {
+                ipStr = padIpv4Cidr(ipaddr.toNormalizedString())
+            }
+            val pair = hostAddr(ipStr)
+            return normalize(pair.first) ?: ""
+        } catch (ignored: NullPointerException) {
+            Log.e(Logger.LOG_TAG_VPN, "Invalid IP address added", ignored)
+        }
+        return "" // empty ips mean its a port-only rule
+    }
+
+    private fun padIpv4Cidr(cidr: String): String {
+        // remove port number from the IP address
+        // [192.x.y/24]:80
+        // ip => [192.x.y/24]
+        val ip = cidr.split(":")[0]
+        // plaincidr => 192.x.y/24
+        val hasbraces = ip.contains("[") and ip.contains("]")
+        val plaincidr = ip.replace("[", "").replace("]", "")
+        // parts => [192.x.y, 24]
+        val parts = plaincidr.split("/")
+        // ipparts => [192, x, y]
+        val ipParts = parts[0].split(".").toMutableList()
+        if (ipParts.size == 4) {
+            return cidr
+        }
+        // Pad the IP address with zeros if not fully specified
+        while (ipParts.size < 4) {
+            // ipparts => [192, x, y, *]
+            ipParts.add("*")
+        }
+        // Remove the last part of the IP address if it is 0
+        // 192.x.y.0 => 192.x.y.*; 192.x.0.* => 192.x.*.*
+        for (i in (ipParts.size - 1) downTo 0) {
+            if (ipParts[i] == "*") {
+                continue
+            } else if (ipParts[i] == "0") {
+                ipParts[i] = "*"
+            } else {
+                break
+            }
+        }
+        // Reassemble the IP address; paddedIp => 192.x.y.*
+        val paddedIp = ipParts.joinToString(".")
+        // Reassemble the CIDR string
+        if (parts.size == 1) return paddedIp
+        return if (hasbraces) {
+            "[$paddedIp/${parts[1]}]"
+        } else {
+            "$paddedIp/${parts[1]}"
+        }
+    }
+
+    suspend fun addIpRule(uid: Int, ipstr: IPAddress, port: Int?, status: IpRuleStatus) {
         Log.i(
             LOG_TAG_FIREWALL,
             "ip rule, add rule for ($uid) ip: $ipstr, $port with status: ${status.name}"
         )
-        val c = makeCustomIp(uid, ipstr, port, status)
+        val normalizedIp = padAndNormalize(ipstr)
+        val c = makeCustomIp2(uid, normalizedIp, port, status)
         db.insert(c)
-        val k = treeKey(ipstr)
+        val k = treeKey(normalizedIp)
         if (!k.isNullOrEmpty()) {
             iptree.escLike(k, treeValLike(uid, port ?: 0))
             iptree.add(k, treeVal(uid, port ?: 0, status.id))
@@ -363,16 +441,29 @@ object IpRulesManager : KoinComponent {
         Log.i(LOG_TAG_FIREWALL, "ip rules updated")
     }
 
-    suspend fun replaceIpRule(prevRule: CustomIp, ipString: String, newStatus: IpRuleStatus) {
-        val host = HostName(ipString)
-        val prevIpAddrStr = prevRule.getCustomIpAddress().asAddress().toNormalizedString()
-        val newIpAddrStr = host.asAddress().toNormalizedString()
+    suspend fun replaceIpRule(
+        prevRule: CustomIp,
+        ipaddr: IPAddress,
+        port: Int?,
+        newStatus: IpRuleStatus
+    ) {
+        val pair = prevRule.getCustomIpAddress()
+        val prevIpaddr = pair.first
+        val prevPort = pair.second
+        val prevIpAddrStr = normalize(prevIpaddr)
+        val newIpAddrStr = padAndNormalize(ipaddr)
         Log.i(
             LOG_TAG_FIREWALL,
-            "ip rule, replace (${prevRule.uid}); ${prevIpAddrStr}:${prevRule.port}; new: $newIpAddrStr, ${newStatus.name}"
+            "ip rule, replace (${prevRule.uid}); ${prevIpAddrStr}:${prevPort}; new: $ipaddr:$port, ${newStatus.name}"
         )
-        db.deleteRule(prevRule.uid, prevIpAddrStr, prevRule.port)
-        val newRule = makeCustomIp(prevRule.uid, ipString, host.port, newStatus)
+        if (prevIpAddrStr != null) { // prev addr should never be null
+            val isDeleted = db.deleteRule(prevRule.uid, prevIpAddrStr, prevRule.port)
+            if (isDeleted == 0) {
+                // delete didn't occur with normalized addr, use ip from prevRule obj
+                db.deleteRule(prevRule.uid, prevRule.ipAddress, prevRule.port)
+            }
+        }
+        val newRule = makeCustomIp2(prevRule.uid, newIpAddrStr, port, newStatus)
         db.insert(newRule)
         val pk = treeKey(prevIpAddrStr)
         if (!pk.isNullOrEmpty()) {
@@ -380,9 +471,102 @@ object IpRulesManager : KoinComponent {
         }
         val nk = treeKey(newIpAddrStr)
         if (!nk.isNullOrEmpty()) {
-            iptree.escLike(nk, treeValLike(newRule.uid, host.port ?: 0))
-            iptree.add(nk, treeVal(newRule.uid, host.port ?: 0, newStatus.id))
+            iptree.escLike(nk, treeValLike(newRule.uid, port ?: 0))
+            iptree.add(nk, treeVal(newRule.uid, port ?: 0, newStatus.id))
         }
         resultsCache.invalidateAll()
+    }
+
+    // translated from go, net.SplitHostPort()
+    class AddrError(val err: String, val addr: String) : Exception()
+
+    private fun splitHostPort(hostport: String): Triple<String, String, Exception?> {
+        val missingPort = "missing port in address"
+        val tooManyColons = "too many colons in address"
+
+        fun addrErr(addr: String, why: String): Triple<String, String, Exception?> {
+            return Triple("", "", AddrError(why, addr))
+        }
+
+        var host = ""
+        var port = ""
+        var err: Exception? = null
+        var j = 0
+        var k = 0
+
+        // The port starts after the last colon.
+        val i = hostport.lastIndexOf(':')
+        if (i < 0) {
+            return addrErr(hostport, missingPort)
+        }
+
+        if (hostport[0] == '[') {
+            // Expect the first ']' just before the last ':'.
+            val end = hostport.indexOf(']')
+            if (end < 0) {
+                return addrErr(hostport, "missing ']' in address")
+            }
+            when (end + 1) {
+                hostport.length -> {
+                    // There can't be a ':' behind the ']' now.
+                    return addrErr(hostport, missingPort)
+                }
+                i -> {
+                    // The expected result.
+                }
+                else -> {
+                    // Either ']' isn't followed by a colon, or it is
+                    // followed by a colon that is not the last one.
+                    if (hostport[end + 1] == ':') {
+                        return addrErr(hostport, tooManyColons)
+                    }
+                    return addrErr(hostport, missingPort)
+                }
+            }
+            host = hostport.substring(1, end)
+            j = 1
+            k = end + 1 // there can't be a '[' resp. ']' before these positions
+        } else {
+            host = hostport.substring(0, i)
+            if (host.contains(':')) {
+                return addrErr(hostport, tooManyColons)
+            }
+        }
+        if (hostport.substring(j).contains('[')) {
+            return addrErr(hostport, "unexpected '[' in address")
+        }
+        if (hostport.substring(k).contains(']')) {
+            return addrErr(hostport, "unexpected ']' in address")
+        }
+
+        port = hostport.substring(i + 1)
+        return Triple(host, port, err)
+    }
+
+    fun getIpNetPort(inp: String): Pair<IPAddress?, Int> {
+        val h = splitHostPort(inp)
+        var ipNet: IPAddress? = null
+        var port = 0
+        if (h.first.isEmpty()) {
+            try {
+                val ips = IPAddressString(inp)
+                ips.validate()
+                ipNet = ips.address
+            } catch (e: AddressStringException) {
+                Log.w(LOG_TAG_FIREWALL, "err: getIpNetPort, ${e.message}", e)
+            }
+        } else {
+            ipNet = IPAddressString(h.first).address
+            port = h.second.toIntOrNull() ?: 0
+        }
+        return Pair(ipNet, port)
+    }
+
+    fun joinIpNetPort(ipNet: String, port: Int = 0): String {
+        return if (ipNet.contains(":") || ipNet.contains("/")) {
+            "[$ipNet]:$port"
+        } else {
+            "$ipNet:$port"
+        }
     }
 }

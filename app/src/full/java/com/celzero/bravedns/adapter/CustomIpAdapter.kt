@@ -54,6 +54,7 @@ import com.celzero.bravedns.util.Utilities.getFlag
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import inet.ipaddr.AddressStringException
 import inet.ipaddr.HostName
 import inet.ipaddr.HostNameException
 import inet.ipaddr.IPAddress
@@ -739,9 +740,8 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
 
         dBind.daciIpTitle.text = context.getString(R.string.ci_dialog_title)
         if (customIp.port != 0) {
-            val ipPort =
-                context.getString(R.string.ct_ip_port, customIp.ipAddress, customIp.port.toString())
-            dBind.daciIpEditText.setText(ipPort)
+            val ipNetPort = IpRulesManager.joinIpNetPort(customIp.ipAddress, customIp.port)
+            dBind.daciIpEditText.setText(ipNetPort)
         } else {
             dBind.daciIpEditText.setText(customIp.ipAddress)
         }
@@ -782,13 +782,14 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         ui {
             val input = dBind.daciIpEditText.text.toString()
             val ipString = Utilities.removeLeadingAndTrailingDots(input)
-            var hostName: HostName? = null
             var ip: IPAddress? = null
+            var port: Int? = null
 
             // chances of creating NetworkOnMainThread exception, handling with io operation
             ioCtx {
-                hostName = getHostName(ipString)
-                ip = hostName?.asAddress()
+                val ipPair = IpRulesManager.getIpNetPort(ipString)
+                ip = ipPair.first
+                port = ipPair.second
             }
 
             if (ip == null || ipString.isEmpty()) {
@@ -798,27 +799,19 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                 return@ui
             }
 
-            updateCustomIp(customIp, ipString, status)
-        }
-    }
-
-    private fun getHostName(ip: String): HostName? {
-        return try {
-            val host = HostName(ip)
-            host.validate()
-            host
-        } catch (e: HostNameException) {
-            val ipAddress = IPAddressString(ip).address ?: return null
-            HostName(ipAddress)
+            updateCustomIp(customIp, ip, port, status)
         }
     }
 
     private fun updateCustomIp(
         prev: CustomIp,
-        ipString: String,
+        ipString: IPAddress?,
+        port: Int?,
         status: IpRulesManager.IpRuleStatus
     ) {
-        io { IpRulesManager.replaceIpRule(prev, ipString, status) }
+        if (ipString == null) return // invalid ip (ui error shown already)
+
+        io { IpRulesManager.replaceIpRule(prev, ipString, port, status) }
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {

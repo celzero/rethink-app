@@ -665,7 +665,10 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                     ipRuleStatus
             )
                 return@io
-            IpRulesManager.addIpRule(info!!.uid, cr.ipAddress, /*wildcard-port*/ 0, ipRuleStatus)
+
+            val ipPair = IpRulesManager.getIpNetPort(info!!.ipAddress)
+            val ip = ipPair.first ?: return@io
+            IpRulesManager.addIpRule(info!!.uid, ip, /*wildcard-port*/ 0, ipRuleStatus)
         }
     }
 
