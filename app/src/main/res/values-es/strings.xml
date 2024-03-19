@@ -981,7 +981,7 @@
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Elimina el punto final de la DNS sobre TLS de la configuración guardada.</string>
     <string name="orbot_no_app_toast" translatable="true">Añadir al menos una aplicación para habilitar Orbot</string>
     <string name="settings_rinr_heading" translatable="true">Bucle invertido \"Loopback\" (experimental)</string>
-    <string name="settings_rinr_desc_enabled" translatable="true">Enruta el tráfico propio de Rethink, como descargas de listas de bloqueo, comprobaciones de conectividad, conexiones DNS, de vuelta al túnel.</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">Enrutar el propio tráfico de Rethink a través del túnel. A menos que sepas lo que haces, desactívalo.</string>
     <string name="cd_dialog_edit_title" translatable="true">Editar la regla del dominio</string>
     <string name="cd_toast_edit" translatable="true">Editado</string>
     <string name="wg_lockdown_dialog_desc" translatable="true">Las aplicaciones seleccionadas sólo se enrutarán a través de esta VPN de WireGuard, independientemente de si la VPN falla o está conectada.</string>
@@ -989,7 +989,7 @@
     <string name="catch_all_wg_dialog_desc" translatable="true">Todas las conexiones y aplicaciones no enrutadas por otras VPN de WireGuard serán enrutadas por esta.</string>
     <string name="one_wg_error_toast" translatable="true">Para cambiar a Avanzado, detenga WireGuard en modo Simple</string>
     <string name="wireguard_disable_message" translatable="true">¿Detener todas las VPN activas de WireGuard?</string>
-    <string name="settings_rinr_desc_disabled" translatable="true">Enrutar el propio tráfico de Rethink a través del túnel. A menos que sepa lo que hace, desactívelo.</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Enruta el tráfico propio de Rethink, como descargas de listas de bloqueo, comprobaciones de conectividad, conexiones DNS, de vuelta al túnel.</string>
     <string name="lbl_remove" translatable="true">Quitar</string>
     <string name="lbl_last" translatable="true">Última</string>
     <string name="lbl_overall" translatable="true">En general</string>
