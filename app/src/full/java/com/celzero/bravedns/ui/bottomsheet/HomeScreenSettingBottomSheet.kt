@@ -157,19 +157,33 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     // disable dns and firewall mode, show user that vpn in lockdown mode indicator if needed
     private fun handleLockdownModeIfNeeded() {
         val isLockdown = VpnController.isVpnLockdown()
+        val isProxyEnabled = appConfig.isProxyEnabled()
         if (isLockdown) {
             b.bsHomeScreenVpnLockdownDesc.visibility = View.VISIBLE
             b.bsHsDnsRl.alpha = 0.5f
             b.bsHsFirewallRl.alpha = 0.5f
+            setRadioButtonsEnabled(false)
+        } else if (isProxyEnabled) {
+            b.bsHomeScreenVpnLockdownDesc.text = getString(R.string.settings_lock_down_proxy_desc)
+            b.bsHomeScreenVpnLockdownDesc.visibility = View.VISIBLE
+            b.bsHsDnsRl.alpha = 0.5f
+            b.bsHsFirewallRl.alpha = 0.5f
+            setRadioButtonsEnabled(false)
         } else {
             b.bsHomeScreenVpnLockdownDesc.visibility = View.GONE
             b.bsHsDnsRl.alpha = 1f
             b.bsHsFirewallRl.alpha = 1f
+            setRadioButtonsEnabled(true)
         }
-        b.bsHsDnsRl.isEnabled = !isLockdown
-        b.bsHsFirewallRl.isEnabled = !isLockdown
-        b.bsHomeScreenRadioFirewall.isEnabled = !isLockdown
-        b.bsHomeScreenRadioDns.isEnabled = !isLockdown
+    }
+
+    private fun setRadioButtonsEnabled(isEnabled: Boolean) {
+        b.bsHsDnsRl.isEnabled = isEnabled
+        b.bsHsFirewallRl.isEnabled = isEnabled
+        b.bsHsDnsFirewallRl.isEnabled = isEnabled
+        b.bsHomeScreenRadioDns.isEnabled = isEnabled
+        b.bsHomeScreenRadioFirewall.isEnabled = isEnabled
+        b.bsHomeScreenRadioDnsFirewall.isEnabled = isEnabled
     }
 
     private fun handleDnsMode(isChecked: Boolean) {
