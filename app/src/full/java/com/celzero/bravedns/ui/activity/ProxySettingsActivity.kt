@@ -488,7 +488,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     getString(
                             R.string.ci_ip_label,
                             it.getName(),
-                            getString(R.string.status_failing).padStart(1, ' ')
+                            getString(R.string.status_waiting).padStart(1, ' ')
                         )
                         .replaceFirstChar(Char::titlecase) + "\n"
                 if (DEBUG) Log.d(LOG_TAG_PROXY, "current proxy status is null for $id")

@@ -239,17 +239,12 @@
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/mtu_text"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/lbl_auto"
                             android:imeOptions="actionDone"
                             android:inputType="number"
-                            android:textAlignment="center"
-                            app:boxCornerRadiusBottomEnd="8dp"
-                            app:boxCornerRadiusBottomStart="8dp"
-                            app:boxCornerRadiusTopEnd="8dp"
-                            app:boxCornerRadiusTopStart="8dp" />
+                            android:textAlignment="center" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

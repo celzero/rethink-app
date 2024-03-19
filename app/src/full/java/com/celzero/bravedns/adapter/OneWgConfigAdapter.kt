@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -45,10 +46,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class OneWgConfigAdapter(private val context: Context, private val lifecycleOwner: LifecycleOwner) :
+class OneWgConfigAdapter(private val context: Context, private val listener: DnsStatusListener) :
     PagingDataAdapter<WgConfigFiles, OneWgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
 
-    private var statusCheckJob: Job = Job()
+    private var statusCheckJob: Job? = Job()
+    private var lifecycleOwner: LifecycleOwner? = null
+
+    interface DnsStatusListener {
+        fun onDnsStatusChanged()
+    }
+
     companion object {
         private const val DELAY = 1000L
 
@@ -86,6 +93,7 @@ class OneWgConfigAdapter(private val context: Context, private val lifecycleOwne
                 parent,
                 false
             )
+        lifecycleOwner = parent.findViewTreeLifecycleOwner()
         return WgInterfaceViewHolder(itemBinding)
     }
 
@@ -100,7 +108,7 @@ class OneWgConfigAdapter(private val context: Context, private val lifecycleOwne
             if (config.oneWireGuard) {
                 keepStatusUpdated(config)
             } else {
-                statusCheckJob.cancel()
+                statusCheckJob?.cancel()
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceAppsCount.visibility = View.GONE
                 b.oneWgCheck.isChecked = false
@@ -122,27 +130,19 @@ class OneWgConfigAdapter(private val context: Context, private val lifecycleOwne
             val id = ProxyManager.ID_WG_BASE + config.id
             val apps = ProxyManager.getAppCountForProxy(id).toString()
             val statusId = VpnController.getProxyStatusById(id)
-            if (statusId == null && config.isActive) {
-                WireguardManager.disableConfig(config)
-            }
-            updateStatusUi(config, statusId, apps)
-        }
-
-        private fun handleSwitchClick(config: WgConfigFiles) {
-            val id = ProxyManager.ID_WG_BASE + config.id
-            val apps = ProxyManager.getAppCountForProxy(id).toString()
-            val statusId = VpnController.getProxyStatusById(id)
             updateStatusUi(config, statusId, apps)
         }
 
         private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, apps: String) {
             // if the view is not active then cancel the job
             if (
-                !lifecycleOwner.lifecycle.currentState.isAtLeast(
-                    androidx.lifecycle.Lifecycle.State.STARTED
-                )
+                lifecycleOwner != null &&
+                    lifecycleOwner
+                        ?.lifecycle
+                        ?.currentState
+                        ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
             ) {
-                statusCheckJob.cancel()
+                statusCheckJob?.cancel()
                 return
             }
 
@@ -160,7 +160,7 @@ class OneWgConfigAdapter(private val context: Context, private val lifecycleOwne
                         b.interfaceDetailCard.strokeColor =
                             fetchColor(context, R.attr.chipTextPositive)
                         // cancel the job, as the status is connected
-                        statusCheckJob.cancel()
+                        statusCheckJob?.cancel()
                     } else if (statusId == Backend.TUP || statusId == Backend.TZZ) {
                         b.interfaceDetailCard.strokeColor =
                             fetchColor(context, R.attr.chipTextNeutral)
@@ -200,7 +200,7 @@ class OneWgConfigAdapter(private val context: Context, private val lifecycleOwne
                             config.oneWireGuard = true
                             WireguardManager.updateOneWireGuardConfig(config.id, owg = true)
                             WireguardManager.enableConfig(config)
-                            uiCtx { handleSwitchClick(config) }
+                            uiCtx { listener.onDnsStatusChanged() }
                         } else {
                             uiCtx {
                                 b.oneWgCheck.isChecked = false
@@ -216,7 +216,7 @@ class OneWgConfigAdapter(private val context: Context, private val lifecycleOwne
                         b.oneWgCheck.isChecked = false
                         WireguardManager.updateOneWireGuardConfig(config.id, owg = false)
                         WireguardManager.disableConfig(config)
-                        uiCtx { handleSwitchClick(config) }
+                        uiCtx { listener.onDnsStatusChanged() }
                     }
                 }
             }
@@ -234,11 +234,14 @@ class OneWgConfigAdapter(private val context: Context, private val lifecycleOwne
         withContext(Dispatchers.Main) { f() }
     }
 
-    private fun ui(f: suspend () -> Unit): Job {
-        return lifecycleOwner.lifecycleScope.launch(Dispatchers.Main) { f() }
+    private fun ui(f: suspend () -> Unit): Job? {
+        if (lifecycleOwner == null) {
+            return null
+        }
+        return lifecycleOwner?.lifecycleScope?.launch(Dispatchers.Main) { f() }
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { f() }
+        lifecycleOwner?.lifecycleScope?.launch(Dispatchers.IO) { f() }
     }
 }
