@@ -36,7 +36,6 @@ import kotlinx.coroutines.withContext
 
 class WgPeersAdapter(
     val context: Context,
-    private val lifecycleOwner: LifecycleOwner,
     private val themeId: Int,
     private val configId: Int,
     private var peers: MutableList<Peer>

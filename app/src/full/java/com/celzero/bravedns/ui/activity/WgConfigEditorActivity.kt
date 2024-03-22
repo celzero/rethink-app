@@ -45,7 +45,6 @@ import org.koin.android.ext.android.inject
 class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_editor) {
     private val b by viewBinding(ActivityWgConfigEditorBinding::bind)
     private val persistentState by inject<PersistentState>()
-    private val appConfig by inject<AppConfig>()
 
     private var wgConfig: Config? = null
     private var wgInterface: WgInterface? = null
@@ -84,7 +83,6 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
     }
 
     private fun init() {
-        observeDnsName()
         io {
             wgConfig = WireguardManager.getConfigById(configId)
             wgInterface = wgConfig?.getInterface()
@@ -116,12 +114,6 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
                     b.mtuText.setText(wgInterface?.mtu?.get().toString())
                 }
             }
-        }
-    }
-
-    private fun observeDnsName() {
-        appConfig.getConnectedDnsObservable().observe(this) {
-            b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, it)
         }
     }
 

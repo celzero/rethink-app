@@ -288,7 +288,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             if (it == 0) {
                 b.applicationsBtn.setTextColor(UIUtils.fetchColor(this, R.attr.accentBad))
             }
-             b.applicationsBtn.text = getString(R.string.add_remove_apps, it.toString())
+            b.applicationsBtn.setTextColor(UIUtils.fetchColor(this, R.attr.accentGood))
+            b.applicationsBtn.text = getString(R.string.add_remove_apps, it.toString())
         }
     }
 
@@ -439,7 +440,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         layoutManager = LinearLayoutManager(this)
         b.peersList.layoutManager = layoutManager
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        wgPeersAdapter = WgPeersAdapter(this, this, themeId, configId, peers)
+        wgPeersAdapter = WgPeersAdapter(this, themeId, configId, peers)
         b.peersList.adapter = wgPeersAdapter
     }
 

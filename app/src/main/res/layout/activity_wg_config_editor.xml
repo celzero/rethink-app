@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp"
     android:background="?attr/background">
 
     <ScrollView
@@ -15,35 +16,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/wg_wireguard_disclaimer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="5dp"
-                android:alpha="0.7"
-                android:padding="10dp"
-                android:text="@string/wireguard_disclaimer"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/default_font_text_view"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/wg_header_tv" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp">
-
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingStart="5dp"
                     android:paddingTop="5dp"
-                    android:paddingEnd="5dp"
                     android:paddingBottom="16dp">
 
                     <com.google.android.material.textview.MaterialTextView
@@ -52,6 +28,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
                         android:layout_marginTop="16dp"
+                        android:paddingBottom="5dp"
                         android:text="@string/lbl_configure"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/extra_large_font_text_view"
@@ -248,12 +225,11 @@
                     </com.google.android.material.textfield.TextInputLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="15dp"
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
