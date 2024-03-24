@@ -431,7 +431,7 @@
     <string name="cd_remove_dialog_title" translatable="true">Usunąć domenę\?</string>
     <string name="cd_remove_dialog_message" translatable="true">Usuń domenę z zapisanej konfiguracji.</string>
     <string name="cd_dialog_desc" translatable="true">Niestandardowy adres URL (domena) lub dzika karta, aby zezwolić lub zablokować. np. *.test.com, test.com/test</string>
-    <string name="cd_dialog_title" translatable="true">Dodaj domenę</string>
+    <string name="cd_dialog_title" translatable="true">Dodaj zasadę domeny</string>
     <string name="cd_dialog_edittext_hint" translatable="true">Wpisz %1$s</string>
     <string name="cd_dialog_error_invalid_domain" translatable="true">Nieprawidłowy adres URL (domena).</string>
     <string name="cd_dialog_error_invalid_wildcard" translatable="true">Błędny wildcard.</string>
@@ -662,9 +662,9 @@
     <string name="lbbs_heading" translatable="true">Skonfiguruj 195+ list blokujących</string>
     <string name="lbbs_download" translatable="true">Zaktualizuj listy blokujące</string>
     <string name="lbbs_enabled" translatable="true">Włączone</string>
-    <string name="dc_refresh_toast" translatable="true">Odświeżanie DNS zakończone</string>
+    <string name="dc_refresh_toast" translatable="true">Odświeżanie zakończone</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Łączenie żądań, buforowanie , obsługa błędów</string>
-    <string name="brbs_backup_restore_desc" translatable="true">Nie działa na różnych wersjach aplikacji i urządzeniach</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Nie działa na różnych wersjach aplikacji</string>
     <string name="brbs_backup_desc" translatable="true">Tworzenie kopii zapasowych ustawień aplikacji, logów sieciowych i dns</string>
     <string name="settings_http_proxy_error_text3" translatable="true">Nazwa hosta jest pusta</string>
     <string name="settings_http_proxy_error_text4" translatable="true">Połączenie z hostem nie powiodło się. Spróbuj ponownie.</string>
@@ -846,7 +846,7 @@
     <string name="bad_config_reason_invalid_number" translatable="true">Nieprawidłowy numer</string>
     <string name="lbl_http" translatable="true">HTTP</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
-    <string name="add_remove_apps" translatable="true">Dodawanie / usuwanie aplikacji (%1$s aplikacji)</string>
+    <string name="add_remove_apps" translatable="true">Dodaj / usuń (%1$s aplikacji)</string>
     <string name="bad_extension_error" translatable="true">Plik musi mieć format .conf lub .zip</string>
     <string name="lbl_mtu" translatable="true">MTU(Maksymalna jednostka transmisji)</string>
     <string name="lbl_sec" translatable="true">sek</string>
@@ -858,7 +858,7 @@
     <string name="crypt_relay_singapore" translatable="true">Anonimowy przekaźnik DNS hostowany w Singapurze.</string>
     <string name="lbl_hour" translatable="true">godzina</string>
     <string name="lbl_persistent_keepalive" translatable="true">Stałe utrzymywanie aktywności</string>
-    <string name="wireguard_enabled_failure">Wyłącz inne serwery proxy, aby włączyć WireGuard</string>
+    <string name="wireguard_enabled_failure">Zatrzymaj inne serwery proxy, aby włączyć WireGuard</string>
     <string name="add_peer" translatable="true">Dodaj element równorzędny</string>
     <string name="cloudflare_family_dns_desc" translatable="true">Blokuje złośliwe oprogramowanie i treści dla dorosłych. Wykorzystuje punkt końcowy DNS Cloudflare 1.1.1.3.</string>
     <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
@@ -955,4 +955,25 @@
     <string name="illegal_filename_error" translatable="true">Nieprawidłowa nazwa pliku \"%s\"</string>
     <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) bez dnssec/bez dziennika/bez filtra/ecs 9.9.9.12 – 149.112.112.12</string>
     <string name="lbl_random" translatable="true">(losowo)</string>
+    <string name="lbl_overall" translatable="true">Ogólnie</string>
+    <string name="lbl_stopped" translatable="true">Zatrzymane</string>
+    <string name="lbl_private" translatable="true">Prywatne</string>
+    <string name="lbl_secure" translatable="true">Bezpieczne</string>
+    <string name="lbl_anonymous" translatable="true">Anonimowe</string>
+    <string name="routing_remaining_apps" translatable="true">Przekierowywanie pozostałych aplikacji</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">Zawsze włączony</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">Wszystkie połączenia i aplikacje nie przekierowane przez inne VPNeny WireGuard będą przekierowane przez ten.</string>
+    <string name="lbl_cache" translatable="true">Pamięć podręczna</string>
+    <string name="lbl_status" translatable="true">Status</string>
+    <string name="lbl_remove" translatable="true">Usuń</string>
+    <string name="lbl_last" translatable="true">Ostatni</string>
+    <string name="lbl_starting" translatable="true">Startowanie</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">część %1$s</string>
+    <string name="orbot_no_app_toast" translatable="true">"Dodaj przynajmiej jedną aplikację by włączyć  Orbot"</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">Przekierowywanie własnych połączeń Rethink\'a przez tunel. Jeśli nie wiesz co robisz, wyłącz to.</string>
+    <string name="cd_dialog_edit_title" translatable="true">Edytuj zasadę domeny</string>
+    <string name="cd_toast_edit" translatable="true">Edytowane</string>
+    <string name="one_wg_apps_added" translatable="true">Przekierowywanie wszystkich aplikacji</string>
+    <string name="wireguard_disable_failure" translatable="true">\"Zawsze włączony WireGuard\" nie może być wyłączony</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">Zawiera %1$s aplikacji</string>
 </resources>
