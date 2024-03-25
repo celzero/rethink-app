@@ -112,10 +112,6 @@ class RethinkEndpointAdapter(
         private fun displayDetails(endpoint: RethinkDnsEndpoint) {
             b.rethinkEndpointListUrlName.text = endpoint.name
             b.rethinkEndpointListCheckImage.isChecked = endpoint.isActive
-            Log.i(
-                LOG_TAG_DNS,
-                "connected to rethink endpoint: ${endpoint.name} isSelected? ${endpoint.isActive}"
-            )
 
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)

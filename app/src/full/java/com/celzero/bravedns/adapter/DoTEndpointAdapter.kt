@@ -113,10 +113,6 @@ class DoTEndpointAdapter(
                     )
             }
             b.endpointCheck.isChecked = endpoint.isSelected
-            Log.i(
-                LOG_TAG_DNS,
-                "connected to dot: ${endpoint.name} isSelected? ${endpoint.isSelected}"
-            )
             if (endpoint.isSelected) {
                 keepSelectedStatusUpdated()
             } else {

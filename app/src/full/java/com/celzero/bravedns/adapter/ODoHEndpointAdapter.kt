@@ -103,10 +103,6 @@ class ODoHEndpointAdapter(
         private fun displayDetails(endpoint: ODoHEndpoint) {
             b.endpointName.text = endpoint.name
             b.endpointCheck.isChecked = endpoint.isSelected
-            Log.i(
-                LOG_TAG_DNS,
-                "connected to ODoH: ${endpoint.name} isSelected? ${endpoint.isSelected}"
-            )
             if (endpoint.isSelected) {
                 keepSelectedStatusUpdated()
             } else {

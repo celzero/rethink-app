@@ -113,10 +113,6 @@ class DohEndpointAdapter(
                     )
             }
             b.endpointCheck.isChecked = endpoint.isSelected
-            Log.i(
-                LOG_TAG_DNS,
-                "connected to doh: ${endpoint.dohName} isSelected? ${endpoint.isSelected}"
-            )
             if (endpoint.isSelected) {
                 keepSelectedStatusUpdated()
             } else {
