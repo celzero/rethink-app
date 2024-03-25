@@ -62,10 +62,10 @@ import com.google.android.material.chip.Chip
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import java.util.Locale
 
 class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null
@@ -269,7 +269,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
         if (log!!.isBlocked) {
             lightenUpChip(b.dnsBlockBlocklistChip, BlockType.BLOCKED)
-        } else if (log!!.hasBlocklists()) {
+        } else if (determineMaybeBlocked()) {
             lightenUpChip(b.dnsBlockBlocklistChip, BlockType.MAYBE_BLOCKED)
         } else {
             lightenUpChip(b.dnsBlockBlocklistChip, BlockType.NONE)
@@ -290,6 +290,18 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         // show chip as blocked
         b.dnsBlockBlocklistChip.text = getString(R.string.lbl_blocked)
         return
+    }
+
+    private fun determineMaybeBlocked(): Boolean {
+        if (log == null) {
+            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update chips")
+            return false
+        }
+
+        val anyRealIpBlocked =
+            !log!!.responseIps.split(",").none { Utilities.isUnspecifiedIp(it.trim()) }
+        val hasBlocklist = log!!.blockLists.isNotEmpty()
+        return anyRealIpBlocked || hasBlocklist
     }
 
     private fun showBlocklistChip() {
