@@ -44,6 +44,7 @@ import com.celzero.bravedns.ui.bottomsheet.DnsBlocklistBottomSheet
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.Utilities
 import com.google.gson.Gson
 
 class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
@@ -106,13 +107,19 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
                 b.queryLogIndicator.setBackgroundColor(
                     ContextCompat.getColor(context, R.color.colorRed_A400)
                 )
-            } else if (dnsLog.blockLists.isNotEmpty()) {
+            } else if (determineMaybeBlocked(dnsLog)) {
                 b.queryLogIndicator.visibility = View.VISIBLE
                 val color = fetchColor(context, R.attr.chipTextNeutral)
                 b.queryLogIndicator.setBackgroundColor(color)
             } else {
                 b.queryLogIndicator.visibility = View.INVISIBLE
             }
+        }
+
+        private fun determineMaybeBlocked(dnsLog: DnsLog): Boolean {
+            val anyRealIpBlocked = !dnsLog.responseIps.split(",").none { Utilities.isUnspecifiedIp(it.trim()) }
+            val hasBlocklist = dnsLog.blockLists.isNotEmpty()
+            return anyRealIpBlocked || hasBlocklist
         }
 
         private fun displayIcon(dnsLog: DnsLog) {
