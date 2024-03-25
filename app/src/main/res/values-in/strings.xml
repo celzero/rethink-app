@@ -796,7 +796,7 @@
     <string name="lbl_blocked" translatable="true">Diblokir</string>
     <string name="firewall_rule_block_domain" translatable="true">Domain (Aplikasi)</string>
     <string name="lbl_disabled" translatable="true">Dinonaktifkan</string>
-    <string name="lbl_domain" translatable="true">Daerah</string>
+    <string name="lbl_domain" translatable="true">Domain</string>
     <string name="firewall_rule_block_domain_desc" translatable="true">Aturan firewall yang diterapkan \"Pengguna\" memblokir <i>Domain</i>.<br/><br/> Untuk mengubahnya, pergi ke tampilan <i>Firewall khusus aplikasi</i>.</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Domain Tepercaya (Aplikasi)</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true">Sambungan ini diizinkan karena <i>domain</i> ditetapkan sebagai domain tepercaya.<br/><br/> Untuk mengubahnya, buka tampilan <i>Firewall khusus aplikasi</i>.</string>
@@ -993,8 +993,8 @@
     <string name="cd_dialog_edit_title" translatable="true">Edit aturan nama domain</string>
     <string name="cd_toast_edit" translatable="true">Disunting</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Rutekan lalu lintas mandiri dari rethink melalui terowongan. Kecuali Anda tahu apa yang Anda lakukan, matikan.</string>
-    <string name="dot_custom_url_remove_dialog_title" translatable="true">Hapus endpoint DoT?</string>
-    <string name="dot_custom_url_remove_dialog_message" translatable="true">Menghapus DNS melalui endpoint TLS dari konfigurasi yang tersimpan.</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Hapus titik akhir DoT?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Hapus DNS ini melalui titik akhir TLS dari konfigurasi yang disimpan.</string>
     <string name="one_wg_apps_added" translatable="true">Rutekan semua aplikasi</string>
     <string name="lbl_status" translatable="true">Status</string>
     <string name="lbl_starting" translatable="true">Memulai</string>
