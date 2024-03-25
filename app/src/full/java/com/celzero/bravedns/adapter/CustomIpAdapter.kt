@@ -293,7 +293,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             }
 
             if (appNames.isEmpty()) {
-                return context.getString(R.string.network_log_app_name_unnamed, "($uid)")
+                return context.getString(R.string.network_log_app_name_unknown) + " ($uid)"
             }
 
             val packageCount = appNames.count()
