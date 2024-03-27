@@ -142,6 +142,16 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         displaySummaryDetails()
         // setup click and item selected listeners
         setupClickListeners()
+
+        val rethinkUid = Utilities.getApplicationInfo(requireContext(), requireContext().packageName)?.uid ?: Constants.INVALID_UID
+        if (info!!.uid == rethinkUid) {
+            // do not show rules for RethinkDNS app
+            b.bsConnBlockedRule1HeaderLl.visibility = View.GONE
+            b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
+            b.bsConnBlockedRule3HeaderLl.visibility = View.GONE
+            b.bsConnDomainRuleLl.visibility = View.GONE
+            return
+        }
         // updates the ip rules button
         updateIpRulesUi(info!!.uid, info!!.ipAddress, info!!.port)
         // updates the value from dns request cache if available
