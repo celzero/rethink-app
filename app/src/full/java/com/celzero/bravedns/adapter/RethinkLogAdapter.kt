@@ -114,7 +114,7 @@ class RethinkLogAdapter(private val context: Context) :
 
         private fun openBottomSheet(log: RethinkLog) {
             if (context !is FragmentActivity) {
-                Log.wtf(LOG_TAG_UI, "Error opening the connection tracker bottomsheet")
+                Log.w(LOG_TAG_UI, "Error opening the connection tracker bottomsheet")
                 return
             }
 

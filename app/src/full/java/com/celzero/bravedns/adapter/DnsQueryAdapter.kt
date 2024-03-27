@@ -160,7 +160,7 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
 
         private fun openBottomSheet(dnsLog: DnsLog) {
             if (context !is FragmentActivity) {
-                Log.wtf(
+                Log.w(
                     Logger.LOG_TAG_UI,
                     "Can not open bottom sheet. Context is not attached to activity"
                 )

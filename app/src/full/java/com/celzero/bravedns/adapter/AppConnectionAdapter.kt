@@ -106,7 +106,7 @@ class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOw
 
         private fun openBottomSheet(appConn: AppConnection) {
             if (context !is AppCompatActivity) {
-                Log.wtf(Logger.LOG_TAG_UI, "Error opening the app conn bottom sheet")
+                Log.w(Logger.LOG_TAG_UI, "Error opening the app conn bottom sheet")
                 return
             }
 
