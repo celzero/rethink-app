@@ -116,7 +116,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
             )
         }
         return if (isRetryRequired(retryCount) && paymentStatus == TcpProxyHelper.PaymentStatus.INITIATED) {
-            Log.i(LOG_TAG_DOWNLOAD, "retrying the downloadRemoteBlocklist")
+            Log.i(LOG_TAG_DOWNLOAD, "retrying the payment status check")
             getPaymentStatusFromServer(retryCount + 1)
         } else {
             Log.i(LOG_TAG_DOWNLOAD, "retry count exceeded, returning null")

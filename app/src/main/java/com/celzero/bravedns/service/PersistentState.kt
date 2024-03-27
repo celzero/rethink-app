@@ -244,9 +244,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // enable dns alg
     var enableDnsAlg by booleanPref("dns_alg").withDefault<Boolean>(false)
 
-    // dns crypt relay server
-    var dnscryptRelays by stringPref("dnscrypt_relay").withDefault<String>("")
-
     // default dns url
     var defaultDnsUrl by stringPref("default_dns_query").withDefault<String>("")
 
