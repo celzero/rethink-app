@@ -170,13 +170,13 @@ class Constants {
         const val SEARCH_QUERY = "search_query"
 
         // default custom http proxy port number
-        const val HTTP_PROXY_PORT = "8118"
+        const val HTTP_PROXY_PORT = 8118
 
         // default custom socks5 ip
         const val SOCKS_DEFAULT_IP = "127.0.0.1"
 
         // default custom socks5 port
-        const val SOCKS_DEFAULT_PORT = "9050"
+        const val SOCKS_DEFAULT_PORT = 9050
 
         // constants to send type of proxy: for socks5
         const val SOCKS = "Socks5"
