@@ -235,6 +235,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main), OneW
 
     override fun onResume() {
         super.onResume()
+        oneWgConfigAdapter?.notifyDataSetChanged()
         wgConfigAdapter?.notifyDataSetChanged()
     }
 
