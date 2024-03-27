@@ -65,7 +65,7 @@ class ODoHListFragment : Fragment(R.layout.fragment_odoh_list) {
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerOdoh.layoutManager = layoutManager
 
-        adapter = ODoHEndpointAdapter(requireContext(), viewLifecycleOwner, get())
+        adapter = ODoHEndpointAdapter(requireContext(), get())
         viewModel.dohEndpointList.observe(viewLifecycleOwner) {
             adapter!!.submitData(viewLifecycleOwner.lifecycle, it)
         }

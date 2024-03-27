@@ -82,7 +82,7 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
         b.recyclerDnsCryptConnections.layoutManager = dnsCryptLayoutManager
 
         dnsCryptRecyclerAdapter =
-            DnsCryptEndpointAdapter(requireContext(), viewLifecycleOwner, get())
+            DnsCryptEndpointAdapter(requireContext(), get())
         dnsCryptViewModel.dnsCryptEndpointList.observe(viewLifecycleOwner) {
             dnsCryptRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
