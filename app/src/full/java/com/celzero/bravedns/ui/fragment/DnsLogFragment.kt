@@ -35,6 +35,7 @@ import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -253,8 +254,12 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        this.filterValue = query
-        viewModel.setFilter(filterValue, filterType)
+        Utilities.delay(500, lifecycleScope) {
+            if (this.isAdded) {
+                this.filterValue = query
+                viewModel.setFilter(filterValue, filterType)
+            }
+        }
         return true
     }
 

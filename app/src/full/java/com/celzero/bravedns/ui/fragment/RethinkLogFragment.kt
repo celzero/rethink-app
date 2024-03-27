@@ -32,6 +32,7 @@ import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.RethinkLogViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -133,7 +134,11 @@ class RethinkLogFragment :
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        viewModel.setFilter(query)
+        Utilities.delay(500, lifecycleScope) {
+            if (this.isAdded) {
+                viewModel.setFilter(query)
+            }
+        }
         return true
     }
 
