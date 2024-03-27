@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -46,16 +47,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DoTEndpointAdapter(
-    private val context: Context,
-    private val lifecycleOwner: LifecycleOwner,
-    private val appConfig: AppConfig
-) : PagingDataAdapter<DoTEndpoint, DoTEndpointAdapter.DoTEndpointViewHolder>(DIFF_CALLBACK) {
+class DoTEndpointAdapter(private val context: Context, private val appConfig: AppConfig) :
+    PagingDataAdapter<DoTEndpoint, DoTEndpointAdapter.DoTEndpointViewHolder>(DIFF_CALLBACK) {
 
-    var statusCheckJob: Job = Job()
+    var lifecycleOwner: LifecycleOwner? = null
 
     companion object {
-        private const val DELAY = 1000L
+        private const val ONE_SEC = 1000L
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<DoTEndpoint>() {
                 override fun areItemsTheSame(
@@ -79,6 +77,7 @@ class DoTEndpointAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DoTEndpointViewHolder {
         val itemBinding =
             ListItemEndpointBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        lifecycleOwner = parent.findViewTreeLifecycleOwner()
         return DoTEndpointViewHolder(itemBinding)
     }
 
@@ -89,6 +88,7 @@ class DoTEndpointAdapter(
 
     inner class DoTEndpointViewHolder(private val b: ListItemEndpointBinding) :
         RecyclerView.ViewHolder(b.root) {
+        private var statusCheckJob: Job? = null
 
         fun update(endpoint: DoTEndpoint) {
             displayDetails(endpoint)
@@ -127,7 +127,7 @@ class DoTEndpointAdapter(
             statusCheckJob = ui {
                 while (true) {
                     updateSelectedStatus()
-                    delay(DELAY)
+                    delay(ONE_SEC)
                 }
             }
         }
@@ -135,11 +135,13 @@ class DoTEndpointAdapter(
         private fun updateSelectedStatus() {
             // if the view is not active then cancel the job
             if (
-                !lifecycleOwner.lifecycle.currentState.isAtLeast(
-                    androidx.lifecycle.Lifecycle.State.STARTED
-                )
+                lifecycleOwner
+                    ?.lifecycle
+                    ?.currentState
+                    ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false ||
+                    bindingAdapterPosition == RecyclerView.NO_POSITION
             ) {
-                statusCheckJob.cancel()
+                statusCheckJob?.cancel()
                 return
             }
 
@@ -171,8 +173,6 @@ class DoTEndpointAdapter(
                 endpoint.isSelected = true
                 appConfig.handleDoTChanges(endpoint)
             }
-            // cancel the current job, new job will be created when the view is active
-            statusCheckJob.cancel()
         }
 
         private fun deleteEndpoint(id: Int) {
@@ -252,12 +252,12 @@ class DoTEndpointAdapter(
             withContext(Dispatchers.Main) { f() }
         }
 
-        private fun ui(f: suspend () -> Unit): Job {
-            return lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
+        private fun ui(f: suspend () -> Unit): Job? {
+            return lifecycleOwner?.lifecycleScope?.launch { withContext(Dispatchers.Main) { f() } }
         }
 
         private fun io(f: suspend () -> Unit) {
-            lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+            lifecycleOwner?.lifecycleScope?.launch { withContext(Dispatchers.IO) { f() } }
         }
     }
 }

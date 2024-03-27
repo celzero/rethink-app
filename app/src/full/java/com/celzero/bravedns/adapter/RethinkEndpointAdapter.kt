@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -47,19 +48,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class RethinkEndpointAdapter(
-    private val context: Context,
-    private val lifecycleOwner: LifecycleOwner,
-    private val appConfig: AppConfig
-) :
+class RethinkEndpointAdapter(private val context: Context, private val appConfig: AppConfig) :
     PagingDataAdapter<RethinkDnsEndpoint, RethinkEndpointAdapter.RethinkEndpointViewHolder>(
         DIFF_CALLBACK
     ) {
 
-    var statusCheckJob: Job = Job()
+    var lifecycleOwner: LifecycleOwner? = null
+
     companion object {
-        private const val DELAY = 1000L
+        private const val ONE_SEC = 1000L
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<RethinkDnsEndpoint>() {
                 override fun areItemsTheSame(
@@ -87,6 +86,7 @@ class RethinkEndpointAdapter(
                 parent,
                 false
             )
+        lifecycleOwner = parent.findViewTreeLifecycleOwner()
         return RethinkEndpointViewHolder(itemBinding)
     }
 
@@ -97,6 +97,7 @@ class RethinkEndpointAdapter(
 
     inner class RethinkEndpointViewHolder(private val b: RethinkEndpointListItemBinding) :
         RecyclerView.ViewHolder(b.root) {
+        private var statusCheckJob: Job? = null
 
         fun update(endpoint: RethinkDnsEndpoint) {
             displayDetails(endpoint)
@@ -127,7 +128,7 @@ class RethinkEndpointAdapter(
             ui {
                 while (true) {
                     updateBlocklistStatusText(endpoint)
-                    delay(DELAY)
+                    delay(ONE_SEC)
                 }
             }
         }
@@ -135,11 +136,13 @@ class RethinkEndpointAdapter(
         private fun updateBlocklistStatusText(endpoint: RethinkDnsEndpoint) {
             // if the view is not active then cancel the job
             if (
-                !lifecycleOwner.lifecycle.currentState.isAtLeast(
-                    androidx.lifecycle.Lifecycle.State.STARTED
-                )
+                lifecycleOwner
+                    ?.lifecycle
+                    ?.currentState
+                    ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false ||
+                    bindingAdapterPosition == RecyclerView.NO_POSITION
             ) {
-                statusCheckJob.cancel()
+                statusCheckJob?.cancel()
                 return
             }
 
@@ -186,8 +189,6 @@ class RethinkEndpointAdapter(
                 endpoint.isActive = true
                 appConfig.handleRethinkChanges(endpoint)
             }
-            // cancel the current job, new job will be created when the view is active
-            statusCheckJob.cancel()
         }
 
         private fun showDohMetadataDialog(endpoint: RethinkDnsEndpoint) {
@@ -236,12 +237,12 @@ class RethinkEndpointAdapter(
             context.startActivity(intent)
         }
 
-        private fun ui(f: suspend () -> Unit) {
-            lifecycleOwner.lifecycleScope.launch(Dispatchers.Main) { f() }
+        private fun ui(f: suspend () -> Unit): Job? {
+            return lifecycleOwner?.lifecycleScope?.launch { withContext(Dispatchers.Main) { f() } }
         }
 
         private fun io(f: suspend () -> Unit) {
-            lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { f() }
+            lifecycleOwner?.lifecycleScope?.launch { withContext(Dispatchers.IO) { f() } }
         }
     }
 }

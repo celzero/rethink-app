@@ -24,6 +24,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -44,18 +45,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DnsCryptEndpointAdapter(
-    private val context: Context,
-    val lifecycleOwner: LifecycleOwner,
-    private val appConfig: AppConfig
-) :
+class DnsCryptEndpointAdapter(private val context: Context, private val appConfig: AppConfig) :
     PagingDataAdapter<DnsCryptEndpoint, DnsCryptEndpointAdapter.DnsCryptEndpointViewHolder>(
         DIFF_CALLBACK
     ) {
-    var statusCheckJob: Job = Job()
+    var lifecycleOwner: LifecycleOwner? = null
 
     companion object {
-        private const val DELAY = 1000L
+        private const val ONE_SEC = 1000L
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<DnsCryptEndpoint>() {
 
@@ -84,6 +81,7 @@ class DnsCryptEndpointAdapter(
                 parent,
                 false
             )
+        lifecycleOwner = parent.findViewTreeLifecycleOwner()
         return DnsCryptEndpointViewHolder(itemBinding)
     }
 
@@ -94,6 +92,7 @@ class DnsCryptEndpointAdapter(
 
     inner class DnsCryptEndpointViewHolder(private val b: DnsCryptEndpointListItemBinding) :
         RecyclerView.ViewHolder(b.root) {
+        private var statusCheckJob: Job? = null
 
         fun update(endpoint: DnsCryptEndpoint) {
             displayDetails(endpoint)
@@ -139,7 +138,7 @@ class DnsCryptEndpointAdapter(
             statusCheckJob = ui {
                 while (true) {
                     updateSelectedStatus()
-                    delay(DELAY)
+                    delay(ONE_SEC)
                 }
             }
         }
@@ -147,11 +146,13 @@ class DnsCryptEndpointAdapter(
         private fun updateSelectedStatus() {
             // if the view is not active then cancel the job
             if (
-                !lifecycleOwner.lifecycle.currentState.isAtLeast(
-                    androidx.lifecycle.Lifecycle.State.STARTED
-                )
+                lifecycleOwner
+                    ?.lifecycle
+                    ?.currentState
+                    ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false ||
+                    bindingAdapterPosition == RecyclerView.NO_POSITION
             ) {
-                statusCheckJob.cancel()
+                statusCheckJob?.cancel()
                 return
             }
 
@@ -238,8 +239,6 @@ class DnsCryptEndpointAdapter(
                 endpoint.isSelected = true
                 appConfig.handleDnscryptChanges(endpoint)
             }
-            // cancel the current job, new job will be created when the view is active
-            statusCheckJob.cancel()
         }
 
         private fun deleteEndpoint(id: Int) {
@@ -259,12 +258,12 @@ class DnsCryptEndpointAdapter(
             withContext(Dispatchers.Main) { f() }
         }
 
-        private fun ui(f: suspend () -> Unit): Job {
-            return lifecycleOwner.lifecycleScope.launch(Dispatchers.Main) { f() }
+        private fun ui(f: suspend () -> Unit): Job? {
+            return lifecycleOwner?.lifecycleScope?.launch(Dispatchers.Main) { f() }
         }
 
         private fun io(f: suspend () -> Unit) {
-            lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { f() }
+            lifecycleOwner?.lifecycleScope?.launch(Dispatchers.IO) { f() }
         }
     }
 }

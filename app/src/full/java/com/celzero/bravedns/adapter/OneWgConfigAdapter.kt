@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -49,7 +50,6 @@ import kotlinx.coroutines.withContext
 class OneWgConfigAdapter(private val context: Context, private val listener: DnsStatusListener) :
     PagingDataAdapter<WgConfigFiles, OneWgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
 
-    private var statusCheckJob: Job? = Job()
     private var lifecycleOwner: LifecycleOwner? = null
 
     interface DnsStatusListener {
@@ -57,7 +57,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
     }
 
     companion object {
-        private const val DELAY = 1000L
+        private const val ONE_SEC = 1000L
 
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
@@ -99,6 +99,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
     inner class WgInterfaceViewHolder(private val b: ListItemWgOneInterfaceBinding) :
         RecyclerView.ViewHolder(b.root) {
+        private var statusCheckJob: Job? = null
 
         fun update(config: WgConfigFiles) {
             b.interfaceNameText.text = config.name
@@ -108,9 +109,9 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             if (config.oneWireGuard) {
                 keepStatusUpdated(config)
             } else {
-                statusCheckJob?.cancel()
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceAppsCount.visibility = View.GONE
+                b.protocolInfoChipGroup.visibility = View.GONE
                 b.oneWgCheck.isChecked = false
                 b.interfaceStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
@@ -121,32 +122,67 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             statusCheckJob = ui {
                 while (true) {
                     updateStatus(config)
-                    delay(DELAY)
+                    delay(ONE_SEC)
                 }
             }
         }
 
-        private fun updateStatus(config: WgConfigFiles) {
-            val id = ProxyManager.ID_WG_BASE + config.id
-            val apps = ProxyManager.getAppCountForProxy(id).toString()
-            val statusId = VpnController.getProxyStatusById(id)
-            updateStatusUi(config, statusId, apps)
+        private fun updateProtocolChip(pair: Pair<Boolean, Boolean>) {
+            if (b.protocolInfoChipGroup.isVisible) return
+
+            if (!pair.first && !pair.second) {
+                b.protocolInfoChipGroup.visibility = View.GONE
+                return
+            }
+            b.protocolInfoChipGroup.visibility = View.VISIBLE
+            if (pair.first) {
+                b.protocolInfoChipIpv4.visibility = View.VISIBLE
+            } else {
+                b.protocolInfoChipIpv4.visibility = View.GONE
+            }
+            if (pair.second) {
+                b.protocolInfoChipIpv6.visibility = View.VISIBLE
+            } else {
+                b.protocolInfoChipIpv6.visibility = View.GONE
+            }
         }
 
-        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, apps: String) {
+        private fun updateSplitTunnelChip(isSplitTunnel: Boolean) {
+            if (isSplitTunnel) {
+                b.chipSplitTunnel.visibility = View.VISIBLE
+            } else {
+                b.chipSplitTunnel.visibility = View.GONE
+            }
+        }
+
+        private fun updateStatus(config: WgConfigFiles) {
             // if the view is not active then cancel the job
             if (
-                lifecycleOwner != null &&
-                    lifecycleOwner
-                        ?.lifecycle
-                        ?.currentState
-                        ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
+                lifecycleOwner
+                    ?.lifecycle
+                    ?.currentState
+                    ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
             ) {
                 statusCheckJob?.cancel()
                 return
             }
 
-            val appsCount = context.getString(R.string.firewall_card_status_active, apps)
+            val id = ProxyManager.ID_WG_BASE + config.id
+            val statusId = VpnController.getProxyStatusById(id)
+            val pair = VpnController.getSupportedIpVersion(id)
+            val c = WireguardManager.getConfigById(config.id)
+            val isSplitTunnel =
+                if (c?.getPeers()?.isNotEmpty() == true) {
+                    VpnController.isSplitTunnelProxy(id, pair)
+                } else {
+                    false
+                }
+            updateStatusUi(config, statusId)
+            updateProtocolChip(pair)
+            updateSplitTunnelChip(isSplitTunnel)
+        }
+
+        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?) {
             if (config.isActive) {
                 b.interfaceDetailCard.strokeColor = fetchColor(context, R.color.accentGood)
                 b.interfaceDetailCard.strokeWidth = 2
@@ -171,14 +207,10 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                     b.interfaceStatus.text =
                         context.getString(resId).replaceFirstChar(Char::titlecase)
                 } else {
+                    b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.chipTextNegative)
+                    b.interfaceDetailCard.strokeWidth = 2
                     b.interfaceStatus.text =
-                        context.getString(
-                            R.string.about_version_install_source,
-                            context
-                                .getString(R.string.status_waiting)
-                                .replaceFirstChar(Char::titlecase),
-                            appsCount
-                        )
+                        context.getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
                 }
             } else {
                 b.interfaceDetailCard.strokeWidth = 0
@@ -235,9 +267,6 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
     }
 
     private fun ui(f: suspend () -> Unit): Job? {
-        if (lifecycleOwner == null) {
-            return null
-        }
         return lifecycleOwner?.lifecycleScope?.launch(Dispatchers.Main) { f() }
     }
 
