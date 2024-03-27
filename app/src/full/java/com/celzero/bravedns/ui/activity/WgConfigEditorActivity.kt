@@ -25,7 +25,6 @@ import androidx.lifecycle.lifecycleScope
 import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityWgConfigEditorBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
@@ -45,7 +44,6 @@ import org.koin.android.ext.android.inject
 class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_editor) {
     private val b by viewBinding(ActivityWgConfigEditorBinding::bind)
     private val persistentState by inject<PersistentState>()
-    private val appConfig by inject<AppConfig>()
 
     private var wgConfig: Config? = null
     private var wgInterface: WgInterface? = null
@@ -55,7 +53,10 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
     companion object {
         const val INTENT_EXTRA_WG_ID = "WIREGUARD_TUNNEL_ID"
         private const val CLIPBOARD_PUBLIC_KEY_LBL = "Public Key"
-        private const val DEFAULT_MTU = "1500"
+        private const val DEFAULT_MTU = "1280"
+        // when dns is set to auto, the default dns is set to 1.1.1.1. this differs from official
+        // wireguard for android, because rethink requires a dns to be set in "Simple" mode
+        private const val DEFAULT_DNS = "1.1.1.1"
         private const val DEFAULT_LISTEN_PORT = "0"
     }
 
@@ -84,7 +85,6 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
     }
 
     private fun init() {
-        observeDnsName()
         io {
             wgConfig = WireguardManager.getConfigById(configId)
             wgInterface = wgConfig?.getInterface()
@@ -119,12 +119,6 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         }
     }
 
-    private fun observeDnsName() {
-        appConfig.getConnectedDnsObservable().observe(this) {
-            b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, it)
-        }
-    }
-
     private fun setupClickListeners() {
         b.privateKeyTextLayout.setEndIconOnClickListener {
             val key = Backend.newWgPrivateKey()
@@ -139,7 +133,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
             val addresses = b.addressesLabelText.text.toString()
             val mtu = b.mtuText.text.toString().ifEmpty { DEFAULT_MTU }
             val listenPort = b.listenPortText.text.toString().ifEmpty { DEFAULT_LISTEN_PORT }
-            val dnsServers = b.dnsServersText.text.toString()
+            val dnsServers = b.dnsServersText.text.toString().ifEmpty { DEFAULT_DNS }
             val privateKey = b.privateKeyText.text.toString()
             io {
                 val isInterfaceAdded =

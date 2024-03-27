@@ -181,15 +181,21 @@ class AppDownloadManager(
 
         // no need to proceed if the current and received timestamp is same
         if (updatableTs <= currentTs && !isRedownload) {
+            Log.i(
+                LOG_TAG_DNS,
+                "local blocklist update not required, current ts: $currentTs, updatable ts: $updatableTs"
+            )
             return DownloadManagerStatus.NOT_REQUIRED
         } else {
             // no-op
         }
 
         if (persistentState.useCustomDownloadManager) {
+            Log.i(LOG_TAG_DNS, "initiating local blocklist download with custom download mgr")
             return initiateCustomDownloadManager(updatableTs)
         }
 
+        Log.i(LOG_TAG_DNS, "initiating local blocklist download with Android download mgr")
         return initiateAndroidDownloadManager(updatableTs)
     }
 
@@ -198,9 +204,12 @@ class AppDownloadManager(
         if (
             WorkScheduler.isWorkScheduled(context, DOWNLOAD_TAG) ||
                 WorkScheduler.isWorkScheduled(context, FILE_TAG)
-        )
+        ) {
+            Log.i(LOG_TAG_DNS, "local blocklist download is already in progress, returning")
             return DownloadManagerStatus.FAILURE
+        }
 
+        Log.i(LOG_TAG_DNS, "local blocklist download is not in progress, starting the download")
         purge(context, timestamp, DownloadType.LOCAL)
         val downloadIds = LongArray(ONDEVICE_BLOCKLISTS_ADM.count())
         ONDEVICE_BLOCKLISTS_ADM.forEachIndexed { i, it ->
@@ -240,6 +249,10 @@ class AppDownloadManager(
         val updatableTs = getDownloadableTimestamp(response)
 
         if (updatableTs <= currentTs && !isRedownload) {
+            Log.i(
+                LOG_TAG_DNS,
+                "remote blocklist update not required, current ts: $currentTs, updatable ts: $updatableTs"
+            )
             return false
         } else {
             // no-op
@@ -258,8 +271,10 @@ class AppDownloadManager(
                     context,
                     RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER
                 )
-        )
+        ) {
+            Log.i(LOG_TAG_DNS, "remote blocklist download is already in progress, returning")
             return false
+        }
 
         startRemoteBlocklistCoordinator(timestamp)
         return true

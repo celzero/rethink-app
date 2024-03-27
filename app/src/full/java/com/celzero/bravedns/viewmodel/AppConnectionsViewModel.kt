@@ -10,60 +10,87 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.liveData
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.util.Constants
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flatMapLatest
 
 class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO) : ViewModel() {
     private var filter: MutableLiveData<String> = MutableLiveData()
-    private var uid: Int = Constants.MISSING_UID
+    private var allLogsFilter: MutableLiveData<String> = MutableLiveData()
+    private var uid: Int = Constants.INVALID_UID
     private val pagingConfig: PagingConfig
-    var f: StateFlow<String>
 
     init {
         filter.value = ""
-        f = filter.value?.let { MutableStateFlow(it) } ?: MutableStateFlow("")
+        allLogsFilter.value = ""
 
         pagingConfig =
             PagingConfig(
-                pageSize = Constants.LIVEDATA_PAGE_SIZE,
-                prefetchDistance = Constants.LIVEDATA_PAGE_SIZE / 2,
-                enablePlaceholders = false
+                enablePlaceholders = false,
+                prefetchDistance = 10,
+                initialLoadSize = Constants.LIVEDATA_PAGE_SIZE,
+                pageSize = Constants.LIVEDATA_PAGE_SIZE
             )
+    }
+
+    enum class FilterType {
+        OFFSET,
+        ALL
     }
 
     val appNetworkLogs = filter.switchMap { input -> fetchNetworkLogs(uid, input) }
 
+    val allAppNetworkLogs = allLogsFilter.switchMap { input -> fetchAllNetworkLogs(uid, input) }
+
     private fun fetchNetworkLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
         val pager =
             if (input.isEmpty()) {
-                Pager(config = pagingConfig, pagingSourceFactory = { nwlogDao.getLogsForApp(uid) })
+                Pager(config = pagingConfig, pagingSourceFactory = { nwlogDao.getLogsForAppWithLimit(uid) })
                     .flow
                     .cachedIn(viewModelScope)
             } else {
                 Pager(
                         config = pagingConfig,
-                        pagingSourceFactory = { nwlogDao.getLogsForAppFiltered(uid, "%$input%") }
+                        pagingSourceFactory = { nwlogDao.getLogsForAppFilteredWithLimit(uid, "%$input%") }
                     )
                     .flow
                     .cachedIn(viewModelScope)
             }
 
         return pager.asLiveData()
+
+        /*return if (input.isEmpty()) {
+            Pager(pagingConfig) { nwlogDao.getLogsForAppWithLimit(uid) }
+                .liveData
+                .cachedIn(viewModelScope)
+        } else {
+            Pager(pagingConfig) { nwlogDao.getLogsForAppFilteredWithLimit(uid, "%$input%") }
+                .liveData
+                .cachedIn(viewModelScope)
+        }*/
+    }
+
+    private fun fetchAllNetworkLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
+        return if (input.isEmpty()) {
+            Pager(pagingConfig) { nwlogDao.getAllLogs(uid) }.liveData.cachedIn(viewModelScope)
+        } else {
+            Pager(pagingConfig) { nwlogDao.getAllLogsFiltered(uid, "%$input%") }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
     }
 
     fun getConnectionsCount(uid: Int): LiveData<Int> {
         return nwlogDao.getAppConnectionsCount(uid)
     }
 
-    fun setFilter(input: String) {
-        this.filter.postValue(input)
-        this.f = MutableStateFlow(input)
+    fun setFilter(input: String, filterType: FilterType) {
+        if (filterType == FilterType.OFFSET) {
+            this.filter.postValue(input)
+        } else {
+            this.allLogsFilter.postValue(input)
+        }
     }
 
     fun setUid(uid: Int) {

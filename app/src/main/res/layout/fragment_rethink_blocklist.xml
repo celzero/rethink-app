@@ -181,6 +181,12 @@
                 android:visibility="gone" />
         </RelativeLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_above="@id/lb_apply_container"
+            android:background="?attr/border" />
+
         <LinearLayout
             android:id="@+id/lb_apply_container"
             android:layout_width="match_parent"
@@ -193,8 +199,9 @@
                 style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.5"
+                android:layout_weight="0.4"
                 android:text="@string/notif_dialog_pause_dialog_negative"
+                android:layout_marginEnd="1dp"
                 android:textColor="?attr/primaryTextColor" />
 
             <androidx.appcompat.widget.AppCompatButton
@@ -202,7 +209,8 @@
                 style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.5"
+                android:layout_gravity="center"
+                android:layout_weight="0.6"
                 android:text="@string/lbl_apply" />
 
         </LinearLayout>

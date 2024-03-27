@@ -48,7 +48,6 @@ internal constructor(
     private val dnsLatencyTracker by inject<QueryTracker>()
 
     private var scope: CoroutineScope? = null
-        private set
 
     private var dnsLogTracker: DnsLogTracker? = null
     private var ipTracker: IPTracker? = null

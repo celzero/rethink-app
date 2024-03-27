@@ -24,6 +24,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.celzero.bravedns.data.DataUsage
+import com.celzero.bravedns.util.Constants.Companion.RETHINK_PACKAGE
 
 @Dao
 interface AppInfoDAO {
@@ -31,8 +32,7 @@ interface AppInfoDAO {
     @Update fun update(appInfo: AppInfo): Int
 
     @Query(
-        "update AppInfo set firewallStatus = :firewallStatus, connectionStatus = :connectionStatus where uid = :uid"
-    )
+        "update AppInfo set firewallStatus = :firewallStatus, connectionStatus = :connectionStatus where uid = :uid and packageName != 'com.celzero.bravedns'")
     fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(appInfo: AppInfo): Long

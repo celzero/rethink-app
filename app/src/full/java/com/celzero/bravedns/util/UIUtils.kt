@@ -89,6 +89,9 @@ object UIUtils {
             Backend.TOK -> {
                 R.string.dns_connected
             }
+            Backend.TZZ -> {
+                R.string.lbl_idle
+            }
             Backend.TKO -> {
                 R.string.status_failing
             }

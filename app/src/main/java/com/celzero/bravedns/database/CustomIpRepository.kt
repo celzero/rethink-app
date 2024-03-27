@@ -39,8 +39,8 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
         return customIpDao.getCustomIpDetail(uid, ipAddress, port)
     }
 
-    suspend fun deleteRule(uid: Int, ipAddress: String, port: Int) {
-        customIpDao.deleteRule(uid, ipAddress, port)
+    suspend fun deleteRule(uid: Int, ipAddress: String, port: Int): Int {
+        return customIpDao.deleteRule(uid, ipAddress, port)
     }
 
     suspend fun deleteRulesByUid(uid: Int) {

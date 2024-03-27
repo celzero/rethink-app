@@ -62,6 +62,8 @@ import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -92,6 +94,7 @@ class AppInfoActivity :
 
     companion object {
         const val UID_INTENT_NAME = "UID"
+        const val LOG_THRESHOLD_SIZE = 100
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -135,6 +138,12 @@ class AppInfoActivity :
                 b.aadConnDetailRecycler.visibility = View.VISIBLE
                 b.aadConnDetailEmptyTxt.visibility = View.GONE
                 b.aadConnDetailSearchLl.visibility = View.VISIBLE
+                // if more than 100 logs, option to view all logs in a new screen
+                if (it > LOG_THRESHOLD_SIZE) {
+                    b.aadConnShowAllChip.visibility = View.VISIBLE
+                } else {
+                    b.aadConnShowAllChip.visibility = View.GONE
+                }
             }
         }
     }
@@ -192,10 +201,6 @@ class AppInfoActivity :
         b.aadIpBlockCard.visibility = View.GONE
     }
 
-    override fun onResume() {
-        super.onResume()
-        b.aadConnDetailRecycler.adapter?.notifyDataSetChanged()
-    }
 
     private fun openCustomIpScreen() {
         val intent = Intent(this, CustomRulesActivity::class.java)
@@ -423,6 +428,12 @@ class AppInfoActivity :
         b.aadAppDnsRethinkConfigure.setOnClickListener { rethinkListBottomSheet() }
 
         b.aadConnDelete.setOnClickListener { showDeleteConnectionsDialog() }
+
+        b.aadConnShowAllChip.setOnClickListener {
+            val intent = Intent(this, AppWiseLogsActivity::class.java)
+            intent.putExtra(UID_INTENT_NAME, uid)
+            startActivity(intent)
+        }
     }
 
     private fun showAppInfoDialog(packages: List<String>) {
@@ -583,10 +594,10 @@ class AppInfoActivity :
         networkLogsViewModel.appNetworkLogs.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }
-        b.aadConnDetailRecycler.isNestedScrollingEnabled = false
+        b.aadConnDetailRecycler.isNestedScrollingEnabled = true
         b.aadConnDetailRecycler.adapter = recyclerAdapter
         val itemAnimator = DefaultItemAnimator()
-        itemAnimator.changeDuration = 1500
+        itemAnimator.changeDuration = 1000
         b.aadConnDetailRecycler.itemAnimator = itemAnimator
     }
 
@@ -821,8 +832,8 @@ class AppInfoActivity :
             Configuration.UI_MODE_NIGHT_YES
     }
 
-    private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch(Dispatchers.IO) { f() }
+    private fun io(f: suspend () -> Unit): Job {
+        return lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
@@ -830,12 +841,16 @@ class AppInfoActivity :
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
-        networkLogsViewModel.setFilter(query)
+        networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.OFFSET)
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        networkLogsViewModel.setFilter(query)
+        Utilities.delay(500, lifecycleScope) {
+            if (!this.isFinishing) {
+                networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.OFFSET)
+            }
+        }
         return true
     }
 }

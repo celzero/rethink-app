@@ -77,7 +77,7 @@ class RethinkListBottomSheet : BottomSheetDialogFragment() {
         layoutManager = LinearLayoutManager(requireContext())
         b.bsrRethinkListRecycler.layoutManager = layoutManager
 
-        recyclerAdapter = RethinkEndpointAdapter(requireContext(), viewLifecycleOwner, get())
+        recyclerAdapter = RethinkEndpointAdapter(requireContext(), get())
         viewModel.setFilter(filter)
         viewModel.rethinkEndpointList.observe(viewLifecycleOwner) {
             recyclerAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)

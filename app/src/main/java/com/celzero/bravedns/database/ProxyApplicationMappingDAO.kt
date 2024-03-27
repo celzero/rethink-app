@@ -80,6 +80,11 @@ interface ProxyApplicationMappingDAO {
     fun updateProxyForAllApps(cfgId: String, cfgName: String = "")
 
     @Query(
+        "update ProxyApplicationMapping set proxyName = :proxyName where proxyId = :proxyId"
+    )
+    fun updateProxyNameForProxyId(proxyId: String, proxyName: String)
+
+    @Query(
         "update ProxyApplicationMapping set proxyId = :cfgId, proxyName = :cfgName where proxyId = ''"
     )
     fun updateProxyForUnselectedApps(cfgId: String, cfgName: String = "")

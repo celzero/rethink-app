@@ -63,7 +63,7 @@ class DoTListFragment : Fragment(R.layout.fragment_dot_list) {
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerDot.layoutManager = layoutManager
 
-        adapter = DoTEndpointAdapter(requireContext(), viewLifecycleOwner, get())
+        adapter = DoTEndpointAdapter(requireContext(), get())
         viewModel.dohEndpointList.observe(viewLifecycleOwner) {
             adapter!!.submitData(viewLifecycleOwner.lifecycle, it)
         }

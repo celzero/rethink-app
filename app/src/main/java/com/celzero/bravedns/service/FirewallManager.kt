@@ -27,6 +27,7 @@ import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfos
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfosLiveData
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.foregroundUids
 import com.celzero.bravedns.util.AndroidUidConfig
+import com.celzero.bravedns.util.Constants.Companion.RETHINK_PACKAGE
 import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.OrbotHelper
 import com.google.common.collect.HashMultimap
@@ -418,6 +419,8 @@ object FirewallManager : KoinComponent {
     ) {
         mutex.withLock {
             appInfos.get(uid).forEach {
+                if (it.packageName == RETHINK_PACKAGE) return@forEach
+
                 it.firewallStatus = firewallStatus.id
                 it.connectionStatus = connectionStatus.id
             }

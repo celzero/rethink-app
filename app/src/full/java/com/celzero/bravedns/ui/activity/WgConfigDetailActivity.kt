@@ -285,6 +285,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         val id = ProxyManager.ID_WG_BASE + configId
         b.applicationsBtn.isEnabled = true
         mappingViewModel.getAppCountById(id).observe(this) {
+            if (it == 0) {
+                b.applicationsBtn.setTextColor(UIUtils.fetchColor(this, R.attr.accentBad))
+            }
+            b.applicationsBtn.setTextColor(UIUtils.fetchColor(this, R.attr.accentGood))
             b.applicationsBtn.text = getString(R.string.add_remove_apps, it.toString())
         }
     }
@@ -436,7 +440,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         layoutManager = LinearLayoutManager(this)
         b.peersList.layoutManager = layoutManager
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        wgPeersAdapter = WgPeersAdapter(this, this, themeId, configId, peers)
+        wgPeersAdapter = WgPeersAdapter(this, themeId, configId, peers)
         b.peersList.adapter = wgPeersAdapter
     }
 

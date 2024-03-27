@@ -34,6 +34,7 @@ import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
+import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.ProxyManager
@@ -114,7 +115,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
 
         private fun openBottomSheet(ct: ConnectionTracker) {
             if (context !is FragmentActivity) {
-                Log.wtf(LOG_TAG_UI, "err opening the connection tracker bottomsheet")
+                Log.w(LOG_TAG_UI, "err opening the connection tracker bottomsheet")
                 return
             }
 

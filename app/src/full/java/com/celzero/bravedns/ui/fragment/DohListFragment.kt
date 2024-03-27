@@ -66,7 +66,7 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerDohConnections.layoutManager = layoutManager
 
-        dohRecyclerAdapter = DohEndpointAdapter(requireContext(), viewLifecycleOwner, get())
+        dohRecyclerAdapter = DohEndpointAdapter(requireContext(), get())
         viewModel.dohEndpointList.observe(viewLifecycleOwner) {
             dohRecyclerAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
         }

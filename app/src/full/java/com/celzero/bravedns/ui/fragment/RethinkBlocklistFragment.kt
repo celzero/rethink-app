@@ -74,12 +74,12 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.regex.Pattern
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.regex.Pattern
 
 class RethinkBlocklistFragment :
     Fragment(R.layout.fragment_rethink_blocklist), SearchView.OnQueryTextListener {
@@ -202,6 +202,15 @@ class RethinkBlocklistFragment :
 
     private fun init() {
         modifiedStamp = getStamp()
+
+        val typeName =
+            if (type.isLocal()) {
+                getString(R.string.lbl_on_device)
+            } else {
+                getString(R.string.rdns_plus)
+            }
+        b.lbBlocklistApplyBtn.text =
+            getString(R.string.ct_ip_details, getString(R.string.lbl_apply), typeName)
 
         updateFileTagList(emptySet())
 

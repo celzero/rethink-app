@@ -43,21 +43,22 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
         BLOCKED(2)
     }
 
+    private val pagingConfig: PagingConfig
+
     init {
         filterString.value = ""
+        pagingConfig =
+            PagingConfig(
+                enablePlaceholders = true,
+                prefetchDistance = 3,
+                initialLoadSize = LIVEDATA_PAGE_SIZE * 2,
+                maxSize = LIVEDATA_PAGE_SIZE * 3,
+                pageSize = LIVEDATA_PAGE_SIZE * 2,
+                jumpThreshold = 5
+            )
     }
 
     val connectionTrackerList = filterString.switchMap { input -> fetchNetworkLogs(input) }
-
-    private val pagingConfig =
-        PagingConfig(
-            enablePlaceholders = true,
-            prefetchDistance = 3,
-            initialLoadSize = LIVEDATA_PAGE_SIZE * 2,
-            maxSize = LIVEDATA_PAGE_SIZE * 3,
-            pageSize = LIVEDATA_PAGE_SIZE * 2,
-            jumpThreshold = 5
-        )
 
     fun setFilter(searchString: String, filter: Set<String>, type: TopLevelFilter) {
         filterRules.clear()

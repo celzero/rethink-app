@@ -55,7 +55,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
+class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main), OneWgConfigAdapter.DnsStatusListener {
     private val b by viewBinding(ActivityWireguardMainBinding::bind)
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
@@ -63,6 +63,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     private var wgConfigAdapter: WgConfigAdapter? = null
     private var oneWgConfigAdapter: OneWgConfigAdapter? = null
     private val wgConfigViewModel: WgConfigViewModel by viewModel()
+
 
     companion object {
         private const val IMPORT_LAUNCH_INPUT = "*/*"
@@ -215,7 +216,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
         val layoutManager = LinearLayoutManager(this)
         b.oneWgInterfaceList.layoutManager = layoutManager
 
-        oneWgConfigAdapter = OneWgConfigAdapter(this)
+        oneWgConfigAdapter = OneWgConfigAdapter(this, this)
         wgConfigViewModel.interfaces.observe(this) { oneWgConfigAdapter?.submitData(lifecycle, it) }
         b.oneWgInterfaceList.adapter = oneWgConfigAdapter
     }
@@ -234,6 +235,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
 
     override fun onResume() {
         super.onResume()
+        oneWgConfigAdapter?.notifyDataSetChanged()
         wgConfigAdapter?.notifyDataSetChanged()
     }
 
@@ -282,6 +284,8 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                 val dnsName = activeConfigs.first().getName()
                 b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsName)
             }
+            // remove the observer if any config is active
+            appConfig.getConnectedDnsObservable().removeObservers(this)
         } else {
             appConfig.getConnectedDnsObservable().observe(this) {
                 b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, it)
@@ -345,6 +349,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                     if (WireguardManager.canDisableAllActiveConfigs()) {
                         WireguardManager.disableAllActiveConfigs()
                         uiCtx {
+                            this.observeDnsName()
                             if (isOneWgToggle) {
                                 showOneWgToggle()
                             } else {
@@ -393,5 +398,9 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
+    }
+
+    override fun onDnsStatusChanged() {
+        observeDnsName()
     }
 }

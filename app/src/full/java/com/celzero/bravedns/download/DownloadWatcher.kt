@@ -50,7 +50,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
     private var downloadIds: MutableList<Long>? = mutableListOf()
 
     override fun doWork(): Result {
-
+        Log.i(LOG_TAG_DOWNLOAD, "start download watcher, checking for download status")
         val startTime = inputData.getLong("workerStartTime", 0)
         downloadIds = inputData.getLongArray("downloadIds")?.toMutableList()
         if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager: $startTime, $downloadIds")

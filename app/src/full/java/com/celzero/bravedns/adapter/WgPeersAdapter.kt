@@ -36,7 +36,6 @@ import kotlinx.coroutines.withContext
 
 class WgPeersAdapter(
     val context: Context,
-    private val lifecycleOwner: LifecycleOwner,
     private val themeId: Int,
     private val configId: Int,
     private var peers: MutableList<Peer>
@@ -81,12 +80,6 @@ class WgPeersAdapter(
             } else {
                 b.persistentKeepaliveText.visibility = View.GONE
                 b.persistentKeepaliveLabel.visibility = View.GONE
-            }
-            if (wgPeer.getPreSharedKey().isPresent) {
-                b.preSharedKeyText.text = wgPeer.getPreSharedKey().get().base64()
-            } else {
-                b.preSharedKeyText.visibility = View.GONE
-                b.preSharedKeyLabel.visibility = View.GONE
             }
             b.publicKeyText.text = wgPeer.getPublicKey().base64()
 

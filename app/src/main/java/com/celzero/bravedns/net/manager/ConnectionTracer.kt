@@ -45,7 +45,7 @@ class ConnectionTracer(ctx: Context) {
     }
 
     @TargetApi(Build.VERSION_CODES.Q)
-    fun getUidQ(
+    suspend fun getUidQ(
         protocol: Int,
         sourceIp: String,
         sourcePort: Int,
@@ -80,8 +80,8 @@ class ConnectionTracer(ctx: Context) {
         }
         val key = makeCacheKey(protocol, local, remote)
         try {
-            // executing inside a coroutine to avoid the NetworkOnMainThreadException issue#853
-            runBlocking(Dispatchers.IO) { uid = cm.getConnectionOwnerUid(protocol, local, remote) }
+            // must be called from io thread to avoid the NetworkOnMainThreadException issue#853
+            uid = cm.getConnectionOwnerUid(protocol, local, remote)
 
             if (DEBUG)
                 Log.d(
