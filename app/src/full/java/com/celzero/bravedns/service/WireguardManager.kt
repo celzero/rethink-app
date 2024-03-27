@@ -581,9 +581,6 @@ object WireguardManager : KoinComponent {
         Log.i(LOG_TAG_PROXY, "update one wg, id: $id, ${config.getName()} to $owg")
         db.updateOneWireGuardConfig(id, owg)
         map?.oneWireGuard = owg
-        if (map?.isActive == true) {
-            VpnController.addWireGuardProxy(id = ProxyManager.ID_WG_BASE + config.getId())
-        }
     }
 
     suspend fun addPeer(id: Int, peer: Peer) {
