@@ -74,6 +74,9 @@ internal constructor(
         private var connectedDns: MutableLiveData<String> = MutableLiveData()
 
         private const val ORBOT_DNS = "Orbot"
+
+        const val LOOPBACK_DNS = "localhost" // also default fallback ip
+        const val RINR_FALLBACK_DNS = "8.8.4.4"
     }
 
     init {
@@ -701,7 +704,6 @@ internal constructor(
 
     suspend fun handleDnsrelayChanges(endpoint: DnsCryptRelayEndpoint) {
         dnsCryptRelayEndpointRepository.update(endpoint)
-        persistentState.dnscryptRelays = getDnscryptRelayServers()
     }
 
     suspend fun removeDnscryptRelay(stamp: String) {
