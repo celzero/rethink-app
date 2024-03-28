@@ -41,14 +41,12 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.HTTP_PROXY_PORT
-import com.celzero.bravedns.util.Constants.Companion.SOCKS_DEFAULT_IP
 import com.celzero.bravedns.util.Constants.Companion.SOCKS_DEFAULT_PORT
 import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.getBroadcastPendingIntent
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
-import com.celzero.bravedns.util.Utilities.isAtleastU
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isValidPort
@@ -192,7 +190,10 @@ class OrbotHelper(
         selectedProxyType = type
         val intent = getOrbotStartIntent()
         isResponseReceivedFromOrbot = false
-        ContextCompat.registerReceiver(context, orbotStatusReceiver, IntentFilter(ACTION_STATUS),
+        ContextCompat.registerReceiver(
+            context,
+            orbotStatusReceiver,
+            IntentFilter(ACTION_STATUS),
             ContextCompat.RECEIVER_EXPORTED
         )
         context.sendBroadcast(intent)
@@ -222,18 +223,22 @@ class OrbotHelper(
 
                 when (status) {
                     STATUS_ON -> {
+                        Log.i(LOG_TAG_VPN, "Orbot is ON, update the proxy data")
                         isResponseReceivedFromOrbot = true
                         updateOrbotProxyData(intent)
                         setOrbotMode()
                     }
                     STATUS_OFF -> {
-                        stopOrbot(isInteractive = false)
+                        Log.i(LOG_TAG_VPN, "Orbot is OFF, retry or stop the Orbot")
+                        io { waitForOrbot() }
                         context.unregisterReceiver(this)
                     }
                     STATUS_STARTING -> {
+                        Log.i(LOG_TAG_VPN, "Orbot is STARTING, update the proxy data")
                         updateOrbotProxyData(intent)
                     }
                     STATUS_STOPPING -> {
+                        Log.i(LOG_TAG_VPN, "Orbot is STOPPING, stop the Proxy")
                         updateOrbotProxyData(intent)
                         stopOrbot(isInteractive = false)
                     }
@@ -259,7 +264,7 @@ class OrbotHelper(
         appConfig.removeAllProxies()
         persistentState.orbotConnectionStatus.postValue(false)
         context.sendBroadcast(getOrbotStopIntent())
-        if (DEBUG) Log.d(LOG_TAG_VPN, "stop orbot, remove from proxy")
+        Log.i(LOG_TAG_VPN, "stop orbot, remove from proxy")
     }
 
     /**
@@ -441,7 +446,6 @@ class OrbotHelper(
             )
     }
 
-
     /**
      * Create a ScheduledExecutorService which will be executed after 30 sec of Orbot status
      * initiation.
@@ -466,7 +470,10 @@ class OrbotHelper(
                 Log.i(LOG_TAG_VPN, "retrying orbot start")
                 startOrbot(selectedProxyType)
             } else {
-                uiCtx { stopOrbot(isInteractive = false) }
+                uiCtx {
+                    stopOrbot(isInteractive = false)
+                    context.unregisterReceiver(orbotStatusReceiver)
+                }
             }
         }
     }
