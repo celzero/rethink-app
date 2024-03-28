@@ -44,12 +44,11 @@ import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.util.concurrent.TimeUnit
 
 class DnsSettingsFragment :
     Fragment(R.layout.fragment_dns_configure),
@@ -152,7 +151,8 @@ class DnsSettingsFragment :
 
     private fun updateConnectedStatus(connectedDns: String) {
         if (WireguardManager.oneWireGuardEnabled()) {
-            b.connectedStatusTitleUrl.text = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
+            b.connectedStatusTitleUrl.text =
+                resources.getString(R.string.configure_dns_connected_dns_proxy_status)
             b.connectedStatusTitle.text = resources.getString(R.string.lbl_wireguard)
             disableAllDns()
             b.wireguardRb.isEnabled = true
@@ -352,9 +352,7 @@ class DnsSettingsFragment :
             persistentState.enableDnsCache = b
         }
 
-        b.dcProxyDnsSwitch.setOnCheckedChangeListener { _, b ->
-            persistentState.proxyDns = !b
-        }
+        b.dcProxyDnsSwitch.setOnCheckedChangeListener { _, b -> persistentState.proxyDns = !b }
 
         b.dcProxyDnsRl.setOnClickListener {
             b.dcProxyDnsSwitch.isChecked = !b.dcProxyDnsSwitch.isChecked

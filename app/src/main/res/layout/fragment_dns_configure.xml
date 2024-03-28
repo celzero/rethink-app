@@ -276,7 +276,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
-                    android:paddingTop="5dp"
+                    android:paddingTop="15dp"
                     android:paddingBottom="15dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
@@ -320,6 +320,118 @@
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/dc_alg_switch"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:padding="10dp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/dc_downloader_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/dc_downloader_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_update" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/dc_downloader_switch"
+                        android:layout_toEndOf="@id/dc_downloader_icon"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/dc_downloader_txt"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_custom_downloader_heading"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/settings_custom_downloader_desc"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/dc_downloader_switch"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:padding="10dp" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/dc_check_update_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/dc_check_update_img"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_blocklist_update_check" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/dc_check_update_switch"
+                        android:layout_toEndOf="@id/dc_check_update_img"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/dc_check_update_heading"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="10dp"
+                            android:text="@string/dc_check_update_heading"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/dc_check_update_desc"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/dc_check_update_switch"
                         style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -470,118 +582,6 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:padding="10dp" />
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/dc_downloader_rl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:paddingTop="15dp"
-                    android:paddingBottom="15dp">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/dc_downloader_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_update" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/dc_downloader_switch"
-                        android:layout_toEndOf="@id/dc_downloader_icon"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/dc_downloader_txt"
-                            style="@style/TextAppearance.AppCompat.Subhead"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/settings_custom_downloader_heading"
-                            android:textSize="@dimen/large_font_text_view" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:paddingBottom="5dp"
-                            android:text="@string/settings_custom_downloader_desc"
-                            android:textSize="@dimen/default_font_text_view" />
-                    </LinearLayout>
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/dc_downloader_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:padding="10dp" />
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/dc_check_update_rl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:paddingTop="15dp"
-                    android:paddingBottom="15dp">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/dc_check_update_img"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_blocklist_update_check" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/dc_check_update_switch"
-                        android:layout_toEndOf="@id/dc_check_update_img"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/dc_check_update_heading"
-                            style="@style/TextAppearance.AppCompat.Subhead"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawablePadding="10dp"
-                            android:text="@string/dc_check_update_heading"
-                            android:textSize="@dimen/large_font_text_view" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:paddingBottom="5dp"
-                            android:text="@string/dc_check_update_desc"
-                            android:textSize="@dimen/default_font_text_view" />
-                    </LinearLayout>
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/dc_check_update_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:padding="10dp" />
-
                 </RelativeLayout>
 
                 <RelativeLayout
