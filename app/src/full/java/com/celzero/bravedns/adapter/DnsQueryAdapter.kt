@@ -117,9 +117,7 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
         }
 
         private fun determineMaybeBlocked(dnsLog: DnsLog): Boolean {
-            val anyRealIpBlocked = !dnsLog.responseIps.split(",").none { Utilities.isUnspecifiedIp(it.trim()) }
-            val hasBlocklist = dnsLog.blockLists.isNotEmpty()
-            return anyRealIpBlocked || hasBlocklist
+            return dnsLog.upstreamBlock || dnsLog.blockLists.isNotEmpty()
         }
 
         private fun displayIcon(dnsLog: DnsLog) {

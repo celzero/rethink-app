@@ -31,7 +31,7 @@ import com.celzero.bravedns.util.Utilities
 
 @Database(
     entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -69,6 +69,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_3_4)
                 .addMigrations(MIGRATION_4_5)
                 .addMigrations(MIGRATION_5_6)
+                .addMigrations(MIGRATION_6_7)
                 .build()
         }
 
@@ -256,6 +257,16 @@ abstract class LogDatabase : RoomDatabase() {
                         "CREATE TABLE 'AlertRegistry' ('id' INTEGER NOT NULL, 'alertTitle' TEXT NOT NULL, 'alertType' TEXT NOT NULL, 'alertCount' INTEGER NOT NULL, 'alertTime' INTEGER NOT NULL, 'alertMessage' TEXT NOT NULL, 'alertCategory' TEXT NOT NULL, 'alertSeverity' TEXT NOT NULL, 'alertActions' TEXT NOT NULL, 'alertStatus' TEXT NOT NULL, 'alertSolution' TEXT NOT NULL, 'isRead' INTEGER NOT NULL, isDeleted INTEGER NOT NULL, isCustom INTEGER NOT NULL, isNotified INTEGER NOT NULL, PRIMARY KEY (id))"
                     )
                     db.execSQL("ALTER TABLE DnsLogs ADD COLUMN msg TEXT DEFAULT '' NOT NULL")
+                }
+            }
+
+        private val MIGRATION_6_7: Migration =
+            object : Migration(6, 7) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    // add a new column upstreamBlock to DNS log table with default as false
+                    db.execSQL(
+                        "ALTER TABLE DnsLogs ADD COLUMN upstreamBlock INTEGER DEFAULT 0 NOT NULL"
+                    )
                 }
             }
     }

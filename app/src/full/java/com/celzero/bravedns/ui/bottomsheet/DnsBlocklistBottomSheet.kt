@@ -77,7 +77,6 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     private var log: DnsLog? = null
 
     private val persistentState by inject<PersistentState>()
-    private val appConfig by inject<AppConfig>()
 
     override fun getTheme(): Int =
         Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
@@ -223,7 +222,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
         displayDescription()
 
-        if (log!!.groundedQuery() || log!!.hasBlocklists()) {
+        if (log!!.groundedQuery() || log!!.hasBlocklists() || log!!.upstreamBlock) {
             handleBlocklistChip()
             b.dnsBlockIpsChip.visibility = View.GONE
             return
@@ -298,10 +297,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             return false
         }
 
-        val anyRealIpBlocked =
-            !log!!.responseIps.split(",").none { Utilities.isUnspecifiedIp(it.trim()) }
-        val hasBlocklist = log!!.blockLists.isNotEmpty()
-        return anyRealIpBlocked || hasBlocklist
+        return log!!.upstreamBlock || log!!.blockLists.isNotEmpty()
     }
 
     private fun showBlocklistChip() {

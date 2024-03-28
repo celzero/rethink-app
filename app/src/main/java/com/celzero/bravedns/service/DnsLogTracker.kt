@@ -84,6 +84,7 @@ internal constructor(
         transaction.blocklist = summary.blocklists ?: ""
         transaction.relayName = summary.relayServer ?: ""
         transaction.msg = summary.msg ?: ""
+        transaction.upstreamBlock = summary.upstreamBlocks
         return transaction
     }
 
@@ -101,6 +102,7 @@ internal constructor(
         dnsLog.status = transaction.status.name
         dnsLog.time = transaction.responseCalendar.timeInMillis
         dnsLog.msg = transaction.msg
+        dnsLog.upstreamBlock = transaction.upstreamBlock
         val typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt())
         if (typeName == ResourceRecordTypes.UNKNOWN) {
             dnsLog.typeName = transaction.type.toString()
@@ -148,7 +150,8 @@ internal constructor(
                     }
                     // now, there is no empty response, instead -- is added as response from go
                     if (
-                        transaction.response == EMPTY_RESPONSE && transaction.blocklist.isNotEmpty()
+                        transaction.response == EMPTY_RESPONSE &&
+                            (transaction.blocklist.isNotEmpty() || transaction.upstreamBlock)
                     ) {
                         dnsLog.isBlocked = true
                     }
