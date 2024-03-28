@@ -287,8 +287,9 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         mappingViewModel.getAppCountById(id).observe(this) {
             if (it == 0) {
                 b.applicationsBtn.setTextColor(UIUtils.fetchColor(this, R.attr.accentBad))
+            } else {
+                b.applicationsBtn.setTextColor(UIUtils.fetchColor(this, R.attr.accentGood))
             }
-            b.applicationsBtn.setTextColor(UIUtils.fetchColor(this, R.attr.accentGood))
             b.applicationsBtn.text = getString(R.string.add_remove_apps, it.toString())
         }
     }
