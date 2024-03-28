@@ -903,7 +903,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             return
         }
 
-        if (isRethinkDnsActive()) {
+        if (canStartRethinkActivity()) {
             // no need to pass value in intent, as default load to Rethink remote
             startActivity(ScreenType.RETHINK, screenToLoad)
             return
@@ -913,9 +913,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         return
     }
 
-    private fun isRethinkDnsActive(): Boolean {
+    private fun canStartRethinkActivity(): Boolean {
         val dns = appConfig.getDnsType()
-        return dns.isRethinkRemote()
+        return dns.isRethinkRemote() && !WireguardManager.oneWireGuardEnabled()
     }
 
     private fun showPrivateDnsDialog() {
