@@ -91,6 +91,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             _: CompoundButton,
             b: Boolean ->
             persistentState.useMultipleNetworks = b
+            if (!b && persistentState.routeRethinkInRethink) {
+                persistentState.routeRethinkInRethink = false
+                displayRethinkInRethinkUi()
+            }
         }
 
         b.settingsRInRRl.setOnClickListener {
