@@ -17,6 +17,9 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.Intent
+import android.os.SystemClock
+import android.text.format.DateUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -189,6 +192,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 b.oneWgCheck.isChecked = true
                 b.interfaceAppsCount.visibility = View.VISIBLE
                 b.interfaceAppsCount.text = context.getString(R.string.one_wg_apps_added)
+                var status = ""
                 if (statusId != null) {
                     val resId = UIUtils.getProxyStatusStringRes(statusId)
                     // change the color based on the status
@@ -204,21 +208,48 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                         b.interfaceDetailCard.strokeColor =
                             fetchColor(context, R.attr.chipTextNegative)
                     }
-                    b.interfaceStatus.text =
-                        context.getString(resId).replaceFirstChar(Char::titlecase)
+                    status = context.getString(resId).replaceFirstChar(Char::titlecase)
                 } else {
                     b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.chipTextNegative)
                     b.interfaceDetailCard.strokeWidth = 2
-                    b.interfaceStatus.text =
+                    status =
                         context.getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
+                }
+                b.interfaceStatus.text = status
+                b.interfaceActiveUptime.visibility = View.VISIBLE
+                val time = getUpTime(config.id)
+                if (time.isNotEmpty()) {
+                    val t = context.getString(R.string.logs_card_duration, getUpTime(config.id))
+                    b.interfaceActiveUptime.text =
+                        context.getString(
+                            R.string.two_argument_space,
+                            context.getString(R.string.lbl_active),
+                            t
+                        )
+                } else {
+                    b.interfaceActiveUptime.text = context.getString(R.string.lbl_active)
                 }
             } else {
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceAppsCount.visibility = View.GONE
                 b.oneWgCheck.isChecked = false
+                b.interfaceActiveUptime.visibility = View.GONE
                 b.interfaceStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
+        }
+
+        private fun getUpTime(id: Int): CharSequence {
+            val startTime = WireguardManager.getActiveConfigTimestamp(id) ?: return ""
+            val now = System.currentTimeMillis()
+            val uptimeMs = SystemClock.elapsedRealtime() - startTime
+            // returns a string describing 'time' as a time relative to 'now'
+            return DateUtils.getRelativeTimeSpanString(
+                now - uptimeMs,
+                now,
+                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE
+            )
         }
 
         fun setupClickListeners(config: WgConfigFiles) {

@@ -16,6 +16,7 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
+import android.os.SystemClock
 import android.util.Log
 import backend.Backend
 import backend.WgKey
@@ -65,6 +66,10 @@ object WireguardManager : KoinComponent {
     private const val JSON_RESPONSE_WORKS = "works"
     private const val JSON_RESPONSE_REASON = "reason"
     private const val JSON_RESPONSE_QUOTA = "quota"
+
+    // map to store the active wireguard configs timestamp for the active time calculation
+    private val activeConfigTimestamps = HashMap<Int, Long>()
+
     // warp primary and secondary config names, ids and file names
     const val SEC_WARP_NAME = "SEC_WARP"
     const val SEC_WARP_ID = 0
@@ -229,19 +234,6 @@ object WireguardManager : KoinComponent {
             return ""
         }
         return config.getName()
-    }
-
-    fun disableConfig(id: String) {
-        if (isConfigActive(id)) {
-            val s = convertStringIdToId(id)
-            val config = mappings.find { it.id == s }
-
-            if (config != null) {
-                disableConfig(config)
-            }
-        } else {
-            Log.w(LOG_TAG_PROXY, "Config not active: $id")
-        }
     }
 
     suspend fun disableAllActiveConfigs() {
@@ -789,6 +781,24 @@ object WireguardManager : KoinComponent {
             }
         }
         return false
+    }
+
+    fun getActiveConfigTimestamp(configId: Int): Long? {
+        return activeConfigTimestamps[configId]
+    }
+
+    fun setActiveConfigTimestamp(configId: String, timestamp: Long) {
+        val id = convertStringIdToId(configId)
+        activeConfigTimestamps[id] = timestamp
+    }
+
+    fun removeActiveConfigTimestamp(configId: String) {
+        val id = convertStringIdToId(configId)
+        activeConfigTimestamps.remove(id)
+    }
+
+    fun clearActiveConfigTimestamps() {
+        activeConfigTimestamps.clear()
     }
 
     private fun io(f: suspend () -> Unit) {

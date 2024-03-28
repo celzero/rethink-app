@@ -17,6 +17,9 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.Intent
+import android.os.SystemClock
+import android.text.format.DateUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -205,11 +208,12 @@ class WgConfigAdapter(private val context: Context) :
             val statusId = VpnController.getProxyStatusById(id)
             val pair = VpnController.getSupportedIpVersion(id)
             val c = WireguardManager.getConfigById(config.id)
-            val isSplitTunnel = if (c?.getPeers()?.isNotEmpty() == true) {
-                VpnController.isSplitTunnelProxy(id, pair)
-            } else {
-                false
-            }
+            val isSplitTunnel =
+                if (c?.getPeers()?.isNotEmpty() == true) {
+                    VpnController.isSplitTunnelProxy(id, pair)
+                } else {
+                    false
+                }
 
             // if the view is not active then cancel the job
             if (
@@ -242,7 +246,8 @@ class WgConfigAdapter(private val context: Context) :
                 b.interfaceDetailCard.strokeWidth = 2
                 b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.accentBad)
                 b.interfaceConfigStatus.visibility = View.VISIBLE
-                b.interfaceConfigStatus.text = context.getString(R.string.firewall_rule_global_lockdown)
+                b.interfaceConfigStatus.text =
+                    context.getString(R.string.firewall_rule_global_lockdown)
             } else {
                 b.interfaceConfigStatus.visibility = View.GONE
             }
@@ -269,8 +274,20 @@ class WgConfigAdapter(private val context: Context) :
                 b.interfaceDetailCard.strokeWidth = 2
                 b.interfaceStatus.visibility = View.VISIBLE
                 b.interfaceConfigStatus.visibility = View.VISIBLE
-                b.interfaceConfigStatus.text =
-                    context.getString(R.string.lbl_active).replaceFirstChar(Char::titlecase)
+                var status = ""
+                b.interfaceActiveUptime.visibility = View.VISIBLE
+                val time = getUpTime(config.id)
+                if (time.isNotEmpty()) {
+                    val t = context.getString(R.string.logs_card_duration, getUpTime(config.id))
+                    b.interfaceActiveUptime.text =
+                        context.getString(
+                            R.string.two_argument_space,
+                            context.getString(R.string.lbl_active),
+                            t
+                        )
+                } else {
+                    b.interfaceActiveUptime.text = context.getString(R.string.lbl_active)
+                }
                 if (statusId != null) {
                     val resId = UIUtils.getProxyStatusStringRes(statusId)
                     // change the color based on the status
@@ -285,15 +302,16 @@ class WgConfigAdapter(private val context: Context) :
                         b.interfaceDetailCard.strokeColor =
                             UIUtils.fetchColor(context, R.attr.accentBad)
                     }
-                    b.interfaceStatus.text =
-                        context.getString(resId).replaceFirstChar(Char::titlecase)
+                    status = context.getString(resId).replaceFirstChar(Char::titlecase)
                 } else {
                     b.interfaceDetailCard.strokeColor =
                         UIUtils.fetchColor(context, R.attr.accentBad)
-                    b.interfaceStatus.text =
+                    status =
                         context.getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
                 }
+                b.interfaceStatus.text = status
             } else {
+                b.interfaceActiveUptime.visibility = View.GONE
                 b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.background)
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceSwitch.isChecked = false
@@ -303,6 +321,19 @@ class WgConfigAdapter(private val context: Context) :
                 b.interfaceConfigStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
+        }
+
+        private fun getUpTime(id: Int): CharSequence {
+            val startTime = WireguardManager.getActiveConfigTimestamp(id) ?: return ""
+            val now = System.currentTimeMillis()
+            val uptimeMs = SystemClock.elapsedRealtime() - startTime
+            // returns a string describing 'time' as a time relative to 'now'
+            return DateUtils.getRelativeTimeSpanString(
+                now - uptimeMs,
+                now,
+                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE
+            )
         }
 
         fun setupClickListeners(config: WgConfigFiles) {

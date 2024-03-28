@@ -49,8 +49,8 @@
                         android:layout_gravity="center"
                         android:layout_marginStart="3dp"
                         android:layout_marginEnd="3dp"
-                        android:padding="5dp"
                         android:maxLength="15"
+                        android:padding="5dp"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?attr/secondaryTextColor" />
 
@@ -60,9 +60,9 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginStart="3dp"
-                        android:visibility="gone"
                         android:layout_marginEnd="5dp"
-                        android:paddingBottom="2dp">
+                        android:paddingBottom="2dp"
+                        android:visibility="gone">
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/protocol_info_chip_ipv4"
@@ -119,6 +119,7 @@
                     android:padding="5dp"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view"
+                    android:visibility="gone"
                     android:textStyle="italic" />
 
                 <TextView
@@ -133,6 +134,17 @@
 
                 <TextView
                     android:id="@+id/interface_config_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginEnd="5dp"
+                    android:padding="5dp"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/default_font_text_view"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/interface_active_uptime"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
