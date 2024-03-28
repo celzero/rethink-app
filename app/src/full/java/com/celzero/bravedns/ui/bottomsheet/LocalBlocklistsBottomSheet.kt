@@ -382,7 +382,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         b.lbbsConfigure.setOnClickListener { invokeRethinkActivity() }
 
         b.lbbsCopy.setOnClickListener {
-            val url = Constants.RETHINK_BASE_URL_SKY + persistentState.localBlocklistStamp
+            val url = Constants.RETHINK_BASE_URL_MAX + persistentState.localBlocklistStamp
             clipboardCopy(
                 requireContext(),
                 url,
