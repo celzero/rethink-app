@@ -48,11 +48,7 @@ import java.net.Socket
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
-import kotlinx.coroutines.async
-import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.selects.select
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -510,7 +506,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     var hasDefaultRoute4 = false
                     var hasDefaultRoute6 = false
                     lp.routes.forEach rloop@{
-                        // ref: androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/net/RouteInfo.java#328
+                        // ref:
+                        // androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/net/RouteInfo.java#328
                         hasDefaultRoute4 =
                             hasDefaultRoute4 ||
                                 (it.isDefaultRoute && it.destination.address is Inet4Address)
@@ -573,8 +570,11 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             currentNetworks: LinkedHashSet<NetworkProperties>,
             newNetworks: LinkedHashSet<NetworkProperties>
         ): Boolean {
-            val cn = currentNetworks.map { it.network }.toSet()
-            val nn = newNetworks.map { it.network }.toSet()
+            if (currentNetworks.size != newNetworks.size) {
+                return true
+            }
+            val cn = currentNetworks.map { it.network.networkHandle }.toHashSet()
+            val nn = newNetworks.map { it.network.networkHandle }.toHashSet()
             return Sets.symmetricDifference(cn, nn).isNotEmpty()
         }
 
@@ -675,29 +675,22 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             nw: Network?,
             isActive: Boolean = false
         ): Boolean = runBlocking {
-            coroutineScope {
-                // select the first reachable IP / domain and return true if any of them is
-                // reachable
-                select<Boolean> {
-                        probes.forEach { ip ->
-                            async {
-                                    var ok = false
-                                    if (isActive) {
-                                        ok = isReachable(ip)
-                                    }
-                                    if (!ok) {
-                                        ok = isReachableTcpUdp(nw, ip)
-                                    }
-                                    ok
-                                }
-                                .onAwait { it }
-                        }
-                    }
-                    .also { coroutineContext.cancelChildren() }
+            var ok = false
+            probes.forEach { ip ->
+                if (isActive) {
+                    ok = isReachable(ip)
+                }
+                if (!ok) {
+                    ok = isReachableTcpUdp(nw, ip)
+                }
+                if (ok) {
+                    return@forEach // break
+                }
             }
+            return@runBlocking ok
         }
 
-        private fun isReachableTcpUdp(nw: Network?, host: String): Boolean {
+        private suspend fun isReachableTcpUdp(nw: Network?, host: String): Boolean {
             try {
                 // https://developer.android.com/reference/android/net/Network#bindSocket(java.net.Socket)
                 TrafficStats.setThreadStatsTag(Thread.currentThread().id.toIntOrDefault())
@@ -712,14 +705,14 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             return false
         }
 
-        private fun isReachable(host: String): Boolean {
+        private suspend fun isReachable(host: String): Boolean {
             // The 'isReachable()' function sends an ICMP echo request to the target host. In the
             // event of the 'Rethink within Rethink' option being used, ICMP checks will fail.
             // Ideally, there is no need to perform ICMP checks. However, 'Rethink within
             // Rethink' is not supplied to this handler, these checks will be carried out but will
             // result in failure.
             try {
-                val onesec = 1000 // ms
+                val timeout = 500 // ms
                 // https://developer.android.com/reference/android/net/Network#bindSocket(java.net.Socket)
                 TrafficStats.setThreadStatsTag(Thread.currentThread().id.toIntOrDefault())
                 // https://developer.android.com/reference/java/net/InetAddress#isReachable(int)
@@ -727,7 +720,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 // isReachable(network-interface, ttl, timeout) cannot be used here since
                 // "network-interface" is a java-construct while "Network" is an android-construct
                 // InetAddress.getByName() will bind the socket to the default active network.
-                val yes = InetAddress.getByName(host).isReachable(onesec)
+                val yes = InetAddress.getByName(host).isReachable(timeout)
 
                 if (DEBUG) Log.d(LOG_TAG_CONNECTION, "$host isReachable on network: $yes")
                 return yes
@@ -738,8 +731,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         }
 
         // https://android.googlesource.com/platform/prebuilts/fullsdk/sources/android-30/+/refs/heads/androidx-benchmark-release/java/net/Inet6AddressImpl.java#217
-        private fun tcp80(nw: Network?, host: String): Boolean {
-            val onesec = 1000 // ms
+        private suspend fun tcp80(nw: Network?, host: String): Boolean {
+            val timeout = 500 // ms
             val port80 = 80 // port
             var socket: Socket? = null
             try {
@@ -747,7 +740,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 val s = InetSocketAddress(host, port80)
                 socket = Socket()
                 nw?.bindSocket(socket)
-                socket.connect(s, onesec)
+                socket.connect(s, timeout)
                 val c = socket.isConnected
                 val b = socket.isBound
                 if (DEBUG)
@@ -770,7 +763,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             }
         }
 
-        private fun tcp53(nw: Network?, host: String): Boolean {
+        private suspend fun tcp53(nw: Network?, host: String): Boolean {
             val port53 = 53 // port
             var socket: Socket? = null
 
@@ -799,7 +792,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             return false
         }
 
-        private fun udp53(nw: Network?, host: String): Boolean {
+        private suspend fun udp53(nw: Network?, host: String): Boolean {
             val port53 = 53 // port
             var socket: DatagramSocket? = null
 
