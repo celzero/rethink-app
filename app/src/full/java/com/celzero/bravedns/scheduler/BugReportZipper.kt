@@ -80,10 +80,10 @@ object BugReportZipper {
         return try {
             ZipFile(getZipFileName(dir))
         } catch (e: FileNotFoundException) {
-            Log.e(LOG_TAG_SCHEDULER, "File not found exception while creating zip file", e)
+            Log.w(LOG_TAG_SCHEDULER, "File not found exception while creating zip file", e)
             null
         } catch (e: ZipException) {
-            Log.e(LOG_TAG_SCHEDULER, "Zip exception while creating zip file", e)
+            Log.w(LOG_TAG_SCHEDULER, "Zip exception while creating zip file", e)
             null
         }
     }
