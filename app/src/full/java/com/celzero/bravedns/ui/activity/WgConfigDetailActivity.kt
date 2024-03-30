@@ -400,10 +400,16 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun showDeleteInterfaceDialog() {
         val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle(getString(R.string.lbl_delete))
+        val delText =
+            getString(
+                R.string.two_argument_space,
+                getString(R.string.config_delete_dialog_title),
+                getString(R.string.lbl_wireguard)
+            )
+        builder.setTitle(delText)
         builder.setMessage(getString(R.string.config_delete_dialog_desc))
         builder.setCancelable(true)
-        builder.setPositiveButton(this.getString(R.string.lbl_delete)) { _, _ ->
+        builder.setPositiveButton(delText) { _, _ ->
             io {
                 WireguardManager.deleteConfig(configId)
                 uiCtx {

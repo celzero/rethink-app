@@ -112,12 +112,17 @@ class WgPeersAdapter(
 
     private fun showDeleteInterfaceDialog(wgPeer: Peer) {
         val builder = MaterialAlertDialogBuilder(context)
-        builder.setTitle(context.getString(R.string.config_delete_dialog_title))
+        val delText =
+            context.getString(
+                R.string.two_argument_space,
+                context.getString(R.string.config_delete_dialog_title),
+                context.getString(R.string.lbl_peer)
+            )
+        builder.setTitle(delText)
         builder.setMessage(context.getString(R.string.config_delete_dialog_desc))
         builder.setCancelable(true)
-        builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
-            deletePeer(wgPeer)
-        }
+
+        builder.setPositiveButton(delText) { _, _ -> deletePeer(wgPeer) }
 
         builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ ->
             // no-op
