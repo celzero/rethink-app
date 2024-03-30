@@ -19,7 +19,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
 import android.text.format.DateUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -243,8 +242,11 @@ class WgConfigAdapter(private val context: Context) :
                 b.interfaceConfigStatus.text = context.getString(R.string.catch_all_wg_dialog_title)
                 return // no need to update the apps count
             } else if (config.isLockdown) {
-                b.interfaceDetailCard.strokeWidth = 2
-                b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.accentBad)
+                if (!config.isActive) {
+                    b.interfaceDetailCard.strokeWidth = 2
+                    b.interfaceDetailCard.strokeColor =
+                        UIUtils.fetchColor(context, R.attr.accentBad)
+                }
                 b.interfaceConfigStatus.visibility = View.VISIBLE
                 b.interfaceConfigStatus.text =
                     context.getString(R.string.firewall_rule_global_lockdown)
