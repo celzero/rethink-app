@@ -25,8 +25,7 @@ import backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.data.AppConfig.Companion.LOOPBACK_DNS
-import com.celzero.bravedns.data.AppConfig.Companion.RINR_FALLBACK_DNS
+import com.celzero.bravedns.data.AppConfig.Companion.FALLBACK_DNS
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.service.BraveVPNService
@@ -90,7 +89,6 @@ class GoVpnAdapter : KoinComponent {
             Intra.connect(
                 tunFd.fd.toLong(),
                 opts.mtu.toLong(),
-                opts.preferredEngine.value(),
                 opts.fakeDns,
                 defaultDns,
                 opts.bridge
@@ -798,7 +796,7 @@ class GoVpnAdapter : KoinComponent {
     }
 
     private fun newDefaultTransport(url: String): intra.DefaultDNS {
-        val defaultDns = getLoopbackOrFallbackDns()
+        val defaultDns = FALLBACK_DNS
         try {
             // when the url is empty, set the default transport to 8.8.4.4:53
             if (url.isEmpty()) {
@@ -820,18 +818,8 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    private fun getLoopbackOrFallbackDns(): String {
-        // in rinr loopback mode, the loopback dns is send back to the tunnel this will result in
-        // infinite loop, so use RINR_FALLBACK_DNS instead of LOOPBACK_DNS
-        return if (persistentState.routeRethinkInRethink) {
-            RINR_FALLBACK_DNS
-        } else {
-            LOOPBACK_DNS
-        }
-    }
-
     fun addDefaultTransport(url: String?) {
-        val defaultDns = getLoopbackOrFallbackDns()
+        val defaultDns = FALLBACK_DNS
         try {
             if (!tunnel.isConnected) {
                 Log.i(LOG_TAG_VPN, "Tunnel not connected, skip new default transport")
@@ -880,18 +868,18 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) { // this is not expected to happen
             Log.e(LOG_TAG_VPN, "set system dns: could not parse system dns", e)
             // see BraveVpnService#determineSystemDns()
-            Intra.setSystemDNS(tunnel, LOOPBACK_DNS)
+            Intra.setSystemDNS(tunnel, FALLBACK_DNS)
         }
     }
 
-    suspend fun updateLink(tunFd: ParcelFileDescriptor, opts: TunnelOptions): Boolean {
+    suspend fun updateLinkAndRoutes(tunFd: ParcelFileDescriptor, opts: TunnelOptions, proto: Long): Boolean {
         if (!tunnel.isConnected) {
             Log.e(LOG_TAG_VPN, "updateLink: tunFd is null, returning")
             return false
         }
         Log.i(LOG_TAG_VPN, "updateLink with fd(${tunFd.fd}) mtu: ${opts.mtu}")
         return try {
-            tunnel.setLink(tunFd.fd.toLong(), opts.mtu.toLong())
+            tunnel.setLinkAndRoutes(tunFd.fd.toLong(), opts.mtu.toLong(), proto)
             true
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "err update tun: ${e.message}", e)

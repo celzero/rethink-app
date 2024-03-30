@@ -259,7 +259,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         val useActive: Boolean,
         val minMtu: Int,
         var isActiveNetworkMetered: Boolean, // may be updated by client listener
-        var lastUpdated: Long // may be updated by client listener
+        var lastUpdated: Long, // may be updated by client listener
+        val dnsServers: LinkedHashMap<InetAddress, Network>
     )
 
     // Handles the network messages from the callback from the connectivity manager
@@ -376,6 +377,13 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 LOG_TAG_CONNECTION,
                 "inform network change: ${sz}, all? $useActiveNetwork, metered? $isActiveNetworkMetered"
             )
+            // maintain a map of dns servers for ipv4 and ipv6 networks
+            val dns4 = getDnsServers(trackedIpv4Networks)
+            val dns6 = getDnsServers(trackedIpv6Networks)
+            val dnsServers: LinkedHashMap<InetAddress, Network> = LinkedHashMap()
+            dnsServers.putAll(dns4)
+            dnsServers.putAll(dns6)
+
             if (sz > 0) {
                 val underlyingNetworks =
                     UnderlyingNetworks(
@@ -384,8 +392,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         useActiveNetwork,
                         determineMtu(useActiveNetwork),
                         isActiveNetworkMetered,
-                        SystemClock.elapsedRealtime()
-                    )
+                        SystemClock.elapsedRealtime(),
+                        dnsServers)
                 if (DEBUG) {
                     trackedIpv4Networks.forEach {
                         Log.d(LOG_TAG_CONNECTION, "inform4: ${it.network}, ${it.networkType}, $sz")
@@ -403,10 +411,25 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         useActiveNetwork,
                         DEFAULT_MTU,
                         isActiveNetworkMetered = false,
-                        SystemClock.elapsedRealtime()
+                        SystemClock.elapsedRealtime(),
+                        LinkedHashMap()
                     )
                 listener.onNetworkDisconnected(underlyingNetworks)
             }
+        }
+
+        private fun getDnsServers(
+            nws: LinkedHashSet<NetworkProperties>
+        ): LinkedHashMap<InetAddress, Network> {
+            // add dns servers into a set to avoid duplicates and add corresponding network to it
+            val dnsServers = LinkedHashMap<InetAddress, Network>()
+            nws.forEach {
+                it.linkProperties?.dnsServers?.forEach v@{ dns ->
+                    val address = dns ?: return@v
+                    dnsServers[address] = it.network
+                }
+            }
+            return dnsServers
         }
 
         private fun determineMtu(useActiveNetwork: Boolean): Int {

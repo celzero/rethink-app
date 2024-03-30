@@ -75,8 +75,7 @@ internal constructor(
 
         private const val ORBOT_DNS = "Orbot"
 
-        const val LOOPBACK_DNS = "localhost" // also default fallback ip
-        const val RINR_FALLBACK_DNS = "8.8.4.4"
+        const val FALLBACK_DNS = "8.8.4.4"
     }
 
     init {
@@ -94,7 +93,6 @@ internal constructor(
         val bridge: Bridge,
         val defaultDns: String,
         val fakeDns: String,
-        val preferredEngine: InternetProtocol,
         val mtu: Int
     )
 
@@ -578,7 +576,6 @@ internal constructor(
     fun newTunnelOptions(
         bridge: Bridge,
         fakeDns: String,
-        preferredEngine: InternetProtocol,
         ptMode: ProtoTranslationMode,
         mtu: Int
     ): TunnelOptions {
@@ -590,7 +587,6 @@ internal constructor(
             bridge,
             getDefaultDns(),
             fakeDns,
-            preferredEngine,
             mtu
         )
     }

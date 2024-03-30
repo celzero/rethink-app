@@ -480,7 +480,7 @@ object IpRulesManager : KoinComponent {
     // translated from go, net.SplitHostPort()
     class AddrError(val err: String, val addr: String) : Exception()
 
-    private fun splitHostPort(hostport: String): Triple<String, String, Exception?> {
+    fun splitHostPort(hostport: String): Triple<String, String, Exception?> {
         val missingPort = "missing port in address"
         val tooManyColons = "too many colons in address"
 
