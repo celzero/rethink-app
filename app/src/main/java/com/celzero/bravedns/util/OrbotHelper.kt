@@ -231,7 +231,7 @@ class OrbotHelper(
                     STATUS_OFF -> {
                         Log.i(LOG_TAG_VPN, "Orbot is OFF, retry or stop the Orbot")
                         io { waitForOrbot() }
-                        context.unregisterReceiver(this)
+                        unregisterReceiver()
                     }
                     STATUS_STARTING -> {
                         Log.i(LOG_TAG_VPN, "Orbot is STARTING, update the proxy data")
@@ -472,7 +472,7 @@ class OrbotHelper(
             } else {
                 uiCtx {
                     stopOrbot(isInteractive = false)
-                    context.unregisterReceiver(orbotStatusReceiver)
+                    unregisterReceiver()
                 }
             }
         }
@@ -482,7 +482,7 @@ class OrbotHelper(
         try {
             context.unregisterReceiver(orbotStatusReceiver)
         } catch (e: IllegalArgumentException) {
-            Log.w(LOG_TAG_VPN, "Unregister not needed: ${e.message}")
+            Log.w(LOG_TAG_VPN, "orbot unregister not needed: ${e.message}")
         }
     }
 
