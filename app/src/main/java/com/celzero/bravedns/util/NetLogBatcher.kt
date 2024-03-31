@@ -18,10 +18,12 @@ package com.celzero.bravedns.util
 
 import android.util.Log
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.util.Logger.Companion.LOG_BATCH_LOGGER
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
@@ -34,17 +36,22 @@ import kotlinx.coroutines.withContext
 
 // channel buffer receives batched entries of batchsize or once every waitms from a batching
 // producer or a time-based monitor (signal) running in a single-threaded co-routine context.
-class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
+class NetLogBatcher<T, V>(
+    val tag: String,
+    val processor: suspend (List<T>) -> Unit,
+    val updator: suspend (List<V>) -> Unit = { _ -> }
+) {
     // i keeps track of currently in-use buffer
     var lsn = 0
 
     // a single thread to run sig and batch co-routines in;
     // to avoid use of mutex/semaphores over shared-state
-    @OptIn(DelicateCoroutinesApi::class) val looper = newSingleThreadContext("logLooper")
+    @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+    val looper = newSingleThreadContext(tag + "Looper")
 
-    private val nprod = CoroutineName("logProducer") // batches writes
-    private val nsig = CoroutineName("logSignal")
-    private val ncons = CoroutineName("logConsumer") // writes batches to db
+    private val nprod = CoroutineName(tag + "Producer") // batches writes
+    private val nsig = CoroutineName(tag + "Signal")
+    private val ncons = CoroutineName(tag + "Consumer") // writes batches to db
 
     // dispatch buffer to consumer if greater than batch size
     private val batchSize = 20
@@ -57,17 +64,20 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
     private val waitms = 2500L
 
     // buffer channel, holds at most 2 buffers, and drops the oldest
-    private val buffers = Channel<List<T>>(qsize, BufferOverflow.DROP_OLDEST)
+    private val buffersCh = Channel<List<T>>(qsize, BufferOverflow.DROP_OLDEST)
+    private val updatesCh = Channel<List<V>>(qsize, BufferOverflow.DROP_OLDEST)
 
     // signal channel, holds at most 1 signal, and drops the oldest
     private val signal = Channel<Int>(Channel.Factory.CONFLATED)
 
     private var batches = mutableListOf<T>()
+    private var updates = mutableListOf<V>()
 
     fun begin(scope: CoroutineScope) {
         // launch suspend fns sig and consume asynchronously
         scope.async { sig() }
-        scope.async { consume() }
+        scope.async { consumeAdd() }
+        scope.async { consumeUpdate() }
         // monitor for cancellation on the default dispatcher
         scope.launch { monitorCancellation() }
     }
@@ -80,24 +90,38 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
             withContext(NonCancellable) {
                 looper.close()
                 signal.close()
-                buffers.close()
+                buffersCh.close()
+                updatesCh.close()
             }
         }
     }
 
-    private suspend fun consume() =
+    private suspend fun consumeAdd() =
         withContext(Dispatchers.IO + ncons) {
-            for (y in buffers) {
+            for (y in buffersCh) {
                 processor(y)
+            }
+        }
+
+    private suspend fun consumeUpdate() =
+        withContext(Dispatchers.IO + ncons) {
+            for (y in updatesCh) {
+                updator(y)
             }
         }
 
     private suspend fun txswap() {
         val b = batches
         batches = mutableListOf() // swap buffers
-        if (DEBUG) Log.d(Logger.LOG_BATCH_LOGGER, "transfer and swap (${lsn}) ${b.size}")
+        buffersCh.send(b)
+
+        val u = updates
+        updates = mutableListOf()
+        updatesCh.send(u)
+
+        if (DEBUG) Log.d(LOG_BATCH_LOGGER, "transfer and swap (${lsn}) u: ${u.size}, b: ${b.size}")
+
         lsn = (lsn + 1)
-        buffers.send(b)
     }
 
     suspend fun add(payload: T) =
@@ -111,32 +135,46 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
             }
         }
 
+    suspend fun update(payload: V) =
+        withContext(looper + nprod) {
+            updates.add(payload)
+            if (updates.size >= batchSize) {
+                txswap()
+            } else if (updates.size == 1) {
+                signal.send(lsn)
+            }
+        }
+
     private suspend fun sig() =
         withContext(looper + nsig) {
             // consume all signals
             for (tracklsn in signal) {
+                if (tracklsn < lsn) {
+                    if (DEBUG) Log.d(LOG_BATCH_LOGGER, "dup signal skip $tracklsn")
+                    continue
+                }
                 // do not honor the signal for 'l' if a[l] is empty
                 // this can happen if the signal for 'l' is processed
                 // after the fact that 'l' has been swapped out by 'batch'
-                if (batches.size <= 0) {
-                    if (DEBUG) Log.d(Logger.LOG_BATCH_LOGGER, "signal continue")
+                if (batches.size <= 0 && updates.size <= 0) {
+                    if (DEBUG) Log.d(LOG_BATCH_LOGGER, "signal continue")
                     continue
                 } else {
-                    if (DEBUG) Log.d(Logger.LOG_BATCH_LOGGER, "signal sleep $waitms ms")
+                    if (DEBUG) Log.d(LOG_BATCH_LOGGER, "signal sleep $waitms ms")
                 }
 
                 // wait for 'batch' to dispatch
                 delay(waitms)
                 if (DEBUG)
                     Log.d(
-                        Logger.LOG_BATCH_LOGGER,
-                        "signal wait over, sz(${batches.size}) / cur-buf(${lsn})"
+                        LOG_BATCH_LOGGER,
+                        "signal wait over, sz(b: ${batches.size}, u: ${updates.size}) / cur-buf(${lsn})"
                     )
 
                 // 'l' is the current buffer, that is, 'l == i',
                 // and 'batch' hasn't dispatched it,
                 // but time's up...
-                if (lsn == tracklsn && batches.size > 0) {
+                if (lsn == tracklsn && (batches.size > 0 || updates.size > 0)) {
                     txswap()
                 }
             }
