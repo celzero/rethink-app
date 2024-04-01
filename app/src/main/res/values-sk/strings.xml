@@ -139,7 +139,7 @@
     <string name="private_dns_dialog_positive" translatable="true">Chodte do Nastavení</string>
     <string name="firewall_act_universal_tab" translatable="true">univerzálny</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Sieť</string>
-    <string name="title_about" translatable="true">O Applikácií</string>
+    <string name="title_about" translatable="true">O nás</string>
     <string name="title_settings" translatable="true">Nastavenia</string>
     <string name="about_title_desc" translatable="true">Detekuje a blokuje bezpečnostné hrozby na sieti</string>
     <string name="accessibility_service_description" translatable="true">Rethink používa službu dostupnosti na detekciu aplikácií na pozadí a brány firewall. Rethink nezhromažďuje ani nepredáva žiadne informácie.</string>
