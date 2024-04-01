@@ -242,7 +242,9 @@ class BraveVPNService :
         var pfd: ParcelFileDescriptor? = null
         try {
             // split the addrPort to get the IP address and convert it to InetAddress
-            val destIp = IPAddressString(IpRulesManager.splitHostPort(addrPort).first).address
+            val dest = IpRulesManager.splitHostPort(addrPort)
+            val destIp = IPAddressString(dest.first).address
+            val destPort = dest.second.toIntOrNull()
             // in case of zero, bind only for wg connections, wireguard tries to bind to
             // network with zero addresses
             if (
@@ -255,7 +257,9 @@ class BraveVPNService :
             }
             val destAddr = destIp.toInetAddress()
             pfd = ParcelFileDescriptor.adoptFd(fid.toInt())
-            val net = curnet?.dnsServers?.get(destAddr)
+            // check if the destination port is DNS port, if so bind to the network where the dns
+            // belongs to, else bind to the available network
+            val net = if (KnownPorts.isDns(destPort)) curnet?.dnsServers?.get(destAddr) else null
             if (net != null) {
                 try {
                     logd("bind4: $who, $addrPort, $fid, ${net.networkHandle}")
@@ -305,12 +309,15 @@ class BraveVPNService :
         var pfd: ParcelFileDescriptor? = null
         try {
             // split the addrPort to get the IP address and convert it to InetAddress
-            val destAddr =
-                IPAddressString(IpRulesManager.splitHostPort(addrPort).first)
-                    .address
-                    .toInetAddress()
+            val dest = IpRulesManager.splitHostPort(addrPort)
+            val destIp = IPAddressString(dest.first).address
+            val destPort = dest.second.toIntOrNull()
+            val destAddr = destIp.toInetAddress()
+
             pfd = ParcelFileDescriptor.adoptFd(fid.toInt())
-            val net = curnet?.dnsServers?.get(destAddr)
+            // check if the destination port is DNS port, if so bind to the network where the dns
+            // belongs to, else bind to the available network
+            val net = if (KnownPorts.isDns(destPort)) curnet?.dnsServers?.get(destAddr) else null
             if (net != null) {
                 try {
                     logd("bind6: $who, $addrPort, $fid, ${net.networkHandle}")
@@ -1551,7 +1558,10 @@ class BraveVPNService :
                 }
             }
             PersistentState.CONNECTIVITY_CHECKS -> {
-                Log.i(LOG_TAG_VPN, "connectivity checks changed, ${persistentState.connectivityChecks}")
+                Log.i(
+                    LOG_TAG_VPN,
+                    "connectivity checks changed, ${persistentState.connectivityChecks}"
+                )
                 io("connectivityChecks") { notifyConnectionMonitor() }
             }
             PersistentState.NOTIFICATION_PERMISSION -> {
@@ -1961,13 +1971,15 @@ class BraveVPNService :
                 val oldActivHas4 = isNetworkSame(old.ipv4Net.firstOrNull()?.network, activ)
                 val oldActivHas6 = isNetworkSame(old.ipv6Net.firstOrNull()?.network, activ)
                 val okActiv4 =
-                    oldActivHas4 == activHas4 // routing for ipv4 is same in old and new FIRST network
+                    oldActivHas4 ==
+                        activHas4 // routing for ipv4 is same in old and new FIRST network
                 val okActiv6 =
-                    oldActivHas6 == activHas6 // routing for ipv6 is same in old and new FIRST network
+                    oldActivHas6 ==
+                        activHas6 // routing for ipv6 is same in old and new FIRST network
                 val netChanged = !okActiv4 || !okActiv6
                 // for active networks, changes in routes includes all possible network changes;
                 return NetworkChanges(routesChanged, netChanged, mtuChanged)
-            }  // active network null, fallthrough to check for netChanged
+            } // active network null, fallthrough to check for netChanged
         }
         // check if ipv6 or ipv4 routes are different in old and new networks
         // val oldHas6 = old.ipv6Net.isNotEmpty() || tunHas6
@@ -1981,7 +1993,8 @@ class BraveVPNService :
         val newFirst6 = new.ipv6Net.firstOrNull()?.network
         val oldFirst4 = old.ipv4Net.firstOrNull()?.network
         val newFirst4 = new.ipv4Net.firstOrNull()?.network
-        val netChanged = !isNetworkSame(oldFirst6, newFirst6) || !isNetworkSame(oldFirst4, newFirst4)
+        val netChanged =
+            !isNetworkSame(oldFirst6, newFirst6) || !isNetworkSame(oldFirst4, newFirst4)
 
         return NetworkChanges(routesChanged, netChanged, mtuChanged)
     }
