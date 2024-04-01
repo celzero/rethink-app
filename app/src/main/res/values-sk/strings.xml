@@ -218,5 +218,5 @@
     <string name="download_update_dialog_message_success" translatable="true">Blok list stiahnutý úspešné.</string>
     <string name="download_update_dialog_failure_title" translatable="true">Niečo sa pokazilo</string>
     <string name="download_update_dialog_failure_message" translatable="true">Buď naše servery sú dole alebo pripojenie nemôže byť stanovená. Skúste prosím znova po nejakom čase.</string>
-    <string name="download_update_dialog_trylater_title" translatable="true">Teraz nemôže aktualizovať</string>
+    <string name="download_update_dialog_trylater_title" translatable="true">Teraz sa nedá aktualizovať</string>
 </resources>
