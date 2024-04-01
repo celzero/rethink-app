@@ -3,7 +3,6 @@ package com.celzero.bravedns.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -27,10 +26,12 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO) : View
 
         pagingConfig =
             PagingConfig(
-                enablePlaceholders = false,
-                prefetchDistance = 10,
-                initialLoadSize = Constants.LIVEDATA_PAGE_SIZE,
-                pageSize = Constants.LIVEDATA_PAGE_SIZE
+                enablePlaceholders = true,
+                prefetchDistance = 3,
+                initialLoadSize = Constants.LIVEDATA_PAGE_SIZE * 2,
+                maxSize = Constants.LIVEDATA_PAGE_SIZE * 3,
+                pageSize = Constants.LIVEDATA_PAGE_SIZE * 2,
+                jumpThreshold = 5
             )
     }
 
@@ -39,37 +40,7 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO) : View
         ALL
     }
 
-    val appNetworkLogs = filter.switchMap { input -> fetchNetworkLogs(uid, input) }
-
     val allAppNetworkLogs = allLogsFilter.switchMap { input -> fetchAllNetworkLogs(uid, input) }
-
-    private fun fetchNetworkLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
-        val pager =
-            if (input.isEmpty()) {
-                Pager(config = pagingConfig, pagingSourceFactory = { nwlogDao.getLogsForAppWithLimit(uid) })
-                    .flow
-                    .cachedIn(viewModelScope)
-            } else {
-                Pager(
-                        config = pagingConfig,
-                        pagingSourceFactory = { nwlogDao.getLogsForAppFilteredWithLimit(uid, "%$input%") }
-                    )
-                    .flow
-                    .cachedIn(viewModelScope)
-            }
-
-        return pager.asLiveData()
-
-        /*return if (input.isEmpty()) {
-            Pager(pagingConfig) { nwlogDao.getLogsForAppWithLimit(uid) }
-                .liveData
-                .cachedIn(viewModelScope)
-        } else {
-            Pager(pagingConfig) { nwlogDao.getLogsForAppFilteredWithLimit(uid, "%$input%") }
-                .liveData
-                .cachedIn(viewModelScope)
-        }*/
-    }
 
     private fun fetchAllNetworkLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
         return if (input.isEmpty()) {

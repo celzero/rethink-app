@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -107,7 +107,7 @@
                     android:id="@+id/aad_aap_firewall_new_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="5dp">
+                    android:padding="10dp">
 
                     <TextView
                         style="@style/TextAppearance.AppCompat.Subhead"
@@ -121,15 +121,6 @@
                         android:textSize="@dimen/large_font_text_view"
                         android:textStyle="bold" />
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/aad_aap_firewall_indicator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:alpha="0.5"
-                        android:minWidth="24dp"
-                        android:minHeight="24dp"
-                        android:src="@drawable/ic_arrow_down" />
                 </RelativeLayout>
 
                 <LinearLayout
@@ -354,8 +345,8 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
                     android:orientation="vertical"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp">
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
 
 
                     <TextView
@@ -375,6 +366,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:drawablePadding="5dp"
                         android:paddingTop="2dp"
                         android:paddingBottom="2dp"
                         android:text="@string/lbl_ip_rules"
@@ -399,8 +391,8 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
                     android:orientation="vertical"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp">
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
 
                     <TextView
                         android:id="@+id/aad_domain_block_header"
@@ -419,6 +411,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:drawablePadding="5dp"
                         android:paddingTop="2dp"
                         android:paddingBottom="2dp"
                         android:text="@string/lbl_domain_rules"
@@ -429,7 +422,7 @@
         </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/aad_conn_card"
+            android:id="@+id/aad_logs_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="true"
@@ -443,160 +436,36 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:orientation="vertical"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp">
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
 
-                <RelativeLayout
-                    android:id="@+id/aad_conn_detail_rl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/aad_conn_detail_indicator"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/aad_conn_detail_header"
-                            style="@style/TextAppearance.AppCompat.Subhead"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-smallcaps"
-                            android:gravity="center_vertical"
-                            android:padding="5dp"
-                            android:text="@string/ada_network_log_title"
-                            android:textColor="?attr/secondaryTextColor"
-                            android:textSize="@dimen/large_font_text_view"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/aad_conn_detail_desc"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingStart="5dp"
-                            android:paddingTop="2dp"
-                            android:paddingEnd="5dp"
-                            android:paddingBottom="5dp"
-                            android:text="@string/ada_ip_no_connection"
-                            android:textSize="@dimen/default_font_text_view" />
-
-                    </LinearLayout>
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/aad_conn_delete"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/aad_conn_detail_indicator"
-                        android:alpha="0.5"
-                        android:minWidth="24dp"
-                        android:minHeight="24dp"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_delete" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/aad_conn_detail_indicator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:alpha="0.5"
-                        android:minWidth="24dp"
-                        android:minHeight="24dp"
-                        android:src="@drawable/ic_arrow_up" />
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:id="@+id/aad_conn_list_top_ll"
+                <TextView
+                    android:id="@+id/aad_logs_detail"
+                    style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:gravity="center"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:textColor="?attr/secondaryTextColor"
+                    android:textSize="@dimen/heading_font_text_view"
+                    android:textStyle="bold" />
 
-                    <LinearLayout
-                        android:id="@+id/aad_conn_detail_search_ll"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                <TextView
+                    android:id="@+id/aad_logs_detail_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:drawablePadding="5dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/lbl_logs"
+                    android:textSize="@dimen/default_font_text_view" />
 
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/aad_conn_detail_search_container"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:focusableInTouchMode="true"
-                            android:visibility="visible">
-
-                            <RelativeLayout
-                                android:id="@+id/aad_conn_search_ll"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="start"
-                                android:weightSum="1"
-                                android:orientation="horizontal">
-
-                                <androidx.appcompat.widget.SearchView
-                                    android:id="@+id/aad_conn_detail_search"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="start"
-                                    android:focusable="false"
-                                    android:fontFamily="sans-serif"
-                                    android:isScrollContainer="true"
-                                    android:layout_toStartOf="@id/aad_conn_show_all_chip"
-                                    android:textSize="@dimen/default_font_text_view"
-                                    app:iconifiedByDefault="false"
-                                    app:queryHint="@string/search_universal_ips" />
-
-                                <com.google.android.material.chip.Chip
-                                    android:id="@+id/aad_conn_show_all_chip"
-                                    style="@style/ThinnerChip.Action"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="end|center_vertical"
-                                    android:layout_marginTop="10dp"
-                                    android:text="@string/ssv_see_more"
-                                    android:visibility="gone"
-                                    android:layout_alignParentEnd="true"
-                                    android:textColor="?attr/chipTextPositive"
-                                    android:textSize="@dimen/default_font_text_view"
-                                    app:chipBackgroundColor="?attr/chipBgColorPositive"
-                                    app:chipSurfaceColor="@null" />
-                            </RelativeLayout>
-                        </com.google.android.material.card.MaterialCardView>
-                    </LinearLayout>
-
-
-                    <TextView
-                        android:id="@+id/aad_conn_detail_empty_txt"
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="10dp"
-                        android:paddingStart="20dp"
-                        android:paddingEnd="20dp"
-                        android:paddingBottom="10dp"
-                        android:text="@string/ada_ip_no_connection"
-                        android:textSize="@dimen/default_font_text_view"
-                        android:visibility="gone" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/aad_conn_detail_recycler"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="10dp"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:clipToPadding="false"
-                        android:nestedScrollingEnabled="false"
-                        android:paddingBottom="10dp"
-                        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 
-</androidx.core.widget.NestedScrollView>
+</LinearLayout>

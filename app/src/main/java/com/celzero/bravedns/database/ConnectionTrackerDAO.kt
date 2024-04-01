@@ -89,11 +89,6 @@ interface ConnectionTrackerDAO {
     fun getBlockedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, '' as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid GROUP BY ipAddress, uid, port ORDER BY count DESC LIMIT 100 OFFSET 0"
-    )
-    fun getLogsForAppWithLimit(uid: Int): PagingSource<Int, AppConnection>
-
-    @Query(
         "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, '' as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid GROUP BY ipAddress, uid, port ORDER BY count DESC"
     )
     fun getAllLogs(uid: Int): PagingSource<Int, AppConnection>
@@ -102,11 +97,6 @@ interface ConnectionTrackerDAO {
         "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, '' as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and ipAddress like :query GROUP BY ipAddress, uid, port ORDER BY count DESC"
     )
     fun getAllLogsFiltered(uid: Int, query: String): PagingSource<Int, AppConnection>
-
-    @Query(
-        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, '' as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and ipAddress like :ipAddress GROUP BY ipAddress, uid, port ORDER BY count DESC LIMIT 100 OFFSET 0"
-    )
-    fun getLogsForAppFilteredWithLimit(uid: Int, ipAddress: String): PagingSource<Int, AppConnection>
 
     @Query("select count(DISTINCT(ipAddress)) from ConnectionTracker where uid = :uid")
     fun getAppConnectionsCount(uid: Int): LiveData<Int>

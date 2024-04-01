@@ -146,30 +146,26 @@ class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOw
         }
 
         private fun updateStatusUi(uid: Int, ipAddress: String) {
-            io {
-                val status = IpRulesManager.getMostSpecificRuleMatch(uid, ipAddress)
-                uiCtx {
-                    when (status) {
-                        IpRulesManager.IpRuleStatus.NONE -> {
-                            b.acdFlag.text = context.getString(R.string.ci_no_rule_initial)
-                        }
-                        IpRulesManager.IpRuleStatus.BLOCK -> {
-                            b.acdFlag.text = context.getString(R.string.ci_blocked_initial)
-                        }
-                        IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                            b.acdFlag.text = context.getString(R.string.ci_bypass_universal_initial)
-                        }
-                        IpRulesManager.IpRuleStatus.TRUST -> {
-                            b.acdFlag.text = context.getString(R.string.ci_trust_initial)
-                        }
-                    }
-
-                    // returns the text and background color for the button
-                    val t = getToggleBtnUiParams(status)
-                    b.acdFlag.setTextColor(t.txtColor)
-                    b.acdFlag.backgroundTintList = ColorStateList.valueOf(t.bgColor)
+            val status = IpRulesManager.getMostSpecificRuleMatch(uid, ipAddress)
+            when (status) {
+                IpRulesManager.IpRuleStatus.NONE -> {
+                    b.acdFlag.text = context.getString(R.string.ci_no_rule_initial)
+                }
+                IpRulesManager.IpRuleStatus.BLOCK -> {
+                    b.acdFlag.text = context.getString(R.string.ci_blocked_initial)
+                }
+                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                    b.acdFlag.text = context.getString(R.string.ci_bypass_universal_initial)
+                }
+                IpRulesManager.IpRuleStatus.TRUST -> {
+                    b.acdFlag.text = context.getString(R.string.ci_trust_initial)
                 }
             }
+
+            // returns the text and background color for the button
+            val t = getToggleBtnUiParams(status)
+            b.acdFlag.setTextColor(t.txtColor)
+            b.acdFlag.backgroundTintList = ColorStateList.valueOf(t.bgColor)
         }
 
         private fun getToggleBtnUiParams(id: IpRulesManager.IpRuleStatus): ToggleBtnUi {
@@ -204,13 +200,5 @@ class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOw
 
     override fun notifyDataset(position: Int) {
         this.notifyItemChanged(position)
-    }
-
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
-    }
-
-    private fun io(f: suspend () -> Unit) {
-        lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }

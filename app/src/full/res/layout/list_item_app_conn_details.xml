@@ -74,6 +74,8 @@
                 android:layout_marginStart="5dp"
                 android:gravity="center_vertical"
                 android:padding="2dp"
+                android:ellipsize="end"
+                android:maxLines="3"
                 android:textSize="@dimen/default_font_text_view" />
 
 

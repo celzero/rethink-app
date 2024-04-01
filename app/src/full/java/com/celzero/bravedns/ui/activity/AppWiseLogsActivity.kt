@@ -17,21 +17,32 @@ package com.celzero.bravedns.ui.activity
 
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppConnectionAdapter
+import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityAppWiseLogsBinding
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -41,8 +52,10 @@ class AppWiseLogsActivity :
 
     private val persistentState by inject<PersistentState>()
     private val networkLogsViewModel: AppConnectionsViewModel by viewModel()
-    private var uid: Int = Constants.INVALID_UID
+    private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
+    private var uid: Int = INVALID_UID
     private var layoutManager: RecyclerView.LayoutManager? = null
+    private lateinit var appInfo: AppInfo
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -52,12 +65,57 @@ class AppWiseLogsActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        uid = intent.getIntExtra(AppInfoActivity.UID_INTENT_NAME, Constants.INVALID_UID)
-        if (uid == Constants.INVALID_UID) {
+        uid = intent.getIntExtra(AppInfoActivity.UID_INTENT_NAME, INVALID_UID)
+        if (uid == INVALID_UID) {
             finish()
         }
-        b.awlSearch.setOnQueryTextListener(this)
+        init()
         setAdapter()
+        observeNetworkLogSize()
+        setClickListener()
+    }
+
+    private fun init() {
+        io {
+            val appInfo = FirewallManager.getAppInfoByUid(uid)
+            // case: app is uninstalled but still available in RethinkDNS database
+            if (appInfo == null || uid == INVALID_UID) {
+                uiCtx { finish() }
+                return@io
+            }
+
+            val packages = FirewallManager.getPackageNamesByUid(appInfo.uid)
+            uiCtx {
+                this.appInfo = appInfo
+
+                b.awlAppDetailName.text = appName(packages.count())
+                displayIcon(
+                    Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
+                    b.awlAppDetailIcon
+                )
+            }
+        }
+    }
+
+    private fun setClickListener() {
+        b.awlDelete.setOnClickListener { showDeleteConnectionsDialog() }
+        b.awlSearch.setOnQueryTextListener(this)
+    }
+
+    private fun appName(packageCount: Int): String {
+        return if (packageCount >= 2) {
+            getString(
+                R.string.ctbs_app_other_apps,
+                appInfo.appName,
+                packageCount.minus(1).toString()
+            )
+        } else {
+            appInfo.appName
+        }
+    }
+
+    private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
+        Glide.with(this).load(drawable).error(Utilities.getDefaultIcon(this)).into(mIconImageView)
     }
 
     private fun setAdapter() {
@@ -72,6 +130,41 @@ class AppWiseLogsActivity :
         b.awlRecyclerConnection.adapter = recyclerAdapter
     }
 
+    private fun observeNetworkLogSize() {
+        networkLogsViewModel.getConnectionsCount(uid).observe(this) {
+            if (it == null) return@observe
+
+            if (it <= 0) {
+                showNoRulesUi()
+                hideRulesUi()
+                return@observe
+            }
+
+            hideNoRulesUi()
+            showRulesUi()
+        }
+    }
+
+    private fun showNoRulesUi() {
+        b.awlNoRulesRl.visibility = android.view.View.VISIBLE
+    }
+
+    private fun hideRulesUi() {
+        b.awlCardViewTop.visibility = android.view.View.GONE
+        b.awlAppDetailRl.visibility = android.view.View.GONE
+        b.awlRecyclerConnection.visibility = android.view.View.GONE
+    }
+
+    private fun hideNoRulesUi() {
+        b.awlNoRulesRl.visibility = android.view.View.GONE
+    }
+
+    private fun showRulesUi() {
+        b.awlCardViewTop.visibility = android.view.View.VISIBLE
+        b.awlAppDetailRl.visibility = android.view.View.VISIBLE
+        b.awlRecyclerConnection.visibility = android.view.View.VISIBLE
+    }
+
     override fun onQueryTextSubmit(query: String): Boolean {
         networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.ALL)
         return true
@@ -84,5 +177,28 @@ class AppWiseLogsActivity :
             }
         }
         return true
+    }
+
+    private fun showDeleteConnectionsDialog() {
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setTitle(R.string.ada_delete_logs_dialog_title)
+        builder.setMessage(R.string.ada_delete_logs_dialog_desc)
+        builder.setCancelable(true)
+        builder.setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> deleteAppLogs() }
+
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
+        builder.create().show()
+    }
+
+    private fun deleteAppLogs() {
+        io { connectionTrackerRepository.clearLogsByUid(uid) }
+    }
+
+    private fun io(f: suspend () -> Unit): Job {
+        return lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }
