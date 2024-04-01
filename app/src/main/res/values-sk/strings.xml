@@ -248,5 +248,11 @@
     <string name="settings_ip_network_heading" translatable="true">Vyberte verziu IP</string>
     <string name="settings_ip_network_desc" translatable="true">Vyberte si medzi verziami internetového protokolu.</string>
     <string name="settings_ptrans_desc" translatable="true">Preložiť odchádzajúce IPv6 spojenia do IPv4 na zariadení. Ak ste pripojený iba k sieti IPv4.</string>
-    <string name="settings_allow_lan_heading" translatable="true">Nesledujte súkromné IP (experimental)</string>
+    <string name="settings_allow_lan_heading" translatable="true">Nepoužívajte trasy so súkromnými IP adresami (experimentálna funkcia)</string>
+    <string name="settings_allow_lan_desc" translatable="true">Vylúč LAN, loopback, multicast, link-local trasy z Rethink VPN tunelu.</string>
+    <string name="settings_allow_bypass_heading" translatable="true">Zapni viditeľnosť na sieti</string>
+    <string name="settings_allow_bypass_desc" translatable="true">Povoľte žiadajúcim aplikáciám prístup ku všetkým dostupným sieťam. Tieto aplikácie môžu na požiadanie obísť tunel Rethink VPN. Niektoré audio/video konferenčné aplikácie, ako napríklad Zoom a Meet, to môžu vyžadovať, aby fungovali správne.</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">Niektoré možnosti sú vypnuté, keď je VPN v režime uzamknutia. <u>Pozrite si nastavenia VPN</u>.</string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Nemožno nastaviť proxy servery, keď VPN beží v režime iba DNS.</string>
+    <string name="settings_socks5_desc" translatable="true">Pošli pripojenia cez SOCKS5 zariadenie.</string>
 </resources>
