@@ -370,7 +370,7 @@
     <string name="configure_dns_crypt">DNSCrypt: %1$s resolvers</string>
     <string name="download_update_dialog_trylater_title">Ik kan nu niet updaten</string>
     <string name="title_about">Over</string>
-    <string name="accessibility_service_description">RethinkDNS gebruikt de toegankelijkheidsdienst om achtergrondtoepassingen te detecteren en te firewarden. RethinkDNS verzamelt of verkoopt geen informatie.</string>
+    <string name="accessibility_service_description">Rethink gebruikt de toegankelijkheidsdienst om achtergrondtoepassingen te detecteren en firewallen. Rethink verzamelt of verkoopt geen informatie.</string>
     <string name="finish">Einde</string>
     <string name="slide_1_desc">RethinkDNS is een open source software ondersteund door het Mozilla Builders MVP programma.</string>
     <string name="allow">laat toe</string>
@@ -510,4 +510,9 @@
     <string name="ctbs_dialog_negative_btn">Ga Terug</string>
     <string name="dns_log_dialog_positive">Logboeken verwijderen</string>
     <string name="cd_dnscrypt_relay_heading">Relays</string>
+    <string name="txt_home" translatable="true">Beginscherm</string>
+    <string name="title_statistics" translatable="true">Statistieken</string>
+    <string name="lbl_cancel" translatable="true">Annuleren</string>
+    <string name="lbl_apply" translatable="true">Toepassen</string>
+    <string name="lbl_dismiss" translatable="true">Afwijzen</string>
 </resources>

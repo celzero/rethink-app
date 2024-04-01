@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_statistics" translatable="true">Štatistiky</string>
+    <string name="pause_title_desc" translatable="true">dávam si šlofíka…</string>
+    <string name="settings_title_desc" translatable="true">Vysoko prispôsobiteľné DNS a Firewall</string>
+    <string name="txt_home" translatable="true">Domov</string>
+    <string name="next" translatable="true">Ďalej</string>
+    <string name="skip" translatable="true">Preskoč</string>
+    <string name="lbl_allowed" translatable="true">Dovolené</string>
+    <string name="lbl_maybe_blocked" translatable="true">Možno Zablokované</string>
+    <string name="lbl_blocked" translatable="true">Zablokované</string>
+    <string name="lbl_disabled" translatable="true">Zakázané</string>
+    <string name="lbl_domain" translatable="true">Doména</string>
+    <string name="lbl_wildcard" translatable="true">Divoká karta (*)</string>
+    <string name="lbl_action_required" translatable="true">Vyžaduje sa akcia</string>
+    <string name="lbl_rules" translatable="true">pravidlá</string>
+    <string name="lbl_configure" translatable="true">Nastaviť</string>
+    <string name="lbl_logs" translatable="true">bezpečnostné záznamy</string>
+    <string name="lbl_network" translatable="true">sieť</string>
+    <string name="lbl_create" translatable="true">Vytvor</string>
+    <string name="lbl_qr_code" translatable="true">QR Kód</string>
+    <string name="lbl_import" translatable="true">Importovať</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_public_key" translatable="true">Verejný Kľúč</string>
+    <string name="lbl_addresses" translatable="true">Adresa</string>
+    <string name="lbl_dns_servers" translatable="true">DNS Server</string>
+    <string name="lbl_applications" translatable="true">Aplikácia</string>
+    <string name="lbl_ip_rules" translatable="true">IP Pravidlá</string>
+    <string name="lbl_domain_rules" translatable="true">Pravidlá Domény</string>
+    <string name="lbl_delete" translatable="true">Vymazať</string>
+    <string name="lbl_proceed" translatable="true">Pokračuj</string>
+    <string name="lbl_private_key" translatable="true">Súkromný kľúč</string>
+    <string name="lbl_generated" translatable="true">(vytvorený)</string>
+    <string name="lbl_random" translatable="true">(náhodný)</string>
+    <string name="lbl_listen_port" translatable="true">Načúvajúci port</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_auto" translatable="true">(automatický)</string>
+    <string name="lbl_include" translatable="true">Zahrnúť</string>
+    <string name="lbl_select_all" translatable="true">zvoliť všetky</string>
+    <string name="lbl_active" translatable="true">Aktívny</string>
+    <string name="lbl_inactive" translatable="true">Neaktívny</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="lbl_fast" translatable="true">rýchli</string>
+    <string name="lbl_slow" translatable="true">pomalí</string>
+    <string name="lbl_very" translatable="true">veľmi</string>
+    <string name="lbl_hour" translatable="true">hodín</string>
+    <string name="lbl_day" translatable="true">deň</string>
+    <string name="lbl_preshared_key" translatable="true">Zdieľaný kľúč</string>
+    <string name="lbl_insecure" translatable="true">(nezabezpečený)</string>
+    <string name="lbl_optional" translatable="true">(dobrovoľný)</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Trvalé udržiavanie spojenia</string>
+    <string name="lbl_allowed_ips" translatable="true">Povolené IP adresy</string>
+    <string name="lbl_save" translatable="true">uložiť</string>
+    <string name="lbl_cache" translatable="true">Krátkodobé úložisko</string>
+    <string name="lbl_status" translatable="true">Stav</string>
+    <string name="lbl_remove" translatable="true">Odstrániť</string>
+    <string name="lbl_last" translatable="true">Posledný</string>
+    <string name="lbl_starting" translatable="true">Spúšťa sa</string>
+    <string name="lbl_overall" translatable="true">Celkový</string>
+    <string name="lbl_stopped" translatable="true">Zastavený</string>
+    <string name="lbl_private" translatable="true">súkromný</string>
+    <string name="lbl_secure" translatable="true">bezpečný</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="slide_2_title" translatable="true">Vitajte</string>
+    <string name="slide_1_title" translatable="true">Zadarmo a Kód verejne dostupný</string>
+    <string name="allow" translatable="true">povoliť</string>
+    <string name="block" translatable="true">blokovať</string>
+    <string name="bypass_universal" translatable="true">Univerzálne povolený</string>
+    <string name="exclude" translatable="true">vylúčiť</string>
+    <string name="isolate" translatable="true">izoluj</string>
+    <string name="bypass_dns_firewall" translatable="true">obíď DNS a Firewall pravidlá</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Pozor: Rethink bol vypnutý</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Klepnutím zmeníte nastavenie ochrany</string>
+    <string name="dns_mode_notification_title" translatable="true">Ste Chránený! Pripojený k Rýchlemu a Bezpečnému DNS.</string>
+    <string name="pause_mode_notification_title" translatable="true">Pozastavené! Zablokované aplikácie budú naďalej chránené bránou firewall.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">čakám</string>
+    <string name="failed_using_default" translatable="true">Zlyhanie: používa sa záložné DNS</string>
+    <string name="status_app_error" translatable="true">chyba aplikácie</string>
+    <string name="status_dns_error" translatable="true">chyba DNS</string>
+    <string name="status_dns_server_down" translatable="true">DNS server nefunguje</string>
+    <string name="status_no_internet" translatable="true">žiadny internet</string>
+    <string name="status_protected_with_tor" translatable="true">chránený s tórom</string>
+    <string name="status_protected_with_private_dns" translatable="true">chránený so súkromným DNS</string>
+    <string name="status_protected_with_tor_private_dns" translatable="true">chránený s tórom a súkromným DNS</string>
+    <string name="status_protected_with_proxy_private_dns" translatable="true">chránený pomocou proxy a súkromným DNS</string>
+    <string name="status_protected_with_socks5_private_dns" translatable="true">chránený SOCKS5 a súkromným DNS</string>
+    <string name="status_protected_with_http_private_dns" translatable="true">chránený s HTTP Proxy a súkromným DNS</string>
+    <string name="status_protected_with_socks5" translatable="true">chránený s SOCKS proxy</string>
+    <string name="status_protected_with_http" translatable="true">chránený s HTTP Proxy</string>
+    <string name="status_protected_with_proxy" translatable="true">chránený s proxy</string>
+    <string name="status_protected_with_wg" translatable="true">chránený s Wireguardom</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">chránený s Wireguardom a súkromným DNS</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">súkromne DNS je zapnuté</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Pripojený s RethinkDNS</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">Pripojený s Firewalom</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Pripojený s RethinkDNS a Firewalom</string>
+    <string name="notification_action_resume_vpn" translatable="true">POKRAČOVAŤ</string>
+    <string name="notification_action_pause_vpn" translatable="true">PAUZA</string>
+    <string name="notification_action_stop_vpn" translatable="true">STOP</string>
+    <string name="notification_action_dns_mode" translatable="true">DNS</string>
+    <string name="notification_action_dns_firewall_mode" translatable="true">DNS + Firewall</string>
+    <string name="dns_mode_info_title" translatable="true">DNS</string>
+    <string name="firewall_rules" translatable="true">Pravidlá Siete</string>
+    <string name="firewall_mode_info_title" translatable="true">Firewall</string>
+    <string name="apps_info_title" translatable="true">Aplikácie</string>
+    <string name="hybrid_mode_info_title" translatable="true">DNS + Firewall</string>
+    <string name="dns_firewall_mode_info_explanation_new" translatable="true">Všetky vyššie uvedené + obísť cenzúru internetu.</string>
+    <string name="alert_permission_accessibility" translatable="true">Povolenie - Prístupnosť</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">Nepodarilo sa otvoriť nastavenia dostupnosti. Skúste to znova neskôr!</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">Vyberte režim.</string>
+    <string name="brave_dns_connect_mode_change_dns" translatable="true">Vyberte režim.</string>
+    <string name="default_dns_name" translatable="true">RDNS Predvolený</string>
+    <string name="custom_url_error_invalid_url" translatable="true">Neplatná URL</string>
+    <string name="conn_track_clear_logs_title" translatable="true">Odstrániť všetky záznamy siete?</string>
+    <string name="conn_track_clear_logs_message" translatable="true">Týmto sa odstránia iba sieťové záznamy, ale nie pravidlá brány firewall. Táto operácia je nezvratná. Chcete pokračovať?</string>
+    <string name="dns_query_clear_logs_title" translatable="true">Odstrániť všetky DNS záznamy?</string>
+    <string name="dns_query_clear_logs_message" translatable="true">Týmto sa odstránia DNS záznamy na zariadení. Táto operácia je nezvratná. Chcete pokračovať?</string>
+    <string name="bsct_app_info" translatable="true">Info o Aplikácií</string>
+    <string name="bsct_block_domain" translatable="true">Blokovať, dôveru <u>doménam</u> pre <u>túto aplikáciu</u></string>
+    <string name="bsct_block_ip" translatable="true">Blokovať, dôveru <u>tejto IP adrese</u> pre <u>túto aplikáciu</u></string>
+    <string name="bsct_block" translatable="true">Zablokujte, vynechajte, vylúčte, izolujte <u>túto aplikáciu</u></string>
+    <string name="bsct_conn_block_desc" translatable="true">zablokovaná %1$s používateľom %2$s</string>
+    <string name="bsct_conn_block_desc_device" translatable="true">zablokovaný %1$s na zariadení</string>
+    <string name="bsct_conn_desc_allowed" translatable="true">povolené na %1$s %2$s</string>
+    <string name="bsct_conn_desc_blocked" translatable="true">zablokovaný na %1$s %2$s</string>
+    <string name="always_on_dialog_heading" translatable="true">Zakázať službu Vždy zapnutá VPN</string>
+    <string name="always_on_dialog" translatable="true">Na tomto zariadení je povolená možnosť \"Vždy zapnutá VPN\". Ak chcete spustiť Rethink, prejdite do aplikácie Nastavenia a vypnite možnosť \"Vždy zapnutá VPN\".</string>
+    <string name="always_on_dialog_positive_btn" translatable="true">Choď do Nastavení</string>
+    <string name="always_on_dialog_stop_heading" translatable="true">Vždy zapnutá VPN</string>
+    <string name="always_on_dialog_stop_message" translatable="true">Pre Rethink je povolená vždy zapnutá VPN. Ste si istý, že napriek tomu chcete zastaviť Rethink?</string>
+    <string name="always_on_dialog_positive" translatable="true">Zastaviť</string>
+    <string name="always_on_dialog_neutral" translatable="true">Nastavenia</string>
+    <string name="private_dns_dialog_heading" translatable="true">Vypni Súkromné DNS</string>
+    <string name="private_dns_dialog_desc" translatable="true">Nastavenia Rethink DNS sú prepísané súkromným DNS systému Android.
+\n
+\nAk chcete použiť Rethink DNS, prejdite do nastavení systému Android a vypnite možnosť „Súkromné DNS“.</string>
+    <string name="private_dns_dialog_positive" translatable="true">Chodte do Nastavení</string>
+    <string name="firewall_act_universal_tab" translatable="true">univerzálny</string>
+    <string name="firewall_act_network_monitor_tab" translatable="true">Sieť</string>
+    <string name="title_about" translatable="true">O Aplikácií</string>
+    <string name="title_settings" translatable="true">Nastavenia</string>
+    <string name="about_title_desc" translatable="true">Detekuje a blokuje bezpečnostné hrozby na sieti</string>
+    <string name="accessibility_service_description" translatable="true">Rethink používa službu dostupnosti na detekciu aplikácií na pozadí a brány firewall. Rethink nezhromažďuje ani nepredáva žiadne informácie.</string>
+    <string name="finish" translatable="true">Skončiť</string>
+    <string name="lbl_cancel" translatable="true">Zrušiť</string>
+    <string name="lbl_apply" translatable="true">Potvrdiť</string>
+    <string name="lbl_dismiss" translatable="true">Odmietnuť</string>
+    <string name="lbl_all" translatable="true">Všetko</string>
+    <string name="lbl_min" translatable="true">minút</string>
+    <string name="firewall_mode_notification_title" translatable="true">Ste Chránený! Pripojený k Firewalu.</string>
+    <string name="hybrid_mode_notification_title" translatable="true">Ste Chránený! Pripojený s DNS + Firewalom.</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">chránený</string>
+    <string name="lbl_add" translatable="true">pridaj</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">zlyháva</string>
+    <string name="lbl_app_wise" translatable="true">pre jednu aplikáciu</string>
+    <string name="lbl_sec" translatable="true">sekúnd</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">nechránený</string>
+    <string name="lbl_anonymous" translatable="true">anonymný</string>
+    <string name="slide_2_desc" translatable="true">Rethink je najjednoduchší spôsob, ako monitorovať sieťovú aktivitu, obísť internetovú cenzúru a firewall na vašom zariadení so systémom Android.</string>
+    <string name="universal_firewall_explanation" translatable="true">Aplikujte firewalové pravidlá na všetky aplikácie na základe udalostí zariadenia, napríklad firewall keď je zariadenie uzamknuté alebo keď sa konkrétna aplikácia nepoužíva.</string>
+    <string name="slide_1_desc" translatable="true">Rethink je softvér s verejným zdrojovým kódom podporovaný programom Mozilla Builders MVP.</string>
+    <string name="untracked" translatable="true">nesleduj</string>
+    <string name="firewall_mode_info_explanation_new" translatable="true">Monitorujte sieťovú aktivitu a firewall akejkoľvek aplikácie alebo IP adresy.</string>
+    <string name="dns_mode_info_explanation_new" translatable="true">Monitorujte, blokujte a šifrujte požiadavky DNS.</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink využíva službu dostupnosti na sledovanie, ktoré aplikácie sa používajú (v popredí) a ktoré nepoužívajú (na pozadí).
+\n
+\nRethink nezhromažďuje žiadne informácie ani vás žiadnym spôsobom nešpehuje.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Rethink služba dostupnosti zastavila alebo zlyhala. <i><b>Prejdite na Nastavenia a Vynútené zastavenie</b></i> Rethink a znova spustite <i>Zablokovať akúkoľvek nepoužívanú aplikáciu</i>.
+\n
+\nRethink využíva službu dostupnosti na sledovanie, ktoré aplikácie sa používajú (v popredí) a ktoré nepoužívajú (na pozadí).</string>
+    <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink používa VPN v režime <i>Uzamknutie</i>. Jeho zastavenie by viedlo k strate internetového pripojenia v tomto užívateľskom profile. Chcete napriek tomu pokračovať?</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Blokuje pripojenie aplikácie k internetu.
+\n<u>#2</u>: Blokuje pripojenie akejkoľvek aplikácie ku konkrétnej adrese IP.
+\n<u>#3</u>: Blokuje všetky pripojenia, keď je zariadenie uzamknuté (Universal Firewall).
+\n<u>#4</u>: Blokuje všetky nepoužívané aplikácie (Universal Firewall).
+\n<u>#5</u>: Blokuje pripojenia, keď je zdrojová aplikácia neznáma (Universal Firewall).
+\n<u>#6</u>: Blokuje všetku komunikáciu UDP okrem DNS (Universal Firewall).
+\n<u>#7</u>: Blokovať pripojenia pri obídení DNS (Universal Firewall).</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">Odstrániť DoH pripojenie?</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Odstrániť DoT pripojenie?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Odstrániť DNS cez TLS z uložených nastavení.</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Odstrániť DNSCrypt server?</string>
+    <string name="dns_crypt_url_remove_dialog_message" translatable="true">Odstrániť DNSCrypt server z uložených nastavení.</string>
+    <string name="dns_crypt_url_remove_success" translatable="true">DNSCrypt server odstránený.</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Odstrániť DNSCrypt relé?</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Odstrániť DNSCrypt relé z uložených nastavení.</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt Relé odstránené.</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">Odstrániť DNS Proxy?</string>
+    <string name="dns_proxy_remove_dialog_message" translatable="true">Odstrániť DNS Proxy z uložených nastavení.</string>
+    <string name="dns_proxy_remove_success" translatable="true">DNS Proxy odstránené.</string>
+    <string name="local_blocklist_download" translatable="true">Stiahni blok listy.</string>
+    <string name="local_blocklist_download_desc" translatable="true">Chcete stiahnuť zoznamy blokovaných položiek (približne 60 MB), aby ste mohli používať túto funkciu?</string>
+    <string name="local_blocklist_redownload" translatable="true">Aktuálny!</string>
+    <string name="local_blocklist_redownload_desc" translatable="true">Zoznamy blokovaných na zariadení sú už v najnovšej verzii v%1$s.</string>
+    <string name="blocklist_update_check_not_required" translatable="true">Zoznamy blokovaných sú už v najnovšej verzii.</string>
+    <string name="refresh_complete" translatable="true"><!-- použite dc_refresh_toast --> Opätovná synchronizácia zoznamu aplikácií je dokončená.</string>
+    <string name="show_logs_disabled_dns_message" translatable="true">Zaznamenávanie požiadaviek DNS bolo zakázané. Ak ju chcete znova povoliť, prejdite do <i>Nastavenia</i> a zapnite možnosť <i>Povoliť zapisovanie do denníka na zariadení.</i></string>
+    <string name="configure_dns_connected_doh_status" translatable="true">DNS cez HTTPS</string>
+    <string name="configure_dns_connected_dns_proxy_status" translatable="true">DNS Proxy</string>
+    <string name="configure_dns_connection_name" translatable="true">Pripojený do %1$s</string>
+    <string name="configure_dns_crypt" translatable="true">DNSCrypt: %1$s server</string>
+    <string name="http_proxy_dialog_heading" translatable="true">Nastav HTTP(S) CONNECT Proxy</string>
+    <string name="download_update_dialog_title" translatable="true">Nová aktualizácia!</string>
+    <string name="download_update_dialog_message" translatable="true">Nová verzia aplikácie je k dispozícii na stiahnutie z webovej stránky. Chcete pokračovať?</string>
+    <string name="download_update_dialog_message_ok_title" translatable="true">Aktuálny!</string>
+    <string name="dns_act_configure_tab" translatable="true">Nastaviť</string>
+    <string name="univ_firewall_dialog_title" translatable="true">Vymazať IP Pravidlo?</string>
+    <string name="univ_firewall_dialog_message" translatable="true">Odstránenie tohto pravidla by umožnilo akejkoľvek aplikácii pripojiť sa k tejto IP adrese. Chcete pokračovať?</string>
+    <string name="doh_custom_url_remove_dialog_message" translatable="true">Odstrániť DNS cez HTTPS z uložených nastavení.</string>
+    <string name="doh_custom_url_remove_success" translatable="true">Pripojenie odstránené.</string>
+    <string name="show_logs_disabled_network_message" translatable="true">Zaznamenávanie pripojenia bolo vypnuté. Ak ju chcete znova povoliť, prejdite do <i>Nastavenia</i> a zapnite možnosť <i>Povoliť zapisovanie do denníka na zariadení.</i></string>
+    <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
+    <string name="blocklist_update_check_failure" translatable="true">Niečo sa pokazilo. Skúste to znova neskôr!</string>
+    <string name="http_proxy_dialog_desc" translatable="true">Nastavte adresu URL formulára, &lt;protokol&gt;://&lt;používateľské meno&gt;:&lt;heslo&gt;@&lt;doména-alebo-ip&gt;:&lt;port&gt;&lt;cesta&gt;. Príklad: http://proxy.example.com:8080/</string>
+    <string name="download_update_dialog_message_ok" translatable="true">Už ste na najnovšej verzií.</string>
+    <string name="download_update_dialog_message_success" translatable="true">Blok list stiahnutý úspešné.</string>
+    <string name="download_update_dialog_failure_title" translatable="true">Niečo sa pokazilo</string>
+    <string name="download_update_dialog_failure_message" translatable="true">Buď naše servery sú dole alebo pripojenie nemôže byť stanovená. Skúste prosím znova po nejakom čase.</string>
+    <string name="download_update_dialog_trylater_title" translatable="true">Teraz sa nedá aktualizovať</string>
+    <string name="download_update_dialog_trylater_message" translatable="true">Aktualizácie nie je možné vykonať hneď, skúste to znova neskôr.</string>
+    <string name="search_firewall_network_log" translatable="true"><font size="12"> Hľadať aplikácie, IP adresy, domény</font></string>
+    <string name="search_dns_logs" translatable="true"><font size="12"> Hľadať názvy domén alebo IP adries</font></string>
+    <string name="search_firewall_all_apps" translatable="true"><font size="12"> Hľadať aplikácie uid, názov</font></string>
+    <string name="search_universal_ips" translatable="true"><font size="12"> Hľadať IP adresy</font></string>
+    <string name="search_custom_domains" translatable="true"><font size="12">Hľadať názvy domén</font></string>
+    <string name="search_rethinkplus_file_tag" translatable="true"><font size="12"> Hľadať blok listy</font></string>
+    <string name="search_proxy_add_apps" translatable="true">Hľadať aplikácie podľa názvu</string>
+    <string name="app_mode_dns_low_battery" translatable="true">DNS (šetrič batérie)</string>
+    <string name="app_mode_dns" translatable="true">DNS</string>
+    <string name="app_mode_firewall" translatable="true">Firewall</string>
+    <string name="app_mode_dns_firewall" translatable="true">DNS a Firewall (predvolené)</string>
+    <string name="app_mode_wireguard" translatable="true">VPN</string>
+    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="info_dialog_copy_toast_msg" translatable="true">IP adresa skopírovaná.</string>
+    <string name="info_dialog_url_copy_toast_msg" translatable="true">URL skopírované</string>
+    <string name="public_key_copy_toast_msg" translatable="true">Verejný kľúč skopírovaný.</string>
+    <string name="info_dialog_rethink_toast_msg" translatable="true">Kopírovaná ako RDNS + DNS-over-HTTPS URL adresa</string>
+    <string name="settings_enable_logs_desc" translatable="true">Uložte DNS a Firewall záznamy lokálne na zariadení.</string>
+    <string name="settings_enable_logs" translatable="true">Zapni záznamy na zariadení</string>
+    <string name="app_mode_choose" translatable="true">Vyberte si režim</string>
+    <string name="whats_new_version_update" translatable="true">&lt;b&gt;Chirayu Desai&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nová funkcia&lt;/i&gt;: Podpora pre anonymizáciu &lt;i&gt;Nevšímavý DNS-over-HTTPS&lt;/i&gt;.&lt;br/&gt; 2. &lt;i&gt;Nová funkcia&lt;/i&gt;: Podpora pre &lt;i&gt;DNS-over-TLS&lt;/i&gt;.&lt;br/&gt; 3. &lt;i&gt;Nová funkcia&lt;/i&gt;: Jednoduchý a pokročilý režim WireGuard.&lt; br/&gt; 4. &lt;i&gt;Nová funkcia&lt;/i&gt;: Zobrazenie šírky pásma na obrazovke so štatistikami.&lt;br/&gt; 5. &lt;i&gt;Nová funkcia&lt;/i&gt;: Podpora všetkých proxy serverov vrátane Orbot aj v &lt;i&gt;uzamknutí VPN&lt; /i&gt; režim.&lt;br/&gt; 6. &lt;i&gt;Nová funkcia&lt;/i&gt;: Monitorujte sieťovú prevádzku spoločnosti Rethink pomocou funkcie Rethink!&lt;br/&gt; 7. &lt;i&gt;Nová funkcia&lt;/i&gt;: Preposielanie DNS cez aktívne proxy servery, napr. WireGuard.&lt;br/&gt; 8. &lt;i&gt;Nová funkcia&lt;/i&gt;: Rovnaká verzia zálohovania a obnovy medzi zariadeniami.&lt;br/&gt; 9. Vylepšené generovanie &lt;i&gt;hlásenia o chybe&lt;/i&gt;.&lt;br/&gt; 10. Lepšie spracovanie sietí IP s dvomi zásobníkmi.&lt;br/&gt; 11. &lt;i&gt;Oprava chyby&lt;/i&gt;: Opravy menších chýb pri práci s multicast DNS.&lt;br/&gt; 12. &lt;i&gt;Oprava chyby&lt;/i&gt;: Automatické obnovenie pripojenia pre WireGuard VPN.&lt;br/&gt; 13. &lt;i&gt;Oprava chyby&lt;/i&gt;: Opravte nesprávne zablokované upozornenia aplikácií.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns. com/r/translate&gt;Pomôžte s prekladom tejto aplikácie&lt;/a&gt;</string>
+    <string name="connection_http3" translatable="true">HTTP3</string>
+    <string name="settings_ptrans_heading" translatable="true">Vynúť IPv4 výstup</string>
+    <string name="relative_time_today" translatable="true">Dnes</string>
+    <string name="relative_time_yesterday" translatable="true">Včera</string>
+    <string name="settings_ip_network_heading" translatable="true">Vyberte verziu IP</string>
+    <string name="settings_ip_network_desc" translatable="true">Vyberte si medzi verziami internetového protokolu.</string>
+    <string name="settings_ptrans_desc" translatable="true">Preložiť odchádzajúce IPv6 spojenia do IPv4 na zariadení. Ak ste pripojený iba k sieti IPv4.</string>
+    <string name="settings_allow_lan_heading" translatable="true">Nepoužívajte trasy so súkromnými IP adresami (experimentálna funkcia)</string>
+    <string name="settings_allow_lan_desc" translatable="true">Vylúč LAN, loopback, multicast, link-local trasy z Rethink VPN tunelu.</string>
+    <string name="settings_allow_bypass_heading" translatable="true">Zapni viditeľnosť na sieti</string>
+    <string name="settings_allow_bypass_desc" translatable="true">Povoľte žiadajúcim aplikáciám prístup ku všetkým dostupným sieťam. Tieto aplikácie môžu na požiadanie obísť tunel Rethink VPN. Niektoré audio/video konferenčné aplikácie, ako napríklad Zoom a Meet, to môžu vyžadovať, aby fungovali správne.</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">Niektoré možnosti sú vypnuté, keď je VPN v režime uzamknutia. <u>Pozrite si nastavenia VPN</u>.</string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Nemožno nastaviť proxy servery, keď VPN beží v režime iba DNS.</string>
+    <string name="settings_socks5_desc" translatable="true">Pošli pripojenia cez SOCKS5 zariadenie.</string>
+    <string name="settings_proxy_header" translatable="true">proxy</string>
+    <string name="settings_socks5_heading" translatable="true">Nastavenie SOCKS5 Proxy</string>
+    <string name="settings_https_heading" translatable="true">Nastavenie HTTP(S) CONNECT Proxy</string>
+    <string name="settings_https_desc" translatable="true">Pošli spojenia cez HTTP(S) CONNECT zariadenie.</string>
+    <string name="orbot_http_desc" translatable="true">Vytvorí spojenia s HTTP CONNECT tunel do Orbot.</string>
+    <string name="orbot_bs_status_1" translatable="true">Pošli %1$s pripojenie k Orbot.</string>
+    <string name="orbot_bs_status_2" translatable="true">HTTP Proxy je zvolené.</string>
+    <string name="orbot_bs_status_3" translatable="true">Pošli %1$s cez Orbot, HTTP Proxy je tiež nastavené.</string>
+    <string name="orbot_socks5_desc" translatable="true">Pošli všetky TCP spojenia cez Orbot.</string>
+    <string name="orbot" translatable="true">Orbot</string>
+    <string name="orbot_http" translatable="true">HTTP Proxy</string>
+    <string name="orbot_both" translatable="true">TCP + HTTP Proxy</string>
+    <string name="orbot_none_desc" translatable="true">Žiadny z vyššie uvedených.</string>
+    <string name="orbot_bs_status_4" translatable="true">Jeden klik Tor-ako-Proxy (Orbot) nastavenie.</string>
+    <string name="orbot_socks5" translatable="true">TCP-len Proxy</string>
+    <string name="orbot_both_desc" translatable="true">Všetky vyššie uvedené.</string>
+    <string name="orbot_none" translatable="true">Žiadne (predvolené)</string>
+    <string name="orbot_status_arg_3" translatable="true">DNS a TCP</string>
+    <string name="orbot_app_issue" translatable="true">Nemohol spustiť Orbot. Je nainštalovaný?</string>
+    <string name="orbot_stop_dialog_title" translatable="true">Potrebný manuálny zásah</string>
+    <string name="orbot_stop_dialog_message" translatable="true">Rethink prestal presmerovanie pripojenia na Orbot, ale Orbot možno beží na pozadí.</string>
+    <string name="orbot_stop_dialog_neutral" translatable="true">Zmeniť DNS</string>
+    <string name="orbot_title" translatable="true">Orbot a Proxies</string>
+    <string name="orbot_install_dialog_title" translatable="true">Nainštalovať Orbot?</string>
+    <string name="orbot_install_dialog_message" translatable="true">Orbot prináša funkcie a funkčnosť Tor do Androidu.</string>
+    <string name="orbot_bs_status_trying_connect" translatable="true">Nastavujem Orbot ..</string>
+    <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink je nastavený k pre-posielaniu DNS žiadostí cez Orbot. Zmeň ako potrebuješ.</string>
+    <string name="orbot_stop_dialog_negative" translatable="true">Zastav Orbot</string>
+    <string name="orbot_explanation" translatable="true">Orbot je bezplatná aplikácia proxy, ktorá iným aplikáciám umožňuje používať internet <u>bezpečnejšie</u>.
+\nOrbot používa <u>Tor</u> na šifrovanie vašej internetovej prevádzky, čo vám pomáha <u>obísť cenzúru</u> a brániť sa pred formami <u>sledovania siete</u>, ktoré ohrozujú osobnú slobodu a súkromie.
+\n<u>TCP Proxy</u>: Rethink posiela iba TCP spojenia <i>zahrnutých</i> aplikácií do Orbotu.
+\n<u>HTTP Proxy</u>: Rethink <i>vytvorí</i> tunel HTTP CONNECT do Orbotu a pošle iba TCP spojenia <i>zahrnutých</i> aplikácií.</string>
+    <string name="orbot_status_arg_2" translatable="true">TCP</string>
+    <string name="orbot_install_dialog_positive" translatable="true">Inštalovať</string>
+    <string name="orbot_install_dialog_neutral" translatable="true">webstránka</string>
+    <string name="orbot_no_app_toast" translatable="true">Pridajte aspoň jednu aplikáciu aby ste zapli Orbot</string>
+    <string name="settings_orbot_heading" translatable="true">Nastav Orbot</string>
+    <string name="settings_orbot_header" translatable="true">Orbot ❯</string>
+    <string name="settings_orbot_desc" translatable="true">Orbot v režime bez-vpn s HTTPS/SOCKS5.</string>
+    <string name="settings_orbot_install_desc" translatable="true">Kliknite tu pre inštaláciu Orbot</string>
+    <string name="settings_socks5_disabled_error" translatable="true">Pripojené k %1$s. Vypnite to, aby ste mohli pokračovať.</string>
+    <string name="settings_socks5_vpn_disabled_error" translatable="true">Zapnite Rethink k pokračovaniu.</string>
+    <string name="settings_orbot_disabled_error" translatable="true">Vypnite HTTP(S) a/alebo SOCKS5 proxy aby ste mohli pokračovať s nastavením Tor-as-a-proxy.</string>
+    <string name="settings_https_disabled_error" translatable="true">Pripojené k %1$s. Vypnite ho a pokračujte.</string>
+</resources>
