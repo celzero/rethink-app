@@ -69,6 +69,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityAllNetworkSwitch.isChecked = persistentState.useMultipleNetworks
         // route lan traffic
         b.settingsActivityLanTrafficSwitch.isChecked = persistentState.privateIps
+        // connectivity check
+        b.settingsActivityConnectivityChecksSwitch.isChecked = persistentState.connectivityChecks
         // for protocol translation, enable only on DNS/DNS+Firewall mode
         if (appConfig.getBraveMode().isDnsActive()) {
             b.settingsActivityPtransSwitch.isChecked = persistentState.protocolTranslationType
@@ -193,6 +195,15 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         }
 
         b.settingsActivityDefaultDnsRl.setOnClickListener { showDefaultDnsDialog() }
+
+        b.settingsActivityConnectivityChecksRl.setOnClickListener {
+            b.settingsActivityConnectivityChecksSwitch.isChecked =
+                !b.settingsActivityConnectivityChecksSwitch.isChecked
+        }
+
+        b.settingsActivityConnectivityChecksSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.connectivityChecks = isChecked
+        }
     }
 
     private fun showDefaultDnsDialog() {

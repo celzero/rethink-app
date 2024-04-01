@@ -31,7 +31,6 @@ import android.system.ErrnoException
 import android.system.OsConstants.ECONNREFUSED
 import android.util.Log
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_CONNECTION
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
@@ -45,6 +44,7 @@ import java.net.Inet6Address
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.util.Collections
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
@@ -55,28 +55,29 @@ import org.koin.core.component.inject
 class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     ConnectivityManager.NetworkCallback(), KoinComponent {
 
-    private val androidValidatedNetworks = false
-
     private val networkSet: MutableSet<Network> = mutableSetOf()
 
+    // add cellular, wifi, bluetooth, ethernet, vpn, wifi aware, low pan
     private val networkRequest: NetworkRequest =
-        if (androidValidatedNetworks)
-            NetworkRequest.Builder()
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-                .apply { if (isAtleastS()) setIncludeOtherUidNetworks(true) }
-                .build()
-        else
-        // add cellular, wifi, bluetooth, ethernet, vpn, wifi aware, low pan
         NetworkRequest.Builder()
-                .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                .addTransportType(NetworkCapabilities.TRANSPORT_BLUETOOTH)
-                .addTransportType(NetworkCapabilities.TRANSPORT_ETHERNET)
-                .apply { if (isAtleastS()) setIncludeOtherUidNetworks(true) }
-                // api27: .addTransportType(NetworkCapabilities.TRANSPORT_WIFI_AWARE)
-                // api26: .addTransportType(NetworkCapabilities.TRANSPORT_LOWPAN)
-                .build()
+            .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .addTransportType(NetworkCapabilities.TRANSPORT_BLUETOOTH)
+            .addTransportType(NetworkCapabilities.TRANSPORT_ETHERNET)
+            .apply { if (isAtleastS()) setIncludeOtherUidNetworks(true) }
+            // api27: .addTransportType(NetworkCapabilities.TRANSPORT_WIFI_AWARE)
+            // api26: .addTransportType(NetworkCapabilities.TRANSPORT_LOWPAN)
+            .build()
+
+    /*
+        // android validated networks builder
+           NetworkRequest.Builder()
+               .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+               .addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+               .apply { if (isAtleastS()) setIncludeOtherUidNetworks(true) }
+               .build()
+
+    */
 
     // An Android handler thread internally operates on a looper
     // ref:
@@ -122,8 +123,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         val msgType: Int,
         val networkSet: Set<Network>,
         val isForceUpdate: Boolean,
-        val testReachability: Boolean,
-        val dualStack: Boolean
+        val testReachability: Boolean
     )
 
     init {
@@ -213,15 +213,13 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         isForceUpdate: Boolean = false,
         delay: Long = TimeUnit.SECONDS.toMillis(1)
     ) {
-        val isDualStack = InternetProtocol.isAuto(persistentState.internetProtocolType)
-        val testReachability = isDualStack && !androidValidatedNetworks
+        val testReachability = persistentState.connectivityChecks
         val msg =
             constructNetworkMessage(
                 if (persistentState.useMultipleNetworks) MSG_ADD_ALL_NETWORKS
                 else MSG_ADD_ACTIVE_NETWORK,
                 isForceUpdate,
-                testReachability,
-                isDualStack
+                testReachability
             )
         serviceHandler?.removeMessages(MSG_ADD_ACTIVE_NETWORK, null)
         serviceHandler?.removeMessages(MSG_ADD_ALL_NETWORKS, null)
@@ -236,10 +234,9 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     private fun constructNetworkMessage(
         what: Int,
         isForceUpdate: Boolean,
-        testReachability: Boolean,
-        dualStack: Boolean
+        testReachability: Boolean
     ): Message {
-        val opPrefs = OpPrefs(what, networkSet, isForceUpdate, testReachability, dualStack)
+        val opPrefs = OpPrefs(what, networkSet, isForceUpdate, testReachability)
         val message = Message.obtain()
         message.what = what
         message.obj = opPrefs
@@ -260,7 +257,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         val minMtu: Int,
         var isActiveNetworkMetered: Boolean, // may be updated by client listener
         var lastUpdated: Long, // may be updated by client listener
-        val dnsServers: LinkedHashMap<InetAddress, Network>
+        val dnsServers: Map<InetAddress, Network>
     )
 
     // Handles the network messages from the callback from the connectivity manager
@@ -393,7 +390,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         determineMtu(useActiveNetwork),
                         isActiveNetworkMetered,
                         SystemClock.elapsedRealtime(),
-                        dnsServers)
+                        Collections.unmodifiableMap(dnsServers)
+                    )
                 if (DEBUG) {
                     trackedIpv4Networks.forEach {
                         Log.d(LOG_TAG_CONNECTION, "inform4: ${it.network}, ${it.networkType}, $sz")
@@ -488,7 +486,6 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             networks: LinkedHashSet<NetworkProperties>
         ) {
             val testReachability: Boolean = opPrefs.testReachability
-            val dualStack: Boolean = opPrefs.dualStack
 
             val activeNetwork = connectivityManager.activeNetwork // null in vpn lockdown mode
 
