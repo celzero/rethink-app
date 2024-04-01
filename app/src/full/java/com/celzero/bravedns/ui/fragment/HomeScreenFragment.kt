@@ -189,6 +189,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             startActivity(intent)
         }
 
+        b.fhsTitleRethink.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
+            startActivity(intent)
+        }
+
         // comment out the below code to disable the alerts card (v0.5.5b)
         // b.fhsCardAlertsLl.setOnClickListener { startActivity(ScreenType.ALERTS) }
     }
