@@ -556,13 +556,13 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         // Sets up permissions request launcher.
         notificationPermissionResult =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                persistentState.shouldRequestNotificationPermission = it
                 if (it) {
                     Log.i(LOG_TAG_VPN, "User allowed notification permission for the app")
                     b.settingsActivityAppNotificationRl.visibility = View.VISIBLE
                     b.settingsActivityAppNotificationSwitch.isChecked = true
                 } else {
                     Log.w(LOG_TAG_VPN, "User rejected notification permission for the app")
-                    persistentState.shouldRequestNotificationPermission = false
                     b.settingsActivityAppNotificationRl.visibility = View.VISIBLE
                     b.settingsActivityAppNotificationSwitch.isChecked = false
                     invokeAndroidNotificationSetting()
@@ -762,9 +762,14 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             // notification permission is granted to the app, enable switch
             b.settingsActivityAppNotificationRl.visibility = View.VISIBLE
             b.settingsActivityAppNotificationSwitch.isChecked = true
+            if (!persistentState.shouldRequestNotificationPermission) {
+                // if the user has already granted the permission, set the flag to true
+                persistentState.shouldRequestNotificationPermission = true
+            }
         } else {
             b.settingsActivityAppNotificationRl.visibility = View.VISIBLE
             b.settingsActivityAppNotificationSwitch.isChecked = false
+            persistentState.shouldRequestNotificationPermission = false
         }
         b.settingsActivityAppNotificationPersistentRl.visibility = View.VISIBLE
         b.settingsActivityAppNotificationPersistentSwitch.isChecked =

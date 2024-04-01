@@ -1099,10 +1099,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // Sets up permissions request launcher.
         notificationPermissionResult =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                persistentState.shouldRequestNotificationPermission = it
                 if (it) {
                     Log.i(LOG_TAG_UI, "User accepted notification permission")
                 } else {
-                    persistentState.shouldRequestNotificationPermission = false
                     Log.w(LOG_TAG_UI, "User rejected notification permission")
                     Snackbar.make(
                             requireActivity().findViewById<View>(android.R.id.content).rootView,

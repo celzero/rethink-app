@@ -56,6 +56,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val RETHINK_IN_RETHINK = "route_rethink_in_rethink"
         const val PREVENT_DNS_LEAKS = "prevent_dns_leaks"
         const val CONNECTIVITY_CHECKS = "connectivity_check"
+        const val NOTIFICATION_PERMISSION = "notification_permission_request"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops

@@ -1554,6 +1554,14 @@ class BraveVPNService :
                 Log.i(LOG_TAG_VPN, "connectivity checks changed, ${persistentState.connectivityChecks}")
                 io("connectivityChecks") { notifyConnectionMonitor() }
             }
+            PersistentState.NOTIFICATION_PERMISSION -> {
+                if (persistentState.shouldRequestNotificationPermission) {
+                    Log.i(LOG_TAG_VPN, "notification permission allowed, show notification")
+                    notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+                } else {
+                    // no-op
+                }
+            }
         }
     }
 
