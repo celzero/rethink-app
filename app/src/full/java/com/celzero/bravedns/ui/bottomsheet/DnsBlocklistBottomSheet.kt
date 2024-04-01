@@ -42,7 +42,6 @@ import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
@@ -62,10 +61,10 @@ import com.google.android.material.chip.Chip
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import java.util.Locale
 
 class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null
@@ -451,7 +450,8 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         }
 
         if (log!!.isAnonymized()) { // anonymized queries answered by dns-crypt
-            val text = getString(R.string.dns_btm_resolved_crypt, uptime, log!!.serverIP, log!!.relayIP)
+            val text =
+                getString(R.string.dns_btm_resolved_crypt, uptime, log!!.serverIP, log!!.relayIP)
             b.dnsBlockBlockedDesc.text = updateHtmlEncodedText(text)
         } else if (log!!.isLocallyAnswered()) { // usually happens when there is a network failure
             b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server, uptime)

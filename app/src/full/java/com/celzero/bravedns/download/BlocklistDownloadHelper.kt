@@ -26,11 +26,10 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities.blocklistCanonicalPath
 import com.celzero.bravedns.util.Utilities.deleteRecursive
-import java.io.File
-import java.lang.RuntimeException
 import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
 
 class BlocklistDownloadHelper {
 

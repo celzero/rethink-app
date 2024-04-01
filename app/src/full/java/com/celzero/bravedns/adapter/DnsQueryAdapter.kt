@@ -44,7 +44,6 @@ import com.celzero.bravedns.ui.bottomsheet.DnsBlocklistBottomSheet
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.Utilities
 import com.google.gson.Gson
 
 class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
