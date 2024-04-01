@@ -50,6 +50,7 @@
                         android:layout_marginStart="3dp"
                         android:layout_marginEnd="3dp"
                         android:maxLength="15"
+                        android:ellipsize="end"
                         android:padding="5dp"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?attr/secondaryTextColor" />

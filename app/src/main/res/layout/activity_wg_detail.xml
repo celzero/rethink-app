@@ -121,6 +121,7 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/global_lockdown_title_tv"
                                 style="@style/TextAppearance.AppCompat.Subhead"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -165,6 +166,7 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/catch_all_title_tv"
                                 style="@style/TextAppearance.AppCompat.Subhead"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"

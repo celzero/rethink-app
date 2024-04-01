@@ -102,6 +102,18 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun init() {
+        b.globalLockdownTitleTv.text =
+            getString(
+                R.string.two_argument_space,
+                getString(R.string.firewall_rule_global_lockdown),
+                getString(R.string.symbol_lockdown)
+            )
+        b.catchAllTitleTv.text =
+            getString(
+                R.string.two_argument_space,
+                getString(R.string.catch_all_wg_dialog_title),
+                getString(R.string.symbol_lightening)
+            )
         if (wgType.isDefault()) {
             b.wgHeaderTv.text = getString(R.string.lbl_advanced).replaceFirstChar(Char::titlecase)
             b.lockdownRl.visibility = View.VISIBLE
