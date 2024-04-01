@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_statistics" translatable="true">Štatistiky</string>
+    <string name="pause_title_desc" translatable="true">dávam si šlofíka…</string>
+    <string name="settings_title_desc" translatable="true">Vysoko prispôsobiteľné DNS a Firewall</string>
+    <string name="txt_home" translatable="true">Domov</string>
+    <string name="next" translatable="true">Ďalej</string>
+    <string name="skip" translatable="true">Preskoč</string>
+    <string name="lbl_allowed" translatable="true">Dovolené</string>
+    <string name="lbl_maybe_blocked" translatable="true">Možno Zablokované</string>
+    <string name="lbl_blocked" translatable="true">Zablokované</string>
+    <string name="lbl_disabled" translatable="true">Zakázané</string>
+    <string name="lbl_domain" translatable="true">Doména</string>
+    <string name="lbl_wildcard" translatable="true">Divoká karta (*)</string>
+    <string name="lbl_action_required" translatable="true">Vyžaduje sa akcia</string>
+    <string name="lbl_rules" translatable="true">pravidlá</string>
+    <string name="lbl_configure" translatable="true">Nastaviť</string>
+    <string name="lbl_logs" translatable="true">bezpečnostné záznamy</string>
+    <string name="lbl_network" translatable="true">sieť</string>
+    <string name="lbl_create" translatable="true">Vytvor</string>
+    <string name="lbl_qr_code" translatable="true">QR Kód</string>
+    <string name="lbl_import" translatable="true">Importovať</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_public_key" translatable="true">Verejný Kľúč</string>
+    <string name="lbl_addresses" translatable="true">Adresa</string>
+    <string name="lbl_dns_servers" translatable="true">DNS Server</string>
+    <string name="lbl_applications" translatable="true">Aplikácia</string>
+    <string name="lbl_ip_rules" translatable="true">IP Pravidlá</string>
+    <string name="lbl_domain_rules" translatable="true">Pravidlá Domény</string>
+    <string name="lbl_delete" translatable="true">Vymazať</string>
+    <string name="lbl_proceed" translatable="true">Pokračuj</string>
+    <string name="lbl_private_key" translatable="true">Súkromný kľúč</string>
+    <string name="lbl_generated" translatable="true">(vytvorený)</string>
+    <string name="lbl_random" translatable="true">(náhodný)</string>
+    <string name="lbl_listen_port" translatable="true">Načúvajúci port</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_auto" translatable="true">(automatický)</string>
+    <string name="lbl_include" translatable="true">Zahrnúť</string>
+    <string name="lbl_select_all" translatable="true">zvoliť všetky</string>
+    <string name="lbl_active" translatable="true">Aktívny</string>
+    <string name="lbl_inactive" translatable="true">Neaktívny</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="lbl_fast" translatable="true">rýchli</string>
+    <string name="lbl_slow" translatable="true">pomalí</string>
+    <string name="lbl_very" translatable="true">veľmi</string>
+    <string name="lbl_hour" translatable="true">hodín</string>
+    <string name="lbl_day" translatable="true">deň</string>
+    <string name="lbl_preshared_key" translatable="true">Zdieľaný kľúč</string>
+    <string name="lbl_insecure" translatable="true">(nezabezpečený)</string>
+    <string name="lbl_optional" translatable="true">(dobrovoľný)</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Trvalé udržiavanie spojenia</string>
+    <string name="lbl_allowed_ips" translatable="true">Povolené IP adresy</string>
+    <string name="lbl_save" translatable="true">uložiť</string>
+    <string name="lbl_cache" translatable="true">Krátkodobé úložisko</string>
+    <string name="lbl_status" translatable="true">Stav</string>
+    <string name="lbl_remove" translatable="true">Odstrániť</string>
+    <string name="lbl_last" translatable="true">Posledný</string>
+    <string name="lbl_starting" translatable="true">Spúšťa sa</string>
+    <string name="lbl_overall" translatable="true">Celkový</string>
+    <string name="lbl_stopped" translatable="true">Zastavený</string>
+    <string name="lbl_private" translatable="true">súkromný</string>
+    <string name="lbl_secure" translatable="true">bezpečný</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="slide_2_title" translatable="true">Vitajte</string>
+    <string name="slide_1_title" translatable="true">Zadarmo a Kód verejne dostupný</string>
+    <string name="allow" translatable="true">povoliť</string>
+    <string name="block" translatable="true">blokovať</string>
+    <string name="bypass_universal" translatable="true">Univerzálne povolený</string>
+    <string name="exclude" translatable="true">vylúčiť</string>
+    <string name="isolate" translatable="true">izoluj</string>
+    <string name="bypass_dns_firewall" translatable="true">obíď DNS a Firewall pravidlá</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Pozor: Rethink bol vypnutý</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Klepnutím zmeníte nastavenie ochrany</string>
+    <string name="dns_mode_notification_title" translatable="true">Ste Chránený! Pripojený k Rýchlemu a Bezpečnému DNS.</string>
+    <string name="pause_mode_notification_title" translatable="true">Pozastavené! Zablokované aplikácie budú naďalej chránené bránou firewall.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">čakám</string>
+    <string name="failed_using_default" translatable="true">Zlyhanie: používa sa záložné DNS</string>
+    <string name="status_app_error" translatable="true">chyba aplikácie</string>
+    <string name="status_dns_error" translatable="true">chyba DNS</string>
+    <string name="status_dns_server_down" translatable="true">DNS server nefunguje</string>
+    <string name="status_no_internet" translatable="true">žiadny internet</string>
+    <string name="status_protected_with_tor" translatable="true">chránený s tórom</string>
+    <string name="status_protected_with_private_dns" translatable="true">chránený so súkromným DNS</string>
+    <string name="status_protected_with_tor_private_dns" translatable="true">chránený s tórom a súkromným DNS</string>
+    <string name="status_protected_with_proxy_private_dns" translatable="true">chránený pomocou proxy a súkromným DNS</string>
+    <string name="status_protected_with_socks5_private_dns" translatable="true">chránený SOCKS5 a súkromným DNS</string>
+    <string name="status_protected_with_http_private_dns" translatable="true">chránený s HTTP Proxy a súkromným DNS</string>
+    <string name="status_protected_with_socks5" translatable="true">chránený s SOCKS proxy</string>
+    <string name="status_protected_with_http" translatable="true">chránený s HTTP Proxy</string>
+    <string name="status_protected_with_proxy" translatable="true">chránený s proxy</string>
+    <string name="status_protected_with_wg" translatable="true">chránený s Wireguardom</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">chránený s Wireguardom a súkromným DNS</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">súkromne DNS je zapnuté</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Pripojený s RethinkDNS</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">Pripojený s Firewalom</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Pripojený s RethinkDNS a Firewalom</string>
+    <string name="notification_action_resume_vpn" translatable="true">POKRAČOVAŤ</string>
+    <string name="notification_action_pause_vpn" translatable="true">PAUZA</string>
+    <string name="notification_action_stop_vpn" translatable="true">STOP</string>
+    <string name="notification_action_dns_mode" translatable="true">DNS</string>
+    <string name="notification_action_dns_firewall_mode" translatable="true">DNS + Firewall</string>
+    <string name="dns_mode_info_title" translatable="true">DNS</string>
+    <string name="firewall_rules" translatable="true">Pravidlá Siete</string>
+    <string name="firewall_mode_info_title" translatable="true">Firewall</string>
+    <string name="apps_info_title" translatable="true">Aplikácie</string>
+    <string name="hybrid_mode_info_title" translatable="true">DNS + Firewall</string>
+    <string name="dns_firewall_mode_info_explanation_new" translatable="true">Všetky vyššie uvedené + obísť cenzúru internetu.</string>
+    <string name="alert_permission_accessibility" translatable="true">Povolenie - Prístupnosť</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">Nepodarilo sa otvoriť nastavenia dostupnosti. Skúste to znova neskôr!</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">Vyberte režim.</string>
+    <string name="brave_dns_connect_mode_change_dns" translatable="true">Vyberte režim.</string>
+    <string name="default_dns_name" translatable="true">RDNS Predvolený</string>
+    <string name="custom_url_error_invalid_url" translatable="true">Neplatná URL</string>
+    <string name="conn_track_clear_logs_title" translatable="true">Odstrániť všetky záznamy siete?</string>
+    <string name="conn_track_clear_logs_message" translatable="true">Týmto sa odstránia iba sieťové záznamy, ale nie pravidlá brány firewall. Táto operácia je nezvratná. Chcete pokračovať?</string>
+    <string name="dns_query_clear_logs_title" translatable="true">Odstrániť všetky DNS záznamy?</string>
+    <string name="dns_query_clear_logs_message" translatable="true">Týmto sa odstránia DNS záznamy na zariadení. Táto operácia je nezvratná. Chcete pokračovať?</string>
+    <string name="bsct_app_info" translatable="true">Info o Aplikácií</string>
+    <string name="bsct_block_domain" translatable="true">Blokovať, dôveru <u>doménam</u> pre <u>túto aplikáciu</u></string>
+    <string name="bsct_block_ip" translatable="true">Blokovať, dôveru <u>tejto IP adrese</u> pre <u>túto aplikáciu</u></string>
+    <string name="bsct_block" translatable="true">Zablokujte, vynechajte, vylúčte, izolujte <u>túto aplikáciu</u></string>
+    <string name="bsct_conn_block_desc" translatable="true">zablokovaná %1$s používateľom %2$s</string>
+    <string name="bsct_conn_block_desc_device" translatable="true">zablokovaný %1$s na zariadení</string>
+    <string name="bsct_conn_desc_allowed" translatable="true">povolené na %1$s %2$s</string>
+    <string name="bsct_conn_desc_blocked" translatable="true">zablokovaný na %1$s %2$s</string>
+    <string name="always_on_dialog_heading" translatable="true">Zakázať službu Vždy zapnutá VPN</string>
+    <string name="always_on_dialog" translatable="true">Na tomto zariadení je povolená možnosť \"Vždy zapnutá VPN\". Ak chcete spustiť Rethink, prejdite do aplikácie Nastavenia a vypnite možnosť \"Vždy zapnutá VPN\".</string>
+    <string name="always_on_dialog_positive_btn" translatable="true">Choď do Nastavení</string>
+    <string name="always_on_dialog_stop_heading" translatable="true">Vždy zapnutá VPN</string>
+    <string name="always_on_dialog_stop_message" translatable="true">Pre Rethink je povolená vždy zapnutá VPN. Ste si istý, že napriek tomu chcete zastaviť Rethink?</string>
+    <string name="always_on_dialog_positive" translatable="true">Zastaviť</string>
+    <string name="always_on_dialog_neutral" translatable="true">Nastavenia</string>
+    <string name="private_dns_dialog_heading" translatable="true">Vypni Súkromné DNS</string>
+    <string name="private_dns_dialog_desc" translatable="true">Nastavenia Rethink DNS sú prepísané súkromným DNS systému Android.
+\n
+\nAk chcete použiť Rethink DNS, prejdite do nastavení systému Android a vypnite možnosť „Súkromné DNS“.</string>
+    <string name="private_dns_dialog_positive" translatable="true">Chodte do Nastavení</string>
+    <string name="firewall_act_universal_tab" translatable="true">univerzálny</string>
+    <string name="firewall_act_network_monitor_tab" translatable="true">Sieť</string>
+    <string name="title_about" translatable="true">O Applikácií</string>
+    <string name="title_settings" translatable="true">Nastavenia</string>
+    <string name="about_title_desc" translatable="true">Detekuje a blokuje bezpečnostné hrozby na sieti</string>
+    <string name="accessibility_service_description" translatable="true">Rethink používa službu dostupnosti na detekciu aplikácií na pozadí a brány firewall. Rethink nezhromažďuje ani nepredáva žiadne informácie.</string>
+    <string name="finish" translatable="true">Skončiť</string>
+    <string name="lbl_cancel" translatable="true">Zrušiť</string>
+    <string name="lbl_apply" translatable="true">Potvrdiť</string>
+    <string name="lbl_dismiss" translatable="true">Odmietnuť</string>
+    <string name="lbl_all" translatable="true">Všetko</string>
+    <string name="lbl_min" translatable="true">minút</string>
+    <string name="firewall_mode_notification_title" translatable="true">Ste Chránený! Pripojený k Firewalu.</string>
+    <string name="hybrid_mode_notification_title" translatable="true">Ste Chránený! Pripojený s DNS + Firewalom.</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">chránený</string>
+    <string name="lbl_add" translatable="true">pridaj</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">zlyháva</string>
+    <string name="lbl_app_wise" translatable="true">pre jednu aplikáciu</string>
+    <string name="lbl_sec" translatable="true">sekúnd</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">nechránený</string>
+    <string name="lbl_anonymous" translatable="true">anonymný</string>
+    <string name="slide_2_desc" translatable="true">Rethink je najjednoduchší spôsob, ako monitorovať sieťovú aktivitu, obísť internetovú cenzúru a firewall na vašom zariadení so systémom Android.</string>
+    <string name="universal_firewall_explanation" translatable="true">Aplikujte firewalové pravidlá na všetky aplikácie na základe udalostí zariadenia, napríklad firewall keď je zariadenie uzamknuté alebo keď sa konkrétna aplikácia nepoužíva.</string>
+    <string name="slide_1_desc" translatable="true">Rethink je softvér s verejným zdrojovým kódom podporovaný programom Mozilla Builders MVP.</string>
+    <string name="untracked" translatable="true">nesleduj</string>
+    <string name="firewall_mode_info_explanation_new" translatable="true">Monitorujte sieťovú aktivitu a firewall akejkoľvek aplikácie alebo IP adresy.</string>
+    <string name="dns_mode_info_explanation_new" translatable="true">Monitorujte, blokujte a šifrujte požiadavky DNS.</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink využíva službu dostupnosti na sledovanie, ktoré aplikácie sa používajú (v popredí) a ktoré nepoužívajú (na pozadí).
+\n
+\nRethink nezhromažďuje žiadne informácie ani vás žiadnym spôsobom nešpehuje.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Rethink služba dostupnosti zastavila alebo zlyhala. <i><b>Prejdite na Nastavenia a Vynútené zastavenie</b></i> Rethink a znova spustite <i>Zablokovať akúkoľvek nepoužívanú aplikáciu</i>.
+\n
+\nRethink využíva službu dostupnosti na sledovanie, ktoré aplikácie sa používajú (v popredí) a ktoré nepoužívajú (na pozadí).</string>
+    <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink používa VPN v režime <i>Uzamknutie</i>. Jeho zastavenie by viedlo k strate internetového pripojenia v tomto užívateľskom profile. Chcete napriek tomu pokračovať?</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Blokuje pripojenie aplikácie k internetu.
+\n<u>#2</u>: Blokuje pripojenie akejkoľvek aplikácie ku konkrétnej adrese IP.
+\n<u>#3</u>: Blokuje všetky pripojenia, keď je zariadenie uzamknuté (Universal Firewall).
+\n<u>#4</u>: Blokuje všetky nepoužívané aplikácie (Universal Firewall).
+\n<u>#5</u>: Blokuje pripojenia, keď je zdrojová aplikácia neznáma (Universal Firewall).
+\n<u>#6</u>: Blokuje všetku komunikáciu UDP okrem DNS (Universal Firewall).
+\n<u>#7</u>: Blokovať pripojenia pri obídení DNS (Universal Firewall).</string>
+</resources>
