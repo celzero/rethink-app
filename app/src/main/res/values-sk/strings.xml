@@ -255,4 +255,7 @@
     <string name="settings_lock_down_mode_desc" translatable="true">Niektoré možnosti sú vypnuté, keď je VPN v režime uzamknutia. <u>Pozrite si nastavenia VPN</u>.</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Nemožno nastaviť proxy servery, keď VPN beží v režime iba DNS.</string>
     <string name="settings_socks5_desc" translatable="true">Pošli pripojenia cez SOCKS5 zariadenie.</string>
+    <string name="settings_proxy_header" translatable="true">proxy</string>
+    <string name="settings_socks5_heading" translatable="true">Nastavenie SOCKS5 Proxy</string>
+    <string name="settings_https_heading" translatable="true">Nastavenie HTTP(S) Proxy</string>
 </resources>
