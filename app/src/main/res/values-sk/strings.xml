@@ -219,4 +219,13 @@
     <string name="download_update_dialog_failure_title" translatable="true">Niečo sa pokazilo</string>
     <string name="download_update_dialog_failure_message" translatable="true">Buď naše servery sú dole alebo pripojenie nemôže byť stanovená. Skúste prosím znova po nejakom čase.</string>
     <string name="download_update_dialog_trylater_title" translatable="true">Teraz sa nedá aktualizovať</string>
+    <string name="download_update_dialog_trylater_message" translatable="true">Aktualizácie nie je možné vykonať hneď, skúste to znova neskôr.</string>
+    <string name="search_firewall_network_log" translatable="true"><font size="12"> Hľadať aplikácie, IPs, domény</font></string>
+    <string name="search_dns_logs" translatable="true"><font size="12"> Hľadať názvy domén alebo IPs</font></string>
+    <string name="search_firewall_all_apps" translatable="true"><font size="12"> Hľadať aplikácie uid, názov</font></string>
+    <string name="search_universal_ips" translatable="true"><font size="12"> Hľadať IPs</font></string>
+    <string name="search_custom_domains" translatable="true"><font size="12">Hľadať názvy domén</font></string>
+    <string name="search_rethinkplus_file_tag" translatable="true"><font size="12"> Hľadať zoznamy</font></string>
+    <string name="search_proxy_add_apps" translatable="true">Hľadať aplikácie podľa názvu</string>
+    <string name="app_mode_dns_low_battery" translatable="true">DNS (battery saver)</string>
 </resources>
