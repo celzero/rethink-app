@@ -228,4 +228,12 @@
     <string name="search_rethinkplus_file_tag" translatable="true"><font size="12"> Hľadať blok listy</font></string>
     <string name="search_proxy_add_apps" translatable="true">Hľadať aplikácie podľa názvu</string>
     <string name="app_mode_dns_low_battery" translatable="true">DNS (šetrič batérie)</string>
+    <string name="app_mode_dns" translatable="true">DNS</string>
+    <string name="app_mode_firewall" translatable="true">Firewall</string>
+    <string name="app_mode_dns_firewall" translatable="true">DNS a Firewall (predvolené)</string>
+    <string name="app_mode_wireguard" translatable="true">VPN</string>
+    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="info_dialog_copy_toast_msg" translatable="true">IP adresa skopírovaná.</string>
+    <string name="info_dialog_url_copy_toast_msg" translatable="true">URL skopírované</string>
+    <string name="public_key_copy_toast_msg" translatable="true">Skopírovaný verejný kľúč.</string>
 </resources>
