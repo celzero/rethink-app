@@ -214,6 +214,6 @@
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
     <string name="blocklist_update_check_failure" translatable="true">Niečo sa pokazilo. Skúste to znova neskôr!</string>
     <string name="http_proxy_dialog_desc" translatable="true">Nastavte adresu URL formulára, &lt;protokol&gt;://&lt;používateľské meno&gt;:&lt;heslo&gt;@&lt;doména-alebo-ip&gt;:&lt;port&gt;&lt;cesta&gt;. Príklad: http://proxy.example.com:8080/</string>
-    <string name="download_update_dialog_message_ok" translatable="true">Už ste na najnovšiu verziu.</string>
-    <string name="download_update_dialog_message_success" translatable="true">Blocklist stiahnuť úspešné.</string>
+    <string name="download_update_dialog_message_ok" translatable="true">Už ste na najnovšej verzií.</string>
+    <string name="download_update_dialog_message_success" translatable="true">Blok list stiahnutý úspešné.</string>
 </resources>
