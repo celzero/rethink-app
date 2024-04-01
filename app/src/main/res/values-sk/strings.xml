@@ -290,4 +290,6 @@
     <string name="orbot_status_arg_2" translatable="true">TCP</string>
     <string name="orbot_install_dialog_positive" translatable="true">Inštalovať</string>
     <string name="orbot_install_dialog_neutral" translatable="true">webstránka</string>
+    <string name="orbot_no_app_toast" translatable="true">Pridajte aspoň jednu aplikáciu aby ste zapli Orbot</string>
+    <string name="settings_orbot_heading" translatable="true">Nastav Orbot</string>
 </resources>
