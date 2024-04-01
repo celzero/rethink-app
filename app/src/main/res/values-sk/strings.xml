@@ -289,4 +289,5 @@
 \n<u>HTTP Proxy</u>: Rethink <i>vytvorí</i> tunel HTTP CONNECT do Orbotu a pošle iba TCP spojenia <i>zahrnutých</i> aplikácií.</string>
     <string name="orbot_status_arg_2" translatable="true">TCP</string>
     <string name="orbot_install_dialog_positive" translatable="true">Inštalovať</string>
+    <string name="orbot_install_dialog_neutral" translatable="true">webstránka</string>
 </resources>
