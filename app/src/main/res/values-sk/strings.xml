@@ -295,5 +295,6 @@
     <string name="settings_orbot_header" translatable="true">Orbot ❯</string>
     <string name="settings_orbot_desc" translatable="true">Orbot v režime bez-vpn s HTTPS/SOCKS5.</string>
     <string name="settings_orbot_install_desc" translatable="true">Kliknite tu pre inštaláciu Orbot</string>
-    <string name="settings_socks5_disabled_error" translatable="true">Pripojené k %1$s. Vypnite ho a pokračujte.</string>
+    <string name="settings_socks5_disabled_error" translatable="true">Pripojené k %1$s. Vypnite to, aby ste mohli pokračovať.</string>
+    <string name="settings_socks5_vpn_disabled_error" translatable="true">Zapnite Rethink k pokračovaniu.</string>
 </resources>
