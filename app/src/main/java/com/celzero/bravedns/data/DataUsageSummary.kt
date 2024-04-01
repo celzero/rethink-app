@@ -15,4 +15,9 @@
  */
 package com.celzero.bravedns.data
 
-data class DataUsageSummary(val totalDownload: Long, val totalUpload: Long, val connectionsCount: Int, val meteredDataUsage: Long)
+data class DataUsageSummary(
+    val totalDownload: Long,
+    val totalUpload: Long,
+    val connectionsCount: Int,
+    val meteredDataUsage: Long
+)

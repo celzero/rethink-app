@@ -70,11 +70,13 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
         }
     }
 
-    private suspend fun getPaymentStatusFromServer(): TcpProxyHelper.PaymentStatus {
+    private suspend fun getPaymentStatusFromServer(
+        retryCount: Int = 0
+    ): TcpProxyHelper.PaymentStatus {
         var paymentStatus = TcpProxyHelper.PaymentStatus.INITIATED
         try {
             val retrofit =
-                RetrofitManager.getTcpProxyBaseBuilder()
+                RetrofitManager.getTcpProxyBaseBuilder(retryCount)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(ITcpProxy::class.java)
@@ -92,7 +94,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                 val status = jsonObject.optString(JSON_STATUS, "")
                 val paymentStatusString = jsonObject.optString(JSON_PAYMENT_STATUS, "")
                 paymentStatus =
-                    TcpProxyHelper.PaymentStatus.values().find { it.name == paymentStatusString }
+                    TcpProxyHelper.PaymentStatus.entries.find { it.name == paymentStatusString }
                         ?: TcpProxyHelper.PaymentStatus.NOT_PAID
                 Log.i(
                     Logger.LOG_TAG_PROXY,
@@ -101,6 +103,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                 if (paymentStatus.isPaid() || paymentStatus.isFailed()) {
                     TcpProxyHelper.updatePaymentStatus(paymentStatus)
                 }
+                return paymentStatus
             } else {
                 Log.w(
                     Logger.LOG_TAG_PROXY,
@@ -114,6 +117,18 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                 e
             )
         }
-        return paymentStatus
+        return if (
+            isRetryRequired(retryCount) && paymentStatus == TcpProxyHelper.PaymentStatus.INITIATED
+        ) {
+            Log.i(LOG_TAG_DOWNLOAD, "retrying the payment status check")
+            getPaymentStatusFromServer(retryCount + 1)
+        } else {
+            Log.i(LOG_TAG_DOWNLOAD, "retry count exceeded, returning null")
+            return paymentStatus
+        }
+    }
+
+    private fun isRetryRequired(retryCount: Int): Boolean {
+        return retryCount < RetrofitManager.Companion.OkHttpDnsType.entries.size - 1
     }
 }

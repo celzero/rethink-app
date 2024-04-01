@@ -40,6 +40,15 @@ enum class InternetProtocol(val id: Int) {
             }
         }
 
+        fun byProtos(has4: Boolean, has6: Boolean): InternetProtocol {
+            return when {
+                has4 && has6 -> IPv46
+                has4 -> IPv4
+                has6 -> IPv6
+                else -> IPv4
+            }
+        }
+
         fun isAuto(id: Int): Boolean {
             return id == IPv46.id
         }

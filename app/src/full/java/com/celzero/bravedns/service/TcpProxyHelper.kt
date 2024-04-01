@@ -17,6 +17,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.TcpProxyEndpoint
 import com.celzero.bravedns.database.TcpProxyRepository
 import com.celzero.bravedns.scheduler.PaymentWorker
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_PROXY
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -127,11 +128,11 @@ object TcpProxyHelper : KoinComponent {
         return dateFormat.format(date)
     }
 
-    suspend fun publicKeyUsable(): Boolean {
+    suspend fun publicKeyUsable(retryCount: Int = 0): Boolean {
         var works = false
         try {
             val retrofit =
-                RetrofitManager.getTcpProxyBaseBuilder()
+                RetrofitManager.getTcpProxyBaseBuilder(retryCount)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(ITcpProxy::class.java)
@@ -152,6 +153,7 @@ object TcpProxyHelper : KoinComponent {
                     LOG_TAG_PROXY,
                     "tcp response for ${response.raw().request.url}, works? $works, minVersionCode: $minVersionCode, publicKey: $publicKey"
                 )
+                return works
             } else {
                 Log.w(LOG_TAG_PROXY, "unsuccessful response for ${response?.raw()?.request?.url}")
             }
@@ -162,7 +164,18 @@ object TcpProxyHelper : KoinComponent {
                 e
             )
         }
-        return works
+
+        return if (isRetryRequired(retryCount) && !works) {
+            Log.i(Logger.LOG_TAG_DOWNLOAD, "retrying publicKeyUsable for $retryCount")
+            publicKeyUsable(retryCount + 1)
+        } else {
+            Log.i(Logger.LOG_TAG_DOWNLOAD, "retry count exceeded for publicKeyUsable")
+            works
+        }
+    }
+
+    private fun isRetryRequired(retryCount: Int): Boolean {
+        return retryCount < RetrofitManager.Companion.OkHttpDnsType.entries.size - 1
     }
 
     suspend fun isPaymentInitiated(): Boolean {

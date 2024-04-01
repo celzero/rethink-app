@@ -171,7 +171,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerDohConnections.layoutManager = layoutManager
 
-        recyclerAdapter = RethinkEndpointAdapter(requireContext(), viewLifecycleOwner, get())
+        recyclerAdapter = RethinkEndpointAdapter(requireContext(), get())
         viewModel.setFilter(uid)
         viewModel.rethinkEndpointList.observe(viewLifecycleOwner) {
             recyclerAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)

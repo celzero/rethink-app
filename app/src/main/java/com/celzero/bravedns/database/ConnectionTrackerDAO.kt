@@ -91,12 +91,12 @@ interface ConnectionTrackerDAO {
     @Query(
         "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, '' as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid GROUP BY ipAddress, uid, port ORDER BY count DESC"
     )
-    fun getLogsForApp(uid: Int): PagingSource<Int, AppConnection>
+    fun getAllLogs(uid: Int): PagingSource<Int, AppConnection>
 
     @Query(
-        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, '' as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and ipAddress like :ipAddress GROUP BY ipAddress, uid, port ORDER BY count DESC"
+        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, '' as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and ipAddress like :query GROUP BY ipAddress, uid, port ORDER BY count DESC"
     )
-    fun getLogsForAppFiltered(uid: Int, ipAddress: String): PagingSource<Int, AppConnection>
+    fun getAllLogsFiltered(uid: Int, query: String): PagingSource<Int, AppConnection>
 
     @Query("select count(DISTINCT(ipAddress)) from ConnectionTracker where uid = :uid")
     fun getAppConnectionsCount(uid: Int): LiveData<Int>

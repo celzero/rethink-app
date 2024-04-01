@@ -510,8 +510,7 @@ internal constructor(
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
             val name: CharSequence = ctx.getString(R.string.notif_channel_firewall_alerts)
-            val description =
-                ctx.resources.getString(R.string.notif_channel_desc_firewall_alerts)
+            val description = ctx.resources.getString(R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
@@ -521,13 +520,9 @@ internal constructor(
             builder = NotificationCompat.Builder(ctx, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         }
 
-        val contentTitle: String =
-            ctx.resources.getString(R.string.new_app_bulk_notification_title)
+        val contentTitle: String = ctx.resources.getString(R.string.new_app_bulk_notification_title)
         val contentText: String =
-            ctx.resources.getString(
-                R.string.new_app_bulk_notification_content,
-                appSize.toString()
-            )
+            ctx.resources.getString(R.string.new_app_bulk_notification_content, appSize.toString())
 
         builder
             .setSmallIcon(R.drawable.ic_notification_icon)
@@ -536,8 +531,7 @@ internal constructor(
             .setContentText(contentText)
 
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        builder.color =
-            ContextCompat.getColor(ctx, UIUtils.getAccentColor(persistentState.theme))
+        builder.color = ContextCompat.getColor(ctx, UIUtils.getAccentColor(persistentState.theme))
 
         // Secret notifications are not shown on the lock screen.  No need for this app to show
         // there.
@@ -594,8 +588,7 @@ internal constructor(
         val builder: NotificationCompat.Builder
         if (isAtleastO()) {
             val name: CharSequence = ctx.getString(R.string.notif_channel_firewall_alerts)
-            val description =
-                ctx.resources.getString(R.string.notif_channel_desc_firewall_alerts)
+            val description = ctx.resources.getString(R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
@@ -616,8 +609,7 @@ internal constructor(
             .setContentText(contentText)
 
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        builder.color =
-            ContextCompat.getColor(ctx, UIUtils.getAccentColor(persistentState.theme))
+        builder.color = ContextCompat.getColor(ctx, UIUtils.getAccentColor(persistentState.theme))
 
         val openIntent1 =
             makeNewAppVpnIntent(
@@ -668,8 +660,7 @@ internal constructor(
             )
         if (isAtleastO()) {
             val name: CharSequence = ctx.getString(R.string.notif_channel_firewall_alerts)
-            val description =
-                ctx.resources.getString(R.string.notif_channel_desc_firewall_alerts)
+            val description = ctx.resources.getString(R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
@@ -686,8 +677,7 @@ internal constructor(
             .setContentIntent(pendingIntent)
             .setContentText(contentText)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        builder.color =
-            ContextCompat.getColor(ctx, UIUtils.getAccentColor(persistentState.theme))
+        builder.color = ContextCompat.getColor(ctx, UIUtils.getAccentColor(persistentState.theme))
         val openIntent =
             makeVpnIntent(NOTIF_ID_LOAD_RULES_FAIL, Constants.NOTIF_ACTION_RULES_FAILURE)
         val notificationAction: NotificationCompat.Action =
@@ -774,8 +764,7 @@ internal constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     private fun appInfoCategory(ai: ApplicationInfo): String {
         val cat = ApplicationInfo.getCategoryTitle(ctx, ai.category)
-        return cat?.toString()
-            ?: ctx.getString(FirewallManager.CategoryConstants.OTHER.nameResId)
+        return cat?.toString() ?: ctx.getString(FirewallManager.CategoryConstants.OTHER.nameResId)
     }
 
     private fun replaceUnderscore(s: String): String {

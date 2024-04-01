@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -41,16 +42,18 @@ import com.celzero.bravedns.util.UIUtils.getDnsStatusStringRes
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ODoHEndpointAdapter(
-    private val context: Context,
-    private val lifecycleOwner: LifecycleOwner,
-    private val appConfig: AppConfig
-) : PagingDataAdapter<ODoHEndpoint, ODoHEndpointAdapter.ODoHEndpointViewHolder>(DIFF_CALLBACK) {
+class ODoHEndpointAdapter(private val context: Context, private val appConfig: AppConfig) :
+    PagingDataAdapter<ODoHEndpoint, ODoHEndpointAdapter.ODoHEndpointViewHolder>(DIFF_CALLBACK) {
+
+    var lifecycleOwner: LifecycleOwner? = null
 
     companion object {
+        private const val ONE_SEC = 1000L
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<ODoHEndpoint>() {
                 override fun areItemsTheSame(
@@ -74,6 +77,7 @@ class ODoHEndpointAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ODoHEndpointViewHolder {
         val itemBinding =
             ListItemEndpointBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        lifecycleOwner = parent.findViewTreeLifecycleOwner()
         return ODoHEndpointViewHolder(itemBinding)
     }
 
@@ -84,6 +88,7 @@ class ODoHEndpointAdapter(
 
     inner class ODoHEndpointViewHolder(private val b: ListItemEndpointBinding) :
         RecyclerView.ViewHolder(b.root) {
+        private var statusCheckJob: Job? = null
 
         fun update(endpoint: ODoHEndpoint) {
             displayDetails(endpoint)
@@ -98,23 +103,39 @@ class ODoHEndpointAdapter(
 
         private fun displayDetails(endpoint: ODoHEndpoint) {
             b.endpointName.text = endpoint.name
-            b.endpointDesc.text = ""
             b.endpointCheck.isChecked = endpoint.isSelected
-            Log.i(
-                LOG_TAG_DNS,
-                "connected to ODoH: ${endpoint.name} isSelected? ${endpoint.isSelected}"
-            )
             if (endpoint.isSelected) {
-                // update the status after 1 second
-                val scope = (context as LifecycleOwner).lifecycleScope
-                Utilities.delay(1000L, scope) { updateSelectedStatus() }
+                keepSelectedStatusUpdated()
+            } else {
+                b.endpointDesc.text = ""
             }
 
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)
         }
 
+        private fun keepSelectedStatusUpdated() {
+            statusCheckJob = ui {
+                while (true) {
+                    updateSelectedStatus()
+                    delay(ONE_SEC)
+                }
+            }
+        }
+
         private fun updateSelectedStatus() {
+            // if the view is not active then cancel the job
+            if (
+                lifecycleOwner
+                    ?.lifecycle
+                    ?.currentState
+                    ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false ||
+                    bindingAdapterPosition == RecyclerView.NO_POSITION
+            ) {
+                statusCheckJob?.cancel()
+                return
+            }
+
             // always use the id as Dnsx.Preffered as it is the primary dns id for now
             val state = VpnController.getDnsStatus(Backend.Preferred)
             val status = getDnsStatusStringRes(state)
@@ -233,8 +254,12 @@ class ODoHEndpointAdapter(
             withContext(Dispatchers.Main) { f() }
         }
 
+        private fun ui(f: suspend () -> Unit): Job? {
+            return lifecycleOwner?.lifecycleScope?.launch { withContext(Dispatchers.Main) { f() } }
+        }
+
         private fun io(f: suspend () -> Unit) {
-            lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+            lifecycleOwner?.lifecycleScope?.launch { withContext(Dispatchers.IO) { f() } }
         }
     }
 }

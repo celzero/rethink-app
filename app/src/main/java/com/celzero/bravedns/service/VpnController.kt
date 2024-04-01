@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import backend.RDNS
 import com.celzero.bravedns.R
+import com.celzero.bravedns.service.BraveVPNService.Companion.FAIL_OPEN_ON_NO_NETWORK
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
@@ -43,6 +44,8 @@ object VpnController : KoinComponent {
     private var connectionState: BraveVPNService.State? = null
     private val persistentState by inject<PersistentState>()
     private var states: Channel<BraveVPNService.State?>? = null
+    private var protocol: Pair<Boolean, Boolean> = Pair(false, false)
+
     var controllerScope: CoroutineScope? = null
         private set
 
@@ -207,25 +210,45 @@ object VpnController : KoinComponent {
         return braveVpnService?.getProxyStatusById(id)
     }
 
+    fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean> {
+        return braveVpnService?.getSupportedIpVersion(id) ?: Pair(false, false)
+    }
+
+    fun isSplitTunnelProxy(id: String, pair: Pair<Boolean, Boolean>): Boolean {
+        return braveVpnService?.isSplitTunnelProxy(id, pair) ?: false
+    }
+
     suspend fun syncP50Latency(id: String) {
         braveVpnService?.syncP50Latency(id)
     }
 
     fun protocols(): String {
-        val ipv4Size = braveVpnService?.underlyingNetworks?.ipv4Net?.size ?: -1
-        val ipv6Size = braveVpnService?.underlyingNetworks?.ipv6Net?.size ?: -1
-        Log.d(LOG_TAG_VPN, "protocols - ipv4Size: $ipv4Size, ipv6Size: $ipv6Size")
-        return if (ipv4Size >= 1 && ipv6Size >= 1) {
+        val ipv4 = protocol.first
+        val ipv6 = protocol.second
+        Log.d(LOG_TAG_VPN, "protocols - ipv4: $ipv4, ipv6: $ipv6")
+        return if (ipv4 && ipv6) {
             "IPv4, IPv6"
-        } else if (ipv6Size >= 1) {
+        } else if (ipv6) {
             "IPv6"
-        } else if (ipv4Size >= 1) {
+        } else if (ipv4) {
             "IPv4"
         } else {
-            // if there are zero ipv4 and ipv6 networks, then we are failing open
-            // see: BraveVpnService#establishVpn
-            "IPv4, IPv6"
+            // if both are false, then return based on the FAIL_OPEN_ON_NO_NETWORK value
+            if (FAIL_OPEN_ON_NO_NETWORK) {
+                "IPv4, IPv6"
+            } else {
+                ""
+            }
         }
+    }
+
+    fun updateProtocol(proto: Pair<Boolean, Boolean>) {
+        if (!proto.first && !proto.second) {
+            Log.i(LOG_TAG_VPN, "both v4 and v6 false, setting $FAIL_OPEN_ON_NO_NETWORK")
+            protocol = Pair(FAIL_OPEN_ON_NO_NETWORK, FAIL_OPEN_ON_NO_NETWORK)
+            return
+        }
+        protocol = proto
     }
 
     fun mtu(): Int {
@@ -265,10 +288,6 @@ object VpnController : KoinComponent {
 
     fun refreshProxies() {
         braveVpnService?.refreshProxies()
-    }
-
-    fun updateWireGuardConfig() {
-        braveVpnService?.updateWireGuardConfig()
     }
 
     fun closeConnectionsIfNeeded(uid: Int = INVALID_UID) {

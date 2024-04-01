@@ -35,18 +35,19 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
 
     private var filteredList: MutableLiveData<String> = MutableLiveData()
     private var filterType = DnsLogFragment.DnsLogFilter.ALL
-    private val pagingConfig =
-        PagingConfig(
-            enablePlaceholders = true,
-            prefetchDistance = 3,
-            initialLoadSize = LIVEDATA_PAGE_SIZE * 2,
-            maxSize = LIVEDATA_PAGE_SIZE * 2,
-            pageSize = LIVEDATA_PAGE_SIZE,
-            jumpThreshold = 5
-        )
+    private val pagingConfig: PagingConfig
 
     init {
         filteredList.value = ""
+        pagingConfig =
+            PagingConfig(
+                enablePlaceholders = true,
+                prefetchDistance = 3,
+                initialLoadSize = LIVEDATA_PAGE_SIZE * 2,
+                maxSize = LIVEDATA_PAGE_SIZE * 3,
+                pageSize = LIVEDATA_PAGE_SIZE * 2,
+                jumpThreshold = 5
+            )
     }
 
     val dnsLogsList = filteredList.switchMap { input -> fetchDnsLogs(input) }

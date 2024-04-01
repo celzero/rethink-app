@@ -37,15 +37,79 @@
                 android:orientation="vertical"
                 android:padding="5dp">
 
-                <TextView
-                    android:id="@+id/interface_name_text"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="3dp"
-                    android:layout_marginEnd="3dp"
-                    android:padding="5dp"
-                    android:textAppearance="?attr/textAppearanceHeadline6"
-                    android:textColor="?attr/secondaryTextColor" />
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/interface_name_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="3dp"
+                        android:layout_marginEnd="3dp"
+                        android:maxLength="15"
+                        android:ellipsize="end"
+                        android:padding="5dp"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textColor="?attr/secondaryTextColor" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/protocol_info_chip_group"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="3dp"
+                        android:layout_marginEnd="5dp"
+                        android:paddingBottom="2dp"
+                        android:visibility="gone">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/protocol_info_chip_ipv4"
+                            style="@style/ThinnerChip.Action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.8"
+                            android:checked="true"
+                            android:text="@string/settings_ip_text_ipv4"
+                            android:textAlignment="center"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/small_font_text_view"
+                            app:chipStrokeColor="?attr/accentGood"
+                            app:chipStrokeWidth="1.5dp" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/protocol_info_chip_ipv6"
+                            style="@style/ThinnerChip.Action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.8"
+                            android:checked="true"
+                            android:text="@string/settings_ip_text_ipv6"
+                            android:textAlignment="center"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/small_font_text_view"
+                            app:chipStrokeColor="?attr/accentGood"
+                            app:chipStrokeWidth="1.5dp" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_split_tunnel"
+                            style="@style/ThinnerChip.Action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.8"
+                            android:checked="true"
+                            android:text="@string/lbl_split"
+                            android:textAlignment="center"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/small_font_text_view"
+                            app:chipStrokeColor="?attr/accentGood"
+                            app:chipStrokeWidth="1.5dp" />
+
+                    </com.google.android.material.chip.ChipGroup>
+
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/interface_status"
@@ -55,7 +119,9 @@
                     android:layout_marginEnd="5dp"
                     android:padding="5dp"
                     android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/default_font_text_view" />
+                    android:textSize="@dimen/default_font_text_view"
+                    android:visibility="gone"
+                    android:textStyle="italic" />
 
                 <TextView
                     android:id="@+id/interface_apps_count"
@@ -68,26 +134,26 @@
                     android:textSize="@dimen/default_font_text_view" />
 
                 <TextView
-                    android:id="@+id/interface_lockdown"
+                    android:id="@+id/interface_config_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
                     android:layout_marginEnd="5dp"
                     android:padding="5dp"
-                    android:visibility="gone"
                     android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/default_font_text_view" />
+                    android:textSize="@dimen/default_font_text_view"
+                    android:visibility="gone" />
 
                 <TextView
-                    android:id="@+id/interface_catch_all"
+                    android:id="@+id/interface_active_uptime"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
                     android:layout_marginEnd="5dp"
                     android:padding="5dp"
-                    android:visibility="gone"
                     android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/default_font_text_view" />
+                    android:textSize="@dimen/default_font_text_view"
+                    android:visibility="gone" />
 
             </LinearLayout>
 

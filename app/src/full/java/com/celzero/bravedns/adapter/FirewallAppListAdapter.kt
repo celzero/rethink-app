@@ -107,6 +107,8 @@ class FirewallAppListAdapter(
                     if (appInfo.packageName == context.packageName) {
                         b.firewallAppToggleWifi.visibility = View.GONE
                         b.firewallAppToggleMobileData.visibility = View.GONE
+                        b.firewallAppToggleOther.text =
+                            context.getString(R.string.firewall_status_allow)
                         return@uiCtx
                     }
 

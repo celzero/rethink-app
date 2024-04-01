@@ -121,6 +121,7 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/global_lockdown_title_tv"
                                 style="@style/TextAppearance.AppCompat.Subhead"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -165,6 +166,7 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/catch_all_title_tv"
                                 style="@style/TextAppearance.AppCompat.Subhead"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -288,7 +290,6 @@
                         android:layout_marginTop="8dp"
                         android:labelFor="@+id/config_public_key_text"
                         android:text="@string/lbl_public_key"
-                        android:textColor="?attr/primaryTextColor"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/config_title_layout" />
 
@@ -309,7 +310,6 @@
                         android:layout_marginTop="8dp"
                         android:labelFor="@+id/config_addresses_text"
                         android:text="@string/lbl_addresses"
-                        android:textColor="?attr/primaryTextColor"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/public_key_text" />
 

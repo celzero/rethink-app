@@ -55,6 +55,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val PRIVATE_IPS = "private_ips"
         const val RETHINK_IN_RETHINK = "route_rethink_in_rethink"
         const val PREVENT_DNS_LEAKS = "prevent_dns_leaks"
+        const val CONNECTIVITY_CHECKS = "connectivity_check"
+        const val NOTIFICATION_PERMISSION = "notification_permission_request"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -244,9 +246,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // enable dns alg
     var enableDnsAlg by booleanPref("dns_alg").withDefault<Boolean>(false)
 
-    // dns crypt relay server
-    var dnscryptRelays by stringPref("dnscrypt_relay").withDefault<String>("")
-
     // default dns url
     var defaultDnsUrl by stringPref("default_dns_query").withDefault<String>("")
 
@@ -270,6 +269,13 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // route rethink in rethink
     var routeRethinkInRethink by booleanPref("route_rethink_in_rethink").withDefault<Boolean>(false)
+
+    // perform connectivity checks
+    var connectivityChecks by
+        booleanPref("connectivity_check").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
+
+    // proxy dns requests over proxy
+    var proxyDns by booleanPref("proxy_dns").withDefault<Boolean>(true)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()

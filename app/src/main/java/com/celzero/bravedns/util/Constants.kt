@@ -49,6 +49,8 @@ class Constants {
         const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_1 = "update"
         const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_2 = "blocklists"
 
+        const val RETHINK_PACKAGE = "com.celzero.bravedns"
+
         // url to check to check the if there is update available for on-device blocklist
         const val ONDEVICE_IPDB_UPDATE_CHECK_URL =
             "$DOWNLOAD_BASE_URL/update/geoip?$RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER"
@@ -168,13 +170,13 @@ class Constants {
         const val SEARCH_QUERY = "search_query"
 
         // default custom http proxy port number
-        const val HTTP_PROXY_PORT = "8118"
+        const val HTTP_PROXY_PORT = 8118
 
         // default custom socks5 ip
         const val SOCKS_DEFAULT_IP = "127.0.0.1"
 
         // default custom socks5 port
-        const val SOCKS_DEFAULT_PORT = "9050"
+        const val SOCKS_DEFAULT_PORT = 9050
 
         // constants to send type of proxy: for socks5
         const val SOCKS = "Socks5"
@@ -284,11 +286,12 @@ class Constants {
         const val BLOCK_FREE_DNS_MAX = "https://max.rethinkdns.com/dns-query"
         const val BLOCK_FREE_DNS_SKY = "https://sky.rethinkdns.com/dns-query"
 
+        // all fallback dns servers should have the corresponding ip address in servers.xml
         val DEFAULT_DNS_LIST =
             listOf(
                 DefaultDnsServer(0, "None", "", "None"),
                 DefaultDnsServer(1, "Rethink", "https://zero.rethinkdns.com/dns-query", "DoH"),
-                DefaultDnsServer(2, "Google", "https://dns.google.com/dns-query", "DoH"),
+                DefaultDnsServer(2, "Google", "https://dns.google/dns-query", "DoH"),
                 DefaultDnsServer(3, "Cloudflare", "https://cloudflare-dns.com/dns-query", "DoH")
             )
 

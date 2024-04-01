@@ -325,10 +325,7 @@ object Utilities {
                         PackageManager.PackageInfoFlags.of(PackageManager.GET_META_DATA.toLong())
                     )
                 } else {
-                    ctx.packageManager.getPackageInfo(
-                        ctx.packageName,
-                        PackageManager.GET_META_DATA
-                    )
+                    ctx.packageManager.getPackageInfo(ctx.packageName, PackageManager.GET_META_DATA)
                 }
             ) {
                 return firstInstallTime == lastUpdateTime
@@ -782,6 +779,8 @@ object Utilities {
     }
 
     fun isNetworkSame(n1: Network?, n2: Network?): Boolean {
-        return n1?.networkHandle == n2?.networkHandle
+        if (n1 == null || n2 == null) return false
+
+        return n1.networkHandle == n2.networkHandle
     }
 }

@@ -199,8 +199,11 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     private fun applyIpRule(status: IpRulesManager.IpRuleStatus) {
         Log.i(Logger.LOG_TAG_FIREWALL, "ip rule for uid: $uid, ip: $ipAddress (${status.name})")
         ipRule = status
+        val ipPair = IpRulesManager.getIpNetPort(ipAddress)
+        val ip = ipPair.first ?: return
+
         // set port number as null for all the rules applied from this screen
-        io { IpRulesManager.addIpRule(uid, ipAddress, null, status) }
+        io { IpRulesManager.addIpRule(uid, ip, null, status) }
     }
 
     override fun onDismiss(dialog: DialogInterface) {

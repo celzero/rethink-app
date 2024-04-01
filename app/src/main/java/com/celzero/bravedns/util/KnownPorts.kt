@@ -23,6 +23,7 @@ class KnownPorts {
         private const val NTP_PORT: Int = 123
         const val HTTP_PORT: Int = 80
         const val HTTPS_PORT: Int = 443
+        const val DOT_PORT: Int = 853
 
         // represents the unknown port in the port map. see class KnownPorts
         const val PORT_VAL_UNKNOWN = "unknown"
@@ -35,11 +36,15 @@ class KnownPorts {
         }
 
         fun isNtp(port: Int): Boolean {
-            return portMap[port] == portMap[NTP_PORT]
+            return port == NTP_PORT
         }
 
-        fun isDns(port: Int): Boolean {
-            return portMap[port] == portMap[DNS_PORT]
+        fun isDns(port: Int?): Boolean {
+            return port == DNS_PORT
+        }
+
+        fun isDoT(port: Int): Boolean {
+            return port == DOT_PORT
         }
 
         // init hash map with reserved ports (1-1024) and protocol identifiers

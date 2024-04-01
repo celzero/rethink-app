@@ -30,7 +30,6 @@ import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
-import java.io.IOException
 
 class BlocklistDownloadHelper {
 
@@ -145,10 +144,14 @@ class BlocklistDownloadHelper {
         ): BlocklistUpdateServerResponse? {
             try {
                 val retrofit =
-                    RetrofitManager.getBlocklistBaseBuilder()
+                    RetrofitManager.getBlocklistBaseBuilder(retryCount)
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()
                 val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
+                Log.i(
+                    LOG_TAG_DOWNLOAD,
+                    "downloadAvailabilityCheck: ${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_1}, ${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_2}, $vcode, $timestamp"
+                )
                 val response =
                     retrofitInterface.downloadAvailabilityCheck(
                         Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_1,
@@ -163,26 +166,26 @@ class BlocklistDownloadHelper {
                 if (response?.isSuccessful == true) {
                     val r = response.body()?.toString()?.let { JSONObject(it) }
                     return processCheckDownloadResponse(r)
-                } else {
-                    retryIfRequired(timestamp, vcode, retryCount)
                 }
-            } catch (ignored: Exception) {
-                Log.w(
-                    LOG_TAG_DOWNLOAD,
-                    "exception in checkBlocklistUpdate: ${ignored.message}",
-                    ignored
-                )
-                retryIfRequired(timestamp, vcode, retryCount)
+            } catch (ex: Exception) {
+                Log.e(LOG_TAG_DOWNLOAD, "exception in checkBlocklistUpdate: ${ex.message}", ex)
+                Log.d(LOG_TAG_DOWNLOAD, "Ex: $ex", RuntimeException())
             }
-            return null
+            Log.i(
+                LOG_TAG_DOWNLOAD,
+                "downloadAvailabilityCheck: failed, returning null, $retryCount"
+            )
+            return if (isRetryRequired(retryCount)) {
+                Log.i(LOG_TAG_DOWNLOAD, "retrying the downloadAvailabilityCheck")
+                checkBlocklistUpdate(timestamp, vcode, retryCount + 1)
+            } else {
+                Log.i(LOG_TAG_DOWNLOAD, "retry count exceeded, returning null")
+                null
+            }
         }
 
-        private suspend fun retryIfRequired(timestamp: Long, vcode: Int, retryCount: Int) {
-            if (retryCount > 3) {
-                return
-            }
-
-            checkBlocklistUpdate(timestamp, vcode, retryCount + 1)
+        private fun isRetryRequired(retryCount: Int): Boolean {
+            return retryCount < RetrofitManager.Companion.OkHttpDnsType.entries.size - 1
         }
 
         private fun processCheckDownloadResponse(
@@ -207,8 +210,9 @@ class BlocklistDownloadHelper {
 
                 return BlocklistUpdateServerResponse(version, shouldUpdate, timestamp)
             } catch (e: JSONException) {
-                throw IOException()
+                Log.e(LOG_TAG_DOWNLOAD, "Error in parsing the response: ${e.message}", e)
             }
+            return null
         }
 
         fun getDownloadableTimestamp(response: BlocklistUpdateServerResponse): Long {

@@ -370,6 +370,14 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun removeThisMethod() {
+        // change the persistent state for defaultDnsUrl, if its google.com (only for v055d)
+        // fixme: remove this post v054.
+        // this is to fix the default dns url, as the default dns url is changed from
+        // dns.google.com to dns.google. In servers.xml default ips available for dns.google
+        // so changing the default dns url to dns.google
+        if (persistentState.defaultDnsUrl.contains("dns.google.com")) {
+            persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[2].url
+        }
         moveRemoteBlocklistFileFromAsset()
         // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
         // to SystemClock.elapsedRealtime

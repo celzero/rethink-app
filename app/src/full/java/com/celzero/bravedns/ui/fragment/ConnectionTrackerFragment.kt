@@ -36,6 +36,7 @@ import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel.TopLevelFilter
 import com.google.android.material.chip.Chip
@@ -247,8 +248,12 @@ class ConnectionTrackerFragment :
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        this.filterQuery = query
-        viewModel.setFilter(query, filterCategories, filterType)
+        Utilities.delay(500, lifecycleScope) {
+            if (this.isAdded) {
+                this.filterQuery = query
+                viewModel.setFilter(query, filterCategories, filterType)
+            }
+        }
         return true
     }
 

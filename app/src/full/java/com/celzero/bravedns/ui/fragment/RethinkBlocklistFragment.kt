@@ -203,6 +203,15 @@ class RethinkBlocklistFragment :
     private fun init() {
         modifiedStamp = getStamp()
 
+        val typeName =
+            if (type.isLocal()) {
+                getString(R.string.lbl_on_device)
+            } else {
+                getString(R.string.rdns_plus)
+            }
+        b.lbBlocklistApplyBtn.text =
+            getString(R.string.ct_ip_details, getString(R.string.lbl_apply), typeName)
+
         updateFileTagList(emptySet())
 
         // update ui based on blocklist availability

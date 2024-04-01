@@ -78,14 +78,14 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -185,6 +185,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         b.fhsSponsor.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
+            startActivity(intent)
+        }
+
+        b.fhsTitleRethink.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
             startActivity(intent)
         }
@@ -392,7 +397,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 val status = VpnController.getProxyStatusById(proxyId)
                 if (status != null) {
                     // consider starting and up as active
-                    if (status == Backend.TOK || status == Backend.TUP) {
+                    if (status == Backend.TOK || status == Backend.TUP || status == Backend.TZZ) {
                         active++
                     } else {
                         failing++
@@ -511,40 +516,48 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
     }
 
-    private var retryCountForDnsStatus: Int = 0
-
     private fun updateUiWithDnsStates(dnsName: String) {
+        var dns = dnsName
+        val preferredId = if (appConfig.isSystemDns()) Backend.System else Backend.Preferred
         // get the status from go to check if the dns transport is added or not
         val id =
             if (WireguardManager.oneWireGuardEnabled()) {
-                val id = WireguardManager.getOneWireGuardProxyId() ?: Backend.Preferred
-                "${ProxyManager.ID_WG_BASE}${id}"
+                val id = WireguardManager.getOneWireGuardProxyId()
+                if (id == null) {
+                    preferredId
+                } else {
+                    dns = getString(R.string.lbl_wireguard)
+                    "${ProxyManager.ID_WG_BASE}${id}"
+                }
             } else {
-                Backend.Preferred
+                preferredId
             }
 
         if (VpnController.isOn()) {
-            val status = VpnController.getDnsStatus(id)
-            // status null means the dns transport is not available / different id is usedE
-            if (status == null) {
-                if (retryCountForDnsStatus < 5) {
-                    retryCountForDnsStatus++
-                    delay(TimeUnit.SECONDS.toMillis(1), lifecycleScope) {
+            ui("dnsStatusCheck") {
+                var failing = false
+                repeat(5) {
+                    val status = VpnController.getDnsStatus(id)
+                    if (status != null) {
+                        failing = false
                         if (isAdded) {
-                            updateUiWithDnsStates(dnsName)
+                            b.fhsCardDnsLatency.visibility = View.VISIBLE
+                            b.fhsCardDnsFailure.visibility = View.GONE
                         }
+                        return@ui
                     }
+                    // status null means the dns transport is not active / different id is used
+                    kotlinx.coroutines.delay(1000L)
+                    failing = true
                 }
-                b.fhsCardDnsLatency.visibility = View.GONE
-                b.fhsCardDnsFailure.visibility = View.VISIBLE
-                b.fhsCardDnsFailure.text = getString(R.string.failed_using_default)
-                b.fhsCardDnsLatency.isSelected = true
-            } else {
-                b.fhsCardDnsLatency.visibility = View.VISIBLE
-                b.fhsCardDnsFailure.visibility = View.GONE
+                if (failing && isAdded) {
+                    b.fhsCardDnsLatency.visibility = View.GONE
+                    b.fhsCardDnsFailure.visibility = View.VISIBLE
+                    b.fhsCardDnsFailure.text = getString(R.string.failed_using_default)
+                }
             }
         }
-        b.fhsCardDnsConnectedDns.text = dnsName
+        b.fhsCardDnsConnectedDns.text = dns
         b.fhsCardDnsConnectedDns.isSelected = true
     }
 
@@ -895,7 +908,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             return
         }
 
-        if (isRethinkDnsActive()) {
+        if (canStartRethinkActivity()) {
             // no need to pass value in intent, as default load to Rethink remote
             startActivity(ScreenType.RETHINK, screenToLoad)
             return
@@ -905,9 +918,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         return
     }
 
-    private fun isRethinkDnsActive(): Boolean {
+    private fun canStartRethinkActivity(): Boolean {
         val dns = appConfig.getDnsType()
-        return dns.isRethinkRemote()
+        return dns.isRethinkRemote() && !WireguardManager.oneWireGuardEnabled()
     }
 
     private fun showPrivateDnsDialog() {
@@ -1091,10 +1104,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // Sets up permissions request launcher.
         notificationPermissionResult =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                persistentState.shouldRequestNotificationPermission = it
                 if (it) {
                     Log.i(LOG_TAG_UI, "User accepted notification permission")
                 } else {
-                    persistentState.shouldRequestNotificationPermission = false
                     Log.w(LOG_TAG_UI, "User rejected notification permission")
                     Snackbar.make(
                             requireActivity().findViewById<View>(android.R.id.content).rootView,

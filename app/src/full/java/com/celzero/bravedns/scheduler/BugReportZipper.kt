@@ -46,7 +46,7 @@ object BugReportZipper {
     private const val BUG_REPORT_FILE_NAME = "bugreport_"
 
     // maximum number of files allowed as part of bugreport zip file
-    private const val BUG_REPORT_MAX_FILES_ALLOWED = 10
+    private const val BUG_REPORT_MAX_FILES_ALLOWED = 30
 
     // secure sharing of files associated with an app, used in share bugreport file feature
     const val FILE_PROVIDER_NAME = BuildConfig.APPLICATION_ID + ".provider"
@@ -80,10 +80,10 @@ object BugReportZipper {
         return try {
             ZipFile(getZipFileName(dir))
         } catch (e: FileNotFoundException) {
-            Log.e(LOG_TAG_SCHEDULER, "File not found exception while creating zip file", e)
+            Log.w(LOG_TAG_SCHEDULER, "File not found exception while creating zip file", e)
             null
         } catch (e: ZipException) {
-            Log.e(LOG_TAG_SCHEDULER, "Zip exception while creating zip file", e)
+            Log.w(LOG_TAG_SCHEDULER, "Zip exception while creating zip file", e)
             null
         }
     }
@@ -196,7 +196,7 @@ object BugReportZipper {
     @RequiresApi(Build.VERSION_CODES.R)
     fun dumpAppExit(aei: ApplicationExitInfo, file: File) {
         val reportDetails =
-            "${aei.packageUid},${aei.reason},${aei.description},${aei.importance},${aei.pss},${aei.rss},${
+            "${aei.packageUid}, reason: ${aei.reason}, desc: ${aei.description}, imp: ${aei.importance}, pss: ${aei.pss}, rss: ${aei.rss},${
             Utilities.convertLongToTime(aei.timestamp, Constants.TIME_FORMAT_3)
         }\n"
         file.appendText(reportDetails)

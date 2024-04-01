@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
+// should this be replaced with developer.android.com/reference/android/os/CountDownTimer?
 object PauseTimer {
 
     // default duration for pause state: 15mins
@@ -85,7 +86,5 @@ object PauseTimer {
         return pauseCountDownTimer
     }
 
-    private fun io(f: suspend () -> Unit) = CoroutineScope(Dispatchers.IO).launch {
-        f()
-    }
+    private fun io(f: suspend () -> Unit) = CoroutineScope(Dispatchers.IO).launch { f() }
 }

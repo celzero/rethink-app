@@ -106,13 +106,17 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
                 b.queryLogIndicator.setBackgroundColor(
                     ContextCompat.getColor(context, R.color.colorRed_A400)
                 )
-            } else if (dnsLog.blockLists.isNotEmpty()) {
+            } else if (determineMaybeBlocked(dnsLog)) {
                 b.queryLogIndicator.visibility = View.VISIBLE
                 val color = fetchColor(context, R.attr.chipTextNeutral)
                 b.queryLogIndicator.setBackgroundColor(color)
             } else {
                 b.queryLogIndicator.visibility = View.INVISIBLE
             }
+        }
+
+        private fun determineMaybeBlocked(dnsLog: DnsLog): Boolean {
+            return dnsLog.upstreamBlock || dnsLog.blockLists.isNotEmpty()
         }
 
         private fun displayIcon(dnsLog: DnsLog) {
@@ -153,7 +157,7 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
 
         private fun openBottomSheet(dnsLog: DnsLog) {
             if (context !is FragmentActivity) {
-                Log.wtf(
+                Log.w(
                     Logger.LOG_TAG_UI,
                     "Can not open bottom sheet. Context is not attached to activity"
                 )

@@ -17,12 +17,15 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
+import android.os.SystemClock
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -41,13 +44,22 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class OneWgConfigAdapter(private val context: Context) :
+class OneWgConfigAdapter(private val context: Context, private val listener: DnsStatusListener) :
     PagingDataAdapter<WgConfigFiles, OneWgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
 
+    private var lifecycleOwner: LifecycleOwner? = null
+
+    interface DnsStatusListener {
+        fun onDnsStatusChanged()
+    }
+
     companion object {
+        private const val ONE_SEC = 1000L
 
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
@@ -83,95 +95,174 @@ class OneWgConfigAdapter(private val context: Context) :
                 parent,
                 false
             )
+        lifecycleOwner = parent.findViewTreeLifecycleOwner()
         return WgInterfaceViewHolder(itemBinding)
     }
 
     inner class WgInterfaceViewHolder(private val b: ListItemWgOneInterfaceBinding) :
         RecyclerView.ViewHolder(b.root) {
+        private var statusCheckJob: Job? = null
 
         fun update(config: WgConfigFiles) {
             b.interfaceNameText.text = config.name
             b.oneWgCheck.isChecked = config.isActive
             updateStatus(config)
             setupClickListeners(config)
-        }
-
-        private fun updateStatus(config: WgConfigFiles) {
-            val id = ProxyManager.ID_WG_BASE + config.id
-            val apps = ProxyManager.getAppCountForProxy(id).toString()
-            val statusId = VpnController.getProxyStatusById(id)
-            if (statusId == null && config.isActive) {
-                WireguardManager.disableConfig(config)
-            }
-            updateStatusUi(config, statusId, apps)
-        }
-
-        private fun handleSwitchClick(config: WgConfigFiles) {
-            val id = ProxyManager.ID_WG_BASE + config.id
-            val apps = ProxyManager.getAppCountForProxy(id).toString()
-            val statusId = VpnController.getProxyStatusById(id)
-            updateStatusUi(config, statusId, apps)
-        }
-
-        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, apps: String) {
-            val appsCount = context.getString(R.string.firewall_card_status_active, apps)
-            if (config.isActive) {
-                b.interfaceDetailCard.strokeColor = fetchColor(context, R.color.accentGood)
-                b.interfaceDetailCard.strokeWidth = 2
-                b.oneWgCheck.isChecked = true
-                b.interfaceAppsCount.visibility = View.VISIBLE
-                b.interfaceAppsCount.text = context.getString(R.string.one_wg_apps_added)
-                if (statusId != null) {
-                    val resId = UIUtils.getProxyStatusStringRes(statusId)
-                    // change the color based on the status
-                    if (statusId == Backend.TOK) {
-                        b.interfaceDetailCard.strokeColor =
-                            fetchColor(context, R.attr.chipTextPositive)
-                    } else if (statusId == Backend.TUP) {
-                        b.interfaceDetailCard.strokeColor =
-                            fetchColor(context, R.attr.chipTextNeutral)
-                    } else {
-                        b.interfaceDetailCard.strokeColor =
-                            fetchColor(context, R.attr.chipTextNegative)
-                    }
-                    b.interfaceStatus.text =
-                        context.getString(resId).replaceFirstChar(Char::titlecase)
-                } else {
-                    b.interfaceStatus.text =
-                        context.getString(
-                            R.string.about_version_install_source,
-                            context
-                                .getString(R.string.status_failing)
-                                .replaceFirstChar(Char::titlecase),
-                            appsCount
-                        )
-                }
+            if (config.oneWireGuard) {
+                keepStatusUpdated(config)
             } else {
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceAppsCount.visibility = View.GONE
+                b.protocolInfoChipGroup.visibility = View.GONE
                 b.oneWgCheck.isChecked = false
                 b.interfaceStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
         }
 
+        private fun keepStatusUpdated(config: WgConfigFiles) {
+            statusCheckJob = ui {
+                while (true) {
+                    updateStatus(config)
+                    delay(ONE_SEC)
+                }
+            }
+        }
+
+        private fun updateProtocolChip(pair: Pair<Boolean, Boolean>) {
+            if (b.protocolInfoChipGroup.isVisible) return
+
+            if (!pair.first && !pair.second) {
+                b.protocolInfoChipGroup.visibility = View.GONE
+                return
+            }
+            b.protocolInfoChipGroup.visibility = View.VISIBLE
+            if (pair.first) {
+                b.protocolInfoChipIpv4.visibility = View.VISIBLE
+            } else {
+                b.protocolInfoChipIpv4.visibility = View.GONE
+            }
+            if (pair.second) {
+                b.protocolInfoChipIpv6.visibility = View.VISIBLE
+            } else {
+                b.protocolInfoChipIpv6.visibility = View.GONE
+            }
+        }
+
+        private fun updateSplitTunnelChip(isSplitTunnel: Boolean) {
+            if (isSplitTunnel) {
+                b.chipSplitTunnel.visibility = View.VISIBLE
+            } else {
+                b.chipSplitTunnel.visibility = View.GONE
+            }
+        }
+
+        private fun updateStatus(config: WgConfigFiles) {
+            // if the view is not active then cancel the job
+            if (
+                lifecycleOwner
+                    ?.lifecycle
+                    ?.currentState
+                    ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
+            ) {
+                statusCheckJob?.cancel()
+                return
+            }
+
+            val id = ProxyManager.ID_WG_BASE + config.id
+            val statusId = VpnController.getProxyStatusById(id)
+            val pair = VpnController.getSupportedIpVersion(id)
+            val c = WireguardManager.getConfigById(config.id)
+            val isSplitTunnel =
+                if (c?.getPeers()?.isNotEmpty() == true) {
+                    VpnController.isSplitTunnelProxy(id, pair)
+                } else {
+                    false
+                }
+            updateStatusUi(config, statusId)
+            updateProtocolChip(pair)
+            updateSplitTunnelChip(isSplitTunnel)
+        }
+
+        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?) {
+            if (config.isActive) {
+                b.interfaceDetailCard.strokeColor = fetchColor(context, R.color.accentGood)
+                b.interfaceDetailCard.strokeWidth = 2
+                b.oneWgCheck.isChecked = true
+                b.interfaceAppsCount.visibility = View.VISIBLE
+                b.interfaceAppsCount.text = context.getString(R.string.one_wg_apps_added)
+                var status = ""
+                if (statusId != null) {
+                    val resId = UIUtils.getProxyStatusStringRes(statusId)
+                    // change the color based on the status
+                    if (statusId == Backend.TOK) {
+                        b.interfaceDetailCard.strokeColor =
+                            fetchColor(context, R.attr.chipTextPositive)
+                        // cancel the job, as the status is connected
+                        statusCheckJob?.cancel()
+                    } else if (statusId == Backend.TUP || statusId == Backend.TZZ) {
+                        b.interfaceDetailCard.strokeColor =
+                            fetchColor(context, R.attr.chipTextNeutral)
+                    } else {
+                        b.interfaceDetailCard.strokeColor =
+                            fetchColor(context, R.attr.chipTextNegative)
+                    }
+                    status = context.getString(resId).replaceFirstChar(Char::titlecase)
+                } else {
+                    b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.chipTextNegative)
+                    b.interfaceDetailCard.strokeWidth = 2
+                    status =
+                        context.getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
+                }
+                b.interfaceStatus.text = status
+                b.interfaceActiveUptime.visibility = View.VISIBLE
+                val time = getUpTime(config.id)
+                if (time.isNotEmpty()) {
+                    val t = context.getString(R.string.logs_card_duration, getUpTime(config.id))
+                    b.interfaceActiveUptime.text =
+                        context.getString(
+                            R.string.two_argument_space,
+                            context.getString(R.string.lbl_active),
+                            t
+                        )
+                } else {
+                    b.interfaceActiveUptime.text = context.getString(R.string.lbl_active)
+                }
+            } else {
+                b.interfaceDetailCard.strokeWidth = 0
+                b.interfaceAppsCount.visibility = View.GONE
+                b.oneWgCheck.isChecked = false
+                b.interfaceActiveUptime.visibility = View.GONE
+                b.interfaceStatus.text =
+                    context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
+            }
+        }
+
+        private fun getUpTime(id: Int): CharSequence {
+            val startTime = WireguardManager.getActiveConfigTimestamp(id) ?: return ""
+            val now = System.currentTimeMillis()
+            val uptimeMs = SystemClock.elapsedRealtime() - startTime
+            // returns a string describing 'time' as a time relative to 'now'
+            return DateUtils.getRelativeTimeSpanString(
+                now - uptimeMs,
+                now,
+                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE
+            )
+        }
+
         fun setupClickListeners(config: WgConfigFiles) {
             b.interfaceDetailCard.setOnClickListener { launchConfigDetail(config.id) }
 
-            // b.oneWgCheck.setOnCheckedChangeListener(null)
             b.oneWgCheck.setOnClickListener {
                 val isChecked = b.oneWgCheck.isChecked
-                Log.d(
-                    "OneWgConfigAdapter",
-                    "Switch checked: $isChecked, ${b.oneWgCheck.isChecked} W: ${WireguardManager.canEnableConfig(config)}"
-                )
                 io {
                     if (isChecked) {
                         if (WireguardManager.canEnableConfig(config)) {
                             config.oneWireGuard = true
                             WireguardManager.updateOneWireGuardConfig(config.id, owg = true)
                             WireguardManager.enableConfig(config)
-                            uiCtx { handleSwitchClick(config) }
+                            uiCtx { listener.onDnsStatusChanged() }
                         } else {
                             uiCtx {
                                 b.oneWgCheck.isChecked = false
@@ -187,7 +278,7 @@ class OneWgConfigAdapter(private val context: Context) :
                         b.oneWgCheck.isChecked = false
                         WireguardManager.updateOneWireGuardConfig(config.id, owg = false)
                         WireguardManager.disableConfig(config)
-                        uiCtx { handleSwitchClick(config) }
+                        uiCtx { listener.onDnsStatusChanged() }
                     }
                 }
             }
@@ -205,7 +296,11 @@ class OneWgConfigAdapter(private val context: Context) :
         withContext(Dispatchers.Main) { f() }
     }
 
+    private fun ui(f: suspend () -> Unit): Job? {
+        return lifecycleOwner?.lifecycleScope?.launch(Dispatchers.Main) { f() }
+    }
+
     private fun io(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
+        lifecycleOwner?.lifecycleScope?.launch(Dispatchers.IO) { f() }
     }
 }

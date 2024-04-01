@@ -23,26 +23,19 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.AppConnectionAdapter
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
@@ -62,17 +55,16 @@ import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AppInfoActivity :
-    AppCompatActivity(R.layout.activity_app_details), SearchView.OnQueryTextListener {
+class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private val b by viewBinding(ActivityAppDetailsBinding::bind)
 
     private val persistentState by inject<PersistentState>()
-    private val appConfig by inject<AppConfig>()
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
 
     private val ipRulesViewModel: CustomIpViewModel by viewModel()
@@ -82,8 +74,8 @@ class AppInfoActivity :
     private var uid: Int = INVALID_UID
     private lateinit var appInfo: AppInfo
 
-    private var ipListUiState: Boolean = true
-    private var firewallUiState: Boolean = false
+    private var ipListUiState: Boolean = false
+    private var firewallUiState: Boolean = true
 
     private var appStatus = FirewallManager.FirewallStatus.NONE
     private var connStatus = FirewallManager.ConnectionStatus.ALLOW
@@ -92,6 +84,7 @@ class AppInfoActivity :
 
     companion object {
         const val UID_INTENT_NAME = "UID"
+        const val LOG_THRESHOLD_SIZE = 100
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,27 +112,12 @@ class AppInfoActivity :
         networkLogsViewModel.getConnectionsCount(uid).observe(this) {
             if (it == null) return@observe
 
-            b.aadConnDetailDesc.text = getString(R.string.ada_ip_connection_count, it.toString())
-            if (it == 0) {
-                b.aadConnDetailDesc.text = getString(R.string.ada_ip_connection_count_zero)
-                b.aadConnDetailRecycler.visibility = View.GONE
-                b.aadConnDetailEmptyTxt.visibility = View.VISIBLE
-                b.aadConnDetailSearchLl.visibility = View.GONE
-
-                // toggle the state only when the firewall rules are not visible
-                if (firewallUiState) {
-                    toggleFirewallUiState(firewallUiState)
-                    toggleNetworkLogState(ipListUiState)
-                }
-            } else {
-                b.aadConnDetailRecycler.visibility = View.VISIBLE
-                b.aadConnDetailEmptyTxt.visibility = View.GONE
-                b.aadConnDetailSearchLl.visibility = View.VISIBLE
-            }
+            b.aadLogsDetail.text = it.toString()
         }
     }
 
     private fun init() {
+        b.aadLogsDetailDesc.text = getString(R.string.lbl_logs).replaceFirstChar { it.uppercase() }
         io {
             val appInfo = FirewallManager.getAppInfoByUid(uid)
             // case: app is uninstalled but still available in RethinkDNS database
@@ -160,7 +138,6 @@ class AppInfoActivity :
                     Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
                     b.aadAppDetailIcon
                 )
-                showNetworkLogsIfAny(appInfo.uid)
 
                 // do not show the firewall status if the app is Rethink
                 if (appInfo.packageName == this.packageName) {
@@ -170,12 +147,7 @@ class AppInfoActivity :
                     hideIpBlockUi()
                     return@uiCtx
                 }
-
-                // introduce this on v056
-                // updateDnsDetails()
                 updateFirewallStatusUi(appStatus, connStatus)
-                toggleFirewallUiState(firewallUiState)
-                toggleNetworkLogState(ipListUiState)
             }
         }
     }
@@ -190,11 +162,6 @@ class AppInfoActivity :
 
     private fun hideIpBlockUi() {
         b.aadIpBlockCard.visibility = View.GONE
-    }
-
-    override fun onResume() {
-        super.onResume()
-        b.aadConnDetailRecycler.adapter?.notifyDataSetChanged()
     }
 
     private fun openCustomIpScreen() {
@@ -214,21 +181,6 @@ class AppInfoActivity :
         intent.putExtra(VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.DOMAIN_RULES.screen)
         intent.putExtra(Constants.INTENT_UID, uid)
         startActivity(intent)
-    }
-
-    private fun updateDnsDetails() {
-        io {
-            val isDnsEnabled = appConfig.isAppWiseDnsEnabled(uid)
-
-            uiCtx {
-                if (isDnsEnabled) {
-                    enableDnsStatusUi()
-                    return@uiCtx
-                }
-
-                disableDnsStatusUi()
-            }
-        }
     }
 
     private fun updateDataUsage() {
@@ -282,8 +234,6 @@ class AppInfoActivity :
     }
 
     private fun setupClickListeners() {
-
-        b.aadConnDetailSearch.setOnQueryTextListener(this)
 
         b.aadAppInfoIcon.setOnClickListener {
             io {
@@ -393,36 +343,15 @@ class AppInfoActivity :
             }
         }
 
-        b.aadConnDetailIndicator.setOnClickListener { toggleNetworkLogState(ipListUiState) }
-
-        b.aadConnDetailRl.setOnClickListener { toggleNetworkLogState(ipListUiState) }
-
-        b.aadAapFirewallIndicator.setOnClickListener { toggleFirewallUiState(firewallUiState) }
-
-        b.aadAapFirewallNewCard.setOnClickListener { toggleFirewallUiState(firewallUiState) }
-
         b.aadIpBlockCard.setOnClickListener { openCustomIpScreen() }
 
         b.aadDomainBlockCard.setOnClickListener { openCustomDomainScreen() }
 
-        b.aadAppDetailIcon.setOnClickListener { toggleFirewallUiState(firewallUiState) }
-
-        b.aadAppDetailLl.setOnClickListener { toggleFirewallUiState(firewallUiState) }
-
-        b.aadDnsHeading.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
-            if (isSelected) {
-                enableDnsStatusUi()
-                // fixme: remove the below code, added for testing
-                setAppDns("https://basic.rethinkdns.com/1:IAAQAA==")
-                return@setOnCheckedChangeListener
-            }
-
-            removeAppDns(uid)
+        b.aadLogsCard.setOnClickListener {
+            val intent = Intent(this, AppWiseLogsActivity::class.java)
+            intent.putExtra(UID_INTENT_NAME, uid)
+            startActivity(intent)
         }
-
-        b.aadAppDnsRethinkConfigure.setOnClickListener { rethinkListBottomSheet() }
-
-        b.aadConnDelete.setOnClickListener { showDeleteConnectionsDialog() }
     }
 
     private fun showAppInfoDialog(packages: List<String>) {
@@ -447,43 +376,9 @@ class AppInfoActivity :
         alertDialog.show()
     }
 
-    private fun setAppDns(url: String) {
-        io {
-            val endpoint =
-                RethinkDnsEndpoint(
-                    "app_${appInfo.appName}",
-                    url,
-                    uid,
-                    desc = "",
-                    isActive = false,
-                    isCustom = true,
-                    latency = 0,
-                    blocklistCount = 0,
-                    modifiedDataTime = Constants.INIT_TIME_MS
-                )
-            appConfig.insertReplaceEndpoint(endpoint)
-        }
-    }
-
     private fun rethinkListBottomSheet() {
         val bottomSheetFragment = RethinkListBottomSheet()
         bottomSheetFragment.show(this.supportFragmentManager, bottomSheetFragment.tag)
-    }
-
-    private fun removeAppDns(uid: Int) {
-        io { appConfig.removeAppWiseDns(uid) }
-
-        disableDnsStatusUi()
-    }
-
-    private fun disableDnsStatusUi() {
-        b.aadDnsRethinkRl.visibility = View.GONE
-        b.aadDnsHeading.isChecked = false
-    }
-
-    private fun enableDnsStatusUi() {
-        b.aadDnsRethinkRl.visibility = View.VISIBLE
-        b.aadDnsHeading.isChecked = true
     }
 
     private fun toggleMobileData(appInfo: AppInfo) {
@@ -572,50 +467,6 @@ class AppInfoActivity :
         connStatus = cStat
         io { updateFirewallStatus(appInfo.uid, aStat, cStat) }
         updateFirewallStatusUi(aStat, cStat)
-    }
-
-    private fun showNetworkLogsIfAny(uid: Int) {
-        networkLogsViewModel.setUid(uid)
-        b.aadConnDetailRecycler.setHasFixedSize(true)
-        val layoutManager = LinearLayoutManager(this)
-        b.aadConnDetailRecycler.layoutManager = layoutManager
-        val recyclerAdapter = AppConnectionAdapter(this, this, uid)
-        networkLogsViewModel.appNetworkLogs.observe(this) {
-            recyclerAdapter.submitData(this.lifecycle, it)
-        }
-        b.aadConnDetailRecycler.isNestedScrollingEnabled = false
-        b.aadConnDetailRecycler.adapter = recyclerAdapter
-        val itemAnimator = DefaultItemAnimator()
-        itemAnimator.changeDuration = 1500
-        b.aadConnDetailRecycler.itemAnimator = itemAnimator
-    }
-
-    private fun toggleNetworkLogState(state: Boolean) {
-        ipListUiState = !state
-
-        if (state) {
-            b.aadConnListTopLl.visibility = View.VISIBLE
-            b.aadConnDetailIndicator.setImageResource(R.drawable.ic_arrow_up)
-            b.aadConnDelete.visibility = View.VISIBLE
-            b.aadConnDetailSearchLl.visibility = View.VISIBLE
-        } else {
-            b.aadConnListTopLl.visibility = View.GONE
-            b.aadConnDetailIndicator.setImageResource(R.drawable.ic_arrow_down)
-            b.aadConnDelete.visibility = View.GONE
-            b.aadConnDetailSearchLl.visibility = View.GONE
-        }
-    }
-
-    private fun toggleFirewallUiState(state: Boolean) {
-        firewallUiState = !state
-
-        if (state) {
-            b.aadAppSettingsLl.visibility = View.VISIBLE
-            b.aadAapFirewallIndicator.setImageResource(R.drawable.ic_arrow_up)
-        } else {
-            b.aadAppSettingsLl.visibility = View.GONE
-            b.aadAapFirewallIndicator.setImageResource(R.drawable.ic_arrow_down)
-        }
     }
 
     private fun enableAppBypassedUi() {
@@ -759,21 +610,6 @@ class AppInfoActivity :
         builder.create().show()
     }
 
-    private fun showDeleteConnectionsDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle(R.string.ada_delete_logs_dialog_title)
-        builder.setMessage(R.string.ada_delete_logs_dialog_desc)
-        builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> deleteAppLogs() }
-
-        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
-        builder.create().show()
-    }
-
-    private fun deleteAppLogs() {
-        io { connectionTrackerRepository.clearLogsByUid(uid) }
-    }
-
     private fun showDialog(
         packageList: List<String>,
         appInfo: AppInfo,
@@ -821,21 +657,11 @@ class AppInfoActivity :
             Configuration.UI_MODE_NIGHT_YES
     }
 
-    private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch(Dispatchers.IO) { f() }
+    private fun io(f: suspend () -> Unit): Job {
+        return lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
-    }
-
-    override fun onQueryTextSubmit(query: String): Boolean {
-        networkLogsViewModel.setFilter(query)
-        return true
-    }
-
-    override fun onQueryTextChange(query: String): Boolean {
-        networkLogsViewModel.setFilter(query)
-        return true
     }
 }

@@ -40,10 +40,7 @@ import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import inet.ipaddr.HostName
-import inet.ipaddr.HostNameException
 import inet.ipaddr.IPAddress
-import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -231,13 +228,14 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
         ui {
             val input = dBind.daciIpEditText.text.toString()
             val ipString = Utilities.removeLeadingAndTrailingDots(input)
-            var hostName: HostName? = null
             var ip: IPAddress? = null
+            var port: Int = 0
 
             // chances of creating NetworkOnMainThread exception, handling with io operation
             ioCtx {
-                hostName = getHostName(ipString)
-                ip = hostName?.asAddress()
+                val ipPair = IpRulesManager.getIpNetPort(ipString)
+                ip = ipPair.first
+                port = ipPair.second
             }
 
             if (ip == null || ipString.isEmpty()) {
@@ -247,22 +245,11 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
             }
 
             dBind.daciIpEditText.text.clear()
-            insertCustomIp(ipString, hostName?.port, status)
+            insertCustomIp(ip, port, status)
         }
     }
 
-    private suspend fun getHostName(ip: String): HostName? {
-        return try {
-            val host = HostName(ip)
-            host.validate()
-            host
-        } catch (e: HostNameException) {
-            val ipAddress = IPAddressString(ip).address ?: return null
-            HostName(ipAddress)
-        }
-    }
-
-    private fun insertCustomIp(ip: String, port: Int?, status: IpRulesManager.IpRuleStatus) {
+    private fun insertCustomIp(ip: IPAddress?, port: Int?, status: IpRulesManager.IpRuleStatus) {
         if (ip == null) return
 
         io { IpRulesManager.addIpRule(uid, ip, port, status) }

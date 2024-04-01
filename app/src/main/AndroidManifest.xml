@@ -2,15 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.celzero.bravedns"
-    android:versionCode="34"
-    android:versionName="v055c"> <!-- 34(v055c) -->
+    android:versionCode="35"
+    android:versionName="v055d"> <!-- 35(v055d) -->
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-
     <!-- https://developer.android.com/about/versions/13/behavior-changes-all#notification-permission -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
@@ -55,6 +55,9 @@
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
+            <meta-data
+                android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
+                android:value="true" />
         </service>
         <service
             android:name=".service.BraveTileService"

@@ -42,7 +42,6 @@ import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
@@ -77,7 +76,6 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     private var log: DnsLog? = null
 
     private val persistentState by inject<PersistentState>()
-    private val appConfig by inject<AppConfig>()
 
     override fun getTheme(): Int =
         Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
@@ -223,7 +221,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
         displayDescription()
 
-        if (log!!.groundedQuery() || log!!.hasBlocklists()) {
+        if (log!!.groundedQuery() || log!!.hasBlocklists() || log!!.upstreamBlock) {
             handleBlocklistChip()
             b.dnsBlockIpsChip.visibility = View.GONE
             return
@@ -269,7 +267,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
         if (log!!.isBlocked) {
             lightenUpChip(b.dnsBlockBlocklistChip, BlockType.BLOCKED)
-        } else if (log!!.hasBlocklists()) {
+        } else if (determineMaybeBlocked()) {
             lightenUpChip(b.dnsBlockBlocklistChip, BlockType.MAYBE_BLOCKED)
         } else {
             lightenUpChip(b.dnsBlockBlocklistChip, BlockType.NONE)
@@ -290,6 +288,15 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         // show chip as blocked
         b.dnsBlockBlocklistChip.text = getString(R.string.lbl_blocked)
         return
+    }
+
+    private fun determineMaybeBlocked(): Boolean {
+        if (log == null) {
+            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update chips")
+            return false
+        }
+
+        return log!!.upstreamBlock || log!!.blockLists.isNotEmpty()
     }
 
     private fun showBlocklistChip() {
@@ -443,7 +450,8 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         }
 
         if (log!!.isAnonymized()) { // anonymized queries answered by dns-crypt
-            val text = getString(R.string.dns_btm_resolved_crypt, uptime, log!!.serverIP, log!!.relayIP)
+            val text =
+                getString(R.string.dns_btm_resolved_crypt, uptime, log!!.serverIP, log!!.relayIP)
             b.dnsBlockBlockedDesc.text = updateHtmlEncodedText(text)
         } else if (log!!.isLocallyAnswered()) { // usually happens when there is a network failure
             b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server, uptime)

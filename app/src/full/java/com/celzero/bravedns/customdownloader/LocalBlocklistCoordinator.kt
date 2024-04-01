@@ -82,6 +82,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
     }
 
     override suspend fun doWork(): Result {
+        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Local blocklist download started")
         try {
             val startTime = inputData.getLong("workerStartTime", 0)
             val timestamp = inputData.getLong("blocklistTimestamp", 0)
@@ -216,21 +217,36 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
     private suspend fun startFileDownload(
         context: Context,
         url: String,
-        fileName: String
+        fileName: String,
+        retryCount: Int = 0
     ): Boolean {
         // enable the OkHttp's logging only in debug mode for testing
         if (DEBUG) OkHttpDebugLogging.enableHttp2()
         if (DEBUG) OkHttpDebugLogging.enableTaskRunner()
 
-        // create okhttp client with base url
-        val retrofit = getBlocklistBaseBuilder().build().create(IBlocklistDownload::class.java)
-        val response = retrofit.downloadLocalBlocklistFile(url, persistentState.appVersion, "")
+        try {
+            // create okhttp client with base url
+            val retrofit =
+                getBlocklistBaseBuilder(retryCount).build().create(IBlocklistDownload::class.java)
+            val response = retrofit.downloadLocalBlocklistFile(url, persistentState.appVersion, "")
 
-        return if (response?.isSuccessful == true) {
-            downloadFile(context, response.body(), fileName)
+            if (response?.isSuccessful == true) {
+                return downloadFile(context, response.body(), fileName)
+            }
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_DOWNLOAD, "Error in startFileDownload: ${e.message}", e)
+        }
+        return if (isRetryRequired(retryCount)) {
+            Log.i(LOG_TAG_DOWNLOAD, "retrying download($url) $fileName, count: $retryCount")
+            startFileDownload(context, url, fileName, retryCount + 1)
         } else {
+            Log.i(LOG_TAG_DOWNLOAD, "download failed for $fileName, retry: $retryCount")
             false
         }
+    }
+
+    private fun isRetryRequired(retryCount: Int): Boolean {
+        return retryCount < RetrofitManager.Companion.OkHttpDnsType.entries.size - 1
     }
 
     private fun downloadFile(context: Context, body: ResponseBody?, fileName: String): Boolean {

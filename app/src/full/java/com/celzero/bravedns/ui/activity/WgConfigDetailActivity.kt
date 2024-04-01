@@ -102,6 +102,18 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun init() {
+        b.globalLockdownTitleTv.text =
+            getString(
+                R.string.two_argument_space,
+                getString(R.string.firewall_rule_global_lockdown),
+                getString(R.string.symbol_lockdown)
+            )
+        b.catchAllTitleTv.text =
+            getString(
+                R.string.two_argument_space,
+                getString(R.string.catch_all_wg_dialog_title),
+                getString(R.string.symbol_lightening)
+            )
         if (wgType.isDefault()) {
             b.wgHeaderTv.text = getString(R.string.lbl_advanced).replaceFirstChar(Char::titlecase)
             b.lockdownRl.visibility = View.VISIBLE
@@ -285,6 +297,11 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         val id = ProxyManager.ID_WG_BASE + configId
         b.applicationsBtn.isEnabled = true
         mappingViewModel.getAppCountById(id).observe(this) {
+            if (it == 0) {
+                b.applicationsBtn.setTextColor(UIUtils.fetchColor(this, R.attr.accentBad))
+            } else {
+                b.applicationsBtn.setTextColor(UIUtils.fetchColor(this, R.attr.accentGood))
+            }
             b.applicationsBtn.text = getString(R.string.add_remove_apps, it.toString())
         }
     }
@@ -395,10 +412,16 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun showDeleteInterfaceDialog() {
         val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle(getString(R.string.lbl_delete))
+        val delText =
+            getString(
+                R.string.two_argument_space,
+                getString(R.string.config_delete_dialog_title),
+                getString(R.string.lbl_wireguard)
+            )
+        builder.setTitle(delText)
         builder.setMessage(getString(R.string.config_delete_dialog_desc))
         builder.setCancelable(true)
-        builder.setPositiveButton(this.getString(R.string.lbl_delete)) { _, _ ->
+        builder.setPositiveButton(delText) { _, _ ->
             io {
                 WireguardManager.deleteConfig(configId)
                 uiCtx {
@@ -436,7 +459,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         layoutManager = LinearLayoutManager(this)
         b.peersList.layoutManager = layoutManager
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        wgPeersAdapter = WgPeersAdapter(this, this, themeId, configId, peers)
+        wgPeersAdapter = WgPeersAdapter(this, themeId, configId, peers)
         b.peersList.adapter = wgPeersAdapter
     }
 

@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+            tools:ignore="ScopedStorage" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
@@ -103,6 +105,8 @@
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.activity.ConfigureOtherDnsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.AppWiseLogsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.NotificationHandlerDialog"

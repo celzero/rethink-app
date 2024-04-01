@@ -35,6 +35,7 @@ class Transaction {
     var ttl: Long = 0L
     var transportType: TransportType = TransportType.DOH
     var msg: String = ""
+    var upstreamBlock: Boolean = false
 
     enum class Status(val id: Long) {
         START(Backend.Start),

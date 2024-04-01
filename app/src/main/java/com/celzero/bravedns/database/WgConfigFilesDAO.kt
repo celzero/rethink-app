@@ -55,7 +55,7 @@ interface WgConfigFilesDAO {
 
     @Query("delete from WgConfigFiles where id = :id") fun deleteConfig(id: Int)
 
-    @Query("update WgConfigFiles set isCatchAll = :isCatchAll where id = :id")
+    @Query("update WgConfigFiles set isCatchAll = :isCatchAll, oneWireGuard = 0 where id = :id")
     fun updateCatchAllConfig(id: Int, isCatchAll: Boolean)
 
     @Query("update WgConfigFiles set oneWireGuard = :oneWireGuard where id = :id")
@@ -69,5 +69,6 @@ interface WgConfigFilesDAO {
     @Query("select count(id) from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID")
     fun getConfigCount(): LiveData<Int>
 
-    @Query("update WgConfigFiles set isActive = 0 where id = :id") fun disableConfig(id: Int)
+    @Query("update WgConfigFiles set isActive = 0, oneWireGuard = 0 where id = :id")
+    fun disableConfig(id: Int)
 }
