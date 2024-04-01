@@ -257,5 +257,11 @@
     <string name="settings_socks5_desc" translatable="true">Pošli pripojenia cez SOCKS5 zariadenie.</string>
     <string name="settings_proxy_header" translatable="true">proxy</string>
     <string name="settings_socks5_heading" translatable="true">Nastavenie SOCKS5 Proxy</string>
-    <string name="settings_https_heading" translatable="true">Nastavenie HTTP(S) Proxy</string>
+    <string name="settings_https_heading" translatable="true">Nastavenie HTTP(S) CONNECT Proxy</string>
+    <string name="settings_https_desc" translatable="true">Pošli spojenia cez HTTP(S) CONNECT zariadenie.</string>
+    <string name="orbot_http_desc" translatable="true">Vytvorí spojenia s HTTP CONNECT tunel do Orbot.</string>
+    <string name="orbot_bs_status_1" translatable="true">Pošli %1$s pripojenie k Orbot.</string>
+    <string name="orbot_bs_status_2" translatable="true">HTTP Proxy je zvolené.</string>
+    <string name="orbot_bs_status_3" translatable="true">Pošli %1$s cez Orbot, HTTP Proxy je tiež nastavené.</string>
+    <string name="orbot_socks5_desc" translatable="true">Pošli všetky TCP spojenia cez Orbot.</string>
 </resources>
