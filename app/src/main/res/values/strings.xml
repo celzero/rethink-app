@@ -90,10 +90,13 @@
     <string name="lbl_starting" translatable="true">Starting</string>
     <string name="lbl_overall" translatable="true">Overall</string>
     <string name="lbl_stopped" translatable="true">Stopped</string>
+    <string name="lbl_idle" translatable="true">Idle</string>
     <string name="lbl_private" translatable="true">private</string>
     <string name="lbl_secure" translatable="true">secure</string>
     <string name="lbl_anonymous" translatable="true">anonymous</string>
     <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="lbl_split" translatable="true">Split</string>
+    <string name="lbl_on_device" translatable="true">on-device</string>
 
     <string name="symbol_upload" translatable="false">%1$s 🔺</string>
     <string name="symbol_download" translatable="false">%1$s 🔻</string>
@@ -114,6 +117,8 @@
     <string name="symbol_slash" translatable="false">/</string>
     <string name="symbol_black_down" translatable="false">\u25be</string>
     <string name="symbol_black_up" translatable="false">\u25b4</string>
+    <string name="symbol_lockdown" translatable="false">🔒</string>
+    <string name="symbol_lightening" translatable="false">⚡</string>
 
     <string name="numeric_one" translatable="false">1</string>
     <string name="numeric_twenty_four" translatable="false">24</string>
@@ -164,6 +169,10 @@
 
     <string name="hybrid_mode_notification_title" translatable="true">
         Protected! Connected to DNS + Firewall.
+    </string>
+
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">
+        Protected! Connected to DNS + Firewall + Proxy.
     </string>
 
     <string name="pause_mode_notification_title" translatable="true">Paused! Blocked apps will continue to be firewalled.</string>
@@ -387,20 +396,15 @@
 
     <string name="app_mode_choose" translatable="true">Choose mode</string>
 
-    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Chirayu Desai</b><br/><br/>
-        1. <i>New feature</i>: Support for anonymizing <i>Oblivious DNS-over-HTTPS</i>.<br/>
-        2. <i>New feature</i>: Support for <i>DNS-over-TLS</i>.<br/>
-        3. <i>New feature</i>: Simple and Advanced WireGuard modes.<br/>
-        4. <i>New feature</i>: Show bandwidth in Stats screen.<br/>
-        5. <i>New feature</i>: Support all proxies including Orbot even in <i>VPN Lockdown</i> mode.<br/>
-        6. <i>New feature</i>: Monitor Rethink\'s network traffic using Rethink!<br/>
-        7. <i>New feature</i>: Forward DNS over active proxies like WireGuard.<br/>
-        8. <i>New feature</i>: Same version backup & restore across devices.<br/>
-        9. Improved <i>bug report</i> generation.<br/>
-        10. Better handling of dual-stack IP networks.<br/>
-        11. <i>Bug fix</i>: Minor bug fixes in handling of multicast DNS.<br/>
-        12. <i>Bug fix</i>: Auto-recover connectivity for WireGuard VPNs.<br/>
-        13. <i>Bug fix</i>: Fix incorrectly blocked app notifications.<br/><br/>
+    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Chirayu Desai 3.0</b><br/><br/>
+        1. <i>New feature</i>: Optionally proxy DNS over WireGuard and SOCKS5 proxies.<br/>
+        2. <i>New feature</i>: Optionally enable built-in Android connectivity checks.<br/>
+        3. Improved support for editing IP-based firewall rules.<br/>
+        4. Improved WireGuard bandwidth.<br/>
+        5. Overhauled WireGuard UX.<br/>
+        6. Avoid connection leaks for Simple and Always-on WireGuard modes.<br/>
+        7. Fix crash when editing WireGuard configurations.<br/>
+        8. Fix minor bugs with RDNS+ and other domain-based firewall rules.<br/><br/>
 
         <a href="https://svc.rethinkdns.com/r/translate">Help translate this app</a>]]>
     </string>
@@ -416,6 +420,9 @@
 
     <string name="settings_ptrans_heading" translatable="true">Force IPv4 egress</string>
     <string name="settings_ptrans_desc" translatable="true">Translate outbound IPv6 traffic to IPv4 on-device. Enable if you are connected to an IPv4-only network.</string>
+
+    <string name="settings_connectivity_checks" translatable="true">Perform connectivity checks</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">Connectivity checks are sent to ascertain reachability.</string>
 
     <string name="settings_allow_lan_heading" translatable="true">Do not route Private IPs (experimental)</string>
     <string name="settings_allow_lan_desc" translatable="true">Exclude LAN, loopback, multicast, link-local routes from Rethink\'s VPN tunnel.</string>
@@ -570,7 +577,7 @@
     <string name="settings_ip_dialog_title" translatable="true">Choose IP version</string>
     <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (default)</string>
     <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (experimental)</string>
-    <string name="settings_ip_dialog_ipv46" translatable="true">Auto (experimental)\nconnectivity checks are sent to ascertain reachability.</string>
+    <string name="settings_ip_dialog_ipv46" translatable="true">Auto (experimental)</string>
     <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
     <string name="settings_ip_text_ipv6" translatable="true">IPv6</string>
     <string name="settings_ip_text_ipv46" translatable="true">Auto</string>
@@ -711,6 +718,9 @@
 
     <string name="dc_check_update_heading" translatable="true">Prompt on blocklist updates</string>
     <string name="dc_check_update_desc" translatable="true">Check for blocklist updates once every <i>three</i> days</string>
+
+    <string name="dc_proxy_dns_heading" translatable="true">Never proxy DNS</string>
+    <string name="dc_proxy_dns_desc" translatable="true">Do not proxy DNS over Always-on WireGuard, SOCKS5, HTTP proxies.</string>
 
     <!-- About fragment -->
     <string name="about_bravedns_explantion" translatable="true">Rethink is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device. </string>
@@ -1062,6 +1072,8 @@
 
     <string name="coming_soon_toast" translatable="true">coming soon</string>
 
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s is disabled as proxies are active</string>
+
     <!-- Pause Activity -->
     <string name="pause_text" translatable="true">paused</string>
     <string name="pause_desc" translatable="true">Note: %1$s blocked apps will continue to be firewalled.</string>
@@ -1225,7 +1237,7 @@
     <string name="ci_trust_rule" translatable="true">Trust</string>
     <string name="ci_delete" translatable="true">delete</string>
     <string name="ci_desc" translatable="false">%1$s %2$s</string>
-    <string name="ci_ip_label" translatable="false">%1$s:%2$s</string>
+    <string name="ci_ip_label" translatable="false">%1$s: %2$s</string>
 
     <!-- app info -->
     <string name="ada_noapp_dialog_title" translatable="true">No such app</string>
