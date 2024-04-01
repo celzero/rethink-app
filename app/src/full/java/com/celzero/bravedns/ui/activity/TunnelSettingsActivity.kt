@@ -233,6 +233,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                         getString(R.string.settings_ip_text_ipv4)
                     )
                 b.settingsActivityPtransRl.visibility = View.GONE
+                b.settingsActivityConnectivityChecksRl.visibility = View.GONE
             }
             InternetProtocol.IPv6.id -> {
                 b.genSettingsIpDesc.text =
@@ -241,6 +242,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                         getString(R.string.settings_ip_text_ipv6)
                     )
                 b.settingsActivityPtransRl.visibility = View.VISIBLE
+                b.settingsActivityConnectivityChecksRl.visibility = View.GONE
             }
             InternetProtocol.IPv46.id -> {
                 b.genSettingsIpDesc.text =
@@ -249,6 +251,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                         getString(R.string.settings_ip_text_ipv46)
                     )
                 b.settingsActivityPtransRl.visibility = View.GONE
+                b.settingsActivityConnectivityChecksRl.visibility = View.VISIBLE
             }
             else -> {
                 b.genSettingsIpDesc.text =
@@ -257,6 +260,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                         getString(R.string.settings_ip_text_ipv4)
                     )
                 b.settingsActivityPtransRl.visibility = View.GONE
+                b.settingsActivityConnectivityChecksRl.visibility = View.GONE
             }
         }
     }

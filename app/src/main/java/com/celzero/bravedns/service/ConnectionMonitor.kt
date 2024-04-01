@@ -31,6 +31,7 @@ import android.system.ErrnoException
 import android.system.OsConstants.ECONNREFUSED
 import android.util.Log
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_CONNECTION
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
@@ -213,7 +214,9 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         isForceUpdate: Boolean = false,
         delay: Long = TimeUnit.SECONDS.toMillis(1)
     ) {
-        val testReachability = persistentState.connectivityChecks
+        val dualStack =
+            InternetProtocol.getInternetProtocol(persistentState.internetProtocolType).isIPv46()
+        val testReachability = dualStack && persistentState.connectivityChecks
         val msg =
             constructNetworkMessage(
                 if (persistentState.useMultipleNetworks) MSG_ADD_ALL_NETWORKS
