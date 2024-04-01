@@ -266,4 +266,18 @@
     <string name="orbot_socks5_desc" translatable="true">Pošli všetky TCP spojenia cez Orbot.</string>
     <string name="orbot" translatable="true">Orbot</string>
     <string name="orbot_http" translatable="true">HTTP Proxy</string>
+    <string name="orbot_both" translatable="true">TCP + HTTP Proxy</string>
+    <string name="orbot_none_desc" translatable="true">Žiadny z vyššie uvedených.</string>
+    <string name="orbot_bs_status_4" translatable="true">One-click Tor-as-a-Proxy (Orbot) nastavenie.</string>
+    <string name="orbot_socks5" translatable="true">TCP-len Proxy</string>
+    <string name="orbot_both_desc" translatable="true">Všetky vyššie uvedené.</string>
+    <string name="orbot_none" translatable="true">Žiadne (predvolené)</string>
+    <string name="orbot_status_arg_3" translatable="true">DNS a TCP</string>
+    <string name="orbot_app_issue" translatable="true">Nemohol spustiť Orbot. Je nainštalovaný?</string>
+    <string name="orbot_stop_dialog_title" translatable="true">Potrebný manuálny zásah</string>
+    <string name="orbot_stop_dialog_message" translatable="true">Rethink prestal presmerovanie pripojenia na Orbot, ale Orbot možno beží na pozadí.</string>
+    <string name="orbot_stop_dialog_neutral" translatable="true">Zmeniť DNS</string>
+    <string name="orbot_title" translatable="true">Orbot a Proxies</string>
+    <string name="orbot_install_dialog_title" translatable="true">Nainštalovať Orbot?</string>
+    <string name="orbot_install_dialog_message" translatable="true">Orbot prináša funkcie a funkčnosť Tor Android.</string>
 </resources>
