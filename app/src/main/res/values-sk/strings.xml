@@ -236,4 +236,6 @@
     <string name="info_dialog_copy_toast_msg" translatable="true">IP adresa skopírovaná.</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL skopírované</string>
     <string name="public_key_copy_toast_msg" translatable="true">Verejný kľúč skopírovaný.</string>
+    <string name="info_dialog_rethink_toast_msg" translatable="true">Copied ako RDNS + DNS-over-HTTPS URL</string>
+    <string name="settings_enable_logs_desc" translatable="true">Uchovávajte DNS a Firewall protokoly lokálne on-device.</string>
 </resources>
