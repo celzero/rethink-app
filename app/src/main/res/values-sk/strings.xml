@@ -268,7 +268,7 @@
     <string name="orbot_http" translatable="true">HTTP Proxy</string>
     <string name="orbot_both" translatable="true">TCP + HTTP Proxy</string>
     <string name="orbot_none_desc" translatable="true">Žiadny z vyššie uvedených.</string>
-    <string name="orbot_bs_status_4" translatable="true">One-click Tor-as-a-Proxy (Orbot) nastavenie.</string>
+    <string name="orbot_bs_status_4" translatable="true">Jeden klik Tor-ako-Proxy (Orbot) nastavenie.</string>
     <string name="orbot_socks5" translatable="true">TCP-len Proxy</string>
     <string name="orbot_both_desc" translatable="true">Všetky vyššie uvedené.</string>
     <string name="orbot_none" translatable="true">Žiadne (predvolené)</string>
@@ -280,4 +280,11 @@
     <string name="orbot_title" translatable="true">Orbot a Proxies</string>
     <string name="orbot_install_dialog_title" translatable="true">Nainštalovať Orbot?</string>
     <string name="orbot_install_dialog_message" translatable="true">Orbot prináša funkcie a funkčnosť Tor Android.</string>
+    <string name="orbot_bs_status_trying_connect" translatable="true">Nastavujem Orbot ..</string>
+    <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink je nastavený k pre-posielaniu DNS žiadostí cez Orbot. Zmeň ako potrebuješ.</string>
+    <string name="orbot_stop_dialog_negative" translatable="true">Zastav Orbot</string>
+    <string name="orbot_explanation" translatable="true">Orbot je bezplatná aplikácia proxy, ktorá iným aplikáciám umožňuje používať internet <u>bezpečnejšie</u>.
+\nOrbot používa <u>Tor</u> na šifrovanie vašej internetovej prevádzky, čo vám pomáha <u>obísť cenzúru</u> a brániť sa pred formami <u>sledovania siete</u>, ktoré ohrozujú osobnú slobodu a súkromie.
+\n<u>TCP Proxy</u>: Rethink posiela iba TCP spojenia <i>zahrnutých</i> aplikácií do Orbotu.
+\n<u>HTTP Proxy</u>: Rethink <i>vytvorí</i> tunel HTTP CONNECT do Orbotu a pošle iba TCP spojenia <i>zahrnutých</i> aplikácií.</string>
 </resources>
