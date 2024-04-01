@@ -867,8 +867,8 @@ class GoVpnAdapter : KoinComponent {
             Intra.setSystemDNS(tunnel, sysDnsStr)
         } catch (e: Exception) { // this is not expected to happen
             Log.e(LOG_TAG_VPN, "set system dns: could not parse system dns", e)
-            // see BraveVpnService#determineSystemDns()
-            Intra.setSystemDNS(tunnel, FALLBACK_DNS)
+            // remove the system dns, if it could not be set
+            tunnel.resolver.remove(Backend.System)
         }
     }
 
