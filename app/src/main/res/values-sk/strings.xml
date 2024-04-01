@@ -139,7 +139,7 @@
     <string name="private_dns_dialog_positive" translatable="true">Chodte do Nastavení</string>
     <string name="firewall_act_universal_tab" translatable="true">univerzálny</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Sieť</string>
-    <string name="title_about" translatable="true">O nás</string>
+    <string name="title_about" translatable="true">O Aplikácií</string>
     <string name="title_settings" translatable="true">Nastavenia</string>
     <string name="about_title_desc" translatable="true">Detekuje a blokuje bezpečnostné hrozby na sieti</string>
     <string name="accessibility_service_description" translatable="true">Rethink používa službu dostupnosti na detekciu aplikácií na pozadí a brány firewall. Rethink nezhromažďuje ani nepredáva žiadne informácie.</string>
@@ -178,4 +178,40 @@
 \n<u>#5</u>: Blokuje pripojenia, keď je zdrojová aplikácia neznáma (Universal Firewall).
 \n<u>#6</u>: Blokuje všetku komunikáciu UDP okrem DNS (Universal Firewall).
 \n<u>#7</u>: Blokovať pripojenia pri obídení DNS (Universal Firewall).</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">Odstrániť DoH pripojenie?</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Odstrániť DoT pripojenie?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Odstrániť DNS cez TLS z uložených nastavení.</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Odstrániť DNSCrypt server?</string>
+    <string name="dns_crypt_url_remove_dialog_message" translatable="true">Odstrániť DNSCrypt server z uložených nastavení.</string>
+    <string name="dns_crypt_url_remove_success" translatable="true">DNSCrypt server odstránený.</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Odstrániť DNSCrypt relé?</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Odstrániť DNSCrypt relé z uložených nastavení.</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt Relé odstránené.</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">Odstrániť DNS Proxy?</string>
+    <string name="dns_proxy_remove_dialog_message" translatable="true">Odstrániť DNS Proxy z uložených nastavení.</string>
+    <string name="dns_proxy_remove_success" translatable="true">DNS Proxy odstránené.</string>
+    <string name="local_blocklist_download" translatable="true">Stiahni blok listy.</string>
+    <string name="local_blocklist_download_desc" translatable="true">Chcete stiahnuť zoznamy blokovaných položiek (približne 60 MB), aby ste mohli používať túto funkciu?</string>
+    <string name="local_blocklist_redownload" translatable="true">Aktuálny!</string>
+    <string name="local_blocklist_redownload_desc" translatable="true">Zoznamy blokovaných na zariadení sú už v najnovšej verzii v%1$s.</string>
+    <string name="blocklist_update_check_not_required" translatable="true">Zoznamy blokovaných sú už v najnovšej verzii.</string>
+    <string name="refresh_complete" translatable="true"><!-- použite dc_refresh_toast --> Opätovná synchronizácia zoznamu aplikácií je dokončená.</string>
+    <string name="show_logs_disabled_dns_message" translatable="true">Zaznamenávanie požiadaviek DNS bolo zakázané. Ak ju chcete znova povoliť, prejdite do <i>Nastavenia</i> a zapnite možnosť <i>Povoliť zapisovanie do denníka na zariadení.</i></string>
+    <string name="configure_dns_connected_doh_status" translatable="true">DNS cez HTTPS</string>
+    <string name="configure_dns_connected_dns_proxy_status" translatable="true">DNS Proxy</string>
+    <string name="configure_dns_connection_name" translatable="true">Pripojený do %1$s</string>
+    <string name="configure_dns_crypt" translatable="true">DNSCrypt: %1$s server</string>
+    <string name="http_proxy_dialog_heading" translatable="true">Nastav HTTP(S) CONNECT Proxy</string>
+    <string name="download_update_dialog_title" translatable="true">Nová aktualizácia!</string>
+    <string name="download_update_dialog_message" translatable="true">Nová verzia aplikácie je k dispozícii na stiahnutie z webovej stránky. Chcete pokračovať?</string>
+    <string name="download_update_dialog_message_ok_title" translatable="true">Aktuálny!</string>
+    <string name="dns_act_configure_tab" translatable="true">Nastaviť</string>
+    <string name="univ_firewall_dialog_title" translatable="true">Vymazať IP Pravidlo?</string>
+    <string name="univ_firewall_dialog_message" translatable="true">Odstránenie tohto pravidla by umožnilo akejkoľvek aplikácii pripojiť sa k tejto IP adrese. Chcete pokračovať?</string>
+    <string name="doh_custom_url_remove_dialog_message" translatable="true">Odstrániť DNS cez HTTPS z uložených nastavení.</string>
+    <string name="doh_custom_url_remove_success" translatable="true">Pripojenie odstránené.</string>
+    <string name="show_logs_disabled_network_message" translatable="true">Zaznamenávanie pripojenia bolo vypnuté. Ak ju chcete znova povoliť, prejdite do <i>Nastavenia</i> a zapnite možnosť <i>Povoliť zapisovanie do denníka na zariadení.</i></string>
+    <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
+    <string name="blocklist_update_check_failure" translatable="true">Niečo sa pokazilo. Skúste to znova neskôr!</string>
+    <string name="http_proxy_dialog_desc" translatable="true">Nastavte adresu URL formulára, &lt;protokol&gt;://&lt;používateľské meno&gt;:&lt;heslo&gt;@&lt;doména-alebo-ip&gt;:&lt;port&gt;&lt;cesta&gt;. Príklad: http://proxy.example.com:8080/</string>
 </resources>
