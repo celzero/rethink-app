@@ -486,10 +486,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             } else {
                 wgStatus +=
                     getString(
-                            R.string.ci_ip_label,
-                            it.getName(),
-                            getString(R.string.status_waiting).replaceFirstChar(Char::titlecase).padStart(1, ' ')
-                        ) + "\n"
+                        R.string.ci_ip_label,
+                        it.getName(),
+                        getString(R.string.status_waiting)
+                            .replaceFirstChar(Char::titlecase)
+                            .padStart(1, ' ')
+                    ) + "\n"
                 if (DEBUG) Log.d(LOG_TAG_PROXY, "current proxy status is null for $id")
             }
         }
@@ -686,7 +688,10 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             }
         } else {
             ipAddressEditText.setText(Constants.SOCKS_DEFAULT_IP, TextView.BufferType.EDITABLE)
-            portEditText.setText(Constants.SOCKS_DEFAULT_PORT.toString(), TextView.BufferType.EDITABLE)
+            portEditText.setText(
+                Constants.SOCKS_DEFAULT_PORT.toString(),
+                TextView.BufferType.EDITABLE
+            )
         }
 
         headerTxt.text = getString(R.string.settings_dns_proxy_dialog_header)

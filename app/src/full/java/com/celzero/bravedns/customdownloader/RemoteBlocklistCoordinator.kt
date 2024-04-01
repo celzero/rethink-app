@@ -28,13 +28,13 @@ import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Utilities
 import com.google.gson.JsonObject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import retrofit2.converter.gson.GsonConverterFactory
 
 class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), KoinComponent {
@@ -81,7 +81,8 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
                 }
             }
         } catch (ex: CancellationException) {
-            Log.e(LOG_TAG_DOWNLOAD,
+            Log.e(
+                LOG_TAG_DOWNLOAD,
                 "Local blocklist download, received cancellation exception: ${ex.message}",
                 ex
             )
@@ -104,7 +105,10 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
                     ""
                 )
 
-            Log.i(LOG_TAG_DOWNLOAD, "response rcvd for remote blocklist, res: ${response?.isSuccessful}")
+            Log.i(
+                LOG_TAG_DOWNLOAD,
+                "response rcvd for remote blocklist, res: ${response?.isSuccessful}"
+            )
 
             if (response?.isSuccessful == true) {
                 return saveRemoteFile(response.body(), timestamp)

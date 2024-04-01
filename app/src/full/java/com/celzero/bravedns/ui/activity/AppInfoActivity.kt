@@ -56,7 +56,6 @@ import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -665,5 +664,4 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
     }
-
 }

@@ -86,7 +86,5 @@ object PauseTimer {
         return pauseCountDownTimer
     }
 
-    private fun io(f: suspend () -> Unit) = CoroutineScope(Dispatchers.IO).launch {
-        f()
-    }
+    private fun io(f: suspend () -> Unit) = CoroutineScope(Dispatchers.IO).launch { f() }
 }

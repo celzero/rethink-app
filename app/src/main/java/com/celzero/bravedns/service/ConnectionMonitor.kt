@@ -37,6 +37,9 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isNetworkSame
 import com.google.common.collect.Sets
+import kotlinx.coroutines.runBlocking
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.Closeable
 import java.io.IOException
 import java.net.DatagramSocket
@@ -49,9 +52,6 @@ import java.util.Collections
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
-import kotlinx.coroutines.runBlocking
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     ConnectivityManager.NetworkCallback(), KoinComponent {

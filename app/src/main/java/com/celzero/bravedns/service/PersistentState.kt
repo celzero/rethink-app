@@ -271,7 +271,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var routeRethinkInRethink by booleanPref("route_rethink_in_rethink").withDefault<Boolean>(false)
 
     // perform connectivity checks
-    var connectivityChecks by booleanPref("connectivity_check").withDefault<Boolean>(!Utilities.isPlayStoreFlavour())
+    var connectivityChecks by
+        booleanPref("connectivity_check").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
 
     // proxy dns requests over proxy
     var proxyDns by booleanPref("proxy_dns").withDefault<Boolean>(true)

@@ -325,10 +325,7 @@ object Utilities {
                         PackageManager.PackageInfoFlags.of(PackageManager.GET_META_DATA.toLong())
                     )
                 } else {
-                    ctx.packageManager.getPackageInfo(
-                        ctx.packageName,
-                        PackageManager.GET_META_DATA
-                    )
+                    ctx.packageManager.getPackageInfo(ctx.packageName, PackageManager.GET_META_DATA)
                 }
             ) {
                 return firstInstallTime == lastUpdateTime

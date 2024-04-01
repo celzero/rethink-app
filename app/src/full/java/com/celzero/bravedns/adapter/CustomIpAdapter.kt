@@ -54,9 +54,6 @@ import com.celzero.bravedns.util.Utilities.getFlag
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import inet.ipaddr.AddressStringException
-import inet.ipaddr.HostName
-import inet.ipaddr.HostNameException
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.Dispatchers

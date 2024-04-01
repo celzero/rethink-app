@@ -33,14 +33,14 @@ import com.celzero.bravedns.database.ODoHEndpoint
 import com.celzero.bravedns.databinding.DialogSetCustomOdohBinding
 import com.celzero.bravedns.databinding.FragmentOdohListBinding
 import com.celzero.bravedns.viewmodel.ODoHEndpointViewModel
-import java.net.MalformedURLException
-import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.net.MalformedURLException
+import java.net.URL
 
 class ODoHListFragment : Fragment(R.layout.fragment_odoh_list) {
     private val b by viewBinding(FragmentOdohListBinding::bind)

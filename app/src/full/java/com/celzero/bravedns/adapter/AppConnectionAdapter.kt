@@ -24,7 +24,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -36,9 +35,6 @@ import com.celzero.bravedns.ui.bottomsheet.AppConnectionBottomSheet
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOwner, val uid: Int) :
     PagingDataAdapter<AppConnection, AppConnectionAdapter.ConnectionDetailsViewHolder>(

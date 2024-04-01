@@ -14,8 +14,6 @@ import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import inet.ipaddr.IPAddressString
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import java.net.InetSocketAddress
 import java.util.concurrent.TimeUnit
 

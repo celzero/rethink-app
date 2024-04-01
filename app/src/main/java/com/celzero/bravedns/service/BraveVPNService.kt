@@ -92,18 +92,6 @@ import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import intra.Bridge
 import intra.SocketSummary
-import java.io.IOException
-import java.net.InetAddress
-import java.net.SocketException
-import java.net.UnknownHostException
-import java.util.Collections
-import java.util.Locale
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.abs
-import kotlin.math.min
-import kotlin.random.Random
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -116,6 +104,18 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import rnet.ServerSummary
 import rnet.Tab
+import java.io.IOException
+import java.net.InetAddress
+import java.net.SocketException
+import java.net.UnknownHostException
+import java.util.Collections
+import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.abs
+import kotlin.math.min
+import kotlin.random.Random
 
 class BraveVPNService :
     VpnService(), ConnectionMonitor.NetworkListener, Bridge, OnSharedPreferenceChangeListener {

@@ -52,12 +52,12 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.wireguard.Config
 import intra.Intra
 import intra.Tunnel
-import java.net.URI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.net.URI
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -872,7 +872,11 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun updateLinkAndRoutes(tunFd: ParcelFileDescriptor, opts: TunnelOptions, proto: Long): Boolean {
+    suspend fun updateLinkAndRoutes(
+        tunFd: ParcelFileDescriptor,
+        opts: TunnelOptions,
+        proto: Long
+    ): Boolean {
         if (!tunnel.isConnected) {
             Log.e(LOG_TAG_VPN, "updateLink: tunFd is null, returning")
             return false
@@ -1006,11 +1010,12 @@ class GoVpnAdapter : KoinComponent {
     }
 
     fun syncP50Latency(id: String) {
-        val tid: String = if (persistentState.enableDnsCache && !id.startsWith(Backend.CT)) {
-            Backend.CT + id
-        } else {
-            id
-        }
+        val tid: String =
+            if (persistentState.enableDnsCache && !id.startsWith(Backend.CT)) {
+                Backend.CT + id
+            } else {
+                id
+            }
         try {
             val transport = getResolver()?.get(tid)
             val p50 = transport?.p50() ?: return
@@ -1089,18 +1094,22 @@ class GoVpnAdapter : KoinComponent {
             val router = tunnel.proxies.getProxy(proxyId).router()
             // if the router contains 0.0.0.0, then it is not split tunnel for ipv4
             // if the router contains ::, then it is not split tunnel for ipv6
-            val res: Boolean = if (pair.first && pair.second) {
-                // if the pair is true, check for both ipv4 and ipv6
-                !router.contains(UNSPECIFIED_IP_IPV4) || !router.contains(UNSPECIFIED_IP_IPV6)
-            } else if (pair.first) {
-                !router.contains(UNSPECIFIED_IP_IPV4)
-            } else if (pair.second) {
-                !router.contains(UNSPECIFIED_IP_IPV6)
-            } else {
-                false
-            }
+            val res: Boolean =
+                if (pair.first && pair.second) {
+                    // if the pair is true, check for both ipv4 and ipv6
+                    !router.contains(UNSPECIFIED_IP_IPV4) || !router.contains(UNSPECIFIED_IP_IPV6)
+                } else if (pair.first) {
+                    !router.contains(UNSPECIFIED_IP_IPV4)
+                } else if (pair.second) {
+                    !router.contains(UNSPECIFIED_IP_IPV6)
+                } else {
+                    false
+                }
 
-            Log.i(LOG_TAG_VPN, "split tunnel proxy($proxyId): ipv4? ${pair.first}, ipv6? ${pair.second}, res? $res")
+            Log.i(
+                LOG_TAG_VPN,
+                "split tunnel proxy($proxyId): ipv4? ${pair.first}, ipv6? ${pair.second}, res? $res"
+            )
             res
         } catch (e: Exception) {
             Log.w(LOG_TAG_VPN, "err isSplitTunnelProxy($proxyId): ${e.message}")

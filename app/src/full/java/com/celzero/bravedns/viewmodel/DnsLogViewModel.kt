@@ -39,14 +39,15 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
 
     init {
         filteredList.value = ""
-        pagingConfig = PagingConfig(
-            enablePlaceholders = true,
-            prefetchDistance = 3,
-            initialLoadSize = LIVEDATA_PAGE_SIZE * 2,
-            maxSize = LIVEDATA_PAGE_SIZE * 3,
-            pageSize = LIVEDATA_PAGE_SIZE * 2,
-            jumpThreshold = 5
-        )
+        pagingConfig =
+            PagingConfig(
+                enablePlaceholders = true,
+                prefetchDistance = 3,
+                initialLoadSize = LIVEDATA_PAGE_SIZE * 2,
+                maxSize = LIVEDATA_PAGE_SIZE * 3,
+                pageSize = LIVEDATA_PAGE_SIZE * 2,
+                jumpThreshold = 5
+            )
     }
 
     val dnsLogsList = filteredList.switchMap { input -> fetchDnsLogs(input) }

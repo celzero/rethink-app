@@ -55,7 +55,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main), OneWgConfigAdapter.DnsStatusListener {
+class WgMainActivity :
+    AppCompatActivity(R.layout.activity_wireguard_main), OneWgConfigAdapter.DnsStatusListener {
     private val b by viewBinding(ActivityWireguardMainBinding::bind)
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
@@ -63,7 +64,6 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main), OneW
     private var wgConfigAdapter: WgConfigAdapter? = null
     private var oneWgConfigAdapter: OneWgConfigAdapter? = null
     private val wgConfigViewModel: WgConfigViewModel by viewModel()
-
 
     companion object {
         private const val IMPORT_LAUNCH_INPUT = "*/*"

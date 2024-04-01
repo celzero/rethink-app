@@ -39,7 +39,7 @@ class KnownPorts {
             return port == NTP_PORT
         }
 
-        fun isDns(port: Int): Boolean {
+        fun isDns(port: Int?): Boolean {
             return port == DNS_PORT
         }
 

@@ -34,7 +34,6 @@ import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
-import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.ProxyManager

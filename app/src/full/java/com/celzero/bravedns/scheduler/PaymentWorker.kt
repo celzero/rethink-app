@@ -26,10 +26,10 @@ import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DOWNLOAD
-import java.util.concurrent.TimeUnit
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
     CoroutineWorker(context, workerParameters), KoinComponent {
@@ -70,7 +70,9 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
         }
     }
 
-    private suspend fun getPaymentStatusFromServer(retryCount: Int = 0): TcpProxyHelper.PaymentStatus {
+    private suspend fun getPaymentStatusFromServer(
+        retryCount: Int = 0
+    ): TcpProxyHelper.PaymentStatus {
         var paymentStatus = TcpProxyHelper.PaymentStatus.INITIATED
         try {
             val retrofit =
@@ -115,7 +117,9 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                 e
             )
         }
-        return if (isRetryRequired(retryCount) && paymentStatus == TcpProxyHelper.PaymentStatus.INITIATED) {
+        return if (
+            isRetryRequired(retryCount) && paymentStatus == TcpProxyHelper.PaymentStatus.INITIATED
+        ) {
             Log.i(LOG_TAG_DOWNLOAD, "retrying the payment status check")
             getPaymentStatusFromServer(retryCount + 1)
         } else {
