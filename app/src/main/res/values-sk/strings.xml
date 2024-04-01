@@ -248,4 +248,5 @@
     <string name="settings_ip_network_heading" translatable="true">Vyberte verziu IP</string>
     <string name="settings_ip_network_desc" translatable="true">Vyberte si medzi verziami internetového protokolu.</string>
     <string name="settings_ptrans_desc" translatable="true">Preložiť odchádzajúce IPv6 spojenia do IPv4 na zariadení. Ak ste pripojený iba k sieti IPv4.</string>
+    <string name="settings_allow_lan_heading" translatable="true">Nesledujte súkromné IP (experimental)</string>
 </resources>
