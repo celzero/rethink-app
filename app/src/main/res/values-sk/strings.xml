@@ -287,4 +287,5 @@
 \nOrbot používa <u>Tor</u> na šifrovanie vašej internetovej prevádzky, čo vám pomáha <u>obísť cenzúru</u> a brániť sa pred formami <u>sledovania siete</u>, ktoré ohrozujú osobnú slobodu a súkromie.
 \n<u>TCP Proxy</u>: Rethink posiela iba TCP spojenia <i>zahrnutých</i> aplikácií do Orbotu.
 \n<u>HTTP Proxy</u>: Rethink <i>vytvorí</i> tunel HTTP CONNECT do Orbotu a pošle iba TCP spojenia <i>zahrnutých</i> aplikácií.</string>
+    <string name="orbot_status_arg_2" translatable="true">TCP</string>
 </resources>
