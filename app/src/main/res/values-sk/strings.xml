@@ -264,4 +264,6 @@
     <string name="orbot_bs_status_2" translatable="true">HTTP Proxy je zvolené.</string>
     <string name="orbot_bs_status_3" translatable="true">Pošli %1$s cez Orbot, HTTP Proxy je tiež nastavené.</string>
     <string name="orbot_socks5_desc" translatable="true">Pošli všetky TCP spojenia cez Orbot.</string>
+    <string name="orbot" translatable="true">Orbot</string>
+    <string name="orbot_http" translatable="true">HTTP Proxy</string>
 </resources>
