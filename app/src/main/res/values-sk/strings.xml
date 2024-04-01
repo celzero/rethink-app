@@ -235,5 +235,5 @@
     <string name="settings_vpn_heading" translatable="true">vpn</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">IP adresa skopírovaná.</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL skopírované</string>
-    <string name="public_key_copy_toast_msg" translatable="true">Skopírovaný verejný kľúč.</string>
+    <string name="public_key_copy_toast_msg" translatable="true">Verejný kľúč skopírovaný.</string>
 </resources>
