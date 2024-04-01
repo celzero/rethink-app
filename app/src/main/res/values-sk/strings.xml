@@ -247,5 +247,5 @@
     <string name="relative_time_yesterday" translatable="true">Včera</string>
     <string name="settings_ip_network_heading" translatable="true">Vyberte verziu IP</string>
     <string name="settings_ip_network_desc" translatable="true">Vyberte si medzi verziami internetového protokolu.</string>
-    <string name="settings_ptrans_desc" translatable="true">Preložiť odchádzajúce IPv6 prevádzku na IPv4 on-device. Ak ste pripojený k sieti IPv4-pouze.</string>
+    <string name="settings_ptrans_desc" translatable="true">Preložiť odchádzajúce IPv6 spojenia do IPv4 na zariadení. Ak ste pripojený iba k sieti IPv4.</string>
 </resources>
