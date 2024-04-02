@@ -35,7 +35,7 @@
 \nNúmero de puerto: %2$s</string>
     <string name="dns_proxy_dialog_header_dns">Añadir proxy DNS</string>
     <string name="cd_toast_added">Dominio añadido con éxito</string>
-    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nueva característica&lt;/i&gt;: Soporte para anonimizar &lt;i&gt;DNS inconsciente a través de HTTPS.&lt;/i&gt;&lt;br/&gt; 2. &lt;i&gt;Nueva característica&lt;/i&gt;: Soporte para &lt;i&gt;DNS sobre TLS&lt;/i&gt;.&lt;br/&gt; 3. &lt;i&gt;Nueva característica&lt;/i&gt;: modos WireGuard simple y avanzado.&lt;br/&gt; 4. &lt;i&gt;Nueva característica&lt;/i&gt;: Mostrar ancho de banda en la pantalla de estadísticas.&lt;br/&gt; 5. &lt;i&gt;Nueva característica&lt;/i&gt;: Soporta todos los proxies, incluyendo Orbot, incluso en modo &lt;i&gt;de bloqueo de VPN&lt;/i&gt;.&lt;br/&gt; 6. &lt;i&gt;Nueva característica&lt;/i&gt;: ¡Monitoree el tráfico de red usando Rethink!&lt;br/&gt; 7. &lt;i&gt;Nueva característica&lt;/i&gt;: Reenviar DNS a través de proxies activos como WireGuard.&lt;br/&gt; 8. &lt;i&gt;Nueva característica&lt;/i&gt;: Copia de seguridad y restauración de la misma versión en todos los dispositivos.&lt;br/&gt; 9. Se ha mejorado la generación de &lt;i&gt;informes de errores&lt;/i&gt;.&lt;br/&gt; 10. Mejor manejo de redes IP de doble pila.&lt;br/&gt; 11. &lt;i&gt;Corrección de errores&lt;/i&gt;: Correcciones de errores menores en el manejo de DNS de multidifusión.&lt;br/&gt; 12. &lt;i&gt;Corrección de errores&lt;/i&gt;: Recuperación automática de la conectividad para las VPN de WireGuard.&lt;br/&gt; 13. &lt;i&gt;Corrección de errores&lt;/i&gt;: Solucione las notificaciones de aplicaciones bloqueadas incorrectamente.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayude a traducir esta aplicación&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai 3.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nueva característica&lt;/i&gt;: Opcionalmente, proxy DNS a través de servidores proxy WireGuard y SOCKS5.&lt;br/&gt; 2. &lt;i&gt;Nueva característica &lt;/i&gt;: opcionalmente habilite las comprobaciones de conectividad integradas de Android.&lt;br/&gt; 3. Soporte mejorado para editar reglas de firewall basadas en IP.&lt;br/&gt; 4. Ancho de banda WireGuard mejorado.&lt;br/&gt; 5. WireGuard UX revisado. &lt;br/&gt; 6. Evite fugas de conexión para los modos WireGuard simple y siempre activo.&lt;br/&gt; 7. Solucione fallas al editar configuraciones de WireGuard.&lt;br/&gt; 8. Solucione errores menores con RDNS+ y otras reglas de firewall basadas en dominios. &lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;</string>
     <string name="dc_dns_leaks_desc">Cuando está activado, Rethink captura todos los paquetes en el puerto 53 y los reenvía a un punto de acceso DNS establecido por el usuario</string>
     <string name="about_settings_app_info">Información de la aplicación</string>
     <string name="settings_orbot_disabled_error">Desactive el proxy HTTP(S) y/o SOCKS5 para continuar con la configuración de Tor-como-un-proxy.</string>
@@ -78,8 +78,7 @@
     <string name="settings_dns_proxy_dialog_password">Contraseña</string>
     <string name="settings_dns_proxy_dialog_positive_btn">configurar</string>
     <string name="settings_socks5_dialog_hint_port">Puerto</string>
-    <string name="settings_ip_dialog_ipv46">Auto (experimental)
-\nse envían comprobaciones de conectividad para determinar la accesibilidad.</string>
+    <string name="settings_ip_dialog_ipv46">Auto (experimental)</string>
     <string name="settings_ip_text_ipv4">IPv4</string>
     <string name="settings_ip_text_ipv46">Automático</string>
     <string name="settings_theme_dialog_themes_4">Negro</string>
@@ -385,7 +384,7 @@
     <string name="about_mail_bugreport_text">Envíe este correo electrónico a : hello@celzero.com</string>
     <string name="settings_notification_dialog_option_2">"
 \nDNS / DNS + Cortafuegos:
-\nMuestra dos botones para cambiar rápidamente entre el modo DNS de ahorro de batería y el modo normal DNS + Firewall."</string>
+\nMuestra dos botones para cambiar rápidamente entre el modo DNS de ahorro de batería y el modo normal DNS + Cortafuegos."</string>
     <string name="settings_selected_theme">Tema actual: %1$s</string>
     <string name="dns_crypt_relay_remove_dialog_title">¿Borrar el repetidor DNSCrypt\?</string>
     <string name="dns_crypt_relay_remove_success">Repetidor DNSCrypt borrado.</string>
@@ -1016,4 +1015,13 @@
     <string name="remaining_apps_dialog_title" translatable="true">Incluir las aplicaciones restantes</string>
     <string name="wireguard_apps_proxy_map_desc" translatable="true">parte de %1$s</string>
     <string name="wg_apps_dialog_title_include" translatable="true">incluye %1$s aplicaciones</string>
+    <string name="lbl_idle" translatable="true">Inactivo</string>
+    <string name="lbl_split" translatable="true">Dividir (Split)</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">¡Protegido! Conectado a DNS + Firewall + Proxy.</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Nunca un proxy DNS</string>
+    <string name="dc_proxy_dns_desc" translatable="true">No utilice DNS a través de servidores proxy Always-on WireGuard, SOCKS5 o HTTP.</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s está deshabilitado porque los servidores proxy están activos</string>
+    <string name="lbl_on_device" translatable="true">en el dispositivo</string>
+    <string name="settings_connectivity_checks" translatable="true">Realizar comprobaciones de conectividad</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">Se envían comprobaciones de conectividad para determinar la accesibilidad.</string>
 </resources>
