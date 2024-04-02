@@ -298,5 +298,5 @@
     <string name="settings_socks5_disabled_error" translatable="true">Pripojené k %1$s. Vypnite to, aby ste mohli pokračovať.</string>
     <string name="settings_socks5_vpn_disabled_error" translatable="true">Zapnite Rethink k pokračovaniu.</string>
     <string name="settings_orbot_disabled_error" translatable="true">Vypnite HTTP(S) a/alebo SOCKS5 proxy aby ste mohli pokračovať s nastavením Tor-as-a-proxy.</string>
-    <string name="settings_https_disabled_error" translatable="true">Pripojené k %1$s. Vypnite ho a pokračujte.</string>
+    <string name="settings_https_disabled_error" translatable="true">Pripojené k %1$s. Vypnite ho aby ste mohli pokračovať.</string>
 </resources>
