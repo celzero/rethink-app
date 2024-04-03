@@ -576,4 +576,8 @@
     <string name="ada_app_status_block" translatable="true">bị chặn</string>
     <string name="firewall_rule_unknown" translatable="true">Nguồn không xác định</string>
     <string name="ada_app_status_allow" translatable="true">được cho phép</string>
+    <string name="lbl_private_key" translatable="true">Khóa cá nhân</string>
+    <string name="lbl_public_key" translatable="true">Khoá công khai</string>
+    <string name="lbl_dns_servers" translatable="true">Máy chủ DNS</string>
+    <string name="lbl_proceed" translatable="true">Tiến hành</string>
 </resources>
