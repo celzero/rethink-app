@@ -14,15 +14,14 @@
     <string name="settings_theme_heading">Aparência</string>
     <string name="settings_network_all_networks_desc">Quando ativado, o Rethink usa todas as redes disponíveis para se conectar à Internet. Caso contrário, ele usará a rede considerada <i>ativa</i> pelo Android.</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (experimental)</string>
-    <string name="settings_ip_dialog_ipv46">Automático (experimental)
-\nverificações de conectividade são enviadas para verificar a acessibilidade.</string>
+    <string name="settings_ip_dialog_ipv46">Automático (experimental)</string>
     <string name="settings_ip_text_ipv46">Automático</string>
     <string name="settings_notification_dialog_option_2">"
 \nDNS / DNS + Firewall:
 \nMostrar dois botões para alternar rapidamente entre o modo DNS para economia de bateria e modo normal DNS + Firewall."</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="about_twitter">Siga-nos no Twitter</string>
-    <string name="about_app_update_check">Verificar se há atualizações do aplicativo</string>
+    <string name="about_app_update_check">Buscar atualizações</string>
     <string name="about_app_contributors">Autores</string>
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="about_mail_subject">[Rethink]:</string>
@@ -99,29 +98,29 @@
     <string name="fapps_firewall_filter_excluded">Excluído</string>
     <string name="dns_proxy_app">Aplicativo</string>
     <string name="fapps_info_dialog_positive_btn">Ok</string>
-    <string name="fapps_metered_block_dialog_title">Bloquear em redes limitadas</string>
+    <string name="fapps_metered_block_dialog_title">Bloquear em redes móveis</string>
     <string name="network_log_app_name_unknown">Desconhecido</string>
     <string name="cd_dns_proxy_error_text_1">Endereço IP inválido</string>
     <string name="cd_dns_proxy_error_text_3">Porta inválida</string>
     <string name="rules_load_failure_desc">Nenhuma regra de firewall encontrada</string>
     <string name="rules_load_failure_reload">recarregar</string>
     <string name="firewall_rule_block_app_new_install">Novo aplicativo</string>
-    <string name="fapps_unmetered_unblock_dialog_title">Permitir em redes ilimitadas</string>
+    <string name="fapps_unmetered_unblock_dialog_title">Permitir em redes Wi-Fi</string>
     <string name="firewall_rule_block_app_exception">Erro</string>
     <string name="firewall_rule_block_ip">IP / Porta (Aplicativo)</string>
     <string name="firewall_rule_exempt_app_bypass_univ">Aplicativo ignorado</string>
     <string name="firewall_rule_block_http">HTTP inseguro</string>
-    <string name="fapps_unmetered_block_dialog_title">Bloquear em redes ilimitadas</string>
-    <string name="fapps_unmetered_block_dialog_message">Bloquear conexões em redes ilimitadas (Wi-Fi) para aplicativos <i>listados</i>\?</string>
+    <string name="fapps_unmetered_block_dialog_title">Bloquear em redes Wi-Fi</string>
+    <string name="fapps_unmetered_block_dialog_message">Bloquear conexões em redes Wi-Fi para aplicativos <i>listados</i>\?</string>
     <string name="firewall_rule_exempt_orbot_setup">Configuração do Orbot</string>
-    <string name="fapps_unmetered_unblock_dialog_message">Permitir conexões em rede ilimitada (Wi-Fi) para aplicativos <i>listados</i>\?</string>
+    <string name="fapps_unmetered_unblock_dialog_message">Permitir conexões em redes Wi-Fi para aplicativos <i>listados</i>\?</string>
     <string name="fapps_firewall_filter_hint">Mostrando todos os aplicativos</string>
     <string name="firewall_rule_exempt_dns_proxied">DNS com proxy</string>
     <string name="firewall_rule_no_rule_desc">Nenhuma regra de firewall correspondeu a esta conexão.</string>
     <string name="firewall_rule_block_dns_bypass">DNS ignorado</string>
     <string name="firewall_rule_global_lockdown">Restrito</string>
-    <string name="firewall_rule_block_app_mobile_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>limitada</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc">Uma regra de firewall universal definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>limitada</i> (Móvel).<br/><br/>Para alterar, acesse a guia <i>Universal</i>.</string>
+    <string name="firewall_rule_block_app_mobile_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>móvel</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc">Uma regra de firewall universal definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>móvel</i>.<br/><br/>Para alterar, acesse a guia <i>Universal</i>.</string>
     <string name="firewall_rule_trusted_ip_desc">Esta conexão foi permitida porque o <i>IP de destino</i> está configurado como IP confiável.<br/><br/> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.</string>
     <string name="firewall_rule_device_lock_desc">Esta conexão foi bloqueada porque o dispositivo <i>estava bloqueado</i> naquele momento.<br/><br/> Para mudar este comportamento, acesse a guia <i>Universal</i>.</string>
     <string name="firewall_rule_block_udp_ntp_desc">Uma regra de firewall definida pelo usuário bloqueou esta conexão <i>UDP</i>.<br/><br/> Para alterar, acesse a guia <i>Universal</i>.</string>
@@ -146,10 +145,10 @@
     <string name="cd_remove_dialog_message">Excluir domínio da configuração salva.</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ci_no_rule_initial">N</string>
-    <string name="ada_app_status_block_wifi">está bloqueada em redes ilimitadas (wi-fi)</string>
+    <string name="ada_app_status_block_wifi">bloqueada em redes Wi-Fi</string>
     <string name="ada_app_status_allow">está permitido</string>
     <string name="ada_ip_no_connection">Nenhum registro de rede para este aplicativo.</string>
-    <string name="ada_app_status_block_md">está bloqueada em redes limitadas (móvel)</string>
+    <string name="ada_app_status_block_md">bloqueada em redes móveis</string>
     <string name="ada_app_status_whitelist">irá ignorar as regras universais de firewall</string>
     <string name="notif_download_content_title">Download da lista de bloqueio no dispositivo</string>
     <string name="rt_download_start">Baixando listas de bloqueio…</string>
@@ -274,7 +273,7 @@
     <string name="firewall_mode_info_title">Firewall</string>
     <string name="firewall_mode_info_explanation_new">Monitorar atividade de rede e implementar um firewall em qualquer aplicativo ou endereço IP.</string>
     <string name="apps_info_title">Aplicativos</string>
-    <string name="dns_mode_info_explanation_new">Monitorar, bloquear e criptografar solicitações via DNS.</string>
+    <string name="dns_mode_info_explanation_new">Monitorar, bloquear e criptografar solicitações DNS.</string>
     <string name="dns_firewall_mode_info_explanation_new">Todas as opções acima, ignorar também censura à Internet.</string>
     <string name="alert_permission_accessibility">Permissão - Acessibilidade</string>
     <string name="alert_firewall_accessibility_explanation">Rethink usa serviço de acessibilidade para rastrear quais aplicativos estão em uso (primeiro plano) e aqueles que não estão em uso (segundo plano).
@@ -383,7 +382,7 @@
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
     <string name="orbot_install_activity_error">Algo deu errado, tente outra vez depois de algum tempo</string>
-    <string name="settings_orbot_heading">Configurar o Orbot</string>
+    <string name="settings_orbot_heading">Configurar Orbot</string>
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="settings_orbot_desc">Orbot em modo não VPN com HTTPS/SOCKS5.</string>
     <string name="settings_orbot_install_desc">Toque aqui para instalar o Orbot</string>
@@ -441,16 +440,16 @@
     <string name="firewall_status_allow">permitido</string>
     <string name="firewall_status_isolate">restrito</string>
     <string name="firewall_status_whitelisted">Ignora regras universais de firewall</string>
-    <string name="firewall_status_block_metered">bloqueado em redes limitadas (móveis)</string>
+    <string name="firewall_status_block_metered">bloqueado em redes móveis</string>
     <string name="firewall_status_blocked">bloqueado</string>
     <string name="firewall_status_unknown">desconhecido</string>
     <string name="firewall_card_text_active">%1$s bloqueados
 \n%2$s ignorados
 \n%3$s excluídos
 \n%4$s restritos</string>
-    <string name="firewall_card_text_inactive">Ativar o modo Firewall.</string>
+    <string name="firewall_card_text_inactive">Ativar modo Firewall.</string>
     <string name="dns_card_latency_active">%1$sms</string>
-    <string name="dns_card_latency_inactive">Ativar o modo DNS.</string>
+    <string name="dns_card_latency_inactive">Ativar modo DNS.</string>
     <string name="apps_card_ips_count">%1$s regra(s) de IP e porta</string>
     <string name="hsf_start_btn_state">iniciar</string>
     <string name="hsf_stop_btn_state">encerrar</string>
@@ -461,7 +460,7 @@
     <string name="lbl_proceed">Continuar</string>
     <string name="hsf_vpn_prepare_failure">Permissão VPN ausente ou outro aplicativo está com a opção \"VPN Sempre Ativa\".</string>
     <string name="hsf_start_dialog_header">Iniciar %1$s</string>
-    <string name="firewall_status_block_unmetered">bloqueado em redes ilimitadas (wi-fi)</string>
+    <string name="firewall_status_block_unmetered">bloqueado em redes Wi-Fi</string>
     <string name="hsf_start_dialog_positive">Começar</string>
     <string name="hsf_blocklist_chip_text_no_data">Ativar RDNS+</string>
     <string name="hsf_exclude_error">Não é possível excluir no modo \"VPN Restrito\"</string>
@@ -533,7 +532,7 @@
     <string name="univ_firewall_rule_6">Bloquear aplicativos recém instalados por padrão</string>
     <string name="univ_firewall_rule_7">Bloquear IPv4 em IPv6 (experimental)</string>
     <string name="univ_firewall_rule_8">Bloquear tráfego na porta 80 (HTTP inseguro)</string>
-    <string name="univ_firewall_rule_9">Bloquear em rede limitada (móvel)</string>
+    <string name="univ_firewall_rule_9">Bloquear em redes móveis</string>
     <string name="univ_view_blocked_ip">Regras de IP e porta</string>
     <string name="univ_view_blocked_ip_desc">Modificar regras de domínio, IP/porta bloqueadas ou confiáveis.</string>
     <string name="univ_ip_delete_individual_toast">%1$s excluído.</string>
@@ -564,9 +563,9 @@
     <string name="fapps_filter_parent_system">Sistema</string>
     <string name="fapps_firewall_filter_bypass_universal">Ignorados</string>
     <string name="fapps_firewall_filter_isolate">Restritos</string>
-    <string name="fapps_metered_block_dialog_message">Bloquear conexões em rede limitada (móvel) para aplicativos <i>listados</i>\?</string>
-    <string name="fapps_metered_unblock_dialog_title">Permitir em redes limitadas</string>
-    <string name="fapps_metered_unblock_dialog_message">Permitir conexões em redes limitada (móvel) para aplicativos <i>listados</i>\?</string>
+    <string name="fapps_metered_block_dialog_message">Bloquear conexões em redes móveis para aplicativos <i>listados</i>\?</string>
+    <string name="fapps_metered_unblock_dialog_title">Permitir em redes móveis</string>
+    <string name="fapps_metered_unblock_dialog_message">Permitir conexões em redes móveis para aplicativos <i>listados</i>\?</string>
     <string name="fapps_firewall_filter_desc">Mostrando aplicativos: <u>%1$s</u>, %2$s</string>
     <string name="fapps_firewall_filter_desc_category">Mostrando aplicativos (<u>%1$s</u>, %2$s) nas categorias: %3$s</string>
     <string name="unicode_warning_sign">⚠</string>
@@ -592,9 +591,9 @@
     <string name="hs_btm_sheet_lock_down">Não é possível alterar entre modos quando a VPN está em modo <i>restrito</i>. Toque para <u>editar configurações da VPN</u>.</string>
     <string name="firewall_rule_no_rule">Sem regras</string>
     <string name="firewall_rule_block_app">Aplicativo bloqueado</string>
-    <string name="firewall_rule_block_unmetered">Ilimitada (Wi-Fi)</string>
-    <string name="firewall_rule_block_metered">Limitada (Móvel)</string>
-    <string name="firewall_rule_univ_block_metered">Limitada (Universal)</string>
+    <string name="firewall_rule_block_unmetered">Wi-Fi</string>
+    <string name="firewall_rule_block_metered">Dados móveis</string>
+    <string name="firewall_rule_univ_block_metered">Rede móvel (Universal)</string>
     <string name="firewall_rule_isolate">Isolar</string>
     <string name="firewall_rule_trusted_ip">IP confiável</string>
     <string name="firewall_rule_bypass_universal_ip">IP ignorado</string>
@@ -604,7 +603,7 @@
     <string name="firewall_rule_block_udp_ntp">UDP bloqueado</string>
     <string name="firewall_rule_block_app_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
     <string name="firewall_rule_new_app_desc">Este aplicativo fez uma conexão pela <i>primeira</i> vez.<br/><br/> Para alterar, acesse a guia <i>Universal</i>.</string>
-    <string name="firewall_rule_block_app_unmetered_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>ilimitada</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
+    <string name="firewall_rule_block_app_unmetered_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>Wi-Fi</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
     <string name="firewall_rule_isolate_desc">Uma regra de firewall definida pelo usuário bloqueou a conexão deste <i>aplicativo</i> com outros <i>IPs ignorados</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
     <string name="firewall_rule_block_ip_univ_desc">Uma regra de firewall definida pelo usuário bloqueou o <i>IP / Porta de destino</i>.<br/><br/> Para alterar, acesse a guia <i>Universal</i>.</string>
     <string name="firewall_rule_block_ip_desc">Uma regra de firewall definida pelo usuário bloqueou o <i>IP de destino</i>.<br/><br/> Para alterar, acesse a tela <i>Firewall específico do aplicativo</i>.</string>
@@ -670,8 +669,8 @@
     <string name="ada_app_status_isolate">está isolado; somente IPs confiáveis são permitidos</string>
     <string name="ada_app_status_unknown">é desconhecido</string>
     <string name="ada_network_log_title">registro de rede para este aplicativo</string>
-    <string name="ada_app_metered">Rede limitada</string>
-    <string name="ada_app_unmetered">Rede ilimitada</string>
+    <string name="ada_app_metered">Rede móvel</string>
+    <string name="ada_app_unmetered">Rede Wi-Fi</string>
     <string name="ada_app_bypass_univ">Ignorar</string>
     <string name="ada_app_exclude">Excluir</string>
     <string name="ada_app_dns_settings">Configurações de DNS</string>
@@ -739,7 +738,7 @@
     <string name="notif_download_cancel_content">Download cancelado.</string>
     <string name="intent_launch_error">Não foi possível abrir %1$s</string>
     <string name="firewall_rule_block_univ_ip">IP / Porta (Universal)</string>
-    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Novo recurso&lt;/i&gt;: Suporte para anonimizar &lt;i&gt;Oblivious DNS-over-HTTPS&lt;/i&gt;.&lt;br/&gt; 2. &lt;i&gt;Novo recurso&lt;/i&gt;: Suporte para &lt;i&gt;DNS-over-TLS&lt;/i&gt;.&lt;br/&gt; 3. &lt;i&gt;Novo recurso&lt;/i&gt;: Modos WireGuard simples e avançados.&lt;br/&gt; 4. &lt;i&gt;Novo recurso&lt;/i&gt;: Mostrar largura de banda na tela de estatísticas.&lt;br/&gt; 5. &lt;i&gt;Novo recurso&lt;/i&gt;: Suporte a todos os proxies, incluindo Orbot, mesmo no modo &lt;i&gt;VPN Restrito&lt;/i&gt;.&lt;br/&gt; 6. &lt;i&gt;Novo recurso&lt;/i&gt;: Monitore o tráfego de rede do Rethink usando Rethink!&lt;br/&gt; 7. &lt;i&gt;Novo recurso&lt;/i&gt;: Encaminhe DNS através de proxies ativos como WireGuard.&lt;br/&gt; 8. &lt;i&gt;Novo recurso&lt;/i&gt;: Backup e restauração da mesma versão em todos os dispositivos.&lt;br/&gt; 9. Geração aprimorada de &lt;i&gt;relatórios de bugs&lt;/i&gt;.&lt;br/&gt; 10. Melhor manuseio de redes IP de pilha dupla.&lt;br/&gt; 11. &lt;i&gt;Correção de bug&lt;/i&gt;: Pequenas correções de bugs no manuseio de DNS multicast.&lt;br/&gt; 12. &lt;i&gt;Correção de bug&lt;/i&gt;: Conectividade de recuperação automática para VPNs WireGuard.&lt;br/&gt; 13. &lt;i&gt;Correção de bug&lt;/i&gt;: Notificações de aplicativos bloqueadas incorretamente.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns. com/r/translate&gt;Ajude a traduzir este aplicativo&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai 3.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Novo recurso&lt;/i&gt;: Proxy DNS sobre proxies WireGuard e SOCKS5 (opcional).&lt;br/&gt; 2. &lt;i&gt;Novo recurso &lt;/i&gt;: Habilitar verificações de conectividade integradas no Android (opcional).&lt;br/&gt; 3. Suporte aprimorado para edição de regras de firewall baseadas em IP.&lt;br/&gt; 4. Largura de banda WireGuard aprimorada.&lt;br/&gt; 5. WireGuard UX revisado. &lt;br/&gt; 6. Evite vazamentos de conexão nos modos WireGuard Simples e \"Sempre Ativa\".&lt;br/&gt; 7. Falhas corrigidas ao editar configurações do WireGuard.&lt;br/&gt; 8. Correções de pequenos bugs com RDNS+ e outras regras de firewall baseadas em domínio. &lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ajude a traduzir este aplicativo&lt;/a&gt;</string>
     <string name="private_dns_dialog_heading">Desativar DNS Privado</string>
     <string name="private_dns_dialog_desc">As configurações de DNS do Rethink são substituídas pelo \"DNS Privado\" do Android.
 \n
@@ -770,7 +769,7 @@
     <string name="bsct_block_domain" translatable="true">Bloquear, confiar <u>domínio(s)</u> para <u>este aplicativo</u></string>
     <string name="settings_general_customize" translatable="true">personalizar</string>
     <string name="settings_pcap_heading" translatable="true">Captura de pacotes</string>
-    <string name="settings_default_dns_heading" translatable="true">Escolha o DNS alternativo</string>
+    <string name="settings_default_dns_heading" translatable="true">Escolher DNS alternativo</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">Desativado (padrão)</string>
     <string name="settings_locale_heading" translatable="true">Alterar idioma</string>
     <string name="settings_locale_dialog_title" translatable="true">Escolha o seu idioma preferido</string>
@@ -787,10 +786,10 @@
     <string name="settings_pcap_dialog_option_2" translatable="true">Saída para Logcat</string>
     <string name="fapps_unblock_dialog_title" translatable="true">Permitir aplicativos</string>
     <string name="fapps_exclude_block_dialog_title" translatable="true">Excluir aplicativos</string>
-    <string name="fapps_info_unmetered_msg" translatable="true">Permitir / Bloquear em rede ilimitada (Wi-Fi).</string>
+    <string name="fapps_info_unmetered_msg" translatable="true">Permitir / Bloquear em redes Wi-Fi.</string>
     <string name="fapps_bypass_block_dialog_title" translatable="true">Ignorar aplicativos</string>
     <string name="fapps_info_bypass_msg" translatable="true">Ignora as regras universais de firewall.</string>
-    <string name="fapps_info_metered_msg" translatable="true">Permitir / Bloquear em rede limitada (Móvel).</string>
+    <string name="fapps_info_metered_msg" translatable="true">Permitir / Bloquear em redes móveis.</string>
     <string name="fapps_info_exclude_msg" translatable="true">Excluir do DNS + Firewall.</string>
     <string name="cd_dns_alg_desc" translatable="true">Atribuir IP exclusivo por solicitação de DNS</string>
     <string name="cd_dns_alg_heading" translatable="true">Filtragem de DNS avançada (experimental)</string>
@@ -889,7 +888,7 @@
     <string name="bypass_dns_firewall_tooltip">%1$s funciona apenas com DNS do Rethink</string>
     <string name="dc_refresh_toast" translatable="true">Atualização concluída</string>
     <string name="dc_setting_dns_cache_heading" translatable="true">Impulsionar DNS</string>
-    <string name="brbs_backup_restore_desc" translatable="true">Não funciona em versões de aplicativos</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Não funciona em todas as versões do aplicativo</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">ips mais contatados</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">ips mais bloqueados</string>
     <string name="bad_config_reason_syntax_error" translatable="true">Erro de sintaxe</string>
@@ -905,7 +904,7 @@
     <string name="generic_error" translatable="true">Erro desconhecido: “%s”</string>
     <string name="parse_error_reason" translatable="true">Não foi possível analisar %1$s “%2$s”</string>
     <string name="new_warp_config_desc" translatable="true">Buscar a configuração WARP no servidor</string>
-    <string name="setup_wireguard" translatable="true">Configurar o WireGuard</string>
+    <string name="setup_wireguard" translatable="true">Configurar WireGuard</string>
     <string name="new_warp_error_toast" translatable="true">Não foi possível buscar a configuração WARP</string>
     <string name="add_peer" translatable="true">Adicionar Par</string>
     <string name="add_remove_apps" translatable="true">Adicionar/Remover (%1$s aplicativos)</string>
@@ -1014,4 +1013,13 @@
     <string name="wireguard_disable_failure" translatable="true">\"WireGuard Sempre Ativa\" não pode ser desativado</string>
     <string name="wg_lockdown_dialog_title" translatable="true">Restrito</string>
     <string name="wireguard_disable_title" translatable="true">Desativar WireGuard</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Protegido! Conectado ao DNS + Firewall + Proxy.</string>
+    <string name="settings_connectivity_checks" translatable="true">Executar verificações de conectividade</string>
+    <string name="lbl_on_device" translatable="true">no dispositivo</string>
+    <string name="lbl_idle" translatable="true">Parado</string>
+    <string name="lbl_split" translatable="true">Dividir</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">As verificações de conectividade são enviadas para verificar a acessibilidade.</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Não usar proxy DNS</string>
+    <string name="dc_proxy_dns_desc" translatable="true">Não usar proxy DNS por meio de proxies WireGuard Sempre Ativa, SOCKS5 e HTTP.</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s está desativado porque os proxies estão ativos</string>
 </resources>

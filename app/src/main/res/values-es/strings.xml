@@ -1019,7 +1019,7 @@
     <string name="lbl_split" translatable="true">Dividir (Split)</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">¡Protegido! Conectado a DNS + Firewall + Proxy.</string>
     <string name="dc_proxy_dns_heading" translatable="true">Nunca un proxy DNS</string>
-    <string name="dc_proxy_dns_desc" translatable="true">No utilice DNS a través de servidores proxy Always-on WireGuard, SOCKS5 o HTTP.</string>
+    <string name="dc_proxy_dns_desc" translatable="true">No utilice DNS a través de servidores proxy WireGuard siempre activo, SOCKS5 o HTTP.</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s está deshabilitado porque los servidores proxy están activos</string>
     <string name="lbl_on_device" translatable="true">en el dispositivo</string>
     <string name="settings_connectivity_checks" translatable="true">Realizar comprobaciones de conectividad</string>
