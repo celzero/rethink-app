@@ -1443,7 +1443,13 @@ class BraveVPNService :
         logd("on pref change, key: $key")
         when (key) {
             PersistentState.BRAVE_MODE -> {
-                io("braveModeChange") { setTunMode() }
+                io("braveModeChange") {
+                    // change in brave mode, requires restart of the vpn (to set routes in vpn),
+                    // tunMode (to set the tun mode), and dnsAlg (to update the dns alg) in go
+                    restartVpnWithNewAppConfig(reason = "braveMode")
+                    setTunMode()
+                    updateDnsAlg()
+                }
                 notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
             }
             PersistentState.LOCAL_BLOCK_LIST -> {
