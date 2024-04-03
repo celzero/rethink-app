@@ -572,7 +572,7 @@ class GoVpnAdapter : KoinComponent {
     }
 
     private suspend fun setSocks5TunnelModeIfNeeded(tunProxyMode: AppConfig.TunProxyMode) {
-        val socksEnabled = AppConfig.ProxyType.of(persistentState.proxyType).isSocks5Enabled()
+        val socksEnabled = AppConfig.ProxyType.of(appConfig.getProxyType()).isSocks5Enabled()
         if (!socksEnabled) return
 
         val socks5: ProxyEndpoint? =

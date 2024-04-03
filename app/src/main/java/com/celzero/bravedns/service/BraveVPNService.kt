@@ -92,18 +92,6 @@ import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import intra.Bridge
 import intra.SocketSummary
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
-import rnet.ServerSummary
-import rnet.Tab
 import java.io.IOException
 import java.net.InetAddress
 import java.net.SocketException
@@ -116,6 +104,18 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.random.Random
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import rnet.ServerSummary
+import rnet.Tab
 
 class BraveVPNService :
     VpnService(), ConnectionMonitor.NetworkListener, Bridge, OnSharedPreferenceChangeListener {
@@ -3138,7 +3138,7 @@ class BraveVPNService :
 
         // chose socks5 proxy over http proxy
         if (appConfig.isCustomSocks5Enabled()) {
-            val endpoint = runBlocking { appConfig.getSocks5ProxyDetails() }
+            val endpoint = appConfig.getSocks5ProxyDetails()
             val packageName = FirewallManager.getPackageNameByUid(uid)
             logd("flow: socks5 proxy is enabled, $packageName, ${endpoint.proxyAppName}")
             // do not block the app if the app is set to forward the traffic via socks5 proxy
@@ -3159,7 +3159,7 @@ class BraveVPNService :
         }
 
         if (appConfig.isCustomHttpProxyEnabled()) {
-            val endpoint = runBlocking { appConfig.getHttpProxyDetails() }
+            val endpoint = appConfig.getHttpProxyDetails()
             val packageName = FirewallManager.getPackageNameByUid(uid)
             // do not block the app if the app is set to forward the traffic via http proxy
             if (endpoint.proxyAppName == packageName) {
