@@ -616,7 +616,7 @@
     <string name="lbl_optional" translatable="true">(任意)</string>
     <string name="lbl_delete" translatable="true">削除</string>
     <string name="lbl_qr_code" translatable="true">QR コード</string>
-    <string name="lbl_generated" translatable="true">(生成)</string>
+    <string name="lbl_generated" translatable="true">(生成されました)</string>
     <string name="lbl_auto" translatable="true">(自動)</string>
     <string name="lbl_slow" translatable="true">遅い</string>
     <string name="lbl_day" translatable="true">日</string>
