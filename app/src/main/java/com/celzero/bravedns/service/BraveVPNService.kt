@@ -3001,7 +3001,7 @@ class BraveVPNService :
         }
 
         if (trapVpnDns) {
-            logd("flow: dns-request, returning Ipn.Base, $uid")
+            logd("flow: dns-request, returning ${Backend.Base}, $uid, $connId")
             return@runBlocking persistAndConstructFlowResponse(null, Backend.Base, connId, uid)
         }
 
@@ -3049,22 +3049,22 @@ class BraveVPNService :
             val proxyId = "${ProxyManager.ID_WG_BASE}${wgConfig.id}"
             // even if inactive, route connections to wg if lockdown/catch-all is enabled to
             // avoid leaks
-            return if (wgConfig.isActive || wgConfig.isLockdown || wgConfig.isCatchAll) {
+            if (wgConfig.isActive || wgConfig.isLockdown || wgConfig.isCatchAll) {
                 val canRoute = vpnAdapter?.canRouteIp(proxyId, connTracker.destIP, true)
                 if (canRoute == true) {
                     logd("flow: wg is active/lockdown/catch-all; $proxyId, $connId, $uid")
-                    persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
+                    return persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
                 } else {
                     logd("flow: wg is active/lockdown/catch-all, but no route, $connId, $uid")
-                    persistAndConstructFlowResponse(connTracker, Backend.Base, connId, uid)
+                    return persistAndConstructFlowResponse(connTracker, Backend.Base, connId, uid)
                 }
             } else {
-                logd("flow: wg is not active; using base, $connId, $uid")
-                persistAndConstructFlowResponse(connTracker, Backend.Base, connId, uid)
+                // fall-through, no lockdown/catch-all/active wg found, so proceed with other checks
             }
         }
 
         // no need to check for other proxies if the protocol is not TCP or UDP
+        // fixme: is this even needed?
         if (
             connTracker.protocol != Protocol.TCP.protocolType &&
                 connTracker.protocol != Protocol.UDP.protocolType

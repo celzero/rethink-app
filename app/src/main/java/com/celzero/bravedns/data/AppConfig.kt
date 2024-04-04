@@ -1051,15 +1051,18 @@ internal constructor(
 
     suspend fun updateCustomSocks5Proxy(proxyEndpoint: ProxyEndpoint) {
         proxyEndpointRepository.update(proxyEndpoint)
+        customSocks5Endpoint = proxyEndpoint
         addProxy(ProxyType.SOCKS5, ProxyProvider.CUSTOM)
     }
 
     suspend fun updateOrbotProxy(proxyEndpoint: ProxyEndpoint) {
         proxyEndpointRepository.update(proxyEndpoint)
+        orbotEndpoint = proxyEndpoint
     }
 
     suspend fun updateCustomHttpProxy(proxyEndpoint: ProxyEndpoint) {
         proxyEndpointRepository.update(proxyEndpoint)
+        customHttpEndpoint = proxyEndpoint
         addProxy(ProxyType.HTTP, ProxyProvider.CUSTOM)
     }
 
