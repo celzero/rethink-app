@@ -69,6 +69,9 @@ internal constructor(
 ) {
     private var braveModeObserver: MutableLiveData<Int> = MutableLiveData()
     private var pcapFilePath: String = ""
+    private var customSocks5Endpoint: ProxyEndpoint? = null
+    private var customHttpEndpoint: ProxyEndpoint? = null
+    private var orbotEndpoint: ProxyEndpoint? = null
 
     companion object {
         private var connectedDns: MutableLiveData<String> = MutableLiveData()
@@ -381,7 +384,7 @@ internal constructor(
             DnsType.DOT.type -> DnsType.DOT
             DnsType.ODOH.type -> DnsType.ODOH
             else -> {
-                Log.wtf(LOG_TAG_VPN, "Invalid dns type mode: ${persistentState.dnsType}")
+                Log.w(LOG_TAG_VPN, "Invalid dns type mode: ${persistentState.dnsType}")
                 DnsType.DOH
             }
         }
@@ -442,15 +445,24 @@ internal constructor(
     }
 
     suspend fun getSocks5ProxyDetails(): ProxyEndpoint {
-        return proxyEndpointRepository.getCustomSocks5Endpoint()
+        if (customSocks5Endpoint == null) {
+            customSocks5Endpoint = proxyEndpointRepository.getCustomSocks5Endpoint()
+        }
+        return customSocks5Endpoint!!
     }
 
     suspend fun getHttpProxyDetails(): ProxyEndpoint {
-        return proxyEndpointRepository.getHttpProxyDetails()
+        if (customHttpEndpoint == null) {
+            customHttpEndpoint = proxyEndpointRepository.getHttpProxyDetails()
+        }
+        return customHttpEndpoint!!
     }
 
     suspend fun getConnectedOrbotProxy(): ProxyEndpoint? {
-        return proxyEndpointRepository.getConnectedOrbotProxy()
+        if (orbotEndpoint == null) {
+            orbotEndpoint = proxyEndpointRepository.getConnectedOrbotProxy()
+        }
+        return orbotEndpoint
     }
 
     suspend fun getOrbotSocks5Endpoint(): ProxyEndpoint {
@@ -1039,15 +1051,18 @@ internal constructor(
 
     suspend fun updateCustomSocks5Proxy(proxyEndpoint: ProxyEndpoint) {
         proxyEndpointRepository.update(proxyEndpoint)
+        customSocks5Endpoint = proxyEndpoint
         addProxy(ProxyType.SOCKS5, ProxyProvider.CUSTOM)
     }
 
     suspend fun updateOrbotProxy(proxyEndpoint: ProxyEndpoint) {
         proxyEndpointRepository.update(proxyEndpoint)
+        orbotEndpoint = proxyEndpoint
     }
 
     suspend fun updateCustomHttpProxy(proxyEndpoint: ProxyEndpoint) {
         proxyEndpointRepository.update(proxyEndpoint)
+        customHttpEndpoint = proxyEndpoint
         addProxy(ProxyType.HTTP, ProxyProvider.CUSTOM)
     }
 

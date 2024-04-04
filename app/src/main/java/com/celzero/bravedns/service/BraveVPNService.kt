@@ -1443,7 +1443,13 @@ class BraveVPNService :
         logd("on pref change, key: $key")
         when (key) {
             PersistentState.BRAVE_MODE -> {
-                io("braveModeChange") { setTunMode() }
+                io("braveModeChange") {
+                    // change in brave mode, requires restart of the vpn (to set routes in vpn),
+                    // tunMode (to set the tun mode), and dnsAlg (to update the dns alg) in go
+                    restartVpnWithNewAppConfig(reason = "braveMode")
+                    setTunMode()
+                    updateDnsAlg()
+                }
                 notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
             }
             PersistentState.LOCAL_BLOCK_LIST -> {
@@ -2995,7 +3001,7 @@ class BraveVPNService :
         }
 
         if (trapVpnDns) {
-            logd("flow: dns-request, returning Ipn.Base, $uid")
+            logd("flow: dns-request, returning ${Backend.Base}, $uid, $connId")
             return@runBlocking persistAndConstructFlowResponse(null, Backend.Base, connId, uid)
         }
 
@@ -3043,22 +3049,22 @@ class BraveVPNService :
             val proxyId = "${ProxyManager.ID_WG_BASE}${wgConfig.id}"
             // even if inactive, route connections to wg if lockdown/catch-all is enabled to
             // avoid leaks
-            return if (wgConfig.isActive || wgConfig.isLockdown || wgConfig.isCatchAll) {
+            if (wgConfig.isActive || wgConfig.isLockdown || wgConfig.isCatchAll) {
                 val canRoute = vpnAdapter?.canRouteIp(proxyId, connTracker.destIP, true)
                 if (canRoute == true) {
                     logd("flow: wg is active/lockdown/catch-all; $proxyId, $connId, $uid")
-                    persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
+                    return persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
                 } else {
                     logd("flow: wg is active/lockdown/catch-all, but no route, $connId, $uid")
-                    persistAndConstructFlowResponse(connTracker, Backend.Base, connId, uid)
+                    return persistAndConstructFlowResponse(connTracker, Backend.Base, connId, uid)
                 }
             } else {
-                logd("flow: wg is not active; using base, $connId, $uid")
-                persistAndConstructFlowResponse(connTracker, Backend.Base, connId, uid)
+                // fall-through, no lockdown/catch-all/active wg found, so proceed with other checks
             }
         }
 
         // no need to check for other proxies if the protocol is not TCP or UDP
+        // fixme: is this even needed?
         if (
             connTracker.protocol != Protocol.TCP.protocolType &&
                 connTracker.protocol != Protocol.UDP.protocolType
@@ -3132,7 +3138,7 @@ class BraveVPNService :
 
         // chose socks5 proxy over http proxy
         if (appConfig.isCustomSocks5Enabled()) {
-            val endpoint = runBlocking { appConfig.getSocks5ProxyDetails() }
+            val endpoint = appConfig.getSocks5ProxyDetails()
             val packageName = FirewallManager.getPackageNameByUid(uid)
             logd("flow: socks5 proxy is enabled, $packageName, ${endpoint.proxyAppName}")
             // do not block the app if the app is set to forward the traffic via socks5 proxy
@@ -3153,7 +3159,7 @@ class BraveVPNService :
         }
 
         if (appConfig.isCustomHttpProxyEnabled()) {
-            val endpoint = runBlocking { appConfig.getHttpProxyDetails() }
+            val endpoint = appConfig.getHttpProxyDetails()
             val packageName = FirewallManager.getPackageNameByUid(uid)
             // do not block the app if the app is set to forward the traffic via http proxy
             if (endpoint.proxyAppName == packageName) {

@@ -787,6 +787,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         }
 
         private suspend fun tcp53(nw: Network?, host: String): Boolean {
+            val timeout = 500 // ms
             val port53 = 53 // port
             var socket: Socket? = null
 
@@ -794,7 +795,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 socket = Socket()
                 val s = InetSocketAddress(host, port53)
                 nw?.bindSocket(socket)
-                socket.connect(s)
+                socket.connect(s, timeout)
                 val c = socket.isConnected
                 val b = socket.isBound
                 if (DEBUG)
@@ -816,6 +817,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         }
 
         private suspend fun udp53(nw: Network?, host: String): Boolean {
+            val timeout = 500 // ms
             val port53 = 53 // port
             var socket: DatagramSocket? = null
 
@@ -823,6 +825,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 socket = DatagramSocket()
                 val s = InetSocketAddress(host, port53)
                 nw?.bindSocket(socket)
+                socket.soTimeout = timeout
                 socket.connect(s)
                 val c = socket.isConnected
                 val b = socket.isBound
