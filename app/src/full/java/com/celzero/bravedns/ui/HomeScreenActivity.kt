@@ -292,6 +292,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun showRestoreDialog(uri: Uri) {
+        if (!isInForeground()) return
+
         val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(R.string.brbs_restore_dialog_title)
         builder.setMessage(R.string.brbs_restore_dialog_message)
@@ -581,6 +583,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         title: String,
         message: String
     ) {
+        if (!isInForeground()) return
+
         val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(title)
         builder.setMessage(message)
