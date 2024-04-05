@@ -77,13 +77,13 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.util.Calendar
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.util.Calendar
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
@@ -97,7 +97,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
-    private var biometricPromptRetryCount = 1
+    //private var biometricPromptRetryCount = 1
     private var onResumeCalledAlready = false
 
     companion object {
@@ -196,13 +196,15 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         // or another pending operation prevents or disables it
                         // error code 10 (ERROR_USER_CANCELED), retry once after user cancelled
                         // the biometric prompt. ref issuetracker.google.com/issues/145231213
-                        if (
+                        // commenting the code below, as the retry is buggy and not working as
+                        // expected, have to revisit this code later
+                        /* if (
                             biometricPromptRetryCount > 0 &&
                                 (errorCode == BiometricPrompt.ERROR_CANCELED ||
                                     errorCode == BiometricPrompt.ERROR_USER_CANCELED)
                         ) {
                             biometricPromptRetryCount--
-                            biometricPrompt.authenticate(promptInfo)
+                            if (isInForeground()) biometricPrompt.authenticate(promptInfo)
                         } else {
                             showToastUiCentered(
                                 applicationContext,
@@ -210,14 +212,20 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                                 Toast.LENGTH_SHORT
                             )
                             finish()
-                        }
+                        } */
+                        showToastUiCentered(
+                            this@HomeScreenActivity,
+                            errString.toString(),
+                            Toast.LENGTH_SHORT
+                        )
+                        finish()
                     }
 
                     override fun onAuthenticationSucceeded(
                         result: BiometricPrompt.AuthenticationResult
                     ) {
                         super.onAuthenticationSucceeded(result)
-                        biometricPromptRetryCount = 1
+                        //biometricPromptRetryCount = 1
                         persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
                         Log.i(LOG_TAG_UI, "Biometric success @ ${System.currentTimeMillis()}")
                     }
@@ -225,12 +233,11 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     override fun onAuthenticationFailed() {
                         super.onAuthenticationFailed()
                         showToastUiCentered(
-                            applicationContext,
+                            this@HomeScreenActivity,
                             getString(R.string.hs_biometeric_failed),
                             Toast.LENGTH_SHORT
                         )
                         Log.i(LOG_TAG_UI, "Biometric authentication failed")
-
                         // show the biometric prompt again only if the ui is in foreground
                         if (isInForeground()) biometricPrompt.authenticate(promptInfo)
                     }
