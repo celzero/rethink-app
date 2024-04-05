@@ -1014,4 +1014,6 @@
     <string name="cleanbrowsing_adult_dns_desc" translatable="true">O filtro para adultos bloqueia o acesso a todos os sites para adultos, pornográficos e explícitos. Não bloqueia proxies ou VPNs, nem sites de conteúdo misto. Sites como o Reddit são permitidos. O Google e o Bing estão definidos para o modo de segurança.</string>
     <string name="quad9_dns_desc" translatable="true">A Quad9 encaminha os pedidos DNS através de uma rede segura de servidores em todo o mundo.</string>
     <string name="crypt_adguard_desc" translatable="true">Protege o seu dispositivo contra malware e muito mais.</string>
+    <string name="lbl_idle" translatable="true">Inativo</string>
+    <string name="lbl_split" translatable="true">Dividir</string>
 </resources>
