@@ -199,7 +199,7 @@ object IpRulesManager : KoinComponent {
     private suspend fun updateRule(uid: Int, ipaddr: String, port: Int, status: IpRuleStatus) {
         Log.i(LOG_TAG_FIREWALL, "ip rule, update: $ipaddr for uid: $uid; status: ${status.name}")
         // ipaddr is expected to be normalized
-        val c = makeCustomIp2(uid, ipaddr, port, status)
+        val c = makeCustomIp(uid, ipaddr, port, status)
         db.update(c)
         val k = treeKey(ipaddr)
         if (!k.isNullOrEmpty()) {
@@ -237,34 +237,36 @@ object IpRulesManager : KoinComponent {
         }
 
         getMostSpecificRuleMatch(uid, ipstr, port).let {
-            logd("ip rule for $uid $ipstr $port => $it ??")
+            logd("ip rule for $uid $ipstr $port => ${it.name} ??")
             if (it != IpRuleStatus.NONE) {
                 resultsCache.put(ck, it)
                 return it
             }
         }
         getMostSpecificRuleMatch(uid, ipstr).let {
-            logd("ip rule for $uid $ipstr => $it ??")
+            logd("ip rule for $uid $ipstr => ${it.name} ??")
             if (it != IpRuleStatus.NONE) {
                 resultsCache.put(ck, it)
                 return it
             }
         }
         getMostSpecificRouteMatch(uid, ipstr, port).let {
-            logd("route rule for $uid $ipstr $port => $it ??")
+            logd("route rule for $uid $ipstr $port => ${it.name} ??")
             if (it != IpRuleStatus.NONE) {
                 resultsCache.put(ck, it)
                 return it
             }
         }
         getMostSpecificRouteMatch(uid, ipstr).let {
-            logd("route rule for $uid $ipstr => $it ??")
+            logd("route rule for $uid $ipstr => ${it.name} ??")
             if (it != IpRuleStatus.NONE) {
                 resultsCache.put(ck, it)
                 return it
             }
         }
-        logd("hasRule? NO: $uid, $ipstr, $port")
+
+        logd("hasRule? NO $uid, $ipstr, $port")
+        resultsCache.put(ck, IpRuleStatus.NONE)
         return IpRuleStatus.NONE
     }
 
@@ -326,7 +328,7 @@ object IpRulesManager : KoinComponent {
         resultsCache.invalidateAll()
     }
 
-    private fun makeCustomIp2(
+    private fun makeCustomIp(
         uid: Int,
         ipAddress: String,
         port: Int?,
@@ -342,9 +344,7 @@ object IpRulesManager : KoinComponent {
         customIp.wildcard = wildcard
         customIp.modifiedDateTime = System.currentTimeMillis()
 
-        val pair = customIp.getCustomIpAddress()
-        val ipaddr = pair.first
-        val port = pair.second
+        val ipaddr = customIp.getCustomIpAddress().first
         // TODO: is this needed in database?
         customIp.ruleType =
             if (ipaddr.isIPv6) {
@@ -420,7 +420,7 @@ object IpRulesManager : KoinComponent {
             "ip rule, add rule for ($uid) ip: $ipstr, $port with status: ${status.name}"
         )
         val normalizedIp = padAndNormalize(ipstr)
-        val c = makeCustomIp2(uid, normalizedIp, port, status)
+        val c = makeCustomIp(uid, normalizedIp, port, status)
         db.insert(c)
         val k = treeKey(normalizedIp)
         if (!k.isNullOrEmpty()) {
@@ -463,7 +463,7 @@ object IpRulesManager : KoinComponent {
                 db.deleteRule(prevRule.uid, prevRule.ipAddress, prevRule.port)
             }
         }
-        val newRule = makeCustomIp2(prevRule.uid, newIpAddrStr, port, newStatus)
+        val newRule = makeCustomIp(prevRule.uid, newIpAddrStr, port, newStatus)
         db.insert(newRule)
         val pk = treeKey(prevIpAddrStr)
         if (!pk.isNullOrEmpty()) {
@@ -490,7 +490,7 @@ object IpRulesManager : KoinComponent {
 
         var host = ""
         var port = ""
-        var err: Exception? = null
+        val err: Exception? = null
         var j = 0
         var k = 0
 
