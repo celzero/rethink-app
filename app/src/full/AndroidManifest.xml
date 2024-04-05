@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-            tools:ignore="ScopedStorage" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
@@ -106,7 +107,8 @@
         <activity
             android:name=".ui.activity.ConfigureOtherDnsActivity"
             android:finishOnTaskLaunch="true" />
-        <activity android:name=".ui.activity.AppWiseLogsActivity"
+        <activity
+            android:name=".ui.activity.AppWiseLogsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.NotificationHandlerDialog"
@@ -120,14 +122,14 @@
             tools:replace="screenOrientation" />
         <activity
             android:name=".ui.activity.AlertsActivity"
-            android:finishOnTaskLaunch="true"  />
+            android:finishOnTaskLaunch="true" />
 
         <receiver
             android:name=".receiver.BraveAutoStartReceiver"
-            android:exported="true"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED"
             android:directBootAware="false"
-            android:label="@string/app_name">
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter android:priority="999">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
@@ -136,6 +138,7 @@
         </receiver>
         <receiver
             android:name=".receiver.NotificationActionReceiver"
+            android:exported="false"
             android:label="@string/app_name" />
 
         <service
