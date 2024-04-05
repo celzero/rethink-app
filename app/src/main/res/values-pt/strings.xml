@@ -1016,4 +1016,6 @@
     <string name="crypt_adguard_desc" translatable="true">Protege o seu dispositivo contra malware e muito mais.</string>
     <string name="lbl_idle" translatable="true">Inativo</string>
     <string name="lbl_split" translatable="true">Dividir</string>
+    <string name="lbl_on_device" translatable="true">no dispositivo</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Protegido! Conectado ao DNS + Firewall + Proxy.</string>
 </resources>
