@@ -108,8 +108,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="2dp"
-                android:textSize="@dimen/default_font_text_view"
                 android:textColor="@color/colorRed_A400"
+                android:textSize="@dimen/default_font_text_view"
                 app:layout_constraintTop_toBottomOf="@id/text_input_layout3" />
 
         </LinearLayout>
@@ -118,19 +118,18 @@
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_dns_crypt_ok_btn"
         style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-        android:textColor="?attr/accentGood"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:text="@string/lbl_add"
+        android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_dns_crypt_scroll" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_dns_crypt_cancel_btn"
-        android:textColor="?attr/accentGood"
         style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -139,6 +138,7 @@
         android:layout_marginBottom="10dp"
         android:gravity="center"
         android:text="@string/lbl_cancel"
+        android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toStartOf="@id/dialog_dns_crypt_ok_btn"
         app:layout_constraintTop_toBottomOf="@id/dialog_dns_crypt_scroll" />

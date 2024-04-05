@@ -3,32 +3,32 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-  <path
-      android:pathData="M2,8C4.8849,6.1012 8.317,5 12,5C15.683,5 19.1151,6.1012 22,8"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/accentGood"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M4.9999,11.8774C7.0592,10.6054 9.4499,9.8774 12,9.8774C14.55,9.8774 16.9407,10.6054 19,11.8774"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/accentGood"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M9.0736,15.4549C10.0119,15.0016 11.0216,14.7549 12.0735,14.7549C13.1255,14.7549 14.1352,15.0016 15.0735,15.4549"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/accentGood"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M11.9181,19.1465L11.902,19.1304"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/accentGood"
-      android:strokeLineCap="round"/>
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M2,8C4.8849,6.1012 8.317,5 12,5C15.683,5 19.1151,6.1012 22,8"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/accentGood"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M4.9999,11.8774C7.0592,10.6054 9.4499,9.8774 12,9.8774C14.55,9.8774 16.9407,10.6054 19,11.8774"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/accentGood"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M9.0736,15.4549C10.0119,15.0016 11.0216,14.7549 12.0735,14.7549C13.1255,14.7549 14.1352,15.0016 15.0735,15.4549"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/accentGood"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M11.9181,19.1465L11.902,19.1304"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/accentGood"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 </vector>

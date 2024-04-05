@@ -20,9 +20,9 @@
         android:id="@+id/dialog_dns_proxy_spinner_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal"
         android:padding="10dp"
-        android:layout_marginTop="10dp"
         android:weightSum="1">
 
         <androidx.appcompat.widget.AppCompatTextView

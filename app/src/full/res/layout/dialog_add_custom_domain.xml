@@ -84,14 +84,14 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/dacd_text_input_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:hint="@string/cd_dialog_edittext_hint"
             app:boxCornerRadiusBottomEnd="8dp"
             app:boxCornerRadiusBottomStart="8dp"
             app:boxCornerRadiusTopEnd="8dp"
             app:boxCornerRadiusTopStart="8dp"
-            android:hint="@string/cd_dialog_edittext_hint"
             app:hintTextColor="?attr/accentGood">
 
             <EditText

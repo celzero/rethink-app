@@ -77,8 +77,8 @@
                 android:layout_marginTop="8dp"
                 android:labelFor="@+id/pre_shared_key_text"
                 android:text="@string/lbl_preshared_key"
-                app:layout_constraintStart_toStartOf="parent"
                 android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/public_key_text" />
 
             <TextView

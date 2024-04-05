@@ -70,8 +70,8 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="5dp"
             android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
             android:layout_toStartOf="@id/custom_ip_expand_icon"
             android:alpha="0.5"
             android:src="@drawable/ic_edit_icon_grey" />

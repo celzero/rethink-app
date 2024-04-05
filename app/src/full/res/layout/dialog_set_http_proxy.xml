@@ -22,8 +22,8 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:text="@string/http_proxy_dialog_desc"
-        android:textSize="@dimen/default_font_text_view"
         android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/default_font_text_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_top" />

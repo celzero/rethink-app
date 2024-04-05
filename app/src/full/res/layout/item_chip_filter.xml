@@ -4,12 +4,12 @@
     style="@style/ThinnerChip.Large"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:textAlignment="center"
     android:layout_margin="3dp"
     android:padding="2dp"
-    app:chipIconEnabled="true"
-    app:chipIconSize="15dp"
-    app:iconStartPadding="3dp"
+    android:textAlignment="center"
     android:textSize="@dimen/default_font_text_view"
     app:checkedIconTint="?attr/primaryTextColor"
-    app:chipBackgroundColor="@drawable/bg_chip_state_list" />
+    app:chipBackgroundColor="@drawable/bg_chip_state_list"
+    app:chipIconEnabled="true"
+    app:chipIconSize="15dp"
+    app:iconStartPadding="3dp" />

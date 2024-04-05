@@ -16,8 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            app:cardCornerRadius="16dp"
-            android:elevation="5dp">
+            android:elevation="5dp"
+            app:cardCornerRadius="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -37,9 +37,9 @@
                         android:id="@+id/connection_search"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:layout_centerVertical="true"
                         android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="start"
                         android:layout_toStartOf="@id/connection_filter_icon"
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"

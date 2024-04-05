@@ -241,10 +241,10 @@
         android:fontFamily="sans-serif-light"
         android:gravity="center"
         android:maxLines="1"
-        android:visibility="gone"
         android:singleLine="true"
         android:textColor="?attr/primaryLightColorText"
-        android:textSize="@dimen/default_font_text_view" />
+        android:textSize="@dimen/default_font_text_view"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/bs_conn_blocked_rule1_header_ll"

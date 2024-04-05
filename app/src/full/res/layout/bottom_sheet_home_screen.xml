@@ -40,7 +40,6 @@
     <TextView
         android:id="@+id/bs_home_screen_vpn_lockdown_desc"
         style="@style/TextAppearance.AppCompat.Subhead"
-        app:drawableStartCompat="@drawable/dis_allowed"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawablePadding="10dp"
@@ -48,10 +47,11 @@
         android:paddingTop="10dp"
         android:paddingEnd="10dp"
         android:paddingBottom="10dp"
-        android:textColor="?attr/primaryTextColor"
         android:text="@string/hs_btm_sheet_lock_down"
+        android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/default_font_text_view"
-        android:visibility="visible" />
+        android:visibility="visible"
+        app:drawableStartCompat="@drawable/dis_allowed" />
 
     <RadioGroup
         android:id="@+id/bs_home_screen_radio_group"
@@ -230,9 +230,9 @@
                     android:id="@+id/textView5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:layout_gravity="center_vertical"
                     android:text="@string/app_mode_dns_firewall"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />

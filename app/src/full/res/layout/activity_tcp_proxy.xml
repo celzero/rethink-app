@@ -102,9 +102,9 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="2dp"
                     android:layout_marginTop="5dp"
+                    android:layout_toEndOf="@id/tcp_proxy_icon"
                     android:padding="5dp"
-                    android:textColor="?attr/secondaryTextColor"
-                    android:layout_toEndOf="@id/tcp_proxy_icon" />
+                    android:textColor="?attr/secondaryTextColor" />
 
                 <androidx.appcompat.widget.AppCompatCheckBox
                     android:id="@+id/enable_udp_relay"

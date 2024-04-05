@@ -3,18 +3,18 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-  <path
-      android:pathData="M5.0351,12.705C5.0119,12.4732 5,12.238 5,12C5,11.762 5.0119,11.5268 5.0351,11.295L3.2058,9.2321L5.2058,5.7679L7.907,6.3207C8.2873,6.0461 8.6963,5.8088 9.1286,5.6141L10,3L14,3L14.8714,5.6141C15.3037,5.8088 15.7127,6.0461 16.093,6.3207L18.7942,5.7679L20.7942,9.2321L18.9649,11.295C18.9881,11.5268 19,11.762 19,12C19,12.238 18.9881,12.4732 18.9649,12.705L20.7942,14.7679L18.7942,18.232L16.093,17.6793C15.7127,17.9539 15.3037,18.1912 14.8714,18.3859L14,21L10,21L9.1286,18.3859C8.6963,18.1912 8.2873,17.9539 7.907,17.6793L5.2058,18.232L3.2058,14.7679L5.0351,12.705Z"
-      android:strokeLineJoin="miter"
-      android:strokeWidth="2"
-      android:fillColor="#00000000"
-      android:strokeColor="#FF000000"
-      android:strokeLineCap="square"/>
-  <path
-      android:pathData="M12,12m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"
-      android:strokeLineJoin="miter"
-      android:strokeWidth="2"
-      android:fillColor="#00000000"
-      android:strokeColor="#FF000000"
-      android:strokeLineCap="square"/>
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M5.0351,12.705C5.0119,12.4732 5,12.238 5,12C5,11.762 5.0119,11.5268 5.0351,11.295L3.2058,9.2321L5.2058,5.7679L7.907,6.3207C8.2873,6.0461 8.6963,5.8088 9.1286,5.6141L10,3L14,3L14.8714,5.6141C15.3037,5.8088 15.7127,6.0461 16.093,6.3207L18.7942,5.7679L20.7942,9.2321L18.9649,11.295C18.9881,11.5268 19,11.762 19,12C19,12.238 18.9881,12.4732 18.9649,12.705L20.7942,14.7679L18.7942,18.232L16.093,17.6793C15.7127,17.9539 15.3037,18.1912 14.8714,18.3859L14,21L10,21L9.1286,18.3859C8.6963,18.1912 8.2873,17.9539 7.907,17.6793L5.2058,18.232L3.2058,14.7679L5.0351,12.705Z"
+        android:strokeWidth="2"
+        android:strokeColor="#FF000000"
+        android:strokeLineCap="square"
+        android:strokeLineJoin="miter" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M12,12m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"
+        android:strokeWidth="2"
+        android:strokeColor="#FF000000"
+        android:strokeLineCap="square"
+        android:strokeLineJoin="miter" />
 </vector>

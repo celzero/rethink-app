@@ -99,10 +99,11 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private var biometricPromptRetryCount = 1
     private var onResumeCalledAlready = false
+
     companion object {
         private const val ON_RESUME_CALLED_PREFERENCE_KEY = "onResumeCalled"
     }
-    
+
     // TODO - #324 - Usage of isDarkTheme() in all activities.
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==

@@ -62,9 +62,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="1"
         android:gravity="center"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:weightSum="1">
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/fs_clear"
@@ -74,9 +74,9 @@
             android:layout_marginEnd="20dp"
             android:layout_weight="0.3"
             android:background="@drawable/rectangle_border_background"
-            android:padding="5dp"
             android:maxHeight="40dp"
             android:minHeight="40dp"
+            android:padding="5dp"
             android:text="@string/fapps_filter_clear_btn"
             android:textColor="?attr/primaryTextColor" />
 
@@ -87,9 +87,9 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_weight="0.7"
+            android:background="@drawable/rounded_corners_button_accent"
             android:maxHeight="40dp"
             android:minHeight="40dp"
-            android:background="@drawable/rounded_corners_button_accent"
             android:padding="5dp"
             android:text="@string/lbl_apply"
             android:textColor="?attr/chipTextColor" />

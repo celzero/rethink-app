@@ -3,9 +3,9 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-  <path
-      android:pathData="m1,16 l7,-7 5,5 10,-10m-23,18h23.999m-7.999,-18h7v7"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/svgStrokeColor"/>
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="m1,16 l7,-7 5,5 10,-10m-23,18h23.999m-7.999,-18h7v7"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/svgStrokeColor" />
 </vector>
