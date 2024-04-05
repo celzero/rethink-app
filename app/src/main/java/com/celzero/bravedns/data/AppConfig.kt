@@ -735,7 +735,7 @@ internal constructor(
         }
     }
 
-    suspend fun getRethinkPlusEndpoint(): RethinkDnsEndpoint {
+    suspend fun getRethinkPlusEndpoint(): RethinkDnsEndpoint? {
         return rethinkDnsEndpointRepository.getRethinkPlusEndpoint()
     }
 
