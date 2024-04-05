@@ -201,7 +201,7 @@
 \nsão enviadas verificações de ligação para analisar a acessibilidade.</string>
     <string name="settings_ip_text_ipv46">Automático</string>
     <string name="settings_selected_ip_desc">%1$s</string>
-    <string name="settings_notification_heading">Escolher ação nas notificação</string>
+    <string name="settings_notification_heading">Escolher ação na notificação</string>
     <string name="settings_notification_desc">Botões a mostrar na notificação Rethink: %1$s</string>
     <string name="settings_notification_desc1">Pausa/Parar (padrão)</string>
     <string name="settings_notification_desc2">DNS / DNS + Firewall</string>
