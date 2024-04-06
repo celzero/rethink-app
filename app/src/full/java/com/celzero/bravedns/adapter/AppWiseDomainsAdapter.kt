@@ -32,7 +32,6 @@ import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppDomainDetailsBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.ui.bottomsheet.AppDomainRulesBottomSheet
-import com.celzero.bravedns.ui.bottomsheet.AppIpRulesBottomSheet
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas

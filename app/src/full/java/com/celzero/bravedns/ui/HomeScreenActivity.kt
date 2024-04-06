@@ -77,13 +77,13 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import java.util.Calendar
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import java.util.Calendar
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
@@ -97,7 +97,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
-    //private var biometricPromptRetryCount = 1
+    // private var biometricPromptRetryCount = 1
     private var onResumeCalledAlready = false
 
     companion object {
@@ -225,7 +225,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         result: BiometricPrompt.AuthenticationResult
                     ) {
                         super.onAuthenticationSucceeded(result)
-                        //biometricPromptRetryCount = 1
+                        // biometricPromptRetryCount = 1
                         persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
                         Log.i(LOG_TAG_UI, "Biometric success @ ${System.currentTimeMillis()}")
                     }
