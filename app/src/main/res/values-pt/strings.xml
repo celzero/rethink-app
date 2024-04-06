@@ -48,7 +48,7 @@
 \n <u>##5</u>: Bloqueia as ligações quando a aplicação de origem é desconhecida (firewall universal).
 \n<u>##6</u>: Bloqueia todo o tráfego UDP exceto DNS (firewall universal).
 \n <u>#7</u>: Bloqueia ligações quando o DNS é ignorado (firewall universal).</string>
-    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Novo recurso&lt;/i&gt;: Suporte para anonimização do &lt;i&gt;Oblivious DNS-over-HTTPS&lt;/i&gt;.&lt;br/&gt; 2. &lt;i&gt;Novo recurso&lt;/i&gt;: Suporte para &lt;i&gt;DNS-over-TLS&lt;/i&gt;.&lt;br/&gt; 3. &lt;i&gt;Novo recurso&lt;/i&gt;: Modos WireGuard simples e avançado.&lt;br/&gt; 4. &lt;i&gt;Novo recurso&lt;/i&gt;: Mostrar largura de banda na tela Stats.&lt;br/&gt; 5. &lt;i&gt;Novo recurso&lt;/i&gt;: Suporte a todos os proxies, incluindo Orbot, mesmo no modo &lt;i&gt;VPN Lockdown&lt;/i&gt;.&lt;br/&gt; 6. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Monitorar o tráfego de rede do Rethink usando o Rethink!&lt;br/&gt; 7. &lt;i&gt;Novo recurso&lt;/i&gt;: Encaminhar DNS através de proxies activos como o WireGuard.&lt;br/&gt; 8. &lt;i&gt;Novo recurso&lt;/i&gt;: Backup e restauração da mesma versão entre dispositivos.&lt;br/&gt; 9. Geração aprimorada de &lt;i&gt;relatórios de erros&lt;/i&gt;.&lt;br/&gt; 10. Melhor manuseio de redes IP de pilha dupla.&lt;br/&gt; 11. &lt;i&gt;Correção de bugs&lt;/i&gt;: Pequenas correções de bugs no manuseio de DNS multicast.&lt;br/&gt; 12. &lt;i&gt;Correção de bugs&lt;/i&gt;: Recuperação automática de conetividade para VPNs WireGuard.&lt;br/&gt; 13. &lt;i&gt;Correção de erros&lt;/i&gt;: Correção de notificações de aplicações incorretamente bloqueadas.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ajuda a traduzir esta aplicação&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai 3.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Opcionalmente, proxy DNS através de proxies WireGuard e SOCKS5.&lt;br/&gt; 2. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Opcionalmente, active as verificações de conetividade Android incorporadas.&lt;br/&gt;Opcionalmente, ative as verificações de conetividade Android incorporadas.&lt;br/&gt; 4. Melhoria da largura de banda do WireGuard.&lt;br/&gt; 6. Evitar fugas de ligação para os modos WireGuard Simples e Sempre ligado.&lt;br/&gt; 7. Correção da falha ao editar as configurações do WireGuard.&lt;br/&gt; 8. Correção de pequenos erros com o RDNS+ e outras regras de firewall baseadas no domínio.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ajude a traduzir esta aplicação&lt;/a&gt;</string>
     <string name="relative_time_yesterday">Ontem</string>
     <string name="always_on_dialog_heading">Desativar VPN sempre ativa</string>
     <string name="always_on_dialog">A opção \"VPN sempre ativa\" está ativada neste dispositivo. Para iniciar Rethink, aceda às definições da VPN Android e desative a opção \"VPN sempre ativa\".</string>
@@ -197,11 +197,10 @@
     <string name="settings_ip_dialog_title">Escolher versão do IP</string>
     <string name="settings_ip_dialog_ipv4">IPv4 (padrão)</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (experimental)</string>
-    <string name="settings_ip_dialog_ipv46">Automático (experimental)
-\nsão enviadas verificações de ligação para analisar a acessibilidade.</string>
+    <string name="settings_ip_dialog_ipv46">Automático (experimental)</string>
     <string name="settings_ip_text_ipv46">Automático</string>
     <string name="settings_selected_ip_desc">%1$s</string>
-    <string name="settings_notification_heading">Escolher ação nas notificação</string>
+    <string name="settings_notification_heading">Escolher ação na notificação</string>
     <string name="settings_notification_desc">Botões a mostrar na notificação Rethink: %1$s</string>
     <string name="settings_notification_desc1">Pausa/Parar (padrão)</string>
     <string name="settings_notification_desc2">DNS / DNS + Firewall</string>
@@ -1014,4 +1013,13 @@
     <string name="cleanbrowsing_adult_dns_desc" translatable="true">O filtro para adultos bloqueia o acesso a todos os sites para adultos, pornográficos e explícitos. Não bloqueia proxies ou VPNs, nem sites de conteúdo misto. Sites como o Reddit são permitidos. O Google e o Bing estão definidos para o modo de segurança.</string>
     <string name="quad9_dns_desc" translatable="true">A Quad9 encaminha os pedidos DNS através de uma rede segura de servidores em todo o mundo.</string>
     <string name="crypt_adguard_desc" translatable="true">Protege o seu dispositivo contra malware e muito mais.</string>
+    <string name="lbl_idle" translatable="true">Inativo</string>
+    <string name="lbl_split" translatable="true">Dividir</string>
+    <string name="lbl_on_device" translatable="true">no dispositivo</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Protegido! Ligado ao DNS + Firewall + Proxy.</string>
+    <string name="settings_connectivity_checks" translatable="true">Efetuar verificações de conetividade</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">São enviadas verificações de conetividade para verificar a acessibilidade.</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Nunca usar proxy DNS</string>
+    <string name="dc_proxy_dns_desc" translatable="true">Não fazer proxy de DNS sobre proxies WireGuard, SOCKS5, HTTP sempre ativos.</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s está desativado porque os proxies estão activos</string>
 </resources>
