@@ -29,18 +29,16 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.databinding.ListItemAppConnDetailsBinding
+import com.celzero.bravedns.databinding.ListItemAppIpDetailsBinding
 import com.celzero.bravedns.service.IpRulesManager
-import com.celzero.bravedns.ui.bottomsheet.AppConnectionBottomSheet
+import com.celzero.bravedns.ui.bottomsheet.AppIpRulesBottomSheet
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
 
-class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOwner, val uid: Int) :
-    PagingDataAdapter<AppConnection, AppConnectionAdapter.ConnectionDetailsViewHolder>(
-        DIFF_CALLBACK
-    ),
-    AppConnectionBottomSheet.OnBottomSheetDialogFragmentDismiss {
+class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner, val uid: Int) :
+    PagingDataAdapter<AppConnection, AppWiseIpsAdapter.ConnectionDetailsViewHolder>(DIFF_CALLBACK),
+    AppIpRulesBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
     companion object {
         private val DIFF_CALLBACK =
@@ -58,7 +56,7 @@ class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOw
             }
     }
 
-    private lateinit var adapter: AppConnectionAdapter
+    private lateinit var adapter: AppWiseIpsAdapter
 
     // ui component to update/toggle the buttons
     data class ToggleBtnUi(val txtColor: Int, val bgColor: Int)
@@ -66,19 +64,15 @@ class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOw
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): AppConnectionAdapter.ConnectionDetailsViewHolder {
+    ): AppWiseIpsAdapter.ConnectionDetailsViewHolder {
         val itemBinding =
-            ListItemAppConnDetailsBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
+            ListItemAppIpDetailsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         adapter = this
         return ConnectionDetailsViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(
-        holder: AppConnectionAdapter.ConnectionDetailsViewHolder,
+        holder: AppWiseIpsAdapter.ConnectionDetailsViewHolder,
         position: Int
     ) {
         val appConnection: AppConnection = getItem(position) ?: return
@@ -86,7 +80,7 @@ class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOw
         holder.update(appConnection)
     }
 
-    inner class ConnectionDetailsViewHolder(private val b: ListItemAppConnDetailsBinding) :
+    inner class ConnectionDetailsViewHolder(private val b: ListItemAppIpDetailsBinding) :
         RecyclerView.ViewHolder(b.root) {
         fun update(conn: AppConnection) {
             displayTransactionDetails(conn)
@@ -106,16 +100,16 @@ class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOw
                 return
             }
 
-            val bottomSheetFragment = AppConnectionBottomSheet()
+            val bottomSheetFragment = AppIpRulesBottomSheet()
             // Fix: free-form window crash
             // all BottomSheetDialogFragment classes created must have a public, no-arg constructor.
             // the best practice is to simply never define any constructors at all.
             // so sending the data using Bundles
             val bundle = Bundle()
-            bundle.putInt(AppConnectionBottomSheet.UID, uid)
-            bundle.putString(AppConnectionBottomSheet.IP_ADDRESS, appConn.ipAddress)
+            bundle.putInt(AppIpRulesBottomSheet.UID, uid)
+            bundle.putString(AppIpRulesBottomSheet.IP_ADDRESS, appConn.ipAddress)
             bundle.putString(
-                AppConnectionBottomSheet.DOMAINS,
+                AppIpRulesBottomSheet.DOMAINS,
                 beautifyDomainString(appConn.appOrDnsName ?: "")
             )
             bottomSheetFragment.arguments = bundle

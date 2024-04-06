@@ -108,7 +108,10 @@
             android:name=".ui.activity.ConfigureOtherDnsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.activity.AppWiseLogsActivity"
+            android:name=".ui.activity.AppWiseIpLogsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.AppWiseDomainLogsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.NotificationHandlerDialog"

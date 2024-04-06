@@ -97,6 +97,7 @@
     <string name="lbl_peer" translatable="true">Peer</string>
     <string name="lbl_split" translatable="true">Split</string>
     <string name="lbl_on_device" translatable="true">on-device</string>
+    <string name="lbl_ip" translatable="false">IP</string>
 
     <string name="symbol_upload" translatable="false">%1$s 🔺</string>
     <string name="symbol_download" translatable="false">%1$s 🔻</string>

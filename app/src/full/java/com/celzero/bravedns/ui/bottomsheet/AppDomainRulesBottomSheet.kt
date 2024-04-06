@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 RethinkDNS and its authors
+ * Copyright 2024 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,12 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.AppConnectionAdapter
-import com.celzero.bravedns.adapter.DomainRulesBtmSheetAdapter
-import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
+import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
@@ -42,7 +40,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class AppConnectionBottomSheet : BottomSheetDialogFragment() {
+class AppDomainRulesBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetAppConnectionsBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
@@ -50,25 +48,22 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         get() = _binding!!
 
     private val persistentState by inject<PersistentState>()
-    private val appConfig by inject<AppConfig>()
 
     // listener to inform dataset change to the adapter
     private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
-    private var adapter: AppConnectionAdapter? = null
+    private var adapter: AppWiseDomainsAdapter? = null
     private var position: Int = -1
 
     override fun getTheme(): Int =
         getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private var uid: Int = -1
-    private var ipAddress: String = ""
-    private var ipRule: IpRulesManager.IpRuleStatus = IpRulesManager.IpRuleStatus.NONE
-    private var domains: String = ""
+    private var domain: String = ""
+    private var domainRule: DomainRulesManager.Status = DomainRulesManager.Status.NONE
 
     companion object {
         const val UID = "UID"
-        const val IP_ADDRESS = "IP_ADDRESS"
-        const val DOMAINS = "DOMAINS"
+        const val DOMAIN = "DOMAIN"
     }
 
     private fun isDarkThemeOn(): Boolean {
@@ -80,7 +75,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         fun notifyDataset(position: Int)
     }
 
-    fun dismissListener(aca: AppConnectionAdapter?, pos: Int) {
+    fun dismissListener(aca: AppWiseDomainsAdapter?, pos: Int) {
         adapter = aca
         position = pos
     }
@@ -102,8 +97,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         uid = arguments?.getInt(UID) ?: INVALID_UID
-        ipAddress = arguments?.getString(IP_ADDRESS) ?: ""
-        domains = arguments?.getString(DOMAINS) ?: ""
+        domain = arguments?.getString(DOMAIN) ?: ""
 
         dismissListener = adapter
 
@@ -117,47 +111,30 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             this.dismiss()
             return
         }
-        b.bsacIpAddressTv.text = ipAddress
+        // making use of the same layout used for ip rules, so changing the text and
+        // removing the recycler related changes
 
-        b.bsacIpRuleTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_ip))
-        b.bsacDomainRuleTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_domain))
+        b.bsacIpAddressTv.text = domain
+        b.bsacIpRuleTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_domain))
 
-        setupRecycler()
-    }
-
-    private fun setupRecycler() {
-        if (domains.isEmpty()) {
-            b.bsacDomainLl.visibility = View.GONE
-            return
-        }
-
-        val list = domains.split(",").toTypedArray()
-
-        b.bsacDomainList.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
-        b.bsacDomainList.layoutManager = layoutManager
-
-        val recyclerAdapter = DomainRulesBtmSheetAdapter(requireContext(), uid, list)
-        b.bsacDomainList.adapter = recyclerAdapter
+        b.bsacDomainRuleTxt.visibility = View.GONE
+        b.bsacDomainLl.visibility = View.GONE
     }
 
     private fun setRulesUi() {
         io {
             // no need to send port number for the app info screen
-            ipRule = IpRulesManager.getMostSpecificRuleMatch(uid, ipAddress)
-            Log.d("FirewallManager", "Set selection of ip: $ipAddress, ${ipRule.id}")
+            domainRule = DomainRulesManager.status(domain, uid)
+            Log.d("FirewallManager", "Set selection of ip: $domain, ${domainRule.id}")
             uiCtx {
-                when (ipRule) {
-                    IpRulesManager.IpRuleStatus.TRUST -> {
+                when (domainRule) {
+                    DomainRulesManager.Status.TRUST -> {
                         enableTrustUi()
                     }
-                    IpRulesManager.IpRuleStatus.BLOCK -> {
+                    DomainRulesManager.Status.BLOCK -> {
                         enableBlockUi()
                     }
-                    IpRulesManager.IpRuleStatus.NONE -> {
-                        noRuleUi()
-                    }
-                    IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                    DomainRulesManager.Status.NONE -> {
                         noRuleUi()
                     }
                 }
@@ -176,34 +153,40 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     private fun initializeClickListeners() {
 
         b.blockIcon.setOnClickListener {
-            if (ipRule == IpRulesManager.IpRuleStatus.BLOCK) {
-                applyIpRule(IpRulesManager.IpRuleStatus.NONE)
+            if (domainRule == DomainRulesManager.Status.BLOCK) {
+                applyDomainRule(DomainRulesManager.Status.NONE)
                 noRuleUi()
             } else {
-                applyIpRule(IpRulesManager.IpRuleStatus.BLOCK)
+                applyDomainRule(DomainRulesManager.Status.BLOCK)
                 enableBlockUi()
             }
         }
 
         b.trustIcon.setOnClickListener {
-            if (ipRule == IpRulesManager.IpRuleStatus.TRUST) {
-                applyIpRule(IpRulesManager.IpRuleStatus.NONE)
+            if (domainRule == DomainRulesManager.Status.TRUST) {
+                applyDomainRule(DomainRulesManager.Status.NONE)
                 noRuleUi()
             } else {
-                applyIpRule(IpRulesManager.IpRuleStatus.TRUST)
+                applyDomainRule(DomainRulesManager.Status.TRUST)
                 enableTrustUi()
             }
         }
     }
 
-    private fun applyIpRule(status: IpRulesManager.IpRuleStatus) {
-        Log.i(Logger.LOG_TAG_FIREWALL, "ip rule for uid: $uid, ip: $ipAddress (${status.name})")
-        ipRule = status
-        val ipPair = IpRulesManager.getIpNetPort(ipAddress)
-        val ip = ipPair.first ?: return
+    private fun applyDomainRule(status: DomainRulesManager.Status) {
+        Log.i(Logger.LOG_TAG_FIREWALL, "domain rule for uid: $uid:$domain (${status.name})")
+        domainRule = status
 
         // set port number as null for all the rules applied from this screen
-        io { IpRulesManager.addIpRule(uid, ip, null, status) }
+        io {
+            DomainRulesManager.changeStatus(
+                domain,
+                uid,
+                "",
+                DomainRulesManager.DomainType.DOMAIN,
+                status
+            )
+        }
     }
 
     override fun onDismiss(dialog: DialogInterface) {

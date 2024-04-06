@@ -422,7 +422,7 @@
         </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/aad_logs_card"
+            android:id="@+id/aad_ip_logs_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="true"
@@ -440,7 +440,7 @@
                 android:paddingBottom="10dp">
 
                 <TextView
-                    android:id="@+id/aad_logs_detail"
+                    android:id="@+id/aad_ip_logs_detail"
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -453,7 +453,52 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/aad_logs_detail_desc"
+                    android:id="@+id/aad_ip_logs_detail_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:drawablePadding="5dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/lbl_logs"
+                    android:textSize="@dimen/default_font_text_view" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/aad_domain_logs_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="true"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:orientation="vertical"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+
+                <TextView
+                    android:id="@+id/aad_domain_logs_detail"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:gravity="center"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:textColor="?attr/secondaryTextColor"
+                    android:textSize="@dimen/heading_font_text_view"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/aad_domain_logs_detail_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"

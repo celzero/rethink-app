@@ -97,6 +97,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         init()
         observeNetworkLogSize()
         observeAppRules()
+        observeDomainLogSize()
         setupClickListeners()
     }
 
@@ -112,12 +113,33 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         networkLogsViewModel.getConnectionsCount(uid).observe(this) {
             if (it == null) return@observe
 
-            b.aadLogsDetail.text = it.toString()
+            b.aadIpLogsDetail.text = it.toString()
+        }
+    }
+
+    private fun observeDomainLogSize() {
+        networkLogsViewModel.getAppDomainConnectionsCount(uid).observe(this) {
+            if (it == null) return@observe
+
+            b.aadDomainLogsDetail.text = it.toString()
         }
     }
 
     private fun init() {
-        b.aadLogsDetailDesc.text = getString(R.string.lbl_logs).replaceFirstChar { it.uppercase() }
+        val domainTxtDesc =
+            getString(
+                R.string.two_argument_space,
+                getString(R.string.lbl_domain).replaceFirstChar { it.uppercase() },
+                getString(R.string.lbl_logs).replaceFirstChar { it.uppercase() }
+            )
+        val ipTxtDesc =
+            getString(
+                R.string.two_argument_space,
+                getString(R.string.lbl_ip).replaceFirstChar { it.uppercase() },
+                getString(R.string.lbl_logs).replaceFirstChar { it.uppercase() }
+            )
+        b.aadIpLogsDetailDesc.text = ipTxtDesc
+        b.aadDomainLogsDetailDesc.text = domainTxtDesc
         io {
             val appInfo = FirewallManager.getAppInfoByUid(uid)
             // case: app is uninstalled but still available in RethinkDNS database
@@ -347,8 +369,14 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
         b.aadDomainBlockCard.setOnClickListener { openCustomDomainScreen() }
 
-        b.aadLogsCard.setOnClickListener {
-            val intent = Intent(this, AppWiseLogsActivity::class.java)
+        b.aadIpLogsCard.setOnClickListener {
+            val intent = Intent(this, AppWiseIpLogsActivity::class.java)
+            intent.putExtra(UID_INTENT_NAME, uid)
+            startActivity(intent)
+        }
+
+        b.aadDomainLogsCard.setOnClickListener {
+            val intent = Intent(this, AppWiseDomainLogsActivity::class.java)
             intent.putExtra(UID_INTENT_NAME, uid)
             startActivity(intent)
         }

@@ -28,10 +28,10 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.AppConnectionAdapter
+import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.celzero.bravedns.databinding.ActivityAppWiseLogsBinding
+import com.celzero.bravedns.databinding.ActivityAppWiseDomainLogsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
@@ -46,9 +46,9 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AppWiseLogsActivity :
-    AppCompatActivity(R.layout.activity_app_wise_logs), SearchView.OnQueryTextListener {
-    private val b by viewBinding(ActivityAppWiseLogsBinding::bind)
+class AppWiseDomainLogsActivity :
+    AppCompatActivity(R.layout.activity_app_wise_domain_logs), SearchView.OnQueryTextListener {
+    private val b by viewBinding(ActivityAppWiseDomainLogsBinding::bind)
 
     private val persistentState by inject<PersistentState>()
     private val networkLogsViewModel: AppConnectionsViewModel by viewModel()
@@ -123,8 +123,8 @@ class AppWiseLogsActivity :
         b.awlRecyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(this)
         b.awlRecyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = AppConnectionAdapter(this, this, uid)
-        networkLogsViewModel.allAppNetworkLogs.observe(this) {
+        val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid)
+        networkLogsViewModel.appDomainLogs.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
@@ -166,14 +166,14 @@ class AppWiseLogsActivity :
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
-        networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.ALL)
+        networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.DOMAIN)
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
         Utilities.delay(500, lifecycleScope) {
             if (!this.isFinishing) {
-                networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.ALL)
+                networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.DOMAIN)
             }
         }
         return true

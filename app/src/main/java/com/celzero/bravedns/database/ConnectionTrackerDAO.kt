@@ -91,15 +91,28 @@ interface ConnectionTrackerDAO {
     @Query(
         "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, '' as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid GROUP BY ipAddress, uid, port ORDER BY count DESC"
     )
-    fun getAllLogs(uid: Int): PagingSource<Int, AppConnection>
+    fun getAppIpLogs(uid: Int): PagingSource<Int, AppConnection>
 
     @Query(
         "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, '' as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and ipAddress like :query GROUP BY ipAddress, uid, port ORDER BY count DESC"
     )
-    fun getAllLogsFiltered(uid: Int, query: String): PagingSource<Int, AppConnection>
+    fun getAppIpLogsFiltered(uid: Int, query: String): PagingSource<Int, AppConnection>
+
+    @Query(
+        "SELECT uid, GROUP_CONCAT(DISTINCT ipAddress) as ipAddress, port, COUNT(dnsQuery) as count, '' as flag, 0 as blocked, dnsQuery as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and dnsQuery != '' GROUP BY dnsQuery ORDER BY count DESC"
+    )
+    fun getAppDomainLogs(uid: Int): PagingSource<Int, AppConnection>
+
+    @Query(
+        "SELECT uid, GROUP_CONCAT(DISTINCT ipAddress) as ipAddress, port, COUNT(dnsQuery) as count, '' as flag, 0 as blocked, dnsQuery as appOrDnsName FROM ConnectionTracker WHERE uid = :uid  and dnsQuery != '' and dnsQuery like :query GROUP BY dnsQuery ORDER BY count DESC"
+    )
+    fun getAppDomainLogsFiltered(uid: Int, query: String): PagingSource<Int, AppConnection>
 
     @Query("select count(DISTINCT(ipAddress)) from ConnectionTracker where uid = :uid")
     fun getAppConnectionsCount(uid: Int): LiveData<Int>
+
+    @Query("select count(DISTINCT(dnsQuery)) from ConnectionTracker where uid = :uid")
+    fun getAppDomainConnectionsCount(uid: Int): LiveData<Int>
 
     @Query(
         "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 order by id desc LIMIT $MAX_LOGS"
