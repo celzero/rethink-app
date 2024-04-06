@@ -275,7 +275,8 @@ dependencies {
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
-    playImplementation 'com.google.android.play:core:1.10.3' // for new version updater
+    playImplementation 'com.google.android.play:app-update:2.1.0'
+    playImplementation 'com.google.android.play:app-update-ktx:2.1.0'
 
     // for encrypting wireguard configuration files
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
