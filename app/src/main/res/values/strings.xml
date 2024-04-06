@@ -97,6 +97,7 @@
     <string name="lbl_peer" translatable="true">Peer</string>
     <string name="lbl_split" translatable="true">Split</string>
     <string name="lbl_on_device" translatable="true">on-device</string>
+    <string name="lbl_ip" translatable="false">IP</string>
 
     <string name="symbol_upload" translatable="false">%1$s 🔺</string>
     <string name="symbol_download" translatable="false">%1$s 🔻</string>
@@ -399,12 +400,15 @@
     <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Chirayu Desai 3.0</b><br/><br/>
         1. <i>New feature</i>: Optionally proxy DNS over WireGuard and SOCKS5 proxies.<br/>
         2. <i>New feature</i>: Optionally enable built-in Android connectivity checks.<br/>
-        3. Improved support for editing IP-based firewall rules.<br/>
-        4. Improved WireGuard bandwidth.<br/>
-        5. Overhauled WireGuard UX.<br/>
-        6. Avoid connection leaks for Simple and Always-on WireGuard modes.<br/>
-        7. Fix crash when editing WireGuard configurations.<br/>
-        8. Fix minor bugs with RDNS+ and other domain-based firewall rules.<br/><br/>
+        3. <i>New feature</i>: List domains and websites an app has connected to.<br/>
+        4. Improved support for editing IP-based firewall rules.<br/>
+        5. Improved WireGuard bandwidth.<br/>
+        6. Overhauled WireGuard UX.<br/>
+        7. Avoid connection leaks for Simple and Always-on WireGuard modes.<br/>
+        8. Fix crash when editing WireGuard configurations.<br/>
+        9. Fix minor bugs with RDNS+ and other domain-based firewall rules.<br/>
+       10. Bug fix: Support multiple rules for a single Trusted IP.<br/>
+       11. Bug fix: Android 14 specific crash.<br/><br/>
 
         <a href="https://svc.rethinkdns.com/r/translate">Help translate this app</a>]]>
     </string>

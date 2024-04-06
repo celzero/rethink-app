@@ -4,11 +4,11 @@
     android:alpha="0.5"
     android:viewportWidth="24"
     android:viewportHeight="24">
-  <path
-      android:pathData="M11,21l1.5,-3m8.5,3l-1.5,-3m-7,0l3.5,-7 3.5,7m-7,0h7M3,5h6m6,0h-2.5M3,18c3.167,-1.667 9.5,-6.6 9.5,-13m0,0H9m2,9L7,9m2,-4V3"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="#00000000"
-      android:strokeColor="?attr/svgStrokeColor"
-      android:strokeLineCap="round"/>
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M11,21l1.5,-3m8.5,3l-1.5,-3m-7,0l3.5,-7 3.5,7m-7,0h7M3,5h6m6,0h-2.5M3,18c3.167,-1.667 9.5,-6.6 9.5,-13m0,0H9m2,9L7,9m2,-4V3"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/svgStrokeColor"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 </vector>

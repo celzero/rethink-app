@@ -71,8 +71,8 @@
                     android:gravity="center_vertical"
                     android:padding="2dp"
                     android:text="Priority"
-                    android:textSize="@dimen/default_font_text_view"
                     android:textColor="?attr/chipTextNeutral"
+                    android:textSize="@dimen/default_font_text_view"
                     app:chipBackgroundColor="?attr/chipBgColorNeutral" />
             </RelativeLayout>
 
@@ -114,11 +114,11 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
+                android:padding="5dp"
                 android:text="Action"
+                android:textColor="?attr/accentGood"
                 android:textSize="14sp"
                 app:iconGravity="textStart"
-                android:textColor="?attr/accentGood"
-                android:padding="5dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/icon"
                 app:layout_constraintTop_toBottomOf="@+id/description_more" />

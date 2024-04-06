@@ -181,8 +181,8 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     private fun updateMaxSwitchUi() {
         ui {
-            var endpointUrl: String? = ""
-            ioCtx { endpointUrl = appConfig.getRethinkPlusEndpoint().url }
+            var endpointUrl: String? = null
+            ioCtx { endpointUrl = appConfig.getRethinkPlusEndpoint()?.url }
             updateRethinkRadioUi(isMax = endpointUrl?.contains(MAX_ENDPOINT) == true)
         }
     }

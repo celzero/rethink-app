@@ -185,21 +185,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:alpha="0.75"
             android:gravity="center"
             android:paddingTop="20dp"
             android:text="@string/brbs_backup_restore_desc"
             android:textColor="?attr/primaryLightColorText"
-            android:alpha="0.75"
             android:textSize="@dimen/default_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/brbs_app_version"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:alpha="0.75"
             android:gravity="center"
             android:textIsSelectable="true"
             android:textSize="@dimen/default_font_text_view"
-            android:alpha="0.75"
             android:typeface="monospace" />
 
     </LinearLayout>

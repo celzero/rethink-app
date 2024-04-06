@@ -94,12 +94,12 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setTitle(getString(R.string.cd_custom_dns_proxy_title))
         dialog.setContentView(dialogBinding.root)
-
+        dialog.show()
         val lp = WindowManager.LayoutParams()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.show()
+
         dialog.setCancelable(true)
 
         // TODO: figure out why window maybe null

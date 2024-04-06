@@ -29,18 +29,22 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.databinding.ListItemAppConnDetailsBinding
-import com.celzero.bravedns.service.IpRulesManager
-import com.celzero.bravedns.ui.bottomsheet.AppConnectionBottomSheet
+import com.celzero.bravedns.databinding.ListItemAppDomainDetailsBinding
+import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.ui.bottomsheet.AppDomainRulesBottomSheet
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
 
-class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOwner, val uid: Int) :
-    PagingDataAdapter<AppConnection, AppConnectionAdapter.ConnectionDetailsViewHolder>(
+class AppWiseDomainsAdapter(
+    val context: Context,
+    val lifecycleOwner: LifecycleOwner,
+    val uid: Int
+) :
+    PagingDataAdapter<AppConnection, AppWiseDomainsAdapter.ConnectionDetailsViewHolder>(
         DIFF_CALLBACK
     ),
-    AppConnectionBottomSheet.OnBottomSheetDialogFragmentDismiss {
+    AppDomainRulesBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
     companion object {
         private val DIFF_CALLBACK =
@@ -58,7 +62,7 @@ class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOw
             }
     }
 
-    private lateinit var adapter: AppConnectionAdapter
+    private lateinit var adapter: AppWiseDomainsAdapter
 
     // ui component to update/toggle the buttons
     data class ToggleBtnUi(val txtColor: Int, val bgColor: Int)
@@ -66,9 +70,9 @@ class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOw
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): AppConnectionAdapter.ConnectionDetailsViewHolder {
+    ): AppWiseDomainsAdapter.ConnectionDetailsViewHolder {
         val itemBinding =
-            ListItemAppConnDetailsBinding.inflate(
+            ListItemAppDomainDetailsBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -78,7 +82,7 @@ class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOw
     }
 
     override fun onBindViewHolder(
-        holder: AppConnectionAdapter.ConnectionDetailsViewHolder,
+        holder: AppWiseDomainsAdapter.ConnectionDetailsViewHolder,
         position: Int
     ) {
         val appConnection: AppConnection = getItem(position) ?: return
@@ -86,11 +90,23 @@ class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOw
         holder.update(appConnection)
     }
 
-    inner class ConnectionDetailsViewHolder(private val b: ListItemAppConnDetailsBinding) :
+    inner class ConnectionDetailsViewHolder(private val b: ListItemAppDomainDetailsBinding) :
         RecyclerView.ViewHolder(b.root) {
         fun update(conn: AppConnection) {
             displayTransactionDetails(conn)
             setupClickListeners(conn)
+        }
+
+        private fun displayTransactionDetails(appConnection: AppConnection) {
+            b.acdCount.text = appConnection.count.toString()
+            b.acdDomain.text = appConnection.appOrDnsName
+            if (appConnection.ipAddress.isNotEmpty()) {
+                b.acdIpAddress.visibility = View.VISIBLE
+                b.acdIpAddress.text = beautifyIpString(appConnection.ipAddress)
+            } else {
+                b.acdIpAddress.visibility = View.GONE
+            }
+            updateStatusUi(appConnection.uid, appConnection.appOrDnsName)
         }
 
         private fun setupClickListeners(appConn: AppConnection) {
@@ -106,54 +122,40 @@ class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOw
                 return
             }
 
-            val bottomSheetFragment = AppConnectionBottomSheet()
+            val bottomSheetFragment = AppDomainRulesBottomSheet()
             // Fix: free-form window crash
             // all BottomSheetDialogFragment classes created must have a public, no-arg constructor.
             // the best practice is to simply never define any constructors at all.
             // so sending the data using Bundles
             val bundle = Bundle()
-            bundle.putInt(AppConnectionBottomSheet.UID, uid)
-            bundle.putString(AppConnectionBottomSheet.IP_ADDRESS, appConn.ipAddress)
-            bundle.putString(
-                AppConnectionBottomSheet.DOMAINS,
-                beautifyDomainString(appConn.appOrDnsName ?: "")
-            )
+            bundle.putInt(AppDomainRulesBottomSheet.UID, uid)
+            bundle.putString(AppDomainRulesBottomSheet.DOMAIN, appConn.appOrDnsName)
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.dismissListener(adapter, absoluteAdapterPosition)
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
-        private fun displayTransactionDetails(appConnection: AppConnection) {
-            b.acdCount.text = appConnection.count.toString()
-            b.acdIpAddress.text = appConnection.ipAddress
-            if (!appConnection.appOrDnsName.isNullOrEmpty()) {
-                b.acdDomainName.visibility = View.VISIBLE
-                b.acdDomainName.text = beautifyDomainString(appConnection.appOrDnsName)
-            } else {
-                b.acdDomainName.visibility = View.GONE
-            }
-            updateStatusUi(appConnection.uid, appConnection.ipAddress)
-        }
-
-        private fun beautifyDomainString(d: String): String {
+        private fun beautifyIpString(d: String): String {
             // replace two commas in the string to one
             // add space after all the commas
             return removeBeginningTrailingCommas(d).replace(",,", ",").replace(",", ", ")
         }
 
-        private fun updateStatusUi(uid: Int, ipAddress: String) {
-            val status = IpRulesManager.getMostSpecificRuleMatch(uid, ipAddress)
+        private fun updateStatusUi(uid: Int, domain: String?) {
+            if (domain == null) {
+                b.acdFlag.text = context.getString(R.string.ci_no_rule_initial)
+                return
+            }
+
+            val status = DomainRulesManager.getDomainRule(domain, uid)
             when (status) {
-                IpRulesManager.IpRuleStatus.NONE -> {
+                DomainRulesManager.Status.NONE -> {
                     b.acdFlag.text = context.getString(R.string.ci_no_rule_initial)
                 }
-                IpRulesManager.IpRuleStatus.BLOCK -> {
+                DomainRulesManager.Status.BLOCK -> {
                     b.acdFlag.text = context.getString(R.string.ci_blocked_initial)
                 }
-                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                    b.acdFlag.text = context.getString(R.string.ci_bypass_universal_initial)
-                }
-                IpRulesManager.IpRuleStatus.TRUST -> {
+                DomainRulesManager.Status.TRUST -> {
                     b.acdFlag.text = context.getString(R.string.ci_trust_initial)
                 }
             }
@@ -164,27 +166,21 @@ class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOw
             b.acdFlag.backgroundTintList = ColorStateList.valueOf(t.bgColor)
         }
 
-        private fun getToggleBtnUiParams(id: IpRulesManager.IpRuleStatus): ToggleBtnUi {
+        private fun getToggleBtnUiParams(id: DomainRulesManager.Status): ToggleBtnUi {
             return when (id) {
-                IpRulesManager.IpRuleStatus.NONE -> {
+                DomainRulesManager.Status.NONE -> {
                     ToggleBtnUi(
                         fetchColor(context, R.attr.chipTextNeutral),
                         fetchColor(context, R.attr.chipBgColorNeutral)
                     )
                 }
-                IpRulesManager.IpRuleStatus.BLOCK -> {
+                DomainRulesManager.Status.BLOCK -> {
                     ToggleBtnUi(
                         fetchColor(context, R.attr.chipTextNegative),
                         fetchColor(context, R.attr.chipBgColorNegative)
                     )
                 }
-                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                    ToggleBtnUi(
-                        fetchColor(context, R.attr.chipTextPositive),
-                        fetchColor(context, R.attr.chipBgColorPositive)
-                    )
-                }
-                IpRulesManager.IpRuleStatus.TRUST -> {
+                DomainRulesManager.Status.TRUST -> {
                     ToggleBtnUi(
                         fetchColor(context, R.attr.chipTextPositive),
                         fetchColor(context, R.attr.chipBgColorPositive)

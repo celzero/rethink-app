@@ -13,7 +13,7 @@
     <locale android:name="it" /> <!-- Italian -->
     <locale android:name="ja" /> <!-- Japanese -->
     <locale android:name="lt" /> <!-- Lithuanian -->
-    <locale android:name="pl"/> <!-- Polish -->
+    <locale android:name="pl" /> <!-- Polish -->
     <locale android:name="pt-BR" /> <!-- Portuguese (Brazil) -->
     <locale android:name="pt-PT" /> <!-- Portuguese (Portugal) -->
     <locale android:name="ru" /> <!-- Russian -->

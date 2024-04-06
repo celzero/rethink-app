@@ -68,7 +68,7 @@ class RethinkDnsEndpointRepository(private val rethinkDnsEndpointDao: RethinkDns
         rethinkDnsEndpointDao.updateEndpoint(name, url, count)
     }
 
-    suspend fun getRethinkPlusEndpoint(): RethinkDnsEndpoint {
+    suspend fun getRethinkPlusEndpoint(): RethinkDnsEndpoint? {
         return rethinkDnsEndpointDao.getRethinkPlusEndpoint()
     }
 

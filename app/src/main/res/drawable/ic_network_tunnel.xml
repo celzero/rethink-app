@@ -3,16 +3,16 @@
     android:height="16dp"
     android:viewportWidth="32"
     android:viewportHeight="32">
-  <path
-      android:fillColor="?attr/firewallWhiteListToggleBtnBg"
-      android:pathData="M21,26m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"/>
-  <path
-      android:fillColor="?attr/firewallWhiteListToggleBtnBg"
-      android:pathData="M21,6m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"/>
-  <path
-      android:fillColor="?attr/firewallWhiteListToggleBtnBg"
-      android:pathData="M4,16m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"/>
-  <path
-      android:fillColor="?attr/firewallWhiteListToggleBtnBg"
-      android:pathData="m28,12a3.996,3.996 0,0 0,-3.858 3h-4.284a3.966,3.966 0,0 0,-5.491 -2.643l-3.177,-3.97a3.963,3.963 0,0 0,0.81 -2.387,4 4,0 1,0 -4,4 3.96,3.96 0,0 0,1.634 -0.357l3.176,3.97a3.924,3.924 0,0 0,0 4.774l-3.176,3.97a3.96,3.96 0,0 0,-1.634 -0.357,4 4,0 1,0 4,4 3.962,3.962 0,0 0,-0.81 -2.387l3.176,-3.97a3.966,3.966 0,0 0,5.492 -2.643h4.284a3.993,3.993 0,1 0,3.858 -5zM6,6a2,2 0,1 1,2 2,2.002 2.002,0 0,1 -2,-2zM8,28a2,2 0,1 1,2 -2,2.002 2.002,0 0,1 -2,2zM16,18a2,2 0,1 1,2 -2,2.002 2.002,0 0,1 -2,2zM28,18a2,2 0,1 1,2 -2,2.002 2.002,0 0,1 -2,2z"/>
+    <path
+        android:fillColor="?attr/firewallWhiteListToggleBtnBg"
+        android:pathData="M21,26m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0" />
+    <path
+        android:fillColor="?attr/firewallWhiteListToggleBtnBg"
+        android:pathData="M21,6m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0" />
+    <path
+        android:fillColor="?attr/firewallWhiteListToggleBtnBg"
+        android:pathData="M4,16m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0" />
+    <path
+        android:fillColor="?attr/firewallWhiteListToggleBtnBg"
+        android:pathData="m28,12a3.996,3.996 0,0 0,-3.858 3h-4.284a3.966,3.966 0,0 0,-5.491 -2.643l-3.177,-3.97a3.963,3.963 0,0 0,0.81 -2.387,4 4,0 1,0 -4,4 3.96,3.96 0,0 0,1.634 -0.357l3.176,3.97a3.924,3.924 0,0 0,0 4.774l-3.176,3.97a3.96,3.96 0,0 0,-1.634 -0.357,4 4,0 1,0 4,4 3.962,3.962 0,0 0,-0.81 -2.387l3.176,-3.97a3.966,3.966 0,0 0,5.492 -2.643h4.284a3.993,3.993 0,1 0,3.858 -5zM6,6a2,2 0,1 1,2 2,2.002 2.002,0 0,1 -2,-2zM8,28a2,2 0,1 1,2 -2,2.002 2.002,0 0,1 -2,2zM16,18a2,2 0,1 1,2 -2,2.002 2.002,0 0,1 -2,2zM28,18a2,2 0,1 1,2 -2,2.002 2.002,0 0,1 -2,2z" />
 </vector>

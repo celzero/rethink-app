@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/awl_app_detail_rl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:padding="5dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/awl_app_detail_icon"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/dns_icon" />
+
+        <TextView
+            android:id="@+id/awl_app_detail_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/awl_app_detail_icon"
+            android:gravity="center"
+            android:padding="5dp"
+            android:textColor="?primaryTextColor"
+            android:textSize="@dimen/large_font_text_view" />
+
+    </RelativeLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/awl_card_view_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:elevation="5dp"
+        app:cardCornerRadius="16dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/awl_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="start"
+                android:layout_toStartOf="@id/awl_delete"
+                android:fontFamily="sans-serif"
+                android:isScrollContainer="true"
+                app:iconifiedByDefault="false"
+                app:queryHint="@string/search_custom_domains" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/awl_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:alpha="0.5"
+                android:minWidth="24dp"
+                android:minHeight="24dp"
+                android:padding="10dp"
+                android:src="@drawable/ic_delete" />
+
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <RelativeLayout
+        android:id="@+id/awl_no_rules_rl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/awl_detail_empty_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="20dp"
+            android:text="@string/ada_ip_no_connection"
+            android:textAlignment="center"
+            android:textSize="@dimen/heading_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/awl_detail_empty_txt"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/illustrations_no_record" />
+
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/awl_recycler_connection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="2dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:orientation="vertical" />
+</LinearLayout>

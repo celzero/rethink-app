@@ -3,11 +3,11 @@
     android:height="18dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-  <path
-      android:pathData="M9,18l6,-6l-6,-6"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/invertedPrimaryTextColor"
-      android:strokeLineCap="round"/>
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M9,18l6,-6l-6,-6"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/invertedPrimaryTextColor"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 </vector>

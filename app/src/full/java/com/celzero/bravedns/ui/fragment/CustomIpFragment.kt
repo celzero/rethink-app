@@ -182,12 +182,12 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
         dialog.setTitle(getString(R.string.ci_dialog_title))
         val dBind = DialogAddCustomIpBinding.inflate(layoutInflater)
         dialog.setContentView(dBind.root)
-
+        dialog.show()
         val lp = WindowManager.LayoutParams()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.show()
+
         dialog.setCancelable(true)
         dialog.window?.attributes = lp
 

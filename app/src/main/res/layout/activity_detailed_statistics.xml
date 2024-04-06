@@ -31,12 +31,12 @@
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/dsa_subtitle"
                 android:fontFamily="sans-serif-smallcaps"
                 android:lineSpacingExtra="5dp"
-                android:layout_centerVertical="true"
                 android:padding="10dp"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@id/dsa_subtitle"
                 android:text="@string/ssv_app_network_activity_heading"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/extra_large_font_text_view" />
@@ -45,10 +45,10 @@
                 android:id="@+id/dsa_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="12dp"
-                android:layout_alignParentEnd="true"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/default_font_text_view" />
         </RelativeLayout>

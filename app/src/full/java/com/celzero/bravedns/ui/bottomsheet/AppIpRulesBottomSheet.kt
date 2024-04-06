@@ -25,9 +25,8 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.AppConnectionAdapter
+import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.adapter.DomainRulesBtmSheetAdapter
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
@@ -42,7 +41,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class AppConnectionBottomSheet : BottomSheetDialogFragment() {
+class AppIpRulesBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetAppConnectionsBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
@@ -50,11 +49,10 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         get() = _binding!!
 
     private val persistentState by inject<PersistentState>()
-    private val appConfig by inject<AppConfig>()
 
     // listener to inform dataset change to the adapter
     private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
-    private var adapter: AppConnectionAdapter? = null
+    private var adapter: AppWiseIpsAdapter? = null
     private var position: Int = -1
 
     override fun getTheme(): Int =
@@ -80,7 +78,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         fun notifyDataset(position: Int)
     }
 
-    fun dismissListener(aca: AppConnectionAdapter?, pos: Int) {
+    fun dismissListener(aca: AppWiseIpsAdapter?, pos: Int) {
         adapter = aca
         position = pos
     }

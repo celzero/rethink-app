@@ -1,10 +1,10 @@
 <?xml version ="1.0" encoding ="utf-8"?><!--  Learn More about how to use App Actions: https://developer.android.com/guide/actions/index.html -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android" >
-   <solid android:color="?attr/background" />
-   <padding
-           android:left="1dp"
-           android:right="1dp"
-           android:bottom="1dp"
-           android:top="1dp" />
-   <corners android:radius="0dp" />
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="?attr/background" />
+    <padding
+        android:bottom="1dp"
+        android:left="1dp"
+        android:right="1dp"
+        android:top="1dp" />
+    <corners android:radius="0dp" />
 </shape>

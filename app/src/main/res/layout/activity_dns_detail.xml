@@ -12,8 +12,8 @@
         android:id="@+id/dns_detail_act_tabLayout"
         style="@style/TabbedLayoutDefault"
         android:layout_width="match_parent"
-        android:visibility="gone"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/dns_detail_act_viewpager"

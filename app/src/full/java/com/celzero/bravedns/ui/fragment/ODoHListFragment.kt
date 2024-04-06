@@ -82,12 +82,12 @@ class ODoHListFragment : Fragment(R.layout.fragment_odoh_list) {
         dialog.setTitle(getString(R.string.cd_custom_doh_dialog_title))
         val dialogBinding = DialogSetCustomOdohBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
-
+        dialog.show()
         val lp = WindowManager.LayoutParams()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.show()
+
         dialog.setCancelable(true)
         dialog.window?.attributes = lp
 

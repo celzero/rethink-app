@@ -56,13 +56,13 @@ import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
+import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 
 class RefreshDatabase
 internal constructor(
@@ -152,9 +152,6 @@ internal constructor(
             )
 
             val trackedApps = FirewallManager.getAllApps()
-            if (trackedApps.isEmpty()) {
-                notifyEmptyFirewallRules()
-            }
             // installedPackages includes apps which are disabled by the user
             val installedPackages: List<PackageInfo> =
                 if (isAtleastT()) {
@@ -202,6 +199,7 @@ internal constructor(
             Log.e(LOG_TAG_APP_DB, e.message, e)
             throw e
         } finally {
+            notifyEmptyFirewallRulesIfNeeded()
             a.cb()
         }
     }
@@ -648,7 +646,12 @@ internal constructor(
         notificationManager.notify(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, app.uid, builder.build())
     }
 
-    private fun notifyEmptyFirewallRules() {
+    private suspend fun notifyEmptyFirewallRulesIfNeeded() {
+        val trackedApps = FirewallManager.getAllApps()
+        if (trackedApps.isNotEmpty()) {
+            return
+        }
+
         val intent = Intent(ctx, HomeScreenActivity::class.java)
         val nm = ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         val pendingIntent =

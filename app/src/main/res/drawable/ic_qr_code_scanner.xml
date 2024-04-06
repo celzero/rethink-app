@@ -4,7 +4,7 @@
     android:alpha="0.75"
     android:viewportWidth="24"
     android:viewportHeight="24">
-  <path
-      android:fillColor="?attr/svgStrokeColor"
-      android:pathData="m9.5,6.5v3h-3v-3zM11,5h-6v6h6zM9.5,14.5v3h-3v-3zM11,13h-6v6h6zM17.5,6.5v3h-3v-3zM19,5h-6v6h6zM13,13h1.5v1.5h-1.5zM14.5,14.5h1.5v1.5h-1.5zM16,13h1.5v1.5h-1.5zM13,16h1.5v1.5h-1.5zM14.5,17.5h1.5v1.5h-1.5zM16,16h1.5v1.5h-1.5zM17.5,14.5h1.5v1.5h-1.5zM17.5,17.5h1.5v1.5h-1.5zM22,7h-2v-3h-3v-2h5zM22,22v-5h-2v3h-3v2zM2,22h5v-2h-3v-3h-2zM2,2v5h2v-3h3v-2z"/>
+    <path
+        android:fillColor="?attr/svgStrokeColor"
+        android:pathData="m9.5,6.5v3h-3v-3zM11,5h-6v6h6zM9.5,14.5v3h-3v-3zM11,13h-6v6h6zM17.5,6.5v3h-3v-3zM19,5h-6v6h6zM13,13h1.5v1.5h-1.5zM14.5,14.5h1.5v1.5h-1.5zM16,13h1.5v1.5h-1.5zM13,16h1.5v1.5h-1.5zM14.5,17.5h1.5v1.5h-1.5zM16,16h1.5v1.5h-1.5zM17.5,14.5h1.5v1.5h-1.5zM17.5,17.5h1.5v1.5h-1.5zM22,7h-2v-3h-3v-2h5zM22,22v-5h-2v3h-3v2zM2,22h5v-2h-3v-3h-2zM2,2v5h2v-3h3v-2z" />
 </vector>

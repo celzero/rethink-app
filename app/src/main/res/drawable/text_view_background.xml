@@ -9,8 +9,7 @@
     </item>
 
     <!--top, dark, inner shadow-->
-    <item
-        android:bottom="2dp">
+    <item android:bottom="2dp">
         <shape android:shape="rectangle">
             <corners android:radius="5dp" />
             <solid android:color="?attr/textViewBackground" />
@@ -18,8 +17,7 @@
     </item>
 
     <!--bottom, light, outer glow-->
-    <item
-        android:top="2dp">
+    <item android:top="2dp">
         <shape android:shape="rectangle">
             <corners android:radius="5dp" />
             <solid android:color="?attr/textViewBackground" />
@@ -28,8 +26,8 @@
 
     <!--your color-->
     <item
-        android:top="2dp"
-        android:bottom="2dp">
+        android:bottom="2dp"
+        android:top="2dp">
         <shape android:shape="rectangle">
             <corners android:radius="5dp" />
             <solid android:color="?attr/primaryDarkColor" />

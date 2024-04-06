@@ -80,12 +80,12 @@ class DoTListFragment : Fragment(R.layout.fragment_dot_list) {
         dialog.setTitle(getString(R.string.cd_custom_doh_dialog_title))
         val dialogBinding = DialogSetCustomDohBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
-
+        dialog.show()
         val lp = WindowManager.LayoutParams()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.show()
+
         dialog.setCancelable(true)
         dialog.window?.attributes = lp
 

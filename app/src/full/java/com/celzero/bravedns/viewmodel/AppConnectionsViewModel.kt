@@ -1,3 +1,18 @@
+/*
+ * Copyright 2024 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.viewmodel
 
 import androidx.lifecycle.LiveData
@@ -15,14 +30,14 @@ import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.util.Constants
 
 class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO) : ViewModel() {
-    private var filter: MutableLiveData<String> = MutableLiveData()
-    private var allLogsFilter: MutableLiveData<String> = MutableLiveData()
+    private var ipFilter: MutableLiveData<String> = MutableLiveData()
+    private var domainFilter: MutableLiveData<String> = MutableLiveData()
     private var uid: Int = Constants.INVALID_UID
     private val pagingConfig: PagingConfig
 
     init {
-        filter.value = ""
-        allLogsFilter.value = ""
+        ipFilter.value = ""
+        domainFilter.value = ""
 
         pagingConfig =
             PagingConfig(
@@ -36,31 +51,46 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO) : View
     }
 
     enum class FilterType {
-        OFFSET,
-        ALL
+        IP,
+        DOMAIN
     }
 
-    val allAppNetworkLogs = allLogsFilter.switchMap { input -> fetchAllNetworkLogs(uid, input) }
+    val appIpLogs = ipFilter.switchMap { input -> fetchIpLogs(uid, input) }
+    val appDomainLogs = domainFilter.switchMap { input -> fetchAppDomainLogs(uid, input) }
 
-    private fun fetchAllNetworkLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
+    private fun fetchIpLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
         return if (input.isEmpty()) {
-            Pager(pagingConfig) { nwlogDao.getAllLogs(uid) }.liveData.cachedIn(viewModelScope)
-        } else {
-            Pager(pagingConfig) { nwlogDao.getAllLogsFiltered(uid, "%$input%") }
-                .liveData
-                .cachedIn(viewModelScope)
-        }
+                Pager(pagingConfig) { nwlogDao.getAppIpLogs(uid) }
+            } else {
+                Pager(pagingConfig) { nwlogDao.getAppIpLogsFiltered(uid, "%$input%") }
+            }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    private fun fetchAppDomainLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
+        return if (input.isEmpty()) {
+                Pager(pagingConfig) { nwlogDao.getAppDomainLogs(uid) }
+            } else {
+                Pager(pagingConfig) { nwlogDao.getAppDomainLogsFiltered(uid, "%$input%") }
+            }
+            .liveData
+            .cachedIn(viewModelScope)
     }
 
     fun getConnectionsCount(uid: Int): LiveData<Int> {
         return nwlogDao.getAppConnectionsCount(uid)
     }
 
+    fun getAppDomainConnectionsCount(uid: Int): LiveData<Int> {
+        return nwlogDao.getAppDomainConnectionsCount(uid)
+    }
+
     fun setFilter(input: String, filterType: FilterType) {
-        if (filterType == FilterType.OFFSET) {
-            this.filter.postValue(input)
+        if (filterType == FilterType.IP) {
+            this.ipFilter.postValue(input)
         } else {
-            this.allLogsFilter.postValue(input)
+            this.domainFilter.postValue(input)
         }
     }
 

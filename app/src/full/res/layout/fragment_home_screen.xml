@@ -17,9 +17,9 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:orientation="vertical"
             android:paddingTop="15dp"
-            android:layout_gravity="center"
             android:visibility="visible">
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -27,18 +27,18 @@
                 style="@style/TextAppearance.Heading.HomeScreen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:alpha="0.5"
-                android:textStyle="bold"
-                android:text="@string/app_name_small_case" />
+                android:gravity="center"
+                android:text="@string/app_name_small_case"
+                android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/fhs_sponsor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:alpha="0.5"
                 android:layout_toEndOf="@id/fhs_title_rethink"
+                android:alpha="0.5"
                 android:background="?android:attr/selectableItemBackground"
                 android:padding="10dp"
                 android:src="@drawable/ic_heart_accent" />

@@ -93,8 +93,8 @@
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:paddingBottom="20dp"
-            android:textAlignment="center"
             android:text="@string/ada_ip_no_connection"
+            android:textAlignment="center"
             android:textSize="@dimen/heading_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatImageView

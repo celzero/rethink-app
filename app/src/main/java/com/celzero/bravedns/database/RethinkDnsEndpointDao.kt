@@ -78,7 +78,7 @@ interface RethinkDnsEndpointDao {
     @Query("select count(*) from RethinkDnsEndpoint") fun getCount(): Int
 
     @Query("select * from RethinkDnsEndpoint where name = :plus and uid = $MISSING_UID")
-    fun getRethinkPlusEndpoint(plus: String = RETHINK_PLUS): RethinkDnsEndpoint
+    fun getRethinkPlusEndpoint(plus: String = RETHINK_PLUS): RethinkDnsEndpoint?
 
     @Query("update RethinkDnsEndpoint set isActive = 1 where uid = $MISSING_UID and name = :plus")
     fun setRethinkPlus(plus: String = RETHINK_PLUS)

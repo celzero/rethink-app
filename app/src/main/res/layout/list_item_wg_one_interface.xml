@@ -49,9 +49,9 @@
                         android:layout_gravity="center"
                         android:layout_marginStart="3dp"
                         android:layout_marginEnd="3dp"
+                        android:ellipsize="end"
                         android:maxLength="15"
                         android:padding="5dp"
-                        android:ellipsize="end"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?attr/secondaryTextColor" />
 

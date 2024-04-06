@@ -199,9 +199,9 @@
                 style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginEnd="1dp"
                 android:layout_weight="0.4"
                 android:text="@string/notif_dialog_pause_dialog_negative"
-                android:layout_marginEnd="1dp"
                 android:textColor="?attr/primaryTextColor" />
 
             <androidx.appcompat.widget.AppCompatButton

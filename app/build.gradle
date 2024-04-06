@@ -247,8 +247,8 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:f5a2218ed6@aar'
-    implementation 'com.github.celzero:firestack:f5a2218ed6@aar'
+    download 'com.github.celzero:firestack:a94a7e78a6@aar'
+    implementation 'com.github.celzero:firestack:a94a7e78a6@aar'
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.9.0') {
@@ -275,7 +275,8 @@ dependencies {
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
-    playImplementation 'com.google.android.play:core:1.10.3' // for new version updater
+    playImplementation 'com.google.android.play:app-update:2.1.0'
+    playImplementation 'com.google.android.play:app-update-ktx:2.1.0'
 
     // for encrypting wireguard configuration files
     implementation("androidx.security:security-crypto:1.1.0-alpha06")

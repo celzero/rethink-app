@@ -4,7 +4,7 @@
     android:alpha="0.5"
     android:viewportWidth="24"
     android:viewportHeight="24">
-  <path
-      android:fillColor="?attr/svgStrokeColor"
-      android:pathData="m12,20c4.4,0 8,-3.6 8,-8s-3.6,-8 -8,-8 -8,3.6 -8,8 3.6,8 8,8m0,-18c5.5,0 10,4.5 10,10s-4.5,10 -10,10 -10,-4.5 -10,-10 4.5,-10 10,-10m5,9.5v1.5h-6v-6h1.5v4.5z"/>
+    <path
+        android:fillColor="?attr/svgStrokeColor"
+        android:pathData="m12,20c4.4,0 8,-3.6 8,-8s-3.6,-8 -8,-8 -8,3.6 -8,8 3.6,8 8,8m0,-18c5.5,0 10,4.5 10,10s-4.5,10 -10,10 -10,-4.5 -10,-10 4.5,-10 10,-10m5,9.5v1.5h-6v-6h1.5v4.5z" />
 </vector>

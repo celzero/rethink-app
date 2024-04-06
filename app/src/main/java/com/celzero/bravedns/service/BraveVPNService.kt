@@ -1315,12 +1315,15 @@ class BraveVPNService :
                 // if service is up (aka connectionMonitor not null)
                 // then simply update the existing tunnel
                 if (connectionMonitor == null) {
-                    underlyingNetworks = null
                     connectionMonitor = ConnectionMonitor(this, this)
                     connectionMonitor?.onVpnStartLocked()
                 } else {
                     isNewVpn = false
                 }
+            }
+
+            if (isNewVpn) {
+                underlyingNetworks = null
             }
 
             val mtu = mtu()
@@ -1347,9 +1350,6 @@ class BraveVPNService :
                     // have app, ip, domain rules. See RefreshDatabase#refresh
                     rdb.refresh(RefreshDatabase.ACTION_REFRESH_AUTO) {
                         restartVpn(opts, Networks(null, overlayNetworks), why = "startVpn")
-                        vpnProtos = Pair(overlayNetworks.has4, overlayNetworks.has6)
-                        // update the controller, which will update the UI (home screen btm sheet)
-                        VpnController.updateProtocol(vpnProtos)
                         // call this *after* a new vpn is created #512
                         uiCtx("observers") { observeChanges() }
                     }
@@ -1678,6 +1678,8 @@ class BraveVPNService :
         Log.i(LOG_TAG_VPN, "stopped vpn adapter and vpn service")
     }
 
+
+
     private fun stopVpnAdapter() {
         io("stopVpn") {
             if (vpnAdapter == null) {
@@ -1707,8 +1709,6 @@ class BraveVPNService :
             nws,
             reason
         )
-        // update the controller, which will update the UI (home screen btm sheet)
-        VpnController.updateProtocol(vpnProtos)
     }
 
     private suspend fun setPcapMode() {
@@ -1780,6 +1780,7 @@ class BraveVPNService :
         }
 
         notifyConnectionStateChangeIfNeeded()
+        informVpnControllerForProtoChange(vpnProtos)
     }
 
     private suspend fun logAndToastIfNeeded(msg: String, logLevel: Int = Log.WARN) {
@@ -1797,6 +1798,11 @@ class BraveVPNService :
         if (appConfig.getBraveMode().isFirewallMode()) {
             VpnController.onConnectionStateChanged(State.WORKING)
         }
+    }
+
+    private fun informVpnControllerForProtoChange(protos: Pair<Boolean, Boolean>) {
+        // update the controller, which will update the UI (home screen btm sheet)
+        VpnController.updateProtocol(protos)
     }
 
     // protected by vpncontroller.mutex
@@ -2172,6 +2178,8 @@ class BraveVPNService :
 
         persistentState.setVpnEnabled(false)
         stopPauseTimer()
+        // reset the underlying networks
+        underlyingNetworks = null
 
         unobserveOrbotStartStatus()
         unobserveAppInfos()
