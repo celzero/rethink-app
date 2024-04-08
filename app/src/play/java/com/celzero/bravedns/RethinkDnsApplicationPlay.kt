@@ -16,27 +16,34 @@
 package com.celzero.bravedns
 
 import android.app.Application
-import com.celzero.bravedns.scheduler.WorkScheduler
+import android.content.pm.ApplicationInfo
 import com.celzero.bravedns.scheduler.ScheduleManager
+import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
+import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
-import org.koin.android.ext.android.get
 
 class RethinkDnsApplicationPlay : Application() {
+
     override fun onCreate() {
         super.onCreate()
+
         startKoin {
             if (BuildConfig.DEBUG) androidLogger()
             androidContext(this@RethinkDnsApplicationPlay)
             koin.loadModules(AppModules)
-            koin.loadModules(listOf(module {
-                // New Koin override strategy allow to override any definition by default.
-                // don't need to specify override = true anymore in module.
-                single<AppUpdater> { StoreAppUpdater(androidContext()) }
-            }))
+            koin.loadModules(
+                listOf(
+                    module {
+                        // New Koin override strategy allow to override any definition by default.
+                        // don't need to specify override = true anymore in module.
+                        single<AppUpdater> { StoreAppUpdater(androidContext()) }
+                    }
+                )
+            )
         }
 
         get<WorkScheduler>().scheduleAppExitInfoCollectionJob()
