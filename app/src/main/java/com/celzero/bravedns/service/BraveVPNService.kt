@@ -17,6 +17,8 @@
 package com.celzero.bravedns.service
 
 import android.app.ActivityManager
+import android.app.ForegroundServiceStartNotAllowedException
+import android.app.ForegroundServiceTypeException
 import android.app.KeyguardManager
 import android.app.Notification
 import android.app.NotificationChannel
@@ -28,6 +30,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -42,6 +45,7 @@ import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.annotation.GuardedBy
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
@@ -1294,19 +1298,25 @@ class BraveVPNService :
             // Initialize the value whenever the vpn is started.
             accessibilityHearbeatTimestamp = INIT_TIME_MS
 
-            startOrbotAsyncIfNeeded()
-
             // startForeground should always be called within 5 secs of onStartCommand invocation
             // https://developer.android.com/guide/components/fg-service-types
             if (isAtleastU()) {
-                startForeground(
-                    SERVICE_ID,
-                    updateNotificationBuilder(),
-                    FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
-                )
+                var ok = startForegroundService(FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED)
+                if (!ok) {
+                    Log.i(LOG_TAG_VPN, "start service failed, retrying with connected device")
+                    ok = startForegroundService(FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
+                }
+                if (!ok) {
+                    Log.i(LOG_TAG_VPN, "start service failed, stopping service")
+                    signalStopService(userInitiated = false) // notify and stop
+                    return@ui
+                }
             } else {
                 startForeground(SERVICE_ID, updateNotificationBuilder())
             }
+
+            startOrbotAsyncIfNeeded()
+
             // this should always be set before ConnectionMonitor is init-d
             // see restartVpn and updateTun which expect this to be the case
             persistentState.setVpnEnabled(true)
@@ -1357,6 +1367,30 @@ class BraveVPNService :
             }
         }
         return Service.START_STICKY
+    }
+
+    @RequiresApi(VERSION_CODES.UPSIDE_DOWN_CAKE)
+    private fun startForegroundService(serviceType: Int): Boolean {
+        try {
+            ServiceCompat.startForeground(
+                this,
+                SERVICE_ID,
+                updateNotificationBuilder(),
+                serviceType
+            )
+            return true
+        } catch (e: ForegroundServiceStartNotAllowedException) {
+            Log.e(LOG_TAG_VPN, "startForeground failed, start not allowed exception", e)
+        } catch (e: ForegroundServiceTypeException) {
+            Log.e(LOG_TAG_VPN, "startForeground failed, service type exception", e)
+        } catch (e: SecurityException) {
+            Log.e(LOG_TAG_VPN, "startForeground failed, security exception", e)
+        } catch (e: IllegalArgumentException) {
+            Log.e(LOG_TAG_VPN, "startForeground failed, illegal argument", e)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "startForeground failed", e)
+        }
+        return false
     }
 
     private fun mtu(): Int {
@@ -1677,8 +1711,6 @@ class BraveVPNService :
         stopSelf()
         Log.i(LOG_TAG_VPN, "stopped vpn adapter and vpn service")
     }
-
-
 
     private fun stopVpnAdapter() {
         io("stopVpn") {
@@ -2897,6 +2929,7 @@ class BraveVPNService :
     override fun flow(
         protocol: Int,
         _uid: Long,
+        dup: Boolean,
         src: String,
         dest: String,
         realIps: String,
@@ -3005,7 +3038,17 @@ class BraveVPNService :
             val key = CidKey(cm.connId, uid)
             trackedCids.add(key)
 
-            return@runBlocking persistAndConstructFlowResponse(cm, proxy, connId, uid, isRethink)
+            // TODO: set dup as true for now (v055e), need to handle dup properly in future
+            val d = dup || true
+            // if the connection is Rethink's uid and if the dup is false, then the connections
+            // are rethink's own connections, so add it in network log as well
+            if (!d) {
+                // no need to consider return value as the function is called only for logging
+                persistAndConstructFlowResponse(cm, proxy, connId, uid)
+            }
+            // make the cm obj to null so that the db write will not happen
+            val c = if (d) cm else null
+            return@runBlocking persistAndConstructFlowResponse(c, proxy, connId, uid, isRethink)
         }
 
         if (trapVpnDns) {
