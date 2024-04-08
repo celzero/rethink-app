@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.bottomsheet
 
-import android.app.Dialog
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
@@ -27,7 +26,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
+import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
@@ -58,13 +57,14 @@ import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import java.util.Locale
 
 class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null
@@ -349,10 +349,10 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun showBlocklistDialog(groupNames: Multimap<String, String>) {
         val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCanceledOnTouchOutside(true)
-        dialog.setContentView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val dialog = builder.create()
+        dialog.show()
+        dialog.setCancelable(true)
         dialogBinding.infoRulesDialogRulesDesc.text = formatText(groupNames)
         dialogBinding.infoRulesDialogRulesTitle.visibility = View.GONE
 
@@ -367,13 +367,17 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         }
 
         val dialogBinding = DialogIpDetailsLayoutBinding.inflate(layoutInflater)
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCanceledOnTouchOutside(true)
-        dialog.setContentView(dialogBinding.root)
-        val width = (resources.displayMetrics.widthPixels * 0.75).toInt()
-        val height = (resources.displayMetrics.heightPixels * 0.5).toInt()
-        dialog.window?.setLayout(width, height)
+
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
+        lp.copyFrom(dialog.window?.attributes)
+        lp.width = (resources.displayMetrics.widthPixels * 0.75).toInt()
+        lp.height = (resources.displayMetrics.heightPixels * 0.5).toInt()
+
+        dialog.setCancelable(true)
+        dialog.window?.attributes = lp
 
         if (b.dnsBlockFavIcon.isVisible)
             dialogBinding.ipDetailsFavIcon.setImageDrawable(b.dnsBlockFavIcon.drawable)

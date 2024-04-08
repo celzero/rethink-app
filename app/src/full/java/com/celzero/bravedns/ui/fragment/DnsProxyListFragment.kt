@@ -15,11 +15,9 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.TextView
@@ -39,6 +37,7 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.DnsProxyEndpointViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -90,19 +89,16 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
 
     private fun showAddDnsProxyDialog(appNames: List<String>) {
         val dialogBinding = DialogSetDnsProxyBinding.inflate(layoutInflater)
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(getString(R.string.cd_custom_dns_proxy_title))
-        dialog.setContentView(dialogBinding.root)
-        dialog.show()
+        val builder =
+            MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
 
         dialog.setCancelable(true)
-
-        // TODO: figure out why window maybe null
         dialog.window?.attributes = lp
 
         val applyURLBtn = dialogBinding.dialogDnsProxyApplyBtn

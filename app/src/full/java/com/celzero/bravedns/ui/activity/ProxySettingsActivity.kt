@@ -66,11 +66,11 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isValidPort
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.concurrent.TimeUnit
 
 class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configure) {
     private val b by viewBinding(FragmentProxyConfigureBinding::bind)
@@ -636,18 +636,16 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         appNames: List<String>,
         appName: String
     ) {
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         val dialogBinding = DialogSetProxyBinding.inflate(layoutInflater)
-        dialog.setContentView(dialogBinding.root)
-
+        val builder = MaterialAlertDialogBuilder(this).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.show()
+
         dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
         dialog.window?.attributes = lp
 
         val headerTxt: TextView = dialogBinding.dialogProxyHeader
@@ -817,16 +815,15 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     ) {
         val defaultHost = "http://127.0.0.1:8118"
         var host: String
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         val dialogBinding = DialogSetProxyBinding.inflate(layoutInflater)
-        dialog.setContentView(dialogBinding.root)
-
+        val builder = MaterialAlertDialogBuilder(this).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.show()
+
         dialog.setCancelable(false)
         dialog.setCanceledOnTouchOutside(false)
         dialog.window?.attributes = lp

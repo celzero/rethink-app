@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.adapter
 
-import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
@@ -24,7 +23,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.Toast
@@ -720,18 +718,16 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
     }
 
     private fun showEditIpDialog(customIp: CustomIp) {
-        val dialog = Dialog(context)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(context.getString(R.string.ci_dialog_title))
         val dBind =
             DialogAddCustomIpBinding.inflate((context as CustomRulesActivity).layoutInflater)
-        dialog.setContentView(dBind.root)
-
+        val builder = MaterialAlertDialogBuilder(context).setView(dBind.root)
         val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.show()
+
         dialog.setCancelable(true)
         dialog.window?.attributes = lp
 

@@ -15,10 +15,8 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -33,6 +31,7 @@ import com.celzero.bravedns.database.DoTEndpoint
 import com.celzero.bravedns.databinding.DialogSetCustomDohBinding
 import com.celzero.bravedns.databinding.FragmentDotListBinding
 import com.celzero.bravedns.viewmodel.DoTEndpointViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -75,13 +74,12 @@ class DoTListFragment : Fragment(R.layout.fragment_dot_list) {
     }
 
     private fun showAddDialog() {
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(getString(R.string.cd_custom_doh_dialog_title))
         val dialogBinding = DialogSetCustomDohBinding.inflate(layoutInflater)
-        dialog.setContentView(dialogBinding.root)
-        dialog.show()
+        val builder =
+            MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
@@ -104,6 +102,7 @@ class DoTListFragment : Fragment(R.layout.fragment_dot_list) {
                 getString(R.string.lbl_add).replaceFirstChar(Char::titlecase),
                 getString(R.string.lbl_dot)
             )
+
         // fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
         io {

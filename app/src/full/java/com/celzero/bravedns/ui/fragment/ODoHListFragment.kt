@@ -15,10 +15,8 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -33,14 +31,15 @@ import com.celzero.bravedns.database.ODoHEndpoint
 import com.celzero.bravedns.databinding.DialogSetCustomOdohBinding
 import com.celzero.bravedns.databinding.FragmentOdohListBinding
 import com.celzero.bravedns.viewmodel.ODoHEndpointViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.net.MalformedURLException
+import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.net.MalformedURLException
-import java.net.URL
 
 class ODoHListFragment : Fragment(R.layout.fragment_odoh_list) {
     private val b by viewBinding(FragmentOdohListBinding::bind)
@@ -77,13 +76,11 @@ class ODoHListFragment : Fragment(R.layout.fragment_odoh_list) {
     }
 
     private fun showAddDialog() {
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(getString(R.string.cd_custom_doh_dialog_title))
         val dialogBinding = DialogSetCustomOdohBinding.inflate(layoutInflater)
-        dialog.setContentView(dialogBinding.root)
-        dialog.show()
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
@@ -101,12 +98,14 @@ class ODoHListFragment : Fragment(R.layout.fragment_odoh_list) {
         val errorTxt = dialogBinding.dialogCustomUrlFailureText
         val hintInputLayout = dialogBinding.textInputLayout1
 
-        heading.text =
+        val title =
             getString(
                 R.string.two_argument_space,
                 getString(R.string.lbl_add).replaceFirstChar(Char::uppercase),
                 getString(R.string.lbl_odoh)
             )
+        heading.text = title
+
         // fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
         io {

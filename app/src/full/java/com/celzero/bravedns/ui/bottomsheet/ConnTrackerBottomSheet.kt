@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
-import android.app.Dialog
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -29,7 +28,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
+import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageView
@@ -61,15 +60,16 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
-import java.util.Locale
 
 class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
@@ -571,10 +571,17 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         if (blockedRule == null) return
 
         val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCanceledOnTouchOutside(true)
-        dialog.setContentView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
+        lp.copyFrom(dialog.window?.attributes)
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+
+        dialog.setCancelable(true)
+        dialog.window?.attributes = lp
+
         val heading = dialogBinding.infoRulesDialogRulesTitle
         val okBtn = dialogBinding.infoRulesDialogCancelImg
         val desc = dialogBinding.infoRulesDialogRulesDesc
