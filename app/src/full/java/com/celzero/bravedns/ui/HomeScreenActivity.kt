@@ -77,13 +77,13 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.util.Calendar
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.util.Calendar
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
@@ -482,18 +482,36 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
 
         if (isGooglePlayServicesAvailable() && isPlayStoreFlavour()) {
-            appUpdateManager.checkForAppUpdate(
-                isInteractive,
-                this,
-                installStateUpdatedListener
-            ) // Might be play updater or web updater
-        } else {
-            get<NonStoreAppUpdater>()
-                .checkForAppUpdate(
+            try {
+                appUpdateManager.checkForAppUpdate(
                     isInteractive,
                     this,
                     installStateUpdatedListener
-                ) // Always web updater
+                ) // Might be play updater or web updater
+            } catch (e: Exception) {
+                Log.e(LOG_TAG_APP_UPDATE, "err in app update check: ${e.message}", e)
+                showDownloadDialog(
+                    AppUpdater.InstallSource.STORE,
+                    getString(R.string.download_update_dialog_failure_title),
+                    getString(R.string.download_update_dialog_failure_message)
+                )
+            }
+        } else {
+            try {
+                get<NonStoreAppUpdater>()
+                    .checkForAppUpdate(
+                        isInteractive,
+                        this,
+                        installStateUpdatedListener
+                    ) // Always web updater
+            } catch (e: Exception) {
+                Log.e(LOG_TAG_APP_UPDATE, "Error in app (web) update check: ${e.message}", e)
+                showDownloadDialog(
+                    AppUpdater.InstallSource.OTHER,
+                    getString(R.string.download_update_dialog_failure_title),
+                    getString(R.string.download_update_dialog_failure_message)
+                )
+            }
         }
     }
 
