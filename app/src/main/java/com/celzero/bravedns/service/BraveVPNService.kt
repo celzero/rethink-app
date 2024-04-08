@@ -1246,21 +1246,26 @@ class BraveVPNService :
             }
         }
 
-        // Secret notifications are not shown on the lock screen.  No need for this app to show
-        // there.
-        // Only available in API >= 21
-        builder = builder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
-        val notification = builder.build()
         // from docs, Starting in Android 13 (API level 33), users can dismiss the notification
         // associated with a foreground service by default. To do so, users perform a swipe gesture
         // on the notification. On previous versions of Android, the notification can't be dismissed
         // unless the foreground service is either stopped or removed from the foreground.
         // make it ongoing to prevent that. https://github.com/celzero/rethink-app/issues/1136
         if (persistentState.persistentNotification) {
-            notification.flags = Notification.FLAG_ONGOING_EVENT
             builder.setOngoing(true)
         } else {
             builder.setOngoing(false)
+        }
+
+        // Secret notifications are not shown on the lock screen.  No need for this app to show
+        // there. Only available in API >= 21
+        builder = builder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
+        val notification = builder.build()
+
+        if (persistentState.persistentNotification) {
+            notification.flags = Notification.FLAG_ONGOING_EVENT
+        } else {
+            notification.flags = Notification.FLAG_NO_CLEAR
         }
         return notification
     }
