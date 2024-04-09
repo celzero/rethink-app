@@ -188,6 +188,8 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun initClickListeners() {
+        // see CustomIpFragment#setupClickListeners#bringToFront()
+        b.dohFabAddServerIcon.bringToFront()
         b.dohFabAddServerIcon.setOnClickListener {
             val intent = Intent(requireContext(), ConfigureRethinkBasicActivity::class.java)
             intent.putExtra(

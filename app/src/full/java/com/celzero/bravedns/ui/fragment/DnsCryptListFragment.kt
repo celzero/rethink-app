@@ -90,6 +90,8 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
     private fun initClickListeners() {
         b.addRelayBtn.setOnClickListener { openDnsCryptRelaysDialog() }
 
+        // see CustomIpFragment#setupClickListeners#bringToFront()
+        b.dohFabAddServerIcon.bringToFront()
         b.dohFabAddServerIcon.setOnClickListener { showAddDnsCryptDialog() }
     }
 

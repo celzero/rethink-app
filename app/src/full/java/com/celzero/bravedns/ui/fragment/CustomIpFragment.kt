@@ -165,6 +165,9 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     }
 
     private fun setupClickListeners() {
+        // make fab to bring to front of the view as click listener is not working
+        // on some device
+        b.cipAddFab.bringToFront()
         b.cipAddFab.setOnClickListener { showAddIpDialog() }
 
         b.cipSearchDeleteIcon.setOnClickListener { showIpRulesDeleteDialog() }

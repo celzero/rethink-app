@@ -294,6 +294,8 @@ class WgMainActivity :
     }
 
     private fun setupClickListeners() {
+        // see CustomIpFragment#setupClickListeners#bringToFront()
+        b.wgAddFab.bringToFront()
         b.wgAddFab.setOnClickListener {
             if (b.createFab.visibility == View.VISIBLE) {
                 collapseFab()

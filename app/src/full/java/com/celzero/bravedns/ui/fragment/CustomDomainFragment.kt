@@ -119,6 +119,8 @@ class CustomDomainFragment :
     }
 
     private fun setupClickListeners() {
+        // see CustomIpFragment#setupClickListeners#bringToFront()
+        b.cdaAddFab.bringToFront()
         b.cdaAddFab.setOnClickListener { showAddDomainDialog() }
 
         b.cdaSearchDeleteIcon.setOnClickListener { showDomainRulesDeleteDialog() }

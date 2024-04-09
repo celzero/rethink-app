@@ -72,6 +72,8 @@ class ODoHListFragment : Fragment(R.layout.fragment_odoh_list) {
     }
 
     private fun initClickListeners() {
+        // see CustomIpFragment#setupClickListeners#bringToFront()
+        b.odohFabAdd.bringToFront()
         b.odohFabAdd.setOnClickListener { showAddDialog() }
     }
 

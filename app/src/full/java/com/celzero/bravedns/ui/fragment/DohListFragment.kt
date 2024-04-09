@@ -74,6 +74,8 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
     }
 
     private fun initClickListeners() {
+        // see CustomIpFragment#setupClickListeners#bringToFront()
+        b.dohFabAddServerIcon.bringToFront()
         b.dohFabAddServerIcon.setOnClickListener { showAddCustomDohDialog() }
     }
 
