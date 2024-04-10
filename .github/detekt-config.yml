@@ -6,12 +6,4 @@ style:
     excludeImportStatements: true
     excludeCommentStatements: false
     excludeRawStrings: true
-complexity:
- TooManyFunctions:
-    active: true
-    threshold: 100
-    excludes: ['**/test/**', '**/generated/**']
 
-
-
-    
