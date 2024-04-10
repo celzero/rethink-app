@@ -16,5 +16,5 @@ jobs:
         uses: natiginfo/action-detekt-all@1.23.4
         # from: https://github.com/natiginfo/action-detekt-all
         with:
-          args: --config detekt-config.yml
+          args:  --config detekt-config.yml
 
