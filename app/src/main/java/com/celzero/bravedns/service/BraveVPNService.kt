@@ -152,6 +152,7 @@ class BraveVPNService :
         private const val IPV6_PREFIX_LENGTH: Int = 120
 
         const val VPN_INTERFACE_MTU: Int = 1500
+        const val MIN_MTU: Int = 1280
 
         // TODO: add routes as normal but do not send fd to netstack
         const val FAIL_OPEN_ON_NO_NETWORK = true
@@ -203,7 +204,8 @@ class BraveVPNService :
     data class OverlayNetworks(
         val has4: Boolean = false,
         val has6: Boolean = false,
-        val failOpen: Boolean = true
+        val failOpen: Boolean = true,
+        val mtu: Int = Int.MAX_VALUE
     )
 
     data class Networks(
@@ -1399,7 +1401,16 @@ class BraveVPNService :
     }
 
     private fun mtu(): Int {
-        return underlyingNetworks?.minMtu ?: VPN_INTERFACE_MTU
+        val overlayMtu = overlayNetworks.mtu
+        val underlyingMtu = underlyingNetworks?.minMtu ?: VPN_INTERFACE_MTU
+        val minMtu = min(overlayMtu, underlyingMtu)
+        Log.i(LOG_TAG_VPN, "mtu; proxy: $overlayMtu, underlying: $underlyingMtu, min: $minMtu")
+        // min mtu should be at least MIN_MTU (1280)
+        if (minMtu < MIN_MTU) {
+            Log.w(LOG_TAG_VPN, "mtu less than $MIN_MTU, using $MIN_MTU")
+            return MIN_MTU
+        }
+        return minMtu
     }
 
     private fun startOrbotAsyncIfNeeded() {
@@ -1999,7 +2010,14 @@ class BraveVPNService :
             new = old
         }
 
-        val mtuChanged = old.minMtu != new.minMtu
+        val underlyingMtuChanged = old.minMtu != new.minMtu
+        val overlayMtuChanged = overlayNetworks.mtu != aux.mtu
+        Log.d(
+            LOG_TAG_VPN,
+            "old: ${old.minMtu}, new: ${new.minMtu}, oldaux: ${overlayNetworks.mtu}  newaux: ${aux.mtu}"
+        )
+        // check if mtu has changed for both underlying and overlay networks
+        val mtuChanged = underlyingMtuChanged || overlayMtuChanged
 
         // val auxHas4 = aux.has4 || aux.failOpen
         // val auxHas6 = aux.has6 || aux.failOpen
@@ -2445,8 +2463,10 @@ class BraveVPNService :
         // overlay network is changed, if so, restart the vpn
         val interestingNet = interestingNetworkChanges(aux = nw)
         val isRoutesChanged = interestingNet.routesChanged
+        val isMtuChanged = interestingNet.mtuChanged
+        Log.i(LOG_TAG_VPN, "overlay: routes changed? $isRoutesChanged, mtu changed? $isMtuChanged")
         overlayNetworks = nw
-        if (isRoutesChanged) {
+        if (isRoutesChanged || isMtuChanged) {
             Log.i(LOG_TAG_VPN, "overlay changed $overlayNetworks, restart vpn")
             // There may be cases where both overlay and underlay networks have the same routes.
             // In such scenarios, no restart is required. However, here the routeChange is
@@ -2460,7 +2480,7 @@ class BraveVPNService :
                 )
             }
         } else {
-            Log.i(LOG_TAG_VPN, "routes not changed, no restart needed")
+            Log.i(LOG_TAG_VPN, "overlay routes or mtu not changed, no restart needed")
         }
     }
 
@@ -2842,7 +2862,7 @@ class BraveVPNService :
         }
         WireguardManager.setActiveConfigTimestamp(id, elapsedRealtime())
         // new proxy added, refresh overlay network pair
-        val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpVersion()
+        val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
         logd("onProxyAdded for proxy $id: $nw")
         onOverlayNetworkChanged(nw ?: OverlayNetworks())
     }
@@ -2854,7 +2874,7 @@ class BraveVPNService :
         }
         WireguardManager.removeActiveConfigTimestamp(id)
         // proxy removed, refresh overlay network pair
-        val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpVersion()
+        val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
         logd("onProxyRemoved for proxy $id: $nw")
         onOverlayNetworkChanged(nw ?: OverlayNetworks())
     }

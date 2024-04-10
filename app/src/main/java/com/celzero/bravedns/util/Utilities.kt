@@ -295,6 +295,8 @@ object Utilities {
             Log.w(LOG_TAG_VPN, "toast err: ${e.message}")
         } catch (e: IOException) {
             Log.w(LOG_TAG_VPN, "toast err: ${e.message}")
+        } catch (e: Exception) {
+            Log.w(LOG_TAG_VPN, "toast err: ${e.message}")
         }
     }
 

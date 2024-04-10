@@ -1117,14 +1117,15 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    fun getActiveProxiesIpVersion(): BraveVPNService.OverlayNetworks {
+    fun getActiveProxiesIpAndMtu(): BraveVPNService.OverlayNetworks {
         try {
             val router = tunnel.proxies.router()
             val has4 = router.iP4()
             val has6 = router.iP6()
             val failOpen = !router.iP4() && !router.iP6()
+            val mtu = router.mtu().toInt()
             Log.i(LOG_TAG_VPN, "proxy ip version, has4? $has4, has6? $has6, failOpen? $failOpen")
-            return BraveVPNService.OverlayNetworks(has4, has6, failOpen)
+            return BraveVPNService.OverlayNetworks(has4, has6, failOpen, mtu)
         } catch (e: Exception) {
             Log.w(LOG_TAG_VPN, "err proxy ip version: ${e.message}")
         }
