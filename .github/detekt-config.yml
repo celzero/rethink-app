@@ -1,7 +1,16 @@
+formatting:
+ MaxLineLength:
+    active: true
+    maxLineLength: 120
+    ignoreBackTickedIdentifier: false
 complexity:
-  MaxLineLength:
-    active: false
-  TooManyFunctions:
-    active: false
+ TooManyFunctions:
+    active: true
+    max: 2
+    excludedFunctions: ['equals']
+    excludeLabeled: false
+    excludeReturnFromLambda: true
+    excludeGuardClauses: false
+
 
     
