@@ -373,8 +373,8 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         val dialog = builder.create()
         dialog.show()
         lp.copyFrom(dialog.window?.attributes)
-        lp.width = (resources.displayMetrics.widthPixels * 0.75).toInt()
-        lp.height = (resources.displayMetrics.heightPixels * 0.5).toInt()
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
 
         dialog.setCancelable(true)
         dialog.window?.attributes = lp
