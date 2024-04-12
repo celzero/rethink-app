@@ -911,4 +911,6 @@
     <string name="lbl_on_device" translatable="true">sul device</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Elimina la configurazione dell\'endpoint DLS su TLS.</string>
     <string name="failed_using_default" translatable="true">Fallimento: uso il DNS di fallback</string>
+    <string name="lbl_secure" translatable="true">sicuro</string>
+    <string name="lbl_idle" translatable="true">Inattivo</string>
 </resources>
