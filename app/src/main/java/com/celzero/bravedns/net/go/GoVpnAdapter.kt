@@ -117,7 +117,7 @@ class GoVpnAdapter : KoinComponent {
         setDnsAlg()
     }
 
-    fun setPcapMode(pcapFilePath: String) {
+    suspend fun setPcapMode(pcapFilePath: String) {
         try {
             Log.i(LOG_TAG_VPN, "set pcap mode: $pcapFilePath")
             tunnel.setPcap(pcapFilePath)

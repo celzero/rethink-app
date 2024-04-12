@@ -53,7 +53,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
 
-class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
+class ConnectionMonitor(private val networkListener: NetworkListener) :
     ConnectivityManager.NetworkCallback(), KoinComponent {
 
     private val networkSet: MutableSet<Network> = mutableSetOf()
@@ -70,26 +70,10 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             // api26: .addTransportType(NetworkCapabilities.TRANSPORT_LOWPAN)
             .build()
 
-    /*
-        // android validated networks builder
-           NetworkRequest.Builder()
-               .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-               .addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-               .apply { if (isAtleastS()) setIncludeOtherUidNetworks(true) }
-               .build()
-
-    */
-
-    // An Android handler thread internally operates on a looper
-    // ref:
-    // alvinalexander.com/java/jwarehouse/android/core/java/android/app/IntentService.java.shtml
-    private var handlerThread: HandlerThread
     private var serviceHandler: NetworkRequestHandler? = null
     private val persistentState by inject<PersistentState>()
 
-    private var connectivityManager: ConnectivityManager =
-        context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
-            as ConnectivityManager
+    private lateinit var connectivityManager: ConnectivityManager
 
     companion object {
         // add active network as underlying vpn network
@@ -127,35 +111,12 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         val testReachability: Boolean
     )
 
-    init {
-        try {
-            connectivityManager.registerNetworkCallback(networkRequest, this)
-        } catch (e: Exception) {
-            Log.w(LOG_TAG_CONNECTION, "Exception while registering network callback", e)
-            networkListener.onNetworkRegistrationFailed()
-        }
-        this.handlerThread = HandlerThread(NetworkRequestHandler::class.simpleName)
-        this.handlerThread.start()
-        this.serviceHandler = NetworkRequestHandler(context, handlerThread.looper, networkListener)
-    }
-
     interface NetworkListener {
         fun onNetworkDisconnected(networks: UnderlyingNetworks)
 
         fun onNetworkConnected(networks: UnderlyingNetworks)
 
         fun onNetworkRegistrationFailed()
-    }
-
-    fun onVpnStop() {
-        connectivityManager.unregisterNetworkCallback(this)
-        destroy()
-    }
-
-    private fun destroy() {
-        this.serviceHandler?.removeCallbacksAndMessages(null)
-        this.handlerThread.quitSafely()
-        this.serviceHandler = null
     }
 
     override fun onAvailable(network: Network) {
@@ -196,7 +157,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
      * Handles user preference changes, ie, when the user elects to see either multiple underlying
      * networks, or just one (the active network).
      */
-    fun onUserPreferenceChangedLocked() {
+    fun onUserPreferenceChanged() {
         if (DEBUG) Log.d(LOG_TAG_CONNECTION, "onUserPreferenceChanged")
         handleNetworkChange(isForceUpdate = true)
     }
@@ -205,9 +166,36 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
      * Force updates the VPN's underlying network based on the preference. Will be initiated when
      * the VPN start is completed.
      */
-    fun onVpnStartLocked() {
+    fun onVpnStart(context: Context) {
+        if (this.serviceHandler != null) {
+            Log.w(LOG_TAG_CONNECTION, "connection monitor is already running")
+            return
+        }
+
         Log.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
+        connectivityManager =
+            context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
+                as ConnectivityManager
+        try {
+            connectivityManager.registerNetworkCallback(networkRequest, this)
+        } catch (e: Exception) {
+            Log.w(LOG_TAG_CONNECTION, "Exception while registering network callback", e)
+            networkListener.onNetworkRegistrationFailed()
+            return
+        }
+
+        val handlerThread = HandlerThread(NetworkRequestHandler::class.simpleName)
+        handlerThread.start()
+        this.serviceHandler =
+            NetworkRequestHandler(connectivityManager, handlerThread.looper, networkListener)
         handleNetworkChange(isForceUpdate = true)
+    }
+
+    fun onVpnStop() {
+        connectivityManager.unregisterNetworkCallback(this)
+        this.serviceHandler?.removeCallbacksAndMessages(null)
+        serviceHandler?.looper?.quitSafely()
+        this.serviceHandler = null
     }
 
     private fun handleNetworkChange(
@@ -265,10 +253,11 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
     // Handles the network messages from the callback from the connectivity manager
     private class NetworkRequestHandler(
-        ctx: Context,
+        val connectivityManager: ConnectivityManager,
         looper: Looper,
         val listener: NetworkListener
     ) : Handler(looper) {
+
         // number of times the reachability check is performed due to failures
         private var reachabilityCount = 0L
         private val maxReachabilityCount = 10L
@@ -302,10 +291,6 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         var trackedIpv4Networks: LinkedHashSet<NetworkProperties> = linkedSetOf()
         var trackedIpv6Networks: LinkedHashSet<NetworkProperties> = linkedSetOf()
 
-        var connectivityManager: ConnectivityManager =
-            ctx.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
-                as ConnectivityManager
-
         override fun handleMessage(msg: Message) {
             // isForceUpdate - true if onUserPreferenceChanged is changes, the messages should be
             // processed forcefully regardless of the current and new networks.
@@ -336,7 +321,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             Log.i(
                 LOG_TAG_CONNECTION,
                 "Connected network: ${newActiveNetwork?.networkHandle} ${networkType(newActiveNetworkCap)
-                            }, new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, auto? ${opPrefs.testReachability}"
+                            }, new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}"
             )
 
             if (isNewNetwork || opPrefs.isForceUpdate) {
@@ -356,7 +341,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
             Log.i(
                 LOG_TAG_CONNECTION,
-                "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks}, ${newNetworks}; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, auto? ${opPrefs.testReachability}"
+                "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks}, ${newNetworks}; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}"
             )
 
             if (isNewNetwork || opPrefs.isForceUpdate) {
@@ -495,6 +480,9 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             trackedIpv4Networks.clear()
             trackedIpv6Networks.clear()
 
+            // BraveVPNService also fails open, see FAIL_OPEN_ON_NO_NETWORK
+            val isAnyNwValidated = networks.any { isNwValidated(it.network) }
+
             networks.forEach outer@{ prop ->
                 val network: Network = prop.network
 
@@ -525,7 +513,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 }
 
                 // see #createNetworksSet for why we are using hasInternet
-                if (hasInternet(network) == true) {
+                // if no network has been validated, then fail open
+                if (hasInternet(network) == true && (!isAnyNwValidated || isNwValidated(network))) {
                     var hasDefaultRoute4 = false
                     var hasDefaultRoute6 = false
                     lp.routes.forEach rloop@{
@@ -648,12 +637,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         null
                     }
                 // test for internet capability iff opPrefs.testReachability is false
-                if (/*hasInternet(it) == true &&*/ isVPN(it) == false) {
-                    if (activeProp != null) {
-                        newNetworks.add(activeProp)
-                    }
-                } else {
-                    // no-op
+                if (/*hasInternet(it) == true &&*/ activeProp != null && isVPN(it) == false) {
+                    newNetworks.add(activeProp)
                 }
             }
             val networks =
@@ -681,12 +666,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 }
 
                 // test for internet capability iff opPrefs.testReachability is false
-                if (/*hasInternet(it) == true &&*/ isVPN(it) == false) {
-                    if (prop != null) {
-                        newNetworks.add(prop)
-                    }
-                } else {
-                    // no-op
+                if (/*hasInternet(it) == true &&*/ prop != null && isVPN(it) == false) {
+                    newNetworks.add(prop)
                 }
             }
 
