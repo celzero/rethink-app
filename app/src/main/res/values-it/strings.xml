@@ -913,4 +913,9 @@
     <string name="failed_using_default" translatable="true">Fallimento: uso il DNS di fallback</string>
     <string name="lbl_secure" translatable="true">sicuro</string>
     <string name="lbl_idle" translatable="true">Inattivo</string>
+    <string name="lbl_anonymous" translatable="true">anonimo</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Eliminare l\'endpoint DoT?</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Protetto! Collegato a DNS + Firewall + Proxy.</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="settings_connectivity_checks" translatable="true">Eseguire controlli di connettività</string>
 </resources>
