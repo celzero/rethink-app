@@ -580,4 +580,10 @@
     <string name="lbl_public_key" translatable="true">Khoá công khai</string>
     <string name="lbl_dns_servers" translatable="true">Máy chủ DNS</string>
     <string name="lbl_proceed" translatable="true">Tiến hành</string>
+    <string name="lbl_idle" translatable="true">Nghỉ</string>
+    <string name="lbl_private" translatable="true">riêng tư</string>
+    <string name="lbl_status" translatable="true">Tình trạng</string>
+    <string name="lbl_remove" translatable="true">Gỡ bỏ</string>
+    <string name="lbl_starting" translatable="true">Đang khởi động</string>
+    <string name="lbl_stopped" translatable="true">Đã dừng</string>
 </resources>

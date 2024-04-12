@@ -904,4 +904,5 @@
     <string name="lbl_stopped" translatable="true">Fermato</string>
     <string name="lbl_very" translatable="true">molto</string>
     <string name="lbl_cache" translatable="true">Cache</string>
+    <string name="lbl_starting" translatable="true">Avvio in corso</string>
 </resources>
