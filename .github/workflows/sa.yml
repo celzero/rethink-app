@@ -13,8 +13,8 @@ jobs:
         uses: actions/checkout@v3
 
       - name: "run"
-        uses: natiginfo/action-detekt-all@1.23.4
+        uses: natiginfo/action-detekt-all@1.23.6
         # from: https://github.com/natiginfo/action-detekt-all
         with:
-          args: --config detekt-config.yml
+          args:  --config .github/detekt-config.yml
 

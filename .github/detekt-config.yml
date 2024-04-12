@@ -1,7 +1,9 @@
-complexity:
-  MaxLineLength:
-    active: false
-  TooManyFunctions:
-    active: false
+style:
+ MaxLineLength:
+    active: true
+    maxLineLength: 1400
+    excludePackageStatements: true
+    excludeImportStatements: true
+    excludeCommentStatements: false
+    excludeRawStrings: true
 
-    

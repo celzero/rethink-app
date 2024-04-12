@@ -989,4 +989,6 @@
     <string name="lbl_stopped" translatable="true">Остановлено</string>
     <string name="lbl_private" translatable="true">частные</string>
     <string name="lbl_secure" translatable="true">безопасные</string>
+    <string name="orbot_no_app_toast" translatable="true">Добавьте хотя бы одно приложение, чтобы выключить Orbot</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s отключен, так как активны прокси</string>
 </resources>
