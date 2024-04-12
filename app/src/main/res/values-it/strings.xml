@@ -905,4 +905,5 @@
     <string name="lbl_very" translatable="true">molto</string>
     <string name="lbl_cache" translatable="true">Cache</string>
     <string name="lbl_starting" translatable="true">Avvio in corso</string>
+    <string name="lbl_overall" translatable="true">Complessivamente</string>
 </resources>
