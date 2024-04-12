@@ -250,7 +250,7 @@
     <string name="firewall_status_allow">consentito</string>
     <string name="firewall_status_whitelisted">Aggira le regole universali del firewall</string>
     <string name="firewall_status_blocked">bloccata</string>
-    <string name="lbl_proceed">Procedi</string>
+    <string name="lbl_proceed">Prosegui</string>
     <string name="hsf_vpn_dialog_message">Rethink ha bisogno del permesso di impostare una VPN locale per crittografare le richieste DNS del dispositivo, monitorare le connessioni di rete e applicare le regole del firewall.
 \n
 \nRethink non raccoglie informazioni né spia l\'utente in alcun modo.</string>
@@ -898,4 +898,10 @@
     <string name="settings_app_notification_persistent_heading" translatable="true">Notifica persistente</string>
     <string name="lbl_listen_port" translatable="true">Porta di ascolto</string>
     <string name="lbl_random" translatable="true">(randomico)</string>
+    <string name="lbl_status" translatable="true">Stato</string>
+    <string name="lbl_remove" translatable="true">Rimuovi</string>
+    <string name="lbl_last" translatable="true">Ultimo</string>
+    <string name="lbl_stopped" translatable="true">Fermato</string>
+    <string name="lbl_very" translatable="true">molto</string>
+    <string name="lbl_cache" translatable="true">Cache</string>
 </resources>
