@@ -19,19 +19,19 @@
     <string name="allow" translatable="true">Cho phép</string>
     <string name="block" translatable="true">Chặn</string>
     <string name="exclude" translatable="true">Loại trừ</string>
-    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Cảnh báo: RethinkDNS đã dừng hoạt động</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Cảnh báo: RethinkDNS đã bị hủy kích hoạt</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Nhấn để thay đổi cài đặt bảo vệ</string>
     <string name="dns_mode_notification_title" translatable="true">Được bảo vệ! Đã kết nối với DNS nhanh và an toàn.</string>
-    <string name="firewall_mode_notification_title" translatable="true">Được bảo vệ! Đã kết nối đến tường lửa</string>
+    <string name="firewall_mode_notification_title" translatable="true">Được bảo vệ! Đã kết nối với Tường lửa.</string>
     <string name="notification_action_resume_vpn" translatable="true">TIẾP TỤC</string>
-    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">Thất bại</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">thất bại</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">Đã được bảo vệ</string>
     <string name="status_app_error" translatable="true">Lỗi ứng dụng</string>
     <string name="status_dns_error" translatable="true">Lỗi DNS</string>
-    <string name="status_no_internet" translatable="true">Không có kết nối internet</string>
-    <string name="status_protected_with_tor" translatable="true">Đã được bảo vệ với Tor</string>
+    <string name="status_no_internet" translatable="true">không có mạng</string>
+    <string name="status_protected_with_tor" translatable="true">được bảo vệ với tor</string>
     <string name="status_protected_with_private_dns" translatable="true">Đã được bảo vệ với DNS riêng tư.</string>
-    <string name="status_protected_with_tor_private_dns" translatable="true">Đã được bảo vệ bởi Tor &amp; DNS riêng tư.</string>
+    <string name="status_protected_with_tor_private_dns" translatable="true">được bảo vệ bằng tor &amp; private dns</string>
     <string name="status_protected_with_socks5_private_dns" translatable="true">Đã được bảo vệ bởi socks5 &amp; private DNS</string>
     <string name="status_protected_with_http_private_dns" translatable="true">Đã được bảo vệ bởi các http proxy &amp; private DNS</string>
     <string name="status_protected_with_socks5" translatable="true">Đã được bảo vệ bởi socks5 proxy</string>
@@ -56,12 +56,12 @@
     <string name="custom_url_error_invalid_url" translatable="true">URL không hợp lệ</string>
     <string name="conn_track_clear_logs_title" translatable="true">Xóa tất cả nhật ký mạng\?</string>
     <string name="ssv_see_more" translatable="true">Hiển thị tất cả</string>
-    <string name="slide_1_desc" translatable="true">Rethink là ứng dụng mã nguồn mở được hỗ trợ bởi chương trình Mozilla Builders MVP.</string>
-    <string name="slide_2_desc" translatable="true">Rethink là cách dễ nhất để giám sát hoạt động mạng, vượt qua kiểm duyệt internet và áp dụng tường lửa lên các ứng dụng trên thiết bị Android của bạn</string>
+    <string name="slide_1_desc" translatable="true">RethinkDNS là một phần mềm nguồn mở được hỗ trợ bởi chương trình MVP của Mozilla Builders.</string>
+    <string name="slide_2_desc" translatable="true">RethinkDNS là cách dễ nhất để giám sát hoạt động mạng, vượt qua kiểm duyệt Internet và các ứng dụng tường lửa trên thiết bị Android của bạn.</string>
     <string name="rdns_plus" translatable="true">RDNS Plus</string>
-    <string name="hybrid_mode_notification_title" translatable="true">Được bảo vệ! Đã kết nối đến DNS + tường lửa</string>
+    <string name="hybrid_mode_notification_title" translatable="true">Được bảo vệ! Đã kết nối với DNS + Tường lửa.</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline." translatable="true">đang chờ</string>
-    <string name="status_dns_server_down" translatable="true">Máy chủ DNS đang ngưng hoạt động</string>
+    <string name="status_dns_server_down" translatable="true">máy chủ dns ngừng hoạt động</string>
     <string name="status_protected_with_proxy_private_dns" translatable="true">"Đã được bảo vệ bởi Proxy &amp;  DNS riêng tư"</string>
     <string name="dns_explanation_dns_connected" translatable="true">Đã kết nối với RethinkDNS</string>
     <string name="notification_action_pause_vpn" translatable="true">NGƯNG</string>
@@ -75,7 +75,7 @@
     <string name="lbl_ip_rules" translatable="true">Quy tắc IP</string>
     <string name="lbl_domain_rules" translatable="true">Quy tắc tên miền</string>
     <string name="isolate" translatable="true">Cách ly</string>
-    <string name="untracked" translatable="true">Không bị theo dõi</string>
+    <string name="untracked" translatable="true">không bị theo dõi</string>
     <string name="universal_firewall_explanation" translatable="true">Áp dụng các quy tắc tường lửa trên tất cả các ứng dụng dựa trên các hoạt động của thiết bị, chẳng hạn như bật tường lửa khi thiết bị đang khóa màn hình hoặc khi một ứng dụng cụ thể không được sử dụng.</string>
     <string name="firewall_rules" translatable="true">Quy tắc mạng</string>
     <string name="firewall_mode_info_explanation_new" translatable="true">Giám sát hoạt động mạng và hoạt động tường lửa của bất kỳ ứng dụng hoặc địa chỉ IP nào.</string>
@@ -325,7 +325,7 @@
     <string name="lbl_rules" translatable="true">quy tắc</string>
     <string name="lbl_configure" translatable="true">Cấu hình</string>
     <string name="bypass_universal" translatable="true">bỏ qua phổ quát</string>
-    <string name="bypass_dns_firewall" translatable="true">Bỏ qua DNS và tường lửa</string>
+    <string name="bypass_dns_firewall" translatable="true">bỏ qua dns &amp; tường lửa</string>
     <string name="bsct_block_ip" translatable="true">Chặn, tin tưởng \u0020<u>địa chỉ IP này</u> cho <u>ứng dụng</u></string>
     <string name="bsct_block_domain" translatable="true">Chặn, tin tưởng <u>tên miền </u> cho <u>ứng dụng này </u></string>
     <string name="lbl_logs" translatable="true">Nhật kí thông tin</string>
@@ -534,7 +534,7 @@
     <string name="lbl_save" translatable="true">lưu</string>
     <string name="status_protected_with_wg" translatable="true">đã được bảo vệ bởi wireguard</string>
     <string name="lbl_qr_code" translatable="true">Mã QR</string>
-    <string name="lbl_create" translatable="true">Tạo</string>
+    <string name="lbl_create" translatable="true">Tạo ra</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
     <string name="lbl_addresses" translatable="true">Địa chỉ</string>
     <string name="lbl_import" translatable="true">Nhập</string>
@@ -586,4 +586,20 @@
     <string name="lbl_remove" translatable="true">Gỡ bỏ</string>
     <string name="lbl_starting" translatable="true">Đang khởi động</string>
     <string name="lbl_stopped" translatable="true">Đã dừng</string>
+    <string name="lbl_secure" translatable="true">an toàn</string>
+    <string name="lbl_anonymous" translatable="true">vô danh</string>
+    <string name="lbl_peer" translatable="true">Đồng lứa</string>
+    <string name="lbl_split" translatable="true">Chia</string>
+    <string name="lbl_on_device" translatable="true">trên-thiết-bị</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Được bảo vệ! Đã kết nối đến DNS + Firewall + Proxy.</string>
+    <string name="lbl_last" translatable="true">Cuối cùng</string>
+    <string name="lbl_overall" translatable="true">Nhìn chung</string>
+    <string name="lbl_generated" translatable="true">(được tạo ra)</string>
+    <string name="lbl_inactive" translatable="true">Không hoạt động</string>
+    <string name="lbl_very" translatable="true">rất</string>
+    <string name="lbl_app_wise" translatable="true">mỗi ứng dụng</string>
+    <string name="lbl_allowed_ips" translatable="true">IPs cho phép</string>
+    <string name="lbl_insecure" translatable="true">(không an toàn)</string>
+    <string name="failed_using_default" translatable="true">Bị thất bại: sử dụng DNS dự phòng</string>
+    <string name="lbl_cache" translatable="true">Bộ nhớ tạm</string>
 </resources>
