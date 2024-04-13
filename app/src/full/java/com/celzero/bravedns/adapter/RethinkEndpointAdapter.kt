@@ -125,7 +125,7 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
         }
 
         private fun keepSelectedStatusUpdated(endpoint: RethinkDnsEndpoint) {
-            ui {
+            statusCheckJob = ui {
                 while (true) {
                     updateBlocklistStatusText(endpoint)
                     delay(ONE_SEC)
