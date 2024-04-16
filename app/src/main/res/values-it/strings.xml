@@ -920,4 +920,5 @@
     <string name="settings_connectivity_checks" translatable="true">Esegui controlli di connettività</string>
     <string name="orbot_no_app_toast" translatable="true">Aggiungi almeno un\'app per abilitare Orbot</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (sperimentale)</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">I controlli di connettività vengono inviati per accertare la raggiungibilità.</string>
 </resources>
