@@ -252,7 +252,7 @@
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Toque para alterar a configuração de proteção</string>
     <string name="dns_mode_notification_title">Protegido! Conectado ao DNS rápido e seguro.</string>
     <string name="firewall_mode_notification_title">Protegido! Conectado ao Firewall.</string>
-    <string name="pause_mode_notification_title">Pausado! Firewall continua bloqueando aplicativos</string>
+    <string name="pause_mode_notification_title">Pausado! Os aplicativos bloqueados continuarão protegidos por firewall.</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">esperando</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">falhando</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">protegido</string>
