@@ -138,19 +138,19 @@
     <string name="settings_proxy_header">proxy</string>
     <string name="settings_socks5_heading">Imposta Proxy SOCKS5</string>
     <string name="settings_socks5_desc">Inoltra le connessioni a un endpoint SOCKS5.</string>
-    <string name="settings_https_heading">Imposta Proxy HTTP(S)</string>
+    <string name="settings_https_heading">Imposta Proxy HTTP(S) CONNECT</string>
     <string name="orbot">Orbot</string>
-    <string name="settings_https_desc">Questa impostazione è solo un suggerimento ed è possibile che le applicazioni la ignorino. Le app che utilizzano il proxy HTTP(S) aggirano sia il firewall che le regole DNS.</string>
+    <string name="settings_https_desc">Inoltra connessioni all\'endpoint HTTP(S) CONNECT.</string>
     <string name="orbot_socks5">Proxy solo-TCP</string>
     <string name="orbot_socks5_desc">Inoltra tutte le connessioni TCP a Orbot.</string>
     <string name="orbot_http">Proxy HTTP</string>
-    <string name="orbot_http_desc">Stabilizza un tunnel HTTP CONNECT a Orbot.</string>
+    <string name="orbot_http_desc">Crea un tunnel HTTP CONNECT con Orbot.</string>
     <string name="orbot_both">TCP + Proxy HTTP</string>
     <string name="orbot_both_desc">Tutti i precedenti.</string>
     <string name="orbot_none">Nessuno (predefinito)</string>
     <string name="orbot_none_desc">Nessuna delle precedenti.</string>
     <string name="orbot_bs_status_1">Inoltro le connessioni %1$s a Orbot.</string>
-    <string name="orbot_bs_status_2">"Proxy HTTP  impostata."</string>
+    <string name="orbot_bs_status_2">Proxy HTTP impostato.</string>
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_status_arg_3">DNS e TCP</string>
     <string name="orbot_app_issue">Impossibile avviare Orbot. È installato\?</string>
@@ -880,7 +880,7 @@
     <string name="lbl_addresses" translatable="true">Indirizzi</string>
     <string name="lbl_active" translatable="true">Attivo</string>
     <string name="lbl_dns_servers" translatable="true">Server DNS</string>
-    <string name="settings_app_notification_persistent_desc" translatable="true">Rendi la notifica persistente</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Rendi la notifica permanente</string>
     <string name="lbl_app_wise" translatable="true">per applicazione</string>
     <string name="status_protected_with_wg" translatable="true">protetto con wireguard</string>
     <string name="lbl_public_key" translatable="true">Chiave Pubblica</string>
@@ -895,7 +895,7 @@
     <string name="lbl_create" translatable="true">Crea</string>
     <string name="http_proxy_dialog_desc" translatable="true">Impostare l\'URL nella forma &lt;protocollo&gt;: //&lt;username&gt;: &lt;password&gt;@&lt;dominio-o-ip&gt;&lt;destinazione&gt; Esempio: http://proxy.esempio.com:8080/</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">protetto con wireguard &amp; dns privato</string>
-    <string name="settings_app_notification_persistent_heading" translatable="true">Notifica persistente</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">Notifica permamente</string>
     <string name="lbl_listen_port" translatable="true">Porta di ascolto</string>
     <string name="lbl_random" translatable="true">(randomico)</string>
     <string name="lbl_status" translatable="true">Stato</string>
@@ -917,5 +917,7 @@
     <string name="dot_custom_url_remove_dialog_title" translatable="true">Eliminare l\'endpoint DoT?</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Protetto! Collegato a DNS + Firewall + Proxy.</string>
     <string name="lbl_peer" translatable="true">Peer</string>
-    <string name="settings_connectivity_checks" translatable="true">Eseguire controlli di connettività</string>
+    <string name="settings_connectivity_checks" translatable="true">Esegui controlli di connettività</string>
+    <string name="orbot_no_app_toast" translatable="true">Aggiungi almeno un\'app per abilitare Orbot</string>
+    <string name="settings_rinr_heading" translatable="true">Loopback (sperimentale)</string>
 </resources>
