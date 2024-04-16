@@ -1007,8 +1007,8 @@
     <string name="wg_lockdown_dialog_title" translatable="true">閉關</string>
     <string name="wg_lockdown_dialog_desc" translatable="true">所選應用程式將只由此 WireGuard VPN 路由，無論此 VPN 是否成功連線。</string>
     <string name="wireguard_apps_proxy_map_desc" translatable="true">%1$s 的一部分</string>
-    <string name="settings_rinr_desc_enabled" translatable="true">將如下載攔截清單、連線檢查與 DNS 連線等的 Rethink 自身流量路由回隧道。</string>
-    <string name="settings_rinr_desc_disabled" translatable="true">將 Rethink 自身的流量路由入隧道。若您不瞭解您在做什麼，請不要啓用。</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">將 Rethink 自身的流量路由入隧道。若您不瞭解您在做什麼，請不要啓用。</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">將如下載攔截清單、連線檢查與 DNS 連線等的 Rethink 自身流量路由回隧道。</string>
     <string name="settings_rinr_dialog_title" translatable="true">回送（實驗性）</string>
     <string name="one_wg_dialog_desc" translatable="true">包括 DNS 在內的來自所有應用程式的流量將被單個活躍的 WireGuard VPN 路由。其他活躍的 WireGuard VPN 將被停止。</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">所有未被其他 WireGuard VPN 路由的應用程式的連線將經此 VPN 路由。</string>

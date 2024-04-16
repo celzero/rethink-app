@@ -984,8 +984,8 @@
     <string name="lbl_peer" translatable="true">对等端点</string>
     <string name="failed_using_default" translatable="true">失败：使用回落 DNS</string>
     <string name="settings_rinr_heading" translatable="true">环回（实验性）</string>
-    <string name="settings_rinr_desc_enabled" translatable="true">将如下载屏蔽名单、连接检查与 DNS 连接等的 Rethink 自身流量路由回隧道。</string>
-    <string name="settings_rinr_desc_disabled" translatable="true">将 Rethink 自身的流量路由入隧道。若您不了解您在做什么，请不要启用。</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">将 Rethink 自身的流量路由入隧道。若您不了解您在做什么，请不要启用。</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">将如下载屏蔽名单、连接检查与 DNS 连接等的 Rethink 自身流量路由回隧道。</string>
     <string name="settings_rinr_dialog_desc" translatable="true">这会同时启用“<!--settings_network_all_networks--> %1$s”设置。您是否想要继续？</string>
     <string name="one_wg_apps_added" translatable="true">正在路由所有应用</string>
     <string name="wg_lockdown_dialog_title" translatable="true">闭关</string>
