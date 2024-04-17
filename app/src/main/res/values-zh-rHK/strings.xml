@@ -67,7 +67,7 @@
     <string name="settings_enable_logs">啓用本地日誌</string>
     <string name="info_dialog_rethink_toast_msg">當做 RDNS+ DNS-over-HTTPS URL 複製咗</string>
     <string name="orbot_http">HTTP 代理</string>
-    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：支援可匿名嘅&lt;i&gt;無曉型 DNS-over-HTTPS&lt;/i&gt;。&lt;br/&gt; 2. &lt;i&gt;新特性&lt;/i&gt;：支援&lt;i&gt;DNS-over-TLS&lt;/i&gt;。&lt;br/&gt; 3. &lt;i&gt;新特性&lt;/i&gt;： WireGuard 簡易模式同進階模式。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：統計區而家會顯示流量。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：無論 &lt;i&gt;VPN 閉關&lt;/i&gt;模式係咪激活，都可以支援包含 Orbot 等嘅所有代理。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：可以用 Rethink 監測 Rethink 嘅網絡流量！&lt;br/&gt; 7. &lt;i&gt;新特性&lt;/i&gt;：將 DNS 經過好似 WireGuard 嘅活動代理轉送。&lt;br/&gt; 8. &lt;i&gt;新特性&lt;/i&gt;：跨裝置相同版本嘅備份同恢復。&lt;br/&gt; 9. 改進&lt;i&gt;漏洞報告&lt;/i&gt;嘅生成。&lt;br/&gt; 10. 對雙棧 IP 網絡更好嘅支援。&lt;br/&gt; 11. &lt;i&gt;漏洞修復&lt;/i&gt;：對多播 DNS 支援嘅微小修復。&lt;br/&gt; 12. &lt;i&gt;漏洞修復&lt;/i&gt;：對 WireGuard VPN 嘅連線自動恢復。&lt;br/&gt; 13. &lt;i&gt;漏洞修復&lt;/i&gt;：修復被錯誤攔截嘅應用程式通知。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;幫手翻譯呢個 app&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai 3.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;New feature&lt;/i&gt;: Optionally proxy DNS over WireGuard and SOCKS5 proxies.&lt;br/&gt; 2. &lt;i&gt;New feature&lt;/i&gt;: Optionally enable built-in Android connectivity checks.&lt;br/&gt; 3. &lt;i&gt;New feature&lt;/i&gt;: List domains and websites an app has connected to.&lt;br/&gt; 4. Improved support for editing IP-based firewall rules.&lt;br/&gt; 5. Improved WireGuard bandwidth.&lt;br/&gt; 6. Overhauled WireGuard UX.&lt;br/&gt; 7. Avoid connection leaks for Simple and Always-on WireGuard modes.&lt;br/&gt; 8. Fix crash when editing WireGuard configurations.&lt;br/&gt; 9. Fix minor bugs with RDNS+ and other domain-based firewall rules.&lt;br/&gt; 10. Bug fix: Support multiple rules for a single Trusted IP.&lt;br/&gt; 11. Bug fix: Android 14 specific crash.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;幫手翻譯呢個 app&lt;/a&gt;</string>
     <string name="cd_doh_dialog_heading">加 DNS over HTTPS</string>
     <string name="cd_doh_dialog_resolver_url">解析服務 URL</string>
     <string name="cd_dnscrypt_relay_heading">中繼</string>
@@ -263,8 +263,7 @@
     <string name="settings_ip_dialog_title">揀 IP 版本</string>
     <string name="settings_ip_dialog_ipv4">IPv4（默認）</string>
     <string name="settings_ip_dialog_ipv6">IPv6（實驗性）</string>
-    <string name="settings_ip_dialog_ipv46">自動（實驗性）
-\n發送連線檢查以確保網絡嘅可訪問性。</string>
+    <string name="settings_ip_dialog_ipv46">自動（實驗性）</string>
     <string name="settings_ip_text_ipv4">IPv4</string>
     <string name="settings_ip_text_ipv6">IPv6</string>
     <string name="settings_ip_text_ipv46">自動</string>
@@ -972,7 +971,7 @@
     <string name="google_dns_desc" translatable="true">唔攔截任何 DNS 請求。用 Google 嘅 DNS 端點。</string>
     <string name="settings_go_log_desc" translatable="true">為咗調試</string>
     <string name="settings_go_log_heading" translatable="true">日誌級別</string>
-    <string name="logs_card_duration" translatable="true">由 %1$s 以來</string>
+    <string name="logs_card_duration" translatable="true">喺 %1$s 前開始</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">係咪丟咗個 DoT 端點？</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">喺儲存咗嘅配置入面丟咗呢個 DNS over TLS 端點。</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">持久通知</string>
@@ -1001,8 +1000,8 @@
     <string name="wireguard_apps_proxy_map_desc" translatable="true">%1$s 嘅一部分</string>
     <string name="orbot_no_app_toast" translatable="true">添加至少一個應用程式以啓用 Orbot</string>
     <string name="settings_rinr_heading" translatable="true">回送（實驗性）</string>
-    <string name="settings_rinr_desc_enabled" translatable="true">將好似攔截清單、連線檢查同 DNS 連線等嘅 Rethink 自身流量路由返隧道。</string>
-    <string name="settings_rinr_desc_disabled" translatable="true">將 Rethink 自身嘅流量路由入隧道。如果您不清楚您喺度做緊乜嘢，請唔好啓用。</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">將 Rethink 自身嘅流量路由入隧道。如果您不清楚您喺度做緊乜嘢，請唔好啓用。</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">將 Rethink 自身嘅流量（例如下載攔截清單、連線檢查同 DNS 連接）路由入隧道。</string>
     <string name="settings_rinr_dialog_title" translatable="true">回送（實驗性）</string>
     <string name="settings_rinr_dialog_desc" translatable="true">咁樣會同時啓用「<!--settings_network_all_networks--> %1$s」設定。您係咪想繼續？</string>
     <string name="cd_dialog_edit_title" translatable="true">改網域規則</string>
@@ -1014,4 +1013,7 @@
     <string name="catch_all_wg_dialog_title" translatable="true">永遠着住</string>
     <string name="wireguard_disable_title" translatable="true">停止 WireGuard</string>
     <string name="wireguard_disable_message" translatable="true">係咪停止所有活躍嘅 WireGuard VPN？</string>
+    <string name="settings_connectivity_checks" translatable="true">檢查連線</string>
+    <string name="dc_proxy_dns_heading" translatable="true">千祈唔好代理 DNS</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">由於開咗代理，用唔到 %1$s</string>
 </resources>
