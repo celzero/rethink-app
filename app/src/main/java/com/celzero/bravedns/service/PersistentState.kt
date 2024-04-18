@@ -19,6 +19,7 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.InternetProtocol
@@ -44,7 +45,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val NETWORK = "add_all_networks_to_vpn"
         const val NOTIFICATION_ACTION = "notification_action"
         const val DNS_CHANGE = "connected_dns_name"
-        const val DNS_RELAYS = "dnscrypt_relay"
         const val INTERNET_PROTOCOL = "internet_protocol"
         const val PROTOCOL_TRANSLATION = "protocol_translation"
         const val DEFAULT_DNS_SERVER = "default_dns_query"
@@ -282,6 +282,14 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
     var universalRulesCount: MutableLiveData<Int> = MutableLiveData()
     var proxyStatus: MutableLiveData<Int> = MutableLiveData()
+
+    // data class to store dnscrypt relay details
+    data class DnsCryptRelayDetails(
+        val relay: DnsCryptRelayEndpoint,
+        val added: Boolean
+    )
+
+    var dnsCryptRelays: MutableLiveData<DnsCryptRelayDetails> = MutableLiveData()
 
     var remoteBlocklistCount: MutableLiveData<Int> = MutableLiveData()
 

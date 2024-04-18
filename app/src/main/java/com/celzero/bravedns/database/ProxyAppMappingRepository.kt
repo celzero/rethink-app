@@ -19,20 +19,20 @@ class ProxyAppMappingRepository(
     private val proxyApplicationMappingDAO: ProxyApplicationMappingDAO
 ) {
 
-    suspend fun update(wgMapping: ProxyApplicationMapping) {
-        proxyApplicationMappingDAO.update(wgMapping)
+    suspend fun update(pam: ProxyApplicationMapping) {
+        proxyApplicationMappingDAO.update(pam)
     }
 
-    suspend fun insert(wgMapping: ProxyApplicationMapping): Long {
-        return proxyApplicationMappingDAO.insert(wgMapping)
+    suspend fun insert(pam: ProxyApplicationMapping): Long {
+        return proxyApplicationMappingDAO.insert(pam)
     }
 
-    suspend fun insertAll(wgMapping: List<ProxyApplicationMapping>): LongArray {
-        return proxyApplicationMappingDAO.insertAll(wgMapping)
+    suspend fun insertAll(pams: List<ProxyApplicationMapping>): LongArray {
+        return proxyApplicationMappingDAO.insertAll(pams)
     }
 
-    suspend fun delete(wgMapping: ProxyApplicationMapping) {
-        proxyApplicationMappingDAO.deleteByPackageName(wgMapping.uid, wgMapping.packageName)
+    suspend fun deleteApp(pam: ProxyApplicationMapping) {
+        proxyApplicationMappingDAO.deleteApp(pam.uid, pam.packageName)
     }
 
     suspend fun deleteAll() {

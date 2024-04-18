@@ -383,8 +383,8 @@ internal constructor(
         trackedApps: Set<FirewallManager.AppInfoTuple>,
         emptyAll: Boolean
     ) {
-        // trackedApps is empty, the installed apps are yet to be added to the database
-        // so no need to refresh the proxy mapping when the tracked apps are empty
+        // trackedApps is empty, the installed apps are yet to be added to the database; and so,
+        // there's no need to refresh these mappings as apps tracked by FirewallManager is empty
         if (trackedApps.isEmpty()) {
             Log.i(LOG_TAG_APP_DB, "refreshProxyMapping: trackedApps is empty")
             return
@@ -402,12 +402,12 @@ internal constructor(
         ProxyManager.purgeDupsBeforeRefresh()
 
         // remove the apps from proxy mapping which are not tracked by app info repository
-        val pxm = ProxyManager.getProxyMapping()
+        val pxm = ProxyManager.trackedApps()
         val del = findPackagesToDelete(pxm, trackedApps)
         val add =
             findPackagesToAdd(pxm, trackedApps).map { FirewallManager.getAppInfoByUid(it.uid) }
-        ProxyManager.deleteMappings(del)
-        ProxyManager.addMappings(add)
+        ProxyManager.deleteApps(del)
+        ProxyManager.addApps(add)
         Log.i(
             "AppDatabase",
             "refreshing proxy mapping, size: ${pxm.size}, trackedApps: ${trackedApps.size}"
@@ -553,11 +553,12 @@ internal constructor(
         // no need to notify if the vpn is not on
         if (!VpnController.isOn()) return
 
-        if (app.packageName.isEmpty()) {
-            app.packageName = FirewallManager.getPackageNameByUid(app.uid) ?: ""
+        var pkgName = app.packageName
+        if (pkgName.isEmpty()) {
+            pkgName = FirewallManager.getPackageNameByUid(app.uid) ?: ""
         }
 
-        val appInfo = Utilities.getApplicationInfo(ctx, app.packageName)
+        val appInfo = Utilities.getApplicationInfo(ctx, pkgName)
         val appName =
             if (appInfo == null) {
                 app.uid

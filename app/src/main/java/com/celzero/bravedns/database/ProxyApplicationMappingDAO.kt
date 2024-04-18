@@ -38,7 +38,7 @@ interface ProxyApplicationMappingDAO {
     @Delete fun delete(wgMapping: ProxyApplicationMapping)
 
     @Query("delete from ProxyApplicationMapping where uid = :uid and packageName = :packageName")
-    fun deleteByPackageName(uid: Int, packageName: String)
+    fun deleteApp(uid: Int, packageName: String)
 
     @Query("delete from ProxyApplicationMapping") fun deleteAll()
 

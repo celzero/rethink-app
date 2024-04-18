@@ -245,7 +245,7 @@ object FirewallManager : KoinComponent {
         io { load() }
     }
 
-    data class AppInfoTuple(val uid: Int, var packageName: String)
+    data class AppInfoTuple(val uid: Int, val packageName: String)
 
     suspend fun isUidFirewalled(uid: Int): Boolean {
         return connectionStatus(uid) != ConnectionStatus.ALLOW

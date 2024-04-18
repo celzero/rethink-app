@@ -52,6 +52,7 @@ import java.lang.reflect.Type
 "discards":0*/
 
 // data class to handle filetags for both local and remote blocklist (filetag.json)
+// do not use as key in map or set, as some fields are mutable
 data class FileTag(
     val value: Int,
     val uname: String,

@@ -712,6 +712,9 @@ internal constructor(
 
     suspend fun handleDnsrelayChanges(endpoint: DnsCryptRelayEndpoint) {
         dnsCryptRelayEndpointRepository.update(endpoint)
+        persistentState.dnsCryptRelays.postValue(
+            PersistentState.DnsCryptRelayDetails(endpoint, endpoint.isSelected)
+        )
     }
 
     suspend fun removeDnscryptRelay(stamp: String) {

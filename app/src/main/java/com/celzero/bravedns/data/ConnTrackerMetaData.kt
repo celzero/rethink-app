@@ -17,6 +17,7 @@ package com.celzero.bravedns.data
 
 import java.io.Serializable
 
+// do not use it as key in the map or set, as it is mutable
 data class ConnTrackerMetaData(
     val uid: Int,
     val usrId: Int,

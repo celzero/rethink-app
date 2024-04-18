@@ -49,6 +49,7 @@ import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.Collections
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
@@ -56,7 +57,7 @@ import kotlin.math.min
 class ConnectionMonitor(private val networkListener: NetworkListener) :
     ConnectivityManager.NetworkCallback(), KoinComponent {
 
-    private val networkSet: MutableSet<Network> = mutableSetOf()
+    private val networkSet: MutableSet<Network> = ConcurrentHashMap.newKeySet()
 
     // add cellular, wifi, bluetooth, ethernet, vpn, wifi aware, low pan
     private val networkRequest: NetworkRequest =

@@ -27,6 +27,7 @@ import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.Companion.FALLBACK_DNS
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
+import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
@@ -40,6 +41,7 @@ import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_DOMAIN
+import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_MAX
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_SKY
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
@@ -275,6 +277,7 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: dns crypt failure for $id", e)
             getResolver()?.remove(id)
+            removeDnscryptRelaysIfAny()
             showDnscryptConnectionFailureToast()
         }
     }
@@ -298,9 +301,10 @@ class GoVpnAdapter : KoinComponent {
 
     private suspend fun addRdnsTransport(id: String, url: String) {
         try {
+            val useDot = false
             val ips: String = getIpString(context, url)
             val convertedUrl = getRdnsUrl(url) ?: return
-            if (url.contains(RETHINK_BASE_URL_SKY)) {
+            if (url.contains(RETHINK_BASE_URL_SKY) || !useDot) {
                 Intra.addDoHTransport(tunnel, id, convertedUrl, ips)
                 Log.i(LOG_TAG_VPN, "new doh (rdns): $id, url: $convertedUrl, ips: $ips")
             } else {
@@ -314,7 +318,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    private fun getRdnsUrl(url: String): String? {
+    private fun getRdnsUrl(url: String, useDot: Boolean = false): String? {
         val tls = "tls://"
         val default = "dns-query"
         // do not proceed if rethinkdns.com is not available
@@ -324,22 +328,26 @@ class GoVpnAdapter : KoinComponent {
         // if url is SKY, convert it to doh format, DOH format https://sky.rethikdns.com/stamp
 
         // for blockfree, the url is https://max.rethinkdns.com/dns-query
-        if (url == Constants.BLOCK_FREE_DNS_MAX) {
+        if (url == Constants.BLOCK_FREE_DNS_MAX && useDot) {
             return "$tls$MAX_ENDPOINT.$RETHINKDNS_DOMAIN"
-        } else if (url == Constants.BLOCK_FREE_DNS_SKY) {
+        } else if (url == Constants.BLOCK_FREE_DNS_SKY || url == Constants.BLOCK_FREE_DNS_MAX) {
             return url
         } else {
             // no-op, pass-through
         }
         val stamp = getRdnsStamp(url)
-        return if (url.contains(MAX_ENDPOINT)) {
+        return if (url.contains(MAX_ENDPOINT) && useDot) {
             // if the stamp is empty or "dns-query", then remove it
             if (stamp.isEmpty() || stamp == default) {
                 return "$tls$MAX_ENDPOINT.$RETHINKDNS_DOMAIN"
             }
             "$tls$stamp.$MAX_ENDPOINT.$RETHINKDNS_DOMAIN"
         } else {
-            "$RETHINK_BASE_URL_SKY$stamp"
+            if (url.contains(MAX_ENDPOINT)) {
+                return "$RETHINK_BASE_URL_MAX$stamp"
+            } else {
+                return "$RETHINK_BASE_URL_SKY$stamp"
+            }
         }
     }
 
@@ -448,6 +456,51 @@ class GoVpnAdapter : KoinComponent {
                 appConfig.removeDnscryptRelay(it)
                 getResolver()?.remove(it)
             }
+        }
+    }
+
+    private suspend fun removeDnscryptRelaysIfAny() {
+        val routes: String = appConfig.getDnscryptRelayServers()
+        routes.split(",").forEach {
+            if (it.isBlank()) return@forEach
+
+            Log.i(LOG_TAG_VPN, "remove dnscrypt relay: $it")
+            try {
+                // remove from appConfig, as this is not from ui, but from the tunnel start up
+                appConfig.removeDnscryptRelay(it)
+                getResolver()?.remove(it)
+            } catch (ex: Exception) {
+                Log.e(LOG_TAG_VPN, "connect-tunnel: dnscrypt rmv failure", ex)
+            }
+        }
+    }
+
+    suspend fun addDnscryptRelay(relay: DnsCryptRelayEndpoint) {
+        if (!tunnel.isConnected) {
+            Log.i(LOG_TAG_VPN, "Tunnel NOT connected, skip add dnscrypt relay")
+            return
+        }
+        try {
+            Intra.addDNSCryptRelay(tunnel, relay.dnsCryptRelayURL)
+            Log.i(LOG_TAG_VPN, "new dnscrypt relay: ${relay.dnsCryptRelayURL}")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "connect-tunnel: dnscrypt add failure", e)
+            appConfig.removeDnscryptRelay(relay.dnsCryptRelayURL)
+            getResolver()?.remove(relay.dnsCryptRelayURL)
+        }
+    }
+
+    suspend fun removeDnscryptRelay(relay: DnsCryptRelayEndpoint) {
+        if (!tunnel.isConnected) {
+            Log.i(LOG_TAG_VPN, "Tunnel NOT connected, skip remove dnscrypt relay")
+            return
+        }
+        try {
+            // no need to remove from appConfig, as it is already removed
+            getResolver()?.remove(relay.dnsCryptRelayURL)
+            Log.i(LOG_TAG_VPN, "remove dnscrypt relay: ${relay.dnsCryptRelayURL}")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "connect-tunnel: dnscrypt rmv failure", e)
         }
     }
 
@@ -710,6 +763,30 @@ class GoVpnAdapter : KoinComponent {
             Log.i(LOG_TAG_VPN, "refresh proxies: $res")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "error refreshing proxies: ${e.message}", e)
+        }
+    }
+
+    fun refreshProxy(id: String) {
+        if (!tunnel.isConnected) {
+            Log.i(LOG_TAG_VPN, "Tunnel NOT connected, skip refreshing proxy")
+            return
+        }
+        try {
+            val res = getProxies()?.getProxy(id)?.refresh()
+            Log.i(LOG_TAG_VPN, "refresh proxy($id): $res")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "error refreshing proxy($id): ${e.message}", e)
+        }
+    }
+
+    fun getProxyStats(id: String): backend.Stats? {
+        return try {
+            val stats = getProxies()?.getProxy(id)?.router()?.stat()
+            Log.i(LOG_TAG_VPN, "proxy stats($id): $stats")
+            stats
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "error getting proxy stats($id): ${e.message}", e)
+            null
         }
     }
 

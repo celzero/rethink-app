@@ -23,6 +23,7 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import backend.RDNS
+import backend.Stats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.BraveVPNService.Companion.FAIL_OPEN_ON_NO_NETWORK
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
@@ -209,6 +210,10 @@ object VpnController : KoinComponent {
 
     fun getProxyStatusById(id: String): Long? {
         return braveVpnService?.getProxyStatusById(id)
+    }
+
+    fun getProxyStats(id: String): Stats? {
+        return braveVpnService?.getProxyStats(id) ?: null
     }
 
     fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean> {
