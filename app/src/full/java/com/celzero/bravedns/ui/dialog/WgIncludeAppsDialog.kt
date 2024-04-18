@@ -263,7 +263,7 @@ class WgIncludeAppsDialog(
                     ProxyManager.setProxyIdForAllApps(proxyId, proxyName)
                 } else {
                     Log.i(LOG_TAG_PROXY, "Removing all apps from proxy $proxyId, $proxyName")
-                    ProxyManager.removeProxyForAllApps()
+                    ProxyManager.setNoProxyForAllApps()
                 }
             }
         }

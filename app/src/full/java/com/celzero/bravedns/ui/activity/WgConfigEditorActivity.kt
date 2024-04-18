@@ -94,13 +94,14 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
 
                 b.privateKeyText.setText(wgInterface?.getKeyPair()?.getPrivateKey()?.base64())
                 b.publicKeyText.setText(wgInterface?.getKeyPair()?.getPublicKey()?.base64())
-                if (wgInterface?.dnsServers?.isEmpty() != true) {
-                    b.dnsServersText.setText(
-                        wgInterface?.dnsServers?.joinToString { it.hostAddress?.toString() ?: "" }
-                    )
+                var dns = wgInterface?.dnsServers?.joinToString { it.hostAddress?.toString() ?: "" }
+                val searchDomains = wgInterface?.dnsSearchDomains?.joinToString { it }
+                dns = if (!searchDomains.isNullOrEmpty()) {
+                    "$dns,$searchDomains"
                 } else {
-                    b.dnsServersText.setText(wgInterface?.dnsSearchDomains?.joinToString { it })
+                    dns
                 }
+                b.dnsServersText.setText(dns)
                 if (wgInterface?.getAddresses()?.isEmpty() != true) {
                     b.addressesLabelText.setText(
                         wgInterface?.getAddresses()?.joinToString { it.toString() }

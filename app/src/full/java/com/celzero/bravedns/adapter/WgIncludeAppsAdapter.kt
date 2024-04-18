@@ -36,6 +36,7 @@ import com.celzero.bravedns.databinding.ListItemWgIncludeAppsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_PROXY
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -99,16 +100,18 @@ class WgIncludeAppsAdapter(
                 b.wgIncludeAppAppDescTv.text = ""
                 b.wgIncludeAppAppDescTv.visibility = View.GONE
                 b.wgIncludeAppListCheckbox.isChecked = false
+                setCardBackground(false)
             } else if (mapping.proxyId != proxyId) {
-
                 b.wgIncludeAppAppDescTv.text =
                     context.getString(R.string.wireguard_apps_proxy_map_desc, mapping.proxyName)
                 b.wgIncludeAppAppDescTv.visibility = View.VISIBLE
                 b.wgIncludeAppListCheckbox.isChecked = false
+                setCardBackground(false)
             } else {
                 b.wgIncludeAppAppDescTv.text = ""
                 b.wgIncludeAppAppDescTv.visibility = View.GONE
                 b.wgIncludeAppListCheckbox.isChecked = mapping.proxyId == proxyId
+                setCardBackground(true)
             }
 
             val isIncluded = mapping.proxyId == proxyId && mapping.proxyId != ""
@@ -117,7 +120,7 @@ class WgIncludeAppsAdapter(
         }
 
         private fun setupClickListeners(mapping: ProxyApplicationMapping, isIncluded: Boolean) {
-            b.wgIncludeAppListContainer.setOnClickListener {
+            b.wgIncludeCard.setOnClickListener {
                 Log.i(LOG_TAG_PROXY, "wgIncludeAppListContainer- ${mapping.appName}, $isIncluded")
                 updateInterfaceDetails(mapping, !isIncluded)
             }
@@ -136,6 +139,16 @@ class WgIncludeAppsAdapter(
                 .error(getDefaultIcon(context))
                 .into(b.wgIncludeAppListApkIconIv)
         }
+
+
+        private fun setCardBackground(isSelected: Boolean) {
+            if (isSelected) {
+                b.wgIncludeCard.setCardBackgroundColor(UIUtils.fetchColor(context, R.attr.selectedCardBg))
+            } else {
+                b.wgIncludeCard.setCardBackgroundColor(UIUtils.fetchColor(context, R.attr.background))
+            }
+        }
+
 
         private fun updateInterfaceDetails(mapping: ProxyApplicationMapping, include: Boolean) {
             io {
@@ -156,7 +169,7 @@ class WgIncludeAppsAdapter(
                     ProxyManager.updateProxyIdForApp(mapping.uid, proxyId, proxyName)
                     Log.i(LOG_TAG_PROXY, "Included apps: ${mapping.uid}, $proxyId, $proxyName")
                 } else {
-                    ProxyManager.removeProxyIdForApp(mapping.uid)
+                    ProxyManager.setNoProxyForApp(mapping.uid)
                     uiCtx { b.wgIncludeAppListCheckbox.isChecked = false }
                     Log.i(LOG_TAG_PROXY, "Removed apps: ${mapping.uid}, $proxyId, $proxyName")
                 }
