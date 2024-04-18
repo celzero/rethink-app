@@ -17,7 +17,6 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.os.SystemClock
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -345,16 +344,14 @@ class WgConfigAdapter(private val context: Context) :
         }
 
         private fun getUpTime(stats: Stats?): CharSequence {
-            var startTime = 0L
-            if (stats != null) {
-                startTime = stats.since
+            if (stats == null) {
+                return ""
             }
             val now = System.currentTimeMillis()
-            val uptimeMs = SystemClock.elapsedRealtime() - startTime
             // returns a string describing 'time' as a time relative to 'now'
             return DateUtils.getRelativeTimeSpanString(
-                now - uptimeMs,
                 now,
+                stats.since,
                 DateUtils.MINUTE_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_RELATIVE
             )
