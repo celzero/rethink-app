@@ -74,6 +74,7 @@ class NetLogBatcher<T, V>(
     private var updates = mutableListOf<V>()
 
     fun begin(scope: CoroutineScope) {
+        Log.i(LOG_BATCH_LOGGER, "begin")
         // launch suspend fns sig and consume asynchronously
         scope.async { sig() }
         scope.async { consumeAdd() }
@@ -92,6 +93,7 @@ class NetLogBatcher<T, V>(
                 signal.close()
                 buffersCh.close()
                 updatesCh.close()
+                Log.i(LOG_BATCH_LOGGER, "end")
             }
         }
     }
@@ -124,7 +126,7 @@ class NetLogBatcher<T, V>(
         lsn = (lsn + 1)
     }
 
-    suspend fun add(payload: T) =
+    suspend fun  add(payload: T) =
         withContext(looper + nprod) {
             batches.add(payload)
             // if the batch size is met, dispatch it to the consumer
