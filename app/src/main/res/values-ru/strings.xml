@@ -1013,5 +1013,6 @@
     <string name="dc_proxy_dns_heading" translatable="true">Новее прокси DNS</string>
     <string name="one_wg_dialog_desc" translatable="true">Все соединения из всех приложений, включая DNS, будут направлены на единственный, активный WireGuard VPN. Другие активные WireGuard VPN, если таковые имеются, будут остановлены.</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Всегда-Включено</string>
-    <string name="catch_all_wg_dialog_desc" translatable="true">Все соединения и приложения, не маршрутизируемые другими WireGuard VPN, будут маршрутизированы этим.</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">Все соединения и приложения, не маршрутизируемые другими WireGuard VPN будут маршрутизированы этим.</string>
+    <string name="one_wg_error_toast" translatable="true">Чтобы переключится в Расширенный, остановите WireGuard в Простом режиме</string>
 </resources>
