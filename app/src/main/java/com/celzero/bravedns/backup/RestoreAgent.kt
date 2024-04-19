@@ -32,6 +32,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.deleteResidue
 import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
 import com.celzero.bravedns.backup.BackupHelper.Companion.stopVpn
 import com.celzero.bravedns.backup.BackupHelper.Companion.unzip
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.LogDatabase
 import com.celzero.bravedns.service.PersistentState
@@ -51,6 +52,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
 
     private val logDatabase by inject<LogDatabase>()
     private val appDatabase by inject<AppDatabase>()
+    private val appConfig by inject<AppConfig>()
     private val persistentState by inject<PersistentState>()
 
     companion object {
@@ -281,6 +283,10 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     private fun wireGuardCleanup() {
+        if (appConfig.isWireGuardEnabled()) {
+            Log.i(LOG_TAG_BACKUP_RESTORE, "wireGuard is enabled, reset the wireguard entries")
+            appConfig.removeAllProxies()
+        }
         // delete WireGuard related entries from database
         Log.i(LOG_TAG_BACKUP_RESTORE, "wireguard cleanup process")
         WireguardManager.restoreProcessDeleteWireGuardEntries()
