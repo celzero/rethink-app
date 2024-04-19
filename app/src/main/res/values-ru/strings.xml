@@ -997,8 +997,9 @@
     <string name="lbl_peer" translatable="true">Пир</string>
     <string name="lbl_split" translatable="true">Раздельно</string>
     <string name="lbl_on_device" translatable="true">на-устройстве</string>
-    <string name="settings_connectivity_checks" translatable="true">Проверка соответствия</string>
-    <string name="settings_rinr_desc_disabled" translatable="true">Путешествовать через туннель. Если вы не знаете, что делаете, выключите.</string>
+    <string name="settings_connectivity_checks" translatable="true">Сделать проверку соединения</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Маршрутизировать собственный трифик Rethink, такой как скачивание списков блокировки, проверки соединения, DNS подключения, обратно в тунель.</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (экспериментальный)</string>
     <string name="settings_connectivity_checks_desc" translatable="true">Проверки подключений отправляются для определения достижимости.</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">Маршрутизация собственного трафика через туннель. Если вы не знаете что делаете, выключите его.</string>
 </resources>
