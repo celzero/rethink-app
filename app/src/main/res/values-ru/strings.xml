@@ -991,6 +991,10 @@
     <string name="lbl_secure" translatable="true">безопасные</string>
     <string name="orbot_no_app_toast" translatable="true">Добавьте хотя бы одно приложение, чтобы включить Orbot</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s отключен, так как активны прокси</string>
-    <string name="failed_using_default" translatable="true">Не удалось: с помощью DNS</string>
+    <string name="failed_using_default" translatable="true">Не удалось: используется запасной DNS</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Защищен! Подключен к DNS + Firewall + Proxy.</string>
+    <string name="lbl_idle" translatable="true">Простаивает</string>
+    <string name="lbl_peer" translatable="true">Пир</string>
+    <string name="lbl_split" translatable="true">Раздельно</string>
+    <string name="lbl_on_device" translatable="true">на-устройстве</string>
 </resources>
