@@ -1012,5 +1012,5 @@
     <string name="dc_proxy_dns_desc" translatable="true">Не проксировать DNS поверх Всегда-Включённый WireGuard, SOCKS5, HTTP прокси.</string>
     <string name="dc_proxy_dns_heading" translatable="true">Новее прокси DNS</string>
     <string name="one_wg_dialog_desc" translatable="true">Все соединения из всех приложений, включая DNS, будут направлены на единственный, активный WireGuard VPN. Другие активные WireGuard VPN, если таковые имеются, будут остановлены.</string>
-    <string name="catch_all_wg_dialog_title" translatable="true">Всегда</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">Всегда-Включено</string>
 </resources>
