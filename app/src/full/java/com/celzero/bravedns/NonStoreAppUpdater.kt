@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns
 
+import Logger
 import Logger.LOG_TAG_APP_UPDATE
 import android.app.Activity
 import com.celzero.bravedns.customdownloader.RetrofitManager

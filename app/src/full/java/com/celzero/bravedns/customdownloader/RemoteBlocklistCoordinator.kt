@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.customdownloader
 
+import Logger
 import Logger.LOG_TAG_DOWNLOAD
 import android.content.Context
 import android.os.SystemClock
@@ -164,7 +165,11 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             }
             return filePath
         } catch (e: IOException) {
-            Logger.e(LOG_TAG_DOWNLOAD, "err creating remote blocklist, ts: $timestamp" + e.message, e)
+            Logger.e(
+                LOG_TAG_DOWNLOAD,
+                "err creating remote blocklist, ts: $timestamp" + e.message,
+                e
+            )
         }
         return null
     }
