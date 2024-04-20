@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.service
 
+import Logger
 import Logger.LOG_TAG_DNS
 import Logger.LOG_TAG_VPN
 import android.content.Context
@@ -188,7 +189,8 @@ object RethinkBlocklistManager : KoinComponent {
             Logger.i(LOG_TAG_DNS, "New Local blocklist files inserted into database")
             return true
         } catch (ioException: IOException) {
-            Logger.e(LOG_TAG_DNS,
+            Logger.e(
+                LOG_TAG_DNS,
                 "Failure reading json file, blocklist type: remote, timestamp: $timestamp",
                 ioException
             )
@@ -271,7 +273,8 @@ object RethinkBlocklistManager : KoinComponent {
             Logger.i(LOG_TAG_DNS, "New Remote blocklist files inserted into database")
             return true
         } catch (ioException: IOException) {
-            Logger.e(LOG_TAG_DNS,
+            Logger.e(
+                LOG_TAG_DNS,
                 "Failure reading json file, blocklist type: remote, timestamp: $timestamp",
                 ioException
             )
@@ -371,9 +374,9 @@ object RethinkBlocklistManager : KoinComponent {
         return try {
             val flags = convertListToCsv(fileValues)
             Logger.d(
-                    LOG_TAG_VPN,
-                    "${type.name} flags: $flags, ${getRDNS(type)?.flagsToStamp(flags, Backend.EB32)}"
-                )
+                LOG_TAG_VPN,
+                "${type.name} flags: $flags, ${getRDNS(type)?.flagsToStamp(flags, Backend.EB32)}"
+            )
             getRDNS(type)?.flagsToStamp(flags, Backend.EB32) ?: ""
         } catch (e: java.lang.Exception) {
             Logger.e(LOG_TAG_VPN, "err stamp2tags: ${e.message}, $e")

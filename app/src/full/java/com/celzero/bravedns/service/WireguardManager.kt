@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.service
 
+import Logger
 import Logger.LOG_TAG_PROXY
 import android.content.Context
 import backend.Backend
@@ -30,12 +31,6 @@ import com.celzero.bravedns.wireguard.BadConfigException
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgInterface
-import java.io.ByteArrayInputStream
-import java.io.File
-import java.io.InputStream
-import java.nio.charset.StandardCharsets
-import java.util.Locale
-import java.util.concurrent.CopyOnWriteArraySet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,6 +38,12 @@ import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.io.InputStream
+import java.nio.charset.StandardCharsets
+import java.util.Locale
+import java.util.concurrent.CopyOnWriteArraySet
 
 object WireguardManager : KoinComponent {
 

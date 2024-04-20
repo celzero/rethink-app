@@ -1,5 +1,6 @@
 package com.celzero.bravedns.service
 
+import Logger
 import Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.os.SystemClock
@@ -136,9 +137,9 @@ object TcpProxyHelper : KoinComponent {
 
             val response = retrofitInterface.getPublicKey(persistentState.appVersion.toString())
             Logger.d(
-                    LOG_TAG_PROXY,
-                    "new tcp config: ${response?.headers()}, ${response?.message()}, ${response?.raw()?.request?.url}"
-                )
+                LOG_TAG_PROXY,
+                "new tcp config: ${response?.headers()}, ${response?.message()}, ${response?.raw()?.request?.url}"
+            )
 
             if (response?.isSuccessful == true) {
                 val jsonObject = JSONObject(response.body().toString())
@@ -151,7 +152,10 @@ object TcpProxyHelper : KoinComponent {
                 )
                 return works
             } else {
-                Logger.w(LOG_TAG_PROXY, "unsuccessful response for ${response?.raw()?.request?.url}")
+                Logger.w(
+                    LOG_TAG_PROXY,
+                    "unsuccessful response for ${response?.raw()?.request?.url}"
+                )
             }
         } catch (e: Exception) {
             Logger.e(

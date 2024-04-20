@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.adapter
 
+import Logger
 import Logger.LOG_TAG_FIREWALL
 import android.content.Context
 import android.view.LayoutInflater
@@ -94,10 +95,7 @@ class DomainRulesBtmSheetAdapter(
         }
 
         private fun applyDomainRule(domain: String, domainRuleStatus: DomainRulesManager.Status) {
-            Logger.i(
-                LOG_TAG_FIREWALL,
-                "Apply domain rule for $domain, ${domainRuleStatus.name}"
-            )
+            Logger.i(LOG_TAG_FIREWALL, "Apply domain rule for $domain, ${domainRuleStatus.name}")
             io {
                 DomainRulesManager.addDomainRule(
                     domain.trim(),

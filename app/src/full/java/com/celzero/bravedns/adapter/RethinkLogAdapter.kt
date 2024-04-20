@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
+import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
 import android.graphics.drawable.Drawable

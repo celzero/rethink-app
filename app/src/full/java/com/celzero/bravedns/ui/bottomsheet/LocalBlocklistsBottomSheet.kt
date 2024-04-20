@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import Logger
 import Logger.LOG_TAG_DNS
 import android.content.DialogInterface
 import android.content.Intent

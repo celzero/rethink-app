@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.service
 
+import Logger
 import android.content.Context
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKey

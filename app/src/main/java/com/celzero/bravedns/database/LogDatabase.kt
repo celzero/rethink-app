@@ -15,11 +15,11 @@
  */
 package com.celzero.bravedns.database
 
+import Logger
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.database.Cursor
 import android.database.sqlite.SQLiteException
-import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase

@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import Logger
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater

@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.download
 
+import Logger
 import Logger.LOG_TAG_DOWNLOAD
 import android.app.DownloadManager
 import android.content.Context
@@ -104,12 +105,11 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
                     if (status == DownloadManager.STATUS_SUCCESSFUL) {
                         downloadIdsIterator.remove()
                     } else if (status == DownloadManager.STATUS_FAILED) {
-                        val reason =
-                            cursor.getInt(columnIndex)
+                        val reason = cursor.getInt(columnIndex)
                         Logger.d(
-                                LOG_TAG_DOWNLOAD,
-                                "download status failure for $downloadID, $reason"
-                            )
+                            LOG_TAG_DOWNLOAD,
+                            "download status failure for $downloadID, $reason"
+                        )
                         return DOWNLOAD_FAILURE
                     }
                 } else {

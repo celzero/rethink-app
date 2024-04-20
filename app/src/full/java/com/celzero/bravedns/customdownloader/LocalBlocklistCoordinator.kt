@@ -44,9 +44,6 @@ import com.celzero.bravedns.util.Utilities.blocklistDownloadBasePath
 import com.celzero.bravedns.util.Utilities.calculateMd5
 import com.celzero.bravedns.util.Utilities.getTagValueFromJson
 import com.celzero.bravedns.util.Utilities.tempDownloadBasePath
-import okhttp3.ResponseBody
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -56,6 +53,9 @@ import java.io.OutputStream
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
+import okhttp3.ResponseBody
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), KoinComponent {
@@ -153,7 +153,10 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         // check if all the files are downloaded, as of now the check if for only number of files
         // downloaded. TODO: Later add checksum matching as well
         if (!isDownloadComplete(file)) {
-            Logger.e(LOG_TAG_DOWNLOAD, "Local blocklist validation failed for timestamp: $timestamp")
+            Logger.e(
+                LOG_TAG_DOWNLOAD,
+                "Local blocklist validation failed for timestamp: $timestamp"
+            )
             notifyDownloadFailure(context)
             return false
         }
@@ -318,9 +321,9 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         }
 
         Logger.d(
-                LOG_TAG_DOWNLOAD,
-                "Valid on-device blocklist in folder (${dir.name}) download? $result, files: $total, dir? ${dir.isDirectory}"
-            )
+            LOG_TAG_DOWNLOAD,
+            "Valid on-device blocklist in folder (${dir.name}) download? $result, files: $total, dir? ${dir.isDirectory}"
+        )
         return result
     }
 
@@ -375,14 +378,18 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             val remoteRdmd5 =
                 getTagValueFromJson(path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG, "rdmd5")
             Logger.d(
-                    LOG_TAG_DOWNLOAD,
-                    "tdmd5: $tdmd5, rdmd5: $rdmd5, remotetd: $remoteTdmd5, remoterd: $remoteRdmd5"
-                )
+                LOG_TAG_DOWNLOAD,
+                "tdmd5: $tdmd5, rdmd5: $rdmd5, remotetd: $remoteTdmd5, remoterd: $remoteRdmd5"
+            )
             val isDownloadValid = tdmd5 == remoteTdmd5 && rdmd5 == remoteRdmd5
             Logger.i(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid? $isDownloadValid")
             return isDownloadValid
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid exception: ${e.message}", e)
+            Logger.e(
+                LOG_TAG_DOWNLOAD,
+                "AppDownloadManager isDownloadValid exception: ${e.message}",
+                e
+            )
         }
         return false
     }

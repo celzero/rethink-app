@@ -75,8 +75,7 @@ class DoTListFragment : Fragment(R.layout.fragment_dot_list) {
 
     private fun showAddDialog() {
         val dialogBinding = DialogSetCustomDohBinding.inflate(layoutInflater)
-        val builder =
-            MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         dialog.show()

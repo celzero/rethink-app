@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger
 import Logger.LOG_TAG_PROXY
 import Logger.LOG_TAG_UI
-import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -25,7 +25,6 @@ import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
@@ -63,11 +62,11 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isValidPort
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configure) {
     private val b by viewBinding(FragmentProxyConfigureBinding::bind)

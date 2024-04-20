@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger
 import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import Logger.updateConfigLevel

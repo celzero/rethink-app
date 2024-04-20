@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -33,14 +32,14 @@ import com.celzero.bravedns.databinding.DialogSetCustomDohBinding
 import com.celzero.bravedns.databinding.FragmentDohListBinding
 import com.celzero.bravedns.viewmodel.DoHEndpointViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.net.MalformedURLException
-import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.net.MalformedURLException
+import java.net.URL
 
 class DohListFragment : Fragment(R.layout.fragment_doh_list) {
     private val b by viewBinding(FragmentDohListBinding::bind)
@@ -86,8 +85,7 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
      */
     private fun showAddCustomDohDialog() {
         val dialogBinding = DialogSetCustomDohBinding.inflate(layoutInflater)
-        val builder =
-            MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         dialog.show()

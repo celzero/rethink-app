@@ -15,16 +15,15 @@
  */
 package com.celzero.bravedns.backup
 
+import Logger
 import Logger.LOG_TAG_BACKUP_RESTORE
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageInfo
 import android.net.Uri
-import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
 import com.celzero.bravedns.backup.BackupHelper.Companion.METADATA_FILENAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.SHARED_PREFS_BACKUP_FILE_NAME
@@ -182,15 +181,15 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         }
 
         Logger.d(
-                LOG_TAG_BACKUP_RESTORE,
-                "List of files in backup folder: ${files.size}, path: ${tempDir.path}"
-            )
+            LOG_TAG_BACKUP_RESTORE,
+            "List of files in backup folder: ${files.size}, path: ${tempDir.path}"
+        )
         for (file in files) {
             val currentDbFile = File(context.getDatabasePath(file.name).path)
             Logger.d(
-                    LOG_TAG_BACKUP_RESTORE,
-                    "db file: ${file.name} backed up from ${file.path} to ${currentDbFile.path}"
-                )
+                LOG_TAG_BACKUP_RESTORE,
+                "db file: ${file.name} backed up from ${file.path} to ${currentDbFile.path}"
+            )
 
             if (
                 !file.name.contains(AppDatabase.DATABASE_NAME) &&
@@ -343,7 +342,11 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             // there is only one database), so do not consider the backups prior to that
             return version >= minVersionSupported && persistentState.appVersion >= version
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_BACKUP_RESTORE, "error while reading metadata, reason? ${e.message}", e)
+            Logger.e(
+                LOG_TAG_BACKUP_RESTORE,
+                "error while reading metadata, reason? ${e.message}",
+                e
+            )
             return false
         }
     }

@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import Logger
 import Logger.LOG_TAG_BACKUP_RESTORE
 import android.app.Activity
 import android.content.Context

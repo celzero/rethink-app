@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.scheduler
 
+import Logger
 import Logger.LOG_TAG_SCHEDULER
 import android.content.Context
 import androidx.work.ExistingPeriodicWorkPolicy

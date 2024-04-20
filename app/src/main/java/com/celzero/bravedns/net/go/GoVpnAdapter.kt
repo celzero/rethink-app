@@ -16,6 +16,7 @@
  */
 package com.celzero.bravedns.net.go
 
+import Logger
 import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.content.res.Resources
@@ -847,9 +848,9 @@ class GoVpnAdapter : KoinComponent {
         val wgUserSpaceString = secWarp.toWgUserspaceString()
         val ok2 = getProxies()?.addProxy(ID_WG_BASE + secWarp.getId(), wgUserSpaceString)
         Logger.d(
-                LOG_TAG_VPN,
-                "tcp-mode(wg) set(${ID_WG_BASE+ secWarp.getId()}): ${secWarp.getName()}, res: $ok2"
-            )
+            LOG_TAG_VPN,
+            "tcp-mode(wg) set(${ID_WG_BASE+ secWarp.getId()}): ${secWarp.getName()}, res: $ok2"
+        )
     }
 
     fun hasTunnel(): Boolean {

@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui
 
+import Logger
 import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.content.Intent

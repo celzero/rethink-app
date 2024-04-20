@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.service
 
+import Logger
 import Logger.LOG_TAG_FIREWALL
 import android.app.KeyguardManager
 import android.content.Context

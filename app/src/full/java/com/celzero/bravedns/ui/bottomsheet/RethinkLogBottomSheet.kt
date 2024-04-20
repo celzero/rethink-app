@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import Logger
 import Logger.LOG_TAG_FIREWALL
 import android.content.Intent
 import android.content.res.ColorStateList

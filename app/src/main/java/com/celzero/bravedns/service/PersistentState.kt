@@ -284,10 +284,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var proxyStatus: MutableLiveData<Int> = MutableLiveData()
 
     // data class to store dnscrypt relay details
-    data class DnsCryptRelayDetails(
-        val relay: DnsCryptRelayEndpoint,
-        val added: Boolean
-    )
+    data class DnsCryptRelayDetails(val relay: DnsCryptRelayEndpoint, val added: Boolean)
 
     var dnsCryptRelays: MutableLiveData<DnsCryptRelayDetails> = MutableLiveData()
 

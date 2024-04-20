@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.util
 
+import Logger
 import Logger.LOG_TAG_VPN
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -48,13 +49,13 @@ import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isValidPort
-import java.net.URI
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.URI
+import java.util.concurrent.TimeUnit
 
 /**
  * One-click Orbot setup.

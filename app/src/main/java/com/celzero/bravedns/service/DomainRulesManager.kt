@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.service
 
+import Logger
 import Logger.LOG_TAG_DNS
 import android.content.Context
 import android.util.Patterns

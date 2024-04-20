@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import Logger
 import Logger.LOG_TAG_FIREWALL
 import android.content.DialogInterface
 import android.content.res.Configuration

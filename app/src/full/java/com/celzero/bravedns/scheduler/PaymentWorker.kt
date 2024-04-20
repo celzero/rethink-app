@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.scheduler
 
+import Logger
 import Logger.LOG_TAG_DOWNLOAD
 import android.content.Context
 import android.os.SystemClock
@@ -23,10 +24,10 @@ import androidx.work.WorkerParameters
 import com.celzero.bravedns.customdownloader.ITcpProxy
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.service.TcpProxyHelper
-import java.util.concurrent.TimeUnit
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
     CoroutineWorker(context, workerParameters), KoinComponent {

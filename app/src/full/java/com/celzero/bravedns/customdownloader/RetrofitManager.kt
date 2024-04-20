@@ -15,14 +15,15 @@
  */
 package com.celzero.bravedns.customdownloader
 
+import Logger
 import com.celzero.bravedns.util.Constants
-import java.net.InetAddress
-import java.util.concurrent.TimeUnit
 import okhttp3.Dns
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
 import retrofit2.Retrofit
+import java.net.InetAddress
+import java.util.concurrent.TimeUnit
 
 class RetrofitManager {
 

@@ -16,6 +16,7 @@
 
 package com.celzero.bravedns.download
 
+import Logger
 import Logger.LOG_TAG_DNS
 import Logger.LOG_TAG_DOWNLOAD
 import android.app.DownloadManager

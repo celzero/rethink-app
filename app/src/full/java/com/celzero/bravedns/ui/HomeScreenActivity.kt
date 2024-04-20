@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui
 
+import Logger
 import Logger.LOG_TAG_APP_UPDATE
 import Logger.LOG_TAG_BACKUP_RESTORE
 import Logger.LOG_TAG_DOWNLOAD
@@ -74,13 +75,13 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import java.util.Calendar
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import java.util.Calendar
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
@@ -470,7 +471,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         // Check updates only for play store / website version. Not fDroid.
         if (!isPlayStoreFlavour() && !isWebsiteFlavour()) {
-            Logger.d(LOG_TAG_APP_UPDATE,
+            Logger.d(
+                LOG_TAG_APP_UPDATE,
                 "Check for update: Not play or website- ${BuildConfig.FLAVOR}"
             )
             return

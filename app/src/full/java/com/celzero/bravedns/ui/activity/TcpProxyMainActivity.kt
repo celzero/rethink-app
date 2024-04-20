@@ -1,5 +1,6 @@
 package com.celzero.bravedns.ui.activity
 
+import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent

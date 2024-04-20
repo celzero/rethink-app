@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.database
 
+import Logger
 import Logger.LOG_TAG_APP_DB
 import Logger.LOG_TAG_VPN
 import android.app.NotificationChannel

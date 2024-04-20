@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.util
 
+import Logger
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager

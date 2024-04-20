@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.backup
 
+import Logger
 import android.content.Context
-import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.service.VpnController

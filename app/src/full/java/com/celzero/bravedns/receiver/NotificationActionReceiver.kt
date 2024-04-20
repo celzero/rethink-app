@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.receiver
 
+import Logger
 import Logger.LOG_TAG_VPN
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
@@ -116,7 +117,11 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
 
     private fun dnsMode(context: Context) {
         if (appConfig.isProxyEnabled()) {
-            Utilities.showToastUiCentered(context, context.getString(R.string.settings_lock_down_proxy_desc), Toast.LENGTH_SHORT)
+            Utilities.showToastUiCentered(
+                context,
+                context.getString(R.string.settings_lock_down_proxy_desc),
+                Toast.LENGTH_SHORT
+            )
             return
         }
         io { appConfig.changeBraveMode(AppConfig.BraveMode.DNS.mode) }

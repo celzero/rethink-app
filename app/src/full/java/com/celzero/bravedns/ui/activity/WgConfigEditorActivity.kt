@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger
 import Logger.LOG_TAG_PROXY
 import Logger.throwableToException
 import android.content.Context
@@ -96,11 +97,12 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
                 b.publicKeyText.setText(wgInterface?.getKeyPair()?.getPublicKey()?.base64())
                 var dns = wgInterface?.dnsServers?.joinToString { it.hostAddress?.toString() ?: "" }
                 val searchDomains = wgInterface?.dnsSearchDomains?.joinToString { it }
-                dns = if (!searchDomains.isNullOrEmpty()) {
-                    "$dns,$searchDomains"
-                } else {
-                    dns
-                }
+                dns =
+                    if (!searchDomains.isNullOrEmpty()) {
+                        "$dns,$searchDomains"
+                    } else {
+                        dns
+                    }
                 b.dnsServersText.setText(dns)
                 if (wgInterface?.getAddresses()?.isEmpty() != true) {
                     b.addressesLabelText.setText(

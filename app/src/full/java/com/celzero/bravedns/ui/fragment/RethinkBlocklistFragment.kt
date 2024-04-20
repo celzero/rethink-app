@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import Logger
 import Logger.LOG_TAG_UI
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -823,7 +824,10 @@ class RethinkBlocklistFragment :
         workManager.getWorkInfosByTagLiveData(DOWNLOAD_TAG).observe(viewLifecycleOwner) {
             workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Logger.i(Logger.LOG_TAG_DOWNLOAD, "WorkManager state: ${workInfo.state} for $DOWNLOAD_TAG")
+            Logger.i(
+                Logger.LOG_TAG_DOWNLOAD,
+                "WorkManager state: ${workInfo.state} for $DOWNLOAD_TAG"
+            )
             if (
                 WorkInfo.State.ENQUEUED == workInfo.state ||
                     WorkInfo.State.RUNNING == workInfo.state

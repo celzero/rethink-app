@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.bottomsheet
 
+import Logger
 import Logger.LOG_TAG_DNS
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -59,10 +60,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import java.util.Locale
 
 class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null
@@ -553,9 +554,9 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     private fun lookupForImageDuckduckgo(url: String, domainUrl: String) {
         try {
             Logger.d(
-                    LOG_TAG_DNS,
-                    "Glide - TransactionViewHolder lookupForImageDuckduckgo: $url, $domainUrl"
-                )
+                LOG_TAG_DNS,
+                "Glide - TransactionViewHolder lookupForImageDuckduckgo: $url, $domainUrl"
+            )
             val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
             Glide.with(requireContext().applicationContext)
                 .load(url)
@@ -580,9 +581,9 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                             transition: Transition<in Drawable>?
                         ) {
                             Logger.d(
-                                    LOG_TAG_DNS,
-                                    "Glide - CustomViewTarget onResourceReady() -$url"
-                                )
+                                LOG_TAG_DNS,
+                                "Glide - CustomViewTarget onResourceReady() -$url"
+                            )
                             if (!isAdded) return
 
                             b.dnsBlockFavIcon.visibility = View.VISIBLE

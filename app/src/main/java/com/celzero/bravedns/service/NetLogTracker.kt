@@ -49,8 +49,7 @@ internal constructor(
 
     private var scope: CoroutineScope? = null
 
-    private var dnsdb: DnsLogTracker =
-        DnsLogTracker(dnsLogRepository, persistentState, context)
+    private var dnsdb: DnsLogTracker = DnsLogTracker(dnsLogRepository, persistentState, context)
     private var ipdb: IPTracker =
         IPTracker(connectionTrackerRepository, rethinkLogRepository, context)
 

@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.backup
 
+import Logger
 import Logger.LOG_TAG_BACKUP_RESTORE
 import android.content.Context
 import android.content.SharedPreferences

@@ -16,6 +16,7 @@
 
 package com.celzero.bravedns.receiver
 
+import Logger
 import Logger.LOG_TAG_VPN
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -33,7 +34,10 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
     override fun onReceive(context: Context, intent: Intent) {
 
         if (!persistentState.prefAutoStartBootUp) {
-            Logger.w(LOG_TAG_VPN, "Auto start is not enabled: ${persistentState.prefAutoStartBootUp}")
+            Logger.w(
+                LOG_TAG_VPN,
+                "Auto start is not enabled: ${persistentState.prefAutoStartBootUp}"
+            )
             return
         }
 

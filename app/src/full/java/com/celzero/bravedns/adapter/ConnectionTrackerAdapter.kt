@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
+import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -46,10 +47,10 @@ import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.gson.Gson
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class ConnectionTrackerAdapter(private val context: Context) :
     PagingDataAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(

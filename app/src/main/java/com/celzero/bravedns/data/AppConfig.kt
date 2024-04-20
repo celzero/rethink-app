@@ -15,13 +15,13 @@
  */
 package com.celzero.bravedns.data
 
+import Logger
 import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsCryptEndpoint
 import com.celzero.bravedns.database.DnsCryptEndpointRepository

@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.fragment
 
+import Logger
 import Logger.LOG_TAG_UI
 import android.content.ActivityNotFoundException
 import android.content.DialogInterface
@@ -61,17 +62,17 @@ import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
 import java.io.File
 import java.io.FileInputStream
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
-import org.koin.core.component.KoinComponent
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)

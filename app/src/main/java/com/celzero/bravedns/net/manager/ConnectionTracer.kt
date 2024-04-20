@@ -1,5 +1,6 @@
 package com.celzero.bravedns.net.manager
 
+import Logger
 import Logger.LOG_TAG_VPN
 import android.annotation.TargetApi
 import android.content.Context

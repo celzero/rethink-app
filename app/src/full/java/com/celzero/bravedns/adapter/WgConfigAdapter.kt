@@ -40,11 +40,11 @@ import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
-import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.ConcurrentHashMap
 
 class WgConfigAdapter(private val context: Context) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {

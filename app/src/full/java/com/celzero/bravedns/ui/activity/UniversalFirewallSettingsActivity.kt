@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger
 import Logger.LOG_TAG_FIREWALL
 import android.content.ActivityNotFoundException
 import android.content.Context

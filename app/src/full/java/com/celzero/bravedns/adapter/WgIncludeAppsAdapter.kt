@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.adapter
 
+import Logger
 import Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.content.DialogInterface
@@ -120,7 +121,10 @@ class WgIncludeAppsAdapter(
 
         private fun setupClickListeners(mapping: ProxyApplicationMapping, isIncluded: Boolean) {
             b.wgIncludeCard.setOnClickListener {
-                Logger.i(LOG_TAG_PROXY, "wgIncludeAppListContainer- ${mapping.appName}, $isIncluded")
+                Logger.i(
+                    LOG_TAG_PROXY,
+                    "wgIncludeAppListContainer- ${mapping.appName}, $isIncluded"
+                )
                 updateInterfaceDetails(mapping, !isIncluded)
             }
 
@@ -139,15 +143,17 @@ class WgIncludeAppsAdapter(
                 .into(b.wgIncludeAppListApkIconIv)
         }
 
-
         private fun setCardBackground(isSelected: Boolean) {
             if (isSelected) {
-                b.wgIncludeCard.setCardBackgroundColor(UIUtils.fetchColor(context, R.attr.selectedCardBg))
+                b.wgIncludeCard.setCardBackgroundColor(
+                    UIUtils.fetchColor(context, R.attr.selectedCardBg)
+                )
             } else {
-                b.wgIncludeCard.setCardBackgroundColor(UIUtils.fetchColor(context, R.attr.background))
+                b.wgIncludeCard.setCardBackgroundColor(
+                    UIUtils.fetchColor(context, R.attr.background)
+                )
             }
         }
-
 
         private fun updateInterfaceDetails(mapping: ProxyApplicationMapping, include: Boolean) {
             io {

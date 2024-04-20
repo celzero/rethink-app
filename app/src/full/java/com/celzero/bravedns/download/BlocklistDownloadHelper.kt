@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.download
 
+import Logger
 import Logger.LOG_TAG_DOWNLOAD
 import android.content.Context
 import com.celzero.bravedns.customdownloader.IBlocklistDownload
@@ -24,10 +25,10 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Utilities.blocklistCanonicalPath
 import com.celzero.bravedns.util.Utilities.deleteRecursive
-import java.io.File
 import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
 
 class BlocklistDownloadHelper {
 

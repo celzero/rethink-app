@@ -18,6 +18,7 @@
  */
 package com.celzero.bravedns.util
 
+import Logger
 import Logger.LOG_TAG_PROXY
 import android.content.ContentResolver
 import android.content.Context

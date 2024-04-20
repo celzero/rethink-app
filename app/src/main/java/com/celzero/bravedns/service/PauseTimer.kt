@@ -15,10 +15,10 @@
  */
 package com.celzero.bravedns.service
 
+import Logger
 import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import androidx.lifecycle.MutableLiveData
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

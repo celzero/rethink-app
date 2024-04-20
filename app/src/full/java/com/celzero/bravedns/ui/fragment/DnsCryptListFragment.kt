@@ -110,9 +110,7 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
 
     private fun showAddDnsCryptDialog() {
         val dialogBinding = DialogSetDnsCryptBinding.inflate(layoutInflater)
-        val builder =
-            MaterialAlertDialogBuilder(requireContext())
-                .setView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
 
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()

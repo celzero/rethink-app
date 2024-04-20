@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import Logger
 import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import android.Manifest
@@ -79,14 +80,14 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -700,7 +701,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 b.fhsCardApps.visibility = View.GONE
                 b.fhsCardAllowedApps.isSelected = true
             } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
-                Logger.e(LOG_TAG_VPN, "error retrieving value from appInfos observer ${e.message}", e)
+                Logger.e(
+                    LOG_TAG_VPN,
+                    "error retrieving value from appInfos observer ${e.message}",
+                    e
+                )
             }
         }
     }
@@ -741,9 +746,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun batteryOptimizationActive(context: Context): Boolean {
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         Logger.d(
-                LOG_TAG_UI,
-                "ignore battery optimization: ${powerManager.isIgnoringBatteryOptimizations(context.packageName)}"
-            )
+            LOG_TAG_UI,
+            "ignore battery optimization: ${powerManager.isIgnoringBatteryOptimizations(context.packageName)}"
+        )
         return !powerManager.isIgnoringBatteryOptimizations(context.packageName)
     }
 
@@ -773,9 +778,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         Logger.d(
-                LOG_TAG_UI,
-                "restrict background status: ${connectivityManager.restrictBackgroundStatus}"
-            )
+            LOG_TAG_UI,
+            "restrict background status: ${connectivityManager.restrictBackgroundStatus}"
+        )
         return connectivityManager.restrictBackgroundStatus ==
             ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED
     }

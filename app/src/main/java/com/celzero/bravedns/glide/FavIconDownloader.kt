@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.glide
 
+import Logger
 import Logger.LOG_TAG_DNS
 import android.content.Context
 import android.os.Process

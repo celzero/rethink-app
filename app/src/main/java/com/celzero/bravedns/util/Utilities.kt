@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.util
 
+import Logger
 import Logger.LOG_TAG_APP_DB
 import Logger.LOG_TAG_DOWNLOAD
 import Logger.LOG_TAG_FIREWALL
@@ -122,7 +123,10 @@ object Utilities {
             am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
         for (enabledService in enabledServices) {
             val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
-            Logger.i(LOG_TAG_VPN, "Accessibility enabled check for: ${enabledServiceInfo.packageName}")
+            Logger.i(
+                LOG_TAG_VPN,
+                "Accessibility enabled check for: ${enabledServiceInfo.packageName}"
+            )
             if (
                 enabledServiceInfo.packageName == context.packageName &&
                     enabledServiceInfo.name == service.name
@@ -155,9 +159,9 @@ object Utilities {
                 val enabledService = ComponentName.unflattenFromString(componentNameString)
                 if (expectedComponentName == enabledService) {
                     Logger.i(
-                            LOG_TAG_VPN,
-                            "SettingsSecure accessibility enabled for: ${expectedComponentName.packageName}"
-                        )
+                        LOG_TAG_VPN,
+                        "SettingsSecure accessibility enabled for: ${expectedComponentName.packageName}"
+                    )
                     return true
                 }
             }
@@ -533,10 +537,7 @@ object Utilities {
                 } else {
                     fileOrDirectory.delete()
                 }
-            Logger.d(
-                    LOG_TAG_DOWNLOAD,
-                    "deleteRecursive File : ${fileOrDirectory.path}, $isDeleted"
-                )
+            Logger.d(LOG_TAG_DOWNLOAD, "deleteRecursive File : ${fileOrDirectory.path}, $isDeleted")
         } catch (e: Exception) {
             Logger.w(LOG_TAG_DOWNLOAD, "File delete exception: ${e.message}", e)
         }

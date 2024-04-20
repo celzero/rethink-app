@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.service
 
+import Logger
 import Logger.LOG_TAG_PROXY
 import backend.Backend
 import com.celzero.bravedns.database.AppInfo
@@ -104,7 +105,7 @@ object ProxyManager : KoinComponent {
 
         val m = pamSet.filter { it.uid == uid } // returns a reference to underlying data-class
         if (m.isNotEmpty()) {
-            val n = m.map { ProxyAppMapTuple(it.uid, it.packageName, nonEmptyProxyId)}
+            val n = m.map { ProxyAppMapTuple(it.uid, it.packageName, nonEmptyProxyId) }
             // in-place updates in Set does not remove dups on conflicts: pl.kotl.in/hEHOgk3V0
             // that is, m.forEach { it.proxyName = nonEmptyProxyId } will not de-dup an existing
             // entry with the same uid+package-name+proxy-id, and instead will retain both entries.
@@ -199,9 +200,7 @@ object ProxyManager : KoinComponent {
         val dups = mutableSetOf<FirewallManager.AppInfoTuple>()
         pamSet
             .map { FirewallManager.AppInfoTuple(it.uid, it.packageName) }
-            .forEach {
-                if (visited.contains(it)) dups.add(it) else visited.add(it)
-            }
+            .forEach { if (visited.contains(it)) dups.add(it) else visited.add(it) }
         // duplicates are unexpected; but since refreshDatabase only deals in uid+package-name
         // and proxy-mapper primary keys on uid+package-name+proxy-id, there have been cases
         // of duplicate entries in the proxy-mapper. Purge all entries that have same
@@ -244,16 +243,15 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun deleteApp(appInfo: AppInfo) {
-         return deleteApp(appInfo.uid, appInfo.packageName)
-     }
+        return deleteApp(appInfo.uid, appInfo.packageName)
+    }
 
     suspend fun deleteApp(appInfoTuple: FirewallManager.AppInfoTuple) {
         return deleteApp(appInfoTuple.uid, appInfoTuple.packageName)
     }
 
     suspend fun deleteApp(uid: Int, packageName: String) {
-        val pam =
-            ProxyApplicationMapping(uid, packageName, "", "", false, "")
+        val pam = ProxyApplicationMapping(uid, packageName, "", "", false, "")
         deleteFromCache(pam)
         db.deleteApp(pam)
         Logger.d(LOG_TAG_PROXY, "Deleting app for mapping: ${pam.appName}, ${pam.uid}")
