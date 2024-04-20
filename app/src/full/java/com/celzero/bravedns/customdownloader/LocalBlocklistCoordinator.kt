@@ -55,6 +55,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.CancellationException
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParameters) :
@@ -62,7 +63,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
     val persistentState by inject<PersistentState>()
     val appConfig by inject<AppConfig>()
-    private var downloadStatuses: MutableMap<Long, DownloadStatus> = hashMapOf()
+    private var downloadStatuses: ConcurrentHashMap<Long, DownloadStatus> = ConcurrentHashMap()
 
     // download request status
     enum class DownloadStatus {

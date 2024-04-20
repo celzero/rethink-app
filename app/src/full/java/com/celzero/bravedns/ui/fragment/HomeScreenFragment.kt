@@ -29,7 +29,9 @@ import android.net.TrafficStats
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.os.SystemClock
+import android.provider.Settings
 import android.text.format.DateUtils
 import android.util.Log
 import android.util.TypedValue
@@ -72,20 +74,21 @@ import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
+import com.celzero.bravedns.util.Utilities.isAtleastN
 import com.celzero.bravedns.util.Utilities.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -710,11 +713,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun handleMainScreenBtnClickEvent() {
-
-        if (handleAlwaysOnVpn()) {
-            return
-        }
-
         b.fhsDnsOnOffBtn.isEnabled = false
         delay(TimeUnit.MILLISECONDS.toMillis(500), lifecycleScope) {
             if (isAdded) {
@@ -722,11 +720,88 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
 
+        // prompt user to disable battery optimization and restrict background data
+        if (isRestrictBackgroundActive(requireContext()) && !isVpnActivated) {
+            showRestrictBgActiveDialog()
+        } else if (batteryOptimizationActive(requireContext()) && !isVpnActivated) {
+            showBatteryOptimizationDialog()
+        }
+
+        handleVpnActivation()
+    }
+
+    private fun handleVpnActivation() {
+        if (handleAlwaysOnVpn()) return
+
         if (isVpnActivated) {
             stopVpnService()
         } else {
             prepareAndStartVpn()
         }
+    }
+
+    private fun batteryOptimizationActive(context: Context): Boolean {
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        if (DEBUG)
+            Log.d(
+                LOG_TAG_UI,
+                "ignore battery optimization: ${powerManager.isIgnoringBatteryOptimizations(context.packageName)}"
+            )
+        return !powerManager.isIgnoringBatteryOptimizations(context.packageName)
+    }
+
+    private fun showBatteryOptimizationDialog() {
+        if (!isAtleastN()) return
+
+        val builder = MaterialAlertDialogBuilder(requireContext())
+        builder.setTitle(R.string.battery_optimization_dialog_heading)
+        builder.setMessage(R.string.battery_optimization_dialog_message)
+        builder.setCancelable(false)
+        builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
+            openNetworkSettings(
+                requireContext(),
+                Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+            )
+        }
+
+        builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
+            // no-op
+        }
+        builder.create().show()
+    }
+
+    private fun isRestrictBackgroundActive(context: Context): Boolean {
+        if (!isAtleastN()) return false
+
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (DEBUG)
+            Log.d(
+                LOG_TAG_UI,
+                "restrict background status: ${connectivityManager.restrictBackgroundStatus}"
+            )
+        return connectivityManager.restrictBackgroundStatus ==
+            ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED
+    }
+
+    private fun showRestrictBgActiveDialog() {
+        if (!isAtleastN()) return
+
+        val builder = MaterialAlertDialogBuilder(requireContext())
+        builder.setTitle(R.string.restrict_bg_dialog_heading)
+        builder.setMessage(R.string.restrict_bg_dialog_message)
+        builder.setCancelable(false)
+        builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
+            openNetworkSettings(
+                requireContext(),
+                Settings.ACTION_IGNORE_BACKGROUND_DATA_RESTRICTIONS_SETTINGS
+            )
+        }
+
+        builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
+            // no-op
+        }
+        builder.create().show()
     }
 
     private fun showAlwaysOnStopDialog() {
@@ -929,7 +1004,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setMessage(R.string.private_dns_dialog_desc)
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.private_dns_dialog_positive) { _, _ ->
-            openNetworkSettings(requireContext())
+            openNetworkSettings(requireContext(), Settings.ACTION_WIRELESS_SETTINGS)
         }
 
         builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->

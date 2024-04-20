@@ -166,17 +166,14 @@ object UIUtils {
         }
     }
 
-    fun openNetworkSettings(context: Context) {
+    fun openNetworkSettings(context: Context, settings: String) {
         try {
-            val intent = Intent(Settings.ACTION_WIRELESS_SETTINGS)
+            val intent = Intent(settings)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Utilities.showToastUiCentered(
-                context,
-                context.getString(R.string.private_dns_error),
-                Toast.LENGTH_SHORT
-            )
+            val msg = context.getString(R.string.intent_launch_error, settings)
+            Utilities.showToastUiCentered(context, msg, Toast.LENGTH_SHORT)
             Log.w(Logger.LOG_TAG_VPN, "Failure opening network setting screen: ${e.message}", e)
         }
     }
