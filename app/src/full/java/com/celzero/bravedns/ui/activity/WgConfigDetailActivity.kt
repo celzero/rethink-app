@@ -192,8 +192,15 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         if (wgType.isOneWg()) {
             b.dnsServersLabel.visibility = View.VISIBLE
             b.dnsServersText.visibility = View.VISIBLE
-            b.dnsServersText.text =
-                wgInterface?.dnsServers?.joinToString { it.hostAddress?.toString() ?: "" }
+            var dns = wgInterface?.dnsServers?.joinToString { it.hostAddress?.toString() ?: "" }
+            val searchDomains = wgInterface?.dnsSearchDomains?.joinToString { it }
+            dns =
+                if (!searchDomains.isNullOrEmpty()) {
+                    "$dns,$searchDomains"
+                } else {
+                    dns
+                }
+            b.dnsServersText.text = dns
         } else {
             b.dnsServersLabel.visibility = View.GONE
             b.dnsServersText.visibility = View.GONE
