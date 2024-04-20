@@ -117,8 +117,10 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)
 
-            if (endpoint.isActive) {
+            if (endpoint.isActive && VpnController.hasTunnel()) {
                 keepSelectedStatusUpdated(endpoint)
+            } else if (endpoint.isActive) {
+                b.rethinkEndpointListUrlExplanation.text = context.getString(R.string.rt_filter_parent_selected)
             } else {
                 b.rethinkEndpointListUrlExplanation.text = ""
             }
@@ -227,6 +229,16 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
         }
 
         private fun openEditConfiguration(endpoint: RethinkDnsEndpoint) {
+
+            if (!VpnController.hasTunnel()) {
+                Utilities.showToastUiCentered(
+                    context,
+                    context.getString(R.string.ssv_toast_start_rethink),
+                    Toast.LENGTH_SHORT
+                )
+                return
+            }
+
             val intent = Intent(context, ConfigureRethinkBasicActivity::class.java)
             intent.putExtra(
                 ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_TYPE,

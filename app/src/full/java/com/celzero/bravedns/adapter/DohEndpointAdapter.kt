@@ -113,8 +113,10 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
                     )
             }
             b.endpointCheck.isChecked = endpoint.isSelected
-            if (endpoint.isSelected) {
+            if (endpoint.isSelected && VpnController.hasTunnel()) {
                 keepSelectedStatusUpdated()
+            } else if (endpoint.isSelected) {
+                b.endpointDesc.text = context.getString(R.string.rt_filter_parent_selected)
             } else {
                 b.endpointDesc.text = ""
             }
