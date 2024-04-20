@@ -38,6 +38,7 @@ import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.download.DownloadConstants
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.fragment.DnsSettingsFragment
 import com.celzero.bravedns.util.Constants
@@ -450,6 +451,15 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun invokeRethinkActivity() {
+        if (VpnController.hasTunnel()) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.ssv_toast_start_rethink),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+
         this.dismiss()
         val intent = Intent(requireContext(), ConfigureRethinkBasicActivity::class.java)
         intent.putExtra(
