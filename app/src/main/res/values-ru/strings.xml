@@ -151,7 +151,8 @@
     <string name="dc_dns_crypt">DNSCrypt</string>
     <string name="collecting_logs_progress_text">Захват…</string>
     <string name="settings_notification_dialog_option_2">"
-\nDNS / DNS + Брандмауэр:
+\nDNS / DNS + Файрвол:
+\n
 \nПоказывает две кнопки для быстрого переключения между экономящим заряд батареи режимом DNS и обычным режимом DNS + Брандмауэр."</string>
     <string name="contributors_list">Проект &lt;i&gt;Rethink Open Source Project&lt;/i&gt; обязан своим существованием этим добровольцам, которые посвящают бесчисленные часы его развитию.&lt;br/&gt; &lt;br/&gt;🛡️ Приложение для Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Сетевой движок &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Резолвер &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Сообщество модов &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;Andersen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Переводы &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Иконки &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;📦 Серверы сборки &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="orbot_explanation">Orbot - это бесплатное прокси-приложение, которое позволяет другим приложениям использовать интернет более <u>безопасно</u>.
@@ -234,7 +235,7 @@
     <string name="unicode_warning_sign">⚠</string>
     <string name="build__flavor_website">website</string>
     <string name="build__flavor_play_store">play</string>
-    <string name="refresh_complete">Повторная синхронизация списка приложений завершена.</string>
+    <string name="refresh_complete"><!-- use dc_refresh_toast --> Повторная синхронизация списка приложений завершена.</string>
     <string name="settings_theme_dialog_themes_2">Светлая</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
     <string name="fapps_filter_categories_heading">Категории</string>
@@ -357,7 +358,7 @@
     <string name="cd_remove_dialog_title">Удалить домен\?</string>
     <string name="cd_no_rule_txt">Нет правил</string>
     <string name="ci_bypass_universal_initial">BU</string>
-    <string name="cd_dialog_desc">Пользовательский URL (домен) или дикий символ для разрешения или блокировки. например, *.test.com, test.com/test</string>
+    <string name="cd_dialog_desc">URL адрес или доменное имя с необязательной подстановкой: *.test.com, test.com/test</string>
     <string name="ci_dialog_desc">Разрешить (обход) или заблокировать IP-адрес, IP-подсеть (диапазон), порт. Пример: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
     <string name="ci_no_rule">Нет правил</string>
     <string name="ci_no_rule_initial">N</string>
@@ -411,14 +412,14 @@
     <string name="settings_http_proxy_error_text3">Имя хоста пустое</string>
     <string name="settings_http_proxy_error_text2">Некорректный порт</string>
     <string name="settings_dns_proxy_dialog_app_desc">Выбранное приложение будет исключено из VPN, чтобы позволить ему проксировать соединения от вашего имени.</string>
-    <string name="settings_ip_dialog_ipv46">Авто (экспериментально)
-\nпроверки подключения отправляются для подтверждения достижимости.</string>
+    <string name="settings_ip_dialog_ipv46">Авто (экспериментально)</string>
     <string name="settings_socks5_dialog_hint_username">Имя пользователя (опционально)</string>
     <string name="settings_protocol_translation_dns_inactive">Переключитесь в режим DNS/DNS+Firewall, чтобы включить эту настройку</string>
     <string name="settings_notification_desc1">Пауза / Стоп (по умолчанию)</string>
     <string name="firewall_status_block_metered">блокируется в сетях с тарификацией (мобильная связь)</string>
     <string name="settings_notification_dialog_option_3">"
 \nНет:
+\n
 \nНе показывает кнопку.
 \n"</string>
     <string name="firewall_status_whitelisted">обходит универсальные правила брандмауэра</string>
@@ -484,10 +485,10 @@
     <string name="network_log_app_name_unnamed">Неназванный (%1$s)</string>
     <string name="cd_toast_deleted">Домен удален из пользовательского списка</string>
     <string name="cd_remove_dialog_message">Удалить домен из сохраненной конфигурации.</string>
-    <string name="cd_dialog_title">Добавить домен</string>
+    <string name="cd_dialog_title">Добавить правило домена</string>
     <string name="cd_dialog_edittext_hint">Войти %1$s</string>
-    <string name="cd_dialog_error_invalid_domain">Неверный URL (домен).</string>
-    <string name="cd_dialog_error_invalid_wildcard">Неверный подстановочный знак.</string>
+    <string name="cd_dialog_error_invalid_domain">Неверный URL или домен</string>
+    <string name="cd_dialog_error_invalid_wildcard">Неверный подстановочный URL или домен</string>
     <string name="cd_blocked_initial">B</string>
     <string name="cd_no_rule_initial">N</string>
     <string name="ci_dialog_title">Добавить правило IP / порта</string>
@@ -559,6 +560,7 @@
     <string name="settings_notification_dialog_title">Выберите действие уведомления</string>
     <string name="settings_notification_dialog_option_1">"
 \nПауза / Стоп (по умолчанию):
+\n
 \nПоказывает две кнопки для быстрой паузы и остановки Rethink."</string>
     <string name="settings_selected_theme">Текущая тема: %1$s</string>
     <string name="apps_icon_content_desc">Иконка приложения</string>
@@ -605,7 +607,7 @@
     <string name="error_loading_log_file">Ошибка загрузки файла журнала</string>
     <string name="dns_btm_sheet_chip">+%1$s IP</string>
     <string name="dns_btm_sheet_chip_no_answer">Нет ответа</string>
-    <string name="dns_btm_resolved_crypt">разрешено <u>анонимно</u> %1$s по %2$s</string>
+    <string name="dns_btm_resolved_crypt">разрешено <u>анонимно</u> %1$s по %2$s через %3$s</string>
     <string name="dns_btm_resolved_doh">разрешено %1$s через %2$s</string>
     <string name="dns_btm_resolved_doh_no_server">разрешено %1$s</string>
     <string name="dns_btm_record_type">Тип запроса: %1$s</string>
@@ -828,7 +830,7 @@
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Доверенный домен (Univ)</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true">Это соединение было заблокировано, поскольку <i>домен</i> заблокирован предпочитаемым DNS.<br/><br/> Чтобы изменить это поведение, перейдите на вкладку <i>Настройка DNS</i>.</string>
     <string name="dc_setting_dns_cache_heading" translatable="true">Ускоритель DNS</string>
-    <string name="dc_refresh_toast" translatable="true">Обновление DNS завершено</string>
+    <string name="dc_refresh_toast" translatable="true">Обновление завершено</string>
     <string name="settings_pcap_heading" translatable="true">Захват пакетов</string>
     <string name="settings_general_customize" translatable="true">Персонализация</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Невозможно настроить прокси, когда VPN работает в режиме Только DNS.</string>
@@ -848,7 +850,7 @@
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">будет обходить универсальные правила DNS и брандмауэра</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Обход DNS и брандмауэра</string>
     <string name="ada_app_firewall" translatable="true">Брандмауэр</string>
-    <string name="brbs_backup_restore_desc" translatable="true">Не работает в разных версиях приложения или на разных устройствах</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Не работает в разных версиях приложения</string>
     <string name="lbl_maybe_blocked" translatable="true">Может быть заблокирован</string>
     <string name="lbl_network" translatable="true">Cеть</string>
     <string name="settings_allow_lan_heading" translatable="true">Не маршрутизировать частные IP-адреса (экспериментально)</string>
@@ -894,10 +896,10 @@
     <string name="add_peer" translatable="true">Добавить пир</string>
     <string name="config_delete_dialog_desc">Вы уверены, что хотите удалить данную конфигурацию\?</string>
     <string name="config_delete_dialog_title">Удалить конфигурацию</string>
-    <string name="wireguard_enabled_failure">Выключите другие прокси, чтобы включить WireGuard</string>
-    <string name="wireguard_no_config_msg">Нет конфигураций WireGuard</string>
-    <string name="wireguard_connection_error">Проблемы с соединением к конфигурации WireGuard</string>
-    <string name="wireguard_disclaimer">Это экспериментальный WireGuard в качестве прокси-сервера TCP и UDP. В то время как DNS-трафик перенаправляется на%1$s, ICMP-трафик (например, ping) отправляется в базовую сеть.</string>
+    <string name="wireguard_enabled_failure">Остановите другие активные прокси чтобы включить WireGuard</string>
+    <string name="wireguard_no_config_msg">Нет конфигураций WireGuard VPNов. Добавьте один чтобы начать.</string>
+    <string name="wireguard_connection_error">WireGuard VPN не смог соединиться</string>
+    <string name="wireguard_disclaimer">DNS-трафик перенаправляется на%1$s, ICMP-трафик (например, ping) отправляется в базовую сеть.</string>
     <string name="cloudflare_dns_desc" translatable="true">Не блокирует никакие DNS-запросы. В конечной точке используется DNS 1.1.1.1 от Cloudflare.</string>
     <string name="cloudflare_family_dns_desc" translatable="true">Блокирует вредоносный и взрослый контент. В конечной точке используется DNS 1.1.1.3 от Cloudflare.</string>
     <string name="cleanbrowsing_family_dns_desc" translatable="true">Семейный фильтр блокирует доступ ко всем взрослым, порнографическим и откровенным сайтам. Он также блокирует домены VPN и прокси, которые могут быть использованы для обхода этих фильтров. Сайты со смешанным контентом (такие как Reddit) также заблокированы. Google, Bing и Youtube настроены на безопасный режим.</string>
@@ -991,4 +993,38 @@
     <string name="lbl_secure" translatable="true">безопасные</string>
     <string name="orbot_no_app_toast" translatable="true">Добавьте хотя бы одно приложение, чтобы включить Orbot</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s отключен, так как активны прокси</string>
+    <string name="failed_using_default" translatable="true">Не удалось: используется запасной DNS</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Защищен! Подключен к DNS + Firewall + Proxy.</string>
+    <string name="lbl_idle" translatable="true">Простаивает</string>
+    <string name="lbl_peer" translatable="true">Пир</string>
+    <string name="lbl_split" translatable="true">Раздельно</string>
+    <string name="lbl_on_device" translatable="true">на-устройстве</string>
+    <string name="settings_connectivity_checks" translatable="true">Сделать проверку соединения</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Маршрутизировать собственный трифик Rethink, такой как скачивание списков блокировки, проверки соединения, DNS подключения, обратно в тунель.</string>
+    <string name="settings_rinr_heading" translatable="true">Loopback (экспериментальный)</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">Проверки подключений отправляются для определения достижимости.</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">Маршрутизация собственного трафика через туннель. Если вы не знаете что делаете, выключите его.</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">Также включает настройку <!--settings_network_all_networks--> %1$s Вы хотите продолжить?</string>
+    <string name="settings_rinr_dialog_title" translatable="true">Loopback (экспериментальный)</string>
+    <string name="cd_dialog_edit_title" translatable="true">Изменить правило домена</string>
+    <string name="one_wg_apps_added" translatable="true">Маршрутизация всех приложений</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Выбранные приложения будут проходить только через этот WireGuard VPN, независимо от того, не работает он или подключен.</string>
+    <string name="cd_toast_edit" translatable="true">Отредактировано</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">Блокировка</string>
+    <string name="dc_proxy_dns_desc" translatable="true">Не проксировать DNS поверх Всегда-Включённый WireGuard, SOCKS5, HTTP прокси.</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Новее прокси DNS</string>
+    <string name="one_wg_dialog_desc" translatable="true">Все соединения из всех приложений, включая DNS, будут направлены на единственный, активный WireGuard VPN. Другие активные WireGuard VPN, если таковые имеются, будут остановлены.</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">Всегда-Включено</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">Все соединения и приложения, не маршрутизируемые другими WireGuard VPN будут маршрутизированы этим.</string>
+    <string name="one_wg_error_toast" translatable="true">Чтобы переключится в Расширенный, остановите WireGuard в Простом режиме</string>
+    <string name="routing_remaining_apps" translatable="true">Маршрутизация оставшихся приложений</string>
+    <string name="wireguard_disable_failure" translatable="true">«Всегда-Включённый WireGuard» нельзя отключить</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">Включая приложения %1$s</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">часть %1$s</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">Исключить приложения %1$s</string>
+    <string name="wireguard_disable_title" translatable="true">Остановить WireGuard</string>
+    <string name="remaining_apps_dialog_title" translatable="true">Включая остальные приложения</string>
+    <string name="lbl_remaining_apps" translatable="true">Оставшиеся приложения</string>
+    <string name="wireguard_disable_message" translatable="true">Остановите все активные WireGuard VPN?</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Включите все остальные приложения не маршрутизируемые другим Прокси</string>
 </resources>
