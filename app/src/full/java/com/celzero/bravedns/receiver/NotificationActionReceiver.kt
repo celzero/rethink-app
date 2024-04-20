@@ -63,7 +63,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
                 stopVpn(context)
             }
             Constants.NOTIF_ACTION_DNS_VPN -> {
-                dnsMode()
+                dnsMode(context)
             }
             Constants.NOTIF_ACTION_DNS_FIREWALL_VPN -> {
                 dnsFirewallMode()
@@ -115,11 +115,17 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
         VpnController.resumeApp()
     }
 
-    private fun dnsMode() {
+    private fun dnsMode(context: Context) {
+        if (appConfig.isProxyEnabled()) {
+            Utilities.showToastUiCentered(context, context.getString(R.string.settings_lock_down_proxy_desc), Toast.LENGTH_SHORT)
+            return
+        }
         io { appConfig.changeBraveMode(AppConfig.BraveMode.DNS.mode) }
     }
 
     private fun dnsFirewallMode() {
+        if (appConfig.getBraveMode().isDnsFirewallMode()) return
+
         io { appConfig.changeBraveMode(AppConfig.BraveMode.DNS_FIREWALL.mode) }
     }
 
