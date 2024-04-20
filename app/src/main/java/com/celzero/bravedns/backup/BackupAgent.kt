@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.backup
 
+import Logger.LOG_TAG_BACKUP_RESTORE
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
@@ -37,7 +38,6 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.getRethinkDatabase
 import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
 import com.celzero.bravedns.backup.BackupHelper.Companion.startVpn
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.copyWithStream
 import org.koin.core.component.KoinComponent
@@ -69,11 +69,10 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
 
     override fun doWork(): Result {
         val backupFileUri = Uri.parse(inputData.getString(DATA_BUILDER_BACKUP_URI))
-        if (DEBUG)
-            Log.d(LOG_TAG_BACKUP_RESTORE, "begin backup process with file uri: $backupFileUri")
+        Logger.d(LOG_TAG_BACKUP_RESTORE, "begin backup process with file uri: $backupFileUri")
         val isBackupSucceed = startBackupProcess(backupFileUri)
 
-        Log.i(
+        Logger.i(
             LOG_TAG_BACKUP_RESTORE,
             "completed backup process, is backup successful? $isBackupSucceed"
         )

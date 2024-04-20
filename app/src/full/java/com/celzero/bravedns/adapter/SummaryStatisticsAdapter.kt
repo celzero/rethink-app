@@ -15,10 +15,10 @@
  */
 package com.celzero.bravedns.adapter
 
+import Logger.LOG_TAG_DNS
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,7 +36,6 @@ import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.database.AppInfo
@@ -48,7 +47,6 @@ import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment.SummaryStatisticsType
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities
@@ -554,7 +552,7 @@ class SummaryStatisticsAdapter(
                         }
                     )
             } catch (e: Exception) {
-                if (DEBUG) Log.d(Logger.LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
+                Logger.d(LOG_TAG_DNS, "Error loading icon, load flag instead")
                 displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)
             }
         }
@@ -601,7 +599,7 @@ class SummaryStatisticsAdapter(
                         }
                     )
             } catch (e: Exception) {
-                if (DEBUG) Log.d(Logger.LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
+                Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
                 showFlag()
                 hideFavIcon()
             }

@@ -16,14 +16,13 @@
 
 package com.celzero.bravedns.scheduler
 
+import Logger.LOG_TAG_SCHEDULER
 import android.app.ApplicationExitInfo
 import android.content.SharedPreferences
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_SCHEDULER
 import com.celzero.bravedns.util.Utilities
 import com.google.common.io.Files
 import java.io.File
@@ -80,10 +79,10 @@ object BugReportZipper {
         return try {
             ZipFile(getZipFileName(dir))
         } catch (e: FileNotFoundException) {
-            Log.w(LOG_TAG_SCHEDULER, "File not found exception while creating zip file", e)
+            Logger.w(LOG_TAG_SCHEDULER, "File not found exception while creating zip file", e)
             null
         } catch (e: ZipException) {
-            Log.w(LOG_TAG_SCHEDULER, "Zip exception while creating zip file", e)
+            Logger.w(LOG_TAG_SCHEDULER, "Zip exception while creating zip file", e)
             null
         }
     }
@@ -153,7 +152,7 @@ object BugReportZipper {
     private fun addNewZipEntry(zo: ZipOutputStream, file: File) {
         if (file.isDirectory) return
 
-        Log.i(LOG_TAG_SCHEDULER, "Add new file: ${file.name} to bug_report.zip")
+        Logger.i(LOG_TAG_SCHEDULER, "Add new file: ${file.name} to bug_report.zip")
         val entry = ZipEntry(file.name)
         zo.putNextEntry(entry)
         FileInputStream(file).use { inStream -> copy(inStream, zo) }
@@ -168,7 +167,7 @@ object BugReportZipper {
         while (entries.hasMoreElements()) {
             val e = entries.nextElement()
             if (ignoreFileName == e.name) {
-                Log.i(LOG_TAG_SCHEDULER, "Ignoring file to be replaced: ${e.name}")
+                Logger.i(LOG_TAG_SCHEDULER, "Ignoring file to be replaced: ${e.name}")
                 continue
             }
 

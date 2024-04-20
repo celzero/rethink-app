@@ -15,11 +15,11 @@
  */
 package com.celzero.bravedns.receiver
 
+import Logger.LOG_TAG_VPN
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
@@ -28,7 +28,6 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.OrbotHelper.Companion.NOTIF_CHANNEL_ID_PROXY_ALERTS
 import com.celzero.bravedns.util.Utilities
@@ -46,7 +45,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     override fun onReceive(context: Context, intent: Intent) {
         // TODO - Move the NOTIFICATION_ACTIONs value to enum
         val action: String? = intent.getStringExtra(Constants.NOTIFICATION_ACTION)
-        Log.i(LOG_TAG_VPN, "Received notification action: $action")
+        Logger.i(LOG_TAG_VPN, "Received notification action: $action")
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         when (action) {
             OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> {

@@ -22,7 +22,6 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.View
 import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
@@ -32,12 +31,10 @@ import androidx.work.WorkManager
 import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.databinding.ActivityCheckoutProxyBinding
 import com.celzero.bravedns.service.EncryptedFileManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import kotlinx.coroutines.Dispatchers
@@ -95,9 +92,9 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
             handleKeys()
         }
 
-        UUID.randomUUID().toString().let { uuid -> Log.d(Logger.LOG_TAG_PROXY, "UUID: $uuid") }
+        UUID.randomUUID().toString().let { uuid -> Logger.d(Logger.LOG_TAG_PROXY, "UUID: $uuid") }
         generateRandomHexToken(TOKEN_LENGTH).let { token ->
-            Log.d(Logger.LOG_TAG_PROXY, "Token: $token")
+            Logger.d(Logger.LOG_TAG_PROXY, "Token: $token")
         }
         setSpannablePricing(b.plan1MonthButton, "1 Month / 1.99", "( 1.99 / month )")
         setSpannablePricing(b.plan3MonthsButton, "3 Months / 3.99", "( 1.33 / month )")
@@ -106,7 +103,7 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
 
     private fun handlePaymentStatusUi() {
         val paymentStatus: TcpProxyHelper.PaymentStatus = TcpProxyHelper.getTcpProxyPaymentStatus()
-        if (DEBUG) Log.d(Logger.LOG_TAG_PROXY, "Payment Status: $paymentStatus")
+        Logger.d(Logger.LOG_TAG_PROXY, "Payment Status: $paymentStatus")
         when (paymentStatus) {
             TcpProxyHelper.PaymentStatus.INITIATED -> {
                 b.paymentAwaitingContainer.visibility = View.VISIBLE
@@ -148,7 +145,7 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
         workManager.getWorkInfosByTagLiveData(TcpProxyHelper.PAYMENT_WORKER_TAG).observe(this) {
             workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(
+            Logger.i(
                 Logger.LOG_TAG_PROXY,
                 "WorkManager state: ${workInfo.state} for ${TcpProxyHelper.PAYMENT_WORKER_TAG}"
             )
@@ -177,10 +174,10 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
         io {
             try {
                 val key = TcpProxyHelper.getPublicKey()
-                Log.d(Logger.LOG_TAG_PROXY, "Public Key: $key")
+                Logger.d(Logger.LOG_TAG_PROXY, "Public Key: $key")
                 val encryptedKey = Backend.newPipKey(key, "")
                 val blind = encryptedKey.blind()
-                Log.d(Logger.LOG_TAG_PROXY, "Blind: $blind")
+                Logger.d(Logger.LOG_TAG_PROXY, "Blind: $blind")
                 val path =
                     File(
                         this.filesDir.canonicalPath +
@@ -191,9 +188,9 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
                     )
                 EncryptedFileManager.writeTcpConfig(this, blind, TcpProxyHelper.PIP_KEY_FILE_NAME)
                 val content = EncryptedFileManager.read(this, path)
-                Log.d(Logger.LOG_TAG_PROXY, "Content: $content")
+                Logger.d(Logger.LOG_TAG_PROXY, "Content: $content")
             } catch (e: Exception) {
-                Log.e(Logger.LOG_TAG_PROXY, "Exception in handleKeys: ${e.message}", e)
+                Logger.e(Logger.LOG_TAG_PROXY, "err in handleKeys: ${e.message}", e)
             }
         }
     }

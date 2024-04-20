@@ -15,13 +15,11 @@
  */
 package com.celzero.bravedns.service
 
-import android.util.Log
+import Logger.LOG_TAG_PROXY
 import backend.Backend
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ProxyAppMappingRepository
 import com.celzero.bravedns.database.ProxyApplicationMapping
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_PROXY
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.concurrent.CopyOnWriteArraySet
@@ -100,7 +98,7 @@ object ProxyManager : KoinComponent {
     // proxyId cannot be empty.
     suspend fun updateProxyIdForApp(uid: Int, nonEmptyProxyId: String, proxyName: String) {
         if (!isValidProxyPrefix(nonEmptyProxyId)) {
-            Log.e(LOG_TAG_PROXY, "cannot update $nonEmptyProxyId; setNoProxyForApp instead?")
+            Logger.e(LOG_TAG_PROXY, "cannot update $nonEmptyProxyId; setNoProxyForApp instead?")
             return
         }
 
@@ -114,7 +112,7 @@ object ProxyManager : KoinComponent {
             pamSet.addAll(n)
             db.updateProxyIdForApp(uid, nonEmptyProxyId, proxyName)
         } else {
-            Log.e(LOG_TAG_PROXY, "updateProxyIdForApp: map not found for uid $uid")
+            Logger.e(LOG_TAG_PROXY, "updateProxyIdForApp: map not found for uid $uid")
         }
     }
 
@@ -125,14 +123,14 @@ object ProxyManager : KoinComponent {
     suspend fun setProxyIdForAllApps(proxyId: String, proxyName: String) {
         // ID_NONE or empty proxy-id is not allowed; see removeProxyForAllApps()
         if (!isValidProxyPrefix(proxyId)) {
-            Log.e(LOG_TAG_PROXY, "Invalid proxy id: $proxyId")
+            Logger.e(LOG_TAG_PROXY, "Invalid proxy id: $proxyId")
             return
         }
         val m = pamSet.map { ProxyAppMapTuple(it.uid, it.packageName, proxyId) }
         pamSet.clear()
         pamSet.addAll(m)
         db.updateProxyForAllApps(proxyId, proxyName)
-        Log.i(LOG_TAG_PROXY, "added all apps to proxy: $proxyId")
+        Logger.i(LOG_TAG_PROXY, "added all apps to proxy: $proxyId")
     }
 
     suspend fun updateProxyNameForProxyId(proxyId: String, proxyName: String) {
@@ -143,7 +141,7 @@ object ProxyManager : KoinComponent {
     suspend fun setProxyIdForUnselectedApps(proxyId: String, proxyName: String) {
         // ID_NONE or empty proxy-id is not allowed
         if (!isValidProxyPrefix(proxyId)) {
-            Log.e(LOG_TAG_PROXY, "Invalid proxy id: $proxyId")
+            Logger.e(LOG_TAG_PROXY, "Invalid proxy id: $proxyId")
             return
         }
         val m = pamSet.filter { it.proxyId == "" }.toSet()
@@ -151,7 +149,7 @@ object ProxyManager : KoinComponent {
         pamSet.removeAll(m)
         pamSet.addAll(n)
         db.updateProxyForUnselectedApps(proxyId, proxyName)
-        Log.i(LOG_TAG_PROXY, "added unselected apps to interface: $proxyId")
+        Logger.i(LOG_TAG_PROXY, "added unselected apps to interface: $proxyId")
     }
 
     suspend fun setNoProxyForApp(uid: Int) {
@@ -164,13 +162,13 @@ object ProxyManager : KoinComponent {
             // update the id as empty string to remove the proxy
             db.updateProxyIdForApp(uid, noProxy, noProxy)
         } else {
-            Log.e(LOG_TAG_PROXY, "app config mapping is null for uid $uid on setNoProxyForApp")
+            Logger.e(LOG_TAG_PROXY, "app config mapping is null for uid $uid on setNoProxyForApp")
         }
     }
 
     suspend fun setNoProxyForAllApps() {
         val noProxy = ""
-        Log.i(LOG_TAG_PROXY, "Removing all apps from proxy")
+        Logger.i(LOG_TAG_PROXY, "Removing all apps from proxy")
         val m = pamSet.filter { it.proxyId != noProxy }.toSet()
         val n = m.map { ProxyAppMapTuple(it.uid, it.packageName, noProxy) }
         pamSet.removeAll(m)
@@ -179,7 +177,7 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun removeProxyId(proxyId: String) {
-        Log.i(LOG_TAG_PROXY, "Removing all apps from proxy with id: $proxyId")
+        Logger.i(LOG_TAG_PROXY, "Removing all apps from proxy with id: $proxyId")
         val noProxy = ""
         val m = pamSet.filter { it.proxyId == proxyId }.toSet()
         val n = m.map { ProxyAppMapTuple(it.uid, it.packageName, noProxy) }
@@ -213,11 +211,11 @@ object ProxyManager : KoinComponent {
         // refreshDatabase so that any entries removed are added back as "new mappings" via
         // addNewApp
         if (dups.size > 0) {
-            Log.w(LOG_TAG_PROXY, "delete dup pxms: $dups")
+            Logger.w(LOG_TAG_PROXY, "delete dup pxms: $dups")
             deleteApps(dups)
         } else {
             // no dups found
-            Log.i(LOG_TAG_PROXY, "no dups found")
+            Logger.i(LOG_TAG_PROXY, "no dups found")
         }
     }
 
@@ -238,7 +236,7 @@ object ProxyManager : KoinComponent {
     }
 
     private fun deleteFromCache(pam: ProxyApplicationMapping) {
-        pamSet.forEach() {
+        pamSet.forEach {
             if (it.uid == pam.uid && it.packageName == pam.packageName) {
                 pamSet.remove(it)
             }
@@ -258,7 +256,7 @@ object ProxyManager : KoinComponent {
             ProxyApplicationMapping(uid, packageName, "", "", false, "")
         deleteFromCache(pam)
         db.deleteApp(pam)
-        if (DEBUG) Log.d(LOG_TAG_PROXY, "Deleting app for mapping: ${pam.appName}, ${pam.uid}")
+        Logger.d(LOG_TAG_PROXY, "Deleting app for mapping: ${pam.appName}, ${pam.uid}")
     }
 
     suspend fun clear() {

@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns
 
+import Logger.LOG_TAG_APP_UPDATE
 import android.app.Activity
-import android.util.Log
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.PersistentState
@@ -25,7 +25,6 @@ import com.celzero.bravedns.util.Constants.Companion.JSON_LATEST
 import com.celzero.bravedns.util.Constants.Companion.JSON_UPDATE
 import com.celzero.bravedns.util.Constants.Companion.JSON_VERSION
 import com.celzero.bravedns.util.Constants.Companion.UPDATE_CHECK_RESPONSE_VERSION
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_APP_UPDATE
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
@@ -43,7 +42,7 @@ class NonStoreAppUpdater(
         activity: Activity,
         listener: AppUpdater.InstallStateListener
     ) {
-        Log.i(LOG_TAG_APP_UPDATE, "Beginning update check")
+        Logger.i(LOG_TAG_APP_UPDATE, "Beginning update check")
         val url = baseUrl + BuildConfig.VERSION_CODE
 
         val client = RetrofitManager.okHttpClient()
@@ -54,7 +53,7 @@ class NonStoreAppUpdater(
             .enqueue(
                 object : Callback {
                     override fun onFailure(call: Call, e: IOException) {
-                        Log.i(
+                        Logger.i(
                             LOG_TAG_APP_UPDATE,
                             "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}"
                         )
@@ -82,7 +81,7 @@ class NonStoreAppUpdater(
 
                             response.close()
                             client.connectionPool.evictAll()
-                            Log.i(
+                            Logger.i(
                                 LOG_TAG_APP_UPDATE,
                                 "Server response for the new version download is $shouldUpdate (json version: $version), version number:  $latest"
                             )

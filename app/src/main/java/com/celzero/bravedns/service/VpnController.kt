@@ -16,10 +16,10 @@
  */
 package com.celzero.bravedns.service
 
+import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import backend.RDNS
@@ -27,7 +27,6 @@ import backend.Stats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.BraveVPNService.Companion.FAIL_OPEN_ON_NO_NETWORK
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -122,7 +121,7 @@ object VpnController : KoinComponent {
     fun start(context: Context) {
         // if the tunnel has the go-adapter then there's nothing to do
         if (hasTunnel()) {
-            Log.w(LOG_TAG_VPN, "braveVPNService is already on, resending vpn enabled state")
+            Logger.w(LOG_TAG_VPN, "braveVPNService is already on, resending vpn enabled state")
             return
         }
         // else: resend/send the start-command to the vpn service which handles both false-start
@@ -136,11 +135,11 @@ object VpnController : KoinComponent {
         ContextCompat.startForegroundService(context, startServiceIntent)
 
         onConnectionStateChanged(connectionState)
-        Log.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
+        Logger.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
     }
 
     fun stop(context: Context) {
-        Log.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
+        Logger.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
         connectionState = null
         onConnectionStateChanged(connectionState)
         braveVpnService?.signalStopService(userInitiated = true)
@@ -231,7 +230,7 @@ object VpnController : KoinComponent {
     fun protocols(): String {
         val ipv4 = protocol.first
         val ipv6 = protocol.second
-        Log.d(LOG_TAG_VPN, "protocols - ipv4: $ipv4, ipv6: $ipv6")
+        Logger.d(LOG_TAG_VPN, "protocols - ipv4: $ipv4, ipv6: $ipv6")
         return if (ipv4 && ipv6) {
             "IPv4, IPv6"
         } else if (ipv6) {
@@ -250,7 +249,7 @@ object VpnController : KoinComponent {
 
     fun updateProtocol(proto: Pair<Boolean, Boolean>) {
         if (!proto.first && !proto.second) {
-            Log.i(LOG_TAG_VPN, "both v4 and v6 false, setting $FAIL_OPEN_ON_NO_NETWORK")
+            Logger.i(LOG_TAG_VPN, "both v4 and v6 false, setting $FAIL_OPEN_ON_NO_NETWORK")
             protocol = Pair(FAIL_OPEN_ON_NO_NETWORK, FAIL_OPEN_ON_NO_NETWORK)
             return
         }

@@ -16,14 +16,13 @@
 
 package com.celzero.bravedns.receiver
 
+import Logger.LOG_TAG_VPN
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
-import android.util.Log
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -34,7 +33,7 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
     override fun onReceive(context: Context, intent: Intent) {
 
         if (!persistentState.prefAutoStartBootUp) {
-            Log.w(LOG_TAG_VPN, "Auto start is not enabled: ${persistentState.prefAutoStartBootUp}")
+            Logger.w(LOG_TAG_VPN, "Auto start is not enabled: ${persistentState.prefAutoStartBootUp}")
             return
         }
 
@@ -43,7 +42,7 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
                 Intent.ACTION_BOOT_COMPLETED != intent.action &&
                 Intent.ACTION_LOCKED_BOOT_COMPLETED != intent.action
         ) {
-            Log.w(LOG_TAG_VPN, "unhandled broadcast ${intent.action}")
+            Logger.w(LOG_TAG_VPN, "unhandled broadcast ${intent.action}")
             return
         }
 
@@ -53,15 +52,15 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
         if (VpnController.state().activationRequested && !VpnController.isAlwaysOn(context)) {
             val prepareVpnIntent: Intent? =
                 try {
-                    Log.i(LOG_TAG_VPN, "Attempting to auto-start VPN")
+                    Logger.i(LOG_TAG_VPN, "Attempting to auto-start VPN")
                     VpnService.prepare(context)
                 } catch (e: NullPointerException) {
-                    Log.w(LOG_TAG_VPN, "Device does not support system-wide VPN mode")
+                    Logger.w(LOG_TAG_VPN, "Device does not support system-wide VPN mode")
                     return
                 }
 
             if (prepareVpnIntent == null) {
-                Log.i(LOG_TAG_VPN, "VPN is already prepared, invoking start")
+                Logger.i(LOG_TAG_VPN, "VPN is already prepared, invoking start")
                 VpnController.start(context)
                 return
             }

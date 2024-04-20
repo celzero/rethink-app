@@ -15,23 +15,21 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger.LOG_TAG_FIREWALL
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.databinding.ActivityUniversalFirewallSettingsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.BackgroundAccessibilityService
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -226,11 +224,10 @@ class UniversalFirewallSettingsActivity :
                 BackgroundAccessibilityService::class.java
             )
 
-        if (DEBUG)
-            Log.d(
-                LOG_TAG_FIREWALL,
-                "backgroundEnabled? ${persistentState.getBlockAppWhenBackground()}, isServiceEnabled? $isAccessibilityServiceEnabled, isServiceRunning? $isAccessibilityServiceRunning"
-            )
+        Logger.d(
+            LOG_TAG_FIREWALL,
+            "backgroundEnabled? ${persistentState.getBlockAppWhenBackground()}, isServiceEnabled? $isAccessibilityServiceEnabled, isServiceRunning? $isAccessibilityServiceRunning"
+        )
         val isAccessibilityServiceFunctional =
             isAccessibilityServiceRunning && isAccessibilityServiceEnabled
 
@@ -274,7 +271,7 @@ class UniversalFirewallSettingsActivity :
                 getString(R.string.alert_firewall_accessibility_exception),
                 Toast.LENGTH_SHORT
             )
-            Log.e(LOG_TAG_FIREWALL, "Failure accessing accessibility settings: ${e.message}", e)
+            Logger.e(LOG_TAG_FIREWALL, "Failure accessing accessibility settings: ${e.message}", e)
         }
     }
 }

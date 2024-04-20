@@ -16,7 +16,6 @@
 package com.celzero.bravedns.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.ArrayAdapter
@@ -27,14 +26,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.DnsProxyEndpointAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.databinding.DialogSetDnsProxyBinding
 import com.celzero.bravedns.databinding.FragmentDnsProxyListBinding
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.DnsProxyEndpointViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -88,9 +85,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
                 // fetch the count from repository and increment by 1 to show the
                 // next doh name in the dialog
                 val nextIndex = appConfig.getDnsProxyCount().plus(1)
-                uiCtx {
-                    showAddDnsProxyDialog(appNames, nextIndex)
-                }
+                uiCtx { showAddDnsProxyDialog(appNames, nextIndex) }
             }
         }
     }
@@ -155,17 +150,17 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
                     errorTxt.text = getString(R.string.cd_dns_proxy_error_text_2)
                 }
             } catch (e: NumberFormatException) {
-                Log.w(Logger.LOG_TAG_UI, "Error: ${e.message}", e)
+                Logger.w(Logger.LOG_TAG_UI, "Error: ${e.message}", e)
                 errorTxt.text = getString(R.string.cd_dns_proxy_error_text_3)
                 isPortValid = false
             }
 
             if (isPortValid && isIpValid) {
-                if (DEBUG) Log.d(Logger.LOG_TAG_UI, "new value inserted into DNSProxy")
+                Logger.d(Logger.LOG_TAG_UI, "new value inserted into DNSProxy")
                 io { insertDNSProxyEndpointDB(mode, name, appName, ip, port) }
                 dialog.dismiss()
             } else {
-                Log.i(Logger.LOG_TAG_UI, "cannot insert invalid dns-proxy IPs: $name, $appName")
+                Logger.i(Logger.LOG_TAG_UI, "cannot insert invalid dns-proxy IPs: $name, $appName")
             }
         }
 
@@ -210,8 +205,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
                     latency = 0
                 )
             appConfig.insertDnsproxyEndpoint(dnsProxyEndpoint)
-            if (DEBUG)
-                Log.d(Logger.LOG_TAG_UI, "Insert into DNSProxy database: $packageName, $port")
+            Logger.d(Logger.LOG_TAG_UI, "Insert into DNSProxy database: $packageName, $port")
         }
     }
 

@@ -1,12 +1,11 @@
 package com.celzero.bravedns
 
+import Logger.LOG_TAG_SCHEDULER
 import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.os.StrictMode
-import android.util.Log
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_SCHEDULER
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -46,7 +45,7 @@ class RethinkDnsApplication : Application() {
 
         turnOnStrictMode()
 
-        if (DEBUG) Log.d(LOG_TAG_SCHEDULER, "Schedule job")
+        Logger.d(LOG_TAG_SCHEDULER, "Schedule job")
         get<WorkScheduler>().scheduleAppExitInfoCollectionJob()
         // database refresh is used in both headless and main project
         get<ScheduleManager>().scheduleDatabaseRefreshJob()

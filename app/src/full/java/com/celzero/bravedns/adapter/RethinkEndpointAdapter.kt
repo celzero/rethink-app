@@ -16,10 +16,10 @@
 
 package com.celzero.bravedns.adapter
 
+import Logger.LOG_TAG_DNS
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -32,14 +32,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import backend.Backend
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.RethinkEndpointListItemBinding
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
@@ -120,7 +118,8 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
             if (endpoint.isActive && VpnController.hasTunnel()) {
                 keepSelectedStatusUpdated(endpoint)
             } else if (endpoint.isActive) {
-                b.rethinkEndpointListUrlExplanation.text = context.getString(R.string.rt_filter_parent_selected)
+                b.rethinkEndpointListUrlExplanation.text =
+                    context.getString(R.string.rt_filter_parent_selected)
             } else {
                 b.rethinkEndpointListUrlExplanation.text = ""
             }
@@ -181,11 +180,10 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
         }
 
         private fun updateConnection(endpoint: RethinkDnsEndpoint) {
-            if (DEBUG)
-                Log.d(
-                    LOG_TAG_DNS,
-                    "on rethink dns change - ${endpoint.name}, ${endpoint.url}, ${endpoint.isActive}"
-                )
+            Logger.d(
+                LOG_TAG_DNS,
+                "on rethink dns change - ${endpoint.name}, ${endpoint.url}, ${endpoint.isActive}"
+            )
 
             io {
                 endpoint.isActive = true

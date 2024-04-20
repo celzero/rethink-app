@@ -1,14 +1,12 @@
 package com.celzero.bravedns.net.manager
 
+import Logger.LOG_TAG_VPN
 import android.annotation.TargetApi
 import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Build
 import android.text.TextUtils
-import android.util.Log
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
 import com.google.common.cache.Cache
@@ -81,21 +79,20 @@ class ConnectionTracer(ctx: Context) {
             // must be called from io thread to avoid the NetworkOnMainThreadException issue#853
             uid = cm.getConnectionOwnerUid(protocol, local, remote)
 
-            if (DEBUG)
-                Log.d(
-                    LOG_TAG_VPN,
-                    "getConnectionOwnerUid(): $uid, $key, ${uidCache.getIfPresent(key)}, ${local.address.hostAddress}, ${remote.address.hostAddress}"
-                )
+            Logger.d(
+                LOG_TAG_VPN,
+                "getConnectionOwnerUid(): $uid, $key, ${uidCache.getIfPresent(key)}, ${local.address.hostAddress}, ${remote.address.hostAddress}"
+            )
             if (uid != Constants.INVALID_UID) {
                 addUidToCache(key, uid)
                 return uid
             }
         } catch (secEx: SecurityException) {
-            Log.e(LOG_TAG_VPN, "err getUidQ: " + secEx.message, secEx)
+            Logger.e(LOG_TAG_VPN, "err getUidQ: " + secEx.message, secEx)
         } catch (ex: InterruptedException) { // InterruptedException is thrown by runBlocking
-            Log.e(LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
+            Logger.e(LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
         } catch (ex: Exception) {
-            Log.e(LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
+            Logger.e(LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
         }
 
         if (retryRequired(uid, protocol, destIp)) {
@@ -108,11 +105,10 @@ class ConnectionTracer(ctx: Context) {
                 }
             val dport = 0
             val res = getUidQ(protocol, sourceIp, sourcePort, dip, dport)
-            if (DEBUG)
-                Log.d(
-                    LOG_TAG_VPN,
-                    "retrying with: $protocol, $sourceIp, $sourcePort, $dip, $dport old($destIp, $destPort), res: $res"
-                )
+            Logger.d(
+                LOG_TAG_VPN,
+                "retrying with: $protocol, $sourceIp, $sourcePort, $dip, $dport old($destIp, $destPort), res: $res"
+            )
             return res
         }
 
@@ -139,7 +135,7 @@ class ConnectionTracer(ctx: Context) {
         // do not cache the DNS request (key: 17|10.111.222.1|10.111.222.3|53)
         if (key == DNS_KEY) return
 
-        if (DEBUG) Log.d(LOG_TAG_VPN, "getConnectionOwnerUid(): $uid, $key")
+        Logger.d(LOG_TAG_VPN, "getConnectionOwnerUid(): $uid, $key")
         uidCache.put(key, uid)
     }
 

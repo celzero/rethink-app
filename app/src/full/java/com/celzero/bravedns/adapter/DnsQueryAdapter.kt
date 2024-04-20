@@ -16,10 +16,11 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
+import Logger.LOG_TAG_DNS
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,13 +37,10 @@ import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.TransactionRowBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.ui.bottomsheet.DnsBlocklistBottomSheet
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.google.gson.Gson
 
@@ -157,8 +155,8 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
 
         private fun openBottomSheet(dnsLog: DnsLog) {
             if (context !is FragmentActivity) {
-                Log.w(
-                    Logger.LOG_TAG_UI,
+                Logger.w(
+                    LOG_TAG_UI,
                     "Can not open bottom sheet. Context is not attached to activity"
                 )
                 return
@@ -212,7 +210,7 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
                         }
                     )
             } catch (e: Exception) {
-                if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
+                Logger.d(LOG_TAG_DNS, "Error loading icon, load flag instead")
                 displayDuckduckgoFavIcon(duckduckGoUrl, duckduckgoDomainURL)
             }
         }
@@ -259,7 +257,7 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
                         }
                     )
             } catch (e: Exception) {
-                if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
+                Logger.d(LOG_TAG_DNS, "Error loading icon, load flag instead")
                 showFlag()
                 hideFavIcon()
             }

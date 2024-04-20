@@ -15,6 +15,10 @@
  */
 package com.celzero.bravedns.ui
 
+import Logger.LOG_TAG_APP_UPDATE
+import Logger.LOG_TAG_BACKUP_RESTORE
+import Logger.LOG_TAG_DOWNLOAD
+import Logger.LOG_TAG_UI
 import android.app.UiModeManager
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -26,7 +30,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.os.SystemClock
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
@@ -45,7 +48,6 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
@@ -62,11 +64,6 @@ import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_APP_UPDATE
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_BACKUP_RESTORE
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DOWNLOAD
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
@@ -188,7 +185,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 object : BiometricPrompt.AuthenticationCallback() {
                     override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                         super.onAuthenticationError(errorCode, errString)
-                        Log.i(
+                        Logger.i(
                             LOG_TAG_UI,
                             "Biometric authentication error (code: $errorCode): $errString"
                         )
@@ -227,7 +224,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         super.onAuthenticationSucceeded(result)
                         // biometricPromptRetryCount = 1
                         persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
-                        Log.i(LOG_TAG_UI, "Biometric success @ ${System.currentTimeMillis()}")
+                        Logger.i(LOG_TAG_UI, "Biometric success @ ${System.currentTimeMillis()}")
                     }
 
                     override fun onAuthenticationFailed() {
@@ -237,7 +234,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                             getString(R.string.hs_biometeric_failed),
                             Toast.LENGTH_SHORT
                         )
-                        Log.i(LOG_TAG_UI, "Biometric authentication failed")
+                        Logger.i(LOG_TAG_UI, "Biometric authentication failed")
                         // show the biometric prompt again only if the ui is in foreground
                         if (isInForeground()) biometricPrompt.authenticate(promptInfo)
                     }
@@ -281,7 +278,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 Toast.LENGTH_SHORT
             )
         } else if (intent.getBooleanExtra(INTENT_RESTART_APP, false)) {
-            Log.i(LOG_TAG_UI, "Restart from restore, so refreshing app database...")
+            Logger.i(LOG_TAG_UI, "Restart from restore, so refreshing app database...")
             io { rdb.refresh(RefreshDatabase.ACTION_REFRESH_RESTORE) }
         }
     }
@@ -319,7 +316,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun startRestore(fileUri: Uri) {
-        Log.i(LOG_TAG_BACKUP_RESTORE, "invoke worker to initiate the restore process")
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "invoke worker to initiate the restore process")
         val data = Data.Builder()
         data.putString(BackupHelper.DATA_BUILDER_RESTORE_URI, fileUri.toString())
 
@@ -342,7 +339,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // observer for custom download manager worker
         workManager.getWorkInfosByTagLiveData(RestoreAgent.TAG).observe(this) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(
+            Logger.i(
                 LOG_TAG_BACKUP_RESTORE,
                 "WorkManager state: ${workInfo.state} for ${RestoreAgent.TAG}"
             )
@@ -425,7 +422,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         if (!isNewVersion()) return
 
         val version = getLatestVersion()
-        Log.i(LOG_TAG_UI, "New version detected, updating the app version, version: $version")
+        Logger.i(LOG_TAG_UI, "New version detected, updating the app version, version: $version")
         persistentState.appVersion = version
         persistentState.showWhatsNewChip = true
 
@@ -452,7 +449,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         val diff = System.currentTimeMillis() - persistentState.lastAppUpdateCheck
 
         val daysElapsed = TimeUnit.MILLISECONDS.toDays(diff)
-        Log.i(LOG_TAG_UI, "App update check initiated, number of days: $daysElapsed")
+        Logger.i(LOG_TAG_UI, "App update check initiated, number of days: $daysElapsed")
         if (daysElapsed <= 1L) return
 
         checkForUpdate()
@@ -473,11 +470,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         // Check updates only for play store / website version. Not fDroid.
         if (!isPlayStoreFlavour() && !isWebsiteFlavour()) {
-            if (DEBUG)
-                Log.d(
-                    LOG_TAG_APP_UPDATE,
-                    "Check for update: Not play or website- ${BuildConfig.FLAVOR}"
-                )
+            Logger.d(LOG_TAG_APP_UPDATE,
+                "Check for update: Not play or website- ${BuildConfig.FLAVOR}"
+            )
             return
         }
 
@@ -489,7 +484,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     installStateUpdatedListener
                 ) // Might be play updater or web updater
             } catch (e: Exception) {
-                Log.e(LOG_TAG_APP_UPDATE, "err in app update check: ${e.message}", e)
+                Logger.e(LOG_TAG_APP_UPDATE, "err in app update check: ${e.message}", e)
                 showDownloadDialog(
                     AppUpdater.InstallSource.STORE,
                     getString(R.string.download_update_dialog_failure_title),
@@ -505,7 +500,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         installStateUpdatedListener
                     ) // Always web updater
             } catch (e: Exception) {
-                Log.e(LOG_TAG_APP_UPDATE, "Error in app (web) update check: ${e.message}", e)
+                Logger.e(LOG_TAG_APP_UPDATE, "Error in app (web) update check: ${e.message}", e)
                 showDownloadDialog(
                     AppUpdater.InstallSource.OTHER,
                     getString(R.string.download_update_dialog_failure_title),
@@ -527,7 +522,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val installStateUpdatedListener =
         object : AppUpdater.InstallStateListener {
             override fun onStateUpdate(state: AppUpdater.InstallState) {
-                Log.i(LOG_TAG_UI, "InstallStateUpdatedListener: state: " + state.status)
+                Logger.i(LOG_TAG_UI, "InstallStateUpdatedListener: state: " + state.status)
                 when (state.status) {
                     AppUpdater.InstallStatus.DOWNLOADED -> {
                         // CHECK THIS if AppUpdateType.FLEXIBLE, otherwise you can skip
@@ -663,7 +658,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             showToastUiCentered(this, getString(R.string.no_browser_error), Toast.LENGTH_SHORT)
-            Log.w(Logger.LOG_TAG_VPN, "Failure opening rethink download link: ${e.message}", e)
+            Logger.w(Logger.LOG_TAG_VPN, "Failure opening rethink download link: ${e.message}", e)
         }
     }
 
@@ -672,7 +667,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         try {
             appUpdateManager.unregisterListener(installStateUpdatedListener)
         } catch (e: IllegalArgumentException) {
-            Log.w(LOG_TAG_DOWNLOAD, "Unregister receiver exception")
+            Logger.w(LOG_TAG_DOWNLOAD, "Unregister receiver exception")
         }
     }
 

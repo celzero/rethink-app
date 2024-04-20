@@ -72,4 +72,12 @@ object ProxyManager : KoinComponent {
     fun isIpnProxy(ipnProxyId: String): Boolean {
         return false
     }
+
+    fun trackedApps() : MutableSet<FirewallManager.AppInfoTuple> {
+        return mutableSetOf()
+    }
+
+    fun deleteApps(apps: Collection<FirewallManager.AppInfoTuple>) {}
+
+    fun addApps(apps: Collection<AppInfo?>) {}
 }

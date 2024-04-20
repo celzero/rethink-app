@@ -17,7 +17,6 @@ package com.celzero.bravedns.ui.fragment
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
@@ -40,7 +39,6 @@ import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.activity.DnsListActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.bottomsheet.LocalBlocklistsBottomSheet
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
@@ -293,7 +291,7 @@ class DnsSettingsFragment :
             if (enabled) {
                 get<WorkScheduler>().scheduleBlocklistUpdateCheckJob()
             } else {
-                Log.i(
+                Logger.i(
                     Logger.LOG_TAG_SCHEDULER,
                     "Cancel all the work related to blocklist update check"
                 )

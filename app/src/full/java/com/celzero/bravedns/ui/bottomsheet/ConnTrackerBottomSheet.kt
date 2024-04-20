@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import Logger.LOG_TAG_FIREWALL
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -24,7 +25,6 @@ import android.os.Bundle
 import android.text.Spanned
 import android.text.TextUtils
 import android.text.format.DateUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +35,6 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
 import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.ConnectionTracker
@@ -50,7 +49,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -118,7 +116,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     private fun initView() {
         if (info == null) {
-            Log.w(LOG_TAG_FIREWALL, "ip-details missing: initView called before onViewCreated?")
+            Logger.w(LOG_TAG_FIREWALL, "ip-details missing: initView called before onViewCreated?")
             this.dismiss()
             return
         }
@@ -163,7 +161,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     override fun onResume() {
         super.onResume()
         if (info == null) {
-            Log.w(LOG_TAG_FIREWALL, "ip-details missing: initView called before onViewCreated?")
+            Logger.w(LOG_TAG_FIREWALL, "ip-details missing: initView called before onViewCreated?")
             this.dismiss()
             return
         }
@@ -197,7 +195,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     private fun updateConnDetailsChip() {
         if (info == null) {
-            Log.w(LOG_TAG_FIREWALL, "ip-details missing: not updating the chip details")
+            Logger.w(LOG_TAG_FIREWALL, "ip-details missing: not updating the chip details")
             return
         }
 
@@ -387,11 +385,10 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     private fun setupClickListeners() {
         b.bsConnUnknownAppCheck.setOnCheckedChangeListener(null)
         b.bsConnUnknownAppCheck.setOnClickListener {
-            if (DEBUG)
-                Log.d(
-                    LOG_TAG_FIREWALL,
-                    "Unknown app, universal firewall settings(block unknown app): ${b.bsConnUnknownAppCheck.isChecked} "
-                )
+            Logger.d(
+                LOG_TAG_FIREWALL,
+                "Unknown app, universal firewall settings(block unknown app): ${b.bsConnUnknownAppCheck.isChecked} "
+            )
             persistentState.setBlockUnknownConnections(b.bsConnUnknownAppCheck.isChecked)
         }
 
@@ -441,7 +438,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
                         if (a == fStatus && c == connStatus) return@io
 
-                        Log.i(
+                        Logger.i(
                             LOG_TAG_FIREWALL,
                             "Change in firewall rule for app uid: ${info?.uid}, firewall status: $fStatus, conn status: $connStatus"
                         )
@@ -489,7 +486,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                     id: Long
                 ) {
                     if (info!!.dnsQuery == null) {
-                        Log.w(LOG_TAG_FIREWALL, "DNS query is null, cannot apply domain rule")
+                        Logger.w(LOG_TAG_FIREWALL, "DNS query is null, cannot apply domain rule")
                         return
                     }
 
@@ -676,7 +673,10 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         val proto = Protocol.getProtocolName(info!!.protocol).name
         val cr = ConnectionRules(info!!.ipAddress, info!!.port, proto)
 
-        Log.i(LOG_TAG_FIREWALL, "Apply ip rule for ${cr.ipAddress}, ${FirewallRuleset.RULE2.name}")
+        Logger.i(
+            LOG_TAG_FIREWALL,
+            "Apply ip rule for ${cr.ipAddress}, ${FirewallRuleset.RULE2.name}"
+        )
         io {
             // no need to apply rule, prev selection and current selection are same
             if (
@@ -692,7 +692,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun applyDomainRule(domainRuleStatus: DomainRulesManager.Status) {
-        Log.i(
+        Logger.i(
             LOG_TAG_FIREWALL,
             "Apply domain rule for ${info!!.dnsQuery}, ${domainRuleStatus.name}"
         )

@@ -15,17 +15,15 @@
  */
 package com.celzero.bravedns.util
 
+import Logger.LOG_TAG_FIREWALL
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.text.TextUtils
-import android.util.Log
 import android.view.accessibility.AccessibilityEvent
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
@@ -35,7 +33,7 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
     private val persistentState by inject<PersistentState>()
 
     override fun onInterrupt() {
-        Log.w(LOG_TAG_FIREWALL, "BackgroundAccessibilityService Interrupted")
+        Logger.w(LOG_TAG_FIREWALL, "BackgroundAccessibilityService Interrupted")
     }
 
     override fun onRebind(intent: Intent?) {
@@ -126,11 +124,10 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
             } else {
                 event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
             }
-        if (DEBUG)
-            Log.d(
-                LOG_TAG_FIREWALL,
-                "onAccessibilityEvent: ${event.packageName}, ${event.eventType}, $hasContentChanged"
-            )
+        Logger.d(
+            LOG_TAG_FIREWALL,
+            "onAccessibilityEvent: ${event.packageName}, ${event.eventType}, $hasContentChanged"
+        )
 
         if (!hasContentChanged) return
 

@@ -15,14 +15,14 @@
  */
 package com.celzero.bravedns.util
 
+import Logger.LOG_TAG_DOWNLOAD
 import android.content.Context
-import android.util.Log
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
-import org.koin.core.component.KoinComponent
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import org.koin.core.component.KoinComponent
 
 class RemoteFileTagUtil : KoinComponent {
     companion object {
@@ -46,11 +46,7 @@ class RemoteFileTagUtil : KoinComponent {
                 persistentState.remoteBlocklistTimestamp =
                     Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
             } catch (e: IOException) {
-                Log.e(
-                    Logger.LOG_TAG_DOWNLOAD,
-                    "Issue moving file from asset folder: ${e.message}",
-                    e
-                )
+                Logger.e(LOG_TAG_DOWNLOAD, "err moving file from asset folder: ${e.message}", e)
                 persistentState.remoteBlocklistTimestamp = Constants.INIT_TIME_MS
             }
         }

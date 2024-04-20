@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.fragment
 
+import Logger.LOG_TAG_UI
 import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
@@ -26,7 +27,6 @@ import android.os.SystemClock
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -52,8 +52,6 @@ import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.sendEmailIntent
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
@@ -124,7 +122,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutAppVersion.text =
                 getString(R.string.about_version_install_source, version, getDownloadSource())
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
+            Logger.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
         }
     }
 
@@ -238,7 +236,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 getString(R.string.intent_launch_error, intent.data),
                 Toast.LENGTH_SHORT
             )
-            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
+            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
@@ -255,7 +253,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 getString(R.string.app_info_error),
                 Toast.LENGTH_SHORT
             )
-            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
+            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
@@ -278,7 +276,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 getString(R.string.notification_screen_error),
                 Toast.LENGTH_SHORT
             )
-            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
+            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
@@ -423,7 +421,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                     binding.logs.text = inputString?.slice(0 until maxLength)
                 }
             } catch (e: Exception) {
-                Log.w(LOG_TAG_UI, "Error loading log files to textview: ${e.message}", e)
+                Logger.w(LOG_TAG_UI, "err loading log files to textview: ${e.message}", e)
                 uiCtx {
                     if (!isAdded) return@uiCtx
                     binding.info.visibility = View.GONE
@@ -468,7 +466,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             viewLifecycleOwner
         ) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(
+            Logger.i(
                 Logger.LOG_TAG_SCHEDULER,
                 "WorkManager state: ${workInfo.state} for ${WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG}"
             )

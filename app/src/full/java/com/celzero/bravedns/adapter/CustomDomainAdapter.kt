@@ -15,11 +15,11 @@
  */
 package com.celzero.bravedns.adapter
 
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.format.DateUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,7 +44,6 @@ import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
@@ -109,7 +108,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         } else if (holder is CustomDomainViewHolderWithoutHeader) {
             holder.update(customDomain)
         } else {
-            Log.w(Logger.LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
+            Logger.w(LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
             return
         }
     }

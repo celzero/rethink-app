@@ -16,9 +16,7 @@
 
 package com.celzero.bravedns.util
 
-import android.util.Log
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.util.Logger.Companion.LOG_BATCH_LOGGER
+import Logger.LOG_BATCH_LOGGER
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -74,7 +72,7 @@ class NetLogBatcher<T, V>(
     private var updates = mutableListOf<V>()
 
     fun begin(scope: CoroutineScope) {
-        Log.i(LOG_BATCH_LOGGER, "begin")
+        Logger.i(LOG_BATCH_LOGGER, "begin")
         // launch suspend fns sig and consume asynchronously
         scope.async { sig() }
         scope.async { consumeAdd() }
@@ -93,7 +91,7 @@ class NetLogBatcher<T, V>(
                 signal.close()
                 buffersCh.close()
                 updatesCh.close()
-                Log.i(LOG_BATCH_LOGGER, "end")
+                Logger.i(LOG_BATCH_LOGGER, "end")
             }
         }
     }
@@ -121,12 +119,12 @@ class NetLogBatcher<T, V>(
         updates = mutableListOf()
         updatesCh.send(u)
 
-        if (DEBUG) Log.d(LOG_BATCH_LOGGER, "transfer and swap (${lsn}) u: ${u.size}, b: ${b.size}")
+        Logger.d(LOG_BATCH_LOGGER, "transfer and swap (${lsn}) u: ${u.size}, b: ${b.size}")
 
         lsn = (lsn + 1)
     }
 
-    suspend fun  add(payload: T) =
+    suspend fun add(payload: T) =
         withContext(looper + nprod) {
             batches.add(payload)
             // if the batch size is met, dispatch it to the consumer
@@ -152,26 +150,25 @@ class NetLogBatcher<T, V>(
             // consume all signals
             for (tracklsn in signal) {
                 if (tracklsn < lsn) {
-                    if (DEBUG) Log.d(LOG_BATCH_LOGGER, "dup signal skip $tracklsn")
+                    Logger.d(LOG_BATCH_LOGGER, "dup signal skip $tracklsn")
                     continue
                 }
                 // do not honor the signal for 'l' if a[l] is empty
                 // this can happen if the signal for 'l' is processed
                 // after the fact that 'l' has been swapped out by 'batch'
                 if (batches.size <= 0 && updates.size <= 0) {
-                    if (DEBUG) Log.d(LOG_BATCH_LOGGER, "signal continue")
+                    Logger.d(LOG_BATCH_LOGGER, "signal continue")
                     continue
                 } else {
-                    if (DEBUG) Log.d(LOG_BATCH_LOGGER, "signal sleep $waitms ms")
+                    Logger.d(LOG_BATCH_LOGGER, "signal sleep $waitms ms")
                 }
 
                 // wait for 'batch' to dispatch
                 delay(waitms)
-                if (DEBUG)
-                    Log.d(
-                        LOG_BATCH_LOGGER,
-                        "signal wait over, sz(b: ${batches.size}, u: ${updates.size}) / cur-buf(${lsn})"
-                    )
+                Logger.d(
+                    LOG_BATCH_LOGGER,
+                    "signal wait over, sz(b: ${batches.size}, u: ${updates.size}) / cur-buf(${lsn})"
+                )
 
                 // 'l' is the current buffer, that is, 'l == i',
                 // and 'batch' hasn't dispatched it,

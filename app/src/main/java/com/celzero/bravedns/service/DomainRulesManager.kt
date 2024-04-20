@@ -15,8 +15,8 @@
  */
 package com.celzero.bravedns.service
 
+import Logger.LOG_TAG_DNS
 import android.content.Context
-import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import backend.Backend
@@ -24,7 +24,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DNS
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.MalformedURLException
@@ -95,7 +94,7 @@ object DomainRulesManager : KoinComponent {
     }
 
     // update the cache with the domain and its status based on the domain type
-    private fun updateTrie(cd: CustomDomain) {
+    fun updateTrie(cd: CustomDomain) {
         val key = mkTrieKey(cd.domain, cd.uid)
         trie.set(key, cd.status.toString())
     }
@@ -308,7 +307,7 @@ object DomainRulesManager : KoinComponent {
     suspend fun deleteRulesByUid(uid: Int) {
         db.deleteRulesByUid(uid)
         val rulesDeleted = trie.delAll(uid.toString())
-        Log.i(LOG_TAG_DNS, "rules deleted from trie for $uid: $rulesDeleted")
+        Logger.i(LOG_TAG_DNS, "rules deleted from trie for $uid: $rulesDeleted")
         clearTrustedMap(uid)
     }
 
@@ -354,11 +353,11 @@ object DomainRulesManager : KoinComponent {
     private suspend fun rehydrateFromDB(uid: Int) {
         val doms = db.getDomainsByUID(uid)
         if (doms.isEmpty()) {
-            Log.w(LOG_TAG_DNS, "rehydrate: zero domains for uid: $uid in db")
+            Logger.w(LOG_TAG_DNS, "rehydrate: zero domains for uid: $uid in db")
             return
         }
 
-        Log.i(LOG_TAG_DNS, "rehydrate: rehydrating ${doms.size} domains for uid: $uid")
+        Logger.i(LOG_TAG_DNS, "rehydrate: rehydrating ${doms.size} domains for uid: $uid")
         // process longer domains first
         val selector: (String) -> Int = { str -> str.length }
         val desc = doms.sortedByDescending { selector(it.domain) }

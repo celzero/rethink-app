@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.util
 
+import Logger.LOG_TAG_VPN
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -27,13 +28,11 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.net.VpnService
 import android.text.TextUtils
-import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.receiver.NotificationActionReceiver
@@ -42,7 +41,6 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.HTTP_PROXY_PORT
 import com.celzero.bravedns.util.Constants.Companion.SOCKS_DEFAULT_PORT
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.getBroadcastPendingIntent
 import com.celzero.bravedns.util.Utilities.isAtleastO
@@ -50,13 +48,13 @@ import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isValidPort
+import java.net.URI
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.net.URI
-import java.util.concurrent.TimeUnit
 
 /**
  * One-click Orbot setup.
@@ -198,7 +196,7 @@ class OrbotHelper(
         )
         context.sendBroadcast(intent)
         waitForOrbot()
-        if (DEBUG) Log.d(LOG_TAG_VPN, "request orbot start by broadcast")
+        Logger.d(LOG_TAG_VPN, "request orbot start by broadcast")
     }
 
     /**
@@ -209,36 +207,35 @@ class OrbotHelper(
     private val orbotStatusReceiver: BroadcastReceiver =
         object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                Log.i(LOG_TAG_VPN, "received status from orbot, action: ${intent.action}")
+                Logger.i(LOG_TAG_VPN, "received status from orbot, action: ${intent.action}")
                 if (ACTION_STATUS != intent.action) {
                     return
                 }
 
                 val status = intent.getStringExtra(EXTRA_STATUS)
-                if (DEBUG)
-                    Log.d(
-                        LOG_TAG_VPN,
-                        "received status from orbot, action: ${intent.action}, status: $status"
-                    )
+                Logger.d(
+                    LOG_TAG_VPN,
+                    "received status from orbot, action: ${intent.action}, status: $status"
+                )
 
                 when (status) {
                     STATUS_ON -> {
-                        Log.i(LOG_TAG_VPN, "Orbot is ON, update the proxy data")
+                        Logger.i(LOG_TAG_VPN, "Orbot is ON, update the proxy data")
                         isResponseReceivedFromOrbot = true
                         updateOrbotProxyData(intent)
                         setOrbotMode()
                     }
                     STATUS_OFF -> {
-                        Log.i(LOG_TAG_VPN, "Orbot is OFF, retry or stop the Orbot")
+                        Logger.i(LOG_TAG_VPN, "Orbot is OFF, retry or stop the Orbot")
                         io { waitForOrbot() }
                         unregisterReceiver()
                     }
                     STATUS_STARTING -> {
-                        Log.i(LOG_TAG_VPN, "Orbot is STARTING, update the proxy data")
+                        Logger.i(LOG_TAG_VPN, "Orbot is STARTING, update the proxy data")
                         updateOrbotProxyData(intent)
                     }
                     STATUS_STOPPING -> {
-                        Log.i(LOG_TAG_VPN, "Orbot is STOPPING, stop the Proxy")
+                        Logger.i(LOG_TAG_VPN, "Orbot is STOPPING, stop the Proxy")
                         updateOrbotProxyData(intent)
                         stopOrbot(isInteractive = false)
                     }
@@ -264,7 +261,7 @@ class OrbotHelper(
         appConfig.removeAllProxies()
         persistentState.orbotConnectionStatus.postValue(false)
         context.sendBroadcast(getOrbotStopIntent())
-        Log.i(LOG_TAG_VPN, "stop orbot, remove from proxy")
+        Logger.i(LOG_TAG_VPN, "stop orbot, remove from proxy")
     }
 
     /**
@@ -337,7 +334,7 @@ class OrbotHelper(
 
     private fun setOrbotMode() {
         io {
-            Log.i(LOG_TAG_VPN, "Initiate orbot start with type: $selectedProxyType")
+            Logger.i(LOG_TAG_VPN, "Initiate orbot start with type: $selectedProxyType")
 
             if (isTypeSocks5() && handleOrbotSocks5Update()) {
                 appConfig.addProxy(AppConfig.ProxyType.SOCKS5, AppConfig.ProxyProvider.ORBOT)
@@ -372,7 +369,7 @@ class OrbotHelper(
             appConfig.updateOrbotProxy(proxyEndpoint)
             true
         } else {
-            Log.w(LOG_TAG_VPN, "Error inserting value in proxy database")
+            Logger.w(LOG_TAG_VPN, "Error inserting value in proxy database")
             false
         }
     }
@@ -387,7 +384,7 @@ class OrbotHelper(
             appConfig.updateOrbotHttpProxy(proxyEndpoint)
             true
         } else {
-            Log.w(LOG_TAG_VPN, "could not setup Orbot http proxy with ${httpsIp}:${httpsPort}")
+            Logger.w(LOG_TAG_VPN, "could not setup Orbot http proxy with ${httpsIp}:${httpsPort}")
             false
         }
     }
@@ -409,7 +406,7 @@ class OrbotHelper(
         port: Int?
     ): ProxyEndpoint? {
         if (ip.isNullOrEmpty() || port == null || !isValidPort(port)) {
-            Log.w(LOG_TAG_VPN, "cannot construct proxy with values ip: $ip, port: $port")
+            Logger.w(LOG_TAG_VPN, "cannot construct proxy with values ip: $ip, port: $port")
             return null
         }
 
@@ -439,11 +436,10 @@ class OrbotHelper(
         httpsIp = data?.getStringExtra(EXTRA_HTTP_PROXY_HOST)
         dnsPort = data?.getIntExtra(EXTRA_DNS_PORT, 0)
 
-        if (DEBUG)
-            Log.d(
-                LOG_TAG_VPN,
-                "OrbotHelper: new val socks5:$socks5Ip($socks5Port), http: $httpsIp($httpsPort), dns: $dnsPort"
-            )
+        Logger.d(
+            LOG_TAG_VPN,
+            "OrbotHelper: new val socks5:$socks5Ip($socks5Port), http: $httpsIp($httpsPort), dns: $dnsPort"
+        )
     }
 
     /**
@@ -453,7 +449,7 @@ class OrbotHelper(
     private suspend fun waitForOrbot() {
         io {
             delay(TimeUnit.SECONDS.toMillis(15L))
-            Log.i(LOG_TAG_VPN, "after timeout, isOrbotUp? $isResponseReceivedFromOrbot")
+            Logger.i(LOG_TAG_VPN, "after timeout, isOrbotUp? $isResponseReceivedFromOrbot")
 
             // Execute a task in the background thread after 15 sec.
             // If there is no response for the broadcast from the Orbot,
@@ -467,7 +463,7 @@ class OrbotHelper(
 
             retryCount--
             if (retryCount > 0) {
-                Log.i(LOG_TAG_VPN, "retrying orbot start")
+                Logger.i(LOG_TAG_VPN, "retrying orbot start")
                 startOrbot(selectedProxyType)
             } else {
                 uiCtx {
@@ -482,7 +478,7 @@ class OrbotHelper(
         try {
             context.unregisterReceiver(orbotStatusReceiver)
         } catch (e: IllegalArgumentException) {
-            Log.w(LOG_TAG_VPN, "orbot unregister not needed: ${e.message}")
+            Logger.w(LOG_TAG_VPN, "orbot unregister not needed: ${e.message}")
         }
     }
 
@@ -497,7 +493,7 @@ class OrbotHelper(
                 openOrbotAppInfo()
             }
         } catch (e: ActivityNotFoundException) {
-            Log.w(LOG_TAG_VPN, "Failure calling app info: ${e.message}", e)
+            Logger.w(LOG_TAG_VPN, "Failure calling app info: ${e.message}", e)
         }
     }
 
@@ -514,7 +510,7 @@ class OrbotHelper(
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Log.w(LOG_TAG_VPN, "Failure calling app info: ${e.message}", e)
+            Logger.w(LOG_TAG_VPN, "Failure calling app info: ${e.message}", e)
         }
     }
 

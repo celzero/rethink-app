@@ -15,10 +15,10 @@
  */
 package com.celzero.bravedns.adapter
 
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,7 +32,6 @@ import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppDomainDetailsBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.ui.bottomsheet.AppDomainRulesBottomSheet
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
 
@@ -118,7 +117,7 @@ class AppWiseDomainsAdapter(
 
         private fun openBottomSheet(appConn: AppConnection) {
             if (context !is AppCompatActivity) {
-                Log.w(Logger.LOG_TAG_UI, "Error opening the app conn bottom sheet")
+                Logger.w(LOG_TAG_UI, "Error opening the app conn bottom sheet")
                 return
             }
 

@@ -15,12 +15,12 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -36,7 +36,6 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityWireguardMainBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.QrCodeFromFileScanner
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.TunnelImporter
@@ -79,17 +78,17 @@ class WgMainActivity :
                         val qrCodeFromFileScanner =
                             QrCodeFromFileScanner(contentResolver, QRCodeReader())
                         val result = qrCodeFromFileScanner.scan(data)
-                        Log.i(Logger.LOG_TAG_PROXY, "result: $result, data: $data")
+                        Logger.i(LOG_TAG_PROXY, "result: $result, data: $data")
                         if (result != null) {
                             withContext(Dispatchers.Main) {
-                                Log.i(Logger.LOG_TAG_PROXY, "result: ${result.text}")
+                                Logger.i(LOG_TAG_PROXY, "result: ${result.text}")
                                 TunnelImporter.importTunnel(result.text) {
                                     Utilities.showToastUiCentered(
                                         this@WgMainActivity,
                                         it.toString(),
                                         Toast.LENGTH_LONG
                                     )
-                                    Log.e(Logger.LOG_TAG_PROXY, it.toString())
+                                    Logger.e(LOG_TAG_PROXY, it.toString())
                                 }
                             }
                         } else {
@@ -103,7 +102,7 @@ class WgMainActivity :
                                 message,
                                 Toast.LENGTH_LONG
                             )
-                            Log.e(Logger.LOG_TAG_PROXY, message)
+                            Logger.e(LOG_TAG_PROXY, message)
                         }
                     } catch (e: Exception) {
                         val message =
@@ -116,11 +115,11 @@ class WgMainActivity :
                             message,
                             Toast.LENGTH_LONG
                         )
-                        Log.e(Logger.LOG_TAG_PROXY, e.message, e)
+                        Logger.e(LOG_TAG_PROXY, e.message ?: "err tun import", e)
                     }
                 } else {
                     TunnelImporter.importTunnel(contentResolver, data) {
-                        Log.e(Logger.LOG_TAG_PROXY, it.toString())
+                        Logger.e(LOG_TAG_PROXY, it.toString())
                         Utilities.showToastUiCentered(
                             this@WgMainActivity,
                             it.toString(),
@@ -142,7 +141,7 @@ class WgMainActivity :
                             it.toString(),
                             Toast.LENGTH_LONG
                         )
-                        Log.e(Logger.LOG_TAG_PROXY, it.toString())
+                        Logger.e(LOG_TAG_PROXY, it.toString())
                     }
                 }
             }

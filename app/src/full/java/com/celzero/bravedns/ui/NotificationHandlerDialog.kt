@@ -15,12 +15,12 @@
  */
 package com.celzero.bravedns.ui
 
+import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
@@ -28,7 +28,6 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class NotificationHandlerDialog : AppCompatActivity() {
@@ -76,7 +75,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
     }
 
     private fun trampoline(trampolineType: TrampolineType) {
-        Log.i(Logger.LOG_TAG_VPN, "act on notification, notification type: $trampolineType")
+        Logger.i(LOG_TAG_VPN, "act on notification, notification type: $trampolineType")
         when (trampolineType) {
             TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG -> {
                 handleAccessibilitySettings()

@@ -15,13 +15,11 @@
  */
 package com.celzero.bravedns.scheduler
 
+import Logger.LOG_TAG_SCHEDULER
 import android.content.Context
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.util.Logger
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.Calendar
@@ -36,11 +34,11 @@ class PurgeConnectionLogs(val context: Context, workerParameters: WorkerParamete
     }
 
     override suspend fun doWork(): Result {
-        if (DEBUG) Log.d(Logger.LOG_TAG_SCHEDULER, "starting purge-database job")
+        Logger.d(LOG_TAG_SCHEDULER, "starting purge-database job")
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.DAY_OF_YEAR, NUMBER_OF_DAYS_TO_PURGE)
         val date = calendar.time.time
-        Log.i(Logger.LOG_TAG_SCHEDULER, "purging logs older than 7 days, date: $date")
+        Logger.i(LOG_TAG_SCHEDULER, "purging logs older than 7 days, date: $date")
 
         /**
          * purge logs older than 7 days (on version v053l, subject to change in later versions based

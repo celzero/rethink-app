@@ -15,11 +15,11 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -36,7 +36,6 @@ import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
@@ -378,7 +377,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         io {
             val config = WireguardManager.getConfigFilesById(configId)
             if (config == null) {
-                Log.e(Logger.LOG_TAG_PROXY, "updateCatchAll: config not found for $configId")
+                Logger.e(LOG_TAG_PROXY, "updateCatchAll: config not found for $configId")
                 return@io
             }
             if (WireguardManager.canEnableConfig(config)) {

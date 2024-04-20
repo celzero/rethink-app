@@ -15,10 +15,10 @@
  */
 package com.celzero.bravedns.adapter
 
+import Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +35,6 @@ import com.celzero.bravedns.database.ProxyApplicationMapping
 import com.celzero.bravedns.databinding.ListItemWgIncludeAppsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.getIcon
@@ -94,7 +93,7 @@ class WgIncludeAppsAdapter(
 
         fun update(mapping: ProxyApplicationMapping) {
             b.wgIncludeAppListApkLabelTv.text = mapping.appName
-            Log.i(LOG_TAG_PROXY, "add ${mapping.appName} to ${mapping.proxyId} from $proxyId")
+            Logger.i(LOG_TAG_PROXY, "add ${mapping.appName} to ${mapping.proxyId} from $proxyId")
 
             if (mapping.proxyId == "") {
                 b.wgIncludeAppAppDescTv.text = ""
@@ -121,14 +120,14 @@ class WgIncludeAppsAdapter(
 
         private fun setupClickListeners(mapping: ProxyApplicationMapping, isIncluded: Boolean) {
             b.wgIncludeCard.setOnClickListener {
-                Log.i(LOG_TAG_PROXY, "wgIncludeAppListContainer- ${mapping.appName}, $isIncluded")
+                Logger.i(LOG_TAG_PROXY, "wgIncludeAppListContainer- ${mapping.appName}, $isIncluded")
                 updateInterfaceDetails(mapping, !isIncluded)
             }
 
             b.wgIncludeAppListCheckbox.setOnCheckedChangeListener(null)
             b.wgIncludeAppListCheckbox.setOnClickListener {
                 val isAdded = mapping.proxyId == proxyId
-                Log.i(LOG_TAG_PROXY, "wgIncludeAppListCheckbox - ${mapping.appName}, $isAdded")
+                Logger.i(LOG_TAG_PROXY, "wgIncludeAppListCheckbox - ${mapping.appName}, $isAdded")
                 updateInterfaceDetails(mapping, !isAdded)
             }
         }
@@ -167,11 +166,11 @@ class WgIncludeAppsAdapter(
             io {
                 if (include) {
                     ProxyManager.updateProxyIdForApp(mapping.uid, proxyId, proxyName)
-                    Log.i(LOG_TAG_PROXY, "Included apps: ${mapping.uid}, $proxyId, $proxyName")
+                    Logger.i(LOG_TAG_PROXY, "Included apps: ${mapping.uid}, $proxyId, $proxyName")
                 } else {
                     ProxyManager.setNoProxyForApp(mapping.uid)
                     uiCtx { b.wgIncludeAppListCheckbox.isChecked = false }
-                    Log.i(LOG_TAG_PROXY, "Removed apps: ${mapping.uid}, $proxyId, $proxyName")
+                    Logger.i(LOG_TAG_PROXY, "Removed apps: ${mapping.uid}, $proxyId, $proxyName")
                 }
             }
         }

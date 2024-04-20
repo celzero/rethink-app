@@ -15,16 +15,15 @@
  */
 package com.celzero.bravedns.provider
 
+import Logger.LOG_PROVIDER
 import android.content.*
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import com.celzero.bravedns.database.RethinkLocalFileTag
 import com.celzero.bravedns.database.RethinkLocalFileTagRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.util.Logger.Companion.LOG_PROVIDER
 import org.koin.android.ext.android.inject
 
 class BlocklistProvider : ContentProvider() {
@@ -71,7 +70,7 @@ class BlocklistProvider : ContentProvider() {
         sortOrder: String?
     ): Cursor? {
         if (!isValidRequest(uri)) {
-            Log.e(LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
+            Logger.e(LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("Invalid URI, cannot update without ID$uri")
         }
 
@@ -79,7 +78,7 @@ class BlocklistProvider : ContentProvider() {
         if (context == null) {
             return null
         }
-        Log.i(LOG_PROVIDER, "blocklists query with parameters $uri, $selection, $selectionArgs")
+        Logger.i(LOG_PROVIDER, "blocklists query with parameters $uri, $selection, $selectionArgs")
         uriMatcher.match(uri).let {
             cursor =
                 when (it) {
@@ -120,11 +119,11 @@ class BlocklistProvider : ContentProvider() {
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
         if (!isValidRequest(uri)) {
-            Log.e(LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
+            Logger.e(LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("Invalid URI, cannot update without ID$uri")
         }
 
-        Log.i(LOG_PROVIDER, "request to insert new blocklist, parameters $values")
+        Logger.i(LOG_PROVIDER, "request to insert new blocklist, parameters $values")
         val localFileTags = RethinkLocalFileTag(values)
         val id = localFileTagRepository.contentInsert(localFileTags)
         context?.contentResolver?.notifyChange(uri, null)
@@ -133,10 +132,10 @@ class BlocklistProvider : ContentProvider() {
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
         if (!isValidRequest(uri)) {
-            Log.e(LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
+            Logger.e(LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("Invalid URI, cannot update without ID$uri")
         }
-        Log.i(
+        Logger.i(
             LOG_PROVIDER,
             "request to delete blocklist, parameters $uri, $selection, $selectionArgs"
         )
@@ -152,12 +151,12 @@ class BlocklistProvider : ContentProvider() {
         when (method) {
             METHOD_GET_STAMP -> {
                 val stamp = persistentState.localBlocklistStamp
-                Log.i(LOG_PROVIDER, "request for blocklist stamp, sending: $stamp")
+                Logger.i(LOG_PROVIDER, "request for blocklist stamp, sending: $stamp")
                 bundle.putString(STAMP, persistentState.localBlocklistStamp)
             }
             METHOD_UPDATE_STAMP -> {
                 val rcvStamp = arg ?: ""
-                Log.i(LOG_PROVIDER, "received stamp to update local blocklist: $rcvStamp")
+                Logger.i(LOG_PROVIDER, "received stamp to update local blocklist: $rcvStamp")
 
                 if (rcvStamp.isNotEmpty()) {
                     persistentState.localBlocklistStamp = rcvStamp
@@ -175,7 +174,7 @@ class BlocklistProvider : ContentProvider() {
         selectionArgs: Array<out String>?
     ): Int {
         if (!isValidRequest(uri)) {
-            Log.e(LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
+            Logger.e(LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("invalid uri, cannot update without ID$uri")
         }
 
@@ -200,7 +199,7 @@ class BlocklistProvider : ContentProvider() {
 
         // check the calling package
         if (callingPackage != RESOLVER_PACKAGE_NAME) {
-            Log.e(
+            Logger.e(
                 LOG_PROVIDER,
                 "request received from unknown package: $callingPackage, $RESOLVER_PACKAGE_NAME"
             )

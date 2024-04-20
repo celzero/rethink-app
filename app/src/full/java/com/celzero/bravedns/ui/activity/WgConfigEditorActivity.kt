@@ -15,10 +15,11 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger.LOG_TAG_PROXY
+import Logger.throwableToException
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -29,7 +30,6 @@ import com.celzero.bravedns.databinding.ActivityWgConfigEditorBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
@@ -197,7 +197,8 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
             return wgConfig
         } catch (e: Throwable) {
             val error = ErrorMessages[this, e]
-            Log.e(LOG_TAG_PROXY, "Exception while parsing wg interface: $error", e)
+            val ex = throwableToException(e)
+            Logger.e(LOG_TAG_PROXY, "err while parsing wg interface: $error", ex)
             uiCtx { Utilities.showToastUiCentered(this, error, Toast.LENGTH_LONG) }
             return null
         }

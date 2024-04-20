@@ -15,13 +15,12 @@
  */
 package com.celzero.bravedns.scheduler
 
+import Logger.LOG_TAG_SCHEDULER
 import android.content.Context
-import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.celzero.bravedns.util.Logger
 import com.google.common.util.concurrent.ListenableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
@@ -38,7 +37,7 @@ class ScheduleManager(val context: Context) {
         fun isWorkScheduled(context: Context, tag: String): Boolean {
             val instance = WorkManager.getInstance(context)
             val statuses: ListenableFuture<List<WorkInfo>> = instance.getWorkInfosByTag(tag)
-            Log.i(Logger.LOG_TAG_SCHEDULER, "Job $tag already scheduled check")
+            Logger.i(LOG_TAG_SCHEDULER, "Job $tag already scheduled check")
             return try {
                 var running = false
                 val workInfos = statuses.get()
@@ -50,13 +49,13 @@ class ScheduleManager(val context: Context) {
                         workStatus.state == WorkInfo.State.RUNNING ||
                             workStatus.state == WorkInfo.State.ENQUEUED
                 }
-                Log.i(Logger.LOG_TAG_SCHEDULER, "Job $tag already scheduled? $running")
+                Logger.i(LOG_TAG_SCHEDULER, "Job $tag already scheduled? $running")
                 running
             } catch (e: ExecutionException) {
-                Log.e(Logger.LOG_TAG_SCHEDULER, "error on status check ${e.message}", e)
+                Logger.e(LOG_TAG_SCHEDULER, "error on status check ${e.message}", e)
                 false
             } catch (e: InterruptedException) {
-                Log.e(Logger.LOG_TAG_SCHEDULER, "error on status check ${e.message}", e)
+                Logger.e(LOG_TAG_SCHEDULER, "error on status check ${e.message}", e)
                 false
             }
         }
@@ -66,7 +65,7 @@ class ScheduleManager(val context: Context) {
     fun scheduleDatabaseRefreshJob() {
         if (isWorkScheduled(context, REFRESH_APPS_JOB_TAG)) return
 
-        Log.i(Logger.LOG_TAG_SCHEDULER, "Refresh database job scheduled")
+        Logger.i(LOG_TAG_SCHEDULER, "Refresh database job scheduled")
         val refreshAppsJob =
             PeriodicWorkRequest.Builder(
                     RefreshAppsJob::class.java,

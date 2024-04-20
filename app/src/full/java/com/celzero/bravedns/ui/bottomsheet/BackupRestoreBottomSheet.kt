@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import Logger.LOG_TAG_BACKUP_RESTORE
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -23,7 +24,6 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,7 +52,6 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_TYPE_XZIP
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.databinding.ActivityBackupRestoreBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
@@ -156,7 +155,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
             workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
 
-            Log.i(
+            Logger.i(
                 LOG_TAG_BACKUP_RESTORE,
                 "WorkManager state: ${workInfo.state} for ${BackupAgent.TAG}"
             )
@@ -183,7 +182,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
         workManager.getWorkInfosByTagLiveData(RestoreAgent.TAG).observe(viewLifecycleOwner) {
             workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(
+            Logger.i(
                 LOG_TAG_BACKUP_RESTORE,
                 "WorkManager state: ${workInfo.state} for ${RestoreAgent.TAG}"
             )
@@ -222,7 +221,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
                         // result data contains the uri from the file picker
                         var fileUri: Uri? = null
                         result.data?.also { uri -> fileUri = uri.data }
-                        Log.i(
+                        Logger.i(
                             LOG_TAG_BACKUP_RESTORE,
                             "activity result for restore process with uri: $fileUri"
                         )
@@ -245,7 +244,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
                         // get URI of file created by picker
                         var backupFileUri: Uri? = null
                         result.data?.also { uri -> backupFileUri = uri.data }
-                        Log.i(
+                        Logger.i(
                             LOG_TAG_BACKUP_RESTORE,
                             "activity result for backup process with uri: $backupFileUri"
                         )
@@ -263,7 +262,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
 
     private fun startRestoreProcess(fileUri: Uri?) {
         if (fileUri == null) {
-            Log.w(
+            Logger.w(
                 LOG_TAG_BACKUP_RESTORE,
                 "uri received from activity result is null, cancel restore process"
             )
@@ -271,7 +270,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
             return
         }
 
-        Log.i(LOG_TAG_BACKUP_RESTORE, "invoke worker to initiate the restore process")
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "invoke worker to initiate the restore process")
         val data = Data.Builder()
         data.putString(DATA_BUILDER_RESTORE_URI, fileUri.toString())
 
@@ -290,7 +289,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
 
     private fun startBackupProcess(backupUri: Uri?) {
         if (backupUri == null) {
-            Log.w(
+            Logger.w(
                 LOG_TAG_BACKUP_RESTORE,
                 "uri received from activity result is null, cancel backup process"
             )
@@ -301,7 +300,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
         // stop vpn before beginning the backup process
         BackupHelper.stopVpn(requireContext())
 
-        Log.i(LOG_TAG_BACKUP_RESTORE, "invoke worker to initiate the backup process")
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "invoke worker to initiate the backup process")
         val data = Data.Builder()
 
         data.putString(DATA_BUILDER_BACKUP_URI, backupUri.toString())

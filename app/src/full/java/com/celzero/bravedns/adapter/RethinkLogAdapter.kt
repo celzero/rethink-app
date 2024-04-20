@@ -16,10 +16,10 @@ limitations under the License.
 
 package com.celzero.bravedns.adapter
 
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,7 +42,6 @@ import com.celzero.bravedns.ui.bottomsheet.ConnTrackerBottomSheet
 import com.celzero.bravedns.ui.bottomsheet.RethinkLogBottomSheet
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.KnownPorts
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities
@@ -114,7 +113,7 @@ class RethinkLogAdapter(private val context: Context) :
 
         private fun openBottomSheet(log: RethinkLog) {
             if (context !is FragmentActivity) {
-                Log.w(LOG_TAG_UI, "Error opening the connection tracker bottomsheet")
+                Logger.w(LOG_TAG_UI, "err opening the connection tracker bottomsheet")
                 return
             }
 
