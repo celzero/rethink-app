@@ -759,7 +759,7 @@
     <string name="lbl_ip_rules" translatable="true">Regras de IP</string>
     <string name="lbl_domain" translatable="true">Domínio</string>
     <string name="lbl_wildcard" translatable="true">Curinga</string>
-    <string name="lbl_dismiss" translatable="true">Dispensar</string>
+    <string name="lbl_dismiss" translatable="true">Descartar</string>
     <string name="lbl_configure" translatable="true">Configurar</string>
     <string name="lbl_rules" translatable="true">regras</string>
     <string name="settings_locale_desc" translatable="true">Escolha o seu idioma preferido</string>
