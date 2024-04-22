@@ -75,12 +75,14 @@ class WgIncludeAppsDialog(
 
     enum class TopLevelFilter(val id: Int) {
         ALL_APPS(0),
-        SELECTED_APPS(1);
+        SELECTED_APPS(1),
+        UNSELECTED_APPS(2);
 
         fun getLabelId(): Int {
             return when (this) {
                 ALL_APPS -> R.string.lbl_all
                 SELECTED_APPS -> R.string.rt_filter_parent_selected
+                UNSELECTED_APPS -> R.string.lbl_unselected
             }
         }
     }
@@ -147,8 +149,15 @@ class WgIncludeAppsDialog(
                 false
             )
 
+        val unselected = makeFirewallChip(
+            TopLevelFilter.UNSELECTED_APPS.id,
+            activity.getString(TopLevelFilter.UNSELECTED_APPS.getLabelId()),
+            false
+        )
+
         b.wgIncludeAppDialogChipGroup.addView(all)
         b.wgIncludeAppDialogChipGroup.addView(selected)
+        b.wgIncludeAppDialogChipGroup.addView(unselected)
     }
 
     private fun makeFirewallChip(id: Int, label: String, checked: Boolean): Chip {
@@ -188,6 +197,10 @@ class WgIncludeAppsDialog(
             }
             TopLevelFilter.SELECTED_APPS.id -> {
                 filterType = TopLevelFilter.SELECTED_APPS
+                viewModel.setFilter(searchText, filterType, proxyId)
+            }
+            TopLevelFilter.UNSELECTED_APPS.id -> {
+                filterType = TopLevelFilter.UNSELECTED_APPS
                 viewModel.setFilter(searchText, filterType, proxyId)
             }
         }

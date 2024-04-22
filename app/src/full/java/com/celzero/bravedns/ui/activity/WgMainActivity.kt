@@ -281,7 +281,7 @@ class WgMainActivity :
             val activeConfigs = WireguardManager.getEnabledConfigs()
             val isAnyConfigActive = activeConfigs.isNotEmpty()
             if (isAnyConfigActive) {
-                val dnsName = activeConfigs.first().getName()
+                val dnsName = activeConfigs.firstOrNull()?.getName() ?: return
                 b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsName)
             }
             // remove the observer if any config is active

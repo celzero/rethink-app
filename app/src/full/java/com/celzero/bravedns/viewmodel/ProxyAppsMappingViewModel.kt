@@ -44,10 +44,13 @@ class ProxyAppsMappingViewModel(private val mappingDAO: ProxyApplicationMappingD
     var apps =
         filteredList.switchMap { searchTxt ->
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    if (filterType == WgIncludeAppsDialog.TopLevelFilter.SELECTED_APPS) {
-                        mappingDAO.getSelectedAppsMapping(searchTxt, proxyId)
-                    } else {
-                        mappingDAO.getAllAppsMapping(searchTxt)
+                    when (filterType) {
+                        WgIncludeAppsDialog.TopLevelFilter.ALL_APPS ->
+                            mappingDAO.getAllAppsMapping(searchTxt)
+                        WgIncludeAppsDialog.TopLevelFilter.SELECTED_APPS ->
+                            mappingDAO.getSelectedAppsMapping(searchTxt, proxyId)
+                        WgIncludeAppsDialog.TopLevelFilter.UNSELECTED_APPS ->
+                            mappingDAO.getUnSelectedAppsMapping(searchTxt, proxyId)
                     }
                 }
                 .liveData

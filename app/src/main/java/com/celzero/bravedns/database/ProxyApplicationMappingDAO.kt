@@ -59,6 +59,14 @@ interface ProxyApplicationMappingDAO {
         proxyId: String
     ): PagingSource<Int, ProxyApplicationMapping>
 
+    @Query(
+        "select * from ProxyApplicationMapping where appName like :appName and proxyId != :proxyId order by lower(appName)"
+    )
+    fun getUnSelectedAppsMapping(
+        appName: String,
+        proxyId: String
+    ): PagingSource<Int, ProxyApplicationMapping>
+
     @Query("select count(packageName) from ProxyApplicationMapping where proxyId = :id")
     fun getAppCountById(id: String): Int
 
