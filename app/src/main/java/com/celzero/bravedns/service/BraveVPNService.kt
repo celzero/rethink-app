@@ -3011,7 +3011,7 @@ class BraveVPNService :
         if (isRethink) {
             // case when uid is rethink, return Ipn.Base
             logd(
-                "flow: Ipn.Exit for rethink, $uid, $packageName, $srcIp, $srcPort, $realDestIp, $dstPort, $possibleDomains"
+                "flow: Ipn.Exit for rethink, $uid, $dup, $packageName, $srcIp, $srcPort, $realDestIp, $dstPort, $possibleDomains"
             )
             if (cm.query.isNullOrEmpty()) {
                 // possible domains only used for logging purposes, it may be available if
@@ -3038,7 +3038,7 @@ class BraveVPNService :
             trackedCids.add(key)
 
             // TODO: set dup as true for now (v055f), need to handle dup properly in future
-            val duplicate = dup || DEBUG
+            val duplicate = dup || true
             // if the connection is Rethink's uid and if the dup is false, then the connections
             // are rethink's own connections, so add it in network log as well
             if (!duplicate) {
