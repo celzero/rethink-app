@@ -496,8 +496,8 @@ class GoVpnAdapter : KoinComponent {
         }
         try {
             // no need to remove from appConfig, as it is already removed
-            getResolver()?.remove(relay.dnsCryptRelayURL)
-            Logger.i(LOG_TAG_VPN, "remove dnscrypt relay: ${relay.dnsCryptRelayURL}")
+            val rmv = getResolver()?.remove(relay.dnsCryptRelayURL)
+            Logger.i(LOG_TAG_VPN, "rmv dnscrypt relay: ${relay.dnsCryptRelayURL}, success? $rmv")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "connect-tunnel: dnscrypt rmv failure", e)
         }
@@ -1079,8 +1079,11 @@ class GoVpnAdapter : KoinComponent {
         }
 
         fun setLogLevel(level: Long) {
-            // 0 - verbose, 1 - debug, 2 - info, 3 - warn, 4 - error, 5 - fatal
-            Intra.logLevel(level)
+            // increment the level by 1, as the levels start from 1, but the log levels start from 0
+            val l = level.inc()
+            // 0 - very verbose (unimplemented)
+            // 1 - verbose, 2 - debug, 3 - info, 4 - warn, 5 - error, 6 - fatal
+            Intra.logLevel(l)
         }
     }
 
