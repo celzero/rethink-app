@@ -756,8 +756,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (!isAtleastN()) return
 
         val builder = MaterialAlertDialogBuilder(requireContext())
-        builder.setTitle(R.string.battery_optimization_dialog_heading)
-        builder.setMessage(R.string.battery_optimization_dialog_message)
+        val title =
+            getString(
+                R.string.battery_optimization_dialog_heading,
+                getString(R.string.lbl_battery_optimization)
+            )
+        val msg =
+            getString(
+                R.string.restrict_dialog_message,
+                getString(R.string.lbl_battery_optimization)
+            )
+        builder.setTitle(title)
+        builder.setMessage(msg)
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
             openNetworkSettings(
@@ -789,8 +799,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (!isAtleastN()) return
 
         val builder = MaterialAlertDialogBuilder(requireContext())
-        builder.setTitle(R.string.restrict_bg_dialog_heading)
-        builder.setMessage(R.string.restrict_bg_dialog_message)
+        builder.setTitle(R.string.lbl_background_data)
+        val msg =
+            getString(R.string.restrict_dialog_message, getString(R.string.lbl_background_data))
+        builder.setMessage(msg)
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
             openNetworkSettings(
