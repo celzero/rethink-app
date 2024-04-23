@@ -461,7 +461,7 @@ object WireguardManager : KoinComponent {
         return cfg
     }
 
-    suspend fun addConfig(config: Config?): Config? {
+    suspend fun addConfig(config: Config?, name: String = ""): Config? {
         if (config == null) {
             Logger.e(LOG_TAG_PROXY, "error adding config")
             return null
@@ -469,11 +469,11 @@ object WireguardManager : KoinComponent {
         // increment the id and add the config
         lastAddedConfigId += 1
         val id = lastAddedConfigId
-        val name = config.getName().ifEmpty { "${Backend.WG}$id" }
+        val n = name.ifEmpty { "${Backend.WG}$id" }
         val cfg =
             Config.Builder()
                 .setId(id)
-                .setName(name)
+                .setName(n)
                 .setInterface(config.getInterface())
                 .addPeers(config.getPeers())
                 .build()

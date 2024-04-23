@@ -103,13 +103,13 @@ object TunnelImporter : KoinComponent {
                                 }
                                 ?.let {
                                     config = it
-                                    WireguardManager.addConfig(config)
+                                    WireguardManager.addConfig(config, name)
                                 }
                         }
                     }
                 } else {
                     config = Config.parse(contentResolver.openInputStream(uri)!!)
-                    WireguardManager.addConfig(config)
+                    WireguardManager.addConfig(config, name)
                 }
 
                 if (config == null) {
