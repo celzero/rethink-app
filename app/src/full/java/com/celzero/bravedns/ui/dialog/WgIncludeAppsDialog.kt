@@ -149,11 +149,12 @@ class WgIncludeAppsDialog(
                 false
             )
 
-        val unselected = makeFirewallChip(
-            TopLevelFilter.UNSELECTED_APPS.id,
-            activity.getString(TopLevelFilter.UNSELECTED_APPS.getLabelId()),
-            false
-        )
+        val unselected =
+            makeFirewallChip(
+                TopLevelFilter.UNSELECTED_APPS.id,
+                activity.getString(TopLevelFilter.UNSELECTED_APPS.getLabelId()),
+                false
+            )
 
         b.wgIncludeAppDialogChipGroup.addView(all)
         b.wgIncludeAppDialogChipGroup.addView(selected)
