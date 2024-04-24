@@ -16,17 +16,18 @@
  */
 package com.celzero.bravedns.service
 
+import Logger
+import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import backend.RDNS
+import backend.Stats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.BraveVPNService.Companion.FAIL_OPEN_ON_NO_NETWORK
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +35,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -46,12 +46,11 @@ object VpnController : KoinComponent {
     private var states: Channel<BraveVPNService.State?>? = null
     private var protocol: Pair<Boolean, Boolean> = Pair(false, false)
 
-    var controllerScope: CoroutineScope? = null
+    // usually same as vpnScope from BraveVPNService
+    var externalScope: CoroutineScope? = null
         private set
 
     private var vpnStartElapsedTime: Long = SystemClock.elapsedRealtime()
-
-    val mutex: Mutex = Mutex()
 
     // FIXME: Publish VpnState through this live-data to relieve direct access
     // into VpnController's state(), isOn(), hasTunnel() etc.
@@ -65,13 +64,13 @@ object VpnController : KoinComponent {
     // TODO: make clients listen on create, start, stop, destroy from vpn-service
     fun onVpnCreated(b: BraveVPNService) {
         braveVpnService = b
-        controllerScope = CoroutineScope(Dispatchers.IO)
+        externalScope = CoroutineScope(Dispatchers.IO)
         states = Channel(Channel.CONFLATED) // drop unconsumed states
 
         // store app start time, used in HomeScreenBottomSheet
         vpnStartElapsedTime = SystemClock.elapsedRealtime()
 
-        controllerScope!!.launch {
+        externalScope!!.launch {
             states!!.consumeEach { state ->
                 // transition from paused connection state only on NEW/NULL
                 when (state) {
@@ -94,9 +93,11 @@ object VpnController : KoinComponent {
 
     fun onVpnDestroyed() {
         braveVpnService = null
-        controllerScope?.cancel("stop")
         states?.cancel()
         vpnStartElapsedTime = SystemClock.elapsedRealtime()
+        try {
+            externalScope?.cancel("VPNController - onVpnDestroyed")
+        } catch (ignored: IllegalStateException) {}
     }
 
     fun uptimeMs(): Long {
@@ -110,7 +111,7 @@ object VpnController : KoinComponent {
     }
 
     fun onConnectionStateChanged(state: BraveVPNService.State?) {
-        controllerScope?.launch { states?.send(state) }
+        externalScope?.launch { states?.send(state) }
     }
 
     private fun updateState(state: BraveVPNService.State?) {
@@ -120,8 +121,8 @@ object VpnController : KoinComponent {
 
     fun start(context: Context) {
         // if the tunnel has the go-adapter then there's nothing to do
-        if (braveVpnService?.isOn() == true) {
-            Log.w(LOG_TAG_VPN, "braveVPNService is already on, resending vpn enabled state")
+        if (hasTunnel()) {
+            Logger.w(LOG_TAG_VPN, "braveVPNService is already on, resending vpn enabled state")
             return
         }
         // else: resend/send the start-command to the vpn service which handles both false-start
@@ -135,11 +136,11 @@ object VpnController : KoinComponent {
         ContextCompat.startForegroundService(context, startServiceIntent)
 
         onConnectionStateChanged(connectionState)
-        Log.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
+        Logger.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
     }
 
     fun stop(context: Context) {
-        Log.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
+        Logger.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
         connectionState = null
         onConnectionStateChanged(connectionState)
         braveVpnService?.signalStopService(userInitiated = true)
@@ -151,8 +152,9 @@ object VpnController : KoinComponent {
         return VpnState(requested, on, connectionState)
     }
 
+    @Deprecated(message = "use hasTunnel() instead", replaceWith = ReplaceWith("hasTunnel()"))
     fun isOn(): Boolean {
-        return braveVpnService?.isOn() == true
+        return hasTunnel()
     }
 
     suspend fun refresh() {
@@ -210,6 +212,10 @@ object VpnController : KoinComponent {
         return braveVpnService?.getProxyStatusById(id)
     }
 
+    fun getProxyStats(id: String): Stats? {
+        return braveVpnService?.getProxyStats(id) ?: null
+    }
+
     fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean> {
         return braveVpnService?.getSupportedIpVersion(id) ?: Pair(false, false)
     }
@@ -225,7 +231,7 @@ object VpnController : KoinComponent {
     fun protocols(): String {
         val ipv4 = protocol.first
         val ipv6 = protocol.second
-        Log.d(LOG_TAG_VPN, "protocols - ipv4: $ipv4, ipv6: $ipv6")
+        Logger.d(LOG_TAG_VPN, "protocols - ipv4: $ipv4, ipv6: $ipv6")
         return if (ipv4 && ipv6) {
             "IPv4, IPv6"
         } else if (ipv6) {
@@ -244,7 +250,7 @@ object VpnController : KoinComponent {
 
     fun updateProtocol(proto: Pair<Boolean, Boolean>) {
         if (!proto.first && !proto.second) {
-            Log.i(LOG_TAG_VPN, "both v4 and v6 false, setting $FAIL_OPEN_ON_NO_NETWORK")
+            Logger.i(LOG_TAG_VPN, "both v4 and v6 false, setting $FAIL_OPEN_ON_NO_NETWORK")
             protocol = Pair(FAIL_OPEN_ON_NO_NETWORK, FAIL_OPEN_ON_NO_NETWORK)
             return
         }

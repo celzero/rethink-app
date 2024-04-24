@@ -16,18 +16,17 @@
 
 package com.celzero.bravedns.scheduler
 
+import Logger
+import Logger.LOG_TAG_SCHEDULER
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_SCHEDULER
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import org.koin.core.component.KoinComponent
@@ -51,7 +50,7 @@ class BugReportCollector(val context: Context, workerParameters: WorkerParameter
     }
 
     override suspend fun doWork(): Result {
-        if (DEBUG) Log.d(LOG_TAG_SCHEDULER, "starting app-exit-info job")
+        Logger.d(LOG_TAG_SCHEDULER, "starting app-exit-info job")
         if (!isAtleastO()) {
             // support for zip file creation for devices below Oreo is not straightforward
             // hence, we are not supporting it for now
@@ -72,9 +71,9 @@ class BugReportCollector(val context: Context, workerParameters: WorkerParameter
     @RequiresApi(Build.VERSION_CODES.O)
     private fun prepare(): File {
         val path = BugReportZipper.prepare(applicationContext.filesDir)
-        Log.i(LOG_TAG_SCHEDULER, "app-exit-info job path: $path")
+        Logger.i(LOG_TAG_SCHEDULER, "app-exit-info job path: $path")
         val file = File(path)
-        Log.i(LOG_TAG_SCHEDULER, "app-exit-info job file: ${file.name}, ${file.absolutePath}")
+        Logger.i(LOG_TAG_SCHEDULER, "app-exit-info job file: ${file.name}, ${file.absolutePath}")
         return file
     }
 
@@ -91,7 +90,7 @@ class BugReportCollector(val context: Context, workerParameters: WorkerParameter
         // app exit info is available only on Android R and above, normal process builder
         // for logcat is used for all the other versions
         if (!Utilities.isAtleastR()) {
-            Log.i(LOG_TAG_SCHEDULER, "app-exit-info job not supported on this device")
+            Logger.i(LOG_TAG_SCHEDULER, "app-exit-info job not supported on this device")
             return -1L
         }
 
@@ -144,10 +143,10 @@ class BugReportCollector(val context: Context, workerParameters: WorkerParameter
             BugReportZipper.fileWrite(ips, file)
             val exitcode = pd.waitFor()
             if (exitcode != 0) {
-                Log.e(LOG_TAG_SCHEDULER, "logcat process exited with $exitcode")
+                Logger.e(LOG_TAG_SCHEDULER, "logcat process exited with $exitcode")
             }
         } catch (e: Exception) {
-            Log.e(LOG_TAG_SCHEDULER, "Error while dumping logs", e)
+            Logger.e(LOG_TAG_SCHEDULER, "err while dumping logs", e)
         }
     }
 }

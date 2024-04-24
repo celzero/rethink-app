@@ -17,6 +17,7 @@ package com.celzero.bravedns.data
 
 import java.io.Serializable
 
+// do not use as key in map or set, as some fields are mutable
 data class ConnectionSummary(
     val uid: String,
     val pid: String,

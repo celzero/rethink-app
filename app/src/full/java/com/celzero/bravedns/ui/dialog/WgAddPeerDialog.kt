@@ -15,10 +15,10 @@
  */
 package com.celzero.bravedns.ui.dialog
 
+import Logger
 import android.app.Activity
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
@@ -26,7 +26,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.databinding.DialogWgAddPeerBinding
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.util.ErrorMessages
@@ -108,7 +107,8 @@ class WgAddPeerDialog(
                     this.dismiss()
                 }
             } catch (e: Throwable) {
-                Log.e(Logger.LOG_TAG_PROXY, "Error while adding peer", e)
+                val ex = Logger.throwableToException(e)
+                Logger.e(Logger.LOG_TAG_PROXY, "Error while adding peer", ex)
                 Utilities.showToastUiCentered(
                     context,
                     ErrorMessages[context, e],

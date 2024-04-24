@@ -15,6 +15,10 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger
+import Logger.LOG_TAG_UI
+import Logger.LOG_TAG_VPN
+import Logger.updateConfigLevel
 import android.Manifest
 import android.app.LocaleManager
 import android.content.ActivityNotFoundException
@@ -28,7 +32,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.LocaleList
 import android.provider.Settings
-import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
@@ -52,8 +55,6 @@ import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.bottomsheet.BackupRestoreBottomSheet
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Themes
@@ -342,7 +343,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 getString(R.string.intent_launch_error, intent.data),
                 Toast.LENGTH_SHORT
             )
-            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
+            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
@@ -360,9 +361,9 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 xpp.next()
             }
         } catch (e: XmlPullParserException) {
-            Log.e(LOG_TAG_UI, "error parsing locale_config.xml", e)
+            Logger.e(LOG_TAG_UI, "error parsing locale_config.xml", e)
         } catch (e: IOException) {
-            Log.e(LOG_TAG_UI, "error parsing locale_config.xml", e)
+            Logger.e(LOG_TAG_UI, "error parsing locale_config.xml", e)
         }
 
         return LocaleListCompat.forLanguageTags(tagsList.joinToString(","))
@@ -434,6 +435,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         alertBuilder.setTitle(getString(R.string.settings_go_log_heading))
         val items =
             arrayOf(
+                getString(R.string.settings_gologger_dialog_option_0),
                 getString(R.string.settings_gologger_dialog_option_1),
                 getString(R.string.settings_gologger_dialog_option_2),
                 getString(R.string.settings_gologger_dialog_option_3),
@@ -449,6 +451,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
             persistentState.goLoggerLevel = which.toLong()
             GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel)
+            updateConfigLevel(persistentState.goLoggerLevel)
         }
         alertBuilder.create().show()
     }
@@ -558,11 +561,11 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                 persistentState.shouldRequestNotificationPermission = it
                 if (it) {
-                    Log.i(LOG_TAG_VPN, "User allowed notification permission for the app")
+                    Logger.i(LOG_TAG_VPN, "User allowed notification permission for the app")
                     b.settingsActivityAppNotificationRl.visibility = View.VISIBLE
                     b.settingsActivityAppNotificationSwitch.isChecked = true
                 } else {
-                    Log.w(LOG_TAG_VPN, "User rejected notification permission for the app")
+                    Logger.w(LOG_TAG_VPN, "User rejected notification permission for the app")
                     b.settingsActivityAppNotificationRl.visibility = View.VISIBLE
                     b.settingsActivityAppNotificationSwitch.isChecked = false
                     invokeAndroidNotificationSetting()
@@ -641,12 +644,12 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         // check for storage permissions
         if (!checkStoragePermissions()) {
             // request for storage permissions
-            Log.i(LOG_TAG_VPN, "requesting for storage permissions")
+            Logger.i(LOG_TAG_VPN, "requesting for storage permissions")
             requestForStoragePermissions()
             return
         }
 
-        Log.i(LOG_TAG_VPN, "storage permission granted, creating pcap file")
+        Logger.i(LOG_TAG_VPN, "storage permission granted, creating pcap file")
         try {
             val file = makePcapFile()
             if (file == null) {
@@ -693,7 +696,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             }
             file
         } catch (e: Exception) {
-            Log.e(LOG_TAG_VPN, "error creating pcap file ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "error creating pcap file ${e.message}", e)
             null
         }
     }
@@ -746,7 +749,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 getString(R.string.notification_screen_error),
                 Toast.LENGTH_SHORT
             )
-            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
+            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 

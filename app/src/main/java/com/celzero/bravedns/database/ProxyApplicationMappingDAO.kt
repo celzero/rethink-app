@@ -38,7 +38,7 @@ interface ProxyApplicationMappingDAO {
     @Delete fun delete(wgMapping: ProxyApplicationMapping)
 
     @Query("delete from ProxyApplicationMapping where uid = :uid and packageName = :packageName")
-    fun deleteByPackageName(uid: Int, packageName: String)
+    fun deleteApp(uid: Int, packageName: String)
 
     @Query("delete from ProxyApplicationMapping") fun deleteAll()
 
@@ -55,6 +55,14 @@ interface ProxyApplicationMappingDAO {
         "select * from ProxyApplicationMapping where appName like :appName and proxyId = :proxyId order by lower(appName)"
     )
     fun getSelectedAppsMapping(
+        appName: String,
+        proxyId: String
+    ): PagingSource<Int, ProxyApplicationMapping>
+
+    @Query(
+        "select * from ProxyApplicationMapping where appName like :appName and proxyId != :proxyId order by lower(appName)"
+    )
+    fun getUnSelectedAppsMapping(
         appName: String,
         proxyId: String
     ): PagingSource<Int, ProxyApplicationMapping>

@@ -15,16 +15,16 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import android.app.Dialog
+import Logger
+import Logger.LOG_TAG_PROXY
+import Logger.LOG_TAG_UI
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
@@ -40,7 +40,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.databinding.DialogSetProxyBinding
@@ -53,9 +52,6 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.bottomsheet.OrbotBottomSheet
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_PROXY
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils
@@ -447,7 +443,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun displayTcpProxyUi() {
-        // v055b, no-op
+        // v055f, no-op
         return
 
         val tcpProxies = TcpProxyHelper.getActiveTcpProxy()
@@ -457,7 +453,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             return
         }
 
-        Log.i(
+        Logger.i(
             LOG_TAG_UI,
             "displayTcpProxyUi: ${tcpProxies?.isActive}, ${tcpProxies?.name}, ${tcpProxies?.url}"
         )
@@ -482,7 +478,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 val resId = UIUtils.getProxyStatusStringRes(statusId)
                 val s = getString(resId).replaceFirstChar(Char::titlecase)
                 wgStatus += getString(R.string.ci_ip_label, it.getName(), s.padStart(1, ' ')) + "\n"
-                if (DEBUG) Log.d(LOG_TAG_PROXY, "current proxy status for $id: $s")
+                Logger.d(LOG_TAG_PROXY, "current proxy status for $id: $s")
             } else {
                 wgStatus +=
                     getString(
@@ -492,7 +488,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                             .replaceFirstChar(Char::titlecase)
                             .padStart(1, ' ')
                     ) + "\n"
-                if (DEBUG) Log.d(LOG_TAG_PROXY, "current proxy status is null for $id")
+                Logger.d(LOG_TAG_PROXY, "current proxy status is null for $id")
             }
         }
         wgStatus = wgStatus.trimEnd()
@@ -636,18 +632,16 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         appNames: List<String>,
         appName: String
     ) {
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         val dialogBinding = DialogSetProxyBinding.inflate(layoutInflater)
-        dialog.setContentView(dialogBinding.root)
-
+        val builder = MaterialAlertDialogBuilder(this).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.show()
+
         dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
         dialog.window?.attributes = lp
 
         val headerTxt: TextView = dialogBinding.dialogProxyHeader
@@ -722,7 +716,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     errorTxt.text = getString(R.string.settings_http_proxy_error_text1)
                 }
             } catch (e: NumberFormatException) {
-                Log.w(Logger.LOG_TAG_VPN, "Error: ${e.message}", e)
+                Logger.w(LOG_TAG_PROXY, "err: ${e.message}", e)
                 errorTxt.text = getString(R.string.settings_http_proxy_error_text2)
                 isValid = false
             }
@@ -817,16 +811,15 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     ) {
         val defaultHost = "http://127.0.0.1:8118"
         var host: String
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         val dialogBinding = DialogSetProxyBinding.inflate(layoutInflater)
-        dialog.setContentView(dialogBinding.root)
-
+        val builder = MaterialAlertDialogBuilder(this).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.show()
+
         dialog.setCancelable(false)
         dialog.setCanceledOnTouchOutside(false)
         dialog.window?.attributes = lp
@@ -1007,12 +1000,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         isUdp: Boolean
     ): ProxyEndpoint? {
         if (ip.isNullOrEmpty()) {
-            Log.w(LOG_TAG_PROXY, "cannot construct proxy with values ip: $ip, port: $port")
+            Logger.w(LOG_TAG_PROXY, "cannot construct proxy with values ip: $ip, port: $port")
             return null
         }
 
         if (mode == ProxyManager.ProxyMode.SOCKS5 && (!isValidPort(port))) {
-            Log.w(LOG_TAG_PROXY, "cannot construct proxy with values ip: $ip, port: $port")
+            Logger.w(LOG_TAG_PROXY, "cannot construct proxy with values ip: $ip, port: $port")
             return null
         }
 

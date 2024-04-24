@@ -49,32 +49,33 @@ internal constructor(
 
     private var scope: CoroutineScope? = null
 
-    private var dnsLogTracker: DnsLogTracker =
-        DnsLogTracker(dnsLogRepository, persistentState, context)
-    private var ipTracker: IPTracker =
+    private var dnsdb: DnsLogTracker = DnsLogTracker(dnsLogRepository, persistentState, context)
+    private var ipdb: IPTracker =
         IPTracker(connectionTrackerRepository, rethinkLogRepository, context)
 
-    private var dnsNetLogBatcher: NetLogBatcher<DnsLog, Nothing> =
-        NetLogBatcher("dns", dnsLogTracker::insertBatch)
-    private var ipNetLogBatcher: NetLogBatcher<ConnectionTracker, ConnectionSummary> =
-        NetLogBatcher("ip", ipTracker::insertBatch, ipTracker::updateBatch)
-    private var rethinkLogBatcher: NetLogBatcher<RethinkLog, ConnectionSummary> =
-        NetLogBatcher("rinr", ipTracker::insertRethinkBatch, ipTracker::updateRethinkBatch)
+    private var dnsBatcher: NetLogBatcher<DnsLog, Nothing>? = null
+    private var ipBatcher: NetLogBatcher<ConnectionTracker, ConnectionSummary>? = null
+    private var rinrBatcher: NetLogBatcher<RethinkLog, ConnectionSummary>? = null
 
-    suspend fun startLogger(s: CoroutineScope) {
+    suspend fun restart(s: CoroutineScope) {
         this.scope = s
 
-        dnsNetLogBatcher.begin(s)
-        ipNetLogBatcher.begin(s)
-        rethinkLogBatcher.begin(s)
+        // create new batchers on every new scope as their lifecycle is tied to the scope
+        this.dnsBatcher = NetLogBatcher("dns", dnsdb::insertBatch)
+        this.ipBatcher = NetLogBatcher("ip", ipdb::insertBatch, ipdb::updateBatch)
+        this.rinrBatcher = NetLogBatcher("rinr", ipdb::insertRethinkBatch, ipdb::updateRethinkBatch)
+
+        dnsBatcher!!.begin(s)
+        ipBatcher!!.begin(s)
+        rinrBatcher!!.begin(s)
     }
 
     fun writeIpLog(info: ConnTrackerMetaData) {
         if (!persistentState.logsEnabled) return
 
         io("writeIpLog") {
-            val connTracker = ipTracker.makeConnectionTracker(info)
-            ipNetLogBatcher.add(connTracker)
+            val connTracker = ipdb.makeConnectionTracker(info)
+            ipBatcher?.add(connTracker)
         }
     }
 
@@ -82,57 +83,57 @@ internal constructor(
         if (!persistentState.logsEnabled) return
 
         io("writeRethinkLog") {
-            val rlog = ipTracker.makeRethinkLogs(info) ?: return@io
-            rethinkLogBatcher.add(rlog)
+            val rlog = ipdb.makeRethinkLogs(info) ?: return@io
+            rinrBatcher?.add(rlog)
         }
     }
 
     fun updateIpSummary(summary: ConnectionSummary) {
         if (!persistentState.logsEnabled) return
 
-        io("writeIpSummary") {
+        io("updateIpSmm") {
             val s =
                 if (DEBUG && summary.targetIp?.isNotEmpty() == true) {
-                    ipTracker.makeSummaryWithTarget(summary)
+                    ipdb.makeSummaryWithTarget(summary)
                 } else {
                     summary
                 }
 
-            ipNetLogBatcher.update(s)
+            ipBatcher?.update(s)
         }
     }
 
     fun updateRethinkSummary(summary: ConnectionSummary) {
         if (!persistentState.logsEnabled) return
 
-        io("writeRethinkSummary") {
+        io("updateRethinkSmm") {
             val s =
                 if (DEBUG && summary.targetIp?.isNotEmpty() == true) {
-                    ipTracker.makeSummaryWithTarget(summary)
+                    ipdb.makeSummaryWithTarget(summary)
                 } else {
                     summary
                 }
 
-            rethinkLogBatcher.update(s)
+            rinrBatcher?.update(s)
         }
     }
 
     // now, this method is doing multiple things which should be removed.
     // fixme: should intend to only write the logs to database.
     fun processDnsLog(summary: DNSSummary) {
-        val transaction = dnsLogTracker.processOnResponse(summary)
+        val transaction = dnsdb.processOnResponse(summary)
 
         transaction.responseCalendar = Calendar.getInstance()
         // refresh latency from GoVpnAdapter
         io("refreshDnsLatency") { dnsLatencyTracker.refreshLatencyIfNeeded(transaction) }
 
         // TODO: This method should be part of BraveVPNService
-        dnsLogTracker.updateVpnConnectionState(transaction)
+        dnsdb.updateVpnConnectionState(transaction)
 
         if (!persistentState.logsEnabled) return
 
-        val dnsLog = dnsLogTracker.makeDnsLogObj(transaction)
-        io("dnsLogger") { dnsNetLogBatcher.add(dnsLog) }
+        val dnsLog = dnsdb.makeDnsLogObj(transaction)
+        io("writeDnsLog") { dnsBatcher?.add(dnsLog) }
     }
 
     private fun io(s: String, f: suspend () -> Unit) =

@@ -17,7 +17,6 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.os.SystemClock
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -31,6 +30,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import backend.Backend
+import backend.Stats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ListItemWgOneInterfaceBinding
@@ -173,25 +173,26 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             val statusId = VpnController.getProxyStatusById(id)
             val pair = VpnController.getSupportedIpVersion(id)
             val c = WireguardManager.getConfigById(config.id)
+            val stats = VpnController.getProxyStats(id)
             val isSplitTunnel =
                 if (c?.getPeers()?.isNotEmpty() == true) {
                     VpnController.isSplitTunnelProxy(id, pair)
                 } else {
                     false
                 }
-            updateStatusUi(config, statusId)
+            updateStatusUi(config, statusId, stats)
             updateProtocolChip(pair)
             updateSplitTunnelChip(isSplitTunnel)
         }
 
-        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?) {
+        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, stats: Stats?) {
             if (config.isActive) {
                 b.interfaceDetailCard.strokeColor = fetchColor(context, R.color.accentGood)
                 b.interfaceDetailCard.strokeWidth = 2
                 b.oneWgCheck.isChecked = true
                 b.interfaceAppsCount.visibility = View.VISIBLE
                 b.interfaceAppsCount.text = context.getString(R.string.one_wg_apps_added)
-                var status = ""
+                val status: String
                 if (statusId != null) {
                     val resId = UIUtils.getProxyStatusStringRes(statusId)
                     // change the color based on the status
@@ -215,10 +216,11 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                         context.getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
                 }
                 b.interfaceStatus.text = status
-                b.interfaceActiveUptime.visibility = View.VISIBLE
-                val time = getUpTime(config.id)
+                b.interfaceActiveLayout.visibility = View.VISIBLE
+                val rxtx = getRxTx(stats)
+                val time = getUpTime(stats)
                 if (time.isNotEmpty()) {
-                    val t = context.getString(R.string.logs_card_duration, getUpTime(config.id))
+                    val t = context.getString(R.string.logs_card_duration, time)
                     b.interfaceActiveUptime.text =
                         context.getString(
                             R.string.two_argument_space,
@@ -228,27 +230,44 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 } else {
                     b.interfaceActiveUptime.text = context.getString(R.string.lbl_active)
                 }
+                b.interfaceActiveRxTx.text = rxtx
             } else {
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceAppsCount.visibility = View.GONE
                 b.oneWgCheck.isChecked = false
-                b.interfaceActiveUptime.visibility = View.GONE
+                b.interfaceActiveLayout.visibility = View.GONE
                 b.interfaceStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
         }
 
-        private fun getUpTime(id: Int): CharSequence {
-            val startTime = WireguardManager.getActiveConfigTimestamp(id) ?: return ""
+        private fun getUpTime(stats: Stats?): CharSequence {
+            if (stats == null) {
+                return ""
+            }
             val now = System.currentTimeMillis()
-            val uptimeMs = SystemClock.elapsedRealtime() - startTime
             // returns a string describing 'time' as a time relative to 'now'
             return DateUtils.getRelativeTimeSpanString(
-                now - uptimeMs,
                 now,
+                stats.since,
                 DateUtils.MINUTE_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_RELATIVE
             )
+        }
+
+        private fun getRxTx(stats: Stats?): String {
+            if (stats == null) return ""
+            val rx =
+                context.getString(
+                    R.string.symbol_upload,
+                    Utilities.humanReadableByteCount(stats.rx, true)
+                )
+            val tx =
+                context.getString(
+                    R.string.symbol_download,
+                    Utilities.humanReadableByteCount(stats.tx, true)
+                )
+            return context.getString(R.string.two_argument_space, rx, tx)
         }
 
         fun setupClickListeners(config: WgConfigFiles) {
@@ -258,10 +277,10 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 val isChecked = b.oneWgCheck.isChecked
                 io {
                     if (isChecked) {
-                        if (WireguardManager.canEnableConfig(config)) {
+                        if (WireguardManager.canEnableConfig(config.toImmutable())) {
                             config.oneWireGuard = true
                             WireguardManager.updateOneWireGuardConfig(config.id, owg = true)
-                            WireguardManager.enableConfig(config)
+                            WireguardManager.enableConfig(config.toImmutable())
                             uiCtx { listener.onDnsStatusChanged() }
                         } else {
                             uiCtx {
@@ -277,7 +296,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                         config.oneWireGuard = false
                         b.oneWgCheck.isChecked = false
                         WireguardManager.updateOneWireGuardConfig(config.id, owg = false)
-                        WireguardManager.disableConfig(config)
+                        WireguardManager.disableConfig(config.toImmutable())
                         uiCtx { listener.onDnsStatusChanged() }
                     }
                 }

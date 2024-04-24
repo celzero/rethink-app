@@ -15,10 +15,8 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
@@ -121,6 +119,8 @@ class CustomDomainFragment :
     }
 
     private fun setupClickListeners() {
+        // see CustomIpFragment#setupClickListeners#bringToFront()
+        b.cdaAddFab.bringToFront()
         b.cdaAddFab.setOnClickListener { showAddDomainDialog() }
 
         b.cdaSearchDeleteIcon.setOnClickListener { showDomainRulesDeleteDialog() }
@@ -174,11 +174,17 @@ class CustomDomainFragment :
      * based on it. User can either select the entered domain to be added in whitelist or blocklist.
      */
     private fun showAddDomainDialog() {
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(getString(R.string.cd_dialog_title))
         val dBind = DialogAddCustomDomainBinding.inflate(layoutInflater)
-        dialog.setContentView(dBind.root)
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dBind.root)
+        val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
+        lp.copyFrom(dialog.window?.attributes)
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+
+        dialog.setCancelable(true)
+        dialog.window?.attributes = lp
 
         var selectedType: DomainRulesManager.DomainType = DomainRulesManager.DomainType.DOMAIN
 
@@ -219,14 +225,6 @@ class CustomDomainFragment :
                     )
             }
         }
-        dialog.show()
-        val lp = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-        dialog.setCancelable(true)
-        dialog.window?.attributes = lp
 
         dBind.dacdUrlTitle.text = getString(R.string.cd_dialog_title)
         dBind.dacdDomainEditText.hint =

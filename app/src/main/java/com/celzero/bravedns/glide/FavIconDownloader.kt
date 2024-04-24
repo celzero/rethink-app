@@ -15,14 +15,13 @@ limitations under the License.
 */
 package com.celzero.bravedns.glide
 
+import Logger
+import Logger.LOG_TAG_DNS
 import android.content.Context
 import android.os.Process
-import android.util.Log
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
@@ -95,10 +94,10 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
                 .submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
         try {
             futureTarget.get()
-            if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide, load success from nextdns for url: $url")
+            Logger.d(LOG_TAG_DNS, "Glide, load success from nextdns for url: $url")
         } catch (e: Exception) {
             // on exception, initiate the download of fav icon from duckduckgo
-            Log.i(LOG_TAG_DNS_LOG, "Glide, load failure from nextdns $subUrl")
+            Logger.i(LOG_TAG_DNS, "Glide, load failure from nextdns $subUrl")
             updateImage(
                 url,
                 constructFavUrlDuckDuckGo(url),
@@ -120,12 +119,12 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
                 .submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
         try {
             futureTarget.get()
-            if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide, downloaded from duckduckgo $subUrl, $url")
+            Logger.d(LOG_TAG_DNS, "Glide, downloaded from duckduckgo $subUrl, $url")
         } catch (e: Exception) {
             // In case of failure the FutureTarget will throw an exception.
             // Will initiate the download of fav icon for the top level domain.
             if (retry) {
-                if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide, download failed from duckduckgo $subUrl")
+                Logger.d(LOG_TAG_DNS, "Glide, download failed from duckduckgo $subUrl")
                 updateImage(fdqnUrl, url, "", false)
             } else {
                 // add failed urls to a local cache, no need to attempt again and again
@@ -133,7 +132,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
                 // FIXME: add metadata instead of boolean
                 failedFavIconUrls.put(fdqnUrl, true)
             }
-            Log.e(LOG_TAG_DNS_LOG, "Glide, no fav icon available for the url: $subUrl")
+            Logger.e(LOG_TAG_DNS, "Glide, no fav icon available for the url: $subUrl")
         } finally {
             Glide.with(context.applicationContext).clear(futureTarget)
         }

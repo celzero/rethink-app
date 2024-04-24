@@ -15,12 +15,13 @@
  */
 package com.celzero.bravedns.ui.dialog
 
+import Logger
+import Logger.LOG_TAG_PROXY
 import android.app.Activity
 import android.app.Dialog
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
-import android.util.Log
 import android.view.Window
 import android.view.WindowManager
 import android.view.animation.Animation
@@ -37,7 +38,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.WgAppsIncludeDialogBinding
 import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.google.android.material.chip.Chip
@@ -75,12 +75,14 @@ class WgIncludeAppsDialog(
 
     enum class TopLevelFilter(val id: Int) {
         ALL_APPS(0),
-        SELECTED_APPS(1);
+        SELECTED_APPS(1),
+        UNSELECTED_APPS(2);
 
         fun getLabelId(): Int {
             return when (this) {
                 ALL_APPS -> R.string.lbl_all
                 SELECTED_APPS -> R.string.rt_filter_parent_selected
+                UNSELECTED_APPS -> R.string.lbl_unselected
             }
         }
     }
@@ -147,8 +149,16 @@ class WgIncludeAppsDialog(
                 false
             )
 
+        val unselected =
+            makeFirewallChip(
+                TopLevelFilter.UNSELECTED_APPS.id,
+                activity.getString(TopLevelFilter.UNSELECTED_APPS.getLabelId()),
+                false
+            )
+
         b.wgIncludeAppDialogChipGroup.addView(all)
         b.wgIncludeAppDialogChipGroup.addView(selected)
+        b.wgIncludeAppDialogChipGroup.addView(unselected)
     }
 
     private fun makeFirewallChip(id: Int, label: String, checked: Boolean): Chip {
@@ -188,6 +198,10 @@ class WgIncludeAppsDialog(
             }
             TopLevelFilter.SELECTED_APPS.id -> {
                 filterType = TopLevelFilter.SELECTED_APPS
+                viewModel.setFilter(searchText, filterType, proxyId)
+            }
+            TopLevelFilter.UNSELECTED_APPS.id -> {
+                filterType = TopLevelFilter.UNSELECTED_APPS
                 viewModel.setFilter(searchText, filterType, proxyId)
             }
         }
@@ -259,11 +273,11 @@ class WgIncludeAppsDialog(
             // add all if the list is empty or remove all if the list is full
             io {
                 if (toAdd) {
-                    Log.i(LOG_TAG_PROXY, "Adding all apps to proxy $proxyId, $proxyName")
+                    Logger.i(LOG_TAG_PROXY, "Adding all apps to proxy $proxyId, $proxyName")
                     ProxyManager.setProxyIdForAllApps(proxyId, proxyName)
                 } else {
-                    Log.i(LOG_TAG_PROXY, "Removing all apps from proxy $proxyId, $proxyName")
-                    ProxyManager.removeProxyForAllApps()
+                    Logger.i(LOG_TAG_PROXY, "Removing all apps from proxy $proxyId, $proxyName")
+                    ProxyManager.setNoProxyForAllApps()
                 }
             }
         }
@@ -282,7 +296,7 @@ class WgIncludeAppsDialog(
         builder.setCancelable(true)
         builder.setPositiveButton(context.getString(R.string.lbl_include)) { _, _ ->
             io {
-                Log.i(LOG_TAG_PROXY, "Adding remaining apps to proxy $proxyId, $proxyName")
+                Logger.i(LOG_TAG_PROXY, "Adding remaining apps to proxy $proxyId, $proxyName")
                 ProxyManager.setProxyIdForUnselectedApps(proxyId, proxyName)
             }
         }

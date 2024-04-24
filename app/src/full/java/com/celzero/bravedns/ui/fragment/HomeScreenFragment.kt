@@ -15,6 +15,9 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import Logger
+import Logger.LOG_TAG_UI
+import Logger.LOG_TAG_VPN
 import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
@@ -29,9 +32,10 @@ import android.net.TrafficStats
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.os.SystemClock
+import android.provider.Settings
 import android.text.format.DateUtils
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.widget.Toast
@@ -45,7 +49,6 @@ import androidx.lifecycle.lifecycleScope
 import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
@@ -65,13 +68,13 @@ import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.ui.bottomsheet.HomeScreenSettingBottomSheet
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openNetworkSettings
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
+import com.celzero.bravedns.util.Utilities.isAtleastN
 import com.celzero.bravedns.util.Utilities.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -314,7 +317,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun enableProxyCardIfNeeded() {
         if (isVpnActivated && !appConfig.getBraveMode().isDnsMode()) {
-            if (persistentState.getProxyStatus() != -1) {
+            if (persistentState.getProxyStatus().value != -1) {
                 observeProxyStates()
             } else {
                 disableProxyCard()
@@ -373,7 +376,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     } */
 
     private fun observeProxyStates() {
-        persistentState.proxyStatus.observe(viewLifecycleOwner) {
+        persistentState.getProxyStatus().observe(viewLifecycleOwner) {
             if (it != -1) {
                 updateUiWithProxyStates(it)
             } else {
@@ -439,7 +442,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun unobserveProxyStates() {
-        persistentState.proxyStatus.removeObservers(viewLifecycleOwner)
+        persistentState.getProxyStatus().removeObservers(viewLifecycleOwner)
     }
 
     private fun disableLogsCard() {
@@ -699,7 +702,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 b.fhsCardApps.visibility = View.GONE
                 b.fhsCardAllowedApps.isSelected = true
             } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
-                Log.e(LOG_TAG_VPN, "error retrieving value from appInfos observer ${e.message}", e)
+                Logger.e(
+                    LOG_TAG_VPN,
+                    "error retrieving value from appInfos observer ${e.message}",
+                    e
+                )
             }
         }
     }
@@ -710,11 +717,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun handleMainScreenBtnClickEvent() {
-
-        if (handleAlwaysOnVpn()) {
-            return
-        }
-
         b.fhsDnsOnOffBtn.isEnabled = false
         delay(TimeUnit.MILLISECONDS.toMillis(500), lifecycleScope) {
             if (isAdded) {
@@ -722,11 +724,113 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
 
+        // prompt user to disable battery optimization and restrict background data
+        if (isRestrictBackgroundActive(requireContext()) && !isVpnActivated) {
+            showRestrictBgActiveDialog()
+        } else if (batteryOptimizationActive(requireContext()) && !isVpnActivated) {
+            showBatteryOptimizationDialog()
+        }
+
+        handleVpnActivation()
+    }
+
+    private fun handleVpnActivation() {
+        if (handleAlwaysOnVpn()) return
+
         if (isVpnActivated) {
             stopVpnService()
         } else {
             prepareAndStartVpn()
         }
+    }
+
+    private fun batteryOptimizationActive(context: Context): Boolean {
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        Logger.d(
+            LOG_TAG_UI,
+            "ignore battery optimization: ${powerManager.isIgnoringBatteryOptimizations(context.packageName)}"
+        )
+        return !powerManager.isIgnoringBatteryOptimizations(context.packageName)
+    }
+
+    private fun showBatteryOptimizationDialog() {
+        if (!isAtleastN()) return
+
+        val builder = MaterialAlertDialogBuilder(requireContext())
+        val title =
+            getString(
+                R.string.battery_optimization_dialog_heading,
+                getString(R.string.lbl_battery_optimization)
+            )
+        val msg =
+            getString(
+                R.string.restrict_dialog_message,
+                getString(R.string.lbl_battery_optimization)
+            )
+        builder.setTitle(title)
+        builder.setMessage(msg)
+        builder.setCancelable(false)
+        builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
+            Logger.v(LOG_TAG_UI, "launch battery optimization settings")
+            val ok =
+                openNetworkSettings(
+                    requireContext(),
+                    Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+                )
+            Logger.v(LOG_TAG_UI, "battery optimization settings launched: $ok")
+            if (!ok) {
+                // launch app settings if the above settings is not available
+                Logger.v(LOG_TAG_UI, "launch app info, battery optimization settings not available")
+                openAppInfo(requireContext())
+            }
+        }
+
+        builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
+            // no-op
+        }
+        builder.create().show()
+    }
+
+    private fun isRestrictBackgroundActive(context: Context): Boolean {
+        if (!isAtleastN()) return false
+
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        Logger.d(
+            LOG_TAG_UI,
+            "restrict background status: ${connectivityManager.restrictBackgroundStatus}"
+        )
+        return connectivityManager.restrictBackgroundStatus ==
+            ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED
+    }
+
+    private fun showRestrictBgActiveDialog() {
+        if (!isAtleastN()) return
+
+        val builder = MaterialAlertDialogBuilder(requireContext())
+        builder.setTitle(R.string.lbl_background_data)
+        val msg =
+            getString(R.string.restrict_dialog_message, getString(R.string.lbl_background_data))
+        builder.setMessage(msg)
+        builder.setCancelable(false)
+        builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
+            Logger.v(LOG_TAG_UI, "launch restrict background data settings")
+            val ok =
+                openNetworkSettings(
+                    requireContext(),
+                    Settings.ACTION_IGNORE_BACKGROUND_DATA_RESTRICTIONS_SETTINGS
+                )
+            if (!ok) {
+                // launch app settings if the above settings is not available
+                Logger.v(LOG_TAG_UI, "launch app info, restrict bg data settings not available")
+                openAppInfo(requireContext())
+            }
+        }
+
+        builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
+            // no-op
+        }
+        builder.create().show()
     }
 
     private fun showAlwaysOnStopDialog() {
@@ -873,7 +977,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      */
     private fun maybeAutoStartVpn() {
         if (isVpnActivated && !VpnController.isOn()) {
-            Log.i(LOG_TAG_VPN, "start VPN (previous state)")
+            Logger.i(LOG_TAG_VPN, "start VPN (previous state)")
             prepareAndStartVpn()
         }
     }
@@ -929,7 +1033,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setMessage(R.string.private_dns_dialog_desc)
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.private_dns_dialog_positive) { _, _ ->
-            openNetworkSettings(requireContext())
+            openNetworkSettings(requireContext(), Settings.ACTION_WIRELESS_SETTINGS)
         }
 
         builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
@@ -944,8 +1048,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun startAppsActivity() {
-        if (DEBUG)
-            Log.d(LOG_TAG_VPN, "Status : $isVpnActivated , BraveMode: ${appConfig.getBraveMode()}")
+        Logger.d(LOG_TAG_VPN, "Status : $isVpnActivated , BraveMode: ${appConfig.getBraveMode()}")
 
         // no need to check for app modes to open this activity
         // one use case: https://github.com/celzero/rethink-app/issues/611
@@ -1032,7 +1135,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         if (!persistentState.shouldRequestNotificationPermission) {
             // user rejected notification permission
-            Log.w(LOG_TAG_VPN, "User rejected notification permission for the app")
+            Logger.w(LOG_TAG_VPN, "User rejected notification permission for the app")
             return
         }
 
@@ -1053,7 +1156,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // This exception is not mentioned in the documentation, but it has been encountered
                 // users and also by other developers, e.g.
                 // https://stackoverflow.com/questions/45470113.
-                Log.e(LOG_TAG_VPN, "Device does not support system-wide VPN mode.", e)
+                Logger.e(LOG_TAG_VPN, "Device does not support system-wide VPN mode.", e)
                 return false
             }
         // If the VPN.prepare() is not null, then the first time VPN dialog is shown, Show info
@@ -1106,9 +1209,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                 persistentState.shouldRequestNotificationPermission = it
                 if (it) {
-                    Log.i(LOG_TAG_UI, "User accepted notification permission")
+                    Logger.i(LOG_TAG_UI, "User accepted notification permission")
                 } else {
-                    Log.w(LOG_TAG_UI, "User rejected notification permission")
+                    Logger.w(LOG_TAG_UI, "User rejected notification permission")
                     Snackbar.make(
                             requireActivity().findViewById<View>(android.R.id.content).rootView,
                             getString(R.string.hsf_notification_permission_failure),

@@ -15,10 +15,11 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import Logger
+import Logger.LOG_TAG_FIREWALL
 import android.content.DialogInterface
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,7 +31,6 @@ import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -124,7 +124,7 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment() {
         io {
             // no need to send port number for the app info screen
             domainRule = DomainRulesManager.status(domain, uid)
-            Log.d("FirewallManager", "Set selection of ip: $domain, ${domainRule.id}")
+            Logger.d(LOG_TAG_FIREWALL, "Set selection of ip: $domain, ${domainRule.id}")
             uiCtx {
                 when (domainRule) {
                     DomainRulesManager.Status.TRUST -> {
@@ -173,7 +173,7 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun applyDomainRule(status: DomainRulesManager.Status) {
-        Log.i(Logger.LOG_TAG_FIREWALL, "domain rule for uid: $uid:$domain (${status.name})")
+        Logger.i(LOG_TAG_FIREWALL, "domain rule for uid: $uid:$domain (${status.name})")
         domainRule = status
 
         // set port number as null for all the rules applied from this screen

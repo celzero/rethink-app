@@ -15,16 +15,15 @@
  */
 package com.celzero.bravedns.adapter
 
-import android.app.Dialog
+import Logger
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.format.DateUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.Toast
@@ -46,7 +45,6 @@ import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
@@ -111,7 +109,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         } else if (holder is CustomDomainViewHolderWithoutHeader) {
             holder.update(customDomain)
         } else {
-            Log.w(Logger.LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
+            Logger.w(LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
             return
         }
     }
@@ -237,12 +235,18 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
     }
 
     private fun showEditDomainDialog(customDomain: CustomDomain) {
-        val dialog = Dialog(context)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(context.getString(R.string.cd_dialog_edit_title))
         val dBind =
             DialogAddCustomDomainBinding.inflate((context as CustomRulesActivity).layoutInflater)
-        dialog.setContentView(dBind.root)
+        val builder = MaterialAlertDialogBuilder(context).setView(dBind.root)
+        val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
+        lp.copyFrom(dialog.window?.attributes)
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+
+        dialog.setCancelable(true)
+        dialog.window?.attributes = lp
 
         var selectedType: DomainRulesManager.DomainType =
             DomainRulesManager.DomainType.getType(customDomain.type)
@@ -295,14 +299,6 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
                     )
             }
         }
-
-        val lp = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.show()
-        dialog.setCancelable(true)
-        dialog.window?.attributes = lp
 
         dBind.dacdUrlTitle.text = context.getString(R.string.cd_dialog_title)
         dBind.dacdDomainEditText.hint =

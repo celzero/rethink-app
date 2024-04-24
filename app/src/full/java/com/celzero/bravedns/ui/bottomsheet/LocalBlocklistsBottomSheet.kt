@@ -15,12 +15,13 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import Logger
+import Logger.LOG_TAG_DNS
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,12 +39,12 @@ import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.download.DownloadConstants
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.fragment.DnsSettingsFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_SEARCH_URL
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
@@ -146,7 +147,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private fun initializeObservers() {
         appDownloadManager.downloadRequired.observe(viewLifecycleOwner) {
-            Log.i(Logger.LOG_TAG_DNS, "Check for blocklist update, status: $it")
+            Logger.i(LOG_TAG_DNS, "Check for blocklist update, status: $it")
             if (it == null) return@observe
 
             handleDownloadStatus(it)
@@ -450,6 +451,15 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun invokeRethinkActivity() {
+        if (VpnController.hasTunnel()) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.ssv_toast_start_rethink),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+
         this.dismiss()
         val intent = Intent(requireContext(), ConfigureRethinkBasicActivity::class.java)
         intent.putExtra(
@@ -485,7 +495,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
             viewLifecycleOwner
         ) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(
+            Logger.i(
                 Logger.LOG_TAG_DOWNLOAD,
                 "WorkManager state: ${workInfo.state} for ${LocalBlocklistCoordinator.CUSTOM_DOWNLOAD}"
             )
@@ -514,7 +524,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
             viewLifecycleOwner
         ) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(
+            Logger.i(
                 Logger.LOG_TAG_DOWNLOAD,
                 "WorkManager state: ${workInfo.state} for ${DownloadConstants.DOWNLOAD_TAG}"
             )
@@ -542,7 +552,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
             if (workInfoList != null && workInfoList.isNotEmpty()) {
                 val workInfo = workInfoList[0]
                 if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-                    Log.i(
+                    Logger.i(
                         Logger.LOG_TAG_DOWNLOAD,
                         "AppDownloadManager Work Manager completed - ${DownloadConstants.FILE_TAG}"
                     )
@@ -556,12 +566,12 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
                     onDownloadFail()
                     workManager.pruneWork()
                     workManager.cancelAllWorkByTag(DownloadConstants.FILE_TAG)
-                    Log.i(
+                    Logger.i(
                         Logger.LOG_TAG_DOWNLOAD,
                         "AppDownloadManager Work Manager failed - ${DownloadConstants.FILE_TAG}"
                     )
                 } else {
-                    Log.i(
+                    Logger.i(
                         Logger.LOG_TAG_DOWNLOAD,
                         "AppDownloadManager Work Manager - ${DownloadConstants.FILE_TAG}, ${workInfo.state}"
                     )

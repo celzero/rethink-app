@@ -15,12 +15,13 @@
  */
 package com.celzero.bravedns.data
 
+import Logger
+import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsCryptEndpoint
 import com.celzero.bravedns.database.DnsCryptEndpointRepository
@@ -45,7 +46,6 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.InternetProtocol.Companion.getInternetProtocol
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -384,7 +384,7 @@ internal constructor(
             DnsType.DOT.type -> DnsType.DOT
             DnsType.ODOH.type -> DnsType.ODOH
             else -> {
-                Log.w(LOG_TAG_VPN, "Invalid dns type mode: ${persistentState.dnsType}")
+                Logger.w(LOG_TAG_VPN, "Invalid dns type mode: ${persistentState.dnsType}")
                 DnsType.DOH
             }
         }
@@ -712,6 +712,9 @@ internal constructor(
 
     suspend fun handleDnsrelayChanges(endpoint: DnsCryptRelayEndpoint) {
         dnsCryptRelayEndpointRepository.update(endpoint)
+        persistentState.dnsCryptRelays.postValue(
+            PersistentState.DnsCryptRelayDetails(endpoint, endpoint.isSelected)
+        )
     }
 
     suspend fun removeDnscryptRelay(stamp: String) {
@@ -928,7 +931,7 @@ internal constructor(
                 setProxy(ProxyType.HTTP, removeProvider)
                 return
             } else {
-                Log.w(
+                Logger.w(
                     LOG_TAG_VPN,
                     "invalid remove proxy call, type: ${removeType.name}, provider: ${removeProvider.name}"
                 )
@@ -959,7 +962,7 @@ internal constructor(
     fun getTunProxyMode(): TunProxyMode {
         val type = persistentState.proxyType
         val provider = persistentState.proxyProvider
-        if (DEBUG) Log.d(LOG_TAG_VPN, "selected proxy type: $type, with provider as $provider")
+        Logger.d(LOG_TAG_VPN, "selected proxy type: $type, with provider as $provider")
 
         if (ProxyProvider.WIREGUARD.name == provider) {
             return TunProxyMode.WIREGUARD

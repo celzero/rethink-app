@@ -15,7 +15,8 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.fragment
 
-import android.app.Dialog
+import Logger
+import Logger.LOG_TAG_UI
 import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
@@ -27,10 +28,8 @@ import android.os.SystemClock
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -54,8 +53,7 @@ import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.sendEmailIntent
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
@@ -126,7 +124,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutAppVersion.text =
                 getString(R.string.about_version_install_source, version, getDownloadSource())
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
+            Logger.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
         }
     }
 
@@ -198,7 +196,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 showNewFeaturesDialog()
             }
             b.aboutAppInfo -> {
-                openAppInfo()
+                openAppInfo(requireContext())
             }
             b.aboutVpnProfile -> {
                 openVpnProfile(requireContext())
@@ -240,24 +238,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 getString(R.string.intent_launch_error, intent.data),
                 Toast.LENGTH_SHORT
             )
-            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
-        }
-    }
-
-    private fun openAppInfo() {
-        val packageName = requireContext().packageName
-        try {
-            val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS)
-            intent.data = Uri.fromParts("package", packageName, null)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            showToastUiCentered(
-                requireContext(),
-                getString(R.string.app_info_error),
-                Toast.LENGTH_SHORT
-            )
-            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
+            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
@@ -280,7 +261,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 getString(R.string.notification_screen_error),
                 Toast.LENGTH_SHORT
             )
-            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
+            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
@@ -347,14 +328,15 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     private fun showContributors() {
         val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCanceledOnTouchOutside(true)
-        dialog.setContentView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+
+        dialog.setCancelable(true)
         dialog.window?.attributes = lp
 
         val heading = dialogBinding.infoRulesDialogRulesTitle
@@ -424,7 +406,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                     binding.logs.text = inputString?.slice(0 until maxLength)
                 }
             } catch (e: Exception) {
-                Log.w(LOG_TAG_UI, "Error loading log files to textview: ${e.message}", e)
+                Logger.w(LOG_TAG_UI, "err loading log files to textview: ${e.message}", e)
                 uiCtx {
                     if (!isAdded) return@uiCtx
                     binding.info.visibility = View.GONE
@@ -469,7 +451,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             viewLifecycleOwner
         ) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(
+            Logger.i(
                 Logger.LOG_TAG_SCHEDULER,
                 "WorkManager state: ${workInfo.state} for ${WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG}"
             )

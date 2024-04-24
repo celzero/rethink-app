@@ -18,13 +18,13 @@
  */
 package com.celzero.bravedns.util
 
+import Logger
+import Logger.LOG_TAG_PROXY
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
-import android.util.Log
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.util.ErrorMessages
@@ -103,13 +103,13 @@ object TunnelImporter : KoinComponent {
                                 }
                                 ?.let {
                                     config = it
-                                    WireguardManager.addConfig(config)
+                                    WireguardManager.addConfig(config, name)
                                 }
                         }
                     }
                 } else {
                     config = Config.parse(contentResolver.openInputStream(uri)!!)
-                    WireguardManager.addConfig(config)
+                    WireguardManager.addConfig(config, name)
                 }
 
                 if (config == null) {
@@ -135,7 +135,7 @@ object TunnelImporter : KoinComponent {
     suspend fun importTunnel(configText: String, messageCallback: (CharSequence) -> Unit) {
         withContext(Dispatchers.IO) {
             try {
-                if (DEBUG) Log.d(Logger.LOG_TAG_PROXY, "Importing tunnel: $configText")
+                Logger.d(LOG_TAG_PROXY, "Importing tunnel: $configText")
                 val config =
                     Config.parse(
                         ByteArrayInputStream(configText.toByteArray(StandardCharsets.UTF_8))
@@ -156,7 +156,8 @@ object TunnelImporter : KoinComponent {
         for (throwable in throwables) {
             val error = ErrorMessages[context, throwable]
             message = context.getString(R.string.import_error, error)
-            Log.e(Logger.LOG_TAG_PROXY, message, throwable)
+            val ex = Logger.throwableToException(throwable)
+            Logger.e(LOG_TAG_PROXY, message, ex)
         }
         // trim the message and take string after ":"
         val idx = message.indexOf(':')

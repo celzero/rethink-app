@@ -15,12 +15,12 @@
  */
 package com.celzero.bravedns.service
 
+import Logger
+import Logger.LOG_TAG_FIREWALL
 import android.app.KeyguardManager
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfos
@@ -28,7 +28,6 @@ import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfosLiveD
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.foregroundUids
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_PACKAGE
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.OrbotHelper
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.ImmutableList
@@ -245,7 +244,7 @@ object FirewallManager : KoinComponent {
         io { load() }
     }
 
-    data class AppInfoTuple(val uid: Int, var packageName: String)
+    data class AppInfoTuple(val uid: Int, val packageName: String)
 
     suspend fun isUidFirewalled(uid: Int): Boolean {
         return connectionStatus(uid) != ConnectionStatus.ALLOW
@@ -461,7 +460,7 @@ object FirewallManager : KoinComponent {
         }
         // Delete the uninstalled apps from database
         val dbok = db.updateUid(olduid, uid, pkg)
-        Log.d("FirewallManager", "update: $pkg; $olduid -> $uid; c? $cacheok; db? $dbok")
+        Logger.d(LOG_TAG_FIREWALL, "update: $pkg; $olduid -> $uid; c? $cacheok; db? $dbok")
         informObservers()
     }
 
@@ -475,7 +474,7 @@ object FirewallManager : KoinComponent {
     suspend fun load(): Int {
         val apps = db.getAppInfo()
         if (apps.isEmpty()) {
-            Log.w(LOG_TAG_FIREWALL, "no apps found in db, no app-based rules to load")
+            Logger.w(LOG_TAG_FIREWALL, "no apps found in db, no app-based rules to load")
             return 0
         }
 
@@ -488,7 +487,7 @@ object FirewallManager : KoinComponent {
     }
 
     fun untrackForegroundApps() {
-        Log.i(
+        Logger.i(
             LOG_TAG_FIREWALL,
             "launcher in the foreground, clear foreground uids: $foregroundUids"
         )
@@ -501,12 +500,15 @@ object FirewallManager : KoinComponent {
                 val appInfo = appInfos[uid]
 
                 if (appInfo.isNullOrEmpty()) {
-                    Log.i(LOG_TAG_FIREWALL, "No such app $uid to update 'dis/allow' firewall rule")
+                    Logger.i(
+                        LOG_TAG_FIREWALL,
+                        "No such app $uid to update 'dis/allow' firewall rule"
+                    )
                     return@io
                 }
             }
             val isAppUid = AndroidUidConfig.isUidAppRange(uid)
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL, "app in foreground with uid? $isAppUid")
+            Logger.d(LOG_TAG_FIREWALL, "app in foreground with uid? $isAppUid")
 
             // Only track packages within app uid range.
             if (!isAppUid) return@io
@@ -522,11 +524,10 @@ object FirewallManager : KoinComponent {
         // should be blocked.
         val locked = keyguardManager?.isKeyguardLocked == false
         val isForeground = foregroundUids.contains(uid)
-        if (DEBUG)
-            Log.d(
-                LOG_TAG_FIREWALL,
-                "is app $uid foreground? ${locked && isForeground}, isLocked? $locked, is available in foreground list? $isForeground"
-            )
+        Logger.d(
+            LOG_TAG_FIREWALL,
+            "is app $uid foreground? ${locked && isForeground}, isLocked? $locked, is available in foreground list? $isForeground"
+        )
         return locked && isForeground
     }
 
@@ -540,7 +541,7 @@ object FirewallManager : KoinComponent {
         firewallStatus: FirewallStatus,
         connectionStatus: ConnectionStatus
     ) {
-        Log.i(
+        Logger.i(
             LOG_TAG_FIREWALL,
             "Apply firewall rule for uid: ${uid}, ${firewallStatus.name}, ${connectionStatus.name}"
         )

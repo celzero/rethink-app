@@ -18,11 +18,12 @@
  */
 package com.celzero.bravedns.util
 
+import Logger
+import Logger.LOG_QR_CODE
 import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Log
 import com.google.zxing.BinaryBitmap
 import com.google.zxing.DecodeHintType
 import com.google.zxing.NotFoundException
@@ -83,7 +84,7 @@ class QrCodeFromFileScanner(
     }
 
     private fun doScan(data: Uri): Result? {
-        Log.d(TAG, "Starting to scan an image: $data")
+        Logger.d(LOG_QR_CODE, "Starting to scan an image: $data")
         contentResolver.openInputStream(data).use { inputStream ->
             val originalBitmap =
                 BitmapFactory.decodeStream(inputStream)
@@ -91,10 +92,13 @@ class QrCodeFromFileScanner(
 
             return try {
                 scanBitmapForResult(originalBitmap).also {
-                    Log.d(TAG, "Found result in original image")
+                    Logger.d(LOG_QR_CODE, "Found result in original image")
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Original image scan finished with error: $e, will try downscaled image")
+                Logger.e(
+                    LOG_QR_CODE,
+                    "Original image scan finished with error: $e, will try downscaled image"
+                )
                 val scaleBitmap = downscaleBitmap(originalBitmap, 500)
                 scanBitmapForResult(originalBitmap).also { scaleBitmap.recycle() }
             } finally {
@@ -112,8 +116,6 @@ class QrCodeFromFileScanner(
     suspend fun scan(data: Uri) = withContext(Dispatchers.Default) { doScan(data) }
 
     companion object {
-        private const val TAG = "QrCodeFromFileScanner"
-
         /**
          * Given a reference to a file, check if this file could be parsed by this class
          *

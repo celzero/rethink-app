@@ -15,9 +15,10 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import Logger
+import Logger.LOG_TAG_UI
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -58,8 +59,7 @@ import com.celzero.bravedns.util.Constants.Companion.DEFAULT_RDNS_REMOTE_DNS_NAM
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_STAMP_VERSION
 import com.celzero.bravedns.util.CustomLinearLayoutManager
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.getRemoteBlocklistStamp
@@ -437,9 +437,9 @@ class RethinkBlocklistFragment :
     }
 
     private fun setStamp(stamp: String?) {
-        Log.i(LOG_TAG_UI, "set stamp for blocklist type: ${type.name} with $stamp")
+        Logger.i(LOG_TAG_UI, "set stamp for blocklist type: ${type.name} with $stamp")
         if (stamp == null) {
-            Log.i(LOG_TAG_UI, "stamp is null")
+            Logger.i(LOG_TAG_UI, "stamp is null")
             return
         }
 
@@ -449,7 +449,7 @@ class RethinkBlocklistFragment :
                 persistentState.localBlocklistStamp = stamp
                 persistentState.numberOfLocalBlocklists = blocklistCount
                 persistentState.blocklistEnabled = true
-                Log.i(LOG_TAG_UI, "set stamp for local blocklist with $stamp, $blocklistCount")
+                Logger.i(LOG_TAG_UI, "set stamp for local blocklist with $stamp, $blocklistCount")
             } else {
                 // set stamp for remote blocklist
                 appConfig.updateRethinkEndpoint(
@@ -496,13 +496,15 @@ class RethinkBlocklistFragment :
         }
     }
 
-    private fun selectToggleBtnUi(b: MaterialButton) {
-        b.backgroundTintList =
+    private fun selectToggleBtnUi(mb: MaterialButton) {
+        mb.backgroundTintList =
             ColorStateList.valueOf(fetchToggleBtnColors(requireContext(), R.color.accentGood))
+        mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.homeScreenHeaderTextColor))
     }
 
-    private fun unselectToggleBtnUi(b: MaterialButton) {
-        b.backgroundTintList =
+    private fun unselectToggleBtnUi(mb: MaterialButton) {
+        mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
+        mb.backgroundTintList =
             ColorStateList.valueOf(
                 fetchToggleBtnColors(requireContext(), R.color.defaultToggleBtnBg)
             )
@@ -797,7 +799,7 @@ class RethinkBlocklistFragment :
         workManager.getWorkInfosByTagLiveData(CUSTOM_DOWNLOAD).observe(viewLifecycleOwner) {
             workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(
+            Logger.i(
                 Logger.LOG_TAG_DOWNLOAD,
                 "WorkManager state: ${workInfo.state} for $CUSTOM_DOWNLOAD"
             )
@@ -825,7 +827,10 @@ class RethinkBlocklistFragment :
         workManager.getWorkInfosByTagLiveData(DOWNLOAD_TAG).observe(viewLifecycleOwner) {
             workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(Logger.LOG_TAG_DOWNLOAD, "WorkManager state: ${workInfo.state} for $DOWNLOAD_TAG")
+            Logger.i(
+                Logger.LOG_TAG_DOWNLOAD,
+                "WorkManager state: ${workInfo.state} for $DOWNLOAD_TAG"
+            )
             if (
                 WorkInfo.State.ENQUEUED == workInfo.state ||
                     WorkInfo.State.RUNNING == workInfo.state
@@ -849,7 +854,7 @@ class RethinkBlocklistFragment :
             if (workInfoList != null && workInfoList.isNotEmpty()) {
                 val workInfo = workInfoList[0]
                 if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-                    Log.i(
+                    Logger.i(
                         Logger.LOG_TAG_DOWNLOAD,
                         "AppDownloadManager Work Manager completed - $FILE_TAG"
                     )
@@ -863,12 +868,12 @@ class RethinkBlocklistFragment :
                     onDownloadFail()
                     workManager.pruneWork()
                     workManager.cancelAllWorkByTag(FILE_TAG)
-                    Log.i(
+                    Logger.i(
                         Logger.LOG_TAG_DOWNLOAD,
                         "AppDownloadManager Work Manager failed - $FILE_TAG"
                     )
                 } else {
-                    Log.i(
+                    Logger.i(
                         Logger.LOG_TAG_DOWNLOAD,
                         "AppDownloadManager Work Manager - $FILE_TAG, ${workInfo.state}"
                     )

@@ -1,75 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="1dp">
+    android:layout_height="wrap_content">
 
-    <RelativeLayout
-        android:id="@+id/wg_include_app_list_container"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/wg_include_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+        app:cardBackgroundColor="?attr/background"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="2dp"
+        app:cardUseCompatPadding="true">
 
-        <ImageView
-            android:id="@+id/wg_include_app_list_apk_icon_iv"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_centerVertical="true"
+        <RelativeLayout
+            android:id="@+id/wg_include_app_list_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="5dp"
-            android:maxWidth="40dp"
-            android:maxHeight="40dp"
-            tools:src="?attr/primaryTextColor" />
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:layout_toStartOf="@id/wg_include_app_list_checkbox"
-            android:layout_toEndOf="@id/wg_include_app_list_apk_icon_iv"
-            android:orientation="vertical">
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/wg_include_app_list_apk_icon_iv"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:maxWidth="40dp"
+                android:maxHeight="40dp"
+                tools:src="?attr/primaryTextColor" />
 
-            <TextView
-                android:id="@+id/wg_include_app_list_apk_label_tv"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:ellipsize="end"
-                android:fontFamily="sans-serif-medium"
-                android:text="Dummy Label"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:layout_toStartOf="@id/wg_include_app_list_checkbox"
+                android:layout_toEndOf="@id/wg_include_app_list_apk_icon_iv"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/wg_include_app_app_desc_tv"
+                <TextView
+                    android:id="@+id/wg_include_app_list_apk_label_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Dummy Label"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/extra_large_font_text_view" />
+
+                <TextView
+                    android:id="@+id/wg_include_app_app_desc_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:alpha="0.5"
+                    android:ellipsize="end"
+                    android:text="Dummy Label"
+                    android:textColor="?attr/accentBad"
+                    android:textSize="@dimen/default_font_text_view" />
+
+            </LinearLayout>
+
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/wg_include_app_list_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:alpha="0.5"
-                android:ellipsize="end"
-                android:text="Dummy Label"
-                android:textColor="?attr/accentBad"
-                android:textSize="@dimen/default_font_text_view" />
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:layout_margin="10dp"
+                android:buttonTint="?attr/accentGood"
+                android:foregroundTint="?attr/accentGood" />
 
-        </LinearLayout>
-
-
-        <androidx.appcompat.widget.AppCompatCheckBox
-            android:id="@+id/wg_include_app_list_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerInParent="true"
-            android:layout_margin="10dp"
-            android:buttonTint="?attr/accentGood"
-            android:foregroundTint="?attr/accentGood" />
-
-    </RelativeLayout>
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </RelativeLayout>

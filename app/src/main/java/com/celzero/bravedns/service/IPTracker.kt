@@ -15,8 +15,9 @@
  */
 package com.celzero.bravedns.service
 
+import Logger
+import Logger.LOG_TAG_FIREWALL
 import android.content.Context
-import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.data.ConnectionSummary
@@ -27,7 +28,6 @@ import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.IPUtil
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getCountryCode
 import com.celzero.bravedns.util.Utilities.getFlag
@@ -155,8 +155,8 @@ internal constructor(
                 appNameForUidOrPackage(uid, pkgs[0])
             } else { // For UNKNOWN or Non-App.
                 val androidUidConfig = AndroidUidConfig.fromFileSystemUid(uid)
-                Log.i(
-                    LOG_TAG_FIREWALL_LOG,
+                Logger.i(
+                    LOG_TAG_FIREWALL,
                     "android-uid for ${uid} is uid: ${androidUidConfig.uid}, n: ${androidUidConfig.name}"
                 )
 
@@ -175,7 +175,7 @@ internal constructor(
         if (appName.isNullOrEmpty()) {
             val appInfo = Utilities.getApplicationInfo(ctx, packageName) ?: return ""
 
-            Log.i(LOG_TAG_FIREWALL_LOG, "app, $appName, not tracked by FirewallManager")
+            Logger.i(LOG_TAG_FIREWALL, "app, $appName, not tracked by FirewallManager")
             appName = ctx.packageManager.getApplicationLabel(appInfo).toString()
         }
         return appName

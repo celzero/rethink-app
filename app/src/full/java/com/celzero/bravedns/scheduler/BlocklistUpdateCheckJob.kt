@@ -15,14 +15,14 @@
  */
 package com.celzero.bravedns.scheduler
 
+import Logger
+import Logger.LOG_TAG_SCHEDULER
 import android.content.Context
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.download.BlocklistDownloadHelper
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_SCHEDULER
 import com.celzero.bravedns.util.Utilities
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -33,7 +33,7 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
     private val persistentState by inject<PersistentState>()
 
     override suspend fun doWork(): Result {
-        Log.i(LOG_TAG_SCHEDULER, "starting blocklist update check job")
+        Logger.i(LOG_TAG_SCHEDULER, "starting blocklist update check job")
 
         if (!Utilities.isPlayStoreFlavour()) {
             isDownloadRequired(

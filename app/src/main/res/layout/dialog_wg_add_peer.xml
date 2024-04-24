@@ -3,177 +3,210 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/background"
-    android:paddingStart="5dp"
-    android:paddingEnd="5dp">
+    android:background="?attr/background">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/peer_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:layout_marginTop="16dp"
-        android:paddingTop="5dp"
-        android:text="@string/add_peer"
-        android:textColor="?attr/primaryLightColorText"
-        android:textSize="@dimen/extra_large_font_text_view"
-        app:layout_constraintBottom_toTopOf="@+id/public_key_label_layout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/public_key_label_layout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:hint="@string/lbl_public_key"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/pre_shared_key_label_layout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/peer_title">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/peer_public_key"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:imeOptions="actionNext"
-            android:inputType="textNoSuggestions|textVisiblePassword" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/pre_shared_key_label_layout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:hint="@string/lbl_preshared_key"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
-        app:expandedHintEnabled="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/public_key_label_layout">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/peer_preshared_key"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/lbl_optional"
-            android:imeOptions="actionNext"
-            android:inputType="textNoSuggestions|textPassword" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/persistent_keepalive_label_layout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:hint="@string/lbl_persistent_keepalive"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
-        app:expandedHintEnabled="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pre_shared_key_label_layout">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/peer_persistent_keep_alive"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/lbl_optional"
-            android:imeOptions="actionNext"
-            android:inputType="number" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/endpoint_label_layout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:hint="@string/parse_error_inet_endpoint"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/persistent_keepalive_label_layout">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/peer_endpoint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:imeOptions="actionNext"
-            android:inputType="textNoSuggestions|textVisiblePassword" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/allowed_ips_label_layout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:hint="@string/lbl_allowed_ips"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/endpoint_label_layout">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/peer_allowed_ips"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:imeOptions="actionDone"
-            android:inputType="textNoSuggestions|textVisiblePassword" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/custom_dialog_dismiss_button"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/lbl_dismiss"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/allowed_ips_label_layout" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
+        android:layout_margin="8dp"
+        android:elevation="8dp"
+        android:focusableInTouchMode="true"
+        app:cardBackgroundColor="?attr/background"
+        app:cardCornerRadius="16dp">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/custom_dialog_ok_button"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/lbl_save"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view"
-        app:layout_constraintLeft_toRightOf="@+id/guideline"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/allowed_ips_label_layout" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/peer_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:paddingTop="5dp"
+                    android:text="@string/add_peer"
+                    android:textColor="?attr/secondaryTextColor"
+                    android:textSize="@dimen/extra_large_font_text_view"
+                    app:layout_constraintBottom_toTopOf="@+id/public_key_label_layout"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/public_key_label_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:hint="@string/lbl_public_key"
+                    android:paddingTop="15dp"
+                    app:boxCornerRadiusBottomEnd="8dp"
+                    app:boxCornerRadiusBottomStart="8dp"
+                    app:boxCornerRadiusTopEnd="8dp"
+                    app:boxCornerRadiusTopStart="8dp"
+                    app:layout_constraintBottom_toTopOf="@+id/pre_shared_key_label_layout"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/peer_title">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/peer_public_key"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionNext"
+                        android:inputType="textNoSuggestions|textVisiblePassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/pre_shared_key_label_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:hint="@string/lbl_preshared_key"
+                    android:paddingTop="15dp"
+                    app:boxCornerRadiusBottomEnd="8dp"
+                    app:boxCornerRadiusBottomStart="8dp"
+                    app:boxCornerRadiusTopEnd="8dp"
+                    app:boxCornerRadiusTopStart="8dp"
+                    app:expandedHintEnabled="false"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/public_key_label_layout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/peer_preshared_key"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/lbl_optional"
+                        android:imeOptions="actionNext"
+                        android:inputType="textNoSuggestions|textPassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/persistent_keepalive_label_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:hint="@string/lbl_persistent_keepalive"
+                    android:paddingTop="15dp"
+                    app:boxCornerRadiusBottomEnd="8dp"
+                    app:boxCornerRadiusBottomStart="8dp"
+                    app:boxCornerRadiusTopEnd="8dp"
+                    app:boxCornerRadiusTopStart="8dp"
+                    app:expandedHintEnabled="false"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/pre_shared_key_label_layout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/peer_persistent_keep_alive"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/lbl_optional"
+                        android:imeOptions="actionNext"
+                        android:inputType="number" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/endpoint_label_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:hint="@string/parse_error_inet_endpoint"
+                    android:paddingTop="15dp"
+                    app:boxCornerRadiusBottomEnd="8dp"
+                    app:boxCornerRadiusBottomStart="8dp"
+                    app:boxCornerRadiusTopEnd="8dp"
+                    app:boxCornerRadiusTopStart="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/persistent_keepalive_label_layout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/peer_endpoint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:imeOptions="actionNext"
+                        android:inputType="textNoSuggestions|textVisiblePassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/allowed_ips_label_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:hint="@string/lbl_allowed_ips"
+                    android:paddingTop="15dp"
+                    app:boxCornerRadiusBottomEnd="8dp"
+                    app:boxCornerRadiusBottomStart="8dp"
+                    app:boxCornerRadiusTopEnd="8dp"
+                    app:boxCornerRadiusTopStart="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/endpoint_label_layout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/peer_allowed_ips"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:imeOptions="actionDone"
+                        android:inputType="textNoSuggestions|textVisiblePassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_above="@id/lb_action_container"
+                android:background="?attr/border" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/lb_action_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/custom_dialog_dismiss_button"
+                    style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:text="@string/lbl_dismiss"
+                    android:textColor="?attr/accentGood"
+                    android:textSize="@dimen/large_font_text_view"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@+id/guideline"
+                    app:layout_constraintTop_toBottomOf="@+id/custom_dialog_ok_button" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/custom_dialog_ok_button"
+                    style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:text="@string/lbl_save"
+                    android:textColor="?attr/accentGood"
+                    android:textSize="@dimen/large_font_text_view"
+                    app:layout_constraintLeft_toRightOf="@+id/guideline"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/save_tunnel" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </RelativeLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

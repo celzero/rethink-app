@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.service
 
+import Logger
+import Logger.LOG_TAG_CONNECTION
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.LinkProperties
@@ -29,10 +31,7 @@ import android.os.Message
 import android.os.SystemClock
 import android.system.ErrnoException
 import android.system.OsConstants.ECONNREFUSED
-import android.util.Log
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.InternetProtocol
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_CONNECTION
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isNetworkSame
@@ -49,14 +48,15 @@ import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.Collections
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
 
-class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
+class ConnectionMonitor(private val networkListener: NetworkListener) :
     ConnectivityManager.NetworkCallback(), KoinComponent {
 
-    private val networkSet: MutableSet<Network> = mutableSetOf()
+    private val networkSet: MutableSet<Network> = ConcurrentHashMap.newKeySet()
 
     // add cellular, wifi, bluetooth, ethernet, vpn, wifi aware, low pan
     private val networkRequest: NetworkRequest =
@@ -70,26 +70,10 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             // api26: .addTransportType(NetworkCapabilities.TRANSPORT_LOWPAN)
             .build()
 
-    /*
-        // android validated networks builder
-           NetworkRequest.Builder()
-               .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-               .addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-               .apply { if (isAtleastS()) setIncludeOtherUidNetworks(true) }
-               .build()
-
-    */
-
-    // An Android handler thread internally operates on a looper
-    // ref:
-    // alvinalexander.com/java/jwarehouse/android/core/java/android/app/IntentService.java.shtml
-    private var handlerThread: HandlerThread
     private var serviceHandler: NetworkRequestHandler? = null
     private val persistentState by inject<PersistentState>()
 
-    private var connectivityManager: ConnectivityManager =
-        context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
-            as ConnectivityManager
+    private lateinit var connectivityManager: ConnectivityManager
 
     companion object {
         // add active network as underlying vpn network
@@ -127,18 +111,6 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         val testReachability: Boolean
     )
 
-    init {
-        try {
-            connectivityManager.registerNetworkCallback(networkRequest, this)
-        } catch (e: Exception) {
-            Log.w(LOG_TAG_CONNECTION, "Exception while registering network callback", e)
-            networkListener.onNetworkRegistrationFailed()
-        }
-        this.handlerThread = HandlerThread(NetworkRequestHandler::class.simpleName)
-        this.handlerThread.start()
-        this.serviceHandler = NetworkRequestHandler(context, handlerThread.looper, networkListener)
-    }
-
     interface NetworkListener {
         fun onNetworkDisconnected(networks: UnderlyingNetworks)
 
@@ -147,48 +119,33 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         fun onNetworkRegistrationFailed()
     }
 
-    fun onVpnStop() {
-        connectivityManager.unregisterNetworkCallback(this)
-        destroy()
-    }
-
-    private fun destroy() {
-        this.serviceHandler?.removeCallbacksAndMessages(null)
-        this.handlerThread.quitSafely()
-        this.serviceHandler = null
-    }
-
     override fun onAvailable(network: Network) {
         networkSet.add(network)
         val cap = connectivityManager.getNetworkCapabilities(network)
-        if (DEBUG)
-            Log.d(
-                LOG_TAG_CONNECTION,
-                "onAvailable: ${network.networkHandle}, $network, ${networkSet.size}, ${networkType(cap)}"
-            )
+        Logger.d(
+            LOG_TAG_CONNECTION,
+            "onAvailable: ${network.networkHandle}, $network, ${networkSet.size}, ${networkType(cap)}"
+        )
         handleNetworkChange()
     }
 
     override fun onLost(network: Network) {
         networkSet.remove(network)
         val cap = connectivityManager.getNetworkCapabilities(network)
-        if (DEBUG)
-            Log.d(
-                LOG_TAG_CONNECTION,
-                "onLost: ${network.networkHandle}, $network, ${networkSet.size}, ${networkType(cap)}"
-            )
+        Logger.d(
+            LOG_TAG_CONNECTION,
+            "onLost: ${network.networkHandle}, $network, ${networkSet.size}, ${networkType(cap)}"
+        )
         handleNetworkChange()
     }
 
     override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
-        if (DEBUG)
-            Log.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged, ${network.networkHandle}, $network")
+        Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged, ${network.networkHandle}, $network")
         handleNetworkChange(isForceUpdate = false, TimeUnit.SECONDS.toMillis(3))
     }
 
     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
-        if (DEBUG)
-            Log.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged: ${network.networkHandle}, $network")
+        Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged: ${network.networkHandle}, $network")
         handleNetworkChange(isForceUpdate = true, TimeUnit.SECONDS.toMillis(3))
     }
 
@@ -196,8 +153,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
      * Handles user preference changes, ie, when the user elects to see either multiple underlying
      * networks, or just one (the active network).
      */
-    fun onUserPreferenceChangedLocked() {
-        if (DEBUG) Log.d(LOG_TAG_CONNECTION, "onUserPreferenceChanged")
+    fun onUserPreferenceChanged() {
+        Logger.d(LOG_TAG_CONNECTION, "onUserPreferenceChanged")
         handleNetworkChange(isForceUpdate = true)
     }
 
@@ -205,9 +162,36 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
      * Force updates the VPN's underlying network based on the preference. Will be initiated when
      * the VPN start is completed.
      */
-    fun onVpnStartLocked() {
-        Log.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
+    fun onVpnStart(context: Context) {
+        if (this.serviceHandler != null) {
+            Logger.w(LOG_TAG_CONNECTION, "connection monitor is already running")
+            return
+        }
+
+        Logger.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
+        connectivityManager =
+            context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
+                as ConnectivityManager
+        try {
+            connectivityManager.registerNetworkCallback(networkRequest, this)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_CONNECTION, "Exception while registering network callback", e)
+            networkListener.onNetworkRegistrationFailed()
+            return
+        }
+
+        val handlerThread = HandlerThread(NetworkRequestHandler::class.simpleName)
+        handlerThread.start()
+        this.serviceHandler =
+            NetworkRequestHandler(connectivityManager, handlerThread.looper, networkListener)
         handleNetworkChange(isForceUpdate = true)
+    }
+
+    fun onVpnStop() {
+        connectivityManager.unregisterNetworkCallback(this)
+        this.serviceHandler?.removeCallbacksAndMessages(null)
+        serviceHandler?.looper?.quitSafely()
+        this.serviceHandler = null
     }
 
     private fun handleNetworkChange(
@@ -265,10 +249,11 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
     // Handles the network messages from the callback from the connectivity manager
     private class NetworkRequestHandler(
-        ctx: Context,
+        val connectivityManager: ConnectivityManager,
         looper: Looper,
         val listener: NetworkListener
     ) : Handler(looper) {
+
         // number of times the reachability check is performed due to failures
         private var reachabilityCount = 0L
         private val maxReachabilityCount = 10L
@@ -302,10 +287,6 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         var trackedIpv4Networks: LinkedHashSet<NetworkProperties> = linkedSetOf()
         var trackedIpv6Networks: LinkedHashSet<NetworkProperties> = linkedSetOf()
 
-        var connectivityManager: ConnectivityManager =
-            ctx.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
-                as ConnectivityManager
-
         override fun handleMessage(msg: Message) {
             // isForceUpdate - true if onUserPreferenceChanged is changes, the messages should be
             // processed forcefully regardless of the current and new networks.
@@ -333,10 +314,10 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             val newNetworks = createNetworksSet(newActiveNetwork, opPrefs.networkSet)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
 
-            Log.i(
+            Logger.i(
                 LOG_TAG_CONNECTION,
                 "Connected network: ${newActiveNetwork?.networkHandle} ${networkType(newActiveNetworkCap)
-                            }, new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, auto? ${opPrefs.testReachability}"
+                            }, new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}"
             )
 
             if (isNewNetwork || opPrefs.isForceUpdate) {
@@ -354,9 +335,9 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             val newNetworks = createNetworksSet(newActiveNetwork, opPrefs.networkSet)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
 
-            Log.i(
+            Logger.i(
                 LOG_TAG_CONNECTION,
-                "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks}, ${newNetworks}; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, auto? ${opPrefs.testReachability}"
+                "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks}, ${newNetworks}; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}"
             )
 
             if (isNewNetwork || opPrefs.isForceUpdate) {
@@ -373,7 +354,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             // TODO: use currentNetworks instead of trackedIpv4Networks and trackedIpv6Networks
             // to determine whether to call onNetworkConnected or onNetworkDisconnected
             val sz = trackedIpv4Networks.size + trackedIpv6Networks.size
-            Log.i(
+            Logger.i(
                 LOG_TAG_CONNECTION,
                 "inform network change: ${sz}, all? $useActiveNetwork, metered? $isActiveNetworkMetered"
             )
@@ -395,13 +376,11 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         SystemClock.elapsedRealtime(),
                         Collections.unmodifiableMap(dnsServers)
                     )
-                if (DEBUG) {
-                    trackedIpv4Networks.forEach {
-                        Log.d(LOG_TAG_CONNECTION, "inform4: ${it.network}, ${it.networkType}, $sz")
-                    }
-                    trackedIpv6Networks.forEach {
-                        Log.d(LOG_TAG_CONNECTION, "inform6: ${it.network}, ${it.networkType}, $sz")
-                    }
+                trackedIpv4Networks.forEach {
+                    Logger.d(LOG_TAG_CONNECTION, "inform4: ${it.network}, ${it.networkType}, $sz")
+                }
+                trackedIpv6Networks.forEach {
+                    Logger.d(LOG_TAG_CONNECTION, "inform6: ${it.network}, ${it.networkType}, $sz")
                 }
                 listener.onNetworkConnected(underlyingNetworks)
             } else {
@@ -466,7 +445,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             }
             // set mtu to MIN_MTU (1280) if mtu4/mtu6 are less than MIN_MTU
             val mtu = max(min(minMtu4, minMtu6), MIN_MTU)
-            Log.i(LOG_TAG_CONNECTION, "mtu4: $minMtu4, mtu6: $minMtu6; final mtu: $mtu")
+            Logger.i(LOG_TAG_CONNECTION, "mtu4: $minMtu4, mtu6: $minMtu6; final mtu: $mtu")
             return mtu
         }
 
@@ -495,18 +474,21 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             trackedIpv4Networks.clear()
             trackedIpv6Networks.clear()
 
+            // BraveVPNService also fails open, see FAIL_OPEN_ON_NO_NETWORK
+            val isAnyNwValidated = networks.any { isNwValidated(it.network) }
+
             networks.forEach outer@{ prop ->
                 val network: Network = prop.network
 
                 val lp = connectivityManager.getLinkProperties(network)
                 if (lp == null) {
-                    Log.i(LOG_TAG_CONNECTION, "skipping: $network; no link properties")
+                    Logger.i(LOG_TAG_CONNECTION, "skipping: $network; no link properties")
                     return@outer
                 }
 
                 val isActive = isNetworkSame(network, activeNetwork)
                 if (isActive) {
-                    if (DEBUG) Log.d(LOG_TAG_CONNECTION, "processing active network: $network")
+                    Logger.d(LOG_TAG_CONNECTION, "processing active network: $network")
                 }
 
                 if (testReachability) {
@@ -519,13 +501,15 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     val has6 = probeConnectivity(ip6probes, network, useIcmp)
                     if (has4) trackedIpv4Networks.add(prop)
                     if (has6) trackedIpv6Networks.add(prop)
-                    Log.i(LOG_TAG_CONNECTION, "nw: has4? $has4, has6? $has6, $prop")
+                    Logger.i(LOG_TAG_CONNECTION, "nw: has4? $has4, has6? $has6, $prop")
                     if (has4 || has6) return@outer
                     // else: fall-through to check reachability with network capabilities
                 }
 
                 // see #createNetworksSet for why we are using hasInternet
-                if (hasInternet(network) == true) {
+                // if no network has been validated, then fail open
+                val failOpen = !isAnyNwValidated && BraveVPNService.FAIL_OPEN_ON_NO_NETWORK
+                if (hasInternet(network) == true && (failOpen || isNwValidated(network))) {
                     var hasDefaultRoute4 = false
                     var hasDefaultRoute6 = false
                     lp.routes.forEach rloop@{
@@ -548,18 +532,18 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         trackedIpv4Networks.add(prop)
                     }
 
-                    Log.i(
+                    Logger.i(
                         LOG_TAG_CONNECTION,
                         "nw: default4? $hasDefaultRoute4, default6? $hasDefaultRoute6 for $prop"
                     )
                 } else {
-                    Log.i(LOG_TAG_CONNECTION, "skip: $network; no internet capability")
+                    Logger.i(LOG_TAG_CONNECTION, "skip: $network; no internet capability")
                 }
             }
 
             redoReachabilityIfNeeded(trackedIpv4Networks, trackedIpv6Networks, opPrefs)
 
-            Log.d(
+            Logger.d(
                 LOG_TAG_CONNECTION,
                 "repopulate v6: $trackedIpv6Networks,\nv4: $trackedIpv4Networks"
             )
@@ -574,7 +558,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         ) {
             if (ipv4.isEmpty() && ipv6.isEmpty()) {
                 reachabilityCount++
-                Log.i(LOG_TAG_CONNECTION, "redo reachability, try: $reachabilityCount")
+                Logger.i(LOG_TAG_CONNECTION, "redo reachability, try: $reachabilityCount")
                 if (reachabilityCount > maxReachabilityCount) return
                 val message = Message.obtain()
                 // assume opPrefs is immutable
@@ -583,7 +567,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 val delay = TimeUnit.SECONDS.toMillis(10 * reachabilityCount)
                 this.sendMessageDelayed(message, delay)
             } else {
-                Log.d(LOG_TAG_CONNECTION, "reset reachability count, prev: $reachabilityCount")
+                Logger.d(LOG_TAG_CONNECTION, "reset reachability count, prev: $reachabilityCount")
                 // reset the reachability count
                 reachabilityCount = 0
             }
@@ -648,20 +632,16 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         null
                     }
                 // test for internet capability iff opPrefs.testReachability is false
-                if (/*hasInternet(it) == true &&*/ isVPN(it) == false) {
-                    if (activeProp != null) {
-                        newNetworks.add(activeProp)
-                    }
-                } else {
-                    // no-op
+                if (/*hasInternet(it) == true &&*/ activeProp != null && isVPN(it) == false) {
+                    newNetworks.add(activeProp)
                 }
             }
             val networks =
                 if (networkSet.isEmpty()) {
-                    if (DEBUG) Log.d(LOG_TAG_CONNECTION, "networkSet is empty")
+                    Logger.d(LOG_TAG_CONNECTION, "networkSet is empty")
                     connectivityManager.allNetworks
                 } else {
-                    if (DEBUG) Log.d(LOG_TAG_CONNECTION, "networkSet size: ${networkSet.size}")
+                    Logger.d(LOG_TAG_CONNECTION, "networkSet size: ${networkSet.size}")
                     networkSet.toTypedArray()
                 }
 
@@ -681,12 +661,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 }
 
                 // test for internet capability iff opPrefs.testReachability is false
-                if (/*hasInternet(it) == true &&*/ isVPN(it) == false) {
-                    if (prop != null) {
-                        newNetworks.add(prop)
-                    }
-                } else {
-                    // no-op
+                if (/*hasInternet(it) == true &&*/ prop != null && isVPN(it) == false) {
+                    newNetworks.add(prop)
                 }
             }
 
@@ -720,10 +696,10 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
                 val yes = tcp80(nw, host) || udp53(nw, host) || tcp53(nw, host)
 
-                if (DEBUG) Log.d(LOG_TAG_CONNECTION, "$host isReachable on network($nw): $yes")
+                Logger.d(LOG_TAG_CONNECTION, "$host isReachable on network($nw): $yes")
                 return yes
             } catch (e: Exception) {
-                Log.w(LOG_TAG_CONNECTION, "err isReachable: ${e.message}")
+                Logger.w(LOG_TAG_CONNECTION, "err isReachable: ${e.message}")
             }
             return false
         }
@@ -745,10 +721,10 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 // InetAddress.getByName() will bind the socket to the default active network.
                 val yes = InetAddress.getByName(host).isReachable(timeout)
 
-                if (DEBUG) Log.d(LOG_TAG_CONNECTION, "$host isReachable on network: $yes")
+                Logger.d(LOG_TAG_CONNECTION, "$host isReachable on network: $yes")
                 return yes
             } catch (e: Exception) {
-                Log.w(LOG_TAG_CONNECTION, "err isReachable: ${e.message}")
+                Logger.w(LOG_TAG_CONNECTION, "err isReachable: ${e.message}")
             }
             return false
         }
@@ -766,20 +742,19 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 socket.connect(s, timeout)
                 val c = socket.isConnected
                 val b = socket.isBound
-                if (DEBUG)
-                    Log.d(LOG_TAG_CONNECTION, "tcpEcho80: $host, ${nw?.networkHandle}: $c, $b")
+                Logger.d(LOG_TAG_CONNECTION, "tcpEcho80: $host, ${nw?.networkHandle}: $c, $b")
 
                 return true
             } catch (e: IOException) {
-                Log.w(LOG_TAG_CONNECTION, "err tcpEcho80: ${e.message}, ${e.cause}")
+                Logger.w(LOG_TAG_CONNECTION, "err tcpEcho80: ${e.message}, ${e.cause}")
                 val cause: Throwable = e.cause ?: return false
 
                 return (cause is ErrnoException && cause.errno == ECONNREFUSED)
             } catch (e: IllegalArgumentException) {
-                Log.w(LOG_TAG_CONNECTION, "err tcpEcho80: ${e.message}, ${e.cause}")
+                Logger.w(LOG_TAG_CONNECTION, "err tcpEcho80: ${e.message}, ${e.cause}")
                 return false
             } catch (e: SecurityException) {
-                Log.w(LOG_TAG_CONNECTION, "err tcpEcho80: ${e.message}, ${e.cause}")
+                Logger.w(LOG_TAG_CONNECTION, "err tcpEcho80: ${e.message}, ${e.cause}")
                 return false
             } finally {
                 clos(socket)
@@ -798,18 +773,17 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 socket.connect(s, timeout)
                 val c = socket.isConnected
                 val b = socket.isBound
-                if (DEBUG)
-                    Log.d(LOG_TAG_CONNECTION, "tcpEcho53: $host, ${nw?.networkHandle}: $c, $b")
+                Logger.d(LOG_TAG_CONNECTION, "tcpEcho53: $host, ${nw?.networkHandle}: $c, $b")
                 return true
             } catch (e: IOException) {
-                Log.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
+                Logger.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
                 val cause: Throwable = e.cause ?: return false
 
                 return (cause is ErrnoException && cause.errno == ECONNREFUSED)
             } catch (e: IllegalArgumentException) {
-                Log.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
+                Logger.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
             } catch (e: SecurityException) {
-                Log.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
+                Logger.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
             } finally {
                 clos(socket)
             }
@@ -829,17 +803,17 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 socket.connect(s)
                 val c = socket.isConnected
                 val b = socket.isBound
-                if (DEBUG) Log.d(LOG_TAG_CONNECTION, "udpEcho: $host, ${nw?.networkHandle}: $c, $b")
+                Logger.d(LOG_TAG_CONNECTION, "udpEcho: $host, ${nw?.networkHandle}: $c, $b")
                 return true
             } catch (e: IOException) {
-                Log.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}, ${e.cause}")
+                Logger.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}, ${e.cause}")
                 val cause: Throwable = e.cause ?: return false
 
                 return (cause is ErrnoException && cause.errno == ECONNREFUSED)
             } catch (e: IllegalArgumentException) {
-                Log.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}, ${e.cause}")
+                Logger.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}, ${e.cause}")
             } catch (e: SecurityException) {
-                Log.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}, ${e.cause}")
+                Logger.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}, ${e.cause}")
             } finally {
                 clos(socket)
             }

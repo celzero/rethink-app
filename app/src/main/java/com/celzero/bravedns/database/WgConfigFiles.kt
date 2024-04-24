@@ -19,6 +19,18 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
+data class WgConfigFilesImmutable(
+    val id: Int,
+    val name: String,
+    val configPath: String,
+    val serverResponse: String,
+    val isActive: Boolean,
+    val isCatchAll: Boolean,
+    val isLockdown: Boolean,
+    val oneWireGuard: Boolean,
+    val isDeletable: Boolean
+)
+
 @Entity(tableName = "WgConfigFiles")
 class WgConfigFiles {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
@@ -69,7 +81,8 @@ class WgConfigFiles {
         isActive: Boolean,
         isCatchAll: Boolean,
         isLockdown: Boolean,
-        oneWireGuard: Boolean
+        oneWireGuard: Boolean,
+        isDeletable: Boolean
     ) {
         this.name = name
         this.configPath = configPath
@@ -78,5 +91,35 @@ class WgConfigFiles {
         this.isCatchAll = isCatchAll
         this.isLockdown = isLockdown
         this.oneWireGuard = oneWireGuard
+        this.isDeletable = isDeletable
+    }
+
+    fun toImmutable(): WgConfigFilesImmutable {
+        return WgConfigFilesImmutable(
+            id,
+            name,
+            configPath,
+            serverResponse,
+            isActive,
+            isCatchAll,
+            isLockdown,
+            oneWireGuard,
+            isDeletable
+        )
+    }
+
+    companion object {
+        fun fromImmutable(data: WgConfigFilesImmutable): WgConfigFiles {
+            return WgConfigFiles(
+                data.id,
+                data.name,
+                data.configPath,
+                data.serverResponse,
+                data.isActive,
+                data.isCatchAll,
+                data.isLockdown,
+                data.oneWireGuard
+            )
+        }
     }
 }

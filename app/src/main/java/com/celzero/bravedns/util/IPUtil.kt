@@ -15,7 +15,8 @@
  */
 package com.celzero.bravedns.util
 
-import android.util.Log
+import Logger
+import Logger.LOG_TAG_VPN
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
@@ -122,11 +123,7 @@ class IPUtil {
             if (start == null || end == null) return null
 
             val listResult: MutableList<CIDR> = ArrayList()
-            if (DEBUG)
-                Log.d(
-                    Logger.LOG_TAG_VPN,
-                    "toCIDR(" + start.hostAddress + "," + end.hostAddress + ")"
-                )
+            Logger.d(LOG_TAG_VPN, "toCIDR(" + start.hostAddress + "," + end.hostAddress + ")")
             var from: Long = inet2long(start)
             val to: Long = inet2long(end)
             while (to >= from) {
@@ -142,7 +139,7 @@ class IPUtil {
                 from += 2.0.pow((32 - prefix).toDouble()).toLong()
             }
             if (DEBUG) {
-                for (cidr in listResult) Log.d(Logger.LOG_TAG_VPN, cidr.toString())
+                for (cidr in listResult) Logger.d(LOG_TAG_VPN, cidr.toString())
             }
             return listResult
         }
@@ -195,7 +192,7 @@ class IPUtil {
                 address = InetAddress.getByName(ip)
                 this.prefix = prefix
             } catch (ex: UnknownHostException) {
-                Log.e(Logger.LOG_TAG_VPN, "error parsing CIDR, $ip, $prefix, $ex")
+                Logger.e(LOG_TAG_VPN, "error parsing CIDR, $ip, $prefix, $ex")
             }
         }
 

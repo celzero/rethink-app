@@ -15,14 +15,12 @@
  */
 package com.celzero.bravedns.service
 
-import android.util.Log
+import Logger
+import Logger.LOG_TAG_PROXY
 import backend.Backend
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ProxyAppMappingRepository
 import com.celzero.bravedns.database.ProxyApplicationMapping
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_PROXY
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.concurrent.CopyOnWriteArraySet
@@ -30,7 +28,6 @@ import java.util.concurrent.CopyOnWriteArraySet
 object ProxyManager : KoinComponent {
 
     private val db: ProxyAppMappingRepository by inject()
-    private val appConfig: AppConfig by inject()
 
     const val ID_ORBOT_BASE = "ORBOT"
     const val ID_WG_BASE = "wg"
@@ -44,7 +41,7 @@ object ProxyManager : KoinComponent {
 
     // we are using ProxyAppMapTuple instead of ProxyApplicationMapping for the pamSet as the equals
     // and hash method implementation is overridden and cannot be used for the pamSet
-    data class ProxyAppMapTuple(val uid: Int, val packageName: String, var proxyId: String)
+    data class ProxyAppMapTuple(val uid: Int, val packageName: String, val proxyId: String)
 
     // TODO: consider adding other proxy modes (e.g, Wireguard, Rethink, etc.)
     enum class ProxyMode(val value: Int) {
@@ -83,12 +80,13 @@ object ProxyManager : KoinComponent {
         }
     }
 
-    private var pamSet = CopyOnWriteArraySet<ProxyAppMapTuple>()
+    private val pamSet = CopyOnWriteArraySet<ProxyAppMapTuple>()
 
     suspend fun load(): Int {
         val a = db.getApps()
-        val tuple = a.map { ProxyAppMapTuple(it.uid, it.packageName, it.proxyId) }
-        pamSet = CopyOnWriteArraySet(tuple)
+        val entries = a.map { ProxyAppMapTuple(it.uid, it.packageName, it.proxyId) }
+        pamSet.clear()
+        pamSet.addAll(entries)
         return a.size
     }
 
@@ -97,128 +95,126 @@ object ProxyManager : KoinComponent {
         return m?.proxyId ?: ID_NONE
     }
 
-    suspend fun updateProxyIdForApp(uid: Int, proxyId: String, proxyName: String) {
-        val m = pamSet.filter { it.uid == uid }
-        if (!isValidProxyPrefix(proxyId)) {
-            Log.e(LOG_TAG_PROXY, "Invalid config id: $proxyId")
+    // get the proxy id for the app, if not found return the default proxy id.
+    // proxyId cannot be empty.
+    suspend fun updateProxyIdForApp(uid: Int, nonEmptyProxyId: String, proxyName: String) {
+        if (!isValidProxyPrefix(nonEmptyProxyId)) {
+            Logger.e(LOG_TAG_PROXY, "cannot update $nonEmptyProxyId; setNoProxyForApp instead?")
             return
         }
 
+        val m = pamSet.filter { it.uid == uid } // returns a reference to underlying data-class
         if (m.isNotEmpty()) {
-            m.forEach {
-                if (DEBUG) Log.d(LOG_TAG_PROXY, "add $proxyId for ${it.packageName} / uid $uid")
-                it.proxyId = proxyId
-            }
-            db.updateProxyIdForApp(uid, proxyId, proxyName)
+            val n = m.map { ProxyAppMapTuple(it.uid, it.packageName, nonEmptyProxyId) }
+            // in-place updates in Set does not remove dups on conflicts: pl.kotl.in/hEHOgk3V0
+            // that is, m.forEach { it.proxyName = nonEmptyProxyId } will not de-dup an existing
+            // entry with the same uid+package-name+proxy-id, and instead will retain both entries.
+            pamSet.removeAll(m.toSet())
+            pamSet.addAll(n)
+            db.updateProxyIdForApp(uid, nonEmptyProxyId, proxyName)
         } else {
-            Log.e(LOG_TAG_PROXY, "updateProxyIdForApp: map not found for uid $uid")
+            Logger.e(LOG_TAG_PROXY, "updateProxyIdForApp: map not found for uid $uid")
         }
     }
 
-    fun isProxyActive(proxyId: String): Boolean {
-        return if (proxyId.contains(ID_NONE)) {
-            false
-        } else if (proxyId.contains(ID_ORBOT_BASE)) {
-            appConfig.isOrbotProxyEnabled()
-        } else if (proxyId.contains(ID_WG_BASE)) {
-            WireguardManager.isConfigActive(proxyId)
-        } else if (proxyId.contains(ID_TCP_BASE)) {
-            TcpProxyHelper.isTcpProxyEnabled()
-        } else if (proxyId.contains(ID_S5_BASE)) {
-            appConfig.isCustomSocks5Enabled()
-        } else if (proxyId.contains(ID_HTTP_BASE)) {
-            appConfig.isCustomHttpProxyEnabled()
-        } else {
-            false
-        }
-    }
-
-    fun getProxyMapping(): MutableSet<FirewallManager.AppInfoTuple> {
+    fun trackedApps(): MutableSet<FirewallManager.AppInfoTuple> {
         return pamSet.map { FirewallManager.AppInfoTuple(it.uid, it.packageName) }.toMutableSet()
     }
 
     suspend fun setProxyIdForAllApps(proxyId: String, proxyName: String) {
         // ID_NONE or empty proxy-id is not allowed; see removeProxyForAllApps()
         if (!isValidProxyPrefix(proxyId)) {
-            Log.e(LOG_TAG_PROXY, "Invalid proxy id: $proxyId")
+            Logger.e(LOG_TAG_PROXY, "Invalid proxy id: $proxyId")
             return
         }
-        pamSet.forEach { it.proxyId = proxyId }
+        val m = pamSet.map { ProxyAppMapTuple(it.uid, it.packageName, proxyId) }
+        pamSet.clear()
+        pamSet.addAll(m)
         db.updateProxyForAllApps(proxyId, proxyName)
-        Log.i(LOG_TAG_PROXY, "added all apps to proxy: $proxyId")
+        Logger.i(LOG_TAG_PROXY, "added all apps to proxy: $proxyId")
     }
 
     suspend fun updateProxyNameForProxyId(proxyId: String, proxyName: String) {
+        // pamSet does not store proxy-name, so nothing to update there
         db.updateProxyNameForProxyId(proxyId, proxyName)
     }
 
     suspend fun setProxyIdForUnselectedApps(proxyId: String, proxyName: String) {
         // ID_NONE or empty proxy-id is not allowed
         if (!isValidProxyPrefix(proxyId)) {
-            Log.e(LOG_TAG_PROXY, "Invalid proxy id: $proxyId")
+            Logger.e(LOG_TAG_PROXY, "Invalid proxy id: $proxyId")
             return
         }
-        pamSet.filter { it.proxyId == "" }.forEach { it.proxyId = proxyId }
+        val m = pamSet.filter { it.proxyId == "" }.toSet()
+        val n = m.map { ProxyAppMapTuple(it.uid, it.packageName, proxyId) }
+        pamSet.removeAll(m)
+        pamSet.addAll(n)
         db.updateProxyForUnselectedApps(proxyId, proxyName)
-        Log.i(LOG_TAG_PROXY, "added unselected apps to interface: $proxyId")
+        Logger.i(LOG_TAG_PROXY, "added unselected apps to interface: $proxyId")
     }
 
-    suspend fun removeProxyIdForApp(uid: Int) {
-        val m = pamSet.filter { it.uid == uid }
+    suspend fun setNoProxyForApp(uid: Int) {
+        val noProxy = ""
+        val m = pamSet.filter { it.uid == uid }.toSet()
         if (m.isNotEmpty()) {
-            m.forEach { it.proxyId = "" }
+            val n = m.map { ProxyAppMapTuple(it.uid, it.packageName, noProxy) }
+            pamSet.removeAll(m)
+            pamSet.addAll(n)
             // update the id as empty string to remove the proxy
-            db.updateProxyIdForApp(uid, "", "")
+            db.updateProxyIdForApp(uid, noProxy, noProxy)
         } else {
-            Log.e(LOG_TAG_PROXY, "app config mapping is null for uid $uid on removeProxyIdForApp")
+            Logger.e(LOG_TAG_PROXY, "app config mapping is null for uid $uid on setNoProxyForApp")
         }
     }
 
-    suspend fun removeProxyForAllApps() {
-        Log.i(LOG_TAG_PROXY, "Removing all apps from proxy")
-        pamSet.forEach { it.proxyId = "" }
-        db.updateProxyForAllApps("", "")
+    suspend fun setNoProxyForAllApps() {
+        val noProxy = ""
+        Logger.i(LOG_TAG_PROXY, "Removing all apps from proxy")
+        val m = pamSet.filter { it.proxyId != noProxy }.toSet()
+        val n = m.map { ProxyAppMapTuple(it.uid, it.packageName, noProxy) }
+        pamSet.removeAll(m)
+        pamSet.addAll(n)
+        db.updateProxyForAllApps(noProxy, noProxy)
     }
 
-    suspend fun removeProxyForAllApps(proxyId: String) {
-        Log.i(LOG_TAG_PROXY, "Removing all apps from proxy with id: $proxyId")
-        pamSet.filter { it.proxyId == proxyId }.forEach { it.proxyId = "" }
+    suspend fun removeProxyId(proxyId: String) {
+        Logger.i(LOG_TAG_PROXY, "Removing all apps from proxy with id: $proxyId")
+        val noProxy = ""
+        val m = pamSet.filter { it.proxyId == proxyId }.toSet()
+        val n = m.map { ProxyAppMapTuple(it.uid, it.packageName, noProxy) }
+        pamSet.removeAll(m)
+        pamSet.addAll(n)
         db.removeAllAppsForProxy(proxyId)
     }
 
-    suspend fun deleteMappings(m: Collection<FirewallManager.AppInfoTuple>) {
+    suspend fun deleteApps(m: Collection<FirewallManager.AppInfoTuple>) {
         m.forEach { deleteApp(it) }
     }
 
-    suspend fun addMappings(m: Collection<AppInfo?>) {
+    suspend fun addApps(m: Collection<AppInfo?>) {
         m.forEach { addNewApp(it) }
     }
 
     suspend fun purgeDupsBeforeRefresh() {
         val visited = mutableSetOf<FirewallManager.AppInfoTuple>()
-        val printList = mutableListOf<FirewallManager.AppInfoTuple>()
         val dups = mutableSetOf<FirewallManager.AppInfoTuple>()
         pamSet
             .map { FirewallManager.AppInfoTuple(it.uid, it.packageName) }
-            .forEach {
-                printList.add(it)
-                if (visited.contains(it)) dups.add(it) else visited.add(it)
-            }
+            .forEach { if (visited.contains(it)) dups.add(it) else visited.add(it) }
         // duplicates are unexpected; but since refreshDatabase only deals in uid+package-name
         // and proxy-mapper primary keys on uid+package-name+proxy-id, there have been cases
         // of duplicate entries in the proxy-mapper. Purge all entries that have same
-        // uid+package-name
-        // pair. Note that, doing so also removes entry for an app even if it is currently
-        // installed.
+        // uid+package-name pair. Note that, doing so also removes entry for an app even if it is
+        // currently installed.
         // This is okay, given we do not expect any dups. Also: This fn must be called before
         // refreshDatabase so that any entries removed are added back as "new mappings" via
         // addNewApp
         if (dups.size > 0) {
-            Log.w(LOG_TAG_PROXY, "delete dup pxms: $dups")
-            deleteMappings(dups)
+            Logger.w(LOG_TAG_PROXY, "delete dup pxms: $dups")
+            deleteApps(dups)
         } else {
             // no dups found
-            Log.i(LOG_TAG_PROXY, "no dups found")
+            Logger.i(LOG_TAG_PROXY, "no dups found")
         }
     }
 
@@ -233,45 +229,37 @@ object ProxyManager : KoinComponent {
                 true,
                 proxyName
             )
-        db.insert(pam)
         val pamTuple = ProxyAppMapTuple(appInfo.uid, appInfo.packageName, proxyId)
         pamSet.add(pamTuple)
-    }
-
-    suspend fun deleteApp(appInfo: AppInfo) {
-        val pam =
-            ProxyApplicationMapping(
-                appInfo.uid,
-                appInfo.packageName,
-                appInfo.appName,
-                "",
-                false,
-                ""
-            )
-        db.delete(pam)
-        deleteFromCache(pam)
-        if (DEBUG) Log.d(LOG_TAG_PROXY, "Deleting app for proxy: ${pam.appName}, ${pam.uid}")
+        db.insert(pam)
     }
 
     private fun deleteFromCache(pam: ProxyApplicationMapping) {
-        pamSet.forEach() {
+        pamSet.forEach {
             if (it.uid == pam.uid && it.packageName == pam.packageName) {
                 pamSet.remove(it)
             }
         }
     }
 
+    suspend fun deleteApp(appInfo: AppInfo) {
+        return deleteApp(appInfo.uid, appInfo.packageName)
+    }
+
     suspend fun deleteApp(appInfoTuple: FirewallManager.AppInfoTuple) {
-        val pam =
-            ProxyApplicationMapping(appInfoTuple.uid, appInfoTuple.packageName, "", "", false, "")
-        db.delete(pam)
+        return deleteApp(appInfoTuple.uid, appInfoTuple.packageName)
+    }
+
+    suspend fun deleteApp(uid: Int, packageName: String) {
+        val pam = ProxyApplicationMapping(uid, packageName, "", "", false, "")
         deleteFromCache(pam)
-        if (DEBUG) Log.d(LOG_TAG_PROXY, "Deleting app for mapping: ${pam.appName}, ${pam.uid}")
+        db.deleteApp(pam)
+        Logger.d(LOG_TAG_PROXY, "Deleting app for mapping: ${pam.appName}, ${pam.uid}")
     }
 
     suspend fun clear() {
-        db.deleteAll()
         pamSet.clear()
+        db.deleteAll()
     }
 
     fun isAnyAppSelected(proxyId: String): Boolean {
@@ -293,8 +281,12 @@ object ProxyManager : KoinComponent {
 
     suspend fun removeWgProxies() {
         // remove all the wg proxies from the app config mappings, during restore process
+        val noProxy = ""
+        val m = pamSet.filter { it.proxyId.startsWith(ID_WG_BASE) }.toSet()
+        val n = m.map { ProxyAppMapTuple(it.uid, it.packageName, noProxy) }
+        pamSet.removeAll(m)
+        pamSet.addAll(n)
         db.removeAllWgProxies()
-        pamSet.filter { it.proxyId.startsWith(ID_WG_BASE) }.forEach { it.proxyId = "" }
     }
 
     fun isIpnProxy(ipnProxyId: String): Boolean {

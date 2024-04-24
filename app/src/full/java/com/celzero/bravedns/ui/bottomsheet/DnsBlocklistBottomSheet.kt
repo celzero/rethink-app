@@ -15,7 +15,8 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.bottomsheet
 
-import android.app.Dialog
+import Logger
+import Logger.LOG_TAG_DNS
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
@@ -23,11 +24,10 @@ import android.os.Bundle
 import android.text.Spanned
 import android.text.TextUtils
 import android.text.format.DateUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
+import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
@@ -40,7 +40,6 @@ import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
@@ -50,7 +49,6 @@ import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.fetchColor
@@ -58,6 +56,7 @@ import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
@@ -118,7 +117,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         log = Gson().fromJson(data, DnsLog::class.java)
 
         if (log == null) {
-            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, dismiss the dialog")
+            Logger.w(LOG_TAG_DNS, "Transaction detail missing, dismiss the dialog")
             this.dismiss()
             return
         }
@@ -150,7 +149,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun displayRecordTypeChip() {
         if (log == null) {
-            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update chips")
+            Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update chips")
             return
         }
 
@@ -199,7 +198,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun applyDnsRule(status: DomainRulesManager.Status) {
         if (log == null) {
-            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to apply dns rules")
+            Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to apply dns rules")
             return
         }
         io {
@@ -215,7 +214,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun displayDnsTransactionDetails() {
         if (log == null) {
-            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update ui")
+            Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update ui")
             return
         }
 
@@ -259,7 +258,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun handleBlocklistChip() {
         if (log == null) {
-            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update chips")
+            Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update chips")
             return
         }
 
@@ -292,7 +291,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun determineMaybeBlocked(): Boolean {
         if (log == null) {
-            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update chips")
+            Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update chips")
             return false
         }
 
@@ -349,10 +348,10 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun showBlocklistDialog(groupNames: Multimap<String, String>) {
         val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCanceledOnTouchOutside(true)
-        dialog.setContentView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val dialog = builder.create()
+        dialog.show()
+        dialog.setCancelable(true)
         dialogBinding.infoRulesDialogRulesDesc.text = formatText(groupNames)
         dialogBinding.infoRulesDialogRulesTitle.visibility = View.GONE
 
@@ -362,18 +361,22 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun showIpsDialog() {
         if (log == null) {
-            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, not showing dialog")
+            Logger.w(LOG_TAG_DNS, "Transaction detail missing, not showing dialog")
             return
         }
 
         val dialogBinding = DialogIpDetailsLayoutBinding.inflate(layoutInflater)
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCanceledOnTouchOutside(true)
-        dialog.setContentView(dialogBinding.root)
-        val width = (resources.displayMetrics.widthPixels * 0.75).toInt()
-        val height = (resources.displayMetrics.heightPixels * 0.5).toInt()
-        dialog.window?.setLayout(width, height)
+
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
+        lp.copyFrom(dialog.window?.attributes)
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+
+        dialog.setCancelable(true)
+        dialog.window?.attributes = lp
 
         if (b.dnsBlockFavIcon.isVisible)
             dialogBinding.ipDetailsFavIcon.setImageDrawable(b.dnsBlockFavIcon.drawable)
@@ -418,7 +421,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun displayDescription() {
         if (log == null) {
-            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update ui")
+            Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update ui")
             return
         }
 
@@ -439,7 +442,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun showResolvedState(uptime: String, latency: Long, isGrounded: Boolean) {
         if (log == null) {
-            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update ui")
+            Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update ui")
             return
         }
 
@@ -463,7 +466,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun showBlockedState(uptime: String) {
         if (log == null) {
-            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update ui")
+            Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update ui")
             return
         }
 
@@ -477,7 +480,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun displayFavIcon() {
         if (log == null) {
-            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update ui")
+            Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update ui")
             return
         }
 
@@ -505,8 +508,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         val duckduckgoUrl = FavIconDownloader.constructFavUrlDuckDuckGo(query)
         val duckduckgoDomainURL = FavIconDownloader.getDomainUrlFromFdqnDuckduckgo(query)
         try {
-            if (DEBUG)
-                Log.d(LOG_TAG_DNS_LOG, "Glide, TransactionViewHolder lookupForImageNextDns :$url")
+            Logger.d(LOG_TAG_DNS, "Glide, TransactionViewHolder lookupForImageNextDns :$url")
             val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
             Glide.with(requireContext().applicationContext)
                 .load(url)
@@ -526,11 +528,10 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                             resource: Drawable,
                             transition: Transition<in Drawable>?
                         ) {
-                            if (DEBUG)
-                                Log.d(
-                                    LOG_TAG_DNS_LOG,
-                                    "Glide - CustomViewTarget onResourceReady() nextdns: $url"
-                                )
+                            Logger.d(
+                                LOG_TAG_DNS,
+                                "Glide - CustomViewTarget onResourceReady() nextdns: $url"
+                            )
                             if (!isAdded) return
 
                             b.dnsBlockFavIcon.visibility = View.VISIBLE
@@ -545,19 +546,17 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                     }
                 )
         } catch (e: Exception) {
-            if (DEBUG)
-                Log.d(LOG_TAG_DNS_LOG, "Glide - TransactionViewHolder Exception() -${e.message}")
+            Logger.d(LOG_TAG_DNS, "Glide - TransactionViewHolder Exception() -${e.message}")
             lookupForImageDuckduckgo(duckduckgoUrl, duckduckgoDomainURL)
         }
     }
 
     private fun lookupForImageDuckduckgo(url: String, domainUrl: String) {
         try {
-            if (DEBUG)
-                Log.d(
-                    LOG_TAG_DNS_LOG,
-                    "Glide - TransactionViewHolder lookupForImageDuckduckgo: $url, $domainUrl"
-                )
+            Logger.d(
+                LOG_TAG_DNS,
+                "Glide - TransactionViewHolder lookupForImageDuckduckgo: $url, $domainUrl"
+            )
             val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
             Glide.with(requireContext().applicationContext)
                 .load(url)
@@ -581,11 +580,10 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                             resource: Drawable,
                             transition: Transition<in Drawable>?
                         ) {
-                            if (DEBUG)
-                                Log.d(
-                                    LOG_TAG_DNS_LOG,
-                                    "Glide - CustomViewTarget onResourceReady() -$url"
-                                )
+                            Logger.d(
+                                LOG_TAG_DNS,
+                                "Glide - CustomViewTarget onResourceReady() -$url"
+                            )
                             if (!isAdded) return
 
                             b.dnsBlockFavIcon.visibility = View.VISIBLE
@@ -600,8 +598,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                     }
                 )
         } catch (e: Exception) {
-            if (DEBUG)
-                Log.d(LOG_TAG_DNS_LOG, "Glide - TransactionViewHolder Exception() -${e.message}")
+            Logger.d(LOG_TAG_DNS, "Glide - TransactionViewHolder Exception() -${e.message}")
             if (!isAdded) return
 
             b.dnsBlockFavIcon.visibility = View.GONE

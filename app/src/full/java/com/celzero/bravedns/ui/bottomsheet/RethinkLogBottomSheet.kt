@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import Logger
+import Logger.LOG_TAG_FIREWALL
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -22,7 +24,6 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.text.format.DateUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,7 +40,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -105,7 +105,7 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     private fun initView() {
         if (info == null) {
-            Log.w(LOG_TAG_FIREWALL, "ip-details missing: initView called before onViewCreated?")
+            Logger.w(LOG_TAG_FIREWALL, "ip-details missing: initView called before onViewCreated?")
             this.dismiss()
             return
         }
@@ -148,7 +148,7 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     override fun onResume() {
         super.onResume()
         if (info == null) {
-            Log.w(LOG_TAG_FIREWALL, "ip-details missing: initView called before onViewCreated?")
+            Logger.w(LOG_TAG_FIREWALL, "ip-details missing: initView called before onViewCreated?")
             this.dismiss()
             return
         }
@@ -190,7 +190,7 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     private fun updateConnDetailsChip() {
         if (info == null) {
-            Log.w(LOG_TAG_FIREWALL, "ip-details missing: not updating the chip details")
+            Logger.w(LOG_TAG_FIREWALL, "ip-details missing: not updating the chip details")
             return
         }
 

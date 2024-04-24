@@ -15,16 +15,15 @@
  */
 package com.celzero.bravedns.adapter
 
-import android.app.Dialog
+import Logger
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.format.DateUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.Toast
@@ -45,7 +44,6 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
@@ -106,7 +104,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                 holder.update(customIp)
             }
             else -> {
-                Log.w(Logger.LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
+                Logger.w(LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
                 return
             }
         }
@@ -720,18 +718,16 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
     }
 
     private fun showEditIpDialog(customIp: CustomIp) {
-        val dialog = Dialog(context)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(context.getString(R.string.ci_dialog_title))
         val dBind =
             DialogAddCustomIpBinding.inflate((context as CustomRulesActivity).layoutInflater)
-        dialog.setContentView(dBind.root)
-
+        val builder = MaterialAlertDialogBuilder(context).setView(dBind.root)
         val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.show()
+
         dialog.setCancelable(true)
         dialog.window?.attributes = lp
 

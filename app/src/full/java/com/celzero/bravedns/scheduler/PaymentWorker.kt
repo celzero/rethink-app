@@ -15,17 +15,15 @@
  */
 package com.celzero.bravedns.scheduler
 
+import Logger
+import Logger.LOG_TAG_DOWNLOAD
 import android.content.Context
 import android.os.SystemClock
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.customdownloader.ITcpProxy
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.service.TcpProxyHelper
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DOWNLOAD
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import retrofit2.converter.gson.GsonConverterFactory
@@ -46,13 +44,13 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
         val startTime = inputData.getLong("workerStartTime", 0)
 
         if (SystemClock.elapsedRealtime() - startTime > MAX_RETRY_TIMEOUT) {
-            Log.w(LOG_TAG_DOWNLOAD, "Payment verification timed out")
+            Logger.w(LOG_TAG_DOWNLOAD, "Payment verification timed out")
             TcpProxyHelper.updatePaymentStatus(TcpProxyHelper.PaymentStatus.FAILED)
             return Result.failure()
         }
 
         val paymentStatus = getPaymentStatusFromServer()
-        Log.i(
+        Logger.i(
             LOG_TAG_DOWNLOAD,
             "Payment status: $paymentStatus received at ${System.currentTimeMillis()}"
         )
@@ -83,11 +81,10 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
             // TODO: get refId from EncryptedFile
             val refId = ""
             val response = retrofitInterface.getPaymentStatus(refId)
-            if (DEBUG)
-                Log.d(
-                    Logger.LOG_TAG_PROXY,
-                    "getPaymentStatusFromServer: ${response?.headers()}, ${response?.message()}, ${response?.raw()?.request?.url}"
-                )
+            Logger.d(
+                Logger.LOG_TAG_PROXY,
+                "getPaymentStatusFromServer: ${response?.headers()}, ${response?.message()}, ${response?.raw()?.request?.url}"
+            )
 
             if (response?.isSuccessful == true) {
                 val jsonObject = JSONObject(response.body().toString())
@@ -96,7 +93,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                 paymentStatus =
                     TcpProxyHelper.PaymentStatus.entries.find { it.name == paymentStatusString }
                         ?: TcpProxyHelper.PaymentStatus.NOT_PAID
-                Log.i(
+                Logger.i(
                     Logger.LOG_TAG_PROXY,
                     "getPaymentStatusFromServer: status: $status, paymentStatus: $paymentStatus"
                 )
@@ -105,13 +102,13 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                 }
                 return paymentStatus
             } else {
-                Log.w(
+                Logger.w(
                     Logger.LOG_TAG_PROXY,
                     "unsuccessful response for ${response?.raw()?.request?.url}"
                 )
             }
         } catch (e: Exception) {
-            Log.w(
+            Logger.w(
                 Logger.LOG_TAG_PROXY,
                 "getPaymentStatusFromServer: exception while checking payment status",
                 e
@@ -120,10 +117,10 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
         return if (
             isRetryRequired(retryCount) && paymentStatus == TcpProxyHelper.PaymentStatus.INITIATED
         ) {
-            Log.i(LOG_TAG_DOWNLOAD, "retrying the payment status check")
+            Logger.i(LOG_TAG_DOWNLOAD, "retrying the payment status check")
             getPaymentStatusFromServer(retryCount + 1)
         } else {
-            Log.i(LOG_TAG_DOWNLOAD, "retry count exceeded, returning null")
+            Logger.i(LOG_TAG_DOWNLOAD, "retry count exceeded, returning null")
             return paymentStatus
         }
     }

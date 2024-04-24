@@ -17,7 +17,6 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.os.SystemClock
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +29,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import backend.Backend
+import backend.Stats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ListItemWgGeneralInterfaceBinding
@@ -207,6 +207,7 @@ class WgConfigAdapter(private val context: Context) :
             val statusId = VpnController.getProxyStatusById(id)
             val pair = VpnController.getSupportedIpVersion(id)
             val c = WireguardManager.getConfigById(config.id)
+            val stats = VpnController.getProxyStats(id)
             val isSplitTunnel =
                 if (c?.getPeers()?.isNotEmpty() == true) {
                     VpnController.isSplitTunnelProxy(id, pair)
@@ -225,7 +226,7 @@ class WgConfigAdapter(private val context: Context) :
                 cancelAllJobs()
                 return
             }
-            updateStatusUi(config, statusId)
+            updateStatusUi(config, statusId, stats)
             updateUi(config, appsCount)
             updateProtocolChip(pair)
             updateSplitTunnelChip(isSplitTunnel)
@@ -270,17 +271,18 @@ class WgConfigAdapter(private val context: Context) :
             }
         }
 
-        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?) {
+        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, stats: Stats?) {
             if (config.isActive) {
                 b.interfaceSwitch.isChecked = true
                 b.interfaceDetailCard.strokeWidth = 2
                 b.interfaceStatus.visibility = View.VISIBLE
                 b.interfaceConfigStatus.visibility = View.VISIBLE
-                var status = ""
-                b.interfaceActiveUptime.visibility = View.VISIBLE
-                val time = getUpTime(config.id)
+                val status: String
+                b.interfaceActiveLayout.visibility = View.VISIBLE
+                val time = getUpTime(stats)
+                val rxtx = getRxTx(stats)
                 if (time.isNotEmpty()) {
-                    val t = context.getString(R.string.logs_card_duration, getUpTime(config.id))
+                    val t = context.getString(R.string.logs_card_duration, time)
                     b.interfaceActiveUptime.text =
                         context.getString(
                             R.string.two_argument_space,
@@ -290,6 +292,7 @@ class WgConfigAdapter(private val context: Context) :
                 } else {
                     b.interfaceActiveUptime.text = context.getString(R.string.lbl_active)
                 }
+                b.interfaceActiveRxTx.text = rxtx
                 if (statusId != null) {
                     val resId = UIUtils.getProxyStatusStringRes(statusId)
                     // change the color based on the status
@@ -313,7 +316,7 @@ class WgConfigAdapter(private val context: Context) :
                 }
                 b.interfaceStatus.text = status
             } else {
-                b.interfaceActiveUptime.visibility = View.GONE
+                b.interfaceActiveLayout.visibility = View.GONE
                 b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.background)
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceSwitch.isChecked = false
@@ -325,14 +328,30 @@ class WgConfigAdapter(private val context: Context) :
             }
         }
 
-        private fun getUpTime(id: Int): CharSequence {
-            val startTime = WireguardManager.getActiveConfigTimestamp(id) ?: return ""
+        private fun getRxTx(stats: Stats?): String {
+            if (stats == null) return ""
+            val rx =
+                context.getString(
+                    R.string.symbol_upload,
+                    Utilities.humanReadableByteCount(stats.rx, true)
+                )
+            val tx =
+                context.getString(
+                    R.string.symbol_download,
+                    Utilities.humanReadableByteCount(stats.tx, true)
+                )
+            return context.getString(R.string.two_argument_space, rx, tx)
+        }
+
+        private fun getUpTime(stats: Stats?): CharSequence {
+            if (stats == null) {
+                return ""
+            }
             val now = System.currentTimeMillis()
-            val uptimeMs = SystemClock.elapsedRealtime() - startTime
             // returns a string describing 'time' as a time relative to 'now'
             return DateUtils.getRelativeTimeSpanString(
-                now - uptimeMs,
                 now,
+                stats.since,
                 DateUtils.MINUTE_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_RELATIVE
             )
@@ -343,9 +362,10 @@ class WgConfigAdapter(private val context: Context) :
 
             b.interfaceSwitch.setOnCheckedChangeListener(null)
             b.interfaceSwitch.setOnClickListener {
+                val cfg = config.toImmutable()
                 if (b.interfaceSwitch.isChecked) {
-                    if (WireguardManager.canEnableConfig(config)) {
-                        WireguardManager.enableConfig(config)
+                    if (WireguardManager.canEnableConfig(cfg)) {
+                        WireguardManager.enableConfig(cfg)
                     } else {
                         Utilities.showToastUiCentered(
                             context,
@@ -355,8 +375,8 @@ class WgConfigAdapter(private val context: Context) :
                         b.interfaceSwitch.isChecked = false
                     }
                 } else {
-                    if (WireguardManager.canDisableConfig(config)) {
-                        WireguardManager.disableConfig(config)
+                    if (WireguardManager.canDisableConfig(cfg)) {
+                        WireguardManager.disableConfig(cfg)
                     } else {
                         Utilities.showToastUiCentered(
                             context,

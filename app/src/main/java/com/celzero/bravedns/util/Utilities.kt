@@ -15,6 +15,11 @@
  */
 package com.celzero.bravedns.util
 
+import Logger
+import Logger.LOG_TAG_APP_DB
+import Logger.LOG_TAG_DOWNLOAD
+import Logger.LOG_TAG_FIREWALL
+import Logger.LOG_TAG_VPN
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.PendingIntent
@@ -33,7 +38,6 @@ import android.os.Build
 import android.provider.Settings
 import android.text.TextUtils
 import android.text.TextUtils.SimpleStringSplitter
-import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
@@ -41,7 +45,6 @@ import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
@@ -56,11 +59,6 @@ import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_APP_DB
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DNS
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DOWNLOAD
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_FIREWALL
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.google.common.base.CharMatcher
 import com.google.common.net.InternetDomainName
 import com.google.gson.JsonParser
@@ -125,7 +123,10 @@ object Utilities {
             am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
         for (enabledService in enabledServices) {
             val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
-            Log.i(LOG_TAG_VPN, "Accessibility enabled check for: ${enabledServiceInfo.packageName}")
+            Logger.i(
+                LOG_TAG_VPN,
+                "Accessibility enabled check for: ${enabledServiceInfo.packageName}"
+            )
             if (
                 enabledServiceInfo.packageName == context.packageName &&
                     enabledServiceInfo.name == service.name
@@ -133,7 +134,7 @@ object Utilities {
                 return true
             }
         }
-        Log.e(
+        Logger.e(
             LOG_TAG_VPN,
             "Accessibility failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.count()}"
         )
@@ -157,22 +158,21 @@ object Utilities {
                 val componentNameString = colonSplitter.next()
                 val enabledService = ComponentName.unflattenFromString(componentNameString)
                 if (expectedComponentName == enabledService) {
-                    if (DEBUG)
-                        Log.i(
-                            LOG_TAG_VPN,
-                            "SettingsSecure accessibility enabled for: ${expectedComponentName.packageName}"
-                        )
+                    Logger.i(
+                        LOG_TAG_VPN,
+                        "SettingsSecure accessibility enabled for: ${expectedComponentName.packageName}"
+                    )
                     return true
                 }
             }
         } catch (e: Settings.SettingNotFoundException) {
-            Log.e(
+            Logger.e(
                 LOG_TAG_VPN,
                 "isAccessibilityServiceEnabled Exception on isAccessibilityServiceEnabledViaSettingsSecure() ${e.message}",
                 e
             )
         }
-        Log.w(LOG_TAG_VPN, "Accessibility service not enabled via Settings Secure")
+        Logger.w(LOG_TAG_VPN, "Accessibility service not enabled via Settings Secure")
         return isAccessibilityServiceEnabled(context, accessibilityService)
     }
 
@@ -196,7 +196,7 @@ object Utilities {
         try {
             countryMap = CountryMap(context.assets)
         } catch (e: IOException) {
-            Log.e(LOG_TAG_VPN, "Failure fetching country map ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "Failure fetching country map ${e.message}", e)
         }
     }
 
@@ -290,11 +290,13 @@ object Utilities {
         try {
             Toast.makeText(context, message, toastLength).show()
         } catch (e: IllegalStateException) {
-            Log.w(LOG_TAG_VPN, "toast err: ${e.message}")
+            Logger.w(LOG_TAG_VPN, "toast err: ${e.message}")
         } catch (e: IllegalAccessException) {
-            Log.w(LOG_TAG_VPN, "toast err: ${e.message}")
+            Logger.w(LOG_TAG_VPN, "toast err: ${e.message}")
         } catch (e: IOException) {
-            Log.w(LOG_TAG_VPN, "toast err: ${e.message}")
+            Logger.w(LOG_TAG_VPN, "toast err: ${e.message}")
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "toast err: ${e.message}")
         }
     }
 
@@ -311,7 +313,7 @@ object Utilities {
                     pm.getPackageInfo(pi, PackageManager.GET_META_DATA)
                 }
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.w(LOG_TAG_APP_DB, "Application not available $pi" + e.message, e)
+            Logger.w(LOG_TAG_APP_DB, "Application not available $pi" + e.message, e)
         }
         return metadata
     }
@@ -334,7 +336,7 @@ object Utilities {
             // assign value as true as the package name not found, should not be the
             // case but some devices seems to return package not found immediately
             // after install
-            Log.w(LOG_TAG_APP_DB, "app not found ${ctx.packageName}" + e.message, e)
+            Logger.w(LOG_TAG_APP_DB, "app not found ${ctx.packageName}" + e.message, e)
             return true
         }
     }
@@ -348,7 +350,7 @@ object Utilities {
 
             src.copyTo(dest, true)
         } catch (e: Exception) { // Throws NoSuchFileException, IOException
-            Log.e(LOG_TAG_DOWNLOAD, "Error copying file ${e.message}", e)
+            Logger.e(LOG_TAG_DOWNLOAD, "Error copying file ${e.message}", e)
             return false
         }
 
@@ -370,7 +372,7 @@ object Utilities {
             writeStream.close()
             true
         } catch (e: Exception) {
-            Log.w(LOG_TAG_DOWNLOAD, "Issue while copying files using streams: ${e.message}, $e")
+            Logger.w(LOG_TAG_DOWNLOAD, "Issue while copying files using streams: ${e.message}, $e")
             false
         }
     }
@@ -399,7 +401,7 @@ object Utilities {
             val alwaysOn = Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
             !TextUtils.isEmpty(alwaysOn) && context.packageName != alwaysOn
         } catch (e: Exception) {
-            Log.e(LOG_TAG_VPN, "Failure while retrieving Settings.Secure value ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "Failure while retrieving Settings.Secure value ${e.message}", e)
             false
         }
     }
@@ -413,7 +415,7 @@ object Utilities {
             ctx.packageManager.getApplicationIcon(packageName)
         } catch (e: PackageManager.NameNotFoundException) {
             // Not adding exception details in logs.
-            Log.e(
+            Logger.e(
                 LOG_TAG_FIREWALL,
                 "Application Icon not available for package: $packageName" + e.message
             )
@@ -435,7 +437,7 @@ object Utilities {
             try {
                 updateUi()
             } catch (e: Exception) {
-                Log.e(LOG_TAG_VPN, "Failure in delay function ${e.message}", e)
+                Logger.e(LOG_TAG_VPN, "Failure in delay function ${e.message}", e)
             }
         }
     }
@@ -444,9 +446,9 @@ object Utilities {
         try {
             return ctx.packageManager.getPackagesForUid(uid)
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.w(Logger.LOG_TAG_FIREWALL_LOG, "Package Not Found: " + e.message)
+            Logger.w(LOG_TAG_FIREWALL, "Package Not Found: " + e.message)
         } catch (e: SecurityException) {
-            Log.w(Logger.LOG_TAG_FIREWALL_LOG, "Package Not Found: " + e.message)
+            Logger.w(LOG_TAG_FIREWALL, "Package Not Found: " + e.message)
         }
         return null
     }
@@ -461,6 +463,10 @@ object Utilities {
 
     fun isAtleastR(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+    }
+
+    fun isAtleastP(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
     }
 
     fun isAtleastQ(): Boolean {
@@ -506,7 +512,7 @@ object Utilities {
                 ctx.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
             }
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.w(LOG_TAG_FIREWALL, "no app info for package name: $packageName")
+            Logger.w(LOG_TAG_FIREWALL, "no app info for package name: $packageName")
             null
         }
     }
@@ -535,13 +541,9 @@ object Utilities {
                 } else {
                     fileOrDirectory.delete()
                 }
-            if (DEBUG)
-                Log.d(
-                    LOG_TAG_DOWNLOAD,
-                    "deleteRecursive File : ${fileOrDirectory.path}, $isDeleted"
-                )
+            Logger.d(LOG_TAG_DOWNLOAD, "deleteRecursive File : ${fileOrDirectory.path}, $isDeleted")
         } catch (e: Exception) {
-            Log.w(LOG_TAG_DOWNLOAD, "File delete exception: ${e.message}", e)
+            Logger.w(LOG_TAG_DOWNLOAD, "File delete exception: ${e.message}", e)
         }
     }
 
@@ -582,7 +584,7 @@ object Utilities {
 
             return File(localBlocklist)
         } catch (e: IOException) {
-            Log.e(LOG_TAG_VPN, "Could not fetch local blocklist: " + e.message, e)
+            Logger.e(LOG_TAG_VPN, "Could not fetch local blocklist: " + e.message, e)
             null
         }
     }
@@ -605,7 +607,7 @@ object Utilities {
         return try {
             File(blocklistDownloadBasePath(ctx, which, timestamp))
         } catch (e: IOException) {
-            Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
+            Logger.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
             null
         }
     }
@@ -614,7 +616,7 @@ object Utilities {
         return try {
             return File(dirPath + fileName)
         } catch (e: IOException) {
-            Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
+            Logger.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
             null
         }
     }
@@ -672,7 +674,7 @@ object Utilities {
             // earlier check of : will not work as now remote stamp can contain sec/rec
             return path.trimStart { it == '/' }.trimEnd { it == '/' }
         } catch (e: Exception) {
-            Log.w(LOG_TAG_DNS, "failure fetching stamp from Go ${e.message}", e)
+            Logger.w(Logger.LOG_TAG_DNS, "failure fetching stamp from Go ${e.message}", e)
             ""
         }
     }
@@ -740,7 +742,7 @@ object Utilities {
             val pre = ("KMGTPE")[exp - 1] + if (si) "" else "i"
             return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
         } catch (e: NumberFormatException) {
-            Log.e(LOG_TAG_DOWNLOAD, "Number format exception: ${e.message}", e)
+            Logger.e(LOG_TAG_DOWNLOAD, "Number format exception: ${e.message}", e)
         }
         return ""
     }
@@ -768,12 +770,12 @@ object Utilities {
             // Extract the specific tag value
             if (jsonObject.has(tag)) {
                 tagValue = jsonObject.get(tag).asString
-                Log.i(LOG_TAG_DOWNLOAD, "get tag value: $tagValue, for tag: $tag")
+                Logger.i(LOG_TAG_DOWNLOAD, "get tag value: $tagValue, for tag: $tag")
             } else {
-                Log.i(LOG_TAG_DOWNLOAD, "tag not found: $tag")
+                Logger.i(LOG_TAG_DOWNLOAD, "tag not found: $tag")
             }
         } catch (e: Exception) {
-            Log.e(LOG_TAG_DOWNLOAD, "err parsing the json file: ${e.message}", e)
+            Logger.e(LOG_TAG_DOWNLOAD, "err parsing the json file: ${e.message}", e)
         }
         return tagValue
     }

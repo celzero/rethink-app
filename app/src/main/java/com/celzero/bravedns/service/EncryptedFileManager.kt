@@ -15,13 +15,11 @@
  */
 package com.celzero.bravedns.service
 
+import Logger
 import android.content.Context
-import android.util.Log
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKey
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.wireguard.Config
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -39,7 +37,7 @@ object EncryptedFileManager {
         var config: Config? = null
         try {
             val dir = File(fileToRead)
-            Log.d(Logger.LOG_TAG_PROXY, "Encrypted File Read1: $fileToRead, ${dir.absolutePath}")
+            Logger.d(Logger.LOG_TAG_PROXY, "Encrypted File Read1: $fileToRead, ${dir.absolutePath}")
             val masterKey =
                 MasterKey.Builder(ctx.applicationContext)
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -53,9 +51,7 @@ object EncryptedFileManager {
                     )
                     .build()
 
-            if (DEBUG) {
-                Log.d(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${dir.absolutePath}, $fileToRead")
-            }
+            Logger.d(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${dir.absolutePath}, $fileToRead")
             val inputStream = encryptedFile.openFileInput()
             val byteArrayOutputStream = ByteArrayOutputStream()
             var nextByte: Int = inputStream.read()
@@ -73,7 +69,7 @@ object EncryptedFileManager {
             ist.close()
             byteArrayOutputStream.close()
         } catch (e: Exception) {
-            Log.e(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${e.message}", e)
+            Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${e.message}", e)
         }
 
         return config
@@ -99,7 +95,7 @@ object EncryptedFileManager {
             val inputStream = encryptedFile.openFileInput()
             content = inputStream.readBytes().toString(Charset.defaultCharset())
         } catch (e: Exception) {
-            Log.e(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${e.message}")
+            Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${e.message}")
         }
         return content
     }
@@ -119,7 +115,7 @@ object EncryptedFileManager {
             val fileToWrite = File(dir, fileName)
             return write(ctx, cfg, fileToWrite)
         } catch (e: Exception) {
-            Log.e(Logger.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
+            Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
         }
         return false
     }
@@ -140,14 +136,14 @@ object EncryptedFileManager {
             val fileToWrite = File(dir, fileName)
             write(ctx, cfg, fileToWrite)
         } catch (e: Exception) {
-            Log.e(Logger.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
+            Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
         }
         return false
     }
 
     fun write(ctx: Context, data: String, file: File): Boolean {
         try {
-            if (DEBUG) Log.d(Logger.LOG_TAG_PROXY, "write into $file")
+            Logger.d(Logger.LOG_TAG_PROXY, "write into $file")
             val masterKey =
                 MasterKey.Builder(ctx.applicationContext)
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -173,7 +169,7 @@ object EncryptedFileManager {
             }
             return true
         } catch (e: Exception) {
-            Log.e(Logger.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
+            Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
         }
         return false
     }

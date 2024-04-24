@@ -15,10 +15,11 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
+import Logger
+import Logger.LOG_TAG_FIREWALL
 import android.content.DialogInterface
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,7 +33,6 @@ import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.CustomLinearLayoutManager
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -143,7 +143,7 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment() {
         io {
             // no need to send port number for the app info screen
             ipRule = IpRulesManager.getMostSpecificRuleMatch(uid, ipAddress)
-            Log.d("FirewallManager", "Set selection of ip: $ipAddress, ${ipRule.id}")
+            Logger.d(LOG_TAG_FIREWALL, "Set selection of ip: $ipAddress, ${ipRule.id}")
             uiCtx {
                 when (ipRule) {
                     IpRulesManager.IpRuleStatus.TRUST -> {
@@ -195,7 +195,7 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun applyIpRule(status: IpRulesManager.IpRuleStatus) {
-        Log.i(Logger.LOG_TAG_FIREWALL, "ip rule for uid: $uid, ip: $ipAddress (${status.name})")
+        Logger.i(LOG_TAG_FIREWALL, "ip rule for uid: $uid, ip: $ipAddress (${status.name})")
         ipRule = status
         val ipPair = IpRulesManager.getIpNetPort(ipAddress)
         val ip = ipPair.first ?: return

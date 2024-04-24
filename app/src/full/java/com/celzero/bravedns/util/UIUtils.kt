@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.util
 
+import Logger
+import Logger.LOG_TAG_UI
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -27,7 +29,6 @@ import android.provider.Settings
 import android.text.Html
 import android.text.Spanned
 import android.text.format.DateUtils
-import android.util.Log
 import android.util.TypedValue
 import android.widget.Toast
 import androidx.core.content.getSystemService
@@ -35,7 +36,6 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import backend.Backend
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
@@ -148,7 +148,7 @@ object UIUtils {
                 context.getString(R.string.vpn_profile_error),
                 Toast.LENGTH_SHORT
             )
-            Log.w(Logger.LOG_TAG_VPN, "Failure opening app info: ${e.message}", e)
+            Logger.w(Logger.LOG_TAG_VPN, "Failure opening app info: ${e.message}", e)
         }
     }
 
@@ -162,22 +162,38 @@ object UIUtils {
                 context.getString(R.string.intent_launch_error, url),
                 Toast.LENGTH_SHORT
             )
-            Log.w(Logger.LOG_TAG_UI, "activity not found ${e.message}", e)
+            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
-    fun openNetworkSettings(context: Context) {
+    fun openNetworkSettings(context: Context, settings: String): Boolean {
+        return try {
+            val intent = Intent(settings)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+            true
+        } catch (e: ActivityNotFoundException) {
+            val msg = context.getString(R.string.intent_launch_error, settings)
+            Utilities.showToastUiCentered(context, msg, Toast.LENGTH_SHORT)
+            Logger.w(Logger.LOG_TAG_VPN, "err opening android setting: ${e.message}", e)
+            false
+        }
+    }
+
+    fun openAppInfo(context: Context) {
+        val packageName = context.packageName
         try {
-            val intent = Intent(Settings.ACTION_WIRELESS_SETTINGS)
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.data = Uri.fromParts("package", packageName, null)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             Utilities.showToastUiCentered(
                 context,
-                context.getString(R.string.private_dns_error),
+                context.getString(R.string.app_info_error),
                 Toast.LENGTH_SHORT
             )
-            Log.w(Logger.LOG_TAG_VPN, "Failure opening network setting screen: ${e.message}", e)
+            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
@@ -216,7 +232,7 @@ object UIUtils {
             intent.data = Uri.fromParts("package", packageName, null)
             context.startActivity(intent)
         } catch (e: Exception) { // ActivityNotFoundException | NullPointerException
-            Log.w(Logger.LOG_TAG_FIREWALL, "Failure calling app info: ${e.message}", e)
+            Logger.w(Logger.LOG_TAG_FIREWALL, "Failure calling app info: ${e.message}", e)
             Utilities.showToastUiCentered(
                 context,
                 context.getString(R.string.ctbs_app_info_not_available_toast),
@@ -270,7 +286,7 @@ object UIUtils {
 
         if (isDgaDomain(dnsLog.queryStr)) return
 
-        if (DEBUG) Log.d(Logger.LOG_TAG_UI, "Glide - fetchFavIcon():${dnsLog.queryStr}")
+        Logger.d(Logger.LOG_TAG_UI, "Glide - fetchFavIcon():${dnsLog.queryStr}")
 
         // fetch fav icon in background using glide
         FavIconDownloader(context, dnsLog.queryStr).run()

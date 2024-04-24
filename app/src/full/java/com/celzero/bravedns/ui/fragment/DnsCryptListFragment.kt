@@ -15,11 +15,10 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import android.app.Dialog
+import Logger
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -40,6 +39,7 @@ import com.celzero.bravedns.ui.dialog.DnsCryptRelaysDialog
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.viewmodel.DnsCryptEndpointViewModel
 import com.celzero.bravedns.viewmodel.DnsCryptRelayEndpointViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -91,6 +91,8 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
     private fun initClickListeners() {
         b.addRelayBtn.setOnClickListener { openDnsCryptRelaysDialog() }
 
+        // see CustomIpFragment#setupClickListeners#bringToFront()
+        b.dohFabAddServerIcon.bringToFront()
         b.dohFabAddServerIcon.setOnClickListener { showAddDnsCryptDialog() }
     }
 
@@ -104,17 +106,22 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         val customDialog =
             DnsCryptRelaysDialog(requireActivity(), dnsCryptRelayRecyclerAdapter, themeId)
+
+        if (!isAdded && requireActivity().isFinishing) {
+            Logger.w(Logger.LOG_TAG_UI, "DnsCrypt relay, Fragment not added to activity")
+            return
+        }
+
         customDialog.show()
     }
 
     private fun showAddDnsCryptDialog() {
         val dialogBinding = DialogSetDnsCryptBinding.inflate(layoutInflater)
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(getString(R.string.cd_dns_crypt_dialog_title))
-        dialog.setContentView(dialogBinding.root)
-        dialog.show()
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+
         val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT

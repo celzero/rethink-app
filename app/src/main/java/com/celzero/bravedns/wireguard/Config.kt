@@ -33,8 +33,8 @@ import java.util.*
  */
 @NonNullForAll
 class Config private constructor(builder: Builder) {
-    private var id: Int
-    private var name: String
+    private val id: Int
+    private val name: String
     /**
      * Returns the interface section of the configuration.
      *
@@ -76,20 +76,12 @@ class Config private constructor(builder: Builder) {
         return peers
     }
 
-    fun setId(id: Int) {
-        this.id = id
-    }
-
     fun getId(): Int {
         return id
     }
 
     fun getName(): String {
         return name
-    }
-
-    fun setName(name: String) {
-        this.name = name
     }
 
     override fun hashCode(): Int {

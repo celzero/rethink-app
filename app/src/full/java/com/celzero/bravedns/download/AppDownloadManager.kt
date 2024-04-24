@@ -16,11 +16,13 @@
 
 package com.celzero.bravedns.download
 
+import Logger
+import Logger.LOG_TAG_DNS
+import Logger.LOG_TAG_DOWNLOAD
 import android.app.DownloadManager
 import android.content.Context
 import android.net.Uri
 import android.os.SystemClock
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.work.BackoffPolicy
 import androidx.work.Data
@@ -28,7 +30,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator
 import com.celzero.bravedns.customdownloader.RemoteBlocklistCoordinator
 import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.checkBlocklistUpdate
@@ -40,8 +41,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager.DownloadType
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLISTS_ADM
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DNS
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities
 import java.util.concurrent.TimeUnit
 
@@ -83,7 +82,7 @@ class AppDownloadManager(
         val response = checkBlocklistUpdate(ts, persistentState.appVersion, retryCount = 0)
         // if received response for update is null
         if (response == null) {
-            Log.w(
+            Logger.w(
                 LOG_TAG_DNS,
                 "blocklist update is check response is null for ${type.name}, ts: $ts, app version: ${persistentState.appVersion}"
             )
@@ -100,7 +99,7 @@ class AppDownloadManager(
         }
 
         val updatableTs = getDownloadableTimestamp(response)
-        Log.i(
+        Logger.i(
             LOG_TAG_DNS,
             "Updatable ts: $updatableTs, current ts: $ts, blocklist type: ${type.name}"
         )
@@ -170,7 +169,7 @@ class AppDownloadManager(
         val response = checkBlocklistUpdate(currentTs, persistentState.appVersion, retryCount = 0)
         // if received response for update is null
         if (response == null) {
-            Log.w(
+            Logger.w(
                 LOG_TAG_DNS,
                 "local blocklist update check is null, ts: $currentTs, app version: ${persistentState.appVersion}"
             )
@@ -181,7 +180,7 @@ class AppDownloadManager(
 
         // no need to proceed if the current and received timestamp is same
         if (updatableTs <= currentTs && !isRedownload) {
-            Log.i(
+            Logger.i(
                 LOG_TAG_DNS,
                 "local blocklist update not required, current ts: $currentTs, updatable ts: $updatableTs"
             )
@@ -191,11 +190,11 @@ class AppDownloadManager(
         }
 
         if (persistentState.useCustomDownloadManager) {
-            Log.i(LOG_TAG_DNS, "initiating local blocklist download with custom download mgr")
+            Logger.i(LOG_TAG_DNS, "initiating local blocklist download with custom download mgr")
             return initiateCustomDownloadManager(updatableTs)
         }
 
-        Log.i(LOG_TAG_DNS, "initiating local blocklist download with Android download mgr")
+        Logger.i(LOG_TAG_DNS, "initiating local blocklist download with Android download mgr")
         return initiateAndroidDownloadManager(updatableTs)
     }
 
@@ -205,17 +204,17 @@ class AppDownloadManager(
             WorkScheduler.isWorkScheduled(context, DOWNLOAD_TAG) ||
                 WorkScheduler.isWorkScheduled(context, FILE_TAG)
         ) {
-            Log.i(LOG_TAG_DNS, "local blocklist download is already in progress, returning")
+            Logger.i(LOG_TAG_DNS, "local blocklist download is already in progress, returning")
             return DownloadManagerStatus.FAILURE
         }
 
-        Log.i(LOG_TAG_DNS, "local blocklist download is not in progress, starting the download")
+        Logger.i(LOG_TAG_DNS, "local blocklist download is not in progress, starting the download")
         purge(context, timestamp, DownloadType.LOCAL)
         val downloadIds = LongArray(ONDEVICE_BLOCKLISTS_ADM.count())
         ONDEVICE_BLOCKLISTS_ADM.forEachIndexed { i, it ->
             val fileName = it.filename
             // url: https://dl.rethinkdns.com/update/blocklists?tstamp=1696197375609&vcode=33
-            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "v: ($timestamp), f: $fileName, u: $it.url")
+            Logger.d(LOG_TAG_DOWNLOAD, "v: ($timestamp), f: $fileName, u: $it.url")
             downloadIds[i] = enqueueDownload(it.url, fileName, timestamp.toString())
             if (downloadIds[i] == INVALID_DOWNLOAD_ID) {
                 return DownloadManagerStatus.FAILURE
@@ -241,7 +240,7 @@ class AppDownloadManager(
         val response = checkBlocklistUpdate(currentTs, persistentState.appVersion, retryCount = 0)
         // if received response for update is null
         if (response == null) {
-            Log.w(LOG_TAG_DNS, "remote blocklist update check is null")
+            Logger.w(LOG_TAG_DNS, "remote blocklist update check is null")
             downloadRequired.postValue(DownloadManagerStatus.FAILURE)
             return false
         }
@@ -249,7 +248,7 @@ class AppDownloadManager(
         val updatableTs = getDownloadableTimestamp(response)
 
         if (updatableTs <= currentTs && !isRedownload) {
-            Log.i(
+            Logger.i(
                 LOG_TAG_DNS,
                 "remote blocklist update not required, current ts: $currentTs, updatable ts: $updatableTs"
             )
@@ -272,7 +271,7 @@ class AppDownloadManager(
                     RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER
                 )
         ) {
-            Log.i(LOG_TAG_DNS, "remote blocklist download is already in progress, returning")
+            Logger.i(LOG_TAG_DNS, "remote blocklist download is already in progress, returning")
             return false
         }
 
@@ -374,11 +373,11 @@ class AppDownloadManager(
                     fileName
                 )
                 val downloadId = downloadManager.enqueue(this)
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "filename: $fileName, downloadID: $downloadId")
+                Logger.d(LOG_TAG_DOWNLOAD, "filename: $fileName, downloadID: $downloadId")
                 return downloadId
             }
         } catch (e: Exception) {
-            Log.w(LOG_TAG_DOWNLOAD, "Exception while downloading the file: $fileName", e)
+            Logger.w(LOG_TAG_DOWNLOAD, "Exception while downloading the file: $fileName", e)
         }
         return INVALID_DOWNLOAD_ID
     }

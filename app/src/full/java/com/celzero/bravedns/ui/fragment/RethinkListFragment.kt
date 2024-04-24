@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import Logger
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,7 +33,6 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.RethinkEndpointAdapter
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator
 import com.celzero.bravedns.customdownloader.RemoteBlocklistCoordinator
@@ -48,7 +47,6 @@ import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
-import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
@@ -145,11 +143,10 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun isBlocklistUpdateAvailable(): Boolean {
-        if (DEBUG)
-            Log.d(
-                Logger.LOG_TAG_DOWNLOAD,
-                "Update available? newest: ${persistentState.newestRemoteBlocklistTimestamp}, available: ${persistentState.remoteBlocklistTimestamp}"
-            )
+        Logger.d(
+            Logger.LOG_TAG_DOWNLOAD,
+            "Update available? newest: ${persistentState.newestRemoteBlocklistTimestamp}, available: ${persistentState.remoteBlocklistTimestamp}"
+        )
         return (persistentState.newestRemoteBlocklistTimestamp != INIT_TIME_MS &&
             persistentState.newestRemoteBlocklistTimestamp >
                 persistentState.remoteBlocklistTimestamp)
@@ -188,6 +185,8 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun initClickListeners() {
+        // see CustomIpFragment#setupClickListeners#bringToFront()
+        b.dohFabAddServerIcon.bringToFront()
         b.dohFabAddServerIcon.setOnClickListener {
             val intent = Intent(requireContext(), ConfigureRethinkBasicActivity::class.java)
             intent.putExtra(
@@ -265,7 +264,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             .getWorkInfosByTagLiveData(RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER)
             .observe(viewLifecycleOwner) { workInfoList ->
                 val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-                Log.i(
+                Logger.i(
                     Logger.LOG_TAG_DOWNLOAD,
                     "WorkManager state: ${workInfo.state} for ${RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER}"
                 )
@@ -297,7 +296,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             }
 
         appDownloadManager.downloadRequired.observe(viewLifecycleOwner) {
-            Log.i(Logger.LOG_TAG_DNS, "Check for blocklist update, status: $it")
+            Logger.i(Logger.LOG_TAG_DNS, "Check for blocklist update, status: $it")
             if (it == null) return@observe
 
             when (it) {

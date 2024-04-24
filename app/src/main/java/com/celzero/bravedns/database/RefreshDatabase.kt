@@ -15,6 +15,9 @@
  */
 package com.celzero.bravedns.database
 
+import Logger
+import Logger.LOG_TAG_APP_DB
+import Logger.LOG_TAG_VPN
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -26,12 +29,10 @@ import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Build
 import android.os.SystemClock
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
@@ -47,8 +48,6 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.PlayStoreCategory
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
@@ -56,13 +55,13 @@ import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
-import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 class RefreshDatabase
 internal constructor(
@@ -118,7 +117,7 @@ internal constructor(
         try {
             val action = a.action
             val uid = a.uid // may be -1
-            if (DEBUG) Log.d(LOG_TAG_APP_DB, "Initiated refresh application info $a")
+            Logger.d(LOG_TAG_APP_DB, "Initiated refresh application info $a")
             if (action == ACTION_INSERT_NEW_APP) {
                 // ignore invalid uid (app source could not be determined)
                 // ignore missing uid (protocol unknown or connectivity mgr missing)
@@ -133,7 +132,7 @@ internal constructor(
                     current - latestRefreshTime < FULL_REFRESH_INTERVAL &&
                     (action == ACTION_REFRESH_AUTO || action == ACTION_REFRESH_INTERACTIVE)
             ) {
-                Log.i(LOG_TAG_APP_DB, "no-op auto refresh")
+                Logger.i(LOG_TAG_APP_DB, "no-op auto refresh")
                 return
             }
             latestRefreshTime = current
@@ -146,7 +145,7 @@ internal constructor(
             val wgm = WireguardManager.load()
             val tcpm = TcpProxyHelper.load()
 
-            Log.i(
+            Logger.i(
                 LOG_TAG_APP_DB,
                 "reload: fm: ${fm}; ip: ${ipm}; dom: ${dm}; px: ${pxm}; wg: ${wgm}; t: ${tcpm}"
             )
@@ -178,7 +177,7 @@ internal constructor(
             printAll(packagesToDelete, "packagesToDelete")
             printAll(packagesToUpdate, "packagesToUpdate")
 
-            Log.i(
+            Logger.i(
                 LOG_TAG_APP_DB,
                 "sizes: rmv: ${packagesToDelete.size}; add: ${packagesToAdd.size}; update: ${packagesToUpdate.size}"
             )
@@ -196,7 +195,7 @@ internal constructor(
             // must be called after updateExistingPackagesIfNeeded
             refreshDomainRules(packagesToUpdate)
         } catch (e: RuntimeException) {
-            Log.e(LOG_TAG_APP_DB, e.message, e)
+            Logger.e(LOG_TAG_APP_DB, e.message ?: "refresh err", e)
             throw e
         } finally {
             notifyEmptyFirewallRulesIfNeeded()
@@ -340,12 +339,12 @@ internal constructor(
     private suspend fun maybeInsertApp(uid: Int) {
         val knownUid = FirewallManager.hasUid(uid)
         if (knownUid) {
-            Log.i(LOG_TAG_APP_DB, "insertApp: $uid already tracked")
+            Logger.i(LOG_TAG_APP_DB, "insertApp: $uid already tracked")
             return
         }
         val ai = maybeFetchAppInfo(uid)
         val pkg = ai?.packageName ?: ""
-        Log.i(LOG_TAG_APP_DB, "insert app; uid: $uid, pkg: ${pkg}")
+        Logger.i(LOG_TAG_APP_DB, "insert app; uid: $uid, pkg: ${pkg}")
         if (ai != null) {
             // uid may be different from the one in ai, if the app is installed in a different user
             insertApp(ai)
@@ -375,7 +374,7 @@ internal constructor(
         if (rmv) {
             WireguardManager.restoreProcessDeleteWireGuardEntries()
         } else {
-            if (DEBUG) Log.d(LOG_TAG_APP_DB, "removeWireGuardProfilesIfNeeded: no-op")
+            Logger.d(LOG_TAG_APP_DB, "removeWireGuardProfilesIfNeeded: no-op")
         }
     }
 
@@ -383,10 +382,10 @@ internal constructor(
         trackedApps: Set<FirewallManager.AppInfoTuple>,
         emptyAll: Boolean
     ) {
-        // trackedApps is empty, the installed apps are yet to be added to the database
-        // so no need to refresh the proxy mapping when the tracked apps are empty
+        // trackedApps is empty, the installed apps are yet to be added to the database; and so,
+        // there's no need to refresh these mappings as apps tracked by FirewallManager is empty
         if (trackedApps.isEmpty()) {
-            Log.i(LOG_TAG_APP_DB, "refreshProxyMapping: trackedApps is empty")
+            Logger.i(LOG_TAG_APP_DB, "refreshProxyMapping: trackedApps is empty")
             return
         }
 
@@ -402,13 +401,13 @@ internal constructor(
         ProxyManager.purgeDupsBeforeRefresh()
 
         // remove the apps from proxy mapping which are not tracked by app info repository
-        val pxm = ProxyManager.getProxyMapping()
+        val pxm = ProxyManager.trackedApps()
         val del = findPackagesToDelete(pxm, trackedApps)
         val add =
             findPackagesToAdd(pxm, trackedApps).map { FirewallManager.getAppInfoByUid(it.uid) }
-        ProxyManager.deleteMappings(del)
-        ProxyManager.addMappings(add)
-        Log.i(
+        ProxyManager.deleteApps(del)
+        ProxyManager.addApps(add)
+        Logger.i(
             "AppDatabase",
             "refreshing proxy mapping, size: ${pxm.size}, trackedApps: ${trackedApps.size}"
         )
@@ -440,7 +439,7 @@ internal constructor(
     }
 
     private suspend fun updateApp(oldUid: Int, newUid: Int, pkg: String) {
-        Log.i(LOG_TAG_APP_DB, "update app; oldUid: $oldUid, newUid: $newUid, pkg: $pkg")
+        Logger.i(LOG_TAG_APP_DB, "update app; oldUid: $oldUid, newUid: $newUid, pkg: $pkg")
         FirewallManager.updateUid(oldUid, newUid, pkg)
     }
 
@@ -468,7 +467,7 @@ internal constructor(
 
         entry.appCategory = determineAppCategory(ai)
 
-        Log.i(LOG_TAG_APP_DB, "insert app: $ai")
+        Logger.i(LOG_TAG_APP_DB, "insert app: $ai")
         FirewallManager.persistAppInfo(entry)
         ProxyManager.addNewApp(entry)
     }
@@ -494,7 +493,7 @@ internal constructor(
 
         val notificationManager =
             ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
-        if (DEBUG) Log.d(Logger.LOG_TAG_VPN, "Number of new apps: $appSize, show notification")
+        Logger.d(LOG_TAG_VPN, "Number of new apps: $appSize, show notification")
 
         val intent = Intent(ctx, NotificationHandlerDialog::class.java)
         intent.putExtra(
@@ -553,11 +552,12 @@ internal constructor(
         // no need to notify if the vpn is not on
         if (!VpnController.isOn()) return
 
-        if (app.packageName.isEmpty()) {
-            app.packageName = FirewallManager.getPackageNameByUid(app.uid) ?: ""
+        var pkgName = app.packageName
+        if (pkgName.isEmpty()) {
+            pkgName = FirewallManager.getPackageNameByUid(app.uid) ?: ""
         }
 
-        val appInfo = Utilities.getApplicationInfo(ctx, app.packageName)
+        val appInfo = Utilities.getApplicationInfo(ctx, pkgName)
         val appName =
             if (appInfo == null) {
                 app.uid
@@ -567,7 +567,7 @@ internal constructor(
 
         val notificationManager =
             ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
-        if (DEBUG) Log.d(Logger.LOG_TAG_VPN, "New app installed: $appName, show notification")
+        Logger.d(LOG_TAG_VPN, "New app installed: $appName, show notification")
 
         val intent = Intent(ctx, NotificationHandlerDialog::class.java)
         intent.putExtra(
@@ -781,7 +781,7 @@ internal constructor(
     }
 
     private fun printAll(c: Collection<FirewallManager.AppInfoTuple>, tag: String) {
-        c.forEach { Log.i(LOG_TAG_APP_DB, "$tag: ${it.uid}, ${it.packageName}") }
+        c.forEach { Logger.i(LOG_TAG_APP_DB, "$tag: ${it.uid}, ${it.packageName}") }
     }
 
     /** Below code to fetch the google play service-application category Not in use as of now. */

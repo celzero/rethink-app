@@ -15,13 +15,12 @@
  */
 package com.celzero.bravedns.scheduler
 
+import Logger
+import Logger.LOG_TAG_SCHEDULER
 import android.content.Context
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_SCHEDULER
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -31,7 +30,7 @@ class RefreshAppsJob(val context: Context, workerParameters: WorkerParameters) :
     private val refreshDatabase by inject<RefreshDatabase>()
 
     override suspend fun doWork(): Result {
-        if (DEBUG) Log.d(LOG_TAG_SCHEDULER, "starting refresh-database job")
+        Logger.d(LOG_TAG_SCHEDULER, "starting refresh-database job")
         refreshDatabase.refresh(RefreshDatabase.ACTION_REFRESH_AUTO)
         return Result.success()
     }

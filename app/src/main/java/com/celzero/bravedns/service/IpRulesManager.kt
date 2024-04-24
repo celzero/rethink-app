@@ -15,17 +15,15 @@
  */
 package com.celzero.bravedns.service
 
+import Logger
+import Logger.LOG_TAG_FIREWALL
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import backend.Backend
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpRepository
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Logger
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_FIREWALL
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import inet.ipaddr.AddressStringException
@@ -94,7 +92,7 @@ object IpRulesManager : KoinComponent {
     }
 
     private fun logd(msg: String) {
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL, msg)
+        Logger.d(LOG_TAG_FIREWALL, msg)
     }
 
     suspend fun load(): Long {
@@ -110,7 +108,7 @@ object IpRulesManager : KoinComponent {
                     logd("iptree.add($k, $v)")
                     iptree.add(k, v)
                 } catch (e: Exception) {
-                    Log.e(LOG_TAG_FIREWALL, "err iptree.add($k, $v)", e)
+                    Logger.e(LOG_TAG_FIREWALL, "err iptree.add($k, $v)", e)
                 }
             }
         }
@@ -169,7 +167,7 @@ object IpRulesManager : KoinComponent {
             }
             return IpRuleStatus.getStatus(items[2].toIntOrNull())
         } catch (e: Exception) {
-            Log.e(LOG_TAG_FIREWALL, "err treeValStatus: ${e.message}")
+            Logger.e(LOG_TAG_FIREWALL, "err treeValStatus: ${e.message}")
             return IpRuleStatus.NONE
         }
     }
@@ -183,7 +181,7 @@ object IpRulesManager : KoinComponent {
     }
 
     suspend fun removeIpRule(uid: Int, ipstr: String, port: Int) {
-        Log.i(LOG_TAG_FIREWALL, "ip rule, rmv: $ipstr for uid: $uid")
+        Logger.i(LOG_TAG_FIREWALL, "ip rule, rmv: $ipstr for uid: $uid")
         if (ipstr.isEmpty()) {
             return
         }
@@ -197,7 +195,7 @@ object IpRulesManager : KoinComponent {
     }
 
     private suspend fun updateRule(uid: Int, ipaddr: String, port: Int, status: IpRuleStatus) {
-        Log.i(LOG_TAG_FIREWALL, "ip rule, update: $ipaddr for uid: $uid; status: ${status.name}")
+        Logger.i(LOG_TAG_FIREWALL, "ip rule, update: $ipaddr for uid: $uid; status: ${status.name}")
         // ipaddr is expected to be normalized
         val c = makeCustomIp(uid, ipaddr, port, status)
         db.update(c)
@@ -367,7 +365,7 @@ object IpRulesManager : KoinComponent {
             val pair = hostAddr(ipStr)
             return normalize(pair.first) ?: ""
         } catch (ignored: NullPointerException) {
-            Log.e(Logger.LOG_TAG_VPN, "Invalid IP address added", ignored)
+            Logger.e(Logger.LOG_TAG_VPN, "Invalid IP address added", ignored)
         }
         return "" // empty ips mean its a port-only rule
     }
@@ -415,7 +413,7 @@ object IpRulesManager : KoinComponent {
     }
 
     suspend fun addIpRule(uid: Int, ipstr: IPAddress, port: Int?, status: IpRuleStatus) {
-        Log.i(
+        Logger.i(
             LOG_TAG_FIREWALL,
             "ip rule, add rule for ($uid) ip: $ipstr, $port with status: ${status.name}"
         )
@@ -438,7 +436,7 @@ object IpRulesManager : KoinComponent {
         }
         resultsCache.invalidateAll()
         load()
-        Log.i(LOG_TAG_FIREWALL, "ip rules updated")
+        Logger.i(LOG_TAG_FIREWALL, "ip rules updated")
     }
 
     suspend fun replaceIpRule(
@@ -452,7 +450,7 @@ object IpRulesManager : KoinComponent {
         val prevPort = pair.second
         val prevIpAddrStr = normalize(prevIpaddr)
         val newIpAddrStr = padAndNormalize(ipaddr)
-        Log.i(
+        Logger.i(
             LOG_TAG_FIREWALL,
             "ip rule, replace (${prevRule.uid}); ${prevIpAddrStr}:${prevPort}; new: $ipaddr:$port, ${newStatus.name}"
         )
@@ -553,7 +551,7 @@ object IpRulesManager : KoinComponent {
                 ips.validate()
                 ipNet = ips.address
             } catch (e: AddressStringException) {
-                Log.w(LOG_TAG_FIREWALL, "err: getIpNetPort, ${e.message}", e)
+                Logger.w(LOG_TAG_FIREWALL, "err: getIpNetPort, ${e.message}", e)
             }
         } else {
             ipNet = IPAddressString(h.first).address

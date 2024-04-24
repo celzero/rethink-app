@@ -15,12 +15,11 @@
  */
 package com.celzero.bravedns.service
 
-import android.util.Log
+import Logger
+import Logger.LOG_TAG_UI
+import Logger.LOG_TAG_VPN
 import androidx.lifecycle.MutableLiveData
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -42,7 +41,7 @@ object PauseTimer {
     val PAUSE_VPN_EXTRA_MILLIS = TimeUnit.MINUTES.toMillis(1)
 
     fun start(durationMs: Long) {
-        if (DEBUG) Log.d(LOG_TAG_UI, "timer started, duration: $durationMs")
+        Logger.d(LOG_TAG_UI, "timer started, duration: $durationMs")
         io {
             try {
                 setCountdown(durationMs)
@@ -51,7 +50,7 @@ object PauseTimer {
                     addCountdown(-COUNT_DOWN_INTERVAL)
                 }
             } finally {
-                if (DEBUG) Log.d(LOG_TAG_VPN, "pause timer complete")
+                Logger.d(LOG_TAG_VPN, "pause timer complete")
                 VpnController.resumeApp()
                 setCountdown(INIT_TIME_MS)
             }

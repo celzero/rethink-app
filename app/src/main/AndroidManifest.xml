@@ -2,11 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.celzero.bravedns"
-    android:versionCode="36"
-    android:versionName="v055e"> <!-- 36(v055e) -->
+    android:versionCode="37"
+    android:versionName="v055f"> <!-- 37(v055f) -->
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
@@ -49,7 +50,7 @@
         <service
             android:name=".service.BraveVPNService"
             android:exported="true"
-            android:foregroundServiceType="systemExempted"
+            android:foregroundServiceType="systemExempted|connectedDevice"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:stopWithTask="false">
             <intent-filter>

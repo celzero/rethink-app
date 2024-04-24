@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.ui.bottomsheet
 
-import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
@@ -25,7 +24,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
+import android.view.WindowManager
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
 import android.widget.Toast
@@ -558,10 +557,18 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
 
     private fun showDialogForInfo() {
         val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCanceledOnTouchOutside(true)
-        dialog.setContentView(dialogBinding.root)
+
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
+        lp.copyFrom(dialog.window?.attributes)
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+
+        dialog.setCancelable(true)
+        dialog.window?.attributes = lp
+
         val okBtn = dialogBinding.infoRulesDialogCancelImg
         val descText = dialogBinding.infoRulesDialogRulesDesc
         val titleText = dialogBinding.infoRulesDialogRulesTitle

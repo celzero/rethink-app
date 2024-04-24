@@ -45,7 +45,7 @@
                     android:fontFamily="sans-serif"
                     android:isScrollContainer="true"
                     app:iconifiedByDefault="false"
-                    app:queryHint="@string/search_proxy_add_apps"></androidx.appcompat.widget.SearchView>
+                    app:queryHint="@string/search_proxy_add_apps" />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/wg_include_app_dialog_search_filter"
@@ -126,7 +126,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/wg_include_app_dialog_ok_button"
-        android:layout_below="@id/wg_include_app_select_all" />
+        android:layout_below="@id/wg_include_app_select_all"
+        android:clickable="true"
+        android:focusable="true" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/wg_include_app_dialog_ok_button"

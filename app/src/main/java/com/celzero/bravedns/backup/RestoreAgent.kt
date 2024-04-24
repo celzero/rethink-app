@@ -15,15 +15,15 @@
  */
 package com.celzero.bravedns.backup
 
+import Logger
+import Logger.LOG_TAG_BACKUP_RESTORE
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageInfo
 import android.net.Uri
-import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
 import com.celzero.bravedns.backup.BackupHelper.Companion.METADATA_FILENAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.SHARED_PREFS_BACKUP_FILE_NAME
@@ -32,11 +32,11 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.deleteResidue
 import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
 import com.celzero.bravedns.backup.BackupHelper.Companion.stopVpn
 import com.celzero.bravedns.backup.BackupHelper.Companion.unzip
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.LogDatabase
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -51,6 +51,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
 
     private val logDatabase by inject<LogDatabase>()
     private val appDatabase by inject<AppDatabase>()
+    private val appConfig by inject<AppConfig>()
     private val persistentState by inject<PersistentState>()
 
     companion object {
@@ -59,10 +60,10 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         val restoreUri = Uri.parse(inputData.getString(DATA_BUILDER_RESTORE_URI))
-        if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "begin restore process with file uri: $restoreUri")
+        Logger.d(LOG_TAG_BACKUP_RESTORE, "begin restore process with file uri: $restoreUri")
         val result = startRestore(restoreUri)
 
-        Log.i(LOG_TAG_BACKUP_RESTORE, "completed restore process, is successful? $result")
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "completed restore process, is successful? $result")
         return if (result) {
             Result.success()
         } else {
@@ -77,29 +78,27 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             val tempDir = getTempDir(context)
             inputStream = context.contentResolver.openInputStream(importUri)
 
-            if (DEBUG)
-                Log.d(LOG_TAG_BACKUP_RESTORE, "restore process, temp file dir: ${tempDir.path}")
+            Logger.d(LOG_TAG_BACKUP_RESTORE, "restore process, temp file dir: ${tempDir.path}")
             // unzip the backup files to tempDir
             if (!unzip(inputStream, tempDir.path)) {
-                Log.w(
+                Logger.w(
                     LOG_TAG_BACKUP_RESTORE,
                     "failed to unzip the uri to temp dir $importUri, ${tempDir.path}, return failure"
                 )
                 return false
             } else {
-                if (DEBUG)
-                    Log.d(LOG_TAG_BACKUP_RESTORE, "restore process, unzipped the files to temp dir")
+                Logger.d(LOG_TAG_BACKUP_RESTORE, "restore process, unzipped the files to temp dir")
                 // proceed
             }
 
             if (!validateMetadata(tempDir.path)) {
-                Log.w(
+                Logger.w(
                     LOG_TAG_BACKUP_RESTORE,
                     "invalid meta-data or metadata not found. maybe earlier version backup"
                 )
                 return false
             } else {
-                Log.i(LOG_TAG_BACKUP_RESTORE, "metadata file validation complete")
+                Logger.i(LOG_TAG_BACKUP_RESTORE, "metadata file validation complete")
                 // no-op; proceed
             }
 
@@ -107,19 +106,19 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             // if shared pref copy is succeeds then proceed to database restore else
             // return failed
             if (!restoreSharedPreferencesFromFile(tempDir.path)) {
-                Log.w(LOG_TAG_BACKUP_RESTORE, "failed to restore shared pref, return failure")
+                Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to restore shared pref, return failure")
                 return false
             } else {
-                Log.i(LOG_TAG_BACKUP_RESTORE, "shared pref restored to the temp dir")
+                Logger.i(LOG_TAG_BACKUP_RESTORE, "shared pref restored to the temp dir")
                 // proceed
             }
 
             // Copy new database file into its final directory
             if (!restoreDatabaseFile(tempDir)) {
-                Log.w(LOG_TAG_BACKUP_RESTORE, "failed to restore database, return failure")
+                Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to restore database, return failure")
                 return false
             } else {
-                Log.i(LOG_TAG_BACKUP_RESTORE, "database restored to the temp dir")
+                Logger.i(LOG_TAG_BACKUP_RESTORE, "database restored to the temp dir")
                 // proceed
             }
 
@@ -134,7 +133,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
 
             return true
         } catch (e: Exception) {
-            Log.e(
+            Logger.e(
                 LOG_TAG_BACKUP_RESTORE,
                 "exception during restore process, reason? ${e.message}",
                 e
@@ -148,7 +147,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     private fun handleDatabaseInit() {
         // get writable database for logs
         if (!logDatabase.isOpen) {
-            Log.i(
+            Logger.i(
                 LOG_TAG_BACKUP_RESTORE,
                 "log database is not open, perform writableDatabase operation"
             )
@@ -159,7 +158,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
 
         // get writable database for app
         if (!appDatabase.isOpen) {
-            Log.i(
+            Logger.i(
                 LOG_TAG_BACKUP_RESTORE,
                 "app database is not open, perform writableDatabase operation"
             )
@@ -173,40 +172,37 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     private fun restoreDatabaseFile(tempDir: File): Boolean {
         checkPoint()
 
-        if (DEBUG)
-            Log.d(LOG_TAG_BACKUP_RESTORE, "begin restore database to temp dir: ${tempDir.path}")
+        Logger.d(LOG_TAG_BACKUP_RESTORE, "begin restore database to temp dir: ${tempDir.path}")
 
         val files = tempDir.listFiles()
         if (files == null) {
-            Log.w(LOG_TAG_BACKUP_RESTORE, "files to restore is empty, path: ${tempDir.path}")
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "files to restore is empty, path: ${tempDir.path}")
             return false
         }
 
-        if (DEBUG)
-            Log.d(
-                LOG_TAG_BACKUP_RESTORE,
-                "List of files in backup folder: ${files.size}, path: ${tempDir.path}"
-            )
+        Logger.d(
+            LOG_TAG_BACKUP_RESTORE,
+            "List of files in backup folder: ${files.size}, path: ${tempDir.path}"
+        )
         for (file in files) {
             val currentDbFile = File(context.getDatabasePath(file.name).path)
-            if (DEBUG)
-                Log.d(
-                    LOG_TAG_BACKUP_RESTORE,
-                    "db file: ${file.name} backed up from ${file.path} to ${currentDbFile.path}"
-                )
+            Logger.d(
+                LOG_TAG_BACKUP_RESTORE,
+                "db file: ${file.name} backed up from ${file.path} to ${currentDbFile.path}"
+            )
 
             if (
                 !file.name.contains(AppDatabase.DATABASE_NAME) &&
                     !file.name.contains(LogDatabase.LOGS_DATABASE_NAME)
             ) {
-                Log.w(
+                Logger.w(
                     LOG_TAG_BACKUP_RESTORE,
                     "restore process, file name is not db, file name: ${file.name}"
                 )
                 continue
             }
             if (!Utilities.copy(file.path, currentDbFile.path)) {
-                Log.w(
+                Logger.w(
                     LOG_TAG_BACKUP_RESTORE,
                     "restore process, failure copying database file: ${file.path} to ${currentDbFile.path}"
                 )
@@ -221,9 +217,9 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     private fun updateLatestVersion() {
         if (isNewVersion()) {
             persistentState.appVersion = getLatestVersion()
-            Log.i(LOG_TAG_BACKUP_RESTORE, "app version updated to ${persistentState.appVersion}")
+            Logger.i(LOG_TAG_BACKUP_RESTORE, "app version updated to ${persistentState.appVersion}")
         } else {
-            Log.i(LOG_TAG_BACKUP_RESTORE, "no need to update app version")
+            Logger.i(LOG_TAG_BACKUP_RESTORE, "no need to update app version")
         }
     }
 
@@ -240,7 +236,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     private fun checkPoint() {
-        Log.i(LOG_TAG_BACKUP_RESTORE, "database checkpoint() during restore process")
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "database checkpoint() during restore process")
         appDatabase.checkPoint()
         logDatabase.checkPoint()
         return
@@ -261,7 +257,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             val metadata = stream.bufferedReader().use { it.readText() }
             isVersionSupported(metadata)
         } catch (ignored: Exception) {
-            Log.e(
+            Logger.e(
                 LOG_TAG_BACKUP_RESTORE,
                 "error while restoring metadata, reason? ${ignored.message}",
                 ignored
@@ -271,7 +267,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             try {
                 stream?.close()
             } catch (ignored: IOException) {
-                Log.e(
+                Logger.e(
                     LOG_TAG_BACKUP_RESTORE,
                     "error while restoring metadata, reason? ${ignored.message}",
                     ignored
@@ -281,8 +277,12 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     private fun wireGuardCleanup() {
+        if (appConfig.isWireGuardEnabled()) {
+            Logger.i(LOG_TAG_BACKUP_RESTORE, "wireGuard is enabled, reset the wireguard entries")
+            appConfig.removeAllProxies()
+        }
         // delete WireGuard related entries from database
-        Log.i(LOG_TAG_BACKUP_RESTORE, "wireguard cleanup process")
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "wireguard cleanup process")
         WireguardManager.restoreProcessDeleteWireGuardEntries()
     }
 
@@ -304,7 +304,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                 if (key == PersistentState.APP_VERSION) {
                     val appVersion = v as Int
                     if (appVersion >= minVersionSupported) {
-                        Log.w(
+                        Logger.w(
                             LOG_TAG_BACKUP_RESTORE,
                             "app version is less than minAppVersion, proceed with restore"
                         )
@@ -318,7 +318,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             }
             return false
         } catch (e: Exception) {
-            Log.e(
+            Logger.e(
                 LOG_TAG_BACKUP_RESTORE,
                 "exception while restoring shared pref, reason? ${e.message}",
                 e
@@ -342,7 +342,11 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             // there is only one database), so do not consider the backups prior to that
             return version >= minVersionSupported && persistentState.appVersion >= version
         } catch (e: Exception) {
-            Log.e(LOG_TAG_BACKUP_RESTORE, "error while reading metadata, reason? ${e.message}", e)
+            Logger.e(
+                LOG_TAG_BACKUP_RESTORE,
+                "error while reading metadata, reason? ${e.message}",
+                e
+            )
             return false
         }
     }
@@ -353,7 +357,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         val currentSharedPreferences: SharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(context)
 
-        if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "shared pref file path: ${prefsBackupFile.path}")
+        Logger.d(LOG_TAG_BACKUP_RESTORE, "shared pref file path: ${prefsBackupFile.path}")
         try {
             input = ObjectInputStream(FileInputStream(prefsBackupFile))
             val prefsEditor = currentSharedPreferences.edit()
@@ -371,13 +375,13 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                 else if (v is String) prefsEditor.putString(key, v as String?)
             }
             prefsEditor.apply()
-            Log.i(
+            Logger.i(
                 LOG_TAG_BACKUP_RESTORE,
                 "completed restore of shared pref values, ${pref.entries}"
             )
             return true
         } catch (e: Exception) {
-            Log.e(
+            Logger.e(
                 LOG_TAG_BACKUP_RESTORE,
                 "exception while restoring shared pref, reason? ${e.message}",
                 e

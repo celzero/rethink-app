@@ -15,10 +15,8 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -33,6 +31,7 @@ import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.DialogSetCustomDohBinding
 import com.celzero.bravedns.databinding.FragmentDohListBinding
 import com.celzero.bravedns.viewmodel.DoHEndpointViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -74,6 +73,8 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
     }
 
     private fun initClickListeners() {
+        // see CustomIpFragment#setupClickListeners#bringToFront()
+        b.dohFabAddServerIcon.bringToFront()
         b.dohFabAddServerIcon.setOnClickListener { showAddCustomDohDialog() }
     }
 
@@ -83,19 +84,19 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
      * point
      */
     private fun showAddCustomDohDialog() {
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(getString(R.string.cd_custom_doh_dialog_title))
         val dialogBinding = DialogSetCustomDohBinding.inflate(layoutInflater)
-        dialog.setContentView(dialogBinding.root)
-        dialog.show()
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+
         dialog.setCancelable(true)
         dialog.window?.attributes = lp
 
+        val heading = dialogBinding.dialogCustomUrlTop
         val applyURLBtn = dialogBinding.dialogCustomUrlOkBtn
         val cancelURLBtn = dialogBinding.dialogCustomUrlCancelBtn
         val customName = dialogBinding.dialogCustomNameEditText
@@ -103,6 +104,9 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
         val progressBar = dialogBinding.dialogCustomUrlLoading
         val errorTxt = dialogBinding.dialogCustomUrlFailureText
         val checkBox = dialogBinding.dialogSecureCheckbox
+
+        heading.text = getString(R.string.cd_doh_dialog_heading)
+
         // fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
         io {

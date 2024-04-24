@@ -15,10 +15,8 @@
  */
 package com.celzero.bravedns.ui.fragment
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
@@ -167,6 +165,9 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     }
 
     private fun setupClickListeners() {
+        // make fab to bring to front of the view as click listener is not working
+        // on some device
+        b.cipAddFab.bringToFront()
         b.cipAddFab.setOnClickListener { showAddIpDialog() }
 
         b.cipSearchDeleteIcon.setOnClickListener { showIpRulesDeleteDialog() }
@@ -177,13 +178,11 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
      * input, if valid then will add it to the custom ip database table.
      */
     private fun showAddIpDialog() {
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(getString(R.string.ci_dialog_title))
         val dBind = DialogAddCustomIpBinding.inflate(layoutInflater)
-        dialog.setContentView(dBind.root)
-        dialog.show()
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dBind.root)
         val lp = WindowManager.LayoutParams()
+        val dialog = builder.create()
+        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT

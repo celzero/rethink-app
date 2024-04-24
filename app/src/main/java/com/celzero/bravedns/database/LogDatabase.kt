@@ -15,11 +15,11 @@
  */
 package com.celzero.bravedns.database
 
+import Logger
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.database.Cursor
 import android.database.sqlite.SQLiteException
-import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -137,7 +137,7 @@ abstract class LogDatabase : RoomDatabase() {
                 }
                 db.enableWriteAheadLogging()
             } catch (ignored: Exception) {
-                Log.e(
+                Logger.e(
                     "MIGRATION",
                     "error migrating from v1to2 on log db: ${ignored.message}",
                     ignored
