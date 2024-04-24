@@ -398,7 +398,7 @@
 
     <string name="app_mode_choose" translatable="true">Choose mode</string>
 
-    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Chirayu Desai 3.0</b><br/><br/>
+    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>JA Donenfeld 2.0</b><br/><br/>
         1. Show upload, download stats for WireGuard.<br/>
         2. Auto recover dropped WireGuard connections.<br/>
         3. Implement Android\'s <i>seamless handover</i> on network changes.<br/>
@@ -534,6 +534,7 @@
     <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimental)</string>
     <string name="settings_rinr_dialog_desc" translatable="true">Also enables<!--settings_network_all_networks--> %1$s setting. Do you want to proceed?</string>
 
+    <string name="settings_gologger_dialog_option_0" translatable="false">Very verbose</string>
     <string name="settings_gologger_dialog_option_1" translatable="false">Verbose</string>
     <string name="settings_gologger_dialog_option_2" translatable="false">Debug</string>
     <string name="settings_gologger_dialog_option_3" translatable="false">Info (default)</string>
