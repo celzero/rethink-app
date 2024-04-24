@@ -38,11 +38,16 @@ object Logger : KoinComponent {
     const val LOG_QR_CODE = "QrCodeFromFileScanner"
 
     enum class LoggerType(val id: Int) {
-        VERBOSE(0),
-        DEBUG(1),
-        INFO(2),
-        WARN(3),
-        ERROR(4)
+        VERY_VERBOSE(0),
+        VERBOSE(1),
+        DEBUG(2),
+        INFO(3),
+        WARN(4),
+        ERROR(5)
+    }
+
+    fun vv(tag: String, message: String) {
+        log(tag, message, LoggerType.VERY_VERBOSE)
     }
 
     fun v(tag: String, message: String) {
@@ -77,13 +82,14 @@ object Logger : KoinComponent {
         }
     }
 
-    private fun log(tag: String, message: String, type: LoggerType, e: Exception? = null) {
+    private fun log(tag: String, msg: String, type: LoggerType, e: Exception? = null) {
         when (type) {
-            LoggerType.VERBOSE -> if (logLevel <= LoggerType.VERBOSE.id) Log.v(tag, message)
-            LoggerType.DEBUG -> if (logLevel <= LoggerType.DEBUG.id) Log.d(tag, message)
-            LoggerType.INFO -> if (logLevel <= LoggerType.INFO.id) Log.i(tag, message)
-            LoggerType.WARN -> if (logLevel <= LoggerType.WARN.id) Log.w(tag, message, e)
-            LoggerType.ERROR -> if (logLevel <= LoggerType.ERROR.id) Log.e(tag, message, e)
+            LoggerType.VERY_VERBOSE -> if (logLevel <= LoggerType.VERY_VERBOSE.id) Log.v(tag, msg)
+            LoggerType.VERBOSE -> if (logLevel <= LoggerType.VERBOSE.id) Log.v(tag, msg)
+            LoggerType.DEBUG -> if (logLevel <= LoggerType.DEBUG.id) Log.d(tag, msg)
+            LoggerType.INFO -> if (logLevel <= LoggerType.INFO.id) Log.i(tag, msg)
+            LoggerType.WARN -> if (logLevel <= LoggerType.WARN.id) Log.w(tag, msg, e)
+            LoggerType.ERROR -> if (logLevel <= LoggerType.ERROR.id) Log.e(tag, msg, e)
         }
     }
 }
