@@ -181,7 +181,7 @@ object UIUtils {
     }
 
     fun openAppInfo(context: Context) {
-        val packageName =context.packageName
+        val packageName = context.packageName
         try {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.data = Uri.fromParts("package", packageName, null)

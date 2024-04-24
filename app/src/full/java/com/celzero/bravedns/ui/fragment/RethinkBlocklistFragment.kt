@@ -74,12 +74,12 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.util.regex.Pattern
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.regex.Pattern
 
 class RethinkBlocklistFragment :
     Fragment(R.layout.fragment_rethink_blocklist), SearchView.OnQueryTextListener {
@@ -498,9 +498,7 @@ class RethinkBlocklistFragment :
 
     private fun selectToggleBtnUi(mb: MaterialButton) {
         mb.backgroundTintList =
-            ColorStateList.valueOf(
-                fetchToggleBtnColors(requireContext(), R.color.accentGood)
-            )
+            ColorStateList.valueOf(fetchToggleBtnColors(requireContext(), R.color.accentGood))
         mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.homeScreenHeaderTextColor))
     }
 

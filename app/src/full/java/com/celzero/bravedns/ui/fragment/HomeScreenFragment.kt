@@ -75,21 +75,20 @@ import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.isAtleastN
-import com.celzero.bravedns.util.Utilities.isAtleastP
 import com.celzero.bravedns.util.Utilities.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -816,20 +815,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
             Logger.v(LOG_TAG_UI, "launch restrict background data settings")
-            var ok =
+            val ok =
                 openNetworkSettings(
                     requireContext(),
                     Settings.ACTION_IGNORE_BACKGROUND_DATA_RESTRICTIONS_SETTINGS
                 )
-            Logger.v(LOG_TAG_UI, "restrict background data settings launched: $ok")
-            if (!ok && isAtleastP()) {
-                // launch data usage settings if the above settings is not available
-                Logger.v(
-                    LOG_TAG_UI,
-                    "launch data usage settings, restrict bg data settings not available"
-                )
-                ok = openNetworkSettings(requireContext(), Settings.ACTION_DATA_USAGE_SETTINGS)
-            }
             if (!ok) {
                 // launch app settings if the above settings is not available
                 Logger.v(LOG_TAG_UI, "launch app info, restrict bg data settings not available")
