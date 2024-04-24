@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import Logger
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
@@ -105,6 +106,12 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         val customDialog =
             DnsCryptRelaysDialog(requireActivity(), dnsCryptRelayRecyclerAdapter, themeId)
+
+        if (!isAdded && requireActivity().isFinishing) {
+            Logger.w(Logger.LOG_TAG_UI, "DnsCrypt relay, Fragment not added to activity")
+            return
+        }
+
         customDialog.show()
     }
 
