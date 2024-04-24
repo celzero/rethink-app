@@ -68,26 +68,28 @@ import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.ui.bottomsheet.HomeScreenSettingBottomSheet
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
+import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openNetworkSettings
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.isAtleastN
+import com.celzero.bravedns.util.Utilities.isAtleastP
 import com.celzero.bravedns.util.Utilities.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -316,7 +318,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun enableProxyCardIfNeeded() {
         if (isVpnActivated && !appConfig.getBraveMode().isDnsMode()) {
-            if (persistentState.getProxyStatus() != -1) {
+            if (persistentState.getProxyStatus().value != -1) {
                 observeProxyStates()
             } else {
                 disableProxyCard()
@@ -375,7 +377,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     } */
 
     private fun observeProxyStates() {
-        persistentState.proxyStatus.observe(viewLifecycleOwner) {
+        persistentState.getProxyStatus().observe(viewLifecycleOwner) {
             if (it != -1) {
                 updateUiWithProxyStates(it)
             } else {
@@ -441,7 +443,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun unobserveProxyStates() {
-        persistentState.proxyStatus.removeObservers(viewLifecycleOwner)
+        persistentState.getProxyStatus().removeObservers(viewLifecycleOwner)
     }
 
     private fun disableLogsCard() {
@@ -770,10 +772,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setMessage(msg)
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
-            openNetworkSettings(
-                requireContext(),
-                Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
-            )
+            Logger.v(LOG_TAG_UI, "launch battery optimization settings")
+            val ok =
+                openNetworkSettings(
+                    requireContext(),
+                    Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+                )
+            Logger.v(LOG_TAG_UI, "battery optimization settings launched: $ok")
+            if (!ok) {
+                // launch app settings if the above settings is not available
+                Logger.v(LOG_TAG_UI, "launch app info, battery optimization settings not available")
+                openAppInfo(requireContext())
+            }
         }
 
         builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
@@ -805,10 +815,26 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setMessage(msg)
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
-            openNetworkSettings(
-                requireContext(),
-                Settings.ACTION_IGNORE_BACKGROUND_DATA_RESTRICTIONS_SETTINGS
-            )
+            Logger.v(LOG_TAG_UI, "launch restrict background data settings")
+            var ok =
+                openNetworkSettings(
+                    requireContext(),
+                    Settings.ACTION_IGNORE_BACKGROUND_DATA_RESTRICTIONS_SETTINGS
+                )
+            Logger.v(LOG_TAG_UI, "restrict background data settings launched: $ok")
+            if (!ok && isAtleastP()) {
+                // launch data usage settings if the above settings is not available
+                Logger.v(
+                    LOG_TAG_UI,
+                    "launch data usage settings, restrict bg data settings not available"
+                )
+                ok = openNetworkSettings(requireContext(), Settings.ACTION_DATA_USAGE_SETTINGS)
+            }
+            if (!ok) {
+                // launch app settings if the above settings is not available
+                Logger.v(LOG_TAG_UI, "launch app info, restrict bg data settings not available")
+                openAppInfo(requireContext())
+            }
         }
 
         builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->

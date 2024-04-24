@@ -465,6 +465,10 @@ object Utilities {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     }
 
+    fun isAtleastP(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
+    }
+
     fun isAtleastQ(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
     }

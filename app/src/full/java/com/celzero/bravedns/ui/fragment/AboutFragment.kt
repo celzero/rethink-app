@@ -53,6 +53,7 @@ import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
+import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.sendEmailIntent
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
@@ -195,7 +196,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 showNewFeaturesDialog()
             }
             b.aboutAppInfo -> {
-                openAppInfo()
+                openAppInfo(requireContext())
             }
             b.aboutVpnProfile -> {
                 openVpnProfile(requireContext())
@@ -235,23 +236,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             showToastUiCentered(
                 requireContext(),
                 getString(R.string.intent_launch_error, intent.data),
-                Toast.LENGTH_SHORT
-            )
-            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
-        }
-    }
-
-    private fun openAppInfo() {
-        val packageName = requireContext().packageName
-        try {
-            val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS)
-            intent.data = Uri.fromParts("package", packageName, null)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            showToastUiCentered(
-                requireContext(),
-                getString(R.string.app_info_error),
                 Toast.LENGTH_SHORT
             )
             Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)

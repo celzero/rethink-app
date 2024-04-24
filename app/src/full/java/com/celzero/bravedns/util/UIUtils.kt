@@ -16,6 +16,7 @@
 package com.celzero.bravedns.util
 
 import Logger
+import Logger.LOG_TAG_UI
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -161,19 +162,38 @@ object UIUtils {
                 context.getString(R.string.intent_launch_error, url),
                 Toast.LENGTH_SHORT
             )
-            Logger.w(Logger.LOG_TAG_UI, "activity not found ${e.message}", e)
+            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
-    fun openNetworkSettings(context: Context, settings: String) {
-        try {
+    fun openNetworkSettings(context: Context, settings: String): Boolean {
+        return try {
             val intent = Intent(settings)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(intent)
+            true
         } catch (e: ActivityNotFoundException) {
             val msg = context.getString(R.string.intent_launch_error, settings)
             Utilities.showToastUiCentered(context, msg, Toast.LENGTH_SHORT)
-            Logger.w(Logger.LOG_TAG_VPN, "Failure opening network setting screen: ${e.message}", e)
+            Logger.w(Logger.LOG_TAG_VPN, "err opening android setting: ${e.message}", e)
+            false
+        }
+    }
+
+    fun openAppInfo(context: Context) {
+        val packageName =context.packageName
+        try {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.data = Uri.fromParts("package", packageName, null)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Utilities.showToastUiCentered(
+                context,
+                context.getString(R.string.app_info_error),
+                Toast.LENGTH_SHORT
+            )
+            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
