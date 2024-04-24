@@ -435,6 +435,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         alertBuilder.setTitle(getString(R.string.settings_go_log_heading))
         val items =
             arrayOf(
+                getString(R.string.settings_gologger_dialog_option_0),
                 getString(R.string.settings_gologger_dialog_option_1),
                 getString(R.string.settings_gologger_dialog_option_2),
                 getString(R.string.settings_gologger_dialog_option_3),

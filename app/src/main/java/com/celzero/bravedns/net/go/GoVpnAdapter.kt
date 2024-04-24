@@ -99,6 +99,7 @@ class GoVpnAdapter : KoinComponent {
     }
 
     suspend fun initResolverProxiesPcap(opts: TunnelOptions) {
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter initResolverProxiesPcap")
         if (!tunnel.isConnected) {
             Logger.i(LOG_TAG_VPN, "Tunnel NOT connected, skip init resolver proxies")
             return
@@ -117,18 +118,22 @@ class GoVpnAdapter : KoinComponent {
         setRDNS()
         addTransport()
         setDnsAlg()
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter initResolverProxiesPcap done")
     }
 
     suspend fun setPcapMode(pcapFilePath: String) {
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter setPcapMode")
         try {
             Logger.i(LOG_TAG_VPN, "set pcap mode: $pcapFilePath")
             tunnel.setPcap(pcapFilePath)
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "err setting pcap: ${e.message}", e)
         }
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter setPcapMode done")
     }
 
     private fun setRoute(tunnelOptions: TunnelOptions) {
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter setRoute")
         try {
             // setRoute can throw exception iff preferredEngine is invalid, which is not possible
             // Log.d(LOG_TAG_VPN, "set route: ${tunnelOptions.preferredEngine.value()}")
@@ -146,9 +151,11 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "err setting route: ${e.message}", e)
         }
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter setRoute done")
     }
 
     suspend fun addTransport() {
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter addTransport")
         if (!tunnel.isConnected) {
             Logger.i(LOG_TAG_VPN, "Tunnel NOT connected, skip add transport")
             return
@@ -200,9 +207,11 @@ class GoVpnAdapter : KoinComponent {
                 }
             }
         }
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter addTransport done")
     }
 
     private suspend fun addDohTransport(id: String) {
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter addDohTransport")
         var url: String? = null
         try {
             val doh = appConfig.getDOHDetails()
@@ -222,9 +231,11 @@ class GoVpnAdapter : KoinComponent {
             getResolver()?.remove(id)
             showDnsFailureToast(url ?: "")
         }
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter addDohTransport done")
     }
 
     private suspend fun addDotTransport(id: String) {
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter addDotTransport, id: $id")
         var url: String? = null
         try {
             val dot = appConfig.getDOTDetails()
@@ -244,9 +255,11 @@ class GoVpnAdapter : KoinComponent {
             getResolver()?.remove(id)
             showDnsFailureToast(url ?: "")
         }
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter addDotTransport done")
     }
 
     private suspend fun addOdohTransport(id: String) {
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter addOdohTransport, id: $id")
         var resolver: String? = null
         try {
             val odoh = appConfig.getODoHDetails()
@@ -262,9 +275,11 @@ class GoVpnAdapter : KoinComponent {
             getResolver()?.remove(id)
             showDnsFailureToast(resolver ?: "")
         }
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter addOdohTransport done")
     }
 
     private suspend fun addDnscryptTransport(id: String) {
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter addDnscryptTransport, id: $id")
         try {
             val dc = appConfig.getConnectedDnscryptServer()
             val url = dc.dnsCryptURL
@@ -279,9 +294,11 @@ class GoVpnAdapter : KoinComponent {
             removeDnscryptRelaysIfAny()
             showDnscryptConnectionFailureToast()
         }
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter addDnscryptTransport done")
     }
 
     private suspend fun addDnsProxyTransport(id: String) {
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter addDnsProxyTransport, id: $id")
         try {
             val dnsProxy = appConfig.getSelectedDnsProxyDetails() ?: return
             // add replaces the existing transport with the same id if successful
@@ -296,9 +313,11 @@ class GoVpnAdapter : KoinComponent {
             getResolver()?.remove(id)
             showDnsProxyConnectionFailureToast()
         }
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter addDnsProxyTransport done")
     }
 
     private suspend fun addRdnsTransport(id: String, url: String) {
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter addRdnsTransport, id: $id, url: $url")
         try {
             val useDot = false
             val ips: String = getIpString(context, url)
@@ -315,9 +334,11 @@ class GoVpnAdapter : KoinComponent {
             getResolver()?.remove(id)
             showDnsFailureToast(url)
         }
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter addRdnsTransport done")
     }
 
     private fun getRdnsUrl(url: String, useDot: Boolean = false): String? {
+
         val tls = "tls://"
         val default = "dns-query"
         // do not proceed if rethinkdns.com is not available
@@ -1079,11 +1100,8 @@ class GoVpnAdapter : KoinComponent {
         }
 
         fun setLogLevel(level: Long) {
-            // increment the level by 1, as the levels start from 1, but the log levels start from 0
-            val l = level.inc()
-            // 0 - very verbose (unimplemented)
-            // 1 - verbose, 2 - debug, 3 - info, 4 - warn, 5 - error, 6 - fatal
-            Intra.logLevel(l)
+            // 0 - very verbose, 1 - verbose, 2 - debug, 3 - info, 4 - warn, 5 - error, 6 - fatal
+            Intra.logLevel(level)
         }
     }
 
