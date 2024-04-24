@@ -281,7 +281,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var median: MutableLiveData<Long> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
     var universalRulesCount: MutableLiveData<Int> = MutableLiveData()
-    var proxyStatus: MutableLiveData<Int> = MutableLiveData()
+    private var proxyStatus: MutableLiveData<Int> = MutableLiveData()
 
     // data class to store dnscrypt relay details
     data class DnsCryptRelayDetails(val relay: DnsCryptRelayEndpoint, val added: Boolean)
@@ -414,9 +414,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         return _blockWhenDeviceLocked
     }
 
-    fun getProxyStatus(): Int {
+    fun getProxyStatus(): MutableLiveData<Int> {
         if (proxyStatus.value == null) updateProxyStatus()
-        return proxyStatus.value ?: -1
+        return proxyStatus
     }
 
     fun updateProxyStatus() {
