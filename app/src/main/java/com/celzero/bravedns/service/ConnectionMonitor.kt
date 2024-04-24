@@ -508,7 +508,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
 
                 // see #createNetworksSet for why we are using hasInternet
                 // if no network has been validated, then fail open
-                if (hasInternet(network) == true && (!isAnyNwValidated || isNwValidated(network))) {
+                val failOpen = !isAnyNwValidated && BraveVPNService.FAIL_OPEN_ON_NO_NETWORK
+                if (hasInternet(network) == true && (failOpen || isNwValidated(network))) {
                     var hasDefaultRoute4 = false
                     var hasDefaultRoute6 = false
                     lp.routes.forEach rloop@{
