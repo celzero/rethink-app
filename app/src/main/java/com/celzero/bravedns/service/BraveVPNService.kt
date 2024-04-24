@@ -1928,7 +1928,7 @@ class BraveVPNService :
                 networks.ipv4Net.map { it.network } + networks.ipv6Net.map { it.network }
             setUnderlyingNetworks(allNetworks.toTypedArray())
         }
-        // restart vpn if the routes (+ auto mode) or when mtu changes
+        // restart vpn if the routes or when mtu changes
         if (isMtuChanged || isRoutesChanged) {
             logd(
                 "mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}); routes? $isRoutesChanged, restart vpn"
@@ -2854,14 +2854,17 @@ class BraveVPNService :
 
     override fun onDNSAdded(id: String) {
         // no-op
+        Logger.v(LOG_TAG_VPN, "onDNSAdded: $id")
     }
 
     override fun onDNSRemoved(id: String) {
         // no-op
+        Logger.v(LOG_TAG_VPN, "onDNSRemoved: $id")
     }
 
     override fun onDNSStopped() {
         // no-op
+        Logger.v(LOG_TAG_VPN, "onDNSStopped")
     }
 
     override fun onComplete(p0: ServerSummary) {
