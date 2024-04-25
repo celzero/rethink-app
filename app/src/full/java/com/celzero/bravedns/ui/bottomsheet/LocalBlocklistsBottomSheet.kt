@@ -451,7 +451,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun invokeRethinkActivity() {
-        if (VpnController.hasTunnel()) {
+        if (!VpnController.hasTunnel()) {
             Utilities.showToastUiCentered(
                 requireContext(),
                 getString(R.string.ssv_toast_start_rethink),
