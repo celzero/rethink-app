@@ -188,7 +188,7 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun deleteApps(m: Collection<FirewallManager.AppInfoTuple>) {
-        m.forEach { deleteApp(it) }
+        m.forEach { deleteApp(it.uid, it.packageName) }
     }
 
     suspend fun addApps(m: Collection<AppInfo?>) {
@@ -219,7 +219,10 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun addNewApp(appInfo: AppInfo?, proxyId: String = "", proxyName: String = "") {
-        if (appInfo == null) return
+        if (appInfo == null) {
+            Logger.e(LOG_TAG_PROXY, "AppInfo is null, cannot add to proxy")
+            return
+        }
         val pam =
             ProxyApplicationMapping(
                 appInfo.uid,
@@ -232,6 +235,7 @@ object ProxyManager : KoinComponent {
         val pamTuple = ProxyAppMapTuple(appInfo.uid, appInfo.packageName, proxyId)
         pamSet.add(pamTuple)
         db.insert(pam)
+        Logger.i(LOG_TAG_PROXY, "Adding app for mapping: ${pam.appName}, ${pam.uid}")
     }
 
     private fun deleteFromCache(pam: ProxyApplicationMapping) {
@@ -242,15 +246,12 @@ object ProxyManager : KoinComponent {
         }
     }
 
-    suspend fun deleteApp(appInfo: AppInfo) {
-        return deleteApp(appInfo.uid, appInfo.packageName)
+    suspend fun deleteAppMappingsByUid(uid: Int) {
+        val m = pamSet.filter { it.uid == uid }
+        m.forEach { deleteApp(it.uid, it.packageName) }
     }
 
-    suspend fun deleteApp(appInfoTuple: FirewallManager.AppInfoTuple) {
-        return deleteApp(appInfoTuple.uid, appInfoTuple.packageName)
-    }
-
-    suspend fun deleteApp(uid: Int, packageName: String) {
+    private suspend fun deleteApp(uid: Int, packageName: String) {
         val pam = ProxyApplicationMapping(uid, packageName, "", "", false, "")
         deleteFromCache(pam)
         db.deleteApp(pam)
@@ -260,6 +261,7 @@ object ProxyManager : KoinComponent {
     suspend fun clear() {
         pamSet.clear()
         db.deleteAll()
+        Logger.d(LOG_TAG_PROXY, "Deleting all apps for mapping")
     }
 
     fun isAnyAppSelected(proxyId: String): Boolean {

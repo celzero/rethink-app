@@ -55,13 +55,13 @@ import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
+import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 
 class RefreshDatabase
 internal constructor(
@@ -253,8 +253,7 @@ internal constructor(
         packagesToDelete.forEach {
             IpRulesManager.deleteRulesByUid(it.uid)
             DomainRulesManager.deleteRulesByUid(it.uid)
-            val appInfo = FirewallManager.getAppInfoByUid(it.uid) ?: return@forEach
-            ProxyManager.deleteApp(appInfo)
+            ProxyManager.deleteAppMappingsByUid(it.uid)
         }
         FirewallManager.deletePackages(packagesToDelete)
     }
@@ -393,8 +392,12 @@ internal constructor(
         if (emptyAll) {
             ProxyManager.clear()
             trackedApps
-                .map { FirewallManager.getAppInfoByUid(it.uid) }
+                .map { FirewallManager.getAppInfoByPackage(it.packageName) }
                 .forEach { ProxyManager.addNewApp(it) } // it may be null, esp for non-apps
+            Logger.i(
+                LOG_TAG_APP_DB,
+                "empty proxy mapping, trackedApps: ${trackedApps.size}, proxy mapping: ${ProxyManager.trackedApps().size}"
+            )
             return
         }
 
@@ -404,11 +407,13 @@ internal constructor(
         val pxm = ProxyManager.trackedApps()
         val del = findPackagesToDelete(pxm, trackedApps)
         val add =
-            findPackagesToAdd(pxm, trackedApps).map { FirewallManager.getAppInfoByUid(it.uid) }
+            findPackagesToAdd(pxm, trackedApps).map {
+                FirewallManager.getAppInfoByPackage(it.packageName)
+            }
         ProxyManager.deleteApps(del)
         ProxyManager.addApps(add)
         Logger.i(
-            "AppDatabase",
+            LOG_TAG_APP_DB,
             "refreshing proxy mapping, size: ${pxm.size}, trackedApps: ${trackedApps.size}"
         )
     }
