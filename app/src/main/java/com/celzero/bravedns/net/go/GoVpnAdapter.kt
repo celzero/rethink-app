@@ -805,7 +805,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.i(LOG_TAG_VPN, "proxy stats($id): $stats")
             stats
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "error getting proxy stats($id): ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "error getting proxy stats($id): ${e.message}")
             null
         }
     }

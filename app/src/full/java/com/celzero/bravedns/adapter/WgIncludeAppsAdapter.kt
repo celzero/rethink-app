@@ -94,7 +94,6 @@ class WgIncludeAppsAdapter(
 
         fun update(mapping: ProxyApplicationMapping) {
             b.wgIncludeAppListApkLabelTv.text = mapping.appName
-            Logger.i(LOG_TAG_PROXY, "add ${mapping.appName} to ${mapping.proxyId} from $proxyId")
 
             if (mapping.proxyId == "") {
                 b.wgIncludeAppAppDescTv.text = ""
