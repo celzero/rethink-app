@@ -738,7 +738,7 @@
     <string name="notif_download_cancel_content">Download cancelado.</string>
     <string name="intent_launch_error">Não foi possível abrir %1$s</string>
     <string name="firewall_rule_block_univ_ip">IP / Porta (Universal)</string>
-    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai 3.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Novo recurso&lt;/i&gt;: Proxy DNS sobre proxies WireGuard e SOCKS5 (opcional).&lt;br/&gt; 2. &lt;i&gt;Novo recurso &lt;/i&gt;: Habilitar verificações de conectividade integradas no Android (opcional).&lt;br/&gt;3. &lt;i&gt;Novo recurso&lt;/i&gt;: Listar domínios e sites aos quais um aplicativo está conectado.&lt;br/&gt; 4. Suporte aprimorado para edição de regras de firewall baseadas em IP.&lt;br/&gt; 5. Largura de banda WireGuard aprimorada.&lt;br/&gt; 6. WireGuard UX revisado. &lt;br/&gt; 7. Evite vazamentos de conexão nos modos WireGuard Simples e \"Sempre Ativa\".&lt;br/&gt; 8. Falhas corrigidas ao editar configurações do WireGuard.&lt;br/&gt; 9. Correções de pequenos bugs com RDNS+ e outras regras de firewall baseadas em domínio. &lt;br/&gt;10. Correção de bug: Suporte a várias regras para um único IP confiável.&lt;br/&gt; 11. Correção de bug: Falha específica do Android 14.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ajude a traduzir este aplicativo&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;JA Donenfeld 2.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Mostrar estatísticas de upload e download do WireGuard.&lt;br/&gt; 2. Recuperação automática de conexões perdidas do WireGuard.&lt;br/&gt; 3. Implementação de &lt;i&gt;transferência perfeita&lt;/i&gt; do Android nas alterações de rede.&lt;br/&gt; 4. Suporte para vários relés DNSCrypt.&lt;br/&gt; 5. Correção de bug: Fechar arquivo de captura de pacotes quando apropriado.&lt;br/&gt; 6. Outros bugs corrigidos e melhorias .&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ajude a traduzir este aplicativo&lt;/a&gt;</string>
     <string name="private_dns_dialog_heading">Desativar DNS Privado</string>
     <string name="private_dns_dialog_desc">As configurações de DNS do Rethink são substituídas pelo \"DNS Privado\" do Android.
 \n
@@ -843,7 +843,7 @@
     <string name="firewall_status_bypass_dns_firewall" translatable="true">ignora regras de DNS e firewall</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">protegido com wireguard &amp; dns privado</string>
     <string name="hs_biometeric_desc" translatable="true">Usar autenticação biométrica para desbloquear o Rethink</string>
-    <string name="lbl_listen_port" translatable="true">Executando na porta</string>
+    <string name="lbl_listen_port" translatable="true">Porta</string>
     <string name="lbl_random" translatable="true">(aleatório)</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Manter a notificação persistente</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Notificação persistente</string>
@@ -860,7 +860,7 @@
     <string name="lbl_mtu" translatable="true">MTU</string>
     <string name="lbl_auto" translatable="true">(auto)</string>
     <string name="lbl_include" translatable="true">Incluir</string>
-    <string name="lbl_preshared_key" translatable="true">Chave pré-partilhada</string>
+    <string name="lbl_preshared_key" translatable="true">Chave pré-compartilhada</string>
     <string name="lbl_optional" translatable="true">(opcional)</string>
     <string name="lbl_persistent_keepalive" translatable="true">Keepalive persistente</string>
     <string name="settings_allow_lan_heading" translatable="true">Não rotear IPs Privados (experimental)</string>
@@ -987,7 +987,7 @@
     <string name="catch_all_wg_dialog_desc" translatable="true">Todas as conexões e aplicativos não roteados por outras VPNs WireGuard serão roteados por esta.</string>
     <string name="one_wg_error_toast" translatable="true">Ao mudar para o modo \"Avançado\", desative o WireGuard no modo \"Simples\"</string>
     <string name="wireguard_disable_message" translatable="true">Desativar todas as VPNs WireGuard ativas?</string>
-    <string name="lbl_last" translatable="true">Última</string>
+    <string name="lbl_last" translatable="true">Último</string>
     <string name="lbl_stopped" translatable="true">Encerrado</string>
     <string name="lbl_private" translatable="true">particular</string>
     <string name="lbl_secure" translatable="true">seguro</string>
@@ -1022,4 +1022,9 @@
     <string name="dc_proxy_dns_heading" translatable="true">Não usar proxy DNS</string>
     <string name="dc_proxy_dns_desc" translatable="true">Não usar proxy DNS por meio de proxies WireGuard Sempre Ativa, SOCKS5 e HTTP.</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s está desativado porque os proxies estão ativos</string>
+    <string name="lbl_unselected" translatable="true">Não selecionado</string>
+    <string name="lbl_battery_optimization" translatable="true">Otimização da Bateria</string>
+    <string name="lbl_background_data" translatable="true">Restringindo dados em segundo plano</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">Desativar %1$s</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> pode resultar em perda de conectividade. Altere a configuração para permitir que o Rethink use dados e outros recursos quando estiver em segundo plano.</string>
 </resources>
