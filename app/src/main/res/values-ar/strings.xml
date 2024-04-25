@@ -22,7 +22,7 @@
     <string name="settings_dns_proxy_dialog_password">كلمة المرور</string>
     <string name="settings_notification_desc1">إيقاف مؤقت / إيقاف (افتراضي)</string>
     <string name="ada_app_bypass_univ">تجاوز عالمي</string>
-    <string name="lbl_advanced">المتقدمة</string>
+    <string name="lbl_advanced">متقدم</string>
     <string name="dns_crypt_relay_remove_dialog_message">احذف مرحل DNSCrypt من التكوين المحفوظ.</string>
     <string name="orbot_install_dialog_title">تثبيت Orbot؟</string>
     <string name="settings_check_update_desc">تحقق تلقائيًا من تحديثات التطبيق مرة واحدة في الأسبوع.</string>
@@ -135,7 +135,7 @@
     <string name="about_dialog_positive_button">لنذهب</string>
     <string name="notif_dialog_pause_dialog_title">تم إيقاف التطبيق مؤقتا!</string>
     <string name="cd_no_rule_txt">لا توجد قاعدة</string>
-    <string name="ci_block">الكتلة</string>
+    <string name="ci_block">حظر</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">تحذير: تم إلغاء تنشيط Rethink</string>
     <string name="firewall_mode_info_title">جدار الحماية</string>
     <string name="dns_query_clear_logs_title">هل تريد حذف كافة سجلات DNS؟</string>
@@ -180,7 +180,7 @@
     <string name="ct_bs_app_info_error">لم يتم العثور على معلومات التطبيق</string>
     <string name="hsf_vpn_dialog_header">انتباه!</string>
     <string name="cd_dns_crypt_title">محللات</string>
-    <string name="cd_custom_dns_proxy_default_app">لا أحد</string>
+    <string name="cd_custom_dns_proxy_default_app">لا شيء</string>
     <string name="hs_download_positive_website">زيارة الموقع</string>
     <string name="univ_firewall_rule_6">حظر التطبيقات المثبتة حديثًا افتراضيًا</string>
     <string name="dns_info_positive">موافق</string>
@@ -247,7 +247,7 @@
     <string name="firewall_rule_no_rule_desc">لا توجد قواعد جدار حماية مطابقة لهذا الاتصال.</string>
     <string name="firewall_rule_new_app_desc">قام هذا التطبيق بالاتصال للمرة <i> للمرة الأولى </i>. <br/> <br/> للتغيير ، انتقل إلى علامة التبويب <i> يونيفرسال </i>.</string>
     <string name="firewall_rule_block_app_unmetered_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم تطبيق <i> </i> هذا عند محاولة الاتصال على شبكة <i> غير محدودة القياس </i>. <br/> <br/> للتغيير ، انتقل إلى علامة التبويب <i> جميع التطبيقات </i>.</string>
-    <string name="ci_dialog_desc">السماح (تجاوز) أو حظر عنوان IP ، شبكة IP الفرعية (النطاق) ، المنفذ. مثال: 10.10.10.10 ، 10.1.1. * ، 10.2.2 / 24 ، ffff :: / 104 ، [::]: 80 ، *. *: 80</string>
+    <string name="ci_dialog_desc">السماح (تجاوز) أو حظر عنوان IP ، شبكة IP الفرعية (النطاق) ، المنفذ. مثال: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
     <string name="notif_download_content_text">التنزيل قيد التقدم …</string>
     <string name="brbs_restore_dialog_positive">استعادة</string>
     <string name="brbs_restore_dialog_failure_message">لا يمكن استعادة. حاول مرة أخرى؟</string>
@@ -291,7 +291,7 @@
     <string name="settings_theme_dialog_themes_2">إضاءة</string>
     <string name="dns_card_latency_inactive">تمكين وضع DNS.</string>
     <string name="hsf_start_btn_state">بداية</string>
-    <string name="lbl_proceed">المضي قدما</string>
+    <string name="lbl_proceed">متابعة</string>
     <string name="hsf_start_dialog_positive">ابدأ</string>
     <string name="dc_dns_website_desc">يجلب ايقونات مواقع الويب من <i> nextdns.io </i> و <i> duckduckgo.com </i>. يستهلك ما يصل إلى 350 ميغابايت في مساحة القرص</string>
     <string name="about_sponsor_link_text">كفيل</string>
@@ -347,7 +347,7 @@
     <string name="brbs_restore_dialog_failure_title">فشلت الاستعادة</string>
     <string name="skip">تخطي</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">متصل بـ RethinkDNS وجدار الحماية</string>
-    <string name="http_proxy_dialog_heading">قم بتعيين وكيل HTTP (S)</string>
+    <string name="http_proxy_dialog_heading">قم بتعيين وكيل HTTP(S) CONNECT</string>
     <string name="search_universal_ips"><font size="12"> بحث في عناوين IP </font></string>
     <string name="settings_socks5_heading">إعداد وكيل SOCKS5</string>
     <string name="orbot_install_dialog_message">يجلب Orbot ميزات ووظائف Tor إلى Android.</string>
@@ -380,7 +380,7 @@
     <string name="configure_dns_connected_dns_proxy_status">وكيل DNS</string>
     <string name="info_dialog_url_copy_toast_msg">تم نسخ URL</string>
     <string name="settings_allow_bypass_heading">تمكين رؤية الشبكة</string>
-    <string name="settings_https_heading">إعداد وكيل HTTP (S)</string>
+    <string name="settings_https_heading">إعداد وكيل HTTP(S) CONNECT</string>
     <string name="orbot_both">وكيل TCP + HTTP</string>
     <string name="orbot_app_issue">تعذر تشغيل Orbot. هل تم تركيبه؟</string>
     <string name="always_on_dialog_stop_message">تم تمكين Always-on VPN لـ Rethink. هل أنت متأكد أنك تريد إيقاف Rethink بأية حال؟</string>
@@ -399,7 +399,7 @@
     <string name="univ_accessibility_crash_dialog_positive">اذهب للاعدادات</string>
     <string name="dns_connected">متصّل</string>
     <string name="rules_load_failure_heading">ملحوظة</string>
-    <string name="firewall_rule_trusted_ip">تجاوز IP (التطبيق)</string>
+    <string name="firewall_rule_trusted_ip">IP موثوق به</string>
     <string name="firewall_rule_foreground">التطبيق ليس قيد الاستخدام</string>
     <string name="notif_channel_desc_vpn_notification">أبلغ عندما يكون Rethink نشطًا ويعمل في الخلفية</string>
     <string name="category_name_installed">التطبيقات المثبتة</string>
@@ -490,7 +490,7 @@
     <string name="search_dns_logs"><font size="12"> البحث في أسماء المجالات أو عناوين IP </font></string>
     <string name="settings_autostart_bootup_heading">بدء التشغيل التلقائي عند التشغيل (تجريبي)</string>
     <string name="settings_dns_proxy_dialog_app_desc">سيتم استبعاد التطبيق المحدد من VPN للسماح له باتصالات الوكيل نيابة عنك.</string>
-    <string name="settings_app_list_default_app">لا أحد</string>
+    <string name="settings_app_list_default_app">لا شيء</string>
     <string name="firewall_card_text_active">%1$s محظور
 \n%2$s متجاوز
 \n%3$s مستثنى
@@ -511,7 +511,7 @@
     <string name="bsrf_sub_group_heading">المجموعة الفرعية</string>
     <string name="lbbs_configure">الضبط</string>
     <string name="brbs_title">النسخ الاحتياطي والاستعادة</string>
-    <string name="brbs_backup_dialog_message">نسخ إعدادات التطبيق وسجلات الشبكة ونظام dns احتياطياً إلى ملف. سيؤدي هذا إلى إعادة تشغيل VPN.</string>
+    <string name="brbs_backup_dialog_message">نسخ إعدادات التطبيق، وسجلات الشبكة ونظام dns احتياطياً إلى ملف. سيؤدي هذا إلى إعادة تشغيل VPN.</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">غير محمي</string>
     <string name="firewall_mode_info_explanation_new">راقب نشاط الشبكة وجدار الحماية أي تطبيق أو عنوان IP.</string>
     <string name="always_on_dialog_heading">تعطيل Always-on VPN</string>
@@ -538,7 +538,7 @@
     <string name="new_app_bulk_notification_content">منع Rethink تطبيقات %1$s الجديدة. انقر للعرض أو التعديل.</string>
     <string name="notif_channel_firewall_alerts">تنبيهات جدار الحماية</string>
     <string name="ci_dialog_edittext_hint">عنوان IP أو الشبكة الفرعية أو المنفذ</string>
-    <string name="ci_bypass_universal">تجاوز عالمية</string>
+    <string name="ci_bypass_universal">تجاوز عالمي</string>
     <string name="rbl_security">الأمن</string>
     <string name="lbbs_copy">نسخ كـ RDNS + URL</string>
     <string name="brbs_restore_dialog_title">استعادة النسخة الاحتياطية</string>
@@ -579,7 +579,7 @@
     <string name="ci_no_rules_text">لا توجد قواعد آي بي أو المنفذ.</string>
     <string name="firewall_rule_bypass_universal_ip_desc">تم السماح بهذا الاتصال لأنه تم تعيين <i>عنوان IP للوجهة</i> لتجاوز جميع قواعد جدار الحماية العالمية. <br/> <br/> للتغيير ، انتقل إلى <i>قواعد IP</i> في <i> عالمي </i> علامة التبويب.</string>
     <string name="firewall_rule_foreground_desc">تم حظر جدار الحماية هذا الاتصال لأن التطبيق المصدر لم يكن <i> في المقدمة </i>. <br/> <br/> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> يونيفرسال </i>.</string>
-    <string name="cd_dialog_desc">عنوان URL مخصص (المجال) أو حرف بدل للسماح أو حظر. على سبيل المثال ، * .test.com ، test.com/test</string>
+    <string name="cd_dialog_desc">عنوان URL أو اسم النطاق مع wildcard اختياري: *.test.com, test.com/test</string>
     <string name="ada_noapp_dialog_message">معلومات التطبيق مفقودة. ربما تم إلغاء تثبيت هذا التطبيق؟</string>
     <string name="ada_noapp_dialog_positive">حسنًا</string>
     <string name="ada_firewall_status">هذا التطبيق <b> <i> %1$s </i> </b>.</string>
@@ -589,7 +589,7 @@
     <string name="rt_edit_dialog_positive">تحرير</string>
     <string name="rt_chip_update_available">تحديث متوفر</string>
     <string name="lbbs_redownload">إعادة تنزيل قوائم الحظر</string>
-    <string name="brbs_restore_dialog_message">قم باستعادة إعدادات التطبيق والشبكة وسجلات نظام dns من نسخة احتياطيّة. سيؤدي هذا إلى إعادة تشغيل التطبيق.</string>
+    <string name="brbs_restore_dialog_message">قم باستعادة إعدادات التطبيق، والشبكة وسجلات نظام dns من نسخة احتياطيّة. سيؤدي هذا إلى إعادة تشغيل التطبيق.</string>
     <string name="firewall_status_block_unmetered">محظور على شبكات (wifi) غير المقننة</string>
     <string name="orbot_stop_dialog_message_combo">%1$s
 \n
@@ -609,7 +609,7 @@
     <string name="next">التالي</string>
     <string name="slide_2_title">أهلاً وسهلاً</string>
     <string name="block">احظر</string>
-    <string name="slide_1_desc">تطبيق RethinkDNS هو تطبيق مفتوح المصدر مدعم ببرنامج Mozilla Builders MVP.</string>
+    <string name="slide_1_desc">Rethink هو برنامج مفتوح المصدر مدعوم ببرنامج Mozilla Builders MVP.</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">انقر لتغيير إعداد الحماية</string>
     <string name="status_no_internet">لا يوجد إنترنت</string>
     <string name="orbot_bs_status_1">إعادة توجيه %1$s اتصالات إلى Orbot.</string>
@@ -742,8 +742,8 @@
     <string name="private_dns_dialog_heading">قم بإيقاف تشغيل DNS الخاص</string>
     <string name="private_dns_dialog_positive">اذهب للاعدادات</string>
     <string name="private_dns_error">تعذر تشغيل شاشة DNS الخاصة.</string>
-    <string name="ci_trust_initial">BA</string>
-    <string name="ci_trust_txt">تجاوز قواعد التطبيق</string>
+    <string name="ci_trust_initial">T</string>
+    <string name="ci_trust_txt">موثوق به</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">امسح جميع السجلات المتعلقة بهذا التطبيق.</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">حظر برامج الانتباه وبرامج التجسس وبرامج الرعب.</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s قوائم الحظر</string>
@@ -847,4 +847,66 @@
     <string name="settings_connectivity_checks_desc" translatable="true">يتم إرسال فحوصات الإتصال للتأكد من إمكانية الوصول.</string>
     <string name="orbot_no_app_toast" translatable="true">إضافة تطبيق واحد على الأقل لتمكين Orbot</string>
     <string name="univ_firewall_heading" translatable="true">قواعد جدار الحماية العالمية</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">النطاق الموثوق به (التطبيق)</string>
+    <string name="dc_refresh_toast" translatable="true">اكتمل التحديث</string>
+    <string name="ada_app_status_bypass_dns_firewall" translatable="true">سوف يتجاوز dns العالمي وقواعد جدار الحماية</string>
+    <string name="ada_app_bypass_dns_firewall" translatable="true">تجاوز DNS وجدار الحماية</string>
+    <string name="brbs_backup_restore_desc" translatable="true">لا يعمل عبر إصدارات التطبيق</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">أكثر التطبيقات التي تم حظرها</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">أكثر عناوين IP التي تم حظرها</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">أكثر البلدان التي تم حظرها</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">مفتاح غير صالح</string>
+    <string name="bad_config_reason_invalid_number" translatable="true">رقم غير صالح</string>
+    <string name="one_wg_apps_added" translatable="true">توجيه جميع التطبيقات</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">سيتم توجيه التطبيقات المحددة فقط من خلال WireGuard VPN، بغض النظر عما إذا كانت شبكة VPN معطلة أو متصلة.</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">دائمًا متصل</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">سيتم توجيه جميع الاتصالات والتطبيقات التي لم يتم توجيهها بواسطة شبكات WireGuard VPN الأخرى بواسطة هذه الشبكة.</string>
+    <string name="routing_remaining_apps" translatable="true">توجيه التطبيقات المتبقية</string>
+    <string name="config_delete_dialog_desc" translatable="true">هل أنت متأكد أنك تريد حذف تكوين WireGuard VPN هذا؟</string>
+    <string name="config_add_success_toast" translatable="true">تم</string>
+    <string name="exclude_all_app_wg_dialog_title" translatable="true">استثناء جميع التطبيقات</string>
+    <string name="exclude_all_app_wg_dialog_desc" translatable="true">هل تريد استثناء جميع التطبيقات من WireGuard VPN؟</string>
+    <string name="wireguard_enabled_failure" translatable="true">أوقف الوكلاء النشطين الآخرين لتفعيل WireGuard</string>
+    <string name="wireguard_no_config_msg" translatable="true">لا توجد شبكات WireGuard VPN. أضف بعضًا للبدء.</string>
+    <string name="wireguard_connection_error" translatable="true">فشل WireGuard VPN في الاتصال</string>
+    <string name="wireguard_disable_title" translatable="true">إيقاف WireGuard</string>
+    <string name="wireguard_disable_message" translatable="true">إيقاف جميع شبكات WireGuard VPN النشطة؟</string>
+    <string name="lbl_remaining_apps" translatable="true">التطبيقات المتبقية</string>
+    <string name="remaining_apps_dialog_title" translatable="true">تضمين التطبيقات المتبقية</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">تضمين جميع التطبيقات المتبقية التي لم يتم توجيهها بواسطة أي وكيل آخر</string>
+    <string name="cloudflare_dns_desc" translatable="true">لا يمنع أي طلبات DNS. يستخدم نقطة نهاية DNS الخاصة بـ Cloudflare 1.1.1.1 .</string>
+    <string name="bypass_dns_firewall_tooltip">%1$s يعمل مع DNS الخاص بـ Rethink فقط</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">أكثر البلدان التي تم الإتصال بها</string>
+    <string name="new_warp_invalid_config_toast" translatable="true">تكوين WARP غير صالح</string>
+    <string name="add_remove_apps" translatable="true">إضافة / إزالة (%1$s apps)</string>
+    <string name="new_warp_error_toast" translatable="true">غير قادر على جلب تكوين WARP</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">أكثر النطاقات التي تم حظرها</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">أكثر عناوين IP التي تم الإتصال بها</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">أكثر النطاقات التي تم الإتصال بها</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">قيمة غير صالحة</string>
+    <string name="ssv_see_more" translatable="true">عرض الكل</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">: يجب أن يكون رقم منفذ UDP صالحًا</string>
+    <string name="unknown_error" translatable="true">خطأ غير معروف</string>
+    <string name="invalid_file_error" translatable="true">ملف غير صالح</string>
+    <string name="import_error" translatable="true">غير قادر على استيراد النفق: %s</string>
+    <string name="include_all_app_wg_dialog_title" translatable="true">تضمين جميع التطبيقات</string>
+    <string name="key_length_error" translatable="true">طول المفتاح غير صحيح</string>
+    <string name="parse_error_inet_address" translatable="true">عنوان IP</string>
+    <string name="parse_error_inet_endpoint" translatable="true">نقطة النهاية</string>
+    <string name="parse_error_inet_network" translatable="true">شبكة IP</string>
+    <string name="parse_error_integer" translatable="true">رقم</string>
+    <string name="illegal_filename_error" translatable="true">إسم ملف غير قانوني “%s”</string>
+    <string name="no_configs_error" translatable="true">لم يتم العثور على أي تكوينات</string>
+    <string name="bad_extension_error" translatable="true">يجب أن يكون الملف .conf أو .zip</string>
+    <string name="new_warp_config_desc" translatable="true">جلب تكوين WARP من الخادم</string>
+    <string name="add_peer" translatable="true">إضافة نظير</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">أكثر التطبيقات المسموح بها</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">إبدأ Rethink للمتابعة</string>
+    <string name="bad_config_explanation_pka" translatable="true">: يجب أن يكون موجبًا ولا يزيد عن 65535</string>
+    <string name="setup_wireguard" translatable="true">إعداد WireGuard</string>
+    <string name="one_wg_dialog_desc" translatable="true">سيتم توجيه جميع الاتصالات من جميع التطبيقات، بما في ذلك DNS، إلى شبكة WireGuard VPN واحدة نشطة. سيتم إيقاف شبكات WireGuard VPN النشطة الأخرى، إن وجدت.</string>
+    <string name="firewall_rule_block_domain" translatable="true">النطاق (التطبيق)</string>
+    <string name="firewall_rule_dns_blocked" translatable="true">تم حظر DNS</string>
+    <string name="cd_dialog_edit_title" translatable="true">تعديل قاعدة النطاق</string>
+    <string name="cd_toast_edit" translatable="true">تم التعديل</string>
 </resources>
