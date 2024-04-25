@@ -86,7 +86,12 @@ object WireguardManager : KoinComponent {
         mappings.forEach {
             val path = it.configPath
             val config =
-                EncryptedFileManager.readWireguardConfig(applicationContext, path) ?: return@forEach
+                EncryptedFileManager.readWireguardConfig(applicationContext, path)
+            if (config == null) {
+                Logger.e(LOG_TAG_PROXY, "error loading wg config: $path, deleting...")
+                db.deleteConfig(it.id)
+                return@forEach
+            }
             if (configs.none { i -> i.getId() == it.id }) {
                 val c =
                     Config.Builder()
