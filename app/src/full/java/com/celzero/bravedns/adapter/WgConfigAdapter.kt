@@ -40,11 +40,11 @@ import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
+import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.concurrent.ConcurrentHashMap
 
 class WgConfigAdapter(private val context: Context) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
@@ -127,6 +127,7 @@ class WgConfigAdapter(private val context: Context) :
             // if lockdown is enabled, then show the lockdown card even if config is disabled
             if (config.isLockdown) {
                 b.protocolInfoChipGroup.visibility = View.GONE
+                b.interfaceActiveLayout.visibility = View.GONE
                 b.interfaceConfigStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
                 val id = ProxyManager.ID_WG_BASE + config.id
@@ -135,6 +136,7 @@ class WgConfigAdapter(private val context: Context) :
             } else {
                 b.interfaceStatus.visibility = View.GONE
                 b.interfaceAppsCount.visibility = View.GONE
+                b.interfaceActiveLayout.visibility = View.GONE
                 b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.background)
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceSwitch.isChecked = false
@@ -257,6 +259,7 @@ class WgConfigAdapter(private val context: Context) :
             if (!config.isActive) {
                 // no need to update the apps count if the config is disabled
                 b.interfaceAppsCount.visibility = View.GONE
+                b.interfaceActiveLayout.visibility = View.GONE
                 return
             }
 
@@ -281,6 +284,7 @@ class WgConfigAdapter(private val context: Context) :
                 b.interfaceActiveLayout.visibility = View.VISIBLE
                 val time = getUpTime(stats)
                 val rxtx = getRxTx(stats)
+                val handShakeTime = getHandshakeTime(stats)
                 if (time.isNotEmpty()) {
                     val t = context.getString(R.string.logs_card_duration, time)
                     b.interfaceActiveUptime.text =
@@ -294,25 +298,47 @@ class WgConfigAdapter(private val context: Context) :
                 }
                 b.interfaceActiveRxTx.text = rxtx
                 if (statusId != null) {
-                    val resId = UIUtils.getProxyStatusStringRes(statusId)
+                    var resId = UIUtils.getProxyStatusStringRes(statusId)
                     // change the color based on the status
                     if (statusId == Backend.TOK) {
-                        b.interfaceDetailCard.strokeColor =
-                            UIUtils.fetchColor(context, R.attr.accentGood)
+                        // if the lastOK is 0, then the handshake is not yet completed
+                        // so show the status as waiting
+                        if (stats?.lastOK == 0L) {
+                            b.interfaceDetailCard.strokeColor =
+                                UIUtils.fetchColor(context, R.attr.chipTextNeutral)
+                            resId = R.string.status_waiting
+                        } else {
+                            b.interfaceDetailCard.strokeColor =
+                                UIUtils.fetchColor(context, R.attr.accentGood)
+                        }
                         cancelJobIfAny(config.id)
-                    } else if (statusId == Backend.TUP || statusId == Backend.TZZ) {
+                    } else if (
+                        statusId == Backend.TUP ||
+                            statusId == Backend.TZZ ||
+                            statusId == Backend.TNT
+                    ) {
                         b.interfaceDetailCard.strokeColor =
                             UIUtils.fetchColor(context, R.attr.chipTextNeutral)
                     } else {
                         b.interfaceDetailCard.strokeColor =
                             UIUtils.fetchColor(context, R.attr.accentBad)
                     }
-                    status = context.getString(resId).replaceFirstChar(Char::titlecase)
+                    status =
+                        if (stats?.lastOK == 0L) {
+                            context.getString(resId).replaceFirstChar(Char::titlecase)
+                        } else {
+                            context.getString(
+                                R.string.about_version_install_source,
+                                context.getString(resId).replaceFirstChar(Char::titlecase),
+                                handShakeTime
+                            )
+                        }
                 } else {
                     b.interfaceDetailCard.strokeColor =
                         UIUtils.fetchColor(context, R.attr.accentBad)
                     status =
                         context.getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
+                    b.interfaceActiveLayout.visibility = View.GONE
                 }
                 b.interfaceStatus.text = status
             } else {
@@ -350,8 +376,25 @@ class WgConfigAdapter(private val context: Context) :
             val now = System.currentTimeMillis()
             // returns a string describing 'time' as a time relative to 'now'
             return DateUtils.getRelativeTimeSpanString(
-                now,
                 stats.since,
+                now,
+                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE
+            )
+        }
+
+        private fun getHandshakeTime(stats: Stats?): CharSequence {
+            if (stats == null) {
+                return ""
+            }
+            if (stats.lastOK == 0L) {
+                return ""
+            }
+            val now = System.currentTimeMillis()
+            // returns a string describing 'time' as a time relative to 'now'
+            return DateUtils.getRelativeTimeSpanString(
+                stats.lastOK,
+                now,
                 DateUtils.MINUTE_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_RELATIVE
             )

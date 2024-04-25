@@ -114,6 +114,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceAppsCount.visibility = View.GONE
                 b.protocolInfoChipGroup.visibility = View.GONE
+                b.interfaceActiveLayout.visibility = View.GONE
                 b.oneWgCheck.isChecked = false
                 b.interfaceStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
@@ -187,18 +188,24 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
         private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, stats: Stats?) {
             if (config.isActive) {
-                b.interfaceDetailCard.strokeColor = fetchColor(context, R.color.accentGood)
                 b.interfaceDetailCard.strokeWidth = 2
                 b.oneWgCheck.isChecked = true
                 b.interfaceAppsCount.visibility = View.VISIBLE
                 b.interfaceAppsCount.text = context.getString(R.string.one_wg_apps_added)
                 val status: String
+                val handShakeTime = getHandshakeTime(stats)
                 if (statusId != null) {
-                    val resId = UIUtils.getProxyStatusStringRes(statusId)
+                    var resId = UIUtils.getProxyStatusStringRes(statusId)
                     // change the color based on the status
                     if (statusId == Backend.TOK) {
-                        b.interfaceDetailCard.strokeColor =
-                            fetchColor(context, R.attr.chipTextPositive)
+                        if (stats?.lastOK == 0L) {
+                            b.interfaceDetailCard.strokeColor =
+                                fetchColor(context, R.attr.chipTextNeutral)
+                            resId = R.string.status_waiting
+                        } else {
+                            b.interfaceDetailCard.strokeColor =
+                                fetchColor(context, R.attr.accentGood)
+                        }
                         // cancel the job, as the status is connected
                         statusCheckJob?.cancel()
                     } else if (statusId == Backend.TUP || statusId == Backend.TZZ) {
@@ -208,7 +215,16 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                         b.interfaceDetailCard.strokeColor =
                             fetchColor(context, R.attr.chipTextNegative)
                     }
-                    status = context.getString(resId).replaceFirstChar(Char::titlecase)
+                    status =
+                        if (stats?.lastOK == 0L) {
+                            context.getString(resId).replaceFirstChar(Char::titlecase)
+                        } else {
+                            context.getString(
+                                R.string.about_version_install_source,
+                                context.getString(resId).replaceFirstChar(Char::titlecase),
+                                handShakeTime
+                            )
+                        }
                 } else {
                     b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.chipTextNegative)
                     b.interfaceDetailCard.strokeWidth = 2
@@ -219,6 +235,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 b.interfaceActiveLayout.visibility = View.VISIBLE
                 val rxtx = getRxTx(stats)
                 val time = getUpTime(stats)
+
                 if (time.isNotEmpty()) {
                     val t = context.getString(R.string.logs_card_duration, time)
                     b.interfaceActiveUptime.text =
@@ -248,8 +265,8 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             val now = System.currentTimeMillis()
             // returns a string describing 'time' as a time relative to 'now'
             return DateUtils.getRelativeTimeSpanString(
-                now,
                 stats.since,
+                now,
                 DateUtils.MINUTE_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_RELATIVE
             )
@@ -268,6 +285,23 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                     Utilities.humanReadableByteCount(stats.tx, true)
                 )
             return context.getString(R.string.two_argument_space, rx, tx)
+        }
+
+        private fun getHandshakeTime(stats: Stats?): CharSequence {
+            if (stats == null) {
+                return ""
+            }
+            if (stats.lastOK == 0L) {
+                return ""
+            }
+            val now = System.currentTimeMillis()
+            // returns a string describing 'time' as a time relative to 'now'
+            return DateUtils.getRelativeTimeSpanString(
+                stats.lastOK,
+                now,
+                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE
+            )
         }
 
         fun setupClickListeners(config: WgConfigFiles) {
