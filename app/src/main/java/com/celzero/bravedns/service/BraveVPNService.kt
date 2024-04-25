@@ -20,8 +20,9 @@ import Logger
 import Logger.LOG_TAG_VPN
 import android.app.ActivityManager
 import android.app.ForegroundServiceStartNotAllowedException
-import android.app.ForegroundServiceTypeException
+import android.app.InvalidForegroundServiceTypeException
 import android.app.KeyguardManager
+import android.app.MissingForegroundServiceTypeException
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -89,6 +90,7 @@ import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isAtleastU
 import com.celzero.bravedns.util.Utilities.isMissingOrInvalidUid
 import com.celzero.bravedns.util.Utilities.isNetworkSame
@@ -99,18 +101,6 @@ import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import intra.Bridge
 import intra.SocketSummary
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
-import rnet.ServerSummary
-import rnet.Tab
 import java.io.IOException
 import java.net.InetAddress
 import java.net.SocketException
@@ -123,6 +113,18 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.random.Random
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import rnet.ServerSummary
+import rnet.Tab
 
 class BraveVPNService :
     VpnService(), ConnectionMonitor.NetworkListener, Bridge, OnSharedPreferenceChangeListener {
@@ -1314,6 +1316,9 @@ class BraveVPNService :
 
             // startForeground should always be called within 5 secs of onStartCommand invocation
             // https://developer.android.com/guide/components/fg-service-types
+            // to log the exception type, wrap the call in different methods based on the API level
+            // TODO: can remove multiple startForegroundService calls if we decide to remove
+            // multiple catch blocks for API 31 and above
             if (isAtleastU()) {
                 var ok = startForegroundService(FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED)
                 if (!ok) {
@@ -1326,7 +1331,12 @@ class BraveVPNService :
                     return@ui
                 }
             } else {
-                startForeground(SERVICE_ID, updateNotificationBuilder())
+                val ok = startForegroundService()
+                if (!ok) {
+                    Logger.i(LOG_TAG_VPN, "start service failed ( > U ), stopping service")
+                    signalStopService(userInitiated = false) // notify and stop
+                    return@ui
+                }
             }
 
             startOrbotAsyncIfNeeded()
@@ -1391,16 +1401,39 @@ class BraveVPNService :
                 serviceType
             )
             return true
-        } catch (e: ForegroundServiceStartNotAllowedException) {
+        } catch (e: ForegroundServiceStartNotAllowedException) { // API 31 and above
             Logger.e(LOG_TAG_VPN, "startForeground failed, start not allowed exception", e)
-        } catch (e: ForegroundServiceTypeException) {
-            Logger.e(LOG_TAG_VPN, "startForeground failed, service type exception", e)
-        } catch (e: SecurityException) {
+        } catch (e: InvalidForegroundServiceTypeException) { // API 34 and above
+            Logger.e(LOG_TAG_VPN, "startForeground failed, invalid service type exception", e)
+        } catch (e: MissingForegroundServiceTypeException) { // API 34 and above
+            Logger.e(LOG_TAG_VPN, "startForeground failed, missing service type exception", e)
+        } catch (e: SecurityException) { // API 34 and above
             Logger.e(LOG_TAG_VPN, "startForeground failed, security exception", e)
-        } catch (e: IllegalArgumentException) {
+        } catch (e: IllegalArgumentException) { // API 34 and above
             Logger.e(LOG_TAG_VPN, "startForeground failed, illegal argument", e)
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "startForeground failed", e)
+        }
+        return false
+    }
+
+    private fun startForegroundService(): Boolean {
+        if (isAtleastS()) {
+            try {
+                startForeground(SERVICE_ID, updateNotificationBuilder())
+                return true
+            } catch (e: ForegroundServiceStartNotAllowedException) { // API 31 and above
+                Logger.e(LOG_TAG_VPN, "startForeground failed, start not allowed exception", e)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_VPN, "startForeground failed", e)
+            }
+        } else {
+            try {
+                startForeground(SERVICE_ID, updateNotificationBuilder())
+                return true
+            } catch (e: Exception) { // no exception expected for API < 31
+                Logger.e(LOG_TAG_VPN, "startForeground failed", e)
+            }
         }
         return false
     }

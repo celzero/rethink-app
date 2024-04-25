@@ -242,10 +242,13 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     hasMinSummary = true
                 } else {
                     b.connectionDataUsage.text = ""
+                    b.connectionDuration.text =""
                 }
                 if (connType.isMetered()) {
                     b.connectionDelay.text = context.getString(R.string.symbol_currency)
                     hasMinSummary = true
+                } else {
+                    b.connectionDelay.text = ""
                 }
 
                 if (isConnectionProxied(ct.blockedByRule, ct.proxyDetails)) {

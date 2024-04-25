@@ -98,6 +98,9 @@ object UIUtils {
             Backend.END -> {
                 R.string.lbl_stopped
             }
+            Backend.TNT -> {
+                R.string.status_waiting
+            }
             else -> {
                 R.string.rt_filter_parent_selected
             }
