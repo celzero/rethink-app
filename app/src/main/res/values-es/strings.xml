@@ -35,7 +35,7 @@
 \nNúmero de puerto: %2$s</string>
     <string name="dns_proxy_dialog_header_dns">Añadir proxy DNS</string>
     <string name="cd_toast_added">Dominio añadido con éxito</string>
-    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai 3.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nueva característica&lt;/i&gt;: Opcionalmente, proxy DNS a través de servidores proxy WireGuard y SOCKS5.&lt;br/&gt; 2. &lt;i&gt;Nueva característica &lt;/i&gt;: opcionalmente habilite las comprobaciones de conectividad integradas de Android.&lt;br/&gt; 3. &lt;i&gt;Nueva función&lt;/i&gt;: enumere los dominios y los sitios web a los que se ha conectado una aplicación.&lt;br/&gt; 4. Soporte mejorado para edición Reglas de firewall basadas en IP.&lt;br/&gt; 5. Ancho de banda WireGuard mejorado.&lt;br/&gt; 6. WireGuard UX revisado.&lt;br/&gt; 7. Evite fugas de conexión para los modos WireGuard simple y siempre activo.&lt;br/&gt; 8. Solucionar fallas al editar configuraciones de WireGuard.&lt;br/&gt; 9. Solucionar errores menores con RDNS+ y otras reglas de firewall basadas en dominio.&lt;br/&gt; 10. Corrección de errores: admite múltiples reglas para una única IP confiable.&lt;br/&gt; 11. Corrección de errores: falla específica de Android 14.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;JA Donenfeld 2.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. 1. Mostrar las estadísticas de carga y descarga de WireGuard. Recuperación automática de conexiones WireGuard caídas.&lt;br/&gt; 3. Implementar el &lt;i&gt;seamless handover&lt;/i&gt; de Android en los cambios de red.&lt;br/&gt; 4. Soporte para múltiples relés DNSCrypt.&lt;br/&gt; 5. Corrección de errores: Cerrar archivo de captura de paquetes cuando sea apropiado.&lt;br/&gt; 6. Otros errores corregidos y mejoras.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;</string>
     <string name="dc_dns_leaks_desc">Cuando está activado, Rethink captura todos los paquetes en el puerto 53 y los reenvía a un punto de acceso DNS establecido por el usuario</string>
     <string name="about_settings_app_info">Información de la aplicación</string>
     <string name="settings_orbot_disabled_error">Desactive el proxy HTTP(S) y/o SOCKS5 para continuar con la configuración de Tor-como-un-proxy.</string>
@@ -1024,4 +1024,9 @@
     <string name="lbl_on_device" translatable="true">en el dispositivo</string>
     <string name="settings_connectivity_checks" translatable="true">Realizar comprobaciones de conectividad</string>
     <string name="settings_connectivity_checks_desc" translatable="true">Se envían comprobaciones de conectividad para determinar la accesibilidad.</string>
+    <string name="lbl_unselected" translatable="true">No seleccionado</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> puede provocar la pérdida de conectividad. Cambia la configuración para permitir que Rethink utilice datos y otros recursos cuando esté en segundo plano.</string>
+    <string name="lbl_background_data" translatable="true">Restringir datos en segundo plano</string>
+    <string name="lbl_battery_optimization" translatable="true">Optimización de la batería</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">Deshabilitar %1$s</string>
 </resources>
