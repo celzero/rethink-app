@@ -18,7 +18,6 @@ package com.celzero.bravedns.data
 import Logger
 import Logger.LOG_TAG_VPN
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
@@ -397,7 +396,7 @@ internal constructor(
             BraveMode.DNS.mode,
             BraveMode.DNS_FIREWALL.mode -> determineTunDnsMode()
             else -> {
-                Log.wtf(LOG_TAG_VPN, "Invalid brave mode: ${persistentState.braveMode}")
+                Logger.e(LOG_TAG_VPN, "invalid brave mode: ${persistentState.braveMode}")
                 TunDnsMode.NONE
             }
         }
