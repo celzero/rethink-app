@@ -236,8 +236,8 @@ dependencies {
     download 'io.insert-koin:koin-core:3.5.0'
     implementation 'io.insert-koin:koin-core:3.5.0'
     // Koin main (Scope, ViewModel ...)
-    download 'io.insert-koin:koin-android:3.5.0'
-    implementation 'io.insert-koin:koin-android:3.5.0'
+    download 'io.insert-koin:koin-android:3.5.6'
+    implementation 'io.insert-koin:koin-android:3.5.6'
 
     download 'hu.autsoft:krate:2.0.0'
     implementation 'hu.autsoft:krate:2.0.0'
