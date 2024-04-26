@@ -65,11 +65,6 @@ import com.google.gson.JsonParser
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
-import kotlinx.coroutines.launch
-import okio.HashingSink
-import okio.blackholeSink
-import okio.buffer
-import okio.source
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -82,6 +77,11 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.math.ln
+import kotlinx.coroutines.launch
+import okio.HashingSink
+import okio.blackholeSink
+import okio.buffer
+import okio.source
 
 object Utilities {
 
@@ -391,8 +391,13 @@ object Utilities {
             return vpnService?.isAlwaysOn == true
         }
 
-        val alwaysOn = Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
-        return context.packageName == alwaysOn
+        return try {
+            val alwaysOn = Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
+            context.packageName == alwaysOn
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "Failure while retrieving Settings.Secure value ${e.message}", e)
+            false
+        }
     }
 
     // This function is not supported from version 12 onwards.

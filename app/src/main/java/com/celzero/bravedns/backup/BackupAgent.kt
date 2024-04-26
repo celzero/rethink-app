@@ -21,7 +21,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.SystemClock
-import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -92,18 +91,16 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
 
             val prefsBackupFile = File(tempDir, SHARED_PREFS_BACKUP_FILE_NAME)
 
-            if (DEBUG)
-                Log.d(
+            Logger.d(
                     LOG_TAG_BACKUP_RESTORE,
                     "backup process, temp file dir: ${tempDir.path}, prefs backup file: ${prefsBackupFile.path}"
                 )
             processCompleted = saveSharedPreferencesToFile(context, prefsBackupFile)
 
             if (processCompleted) {
-                if (DEBUG)
-                    Log.d(LOG_TAG_BACKUP_RESTORE, "shared pref backup is added to the temp dir")
+                Logger.d(LOG_TAG_BACKUP_RESTORE, "shared pref backup is added to the temp dir")
             } else {
-                Log.w(
+                Logger.w(
                     LOG_TAG_BACKUP_RESTORE,
                     "failed to add shared pref to temp backup dir, return failure"
                 )
@@ -113,9 +110,9 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             processCompleted = saveDatabasesToFile(tempDir.path)
 
             if (processCompleted) {
-                if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "database backup is added to the temp dir")
+                Logger.d(LOG_TAG_BACKUP_RESTORE, "database backup is added to the temp dir")
             } else {
-                Log.w(
+                Logger.w(
                     LOG_TAG_BACKUP_RESTORE,
                     "failed to add database to temp backup dir, return failure"
                 )
@@ -125,15 +122,15 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             processCompleted = createMetaData(tempDir)
 
             if (processCompleted) {
-                if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "metadata is added to the temp dir")
+                Logger.d(LOG_TAG_BACKUP_RESTORE, "metadata is added to the temp dir")
             } else {
-                Log.w(LOG_TAG_BACKUP_RESTORE, "failed to create metadata file, return failure")
+                Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to create metadata file, return failure")
                 return false
             }
 
             return zipAndCopyToDestination(tempDir, backupFileUri)
         } catch (e: Exception) {
-            Log.e(
+            Logger.e(
                 LOG_TAG_BACKUP_RESTORE,
                 "exception during backup process, reason? ${e.message}",
                 e
@@ -149,11 +146,11 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     private fun createMetaData(backupDir: File): Boolean {
-        if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "creating meta data file, path: ${backupDir.path}")
+        Logger.d(LOG_TAG_BACKUP_RESTORE, "creating meta data file, path: ${backupDir.path}")
         // check if the file exists already, if yes, delete it
         val file = File(backupDir, METADATA_FILENAME)
         if (file.exists()) {
-            if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "metadata file exists, deleting it")
+            Logger.d(LOG_TAG_BACKUP_RESTORE, "metadata file exists, deleting it")
             file.delete()
             filesPathToZip.remove(file.absolutePath)
         }
@@ -169,7 +166,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             filesPathToZip.add(metadataFile.absolutePath)
             return true
         } catch (e: Exception) {
-            Log.e(
+            Logger.e(
                 LOG_TAG_BACKUP_RESTORE,
                 "exception while creating meta data file, ${e.message}",
                 e
@@ -194,7 +191,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
     private fun zipAndCopyToDestination(tempDir: File, destUri: Uri): Boolean {
         val bZipSucceeded: Boolean = zip(filesPathToZip, tempDir.path)
 
-        Log.i(
+        Logger.i(
             LOG_TAG_BACKUP_RESTORE,
             "backup zip completed, is success? $bZipSucceeded, proceed to copy $destUri"
         )
@@ -211,21 +208,21 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             // write access to the destination dir.
             val copySucceeded: Boolean = copyWithStream(inputStream, outputStream)
             return if (copySucceeded) {
-                Log.i(
+                Logger.i(
                     LOG_TAG_BACKUP_RESTORE,
                     "Copy completed, delete the temp dir ${tempZipFile.path}"
                 )
                 deleteResidue(tempZipFile)
                 true
             } else {
-                Log.w(
+                Logger.w(
                     LOG_TAG_BACKUP_RESTORE,
                     "copy failed to destination dir, path: ${zipFileUri.path}"
                 )
                 false
             }
         } else {
-            Log.w(LOG_TAG_BACKUP_RESTORE, "backup zip failed, do not proceed")
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "backup zip failed, do not proceed")
             return false
         }
     }
@@ -234,8 +231,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         val files = getRethinkDatabase(context)?.listFiles() ?: return false
 
         for (f in files) {
-            if (DEBUG)
-                Log.d(
+            Logger.d(
                     LOG_TAG_BACKUP_RESTORE,
                     "file ${f.name} found in database dir (${f.absolutePath})"
                 )
@@ -248,8 +244,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             }*/
             val databaseFile =
                 backUpFile(f.absolutePath, constructDbFileName(path, f.name)) ?: return false
-            if (DEBUG)
-                Log.d(LOG_TAG_BACKUP_RESTORE, "file ${databaseFile.name} added to backup dir")
+            Logger.i(LOG_TAG_BACKUP_RESTORE, "file ${databaseFile.name} added to backup dir")
             filesPathToZip.add(databaseFile.absolutePath)
         }
 
@@ -263,8 +258,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
     private fun saveSharedPreferencesToFile(context: Context, prefFile: File): Boolean {
         var output: ObjectOutputStream? = null
 
-        if (DEBUG)
-            Log.d(LOG_TAG_BACKUP_RESTORE, "begin shared pref copy, file path:${prefFile.path}")
+        Logger.i(LOG_TAG_BACKUP_RESTORE, "begin shared pref copy, file path:${prefFile.path}")
         val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
         try {
@@ -272,7 +266,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             val allPrefs = sharedPrefs.all
             output.writeObject(allPrefs)
         } catch (e: Exception) {
-            Log.e(LOG_TAG_BACKUP_RESTORE, "exception during shared pref backup, ${e.message}", e)
+            Logger.e(LOG_TAG_BACKUP_RESTORE, "exception during shared pref backup, ${e.message}", e)
             return false
         } finally {
             try {
@@ -290,7 +284,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
 
     private fun backUpFile(backupFilePath: String?, destFilePath: String?): File? {
         if (backupFilePath == null || destFilePath == null) {
-            Log.w(
+            Logger.w(
                 LOG_TAG_BACKUP_RESTORE,
                 "invalid backup info during db backup, file: $backupFilePath, destination: $destFilePath"
             )
@@ -304,7 +298,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
 
     private fun zip(files: List<String>, zipDirectory: String): Boolean {
         val outputFileName = zipDirectory + File.separator + TEMP_ZIP_FILE_NAME
-        if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "files: $files, output: $outputFileName")
+        Logger.d(LOG_TAG_BACKUP_RESTORE, "files: $files, output: $outputFileName")
         return try {
             val dest = FileOutputStream(outputFileName)
             val out = ZipOutputStream(BufferedOutputStream(dest))
@@ -321,14 +315,14 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                     out.write(data, 0, count)
                 }
                 origin.close()
-                if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "$file added to zip, path: $file")
+                Logger.d(LOG_TAG_BACKUP_RESTORE, "$file added to zip, path: $file")
             }
             out.close()
             out.close()
-            Log.i(LOG_TAG_BACKUP_RESTORE, "$files added to zip")
+            Logger.i(LOG_TAG_BACKUP_RESTORE, "$files added to zip")
             true
         } catch (e: Exception) {
-            Log.e(LOG_TAG_BACKUP_RESTORE, "error while adding files to zip dir, ${e.message}", e)
+            Logger.e(LOG_TAG_BACKUP_RESTORE, "error while adding files to zip dir, ${e.message}", e)
             false
         }
     }
