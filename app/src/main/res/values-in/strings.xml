@@ -993,7 +993,7 @@
     <string name="cd_toast_edit" translatable="true">Disunting</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Rutekan lalu lintas mandiri dari rethink melalui terowongan. Kecuali Anda tahu apa yang Anda lakukan, matikan.</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">Hapus titik akhir DoT?</string>
-    <string name="dot_custom_url_remove_dialog_message" translatable="true">Hapus DNS ini melalui titik akhir TLS dari konfigurasi yang disimpan.</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Menghapus DNS melalui titik-akhir TLS dari konfigurasi yang tersimpan.</string>
     <string name="one_wg_apps_added" translatable="true">Rutekan semua aplikasi</string>
     <string name="lbl_status" translatable="true">Status</string>
     <string name="lbl_starting" translatable="true">Memulai</string>
@@ -1014,7 +1014,7 @@
     <string name="wireguard_apps_proxy_map_desc" translatable="true">bagian %1$s</string>
     <string name="wg_apps_dialog_title_include" translatable="true">Sertakan aplikasi %1$s</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Terlindungi! Terhubung dengan DNS + Firewall + Proksi.</string>
-    <string name="dc_proxy_dns_desc" translatable="true">Jangan melakukan proksi DNS melalui proksi WireGuard, SOCKS5, dan HTTP yang selalu aktif.</string>
+    <string name="dc_proxy_dns_desc" translatable="true">Jangan memproksi DNS melalui WireGuard, SOCKS5, dan proksi HTTP yang-selalu-aktif.</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s dinonaktifkan karena proksi aktif</string>
     <string name="lbl_idle" translatable="true">Menganggur</string>
     <string name="lbl_split" translatable="true">Memisah</string>
@@ -1022,4 +1022,9 @@
     <string name="settings_connectivity_checks" translatable="true">Melakukan pengecekan koneksi</string>
     <string name="settings_connectivity_checks_desc" translatable="true">Pemeriksaan konektivitas dikirim untuk memastikan keterjangkauan.</string>
     <string name="dc_proxy_dns_heading" translatable="true">Jangan pernah memproksi DNS</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">Nonaktifkan %1$s</string>
+    <string name="lbl_unselected" translatable="true">Tidak dipilih</string>
+    <string name="lbl_background_data" translatable="true">Membatasi data latar belakang</string>
+    <string name="lbl_battery_optimization" translatable="true">Optimasi baterai</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> dapat mengakibatkan hilangnya konektivitas. Ubah pengaturan untuk membiarkan Rethink menggunakan data dan sumber daya lainnya saat berada di latar belakang.</string>
 </resources>
