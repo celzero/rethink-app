@@ -1015,4 +1015,10 @@
     <string name="wg_apps_dialog_title_exclude" translatable="true">排除 %1$s 个应用</string>
     <string name="wireguard_disable_title" translatable="true">停止 WireGuard</string>
     <string name="wireguard_disable_message" translatable="true">是否停止所有活跃 WireGuard VPN ？</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> 可能会导致连接丢失。 更改设置以让 Rethink 在后台调用数据和其他资源。</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">由于代理处于活动状态，%1$s 被禁用</string>
+    <string name="lbl_unselected" translatable="true">未选中的</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">禁用 %1$s</string>
+    <string name="dc_proxy_dns_heading" translatable="true">从不代理 DNS</string>
+    <string name="dc_proxy_dns_desc" translatable="true">不要通过Always-on WireGuard、SOCKS5、HTTP 代理来代理 DNS。</string>
 </resources>
