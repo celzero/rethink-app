@@ -1021,4 +1021,5 @@
     <string name="battery_optimization_dialog_heading" translatable="true">禁用 %1$s</string>
     <string name="dc_proxy_dns_heading" translatable="true">从不代理 DNS</string>
     <string name="dc_proxy_dns_desc" translatable="true">不要通过Always-on WireGuard、SOCKS5、HTTP 代理来代理 DNS。</string>
+    <string name="lbl_battery_optimization" translatable="true">电池优化</string>
 </resources>
