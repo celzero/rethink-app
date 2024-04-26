@@ -48,7 +48,7 @@
 \n <u>##5</u>: Bloqueia as ligações quando a aplicação de origem é desconhecida (firewall universal).
 \n<u>##6</u>: Bloqueia todo o tráfego UDP exceto DNS (firewall universal).
 \n <u>#7</u>: Bloqueia ligações quando o DNS é ignorado (firewall universal).</string>
-    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai 3.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Opcionalmente, proxy DNS através de proxies WireGuard e SOCKS5.&lt;br/&gt; 2. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Opcionalmente, ative as verificações de conetividade Android incorporadas.3. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Lista de domínios e sítios Web a que uma aplicação se ligou.&lt;br/&gt; Suporte melhorado para a edição de regras de firewall baseadas em IP.&lt;br/&gt; 5. Melhoria da largura de banda do WireGuard.&lt;br/&gt; &lt;br/&gt; 6. Revisão da experiência de utilizador do WireGuard.&lt;br/&gt; 7. Evitar fugas de ligação para os modos WireGuard Simples e Sempre ligado.&lt;br/&gt; 8. Correção da falha ao editar as configurações do WireGuard.&lt;br/&gt; 9. Correção de pequenos erros com o RDNS+ e outras regras de firewall baseadas no domínio.&lt;br/&gt; 10. Correção de erros: Suporte de várias regras para um único IP fidedigno.&lt;br/&gt; 11. Correção de erros: Falha específica do Android 14.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ajude a traduzir este aplicativo&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;JA Donenfeld 2.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Show upload, download stats for WireGuard.&lt;br/&gt; 2. Auto recover dropped WireGuard connections.&lt;br/&gt; 3. Implement Android\'s &lt;i&gt;seamless handover&lt;/i&gt; on network changes.&lt;br/&gt; 4. Support for multiple DNSCrypt relays.&lt;br/&gt; 5. Bug fix: Close packet capture file when appropriate.&lt;br/&gt; 6. Other bug fixed and improvements.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Help translate this app&lt;/a&gt;</string>
     <string name="relative_time_yesterday">Ontem</string>
     <string name="always_on_dialog_heading">Desativar VPN sempre ativa</string>
     <string name="always_on_dialog">A opção \"VPN sempre ativa\" está ativada neste dispositivo. Para iniciar Rethink, aceda às definições da VPN Android e desative a opção \"VPN sempre ativa\".</string>
@@ -1022,4 +1022,5 @@
     <string name="dc_proxy_dns_heading" translatable="true">Nunca usar proxy DNS</string>
     <string name="dc_proxy_dns_desc" translatable="true">Não fazer proxy de DNS em proxies WireGuard, SOCKS5, HTTP sempre ativos.</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s está desativado porque os proxies estão ativos</string>
+    <string name="lbl_unselected" translatable="true">Não selecionado</string>
 </resources>
