@@ -247,8 +247,8 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:99521f3ca9@aar'
-    implementation 'com.github.celzero:firestack:99521f3ca9@aar'
+    download 'com.github.celzero:firestack:1f812ec9e6@aar'
+    implementation 'com.github.celzero:firestack:1f812ec9e6@aar'
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.9.0') {
