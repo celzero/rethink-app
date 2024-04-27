@@ -894,7 +894,7 @@ class GoVpnAdapter : KoinComponent {
     private fun newDefaultTransport(url: String): intra.DefaultDNS {
         val defaultDns = FALLBACK_DNS
         try {
-            // when the url is empty, set the default transport to 8.8.4.4:53
+            // when the url is empty, set the default transport to 8.8.4.4, 2001:4860:4860::8844
             if (url.isEmpty()) {
                 Logger.i(LOG_TAG_VPN, "set default transport to $defaultDns, as url is empty")
                 return Intra.newDefaultDNS(Backend.DNS53, defaultDns, "")
@@ -921,7 +921,7 @@ class GoVpnAdapter : KoinComponent {
                 Logger.i(LOG_TAG_VPN, "Tunnel not connected, skip new default transport")
                 return
             }
-            // when the url is empty, set the default transport to DEFAULT_DNS_IP
+            // when the url is empty, set the default transport to FALLBACK_DNS
             // default transport is always sent to Ipn.Exit in the go code and so dns
             // request sent to the default transport will not be looped back into the tunnel
             if (url.isNullOrEmpty()) {

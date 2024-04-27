@@ -77,7 +77,7 @@ internal constructor(
 
         private const val ORBOT_DNS = "Orbot"
 
-        const val FALLBACK_DNS = "8.8.4.4"
+        const val FALLBACK_DNS = "8.8.4.4, 2001:4860:4860::8844"
     }
 
     init {
