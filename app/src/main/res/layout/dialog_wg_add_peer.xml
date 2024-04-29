@@ -116,6 +116,18 @@
                         android:inputType="number" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/keep_alive_hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:gravity="center_vertical"
+                    android:padding="5dp"
+                    android:textColor="?attr/primaryLightColorText"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/public_key_label_layout" />
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/endpoint_label_layout"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
