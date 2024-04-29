@@ -227,7 +227,7 @@ dependencies {
     }
 
     // Ref: https://stackoverflow.com/a/46638213
-    kspFull 'com.github.bumptech.glide:compiler:4.15.1'
+    kspFull 'com.github.bumptech.glide:compiler:4.16.0'
 
     // Swipe button animation
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
