@@ -18,7 +18,6 @@ package com.celzero.bravedns.adapter
 import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,12 +32,17 @@ import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppIpDetailsBinding
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.bottomsheet.AppIpRulesBottomSheet
-import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
+import kotlin.math.log2
 
 class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner, val uid: Int) :
     PagingDataAdapter<AppConnection, AppWiseIpsAdapter.ConnectionDetailsViewHolder>(DIFF_CALLBACK),
     AppIpRulesBottomSheet.OnBottomSheetDialogFragmentDismiss {
+
+    private var maxValue: Int = 0
+    private var minPercentage: Int = 100
 
     companion object {
         private val DIFF_CALLBACK =
@@ -58,9 +62,6 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
 
     private lateinit var adapter: AppWiseIpsAdapter
 
-    // ui component to update/toggle the buttons
-    data class ToggleBtnUi(val txtColor: Int, val bgColor: Int)
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -78,6 +79,24 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
         val appConnection: AppConnection = getItem(position) ?: return
         // updates the app-wise connections from network log to AppInfo screen
         holder.update(appConnection)
+    }
+
+    private fun calculatePercentage(c: Double): Int {
+        val value = (log2(c) * 100).toInt()
+        // maxValue will be based on the count returned by db query (order by count desc)
+        if (value > maxValue) {
+            maxValue = value
+        }
+        return if (maxValue == 0) {
+            0
+        } else {
+            val percentage = (value * 100 / maxValue)
+            // minPercentage is used to show the progress bar when the percentage is 0
+            if (percentage < minPercentage && percentage != 0) {
+                minPercentage = percentage
+            }
+            percentage
+        }
     }
 
     inner class ConnectionDetailsViewHolder(private val b: ListItemAppIpDetailsBinding) :
@@ -126,7 +145,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
             } else {
                 b.acdDomainName.visibility = View.GONE
             }
-            updateStatusUi(appConnection.uid, appConnection.ipAddress)
+            updateStatusUi(appConnection)
         }
 
         private fun beautifyDomainString(d: String): String {
@@ -135,55 +154,41 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
             return removeBeginningTrailingCommas(d).replace(",,", ",").replace(",", ", ")
         }
 
-        private fun updateStatusUi(uid: Int, ipAddress: String) {
-            val status = IpRulesManager.getMostSpecificRuleMatch(uid, ipAddress)
+        private fun updateStatusUi(conn: AppConnection) {
+            val status = IpRulesManager.getMostSpecificRuleMatch(conn.uid, conn.ipAddress)
             when (status) {
                 IpRulesManager.IpRuleStatus.NONE -> {
-                    b.acdFlag.text = context.getString(R.string.ci_no_rule_initial)
+                    b.progress.setIndicatorColor(
+                        UIUtils.fetchToggleBtnColors(context, R.color.chipBgNeutral)
+                    )
                 }
                 IpRulesManager.IpRuleStatus.BLOCK -> {
-                    b.acdFlag.text = context.getString(R.string.ci_blocked_initial)
+                    b.progress.setIndicatorColor(
+                        UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
+                    )
                 }
                 IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                    b.acdFlag.text = context.getString(R.string.ci_bypass_universal_initial)
+                    b.progress.setIndicatorColor(
+                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
+                    )
                 }
                 IpRulesManager.IpRuleStatus.TRUST -> {
-                    b.acdFlag.text = context.getString(R.string.ci_trust_initial)
+                    b.progress.setIndicatorColor(
+                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
+                    )
                 }
             }
+            b.acdFlag.text = conn.flag
 
-            // returns the text and background color for the button
-            val t = getToggleBtnUiParams(status)
-            b.acdFlag.setTextColor(t.txtColor)
-            b.acdFlag.backgroundTintList = ColorStateList.valueOf(t.bgColor)
-        }
-
-        private fun getToggleBtnUiParams(id: IpRulesManager.IpRuleStatus): ToggleBtnUi {
-            return when (id) {
-                IpRulesManager.IpRuleStatus.NONE -> {
-                    ToggleBtnUi(
-                        fetchColor(context, R.attr.chipTextNeutral),
-                        fetchColor(context, R.attr.chipBgColorNeutral)
-                    )
-                }
-                IpRulesManager.IpRuleStatus.BLOCK -> {
-                    ToggleBtnUi(
-                        fetchColor(context, R.attr.chipTextNegative),
-                        fetchColor(context, R.attr.chipBgColorNegative)
-                    )
-                }
-                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                    ToggleBtnUi(
-                        fetchColor(context, R.attr.chipTextPositive),
-                        fetchColor(context, R.attr.chipBgColorPositive)
-                    )
-                }
-                IpRulesManager.IpRuleStatus.TRUST -> {
-                    ToggleBtnUi(
-                        fetchColor(context, R.attr.chipTextPositive),
-                        fetchColor(context, R.attr.chipBgColorPositive)
-                    )
-                }
+            var p = calculatePercentage(conn.count.toDouble())
+            if (p == 0) {
+                p = minPercentage / 2
+            }
+            
+            if (Utilities.isAtleastN()) {
+                b.progress.setProgress(p, true)
+            } else {
+                b.progress.progress = p
             }
         }
     }

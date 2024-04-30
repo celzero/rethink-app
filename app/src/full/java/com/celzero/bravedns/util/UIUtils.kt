@@ -278,6 +278,12 @@ object UIUtils {
                 R.attr.accentGood
             } else if (attr == R.color.accentBad) {
                 R.attr.accentBad
+            } else if (attr == R.color.chipBgNeutral) {
+                R.attr.chipBgColorNeutral
+            } else if (attr == R.color.chipTextNegative) {
+                R.attr.chipBgColorNegative
+            } else if (attr == R.color.chipTextPositive) {
+                R.attr.chipBgColorPositive
             } else {
                 R.attr.chipBgColorPositive
             }
