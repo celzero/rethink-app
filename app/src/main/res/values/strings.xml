@@ -1463,7 +1463,7 @@
     <string name="one_wg_apps_added" translatable="true">Routing all apps</string>
 
     <string name="wg_lockdown_dialog_title" translatable="true">Lockdown</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Selected apps will only be routed through this WireGuard VPN, regardless of whether the VPN is failing or connected.</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Selected apps will only be routed through this WireGuard VPN, regardless of whether the VPN is active or disabled.</string>
 
     <string name="one_wg_dialog_desc" translatable="true">All connections from all apps, including DNS, will be routed to a single, active WireGuard VPN. Other active WireGuard VPNs, if any, will be stopped.</string>
 
