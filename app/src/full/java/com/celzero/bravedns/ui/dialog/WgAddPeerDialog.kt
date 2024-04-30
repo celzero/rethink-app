@@ -19,13 +19,18 @@ import Logger
 import android.app.Activity
 import android.app.Dialog
 import android.os.Bundle
+import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
+import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.databinding.DialogWgAddPeerBinding
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.util.ErrorMessages
@@ -71,15 +76,32 @@ class WgAddPeerDialog(
                 b.peerEndpoint.setText(wgPeer.getEndpoint().get().toString())
             }
             if (wgPeer.persistentKeepalive.isPresent) {
-                b.peerPersistentKeepAlive.setText(wgPeer.persistentKeepalive.get().toString())
+                val kas = wgPeer.persistentKeepalive.get()
+                b.keepAliveHint.visibility = View.VISIBLE
+                b.peerPersistentKeepAlive.setText(kas.toString())
+                b.keepAliveHint.text = getDurationInHumanReadableFormat(activity, kas)
             } else {
-                // no-op
+                b.keepAliveHint.visibility = View.GONE
             }
         }
     }
 
     private fun setupClickListener() {
         b.customDialogDismissButton.setOnClickListener { this.dismiss() }
+
+        b.peerPersistentKeepAlive.doOnTextChanged { text, _, _, _ ->
+            if (text.toString().isNotEmpty()) {
+                try {
+                    val kas = text.toString().toInt()
+                    b.keepAliveHint.visibility = View.VISIBLE
+                    b.keepAliveHint.text = getDurationInHumanReadableFormat(activity, kas)
+                } catch (e: NumberFormatException) {
+                    b.keepAliveHint.visibility = View.GONE
+                }
+            } else {
+                b.keepAliveHint.visibility = View.GONE
+            }
+        }
 
         b.customDialogOkButton.setOnClickListener {
             val peerPublicKey = b.peerPublicKey.text.toString()

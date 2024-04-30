@@ -398,13 +398,18 @@
 
     <string name="app_mode_choose" translatable="true">Choose mode</string>
 
-    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>JA Donenfeld 2.0</b><br/><br/>
+    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>JA Donenfeld 4.0</b><br/><br/>
         1. Show upload, download stats for WireGuard.<br/>
         2. Auto recover dropped WireGuard connections.<br/>
         3. Implement Android\'s <i>seamless handover</i> on network changes.<br/>
-        4. Support for multiple DNSCrypt relays.<br/>
-        5. Bug fix: Close packet capture file when appropriate.<br/>
-        6. Other bug fixed and improvements.<br/><br/>
+        4. New UI for per-app Network and DNS logs.<br/>
+        5. Support for multiple DNSCrypt relays.<br/>
+        6. Improvement: Show WireGuard Peer handshake time periods.<br/>
+        7. Bug fix: Prevent multi package apps auto-deleting from WireGuard configs.<br/>
+        8. Bug fix: Inaccessible On-device blocklists Configure UI.<br/>
+        9. Bug fix: Close packet capture file when appropriate.<br/>
+        10. Bug fix: Fix crash when stopping WireGuard.<br/>
+        11. Other bug fixed and improvements.<br/><br/>
 
         <a href="https://svc.rethinkdns.com/r/translate">Help translate this app</a>]]>
     </string>
@@ -1463,7 +1468,7 @@
     <string name="one_wg_apps_added" translatable="true">Routing all apps</string>
 
     <string name="wg_lockdown_dialog_title" translatable="true">Lockdown</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Selected apps will only be routed through this WireGuard VPN, regardless of whether the VPN is failing or connected.</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Selected apps will only be routed through this WireGuard VPN, regardless of whether the VPN is active or disabled.</string>
 
     <string name="one_wg_dialog_desc" translatable="true">All connections from all apps, including DNS, will be routed to a single, active WireGuard VPN. Other active WireGuard VPNs, if any, will be stopped.</string>
 

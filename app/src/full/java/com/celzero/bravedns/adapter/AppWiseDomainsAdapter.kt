@@ -18,7 +18,6 @@ package com.celzero.bravedns.adapter
 import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,8 +32,10 @@ import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppDomainDetailsBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.ui.bottomsheet.AppDomainRulesBottomSheet
-import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
+import kotlin.math.log2
 
 class AppWiseDomainsAdapter(
     val context: Context,
@@ -45,6 +46,9 @@ class AppWiseDomainsAdapter(
         DIFF_CALLBACK
     ),
     AppDomainRulesBottomSheet.OnBottomSheetDialogFragmentDismiss {
+
+    private var maxValue: Int = 0
+    private var minPercentage: Int = 100
 
     companion object {
         private val DIFF_CALLBACK =
@@ -90,6 +94,24 @@ class AppWiseDomainsAdapter(
         holder.update(appConnection)
     }
 
+    private fun calculatePercentage(c: Double): Int {
+        val value = (log2(c) * 100).toInt()
+        // maxValue will be based on the count returned by db query (order by count desc)
+        if (value > maxValue) {
+            maxValue = value
+        }
+        return if (maxValue == 0) {
+            0
+        } else {
+            val percentage = (value * 100 / maxValue)
+            // minPercentage is used to show the progress bar when the percentage is 0
+            if (percentage < minPercentage && percentage != 0) {
+                minPercentage = percentage
+            }
+            percentage
+        }
+    }
+
     inner class ConnectionDetailsViewHolder(private val b: ListItemAppDomainDetailsBinding) :
         RecyclerView.ViewHolder(b.root) {
         fun update(conn: AppConnection) {
@@ -97,22 +119,23 @@ class AppWiseDomainsAdapter(
             setupClickListeners(conn)
         }
 
-        private fun displayTransactionDetails(appConnection: AppConnection) {
-            b.acdCount.text = appConnection.count.toString()
-            b.acdDomain.text = appConnection.appOrDnsName
-            if (appConnection.ipAddress.isNotEmpty()) {
+        private fun displayTransactionDetails(conn: AppConnection) {
+            b.acdCount.text = conn.count.toString()
+            b.acdDomain.text = conn.appOrDnsName
+            b.acdFlag.text = conn.flag
+            if (conn.ipAddress.isNotEmpty()) {
                 b.acdIpAddress.visibility = View.VISIBLE
-                b.acdIpAddress.text = beautifyIpString(appConnection.ipAddress)
+                b.acdIpAddress.text = beautifyIpString(conn.ipAddress)
             } else {
                 b.acdIpAddress.visibility = View.GONE
             }
-            updateStatusUi(appConnection.uid, appConnection.appOrDnsName)
+            updateStatusUi(conn)
         }
 
-        private fun setupClickListeners(appConn: AppConnection) {
+        private fun setupClickListeners(conn: AppConnection) {
             b.acdContainer.setOnClickListener {
                 // open bottom sheet to apply domain/ip rules
-                openBottomSheet(appConn)
+                openBottomSheet(conn)
             }
         }
 
@@ -141,51 +164,39 @@ class AppWiseDomainsAdapter(
             return removeBeginningTrailingCommas(d).replace(",,", ",").replace(",", ", ")
         }
 
-        private fun updateStatusUi(uid: Int, domain: String?) {
-            if (domain == null) {
-                b.acdFlag.text = context.getString(R.string.ci_no_rule_initial)
+        private fun updateStatusUi(conn: AppConnection) {
+            if (conn.appOrDnsName.isNullOrEmpty()) {
+                b.progress.visibility = View.GONE
                 return
             }
-
-            val status = DomainRulesManager.getDomainRule(domain, uid)
+            val status = DomainRulesManager.getDomainRule(conn.appOrDnsName, uid)
             when (status) {
                 DomainRulesManager.Status.NONE -> {
-                    b.acdFlag.text = context.getString(R.string.ci_no_rule_initial)
+                    b.progress.setIndicatorColor(
+                        UIUtils.fetchToggleBtnColors(context, R.color.chipTextNeutral)
+                    )
                 }
                 DomainRulesManager.Status.BLOCK -> {
-                    b.acdFlag.text = context.getString(R.string.ci_blocked_initial)
+                    b.progress.setIndicatorColor(
+                        UIUtils.fetchToggleBtnColors(context, R.color.accentBad)
+                    )
                 }
                 DomainRulesManager.Status.TRUST -> {
-                    b.acdFlag.text = context.getString(R.string.ci_trust_initial)
+                    b.progress.setIndicatorColor(
+                        UIUtils.fetchToggleBtnColors(context, R.color.accentGood)
+                    )
                 }
             }
 
-            // returns the text and background color for the button
-            val t = getToggleBtnUiParams(status)
-            b.acdFlag.setTextColor(t.txtColor)
-            b.acdFlag.backgroundTintList = ColorStateList.valueOf(t.bgColor)
-        }
+            var p = calculatePercentage(conn.count.toDouble())
+            if (p == 0) {
+                p = minPercentage / 2
+            }
 
-        private fun getToggleBtnUiParams(id: DomainRulesManager.Status): ToggleBtnUi {
-            return when (id) {
-                DomainRulesManager.Status.NONE -> {
-                    ToggleBtnUi(
-                        fetchColor(context, R.attr.chipTextNeutral),
-                        fetchColor(context, R.attr.chipBgColorNeutral)
-                    )
-                }
-                DomainRulesManager.Status.BLOCK -> {
-                    ToggleBtnUi(
-                        fetchColor(context, R.attr.chipTextNegative),
-                        fetchColor(context, R.attr.chipBgColorNegative)
-                    )
-                }
-                DomainRulesManager.Status.TRUST -> {
-                    ToggleBtnUi(
-                        fetchColor(context, R.attr.chipTextPositive),
-                        fetchColor(context, R.attr.chipBgColorPositive)
-                    )
-                }
+            if (Utilities.isAtleastN()) {
+                b.progress.setProgress(p, true)
+            } else {
+                b.progress.progress = p
             }
         }
     }
