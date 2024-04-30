@@ -280,10 +280,16 @@ object UIUtils {
                 R.attr.accentBad
             } else if (attr == R.color.chipBgNeutral) {
                 R.attr.chipBgColorNeutral
-            } else if (attr == R.color.chipTextNegative) {
+            } else if (attr == R.color.chipBgNegative) {
                 R.attr.chipBgColorNegative
-            } else if (attr == R.color.chipTextPositive) {
+            } else if (attr == R.color.chipBgPositive) {
                 R.attr.chipBgColorPositive
+            } else if (attr == R.color.chipTextNeutral) {
+                R.attr.chipTextNeutral
+            } else if (attr == R.color.chipTextNegative) {
+                R.attr.chipTextNegative
+            } else if (attr == R.color.chipTextPositive) {
+                R.attr.chipTextPositive
             } else {
                 R.attr.chipBgColorPositive
             }

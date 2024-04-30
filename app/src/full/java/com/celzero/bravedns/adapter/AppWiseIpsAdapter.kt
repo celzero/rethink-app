@@ -47,16 +47,9 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
     companion object {
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<AppConnection>() {
+                override fun areItemsTheSame(old: AppConnection, new: AppConnection) = old == new
 
-                override fun areItemsTheSame(
-                    oldConnection: AppConnection,
-                    newConnection: AppConnection
-                ) = oldConnection == newConnection
-
-                override fun areContentsTheSame(
-                    oldConnection: AppConnection,
-                    newConnection: AppConnection
-                ) = oldConnection == newConnection
+                override fun areContentsTheSame(old: AppConnection, new: AppConnection) = old == new
             }
     }
 
@@ -106,16 +99,16 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
             setupClickListeners(conn)
         }
 
-        private fun setupClickListeners(appConn: AppConnection) {
+        private fun setupClickListeners(conn: AppConnection) {
             b.acdContainer.setOnClickListener {
                 // open bottom sheet to apply domain/ip rules
-                openBottomSheet(appConn)
+                openBottomSheet(conn)
             }
         }
 
-        private fun openBottomSheet(appConn: AppConnection) {
+        private fun openBottomSheet(conn: AppConnection) {
             if (context !is AppCompatActivity) {
-                Logger.w(LOG_TAG_UI, "Error opening the app conn bottom sheet")
+                Logger.w(LOG_TAG_UI, "err opening the app conn bottom sheet")
                 return
             }
 
@@ -126,26 +119,27 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
             // so sending the data using Bundles
             val bundle = Bundle()
             bundle.putInt(AppIpRulesBottomSheet.UID, uid)
-            bundle.putString(AppIpRulesBottomSheet.IP_ADDRESS, appConn.ipAddress)
+            bundle.putString(AppIpRulesBottomSheet.IP_ADDRESS, conn.ipAddress)
             bundle.putString(
                 AppIpRulesBottomSheet.DOMAINS,
-                beautifyDomainString(appConn.appOrDnsName ?: "")
+                beautifyDomainString(conn.appOrDnsName ?: "")
             )
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.dismissListener(adapter, absoluteAdapterPosition)
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
-        private fun displayTransactionDetails(appConnection: AppConnection) {
-            b.acdCount.text = appConnection.count.toString()
-            b.acdIpAddress.text = appConnection.ipAddress
-            if (!appConnection.appOrDnsName.isNullOrEmpty()) {
+        private fun displayTransactionDetails(conn: AppConnection) {
+            b.acdCount.text = conn.count.toString()
+            b.acdIpAddress.text = conn.ipAddress
+            b.acdFlag.text = conn.flag
+            if (!conn.appOrDnsName.isNullOrEmpty()) {
                 b.acdDomainName.visibility = View.VISIBLE
-                b.acdDomainName.text = beautifyDomainString(appConnection.appOrDnsName)
+                b.acdDomainName.text = beautifyDomainString(conn.appOrDnsName)
             } else {
                 b.acdDomainName.visibility = View.GONE
             }
-            updateStatusUi(appConnection)
+            updateStatusUi(conn)
         }
 
         private fun beautifyDomainString(d: String): String {
@@ -159,7 +153,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
             when (status) {
                 IpRulesManager.IpRuleStatus.NONE -> {
                     b.progress.setIndicatorColor(
-                        UIUtils.fetchToggleBtnColors(context, R.color.chipBgNeutral)
+                        UIUtils.fetchToggleBtnColors(context, R.color.chipTextNeutral)
                     )
                 }
                 IpRulesManager.IpRuleStatus.BLOCK -> {
@@ -178,13 +172,12 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
                     )
                 }
             }
-            b.acdFlag.text = conn.flag
 
             var p = calculatePercentage(conn.count.toDouble())
             if (p == 0) {
                 p = minPercentage / 2
             }
-            
+
             if (Utilities.isAtleastN()) {
                 b.progress.setProgress(p, true)
             } else {

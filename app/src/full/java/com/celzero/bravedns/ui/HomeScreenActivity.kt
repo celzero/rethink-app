@@ -54,6 +54,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
 import com.celzero.bravedns.service.AppUpdater
@@ -75,18 +76,19 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.util.Calendar
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.util.Calendar
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
 
     private val persistentState by inject<PersistentState>()
+    private val appConfig by inject<AppConfig>()
     private val appUpdateManager by inject<AppUpdater>()
     private val rdb by inject<RefreshDatabase>()
 
@@ -120,6 +122,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // do not launch on board activity when app is running on TV
         if (persistentState.firstTimeLaunch && !isAppRunningOnTv()) {
             launchOnboardActivity()
+            rdnsRemote()
             return
         }
         updateNewVersion()
@@ -390,6 +393,18 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
         // to SystemClock.elapsedRealtime
         persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
+    }
+
+    private fun rdnsRemote() {
+        // enforce the dns to sky for play store build, and max for website and f-droid build
+        // on first time launch
+        io {
+            if (isPlayStoreFlavour()) {
+                appConfig.switchRethinkDnsToSky()
+            } else {
+                appConfig.switchRethinkDnsToMax()
+            }
+        }
     }
 
     // fixme: find a cleaner way to implement this, move this to some other place

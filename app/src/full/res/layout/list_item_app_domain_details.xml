@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/acd_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -14,45 +15,33 @@
 
         <TextView
             android:id="@+id/acd_flag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_centerVertical="true"
+            android:layout_gravity="center"
             android:layout_marginStart="5dp"
+            android:alpha="0.9"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
-            android:background="@drawable/rectangle_border_background"
+            android:layout_marginBottom="5dp"
+            android:ellipsize="none"
             android:gravity="center"
-            android:minWidth="25dp"
-            android:padding="5dp"
-            android:textSize="@dimen/default_font_text_view" />
-
-        <TextView
-            android:id="@+id/acd_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@id/acd_flag"
-            android:background="@drawable/drawable_purple_gradient"
-            android:fontFamily="sans-serif-light"
-            android:gravity="center"
-            android:maxWidth="40dp"
-            android:minWidth="40dp"
-            android:padding="5dp"
+            android:minWidth="32dp"
             android:singleLine="true"
-            android:textAppearance="@android:style/TextAppearance.Material.Subhead"
-            android:textSize="@dimen/default_font_text_view"
-            android:textStyle="bold" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textSize="26sp" />
+
 
         <LinearLayout
             android:id="@+id/acd_top_layout_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toEndOf="@id/acd_count"
+            android:layout_toStartOf="@id/acd_count"
+            android:layout_toEndOf="@id/acd_flag"
             android:baselineAligned="false"
-            android:layout_toStartOf="@id/acd_status_button"
             android:gravity="center"
-            android:orientation="vertical"
-            android:padding="5dp">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/acd_domain"
@@ -74,11 +63,40 @@
                 android:layout_marginStart="5dp"
                 android:ellipsize="end"
                 android:gravity="center_vertical"
-                android:maxLines="1"
+                android:maxLines="3"
                 android:padding="2dp"
                 android:textSize="@dimen/default_font_text_view" />
 
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="7dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:alpha="0.75"
+                android:padding="3dp"
+                app:trackColor="?attr/background" />
+
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/acd_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/acd_status_button"
+            android:background="@drawable/drawable_purple_gradient"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center"
+            android:maxWidth="40dp"
+            android:minWidth="40dp"
+            android:padding="5dp"
+            android:singleLine="true"
+            android:textAppearance="@android:style/TextAppearance.Material.Subhead"
+            android:textSize="@dimen/default_font_text_view"
+            android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/acd_status_button"
@@ -94,11 +112,13 @@
             android:padding="5dp"
             android:src="@drawable/ic_arrow_down_small" />
 
+
     </RelativeLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0.75dp"
         android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
         android:background="?attr/divider" />
 </LinearLayout>
