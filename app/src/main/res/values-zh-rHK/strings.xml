@@ -1016,4 +1016,5 @@
     <string name="settings_connectivity_checks" translatable="true">檢查連線</string>
     <string name="dc_proxy_dns_heading" translatable="true">千祈唔好代理 DNS</string>
     <string name="toast_allow_bypass_disabled" translatable="true">由於開咗代理，用唔到 %1$s</string>
+    <string name="lbl_idle" translatable="true">閒置</string>
 </resources>
