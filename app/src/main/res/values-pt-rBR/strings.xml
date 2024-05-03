@@ -738,7 +738,7 @@
     <string name="notif_download_cancel_content">Download cancelado.</string>
     <string name="intent_launch_error">Não foi possível abrir %1$s</string>
     <string name="firewall_rule_block_univ_ip">IP / Porta (Universal)</string>
-    <string name="whats_new_version_update">&lt;b&gt;JA Donenfeld 2.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Mostrar estatísticas de upload e download do WireGuard.&lt;br/&gt; 2. Recuperação automática de conexões perdidas do WireGuard.&lt;br/&gt; 3. Implementação de &lt;i&gt;transferência perfeita&lt;/i&gt; do Android nas alterações de rede.&lt;br/&gt; 4. Suporte para vários relés DNSCrypt.&lt;br/&gt; 5. Correção de bug: Fechar arquivo de captura de pacotes quando apropriado.&lt;br/&gt; 6. Outros bugs corrigidos e melhorias .&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ajude a traduzir este aplicativo&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;JA Donenfeld 4.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Show upload, download stats for WireGuard.&lt;br/&gt; 2. Auto recover dropped WireGuard connections.&lt;br/&gt; 3. Implement Android\'s &lt;i&gt;seamless handover&lt;/i&gt; on network changes.&lt;br/&gt; 4. New UI for per-app Network and DNS logs.&lt;br/&gt; 5. Support for multiple DNSCrypt relays.&lt;br/&gt; 6. Improvement: Show WireGuard Peer handshake time periods.&lt;br/&gt; 7. Bug fix: Prevent multi package apps auto-deleting from WireGuard configs.&lt;br/&gt; 8. Bug fix: Inaccessible On-device blocklists Configure UI.&lt;br/&gt; 9. Bug fix: Close packet capture file when appropriate.&lt;br/&gt; 10. Bug fix: Fix crash when stopping WireGuard.&lt;br/&gt; 11. Other bug fixed and improvements.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Help translate this app&lt;/a&gt;</string>
     <string name="private_dns_dialog_heading">Desativar DNS Privado</string>
     <string name="private_dns_dialog_desc">As configurações de DNS do Rethink são substituídas pelo \"DNS Privado\" do Android.
 \n
@@ -982,7 +982,7 @@
     <string name="settings_rinr_desc_enabled" translatable="true">Encaminhando o próprio tráfego do Rethink através do túnel. A menos que você saiba o que está fazendo, desligue-o.</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Encaminhar o próprio tráfego do Rethink, como downloads de listas de bloqueio, verificações de conectividade, conexões DNS, de volta ao túnel.</string>
     <string name="cd_toast_edit" translatable="true">Editado</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Os aplicativos selecionados serão roteados apenas por meio desta VPN WireGuard, independentemente de a VPN estar falhando ou conectada.</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Os aplicativos selecionados serão roteados apenas por meio desta VPN WireGuard, independentemente de a VPN estar ativa ou desativada.</string>
     <string name="one_wg_dialog_desc" translatable="true">Todas as conexões de todos os aplicativos, incluindo DNS, serão roteadas para uma única VPN WireGuard ativa. Outras VPNs WireGuard ativas, se houver, serão interrompidas.</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Todas as conexões e aplicativos não roteados por outras VPNs WireGuard serão roteados por esta.</string>
     <string name="one_wg_error_toast" translatable="true">Ao mudar para o modo \"Avançado\", desative o WireGuard no modo \"Simples\"</string>
