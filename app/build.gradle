@@ -217,7 +217,7 @@ dependencies {
     fullImplementation 'com.squareup.retrofit2:retrofit:2.9.0'
     fullImplementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
-    implementation 'com.squareup.okio:okio-jvm:3.6.0'
+    implementation 'com.squareup.okio:okio-jvm:3.9.0'
     // Glide
     fullImplementation('com.github.bumptech.glide:glide:4.16.0') {
         exclude group: 'glide-parent'
