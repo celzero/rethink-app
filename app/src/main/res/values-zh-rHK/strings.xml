@@ -67,7 +67,7 @@
     <string name="settings_enable_logs">啓用本地日誌</string>
     <string name="info_dialog_rethink_toast_msg">當做 RDNS+ DNS-over-HTTPS URL 複製咗</string>
     <string name="orbot_http">HTTP 代理</string>
-    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai 3.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;New feature&lt;/i&gt;: Optionally proxy DNS over WireGuard and SOCKS5 proxies.&lt;br/&gt; 2. &lt;i&gt;New feature&lt;/i&gt;: Optionally enable built-in Android connectivity checks.&lt;br/&gt; 3. &lt;i&gt;New feature&lt;/i&gt;: List domains and websites an app has connected to.&lt;br/&gt; 4. Improved support for editing IP-based firewall rules.&lt;br/&gt; 5. Improved WireGuard bandwidth.&lt;br/&gt; 6. Overhauled WireGuard UX.&lt;br/&gt; 7. Avoid connection leaks for Simple and Always-on WireGuard modes.&lt;br/&gt; 8. Fix crash when editing WireGuard configurations.&lt;br/&gt; 9. Fix minor bugs with RDNS+ and other domain-based firewall rules.&lt;br/&gt; 10. Bug fix: Support multiple rules for a single Trusted IP.&lt;br/&gt; 11. Bug fix: Android 14 specific crash.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;幫手翻譯呢個 app&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;JA Donenfeld 4.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Show upload, download stats for WireGuard.&lt;br/&gt; 2. Auto recover dropped WireGuard connections.&lt;br/&gt; 3. Implement Android\'s &lt;i&gt;seamless handover&lt;/i&gt; on network changes.&lt;br/&gt; 4. New UI for per-app Network and DNS logs.&lt;br/&gt; 5. Support for multiple DNSCrypt relays.&lt;br/&gt; 6. Improvement: Show WireGuard Peer handshake time periods.&lt;br/&gt; 7. Bug fix: Prevent multi package apps auto-deleting from WireGuard configs.&lt;br/&gt; 8. Bug fix: Inaccessible On-device blocklists Configure UI.&lt;br/&gt; 9. Bug fix: Close packet capture file when appropriate.&lt;br/&gt; 10. Bug fix: Fix crash when stopping WireGuard.&lt;br/&gt; 11. Other bug fixed and improvements.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;幫手翻譯呢個 app&lt;/a&gt;</string>
     <string name="cd_doh_dialog_heading">加 DNS over HTTPS</string>
     <string name="cd_doh_dialog_resolver_url">解析服務 URL</string>
     <string name="cd_dnscrypt_relay_heading">中繼</string>
@@ -1008,7 +1008,7 @@
     <string name="cd_toast_edit" translatable="true">改咗</string>
     <string name="one_wg_apps_added" translatable="true">路由緊所有應用程式</string>
     <string name="wg_lockdown_dialog_title" translatable="true">閉關</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">揀咗嘅應用程式將淨係用呢個 WireGuard VPN 嚟路由，無論呢個 VPN 係咪成功連線。</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">揀咗嘅應用程式將淨係用呢個 WireGuard VPN 嚟路由，無論呢個 VPN 係咪已經啓用。</string>
     <string name="one_wg_dialog_desc" translatable="true">包括 DNS 在內嘅來自所有應用程式嘅流量將被單個活躍嘅 WireGuard VPN 路由。其他活躍嘅 WireGuard VPN 將被停止。</string>
     <string name="catch_all_wg_dialog_title" translatable="true">永遠着住</string>
     <string name="wireguard_disable_title" translatable="true">停止 WireGuard</string>
@@ -1016,4 +1016,12 @@
     <string name="settings_connectivity_checks" translatable="true">檢查連線</string>
     <string name="dc_proxy_dns_heading" translatable="true">千祈唔好代理 DNS</string>
     <string name="toast_allow_bypass_disabled" translatable="true">由於開咗代理，用唔到 %1$s</string>
+    <string name="lbl_idle" translatable="true">閒置</string>
+    <string name="lbl_split" translatable="true">分割</string>
+    <string name="lbl_on_device" translatable="true">喺設備度</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">保護咗！連咗去 DNS + 防火牆 + 代理。</string>
+    <string name="lbl_unselected" translatable="true">冇揀嘅</string>
+    <string name="lbl_battery_optimization" translatable="true">電池優化</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">禁用 %1$s</string>
+    <string name="lbl_background_data" translatable="true">限制背景數據</string>
 </resources>

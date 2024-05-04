@@ -939,7 +939,7 @@
     <string name="wireguard_description" translatable="true">WireGuard como proxy.</string>
     <string name="setup_wireguard" translatable="true">Configurar WireGuard</string>
     <string name="one_wg_apps_added" translatable="true">Encaminhar todas as aplicações</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">As aplicações selecionadas serão sempre encaminhadas através desta VPN WireGuard, independentemente da VPN estar a falhar ou ligada.</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">As aplicações selecionadas apenas serão encaminhadas através desta VPN WireGuard, independentemente de estar ou não ligada.</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Sempre ligada</string>
     <string name="routing_remaining_apps" translatable="true">Encaminhamento das restantes aplicações</string>
     <string name="exclude_all_app_wg_dialog_title" translatable="true">Excluir todas as aplicações</string>
@@ -1023,4 +1023,7 @@
     <string name="dc_proxy_dns_desc" translatable="true">Não fazer proxy de DNS em proxies WireGuard, SOCKS5, HTTP sempre ativos.</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s está desativado porque os proxies estão ativos</string>
     <string name="lbl_unselected" translatable="true">Não selecionado</string>
+    <string name="lbl_background_data" translatable="true">Restringir dados em segundo plano</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">Desativar %1$s</string>
+    <string name="lbl_battery_optimization" translatable="true">Otimização de bateria</string>
 </resources>
