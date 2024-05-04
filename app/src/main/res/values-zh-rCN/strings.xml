@@ -207,8 +207,7 @@
     <string name="settings_proxy_header">代理</string>
     <string name="settings_http_proxy_error_text2">无效端口</string>
     <string name="settings_dns_proxy_dialog_username">帐号</string>
-    <string name="settings_ip_dialog_ipv46">自动（实验性）
-\n发送连接检查以确保网络连通性。</string>
+    <string name="settings_ip_dialog_ipv46">自动（测试功能）</string>
     <string name="firewall_status_block_unmetered">已阻止连接非收费（ WiFi ）网络</string>
     <string name="firewall_status_blocked">已拦截</string>
     <string name="dns_card_latency_inactive">请启用 DNS 模式。</string>
@@ -849,7 +848,7 @@
     <string name="ada_app_firewall" translatable="true">防火墙</string>
     <string name="brbs_backup_restore_desc" translatable="true">无法跨版本使用</string>
     <string name="bypass_dns_firewall_tooltip">%1$s 仅于 Rethink 的 DNS 生效</string>
-    <string name="lbl_maybe_blocked" translatable="true">或已拦截</string>
+    <string name="lbl_maybe_blocked" translatable="true">可能被封锁</string>
     <string name="lbl_network" translatable="true">网络</string>
     <string name="settings_allow_lan_desc" translatable="true">将局域网、环回、多播与本地链路路由排除于 Rethink 的 VPN 隧道外。</string>
     <string name="settings_allow_lan_heading" translatable="true">勿路由私有 IP （实验性）</string>
@@ -989,7 +988,7 @@
     <string name="settings_rinr_dialog_desc" translatable="true">这会同时启用“<!--settings_network_all_networks--> %1$s”设置。您是否想要继续？</string>
     <string name="one_wg_apps_added" translatable="true">正在路由所有应用</string>
     <string name="wg_lockdown_dialog_title" translatable="true">闭关</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">所选应用将只由此 WireGuard VPN 路由，无论此 VPN 是否成功连接。</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">选定的应用程序只能通过该 WireGuard VPN 路由，无论连接是否成功。</string>
     <string name="one_wg_dialog_desc" translatable="true">包括 DNS 在内的来自所有应用的流量将被单个活跃的 WireGuard VPN 路由。其他活跃的 WireGuard VPN 将被停止。</string>
     <string name="catch_all_wg_dialog_title" translatable="true">永久连接</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">所有未被其他 WireGuard VPN 路由的应用的连接将经此 VPN 路由。</string>
@@ -1025,7 +1024,7 @@
     <string name="lbl_idle" translatable="true">空闲</string>
     <string name="lbl_split" translatable="true">分录</string>
     <string name="lbl_on_device" translatable="true">设备上</string>
-    <string name="settings_connectivity_checks" translatable="true">进行连接检查</string>
+    <string name="settings_connectivity_checks" translatable="true">进行连接性测试</string>
     <string name="settings_connectivity_checks_desc" translatable="true">进行互联检查，以确定可达性。</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">保护! 连接DNS+防火墙+Proxy.</string>
     <string name="lbl_background_data" translatable="true">限制背景数据</string>
