@@ -1026,4 +1026,6 @@
     <string name="lbl_split" translatable="true">分录</string>
     <string name="lbl_on_device" translatable="true">设备上</string>
     <string name="settings_connectivity_checks" translatable="true">执行连接性测试</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">进行互联检查,以确定可达性.</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">保护! 连接DNS+防火墙+Proxy.</string>
 </resources>
