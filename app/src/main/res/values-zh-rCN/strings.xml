@@ -1022,4 +1022,6 @@
     <string name="dc_proxy_dns_heading" translatable="true">从不代理 DNS</string>
     <string name="dc_proxy_dns_desc" translatable="true">不要通过Always-on WireGuard、SOCKS5、HTTP 代理来代理 DNS。</string>
     <string name="lbl_battery_optimization" translatable="true">电池优化</string>
+    <string name="lbl_idle" translatable="true">空闲</string>
+    <string name="lbl_split" translatable="true">分录</string>
 </resources>
