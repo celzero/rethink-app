@@ -207,8 +207,7 @@
     <string name="settings_proxy_header">代理</string>
     <string name="settings_http_proxy_error_text2">无效端口</string>
     <string name="settings_dns_proxy_dialog_username">帐号</string>
-    <string name="settings_ip_dialog_ipv46">自动（实验性）
-\n发送连接检查以确保网络连通性。</string>
+    <string name="settings_ip_dialog_ipv46">自动（测试功能）</string>
     <string name="firewall_status_block_unmetered">已阻止连接非收费（ WiFi ）网络</string>
     <string name="firewall_status_blocked">已拦截</string>
     <string name="dns_card_latency_inactive">请启用 DNS 模式。</string>
@@ -642,7 +641,7 @@
     <string name="about_mozilla">Rethink 受来自 Mozilla Builders 、 FOSS United 基金会与 OSOM Products Inc 的支持。</string>
     <string name="http_proxy_dialog_heading">设置 HTTP(S) CONNECT 代理</string>
     <string name="search_dns_logs"><font size="12">搜索域名或 IP</font></string>
-    <string name="whats_new_version_update">&lt;b&gt;齐拉尤·德塞&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：支持可匿名的&lt;i&gt;无晓型 DNS-over-HTTPS&lt;/i&gt;。&lt;br/&gt; 2. &lt;i&gt;新特性&lt;/i&gt;：支持&lt;i&gt;DNS-over-TLS&lt;/i&gt;。&lt;br/&gt; 3. &lt;i&gt;新特性&lt;/i&gt;： WireGuard 简易模式与高级模式。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：统计屏现显示流量。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：无论 &lt;i&gt;VPN 闭关&lt;/i&gt;模式是否激活，支持包含 Orbot 等的所有代理。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：使用 Rethink 监测 Rethink 的网络流量！&lt;br/&gt; 7. &lt;i&gt;新特性&lt;/i&gt;：将 DNS 经如 WireGuard 的活动代理转发。&lt;br/&gt; 8. &lt;i&gt;新特性&lt;/i&gt;：跨设备同版本备份与恢复。&lt;br/&gt; 9. 改进&lt;i&gt;漏洞报告&lt;/i&gt;的生成。&lt;br/&gt; 10. 对双栈 IP 网络的更好支持。&lt;br/&gt; 11. &lt;i&gt;漏洞修复&lt;/i&gt;：对多播 DNS 支持的微小修复。&lt;br/&gt; 12. &lt;i&gt;漏洞修复&lt;/i&gt;：对 WireGuard VPN 的连接自动恢复。&lt;br/&gt; 13. &lt;i&gt;漏洞修复&lt;/i&gt;：修复不正确拦截的应用通知。&lt;br/&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;协助翻译此应用程序&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;JA Donenfeld 4.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. 显示 WireGuard 的上传、下载统计信息。&lt;br/&gt; 2. 自动恢复掉线的 WireGuard 连接。&lt;br/&gt; 3. 实施安卓的 &lt;i&gt;无缝切换&lt;/i&gt; 网络。&lt;br/&gt; 4. 针对每个应用程序的网络和 DNS 日志的新用户界面。&lt;br/&gt; 5. 支持多个 DNSCrypt 中继器。&lt;br/&gt; 6. 改进： 显示 WireGuard 对等协议握手时间段。&lt;br/&gt; 7. 错误修正： 防止从 WireGuard 配置中自动删除多软件包应用程序。&lt;br/&gt; 8. 错误修正： 无法访问设备上的拦截列表 配置用户界面。&lt;br/&gt; 9. 错误修正： 在适当时关闭数据包捕获文件。&lt;br/&gt; 10.错误修复：修复停止 WireGuard 时的崩溃。&lt;br/&gt; 11.修复并改进了其他错误。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;帮助翻译&lt;/a&gt;</string>
     <string name="about_website">访问 rethinkdns.com</string>
     <string name="settings_network_all_networks_desc">启用时， Rethink 将使用所有可用的网络来连接至互联网。若未启用，则将使用 Android 认为<i>活跃</i>的网络。</string>
     <string name="settings_dns_proxy_dialog_app_desc">所选应用将被排除在 VPN 外，以允许其为您转发连接。</string>
@@ -849,7 +848,7 @@
     <string name="ada_app_firewall" translatable="true">防火墙</string>
     <string name="brbs_backup_restore_desc" translatable="true">无法跨版本使用</string>
     <string name="bypass_dns_firewall_tooltip">%1$s 仅于 Rethink 的 DNS 生效</string>
-    <string name="lbl_maybe_blocked" translatable="true">或已拦截</string>
+    <string name="lbl_maybe_blocked" translatable="true">可能被封锁</string>
     <string name="lbl_network" translatable="true">网络</string>
     <string name="settings_allow_lan_desc" translatable="true">将局域网、环回、多播与本地链路路由排除于 Rethink 的 VPN 隧道外。</string>
     <string name="settings_allow_lan_heading" translatable="true">勿路由私有 IP （实验性）</string>
@@ -989,7 +988,7 @@
     <string name="settings_rinr_dialog_desc" translatable="true">这会同时启用“<!--settings_network_all_networks--> %1$s”设置。您是否想要继续？</string>
     <string name="one_wg_apps_added" translatable="true">正在路由所有应用</string>
     <string name="wg_lockdown_dialog_title" translatable="true">闭关</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">所选应用将只由此 WireGuard VPN 路由，无论此 VPN 是否成功连接。</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">选定的应用程序只能通过该 WireGuard VPN 路由，无论连接是否成功。</string>
     <string name="one_wg_dialog_desc" translatable="true">包括 DNS 在内的来自所有应用的流量将被单个活跃的 WireGuard VPN 路由。其他活跃的 WireGuard VPN 将被停止。</string>
     <string name="catch_all_wg_dialog_title" translatable="true">永久连接</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">所有未被其他 WireGuard VPN 路由的应用的连接将经此 VPN 路由。</string>
@@ -1022,4 +1021,11 @@
     <string name="dc_proxy_dns_heading" translatable="true">从不代理 DNS</string>
     <string name="dc_proxy_dns_desc" translatable="true">不要通过Always-on WireGuard、SOCKS5、HTTP 代理来代理 DNS。</string>
     <string name="lbl_battery_optimization" translatable="true">电池优化</string>
+    <string name="lbl_idle" translatable="true">空闲</string>
+    <string name="lbl_split" translatable="true">分录</string>
+    <string name="lbl_on_device" translatable="true">设备上</string>
+    <string name="settings_connectivity_checks" translatable="true">进行连接性测试</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">进行互联检查，以确定可达性。</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">保护! 连接DNS+防火墙+Proxy.</string>
+    <string name="lbl_background_data" translatable="true">限制背景数据</string>
 </resources>
