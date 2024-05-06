@@ -1028,4 +1028,5 @@
     <string name="wireguard_disable_message" translatable="true">Остановите все активные WireGuard VPN?</string>
     <string name="remaining_apps_dialog_desc" translatable="true">Включите все остальные приложения не маршрутизируемые другим Прокси</string>
     <string name="lbl_battery_optimization" translatable="true">Оптимизация батареи</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">Отключить %1$s</string>
 </resources>
