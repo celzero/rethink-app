@@ -1005,7 +1005,7 @@
     <string name="one_wg_dialog_desc" translatable="true">Seluruh koneksi dari semua aplikasi, termasuk DNS, akan dirutekan dengan lajur tunggal, yaitu VPN WireGuard yang aktif. Seluruh aktivitas VPN WireGuard yang lain akan dihentikan.</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Semua koneksi dan aplikasi yang tidak dirutekan oleh VPN WireGuard akan dirutekan melalui VPN ini.</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Selalu aktif</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Aplikasi yang dipilih hanya akan dirutekan melalui jalur VPN WireGuard, terlepas apakah VPN tersambung atau gagal terhubung.</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Aplikasi yang dipilih hanya akan dirutekan melalui jalur VPN WireGuard, terlepas apakah VPN aktif atau non-aktif.</string>
     <string name="one_wg_error_toast" translatable="true">Untuk beralih ke mode lanjutan, hentikan WireGuard dalam mode Sederhana</string>
     <string name="wireguard_disable_failure" translatable="true">\"Selalu hidupkan WireGuard\" tidak dapat dimatikan</string>
     <string name="wg_apps_dialog_title_exclude" translatable="true">Kecualikan aplikasi %1$s</string>
