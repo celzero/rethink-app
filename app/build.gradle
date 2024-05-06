@@ -215,7 +215,7 @@ dependencies {
     fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.12.0'
 
     fullImplementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    fullImplementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    fullImplementation 'com.squareup.retrofit2:converter-gson:2.11.0'
 
     implementation 'com.squareup.okio:okio-jvm:3.9.0'
     // Glide
