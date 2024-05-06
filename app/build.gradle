@@ -280,8 +280,8 @@ dependencies {
 
     // for encrypting wireguard configuration files
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
-    implementation("androidx.security:security-app-authenticator:1.0.0-alpha03")
-    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-alpha03")
+    implementation("androidx.security:security-app-authenticator:1.0.0-beta01")
+    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-beta01")
 
     // barcode scanner for wireguard
     fullImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
