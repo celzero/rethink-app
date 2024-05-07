@@ -34,6 +34,24 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO) : View
     private var domainFilter: MutableLiveData<String> = MutableLiveData()
     private var uid: Int = Constants.INVALID_UID
     private val pagingConfig: PagingConfig
+    private var timeCategory: TimeCategory = TimeCategory.ONE_HOUR
+    private var startTime: MutableLiveData<Long> = MutableLiveData()
+
+    companion object {
+        private const val ONE_HOUR_MILLIS = 1 * 60 * 60 * 1000L
+        private const val ONE_DAY_MILLIS = 24 * ONE_HOUR_MILLIS
+        private const val ONE_WEEK_MILLIS = 7 * ONE_DAY_MILLIS
+    }
+
+    enum class TimeCategory(val value: Int) {
+        ONE_HOUR(0),
+        TWENTY_FOUR_HOUR(1),
+        SEVEN_DAYS(2);
+
+        companion object {
+            fun fromValue(value: Int) = entries.firstOrNull { it.value == value }
+        }
+    }
 
     init {
         ipFilter.value = ""
@@ -50,6 +68,29 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO) : View
             )
     }
 
+    fun timeCategoryChanged(tc: TimeCategory, isDomain: Boolean) {
+        timeCategory = tc
+        when (tc) {
+            TimeCategory.ONE_HOUR -> {
+                startTime.value =
+                    System.currentTimeMillis() - ONE_HOUR_MILLIS
+            }
+            TimeCategory.TWENTY_FOUR_HOUR -> {
+                startTime.value =
+                    System.currentTimeMillis() - ONE_DAY_MILLIS
+            }
+            TimeCategory.SEVEN_DAYS -> {
+                startTime.value =
+                    System.currentTimeMillis() - ONE_WEEK_MILLIS
+            }
+        }
+        if (isDomain) {
+            domainFilter.value = ""
+        } else {
+            ipFilter.value = ""
+        }
+    }
+
     enum class FilterType {
         IP,
         DOMAIN
@@ -59,23 +100,29 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO) : View
     val appDomainLogs = domainFilter.switchMap { input -> fetchAppDomainLogs(uid, input) }
 
     private fun fetchIpLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
+        val to = getStartTime()
         return if (input.isEmpty()) {
-                Pager(pagingConfig) { nwlogDao.getAppIpLogs(uid) }
+                Pager(pagingConfig) { nwlogDao.getAppIpLogs(uid, to) }
             } else {
-                Pager(pagingConfig) { nwlogDao.getAppIpLogsFiltered(uid, "%$input%") }
+                Pager(pagingConfig) { nwlogDao.getAppIpLogsFiltered(uid, to, "%$input%") }
             }
             .liveData
             .cachedIn(viewModelScope)
     }
 
     private fun fetchAppDomainLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
+        val to = getStartTime()
         return if (input.isEmpty()) {
-                Pager(pagingConfig) { nwlogDao.getAppDomainLogs(uid) }
+                Pager(pagingConfig) { nwlogDao.getAppDomainLogs(uid, to) }
             } else {
-                Pager(pagingConfig) { nwlogDao.getAppDomainLogsFiltered(uid, "%$input%") }
+                Pager(pagingConfig) { nwlogDao.getAppDomainLogsFiltered(uid, to, "%$input%") }
             }
             .liveData
             .cachedIn(viewModelScope)
+    }
+
+    private fun getStartTime(): Long {
+        return startTime.value ?: (System.currentTimeMillis() - ONE_HOUR_MILLIS)
     }
 
     fun getConnectionsCount(uid: Int): LiveData<Int> {
@@ -84,6 +131,18 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO) : View
 
     fun getAppDomainConnectionsCount(uid: Int): LiveData<Int> {
         return nwlogDao.getAppDomainConnectionsCount(uid)
+    }
+
+    fun getDomainLogsLimited(uid: Int): LiveData<PagingData<AppConnection>> {
+        return Pager(pagingConfig) { nwlogDao.getAppDomainLogsLimited(uid) }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    fun getIpLogsLimited(uid: Int): LiveData<PagingData<AppConnection>> {
+        return Pager(pagingConfig) { nwlogDao.getAppIpLogsLimited(uid) }
+            .liveData
+            .cachedIn(viewModelScope)
     }
 
     fun setFilter(input: String, filterType: FilterType) {

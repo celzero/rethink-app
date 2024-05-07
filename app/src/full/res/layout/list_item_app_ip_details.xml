@@ -20,7 +20,7 @@
             android:layout_centerVertical="true"
             android:layout_gravity="center"
             android:layout_marginStart="5dp"
-            android:alpha="0.9"
+            android:alpha="0.75"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
