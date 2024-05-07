@@ -98,6 +98,11 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         remakeFilterChipsUi()
     }
 
+    override fun onResume() {
+        super.onResume()
+        b.topRl.requestFocus()
+    }
+
     private fun setupClickListeners() {
         b.queryListSearch.setOnQueryTextListener(this)
         b.queryListSearch.setOnClickListener {
@@ -233,18 +238,19 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     }
 
     private fun showDnsLogsDeleteDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
-        builder.setTitle(R.string.dns_query_clear_logs_title)
-        builder.setMessage(R.string.dns_query_clear_logs_message)
-        builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
-            io {
-                Glide.get(requireActivity()).clearDiskCache()
-                dnsLogRepository.clearAllData()
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.dns_query_clear_logs_title)
+            .setMessage(R.string.dns_query_clear_logs_message)
+            .setCancelable(true)
+            .setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
+                io {
+                    Glide.get(requireActivity()).clearDiskCache()
+                    dnsLogRepository.clearAllData()
+                }
             }
-        }
-        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
-        builder.create().show()
+            .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
+            .create()
+            .show()
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
