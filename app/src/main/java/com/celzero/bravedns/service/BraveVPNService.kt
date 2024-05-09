@@ -1017,7 +1017,7 @@ class BraveVPNService :
             val nonFirewalledApps = FirewallManager.getNonFirewalledAppsPackageNames()
             val packages = nonFirewalledApps.map { it.packageName }
             Logger.i(LOG_TAG_VPN, "paused, exclude non-firewalled apps, size: ${packages.count()}")
-            addDisallowedApplication(builder, packages)
+            addDisallowedApplications(builder, packages)
             return builder
         }
 
@@ -1029,12 +1029,73 @@ class BraveVPNService :
             // ignore excluded-apps settings when vpn is lockdown because
             // those apps would lose all internet connectivity, otherwise
             if (!VpnController.isVpnLockdown()) {
-                addDisallowedApplication(builder, excludedApps)
+                addDisallowedApplications(builder, excludedApps)
             } else {
                 Logger.w(LOG_TAG_VPN, "builder, vpn is lockdown, ignoring exclude-apps list")
             }
         }
+
+        if (appConfig.isCustomSocks5Enabled()) {
+            // For Socks5 if there is a app selected, add that app in excluded list
+            val socks5ProxyEndpoint = appConfig.getConnectedSocks5Proxy()
+            val appName = socks5ProxyEndpoint?.proxyAppName
+            Log.i(LOG_TAG_VPN, "exclude selected socks5 app $appName")
+            if (
+                appName?.equals(getString(R.string.settings_app_list_default_app)) == false &&
+                    isExcludePossible(appName)
+            ) {
+                addDisallowedApplication(builder, appName)
+            } else {
+                Logger.d(LOG_TAG_VPN, "exclude socks5 app not set or exclude not possible")
+            }
+        }
+
+        if (appConfig.isOrbotProxyEnabled() && isExcludePossible(getString(R.string.orbot))) {
+            Logger.i(LOG_TAG_VPN, "exclude orbot app")
+            addDisallowedApplication(builder, OrbotHelper.ORBOT_PACKAGE_NAME)
+        }
+
+        if (appConfig.isCustomHttpProxyEnabled()) {
+            // For HTTP proxy if there is a app selected, add that app in excluded list
+            val httpProxyEndpoint = appConfig.getConnectedHttpProxy()
+            val appName = httpProxyEndpoint?.proxyAppName
+            if (
+                appName?.equals(getString(R.string.settings_app_list_default_app)) == false &&
+                    isExcludePossible(appName)
+            ) {
+                Logger.i(LOG_TAG_VPN, "exclude http proxy app $appName")
+                addDisallowedApplication(builder, appName)
+            } else {
+                Logger.d(LOG_TAG_VPN, "exclude http proxy app not set or exclude not possible")
+            }
+        }
+
+        if (appConfig.isDnsProxyActive()) {
+            // For DNS proxy mode, if any app is set then exclude the application from the list
+            val dnsProxyEndpoint = appConfig.getSelectedDnsProxyDetails()
+            val appName =
+                dnsProxyEndpoint?.proxyAppName ?: getString(R.string.settings_app_list_default_app)
+            if (
+                appName != getString(R.string.settings_app_list_default_app) &&
+                    isExcludePossible(appName)
+            ) {
+                Logger.i(LOG_TAG_VPN, "exclude dns proxy app $appName")
+                addDisallowedApplication(builder, appName)
+            } else {
+                Logger.d(LOG_TAG_VPN, "exclude dns proxy app not set or exclude not possible")
+            }
+        }
+
         return builder
+    }
+
+    private fun isExcludePossible(appName: String?): Boolean {
+        // user settings to exclude apps in proxy mode
+        if (!persistentState.excludeAppsInProxy) return false
+
+        if (!VpnController.isVpnLockdown())
+            return (appName?.equals(getString(R.string.settings_app_list_default_app)) == false)
+        return false
     }
 
     private fun addDisallowedApplication(builder: Builder, pkg: String) {
@@ -1045,7 +1106,7 @@ class BraveVPNService :
         }
     }
 
-    private fun addDisallowedApplication(builder: Builder, packages: Collection<String>) {
+    private fun addDisallowedApplications(builder: Builder, packages: Collection<String>) {
         packages.forEach { addDisallowedApplication(builder, it) }
     }
 
@@ -1393,6 +1454,7 @@ class BraveVPNService :
 
     @RequiresApi(VERSION_CODES.UPSIDE_DOWN_CAKE)
     private fun startForegroundService(serviceType: Int): Boolean {
+        Logger.vv(LOG_TAG_VPN, "startForegroundService, api: ${VERSION.SDK_INT}")
         try {
             ServiceCompat.startForeground(
                 this,
@@ -1418,6 +1480,7 @@ class BraveVPNService :
     }
 
     private fun startForegroundService(): Boolean {
+        Logger.vv(LOG_TAG_VPN, "startForegroundService, api: ${VERSION.SDK_INT}")
         if (isAtleastS()) {
             try {
                 startForeground(SERVICE_ID, updateNotificationBuilder())
@@ -1577,6 +1640,7 @@ class BraveVPNService :
                             addTransport()
                         }
                         AppConfig.DnsType.DNS_PROXY -> {
+                            restartVpnWithNewAppConfig(reason = "dnsProxy")
                             addTransport()
                         }
                         AppConfig.DnsType.RETHINK_REMOTE -> {
@@ -1732,10 +1796,14 @@ class BraveVPNService :
             }
             AppConfig.ProxyProvider.ORBOT -> {
                 // update orbot config, its treated as SOCKS5 or HTTP proxy internally
+                // orbot proxy requires app to be excluded from vpn, so restart vpn
+                restartVpnWithNewAppConfig(reason = "orbotProxy")
                 vpnAdapter?.setCustomProxy(tunProxyMode)
             }
             AppConfig.ProxyProvider.CUSTOM -> {
                 // custom either means socks5 or http proxy
+                // socks5 proxy requires app to be excluded from vpn, so restart vpn
+                restartVpnWithNewAppConfig(reason = "customProxy")
                 vpnAdapter?.setCustomProxy(tunProxyMode)
             }
         }
@@ -3200,6 +3268,12 @@ class BraveVPNService :
             // even if inactive, route connections to wg if lockdown/catch-all is enabled to
             // avoid leaks
             if (wgConfig.isActive || wgConfig.isLockdown || wgConfig.isCatchAll) {
+                // if lockdown is enabled, canRoute checks peer configuration and if it returns
+                // "false", then the connection will be sent to base and not dropped
+                // if lockdown is disabled, then canRoute returns default (true) which
+                // will have the effect of blocking all connections
+                // ie, if lockdown is enabled, split-tunneling happens as expected but if
+                // lockdown is disabled, it has the effect of blocking all connections
                 val canRoute = vpnAdapter?.canRouteIp(proxyId, connTracker.destIP, true)
                 return if (canRoute == true) {
                     handleProxyHandshake(proxyId)

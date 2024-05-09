@@ -58,7 +58,8 @@ interface ProxyEndpointDAO {
     fun getHttpProxyDetails(): ProxyEndpoint
 
     @Query("select * from ProxyEndpoint where proxyMode = 1 and isSelected = 1")
-    fun getConnectedHttpProxy(): ProxyEndpoint
+    fun getConnectedHttpProxy(): ProxyEndpoint?
+
 
     @Query("select * from ProxyEndpoint where isSelected = 1 and (proxyMode = 2 or proxyMode = 3)")
     fun getConnectedOrbotProxy(): ProxyEndpoint

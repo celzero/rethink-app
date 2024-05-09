@@ -71,6 +71,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityLanTrafficSwitch.isChecked = persistentState.privateIps
         // connectivity check
         b.settingsActivityConnectivityChecksSwitch.isChecked = persistentState.connectivityChecks
+        // exclude apps in proxy
+        b.settingsActivityExcludeProxyAppsSwitch.isChecked = persistentState.excludeAppsInProxy
         // for protocol translation, enable only on DNS/DNS+Firewall mode
         if (appConfig.getBraveMode().isDnsActive()) {
             b.settingsActivityPtransSwitch.isChecked = persistentState.protocolTranslationType
@@ -97,6 +99,14 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                 persistentState.routeRethinkInRethink = false
                 displayRethinkInRethinkUi()
             }
+        }
+
+        b.settingsActivityExcludeProxyAppsSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.excludeAppsInProxy = isChecked
+        }
+
+        b.settingsActivityExcludeProxyAppsRl.setOnClickListener {
+            b.settingsActivityExcludeProxyAppsSwitch.isChecked = !b.settingsActivityExcludeProxyAppsSwitch.isChecked
         }
 
         b.settingsRInRRl.setOnClickListener {
@@ -305,15 +315,18 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
             b.settingsActivityAllowBypassRl.alpha = 0.5f
             b.settingsActivityLanTrafficRl.alpha = 0.5f
+            b.settingsActivityExcludeProxyAppsRl.alpha = 0.5f
         } else {
             b.settingsActivityVpnLockdownDesc.visibility = View.GONE
             b.settingsActivityAllowBypassRl.alpha = 1f
             b.settingsActivityLanTrafficRl.alpha = 1f
+            b.settingsActivityExcludeProxyAppsRl.alpha = 1f
         }
         b.settingsActivityAllowBypassSwitch.isEnabled = !isLockdown
         b.settingsActivityAllowBypassRl.isEnabled = !isLockdown
         b.settingsActivityLanTrafficSwitch.isEnabled = !isLockdown
         b.settingsActivityLanTrafficRl.isEnabled = !isLockdown
+        b.settingsActivityExcludeProxyAppsSwitch.isEnabled = !isLockdown
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {
