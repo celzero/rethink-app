@@ -1003,6 +1003,7 @@ class BraveVPNService :
 
         // route rethink traffic in rethink based on the user selection
         if (!persistentState.routeRethinkInRethink) {
+            Logger.i(LOG_TAG_VPN, "builder: exclude rethink app from builder")
             addDisallowedApplication(builder, this.packageName)
         } else {
             Logger.i(LOG_TAG_VPN, "builder: route rethink traffic in rethink")
@@ -1029,6 +1030,7 @@ class BraveVPNService :
             // ignore excluded-apps settings when vpn is lockdown because
             // those apps would lose all internet connectivity, otherwise
             if (!VpnController.isVpnLockdown()) {
+                Logger.i(LOG_TAG_VPN, "builder, vpn is not lockdown, exclude-apps $excludedApps")
                 addDisallowedApplications(builder, excludedApps)
             } else {
                 Logger.w(LOG_TAG_VPN, "builder, vpn is lockdown, ignoring exclude-apps list")
@@ -1042,9 +1044,10 @@ class BraveVPNService :
                 socks5ProxyEndpoint?.proxyAppName
                     ?: getString(R.string.settings_app_list_default_app)
             if (isExcludePossible(appName)) {
+                Logger.i(LOG_TAG_VPN, "exclude app for socks5, pkg: $appName")
                 addDisallowedApplication(builder, appName)
             } else {
-                Logger.d(LOG_TAG_VPN, "exclude socks5 app not set or exclude not possible")
+                Logger.i(LOG_TAG_VPN, "socks5(exclude): app not set or exclude not possible")
             }
         }
 
@@ -1059,10 +1062,10 @@ class BraveVPNService :
             val appName =
                 httpProxyEndpoint?.proxyAppName ?: getString(R.string.settings_app_list_default_app)
             if (isExcludePossible(appName)) {
-                Logger.i(LOG_TAG_VPN, "exclude http proxy app $appName")
+                Logger.i(LOG_TAG_VPN, "exclude app for http proxy, pkg: $appName")
                 addDisallowedApplication(builder, appName)
             } else {
-                Logger.d(LOG_TAG_VPN, "exclude http proxy app not set or exclude not possible")
+                Logger.i(LOG_TAG_VPN, "http proxy(exclude): app not set or exclude not possible")
             }
         }
 
@@ -1072,10 +1075,10 @@ class BraveVPNService :
             val appName =
                 dnsProxyEndpoint?.proxyAppName ?: getString(R.string.settings_app_list_default_app)
             if (isExcludePossible(appName)) {
-                Logger.i(LOG_TAG_VPN, "exclude dns proxy app $appName")
+                Logger.i(LOG_TAG_VPN, "exclude app for dns proxy, pkg: $appName")
                 addDisallowedApplication(builder, appName)
             } else {
-                Logger.d(LOG_TAG_VPN, "exclude dns proxy app not set or exclude not possible")
+                Logger.i(LOG_TAG_VPN, "dns proxy(exclude): app not set or exclude not possible")
             }
         }
 
@@ -1085,12 +1088,12 @@ class BraveVPNService :
     private fun isExcludePossible(appName: String?): Boolean {
         // user settings to exclude apps in proxy mode
         if (!persistentState.excludeAppsInProxy) {
-            Logger.d(LOG_TAG_VPN, "exclude apps in proxy is disabled")
+            Logger.i(LOG_TAG_VPN, "exclude apps in proxy is disabled")
             return false
         }
 
         if (VpnController.isVpnLockdown()) {
-            Logger.d(LOG_TAG_VPN, "vpn is lockdown, exclude apps not possible")
+            Logger.i(LOG_TAG_VPN, "vpn is lockdown, exclude apps not possible")
             return false
         }
 
