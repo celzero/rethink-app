@@ -327,6 +327,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityLanTrafficSwitch.isEnabled = !isLockdown
         b.settingsActivityLanTrafficRl.isEnabled = !isLockdown
         b.settingsActivityExcludeProxyAppsSwitch.isEnabled = !isLockdown
+        b.settingsActivityExcludeProxyAppsRl.isEnabled = !isLockdown
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {
