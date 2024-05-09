@@ -1038,12 +1038,10 @@ class BraveVPNService :
         if (appConfig.isCustomSocks5Enabled()) {
             // For Socks5 if there is a app selected, add that app in excluded list
             val socks5ProxyEndpoint = appConfig.getConnectedSocks5Proxy()
-            val appName = socks5ProxyEndpoint?.proxyAppName
-            Log.i(LOG_TAG_VPN, "exclude selected socks5 app $appName")
-            if (
-                appName?.equals(getString(R.string.settings_app_list_default_app)) == false &&
-                    isExcludePossible(appName)
-            ) {
+            val appName =
+                socks5ProxyEndpoint?.proxyAppName
+                    ?: getString(R.string.settings_app_list_default_app)
+            if (isExcludePossible(appName)) {
                 addDisallowedApplication(builder, appName)
             } else {
                 Logger.d(LOG_TAG_VPN, "exclude socks5 app not set or exclude not possible")
@@ -1058,11 +1056,9 @@ class BraveVPNService :
         if (appConfig.isCustomHttpProxyEnabled()) {
             // For HTTP proxy if there is a app selected, add that app in excluded list
             val httpProxyEndpoint = appConfig.getConnectedHttpProxy()
-            val appName = httpProxyEndpoint?.proxyAppName
-            if (
-                appName?.equals(getString(R.string.settings_app_list_default_app)) == false &&
-                    isExcludePossible(appName)
-            ) {
+            val appName =
+                httpProxyEndpoint?.proxyAppName ?: getString(R.string.settings_app_list_default_app)
+            if (isExcludePossible(appName)) {
                 Logger.i(LOG_TAG_VPN, "exclude http proxy app $appName")
                 addDisallowedApplication(builder, appName)
             } else {
@@ -1075,10 +1071,7 @@ class BraveVPNService :
             val dnsProxyEndpoint = appConfig.getSelectedDnsProxyDetails()
             val appName =
                 dnsProxyEndpoint?.proxyAppName ?: getString(R.string.settings_app_list_default_app)
-            if (
-                appName != getString(R.string.settings_app_list_default_app) &&
-                    isExcludePossible(appName)
-            ) {
+            if (isExcludePossible(appName)) {
                 Logger.i(LOG_TAG_VPN, "exclude dns proxy app $appName")
                 addDisallowedApplication(builder, appName)
             } else {
@@ -1091,11 +1084,17 @@ class BraveVPNService :
 
     private fun isExcludePossible(appName: String?): Boolean {
         // user settings to exclude apps in proxy mode
-        if (!persistentState.excludeAppsInProxy) return false
+        if (!persistentState.excludeAppsInProxy) {
+            Logger.d(LOG_TAG_VPN, "exclude apps in proxy is disabled")
+            return false
+        }
 
-        if (!VpnController.isVpnLockdown())
-            return (appName?.equals(getString(R.string.settings_app_list_default_app)) == false)
-        return false
+        if (VpnController.isVpnLockdown()) {
+            Logger.d(LOG_TAG_VPN, "vpn is lockdown, exclude apps not possible")
+            return false
+        }
+
+        return appName?.equals(getString(R.string.settings_app_list_default_app)) == false
     }
 
     private fun addDisallowedApplication(builder: Builder, pkg: String) {
@@ -1722,6 +1721,16 @@ class BraveVPNService :
                     notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
                 } else {
                     // no-op
+                }
+            }
+            PersistentState.EXCLUDE_APPS_IN_PROXY -> {
+                // restart vpn to exclude apps if either proxy or dns proxy is enabled
+                if (appConfig.isProxyEnabled() || appConfig.isDnsProxyActive()) {
+                    io("excludeAppsInProxy") {
+                        restartVpnWithNewAppConfig(reason = "excludeAppsInProxy")
+                    }
+                } else {
+                    // no-op, no need to restart vpn as no proxy/dns proxy is enabled
                 }
             }
         }
