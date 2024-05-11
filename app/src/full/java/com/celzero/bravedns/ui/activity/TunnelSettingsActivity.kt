@@ -72,7 +72,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         // connectivity check
         b.settingsActivityConnectivityChecksSwitch.isChecked = persistentState.connectivityChecks
         // exclude apps in proxy
-        b.settingsActivityExcludeProxyAppsSwitch.isChecked = persistentState.excludeAppsInProxy
+        b.settingsActivityExcludeProxyAppsSwitch.isChecked = !persistentState.excludeAppsInProxy
         // for protocol translation, enable only on DNS/DNS+Firewall mode
         if (appConfig.getBraveMode().isDnsActive()) {
             b.settingsActivityPtransSwitch.isChecked = persistentState.protocolTranslationType
@@ -102,7 +102,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         }
 
         b.settingsActivityExcludeProxyAppsSwitch.setOnCheckedChangeListener { _, isChecked ->
-            persistentState.excludeAppsInProxy = isChecked
+            persistentState.excludeAppsInProxy = !isChecked
         }
 
         b.settingsActivityExcludeProxyAppsRl.setOnClickListener {

@@ -27,6 +27,17 @@
         android:text="@string/settings_dns_proxy_dialog_app_desc"
         android:textSize="@dimen/default_font_text_view" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/dialog_proxy_header_lockdown_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:paddingTop="10dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:text="@string/settings_lock_down_mode_desc"
+        android:textSize="@dimen/default_font_text_view" />
+
     <LinearLayout
         android:id="@+id/dialog_proxy_spinner_header"
         android:layout_width="match_parent"
@@ -190,6 +201,33 @@
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/dialog_proxy_udp_check"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.1"
+            android:buttonTint="?attr/accentGood"
+            android:foregroundTint="?attr/accentGood" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/dialog_proxy_exclude_apps_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:weightSum="1">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.9"
+            android:text="@string/settings_exclude_proxy_apps_heading"
+            android:textSize="@dimen/large_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/dialog_proxy_exclude_apps_check"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

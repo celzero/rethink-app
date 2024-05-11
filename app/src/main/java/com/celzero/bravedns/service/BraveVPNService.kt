@@ -1102,6 +1102,7 @@ class BraveVPNService :
 
     private fun addDisallowedApplication(builder: Builder, pkg: String) {
         try {
+            Logger.d(LOG_TAG_VPN, "exclude app: $pkg")
             builder.addDisallowedApplication(pkg)
         } catch (e: PackageManager.NameNotFoundException) {
             Logger.w(LOG_TAG_VPN, "skip adding disallowed app ($pkg)", e)
