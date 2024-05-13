@@ -54,12 +54,12 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.wireguard.Config
 import intra.Intra
 import intra.Tunnel
+import java.net.URI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.net.URI
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -941,7 +941,12 @@ class GoVpnAdapter : KoinComponent {
             Logger.e(LOG_TAG_VPN, "err new default transport: ${e.message}", e)
             // most of the android devices have google dns, so add it as default transport
             // TODO: notify the user that the default transport could not be set
-            Intra.addDefaultTransport(tunnel, Backend.DNS53, defaultDns, "")
+            try {
+                Intra.addDefaultTransport(tunnel, Backend.DNS53, defaultDns, "")
+            } catch (e: Exception) {
+                // fixme: this is not expected to happen, should show a notification?
+                Logger.e(LOG_TAG_VPN, "err add $defaultDns transport: ${e.message}", e)
+            }
         }
     }
 
