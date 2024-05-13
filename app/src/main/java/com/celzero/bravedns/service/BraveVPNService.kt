@@ -2055,6 +2055,21 @@ class BraveVPNService :
                 )
             }
         }
+
+        // no need to close the existing connections if the bound networks are changed
+        // observations on close connections:
+        // instagram video delays when the network changes, reconnects (5-10s), feeds take longer
+        // play store downloads completely broke when the network changes
+        // observations on not closing connections:
+        // instagram video delays when the network changes, reconnects (5-10s or more), feeds normal
+        // play store downloads continue when the network changes, resumes after reconnect (5-10s)
+        // so, not closing connections is better for user experience
+        /* if (isBoundNetworksChanged) {
+            logd("bound networks changed, close connections")
+            io("boundNetworksChanged") { vpnAdapter?.closeAllConnections() }
+        } */
+
+
         // Workaround for WireGuard connection issues after network change
         // WireGuard may fail to connect to the server when the network changes.
         // refresh will do a configuration refresh in tunnel to ensure a successful
