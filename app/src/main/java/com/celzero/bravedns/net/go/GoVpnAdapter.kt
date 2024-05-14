@@ -216,12 +216,12 @@ class GoVpnAdapter : KoinComponent {
         try {
             val doh = appConfig.getDOHDetails()
             url = doh?.dohURL
+            val ips: String = getIpString(context, url)
             // change the url from https to http if the isSecure is false
             if (doh?.isSecure == false) {
                 Logger.d(LOG_TAG_VPN, "changing url from https to http for $url")
                 url = url?.replace("https", "http")
             }
-            val ips: String = getIpString(context, url)
             // add replaces the existing transport with the same id if successful
             // so no need to remove the transport before adding
             Intra.addDoHTransport(tunnel, id, url, ips)
@@ -240,12 +240,13 @@ class GoVpnAdapter : KoinComponent {
         try {
             val dot = appConfig.getDOTDetails()
             url = dot?.url
+            // if tls is present, remove it and pass it to getIpString
+            val ips: String = getIpString(context, url?.replace("tls://", ""))
             if (dot?.isSecure == true && url?.startsWith("tls") == false) {
                 Logger.d(LOG_TAG_VPN, "adding tls to url for $url")
                 // add tls to the url if isSecure is true and the url does not start with tls
                 url = "tls://$url"
             }
-            val ips: String = getIpString(context, url)
             // add replaces the existing transport with the same id if successful
             // so no need to remove the transport before adding
             Intra.addDoTTransport(tunnel, id, url, ips)
