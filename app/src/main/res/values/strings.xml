@@ -565,7 +565,7 @@
     <string name="settings_dns_proxy_dialog_username" translatable="true">Username</string>
     <string name="settings_dns_proxy_dialog_password" translatable="true">Password</string>
     <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">set</string>
-    <string name="settings_dns_proxy_dialog_app_desc" translatable="true">The selected app will be excluded from the VPN to let it proxy connections on your behalf.</string>
+    <string name="settings_dns_proxy_dialog_app_desc" translatable="false">The selected app will be excluded from the VPN to let it proxy connections on your behalf.</string>
 
     <string name="settings_app_list_default_app" translatable="true">None</string>
 

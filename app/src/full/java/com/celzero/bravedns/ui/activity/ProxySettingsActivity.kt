@@ -658,6 +658,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         val udpBlockCheckBox: CheckBox = dialogBinding.dialogProxyUdpCheck
         val excludeAppCheckBox: CheckBox = dialogBinding.dialogProxyExcludeAppsCheck
 
+        headerDesc.visibility = View.GONE
         udpBlockCheckBox.isChecked = persistentState.getUdpBlocked()
         excludeAppCheckBox.isChecked = !persistentState.excludeAppsInProxy
         excludeAppCheckBox.isEnabled = !VpnController.isVpnLockdown()
@@ -756,12 +757,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                         )
                 } else {
                     b.settingsActivitySocks5Desc.text =
-                        getString(
-                            R.string.settings_socks_forwarding_desc,
-                            ip,
-                            port.toString(),
-                            app
-                        )
+                        getString(R.string.settings_socks_forwarding_desc, ip, port.toString(), app)
                 }
                 dialog.dismiss()
             } else {
