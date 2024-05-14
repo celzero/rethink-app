@@ -1097,7 +1097,8 @@ class GoVpnAdapter : KoinComponent {
             val ips: Array<out String>? = res?.getStringArray(R.array.ips)
             if (urls == null) return ""
             for (i in urls.indices) {
-                if (url.contains((urls[i]))) {
+                // either the url is a substring of urls[i] or urls[i] is a substring of url
+                if ((url.contains(urls[i])) || (urls[i].contains(url))) {
                     if (ips != null) return ips[i]
                 }
             }
