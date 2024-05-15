@@ -247,8 +247,8 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:724773bd97@aar'
-    implementation 'com.github.celzero:firestack:724773bd97@aar'
+    download 'com.github.celzero:firestack:3c9b203823@aar'
+    implementation 'com.github.celzero:firestack:3c9b203823@aar'
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.9.0') {
@@ -285,6 +285,10 @@ dependencies {
 
     // barcode scanner for wireguard
     fullImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+
+    playImplementation platform('com.google.firebase:firebase-bom:33.0.0')
+    playImplementation 'com.google.firebase:firebase-crashlytics-ktx'
+
 }
 
 // github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903
