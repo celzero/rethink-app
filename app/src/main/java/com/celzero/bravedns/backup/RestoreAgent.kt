@@ -281,9 +281,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             Logger.i(LOG_TAG_BACKUP_RESTORE, "wireGuard is enabled, reset the wireguard entries")
             appConfig.removeAllProxies()
         }
-        // delete WireGuard related entries from database
-        Logger.i(LOG_TAG_BACKUP_RESTORE, "wireguard cleanup process")
-        WireguardManager.restoreProcessDeleteWireGuardEntries()
+        // cleaning up the wireguard entries are handled in RefreshDatabase
     }
 
     private fun isMetadataCompatible(tempDirectory: String?): Boolean {
