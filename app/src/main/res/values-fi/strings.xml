@@ -101,4 +101,5 @@
     <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">odottamassa</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Varoitus: Rethink on poistettu käytöstä</string>
     <string name="firewall_mode_notification_title" translatable="true">Suojattu! Yhteys palomuuriin.</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">Suojattu</string>
 </resources>
