@@ -171,12 +171,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         b.fssProgressBar.secondaryProgress = secondaryVal
     }
 
-    private fun calculatePercentage(currentValue: Long, maxValue: Long): Int {
-        // calculate the percentage as a float
-        val percentageFloat = currentValue.toFloat() / maxValue * 100
-
-        // convert the float to an int, rounding down if necessary
-        return percentageFloat.toInt()
+    private fun calculatePercentage(value: Long, maxValue: Long): Int {
+        return (value * 100 / maxValue).toInt()
     }
 
     private fun highlightToggleBtn() {

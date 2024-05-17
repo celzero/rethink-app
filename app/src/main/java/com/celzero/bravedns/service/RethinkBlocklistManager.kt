@@ -41,12 +41,12 @@ import com.google.common.collect.Multimap
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
+import java.io.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.IOException
 
 object RethinkBlocklistManager : KoinComponent {
 
@@ -373,11 +373,9 @@ object RethinkBlocklistManager : KoinComponent {
     suspend fun getStamp(fileValues: Set<Int>, type: RethinkBlocklistType): String {
         return try {
             val flags = convertListToCsv(fileValues)
-            Logger.d(
-                LOG_TAG_VPN,
-                "${type.name} flags: $flags, ${getRDNS(type)?.flagsToStamp(flags, Backend.EB32)}"
-            )
-            getRDNS(type)?.flagsToStamp(flags, Backend.EB32) ?: ""
+            val flags2Stamp = getRDNS(type)?.flagsToStamp(flags, Backend.EB32)
+            Logger.d(LOG_TAG_VPN, "${type.name} flags: $flags; stamp: $flags2Stamp")
+            flags2Stamp ?: ""
         } catch (e: java.lang.Exception) {
             Logger.e(LOG_TAG_VPN, "err stamp2tags: ${e.message}, $e")
             ""
@@ -386,7 +384,9 @@ object RethinkBlocklistManager : KoinComponent {
 
     suspend fun getTagsFromStamp(stamp: String, type: RethinkBlocklistType): Set<Int> {
         return try {
-            convertCsvToList(getRDNS(type)?.stampToFlags(stamp))
+            val tags = convertCsvToList(getRDNS(type)?.stampToFlags(stamp))
+            Logger.d(LOG_TAG_VPN, "${type.name} stamp: $stamp; tags: $tags")
+            tags
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "err tags2stamp: ${e.message}, $e")
             setOf()

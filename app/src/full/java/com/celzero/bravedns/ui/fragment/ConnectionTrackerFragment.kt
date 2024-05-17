@@ -123,6 +123,11 @@ class ConnectionTrackerFragment :
         remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
     }
 
+    override fun onResume() {
+        super.onResume()
+        b.connectionListRl.requestFocus()
+    }
+
     private fun setupRecyclerScrollListener() {
         val scrollListener =
             object : RecyclerView.OnScrollListener() {
@@ -258,22 +263,24 @@ class ConnectionTrackerFragment :
     }
 
     private fun showDeleteDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
-        builder.setTitle(R.string.conn_track_clear_logs_title)
-        builder.setMessage(R.string.conn_track_clear_logs_message)
-        builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
-            io { connectionTrackerRepository.clearAllData() }
-        }
-
-        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
-        builder.create().show()
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.conn_track_clear_logs_title)
+            .setMessage(R.string.conn_track_clear_logs_message)
+            .setCancelable(true)
+            .setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
+                io { connectionTrackerRepository.clearAllData() }
+            }
+            .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
+            .create()
+            .show()
     }
 
     private fun remakeChildFilterChipsUi(categories: List<FirewallRuleset>) {
-        b.filterChipGroup.removeAllViews()
-        for (c in categories) {
-            b.filterChipGroup.addView(makeChildChip(c.id, c.title))
+        with(b.filterChipGroup) {
+            removeAllViews()
+            for (c in categories) {
+                addView(makeChildChip(c.id, c.title))
+            }
         }
     }
 

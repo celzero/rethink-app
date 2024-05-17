@@ -89,29 +89,45 @@ interface ConnectionTrackerDAO {
     fun getBlockedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid GROUP BY ipAddress, uid, port ORDER BY count DESC"
+        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to GROUP BY ipAddress, uid, port ORDER BY count DESC"
     )
-    fun getAppIpLogs(uid: Int): PagingSource<Int, AppConnection>
+    fun getAppIpLogs(uid: Int, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and ipAddress like :query GROUP BY ipAddress, uid, port ORDER BY count DESC"
+        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, '' as appOrDnsName FROM ConnectionTracker WHERE uid = :uid GROUP BY ipAddress, uid, port ORDER BY count DESC LIMIT 3"
     )
-    fun getAppIpLogsFiltered(uid: Int, query: String): PagingSource<Int, AppConnection>
+    fun getAppIpLogsLimited(uid: Int): PagingSource<Int, AppConnection>
 
     @Query(
-        "SELECT uid, GROUP_CONCAT(DISTINCT ipAddress) as ipAddress, port, COUNT(dnsQuery) as count, flag as flag, 0 as blocked, dnsQuery as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and dnsQuery != '' GROUP BY dnsQuery ORDER BY count DESC"
+        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to and ipAddress like :query GROUP BY ipAddress, uid, port ORDER BY count DESC"
     )
-    fun getAppDomainLogs(uid: Int): PagingSource<Int, AppConnection>
+    fun getAppIpLogsFiltered(uid: Int, to: Long, query: String): PagingSource<Int, AppConnection>
 
     @Query(
-        "SELECT uid, GROUP_CONCAT(DISTINCT ipAddress) as ipAddress, port, COUNT(dnsQuery) as count, flag as flag, 0 as blocked, dnsQuery as appOrDnsName FROM ConnectionTracker WHERE uid = :uid  and dnsQuery != '' and dnsQuery like :query GROUP BY dnsQuery ORDER BY count DESC"
+        "SELECT uid, GROUP_CONCAT(DISTINCT ipAddress) as ipAddress, port, COUNT(dnsQuery) as count, flag as flag, 0 as blocked, dnsQuery as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to and dnsQuery != '' GROUP BY dnsQuery ORDER BY count DESC"
     )
-    fun getAppDomainLogsFiltered(uid: Int, query: String): PagingSource<Int, AppConnection>
+    fun getAppDomainLogs(uid: Int, to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        "SELECT uid, '' as ipAddress, port, COUNT(dnsQuery) as count, flag as flag, 0 as blocked, dnsQuery as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and dnsQuery != '' GROUP BY dnsQuery ORDER BY count DESC LIMIT 3"
+    )
+    fun getAppDomainLogsLimited(uid: Int): PagingSource<Int, AppConnection>
+
+    @Query(
+        "SELECT uid, GROUP_CONCAT(DISTINCT ipAddress) as ipAddress, port, COUNT(dnsQuery) as count, flag as flag, 0 as blocked, dnsQuery as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to and dnsQuery != '' and dnsQuery like :query GROUP BY dnsQuery ORDER BY count DESC"
+    )
+    fun getAppDomainLogsFiltered(
+        uid: Int,
+        to: Long,
+        query: String
+    ): PagingSource<Int, AppConnection>
 
     @Query("select count(DISTINCT(ipAddress)) from ConnectionTracker where uid = :uid")
     fun getAppConnectionsCount(uid: Int): LiveData<Int>
 
-    @Query("select count(DISTINCT(dnsQuery)) from ConnectionTracker where uid = :uid")
+    @Query(
+        "select count(DISTINCT(dnsQuery)) from ConnectionTracker where uid = :uid and dnsQuery != ''"
+    )
     fun getAppDomainConnectionsCount(uid: Int): LiveData<Int>
 
     @Query(

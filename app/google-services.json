@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "974915159594",
+    "project_id": "rethink-dns-firewall",
+    "storage_bucket": "rethink-dns-firewall.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:974915159594:android:ed4f2e6c806fa816bda553",
+        "android_client_info": {
+          "package_name": "com.celzero.bravedns"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsj6i5hZNgsYopDLZlqV7jFAAp1F0y6JQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

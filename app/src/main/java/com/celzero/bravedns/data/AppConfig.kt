@@ -1051,6 +1051,14 @@ internal constructor(
             (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderOrbot())
     }
 
+    suspend fun getConnectedSocks5Proxy(): ProxyEndpoint? {
+        return proxyEndpointRepository.getConnectedSocks5Proxy()
+    }
+
+    suspend fun getConnectedHttpProxy(): ProxyEndpoint? {
+        return proxyEndpointRepository.getConnectedHttpProxy()
+    }
+
     suspend fun updateCustomSocks5Proxy(proxyEndpoint: ProxyEndpoint) {
         proxyEndpointRepository.update(proxyEndpoint)
         customSocks5Endpoint = proxyEndpoint

@@ -57,6 +57,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val PREVENT_DNS_LEAKS = "prevent_dns_leaks"
         const val CONNECTIVITY_CHECKS = "connectivity_check"
         const val NOTIFICATION_PERMISSION = "notification_permission_request"
+        const val EXCLUDE_APPS_IN_PROXY = "exclude_apps_in_proxy"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -276,6 +277,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // proxy dns requests over proxy
     var proxyDns by booleanPref("proxy_dns").withDefault<Boolean>(true)
+
+    // exclude apps which are configured in proxy (socks5, http, dns proxy)
+    var excludeAppsInProxy by booleanPref("exclude_apps_in_proxy").withDefault<Boolean>(false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()

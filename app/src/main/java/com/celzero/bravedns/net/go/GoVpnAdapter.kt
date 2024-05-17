@@ -50,16 +50,17 @@ import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.blocklistDir
 import com.celzero.bravedns.util.Utilities.blocklistFile
+import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.wireguard.Config
 import intra.Intra
 import intra.Tunnel
+import java.net.URI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.net.URI
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -216,12 +217,12 @@ class GoVpnAdapter : KoinComponent {
         try {
             val doh = appConfig.getDOHDetails()
             url = doh?.dohURL
+            val ips: String = getIpString(context, url)
             // change the url from https to http if the isSecure is false
             if (doh?.isSecure == false) {
                 Logger.d(LOG_TAG_VPN, "changing url from https to http for $url")
                 url = url?.replace("https", "http")
             }
-            val ips: String = getIpString(context, url)
             // add replaces the existing transport with the same id if successful
             // so no need to remove the transport before adding
             Intra.addDoHTransport(tunnel, id, url, ips)
@@ -240,12 +241,13 @@ class GoVpnAdapter : KoinComponent {
         try {
             val dot = appConfig.getDOTDetails()
             url = dot?.url
+            // if tls is present, remove it and pass it to getIpString
+            val ips: String = getIpString(context, url?.replace("tls://", ""))
             if (dot?.isSecure == true && url?.startsWith("tls") == false) {
                 Logger.d(LOG_TAG_VPN, "adding tls to url for $url")
                 // add tls to the url if isSecure is true and the url does not start with tls
                 url = "tls://$url"
             }
-            val ips: String = getIpString(context, url)
             // add replaces the existing transport with the same id if successful
             // so no need to remove the transport before adding
             Intra.addDoTTransport(tunnel, id, url, ips)
@@ -430,7 +432,7 @@ class GoVpnAdapter : KoinComponent {
         Logger.d(LOG_TAG_VPN, "set brave dns to tunnel (local/remote)")
 
         // enable local blocklist if enabled
-        if (persistentState.blocklistEnabled) {
+        if (persistentState.blocklistEnabled && !Utilities.isPlayStoreFlavour()) {
             setRDNSLocal()
         } else {
             // remove local blocklist, if any
@@ -830,7 +832,7 @@ class GoVpnAdapter : KoinComponent {
 
     fun getRDNS(type: RethinkBlocklistManager.RethinkBlocklistType): backend.RDNS? {
         try {
-            return if (type.isLocal()) {
+            return if (type.isLocal() && !isPlayStoreFlavour()) {
                 getRDNSResolver()?.rdnsLocal
             } else {
                 getRDNSResolver()?.rdnsRemote
@@ -941,7 +943,12 @@ class GoVpnAdapter : KoinComponent {
             Logger.e(LOG_TAG_VPN, "err new default transport: ${e.message}", e)
             // most of the android devices have google dns, so add it as default transport
             // TODO: notify the user that the default transport could not be set
-            Intra.addDefaultTransport(tunnel, Backend.DNS53, defaultDns, "")
+            try {
+                Intra.addDefaultTransport(tunnel, Backend.DNS53, defaultDns, "")
+            } catch (e: Exception) {
+                // fixme: this is not expected to happen, should show a notification?
+                Logger.e(LOG_TAG_VPN, "err add $defaultDns transport: ${e.message}", e)
+            }
         }
     }
 
@@ -962,7 +969,7 @@ class GoVpnAdapter : KoinComponent {
             // no need to send the dnsProxy.port for the below method, as it is not expecting port
             Intra.setSystemDNS(tunnel, sysDnsStr)
         } catch (e: Exception) { // this is not expected to happen
-            Logger.e(LOG_TAG_VPN, "set system dns: could not parse system dns", e)
+            Logger.e(LOG_TAG_VPN, "set system dns: could not parse: $systemDns", e)
             // remove the system dns, if it could not be set
             tunnel.resolver.remove(Backend.System)
         }
@@ -1036,6 +1043,8 @@ class GoVpnAdapter : KoinComponent {
     }
 
     private fun resetLocalBlocklistStampFromTunnel() {
+        if (Utilities.isPlayStoreFlavour()) return
+
         try {
             val rl = getRDNS(RethinkBlocklistManager.RethinkBlocklistType.LOCAL)
             if (rl == null) {
@@ -1092,7 +1101,8 @@ class GoVpnAdapter : KoinComponent {
             val ips: Array<out String>? = res?.getStringArray(R.array.ips)
             if (urls == null) return ""
             for (i in urls.indices) {
-                if (url.contains((urls[i]))) {
+                // either the url is a substring of urls[i] or urls[i] is a substring of url
+                if ((url.contains(urls[i])) || (urls[i].contains(url))) {
                     if (ips != null) return ips[i]
                 }
             }

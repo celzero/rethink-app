@@ -1,240 +1,307 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ll_proxy_header"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="5dp"
     android:orientation="vertical"
-    android:visibility="visible">
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/dialog_proxy_header"
-        style="@style/TextAppearance.AppCompat.Subhead"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:padding="10dp"
-        android:text="@string/settings_dns_proxy_dialog_header"
-        android:textSize="@dimen/large_font_text_view" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/dialog_proxy_header_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:text="@string/settings_dns_proxy_dialog_app_desc"
-        android:textSize="@dimen/default_font_text_view" />
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    app:layout_scrollFlags="scroll|enterAlways">
 
     <LinearLayout
-        android:id="@+id/dialog_proxy_spinner_header"
+        android:id="@+id/ll_proxy_header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:weightSum="1">
+        android:layout_height="match_parent"
+        android:layout_margin="5dp"
+        android:orientation="vertical"
+        android:visibility="visible">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="0dp"
+            android:id="@+id/dialog_proxy_header"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_weight="0.3"
-            android:text="@string/settings_dns_proxy_dialog_app"
+            android:padding="10dp"
+            android:text="@string/settings_dns_proxy_dialog_header"
             android:textSize="@dimen/large_font_text_view" />
-
-        <androidx.appcompat.widget.AppCompatSpinner
-            android:id="@+id/dialog_proxy_spinner_appname"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.7"
-            android:textSize="@dimen/large_font_text_view" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/dialog_proxy_ip_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:weightSum="1">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="0dp"
+            android:id="@+id/dialog_proxy_header_desc"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.3"
-            android:text="@string/settings_dns_proxy_dialog_hostname"
-            android:textSize="@dimen/large_font_text_view" />
-
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/dialog_proxy_edit_ip"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.7"
-            android:hint="@string/settings_socks5_dialog_hint_ip"
-            android:maxLines="1"
-            android:textSize="@dimen/large_font_text_view"
-            android:typeface="monospace" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/dialog_proxy_port_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:weightSum="1">
+            android:layout_gravity="end"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="@string/settings_dns_proxy_dialog_app_desc"
+            android:textSize="@dimen/default_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="0dp"
+            android:id="@+id/dialog_proxy_header_lockdown_desc"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.3"
-            android:text="@string/settings_dns_proxy_dialog_port_number"
-            android:textSize="@dimen/large_font_text_view" />
+            android:layout_gravity="end"
+            android:paddingStart="10dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="10dp"
+            android:text="@string/settings_lock_down_mode_desc"
+            android:textSize="@dimen/default_font_text_view" />
 
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/dialog_proxy_edit_port"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/dialog_proxy_spinner_header"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.7"
-            android:hint="@string/settings_socks5_dialog_hint_port"
-            android:inputType="number"
-            android:maxLines="1"
-            android:textSize="@dimen/large_font_text_view"
-            android:typeface="monospace" />
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp"
+            android:paddingTop ="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:weightSum="1">
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.3"
+                android:text="@string/settings_dns_proxy_dialog_app"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/dialog_proxy_spinner_appname"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.7"
+                android:textSize="@dimen/large_font_text_view" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/dialog_proxy_ip_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:weightSum="1">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.3"
+                android:text="@string/settings_dns_proxy_dialog_hostname"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/dialog_proxy_edit_ip"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.7"
+                android:hint="@string/settings_socks5_dialog_hint_ip"
+                android:maxLines="1"
+                android:textSize="@dimen/large_font_text_view"
+                android:typeface="monospace" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/dialog_proxy_port_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:weightSum="1">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.3"
+                android:text="@string/settings_dns_proxy_dialog_port_number"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/dialog_proxy_edit_port"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.7"
+                android:hint="@string/settings_socks5_dialog_hint_port"
+                android:inputType="number"
+                android:maxLines="1"
+                android:textSize="@dimen/large_font_text_view"
+                android:typeface="monospace" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/dialog_proxy_username_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:weightSum="1">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.3"
+                android:text="@string/settings_dns_proxy_dialog_username"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/dialog_proxy_edit_username"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.7"
+                android:hint="@string/settings_socks5_dialog_hint_username"
+                android:maxLines="1"
+                android:textSize="@dimen/large_font_text_view"
+                android:typeface="monospace" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/dialog_proxy_password_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:weightSum="1">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.3"
+                android:text="@string/settings_dns_proxy_dialog_password"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/dialog_proxy_edit_password"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.7"
+                android:hint="@string/settings_socks5_dialog_hint_password"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:textSize="@dimen/large_font_text_view"
+                android:typeface="monospace" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/dialog_proxy_udp_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:weightSum="1">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.9"
+                android:text="@string/univ_firewall_rule_4"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/dialog_proxy_udp_check"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.1"
+                android:buttonTint="?attr/accentGood"
+                android:foregroundTint="?attr/accentGood" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/dialog_proxy_exclude_apps_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="10dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="10dp"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="0.9"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_exclude_proxy_apps_heading"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/dialog_proxy_exclude_apps_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:text="@string/settings_exclude_proxy_apps_desc"
+                    android:textSize="@dimen/default_font_text_view" />
+
+            </LinearLayout>
+
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/dialog_proxy_exclude_apps_check"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.1"
+                android:buttonTint="?attr/accentGood"
+                android:foregroundTint="?attr/accentGood" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/dialog_proxy_error_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:textColor="@color/colorRed_A400"
+            android:textSize="@dimen/default_font_text_view" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/dialog_proxy_cancel_btn"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:gravity="center"
+                android:text="@string/lbl_cancel"
+                android:textColor="?attr/accentGood"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/dialog_proxy_apply_btn"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:gravity="center"
+                android:text="@string/settings_dns_proxy_dialog_positive_btn"
+                android:textColor="?attr/accentGood"
+                android:textSize="@dimen/large_font_text_view" />
+        </LinearLayout>
     </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/dialog_proxy_username_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:weightSum="1">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.3"
-            android:text="@string/settings_dns_proxy_dialog_username"
-            android:textSize="@dimen/large_font_text_view" />
-
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/dialog_proxy_edit_username"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.7"
-            android:hint="@string/settings_socks5_dialog_hint_username"
-            android:maxLines="1"
-            android:textSize="@dimen/large_font_text_view"
-            android:typeface="monospace" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/dialog_proxy_password_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:weightSum="1">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.3"
-            android:text="@string/settings_dns_proxy_dialog_password"
-            android:textSize="@dimen/large_font_text_view" />
-
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/dialog_proxy_edit_password"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.7"
-            android:hint="@string/settings_socks5_dialog_hint_password"
-            android:inputType="textPassword"
-            android:maxLines="1"
-            android:textSize="@dimen/large_font_text_view"
-            android:typeface="monospace" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/dialog_proxy_udp_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:weightSum="1">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.9"
-            android:text="@string/univ_firewall_rule_4"
-            android:textSize="@dimen/large_font_text_view" />
-
-        <androidx.appcompat.widget.AppCompatCheckBox
-            android:id="@+id/dialog_proxy_udp_check"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.1"
-            android:buttonTint="?attr/accentGood"
-            android:foregroundTint="?attr/accentGood" />
-
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/dialog_proxy_error_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:textColor="@color/colorRed_A400"
-        android:textSize="@dimen/default_font_text_view" />
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        android:orientation="horizontal">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/dialog_proxy_cancel_btn"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:gravity="center"
-            android:text="@string/lbl_cancel"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/large_font_text_view" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/dialog_proxy_apply_btn"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:gravity="center"
-            android:text="@string/settings_dns_proxy_dialog_positive_btn"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/large_font_text_view" />
-    </LinearLayout>
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>

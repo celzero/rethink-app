@@ -112,6 +112,7 @@
     <string name="symbol_turtle" translatable="false">🐢</string>
     <string name="symbol_currency" translatable="false">💸</string>
     <string name="symbol_green_circle" translatable="false">🟢</string>
+    <string name="symbol_red_circle" translatable="false">🔴</string>
     <string name="symbol_key" translatable="false">🗝️</string>
     <string name="symbol_global" translatable="false">🌐</string>
     <string name="symbol_clock" translatable="false">🕒</string>
@@ -432,6 +433,9 @@
     <string name="settings_allow_lan_heading" translatable="true">Do not route Private IPs (experimental)</string>
     <string name="settings_allow_lan_desc" translatable="true">Exclude LAN, loopback, multicast, link-local routes from Rethink\'s VPN tunnel.</string>
 
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback proxy forwarder apps</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">When disabled, excludes proxy (SOCKS5, HTTP, DNS) forwarder apps from Rethink\'s VPN tunnel.</string>
+
     <string name="settings_allow_bypass_heading" translatable="true">Enable network visibility</string>
     <string name="settings_allow_bypass_desc" translatable="true">Allow requesting apps to access all available networks. These apps may bypass Rethink\'s VPN tunnel on-demand. Some audio/video conference apps like Zoom and Meet may require this to function properly.</string>
     <string name="settings_lock_down_mode_desc" translatable="true">Certain options disabled when VPN is in lockdown mode. <u>See VPN settings</u>.</string>
@@ -561,7 +565,7 @@
     <string name="settings_dns_proxy_dialog_username" translatable="true">Username</string>
     <string name="settings_dns_proxy_dialog_password" translatable="true">Password</string>
     <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">set</string>
-    <string name="settings_dns_proxy_dialog_app_desc" translatable="true">The selected app will be excluded from the VPN to let it proxy connections on your behalf.</string>
+    <string name="settings_dns_proxy_dialog_app_desc" translatable="false">The selected app will be excluded from the VPN to let it proxy connections on your behalf.</string>
 
     <string name="settings_app_list_default_app" translatable="true">None</string>
 

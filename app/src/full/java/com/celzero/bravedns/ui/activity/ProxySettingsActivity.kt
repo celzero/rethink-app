@@ -62,11 +62,11 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isValidPort
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.concurrent.TimeUnit
 
 class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configure) {
     private val b by viewBinding(FragmentProxyConfigureBinding::bind)
@@ -646,6 +646,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
 
         val headerTxt: TextView = dialogBinding.dialogProxyHeader
         val headerDesc: TextView = dialogBinding.dialogProxyHeaderDesc
+        val lockdownDesc: TextView = dialogBinding.dialogProxyHeaderLockdownDesc
         val applyURLBtn = dialogBinding.dialogProxyApplyBtn
         val cancelURLBtn = dialogBinding.dialogProxyCancelBtn
         val appNameSpinner: Spinner = dialogBinding.dialogProxySpinnerAppname
@@ -655,8 +656,17 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         val userNameEditText: EditText = dialogBinding.dialogProxyEditUsername
         val passwordEditText: EditText = dialogBinding.dialogProxyEditPassword
         val udpBlockCheckBox: CheckBox = dialogBinding.dialogProxyUdpCheck
+        val excludeAppCheckBox: CheckBox = dialogBinding.dialogProxyExcludeAppsCheck
 
+        headerDesc.visibility = View.GONE
         udpBlockCheckBox.isChecked = persistentState.getUdpBlocked()
+        excludeAppCheckBox.isChecked = !persistentState.excludeAppsInProxy
+        excludeAppCheckBox.isEnabled = !VpnController.isVpnLockdown()
+        lockdownDesc.visibility = if (VpnController.isVpnLockdown()) View.VISIBLE else View.GONE
+
+        if (VpnController.isVpnLockdown()) {
+            excludeAppCheckBox.alpha = 0.5f
+        }
 
         val proxySpinnerAdapter =
             ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, appNames)
@@ -691,6 +701,11 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         headerTxt.text = getString(R.string.settings_dns_proxy_dialog_header)
         headerDesc.text = getString(R.string.settings_dns_proxy_dialog_app_desc)
 
+        lockdownDesc.setOnClickListener {
+            dialog.dismiss()
+            UIUtils.openVpnProfile(this)
+        }
+
         applyURLBtn.setOnClickListener {
             var port: Int? = 0
             var isValid: Boolean
@@ -724,14 +739,16 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 isUDPBlock = true
             }
 
+            persistentState.excludeAppsInProxy = !excludeAppCheckBox.isChecked
+
             val userName: String = userNameEditText.text.toString()
             val password: String = passwordEditText.text.toString()
             if (isValid && isIPValid) {
                 // Do the Socks5 Proxy setting there
                 persistentState.setUdpBlocked(udpBlockCheckBox.isChecked)
-                val appName = appNameSpinner.selectedItem.toString()
-                insertSocks5Endpoint(endpoint.id, ip, port, appName, userName, password, isUDPBlock)
-                if (appName == getString(R.string.settings_app_list_default_app)) {
+                val app = appNameSpinner.selectedItem.toString()
+                insertSocks5Endpoint(endpoint.id, ip, port, app, userName, password, isUDPBlock)
+                if (app == getString(R.string.settings_app_list_default_app)) {
                     b.settingsActivitySocks5Desc.text =
                         getString(
                             R.string.settings_socks_forwarding_desc_no_app,
@@ -740,12 +757,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                         )
                 } else {
                     b.settingsActivitySocks5Desc.text =
-                        getString(
-                            R.string.settings_socks_forwarding_desc,
-                            ip,
-                            port.toString(),
-                            appName
-                        )
+                        getString(R.string.settings_socks_forwarding_desc, ip, port.toString(), app)
                 }
                 dialog.dismiss()
             } else {
@@ -826,6 +838,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
 
         val headerTxt: TextView = dialogBinding.dialogProxyHeader
         val headerDesc: TextView = dialogBinding.dialogProxyHeaderDesc
+        val lockdownDesc: TextView = dialogBinding.dialogProxyHeaderLockdownDesc
         val applyURLBtn = dialogBinding.dialogProxyApplyBtn
         val cancelURLBtn = dialogBinding.dialogProxyCancelBtn
         val appNameSpinner: Spinner = dialogBinding.dialogProxySpinnerAppname
@@ -836,6 +849,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         val userNameLl: LinearLayout = dialogBinding.dialogProxyUsernameHeader
         val passwordLl: LinearLayout = dialogBinding.dialogProxyPasswordHeader
         val udpBlockLl: LinearLayout = dialogBinding.dialogProxyUdpHeader
+        val excludeAppCheckBox: CheckBox = dialogBinding.dialogProxyExcludeAppsCheck
 
         // do not show the UDP block option for HTTP proxy
         udpBlockLl.visibility = View.GONE
@@ -844,6 +858,16 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         // do not show the username/password option for HTTP proxy
         userNameLl.visibility = View.GONE
         passwordLl.visibility = View.GONE
+        excludeAppCheckBox.isChecked = !persistentState.excludeAppsInProxy
+        excludeAppCheckBox.isEnabled = !VpnController.isVpnLockdown()
+        if (VpnController.isVpnLockdown()) {
+            excludeAppCheckBox.alpha = 0.5f
+        }
+        lockdownDesc.setOnClickListener {
+            dialog.dismiss()
+            UIUtils.openVpnProfile(this)
+        }
+        lockdownDesc.visibility = if (VpnController.isVpnLockdown()) View.VISIBLE else View.GONE
 
         val proxySpinnerAdapter =
             ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, appNames)
@@ -884,9 +908,9 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
 
             if (isHostValid) {
                 errorTxt.visibility = View.INVISIBLE
-                val appName = appNameSpinner.selectedItem.toString()
-                insertHttpProxyEndpointDB(endpoint.id, host, appName)
+                insertHttpProxyEndpointDB(endpoint.id, host, appNameSpinner.selectedItem.toString())
                 dialog.dismiss()
+                persistentState.excludeAppsInProxy = !excludeAppCheckBox.isChecked
                 showToastUiCentered(
                     this,
                     getString(R.string.settings_http_proxy_toast_success),

@@ -11,14 +11,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
         android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
         android:padding="5dp">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/awl_app_detail_icon"
             android:layout_width="36dp"
             android:layout_height="36dp"
+            android:alpha="0.75"
             android:layout_centerVertical="true"
             android:src="@drawable/dns_icon" />
 
@@ -31,10 +32,57 @@
             android:layout_toEndOf="@id/awl_app_detail_icon"
             android:gravity="center"
             android:padding="5dp"
-            android:textColor="?primaryTextColor"
+            android:textColor="?primaryLightColorText"
             android:textSize="@dimen/large_font_text_view" />
 
     </RelativeLayout>
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggle_group"
+        style="@style/toggleButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:checkedButton="@id/tb_recent_toggle_btn"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tb_recent_toggle_btn"
+            style="@style/toggleButtonNoStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:tag="0"
+            android:textAllCaps="false"
+            android:textColor="?attr/defaultToggleBtnTxt"
+            android:textSize="@dimen/default_font_text_view"
+            app:cornerRadius="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tb_daily_toggle_btn"
+            style="@style/toggleButtonNoStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:tag="1"
+            android:textAllCaps="false"
+            android:textColor="?attr/defaultToggleBtnTxt"
+            android:textSize="@dimen/default_font_text_view"
+            app:cornerRadius="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tb_weekly_toggle_btn"
+            style="@style/toggleButtonNoStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:tag="2"
+            android:textAllCaps="false"
+            android:textColor="?attr/defaultToggleBtnTxt"
+            android:textSize="@dimen/default_font_text_view"
+            app:cornerRadius="16dp" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/awl_card_view_top"

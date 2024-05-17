@@ -33,6 +33,9 @@ import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.databinding.DialogSetDnsProxyBinding
 import com.celzero.bravedns.databinding.FragmentDnsProxyListBinding
 import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.DnsProxyEndpointViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -48,6 +51,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
     private val b by viewBinding(FragmentDnsProxyListBinding::bind)
 
     private val appConfig by inject<AppConfig>()
+    private val persistentState by inject<PersistentState>()
 
     // DNS Proxy UI Elements
     private lateinit var dnsProxyRecyclerAdapter: DnsProxyEndpointAdapter
@@ -106,11 +110,20 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
 
         val applyURLBtn = dialogBinding.dialogDnsProxyApplyBtn
         val cancelURLBtn = dialogBinding.dialogDnsProxyCancelBtn
+        val lockdownDesc = dialogBinding.dialogDnsProxyLockdownDesc
         val proxyNameEditText = dialogBinding.dialogDnsProxyEditName
         val appNameSpinner = dialogBinding.dialogProxySpinnerAppname
         val ipAddressEditText = dialogBinding.dialogDnsProxyEditIp
         val portEditText = dialogBinding.dialogDnsProxyEditPort
         val errorTxt = dialogBinding.dialogDnsProxyErrorText
+        val excludeAppCheckBox = dialogBinding.dialogDnsProxyExcludeAppsCheck
+
+        excludeAppCheckBox.isChecked = !persistentState.excludeAppsInProxy
+        excludeAppCheckBox.isEnabled = !VpnController.isVpnLockdown()
+        lockdownDesc.visibility = if (VpnController.isVpnLockdown()) View.VISIBLE else View.GONE
+        if (VpnController.isVpnLockdown()) {
+            excludeAppCheckBox.alpha = 0.5f
+        }
         proxyNameEditText.setText(
             getString(R.string.cd_custom_dns_proxy_name, nextIndex.toString()),
             TextView.BufferType.EDITABLE
@@ -122,6 +135,11 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
         val proxySpinnerAdapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, appNames)
         appNameSpinner.adapter = proxySpinnerAdapter
+
+        lockdownDesc.setOnClickListener {
+            dialog.dismiss()
+            UIUtils.openVpnProfile(requireContext())
+        }
 
         applyURLBtn.setOnClickListener {
             var port = 0
@@ -159,6 +177,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
             if (isPortValid && isIpValid) {
                 Logger.d(Logger.LOG_TAG_UI, "new value inserted into DNSProxy")
                 io { insertDNSProxyEndpointDB(mode, name, appName, ip, port) }
+                persistentState.excludeAppsInProxy = !excludeAppCheckBox.isChecked
                 dialog.dismiss()
             } else {
                 Logger.i(Logger.LOG_TAG_UI, "cannot insert invalid dns-proxy IPs: $name, $appName")

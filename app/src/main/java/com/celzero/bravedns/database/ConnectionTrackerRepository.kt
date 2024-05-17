@@ -16,6 +16,8 @@
 package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
+import com.celzero.bravedns.RethinkDnsApplication
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.data.DataUsage
 
@@ -31,16 +33,8 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
 
     suspend fun updateBatch(summary: List<ConnectionSummary>) {
         summary.forEach {
-            if (it.targetIp.isNullOrEmpty()) {
-                connectionTrackerDAO.updateSummary(
-                    it.connId,
-                    it.downloadBytes,
-                    it.uploadBytes,
-                    it.duration,
-                    it.synack,
-                    it.message
-                )
-            } else {
+            // update the flag and target ip if in debug mode
+            if (DEBUG && !it.targetIp.isNullOrEmpty()) {
                 val flag = it.flag ?: ""
                 connectionTrackerDAO.updateSummary(
                     it.connId,
@@ -51,6 +45,15 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
                     it.message,
                     it.targetIp,
                     flag
+                )
+            } else {
+                connectionTrackerDAO.updateSummary(
+                    it.connId,
+                    it.downloadBytes,
+                    it.uploadBytes,
+                    it.duration,
+                    it.synack,
+                    it.message
                 )
             }
         }

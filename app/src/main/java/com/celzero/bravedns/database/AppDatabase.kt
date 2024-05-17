@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.database
 
+import Logger
+import Logger.LOG_TAG_APP_DB
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -53,7 +55,7 @@ import java.io.File
             DoTEndpoint::class,
             ODoHEndpoint::class
         ],
-    version = 21,
+    version = 22,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -94,6 +96,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(migration1819(context))
                 .addMigrations(MIGRATION_19_20)
                 .addMigrations(MIGRATION_20_21)
+                .addMigrations(MIGRATION_21_22)
                 .build()
 
         private val MIGRATION_1_2: Migration =
@@ -896,6 +899,34 @@ abstract class AppDatabase : RoomDatabase() {
                         "INSERT INTO ProxyEndpoint (proxyName, proxyMode, proxyType, proxyAppName, proxyIP, userName, password, proxyPort, isSelected, isCustom, isUDP, modifiedDataTime, latency) VALUES('HTTP Orbot', 3, 'NONE', 'org.torproject.android', '', '', '', 0, 0, 0, 0, 0, 0)"
                     )
                     db.execSQL("DROP TABLE IF EXISTS ProxyEndpoint_backup")
+                }
+            }
+
+        private val MIGRATION_21_22: Migration =
+            object : Migration(21, 22) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    // fix: migration with the WgConfigFiles seen in play store crash
+                    try {
+                        db.execSQL(
+                            "ALTER TABLE WgConfigFiles ADD COLUMN isLockdown INTEGER NOT NULL DEFAULT 0"
+                        )
+                    } catch (e: Exception) {
+                        Logger.i(LOG_TAG_APP_DB, "isLockdown column already exists, ignore")
+                    }
+                    try {
+                        db.execSQL(
+                            "ALTER TABLE WgConfigFiles ADD COLUMN isCatchAll INTEGER NOT NULL DEFAULT 0"
+                        )
+                    } catch (e: Exception) {
+                        Logger.i(LOG_TAG_APP_DB, "isCatchAll column already exists, ignore")
+                    }
+                    try {
+                        db.execSQL(
+                            "ALTER TABLE WgConfigFiles ADD COLUMN oneWireGuard INTEGER NOT NULL DEFAULT 0"
+                        )
+                    } catch (e: Exception) {
+                        Logger.i(LOG_TAG_APP_DB, "oneWireGuard column already exists, ignore")
+                    }
                 }
             }
     }

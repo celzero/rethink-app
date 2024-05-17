@@ -16,6 +16,7 @@
 package com.celzero.bravedns.ui.activity
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -36,8 +37,11 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -76,6 +80,8 @@ class AppWiseIpLogsActivity :
     }
 
     private fun init() {
+        setTabbedViewTxt()
+        highlightToggleBtn()
         io {
             val appInfo = FirewallManager.getAppInfoByUid(uid)
             // case: app is uninstalled but still available in RethinkDNS database
@@ -97,7 +103,49 @@ class AppWiseIpLogsActivity :
         }
     }
 
+    private fun setTabbedViewTxt() {
+        b.tbRecentToggleBtn.text = getString(R.string.ci_desc, "1", getString(R.string.lbl_hour))
+        b.tbDailyToggleBtn.text = getString(R.string.ci_desc, "24", getString(R.string.lbl_hour))
+        b.tbWeeklyToggleBtn.text = getString(R.string.ci_desc, "7", getString(R.string.lbl_day))
+    }
+
+    private val listViewToggleListener =
+        MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
+            val mb: MaterialButton = b.toggleGroup.findViewById(checkedId)
+            if (isChecked) {
+                selectToggleBtnUi(mb)
+                val tcValue = (mb.tag as String).toIntOrNull() ?: 0
+                val timeCategory =
+                    AppConnectionsViewModel.TimeCategory.fromValue(tcValue)
+                        ?: AppConnectionsViewModel.TimeCategory.ONE_HOUR
+                networkLogsViewModel.timeCategoryChanged(timeCategory, isDomain = false)
+                return@OnButtonCheckedListener
+            }
+
+            unselectToggleBtnUi(mb)
+        }
+
+    private fun selectToggleBtnUi(mb: MaterialButton) {
+        mb.backgroundTintList =
+            ColorStateList.valueOf(UIUtils.fetchToggleBtnColors(this, R.color.accentGood))
+        mb.setTextColor(UIUtils.fetchColor(this, R.attr.homeScreenHeaderTextColor))
+    }
+
+    private fun unselectToggleBtnUi(mb: MaterialButton) {
+        mb.setTextColor(UIUtils.fetchColor(this, R.attr.primaryTextColor))
+        mb.backgroundTintList =
+            ColorStateList.valueOf(UIUtils.fetchToggleBtnColors(this, R.color.defaultToggleBtnBg))
+    }
+
+    private fun highlightToggleBtn() {
+        val timeCategory = "0" // default is 1 hours, "0" tag is 1 hours
+        val btn = b.toggleGroup.findViewWithTag<MaterialButton>(timeCategory)
+        btn.isChecked = true
+        selectToggleBtnUi(btn)
+    }
+
     private fun setClickListener() {
+        b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
         b.awlDelete.setOnClickListener { showDeleteConnectionsDialog() }
         b.awlSearch.setOnQueryTextListener(this)
     }

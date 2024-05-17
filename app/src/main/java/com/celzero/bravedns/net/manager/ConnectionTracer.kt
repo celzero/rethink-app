@@ -71,8 +71,10 @@ class ConnectionTracer(ctx: Context) {
                 }
         } catch (ignored: IllegalArgumentException) {
             // InetSocketAddress throws IllegalArgumentException or SecurityException
+            Logger.d(LOG_TAG_VPN, "err getUidQ: $ignored")
             return uid
         } catch (ignored: SecurityException) {
+            Logger.d(LOG_TAG_VPN, "err getUidQ: $ignored")
             return uid
         }
         val key = makeCacheKey(protocol, local, remote)
@@ -96,7 +98,7 @@ class ConnectionTracer(ctx: Context) {
             Logger.e(LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
         }
 
-        if (retryRequired(uid, protocol, destIp)) {
+        if (retryRequired(uid, protocol, destIp, key)){
             // change the destination IP to unspecified IP and try again for unconnected UDP
             val dip =
                 if (IPAddressString(destIp).isIPv6) {
@@ -119,8 +121,12 @@ class ConnectionTracer(ctx: Context) {
     }
 
     // handle unconnected UDP requests
-    private fun retryRequired(uid: Int, protocol: Int, destIp: String): Boolean {
+    private fun retryRequired(uid: Int, protocol: Int, destIp: String, key: String): Boolean {
         if (uid != Constants.INVALID_UID) { // already got the uid, no need to retry
+            return false
+        }
+        // if uid is already cached, no need to retry
+        if (uidCache.getIfPresent(key) != null) {
             return false
         }
         // no need to retry for protocols other than UDP

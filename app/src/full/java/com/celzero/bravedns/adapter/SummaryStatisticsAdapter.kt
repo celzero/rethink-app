@@ -218,10 +218,8 @@ class SummaryStatisticsAdapter(
                         } else {
                             // Glide will cache the icons against the urls. To extract the fav
                             // icon from the cache, first verify that the cache is available with
-                            // the
-                            // next dns url. If it is not available then glide will throw an error,
-                            // do
-                            // the duckduckgo url check in that case.
+                            // the next dns url. If it is not available then glide will throw an
+                            // error, do the duckduckgo url check in that case.
                             displayNextDnsFavIcon(query)
                         }
                     }

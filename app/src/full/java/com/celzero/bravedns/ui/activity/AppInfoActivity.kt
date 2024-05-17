@@ -31,9 +31,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
+import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
@@ -41,7 +44,6 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.bottomsheet.RethinkListBottomSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
@@ -65,7 +67,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private val b by viewBinding(ActivityAppDetailsBinding::bind)
 
     private val persistentState by inject<PersistentState>()
-    private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
 
     private val ipRulesViewModel: CustomIpViewModel by viewModel()
     private val domainRulesViewModel: CustomDomainViewModel by viewModel()
@@ -74,9 +75,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private var uid: Int = INVALID_UID
     private lateinit var appInfo: AppInfo
 
-    private var ipListUiState: Boolean = false
-    private var firewallUiState: Boolean = true
-
     private var appStatus = FirewallManager.FirewallStatus.NONE
     private var connStatus = FirewallManager.ConnectionStatus.ALLOW
 
@@ -84,7 +82,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     companion object {
         const val UID_INTENT_NAME = "UID"
-        const val LOG_THRESHOLD_SIZE = 100
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,9 +92,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         domainRulesViewModel.setUid(uid)
         networkLogsViewModel.setUid(uid)
         init()
-        observeNetworkLogSize()
         observeAppRules()
-        observeDomainLogSize()
         setupClickListeners()
     }
 
@@ -109,37 +104,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
     }
 
-    private fun observeNetworkLogSize() {
-        networkLogsViewModel.getConnectionsCount(uid).observe(this) {
-            if (it == null) return@observe
-
-            b.aadIpLogsDetail.text = it.toString()
-        }
-    }
-
-    private fun observeDomainLogSize() {
-        networkLogsViewModel.getAppDomainConnectionsCount(uid).observe(this) {
-            if (it == null) return@observe
-
-            b.aadDomainLogsDetail.text = it.toString()
-        }
-    }
-
     private fun init() {
-        val domainTxtDesc =
-            getString(
-                R.string.two_argument_space,
-                getString(R.string.lbl_domain).replaceFirstChar { it.uppercase() },
-                getString(R.string.lbl_logs).replaceFirstChar { it.uppercase() }
-            )
-        val ipTxtDesc =
-            getString(
-                R.string.two_argument_space,
-                getString(R.string.lbl_ip).replaceFirstChar { it.uppercase() },
-                getString(R.string.lbl_logs).replaceFirstChar { it.uppercase() }
-            )
-        b.aadIpLogsDetailDesc.text = ipTxtDesc
-        b.aadDomainLogsDetailDesc.text = domainTxtDesc
         io {
             val appInfo = FirewallManager.getAppInfoByUid(uid)
             // case: app is uninstalled but still available in RethinkDNS database
@@ -170,6 +135,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                     return@uiCtx
                 }
                 updateFirewallStatusUi(appStatus, connStatus)
+                setDomainsAdapter()
+                setIpAdapter()
             }
         }
     }
@@ -369,16 +336,59 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
         b.aadDomainBlockCard.setOnClickListener { openCustomDomainScreen() }
 
-        b.aadIpLogsCard.setOnClickListener {
-            val intent = Intent(this, AppWiseIpLogsActivity::class.java)
-            intent.putExtra(UID_INTENT_NAME, uid)
-            startActivity(intent)
-        }
+        b.aadIpsChip.setOnClickListener { openAppWiseIpLogsActivity() }
 
-        b.aadDomainLogsCard.setOnClickListener {
-            val intent = Intent(this, AppWiseDomainLogsActivity::class.java)
-            intent.putExtra(UID_INTENT_NAME, uid)
-            startActivity(intent)
+        b.aadDomainsChip.setOnClickListener { openAppWiseDomainLogsActivity() }
+    }
+
+    private fun openAppWiseDomainLogsActivity() {
+        val intent = Intent(this, AppWiseDomainLogsActivity::class.java)
+        intent.putExtra(UID_INTENT_NAME, uid)
+        startActivity(intent)
+    }
+
+    private fun openAppWiseIpLogsActivity() {
+        val intent = Intent(this, AppWiseIpLogsActivity::class.java)
+        intent.putExtra(UID_INTENT_NAME, uid)
+        startActivity(intent)
+    }
+
+    private fun setDomainsAdapter() {
+        val layoutManager = LinearLayoutManager(this)
+        b.aadMostContactedDomainRv.layoutManager = layoutManager
+        val adapter = AppWiseDomainsAdapter(this, this, uid)
+        networkLogsViewModel.getDomainLogsLimited(uid).observe(this) {
+            adapter.submitData(this.lifecycle, it)
+        }
+        b.aadMostContactedDomainRv.adapter = adapter
+
+        adapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (adapter.itemCount < 1) {
+                    b.aadMostContactedDomainRl.visibility = View.GONE
+                    b.aadMostContactedIpsRv.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    private fun setIpAdapter() {
+        b.aadMostContactedIpsRv.setHasFixedSize(true)
+        val layoutManager = LinearLayoutManager(this)
+        b.aadMostContactedIpsRv.layoutManager = layoutManager
+        val adapter = AppWiseIpsAdapter(this, this, uid)
+        networkLogsViewModel.getIpLogsLimited(uid).observe(this) {
+            adapter.submitData(this.lifecycle, it)
+        }
+        b.aadMostContactedIpsRv.adapter = adapter
+
+        adapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (adapter.itemCount < 1) {
+                    b.aadMostContactedIpsRl.visibility = View.GONE
+                    b.aadMostContactedDomainRv.visibility = View.GONE
+                }
+            }
         }
     }
 
@@ -402,11 +412,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         val alertDialog = builderSingle.create()
         alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
         alertDialog.show()
-    }
-
-    private fun rethinkListBottomSheet() {
-        val bottomSheetFragment = RethinkListBottomSheet()
-        bottomSheetFragment.show(this.supportFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun toggleMobileData(appInfo: AppInfo) {
