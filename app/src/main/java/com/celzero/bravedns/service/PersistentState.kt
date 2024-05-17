@@ -279,7 +279,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var proxyDns by booleanPref("proxy_dns").withDefault<Boolean>(true)
 
     // exclude apps which are configured in proxy (socks5, http, dns proxy)
-    var excludeAppsInProxy by booleanPref("exclude_apps_in_proxy").withDefault<Boolean>(false)
+    var excludeAppsInProxy by booleanPref("exclude_apps_in_proxy").withDefault<Boolean>(true)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
