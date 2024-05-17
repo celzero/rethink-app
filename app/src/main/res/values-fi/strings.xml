@@ -63,4 +63,21 @@
     <string name="lbl_configure" translatable="true">Määritä</string>
     <string name="lbl_private_key" translatable="true">Yksityinen avain</string>
     <string name="lbl_private" translatable="true">yksityinen</string>
+    <string name="lbl_status" translatable="true">Tila</string>
+    <string name="lbl_starting" translatable="true">Käynnistetään</string>
+    <string name="lbl_overall" translatable="true">Kaiken kaikkiaan</string>
+    <string name="lbl_random" translatable="true">(satunnainen)</string>
+    <string name="slide_2_desc" translatable="true">Rethink on helpoin tapa seurata verkkotoimintaa, ohittaa Internet-sensuuri ja asettaa palomuuri Android-laitteesi sovelluksille.</string>
+    <string name="lbl_action_required" translatable="true">Vaatii toimenpide</string>
+    <string name="lbl_domain_rules" translatable="true">Toimialueen säännöt</string>
+    <string name="lbl_generated" translatable="true">(luotu)</string>
+    <string name="lbl_listen_port" translatable="true">Kuunteluportti</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_preshared_key" translatable="true">Esijaettu avain</string>
+    <string name="lbl_insecure" translatable="true">(epäturvallinen)</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Pysyvä hengissäpysyminen</string>
+    <string name="lbl_unselected" translatable="true">Ei valittu</string>
+    <string name="lbl_peer" translatable="true">Pari</string>
+    <string name="lbl_split" translatable="true">Jaa</string>
+    <string name="lbl_on_device" translatable="true">laitteessa</string>
 </resources>
