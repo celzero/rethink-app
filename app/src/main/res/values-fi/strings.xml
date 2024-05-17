@@ -53,4 +53,14 @@
     <string name="lbl_logs" translatable="true">lokit</string>
     <string name="lbl_dismiss" translatable="true">Sulje</string>
     <string name="slide_2_title" translatable="true">Tervetuloa</string>
+    <string name="lbl_cache" translatable="true">Välimuisti</string>
+    <string name="lbl_remove" translatable="true">Poista</string>
+    <string name="lbl_last" translatable="true">Viimeinen</string>
+    <string name="lbl_stopped" translatable="true">Pysäytetty</string>
+    <string name="lbl_wildcard" translatable="true">Jokerimerkki</string>
+    <string name="lbl_secure" translatable="true">turvallinen</string>
+    <string name="lbl_idle" translatable="true">Tyhjäkäynti</string>
+    <string name="lbl_configure" translatable="true">Määritä</string>
+    <string name="lbl_private_key" translatable="true">Yksityinen avain</string>
+    <string name="lbl_private" translatable="true">yksityinen</string>
 </resources>
