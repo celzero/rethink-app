@@ -80,4 +80,10 @@
     <string name="lbl_peer" translatable="true">Pari</string>
     <string name="lbl_split" translatable="true">Jaa</string>
     <string name="lbl_on_device" translatable="true">laitteessa</string>
+    <string name="slide_1_desc" translatable="true">Rethink on avoimen lähdekoodin ohjelmisto, jota tukee Mozilla Builders MVP.</string>
+    <string name="lbl_rules" translatable="true">säännöt</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="slide_1_title" translatable="true">Vapaa ja avoin lähde</string>
+    <string name="lbl_anonymous" translatable="true">anonyymi</string>
+    <string name="allow" translatable="true">sallia</string>
 </resources>
