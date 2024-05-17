@@ -53,4 +53,53 @@
     <string name="lbl_logs" translatable="true">lokit</string>
     <string name="lbl_dismiss" translatable="true">Sulje</string>
     <string name="slide_2_title" translatable="true">Tervetuloa</string>
+    <string name="lbl_cache" translatable="true">Välimuisti</string>
+    <string name="lbl_remove" translatable="true">Poista</string>
+    <string name="lbl_last" translatable="true">Viimeinen</string>
+    <string name="lbl_stopped" translatable="true">Pysäytetty</string>
+    <string name="lbl_wildcard" translatable="true">Jokerimerkki</string>
+    <string name="lbl_secure" translatable="true">turvallinen</string>
+    <string name="lbl_idle" translatable="true">Tyhjäkäynti</string>
+    <string name="lbl_configure" translatable="true">Määritä</string>
+    <string name="lbl_private_key" translatable="true">Yksityinen avain</string>
+    <string name="lbl_private" translatable="true">yksityinen</string>
+    <string name="lbl_status" translatable="true">Tila</string>
+    <string name="lbl_starting" translatable="true">Käynnistetään</string>
+    <string name="lbl_overall" translatable="true">Kaiken kaikkiaan</string>
+    <string name="lbl_random" translatable="true">(satunnainen)</string>
+    <string name="slide_2_desc" translatable="true">Rethink on helpoin tapa seurata verkkotoimintaa, ohittaa Internet-sensuuri ja asettaa palomuuri Android-laitteesi sovelluksille.</string>
+    <string name="lbl_action_required" translatable="true">Vaatii toimenpide</string>
+    <string name="lbl_domain_rules" translatable="true">Toimialueen säännöt</string>
+    <string name="lbl_generated" translatable="true">(luotu)</string>
+    <string name="lbl_listen_port" translatable="true">Kuunteluportti</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_preshared_key" translatable="true">Esijaettu avain</string>
+    <string name="lbl_insecure" translatable="true">(epäturvallinen)</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Pysyvä hengissäpysyminen</string>
+    <string name="lbl_unselected" translatable="true">Ei valittu</string>
+    <string name="lbl_peer" translatable="true">Pari</string>
+    <string name="lbl_split" translatable="true">Jaa</string>
+    <string name="lbl_on_device" translatable="true">laitteessa</string>
+    <string name="slide_1_desc" translatable="true">Rethink on avoimen lähdekoodin ohjelmisto, jota tukee Mozilla Builders MVP -ohjelma.</string>
+    <string name="lbl_rules" translatable="true">säännöt</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="slide_1_title" translatable="true">Vapaa ja avoin lähde</string>
+    <string name="lbl_anonymous" translatable="true">anonyymi</string>
+    <string name="allow" translatable="true">salli</string>
+    <string name="isolate" translatable="true">eristä</string>
+    <string name="pause_mode_notification_title" translatable="true">Keskeytetty! Estetyt sovellukset pysyvät palomuurissa.</string>
+    <string name="block" translatable="true">estä</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Suojattu! Yhdistetty DNS + palomuuri + välityspalvelimeen.</string>
+    <string name="bypass_universal" translatable="true">ohita universaali</string>
+    <string name="exclude" translatable="true">Pois sulje</string>
+    <string name="untracked" translatable="true">ei jäljitetty</string>
+    <string name="bypass_dns_firewall" translatable="true">ohita DNS ja palomuuri</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Muuta suojausasetusta napauttamalla</string>
+    <string name="dns_mode_notification_title" translatable="true">Suojattu! Yhdistetty nopeaan ja suojattuun DNS:ään.</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">epäonnistuminen</string>
+    <string name="hybrid_mode_notification_title" translatable="true">Suojattu! Yhteys DNS + palomuuriin.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">odottamassa</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Varoitus: Rethink on poistettu käytöstä</string>
+    <string name="firewall_mode_notification_title" translatable="true">Suojattu! Yhteys palomuuriin.</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">Suojattu</string>
 </resources>
