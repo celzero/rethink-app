@@ -104,6 +104,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
                         Logger.i(LOG_TAG_DOWNLOAD, "Local blocklist download cancelled")
                         notifyDownloadCancelled(context)
                     }
+                    Logger.i(LOG_TAG_DOWNLOAD, "Local blocklist download failed")
                     Result.failure()
                 }
                 true -> {
