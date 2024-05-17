@@ -96,4 +96,9 @@
     <string name="bypass_dns_firewall" translatable="true">ohita DNS ja palomuuri</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Muuta suojausasetusta napauttamalla</string>
     <string name="dns_mode_notification_title" translatable="true">Suojattu! Yhdistetty nopeaan ja suojattuun DNS:ään.</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">epäonnistuminen</string>
+    <string name="hybrid_mode_notification_title" translatable="true">Suojattu! Yhteys DNS + palomuuriin.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">odottamassa</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Varoitus: Rethink on poistettu käytöstä</string>
+    <string name="firewall_mode_notification_title" translatable="true">Suojattu! Yhteys palomuuriin.</string>
 </resources>
