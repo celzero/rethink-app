@@ -55,6 +55,7 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.paging.LOG_TAG
 import backend.Backend
 import backend.RDNS
 import backend.Stats
@@ -94,6 +95,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isAtleastU
 import com.celzero.bravedns.util.Utilities.isMissingOrInvalidUid
 import com.celzero.bravedns.util.Utilities.isNetworkSame
+import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.common.collect.Sets
@@ -1823,6 +1825,8 @@ class BraveVPNService :
     }
 
     private fun spawnLocalBlocklistStampUpdate() {
+        if (isPlayStoreFlavour()) return
+
         io("dnsStampUpdate") { vpnAdapter?.setRDNSStamp() }
     }
 
@@ -2068,7 +2072,6 @@ class BraveVPNService :
             logd("bound networks changed, close connections")
             io("boundNetworksChanged") { vpnAdapter?.closeAllConnections() }
         } */
-
 
         // Workaround for WireGuard connection issues after network change
         // WireGuard may fail to connect to the server when the network changes.
@@ -2954,6 +2957,7 @@ class BraveVPNService :
 
     override fun onProxiesStopped() {
         // clear the proxy handshake times
+        logd("onProxiesStopped; clear the handshake times")
         wgHandShakeCheckpoints.clear()
     }
 
@@ -3303,12 +3307,11 @@ class BraveVPNService :
                 // ie, if lockdown is enabled, split-tunneling happens as expected but if
                 // lockdown is disabled, it has the effect of blocking all connections
                 val canRoute = vpnAdapter?.canRouteIp(proxyId, connTracker.destIP, true)
+                logd("flow: wg is active/lockdown/catch-all; $proxyId, $connId, $uid; canRoute? $canRoute")
                 return if (canRoute == true) {
                     handleProxyHandshake(proxyId)
-                    logd("flow: wg is active/lockdown/catch-all; $proxyId, $connId, $uid")
                     persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
                 } else {
-                    logd("flow: wg is active/lockdown/catch-all, but no route, $connId, $uid")
                     persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid)
                 }
             } else {
@@ -3435,32 +3438,40 @@ class BraveVPNService :
             return
         }
 
+        val latestCheckpoint = wgHandShakeCheckpoints[id]
+        if (latestCheckpoint == null) {
+            Logger.w(LOG_TAG_VPN, "flow: latest checkpoint is null for $id")
+            return
+        }
+
+        val stats = vpnAdapter?.getProxyStats(id)
+        if (stats == null) {
+            Logger.w(LOG_TAG_VPN, "flow: stats is null for $id")
+            return
+        }
+
         val realtime = elapsedRealtime()
-        val latestCheckpoint = wgHandShakeCheckpoints[id] ?: return
         val cpInterval = realtime - latestCheckpoint
         val cpIntervalSecs = TimeUnit.MILLISECONDS.toSeconds(cpInterval)
         if (cpInterval < this.checkpointInterval) {
-            logd("flow: handshake skipping check for $id, $cpIntervalSecs")
+            logd("flow: skip refresh for $id, within interval: $cpIntervalSecs")
             return
         }
-        val stats = vpnAdapter?.getProxyStats(id) ?: return
         val lastHandShake = stats.lastOK
-        logd("flow: handshake check for $id, $lastHandShake, interval: $cpIntervalSecs")
         if (lastHandShake <= 0) {
-            logd("flow: handshake is not established for $id, $lastHandShake, returning")
+            Logger.w(LOG_TAG_VPN, "flow: skip refresh, handshake never done for $id")
             return
         }
+        logd("flow: handshake check for $id, $lastHandShake, interval: $cpIntervalSecs")
+        wgHandShakeCheckpoints[id] = realtime
         val currTimeMs = System.currentTimeMillis()
         val durationMs = currTimeMs - lastHandShake
         val durationSecs = TimeUnit.MILLISECONDS.toSeconds(durationMs)
         // if the last handshake is older than the timeout, refresh the proxy
-        if (durationMs > wgHandshakeTimeout) {
-            wgHandShakeCheckpoints[id] = realtime
-            Logger.i(LOG_TAG_VPN, "flow: handshake timeout for $id, $durationSecs, refreshing")
+        val mustRefresh = durationMs > wgHandshakeTimeout
+        Logger.i(LOG_TAG_VPN, "flow: refresh $id after $durationSecs: $mustRefresh")
+        if (mustRefresh) {
             io("proxyHandshake") { vpnAdapter?.refreshProxy(id) }
-        } else {
-            Logger.i(LOG_TAG_VPN, "flow: handshake is within timeout for $id, $durationSecs")
-            wgHandShakeCheckpoints[id] = realtime
         }
     }
 
