@@ -50,6 +50,7 @@ import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.blocklistDir
 import com.celzero.bravedns.util.Utilities.blocklistFile
+import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.wireguard.Config
 import intra.Intra
@@ -431,7 +432,7 @@ class GoVpnAdapter : KoinComponent {
         Logger.d(LOG_TAG_VPN, "set brave dns to tunnel (local/remote)")
 
         // enable local blocklist if enabled
-        if (persistentState.blocklistEnabled) {
+        if (persistentState.blocklistEnabled && !Utilities.isPlayStoreFlavour()) {
             setRDNSLocal()
         } else {
             // remove local blocklist, if any
@@ -831,7 +832,7 @@ class GoVpnAdapter : KoinComponent {
 
     fun getRDNS(type: RethinkBlocklistManager.RethinkBlocklistType): backend.RDNS? {
         try {
-            return if (type.isLocal()) {
+            return if (type.isLocal() && !isPlayStoreFlavour()) {
                 getRDNSResolver()?.rdnsLocal
             } else {
                 getRDNSResolver()?.rdnsRemote
@@ -968,7 +969,7 @@ class GoVpnAdapter : KoinComponent {
             // no need to send the dnsProxy.port for the below method, as it is not expecting port
             Intra.setSystemDNS(tunnel, sysDnsStr)
         } catch (e: Exception) { // this is not expected to happen
-            Logger.e(LOG_TAG_VPN, "set system dns: could not parse system dns", e)
+            Logger.e(LOG_TAG_VPN, "set system dns: could not parse: $systemDns", e)
             // remove the system dns, if it could not be set
             tunnel.resolver.remove(Backend.System)
         }
@@ -1042,6 +1043,8 @@ class GoVpnAdapter : KoinComponent {
     }
 
     private fun resetLocalBlocklistStampFromTunnel() {
+        if (Utilities.isPlayStoreFlavour()) return
+
         try {
             val rl = getRDNS(RethinkBlocklistManager.RethinkBlocklistType.LOCAL)
             if (rl == null) {
