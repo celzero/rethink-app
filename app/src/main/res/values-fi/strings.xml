@@ -80,10 +80,20 @@
     <string name="lbl_peer" translatable="true">Pari</string>
     <string name="lbl_split" translatable="true">Jaa</string>
     <string name="lbl_on_device" translatable="true">laitteessa</string>
-    <string name="slide_1_desc" translatable="true">Rethink on avoimen lähdekoodin ohjelmisto, jota tukee Mozilla Builders MVP.</string>
+    <string name="slide_1_desc" translatable="true">Rethink on avoimen lähdekoodin ohjelmisto, jota tukee Mozilla Builders MVP -ohjelma.</string>
     <string name="lbl_rules" translatable="true">säännöt</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
     <string name="slide_1_title" translatable="true">Vapaa ja avoin lähde</string>
     <string name="lbl_anonymous" translatable="true">anonyymi</string>
-    <string name="allow" translatable="true">sallia</string>
+    <string name="allow" translatable="true">salli</string>
+    <string name="isolate" translatable="true">eristä</string>
+    <string name="pause_mode_notification_title" translatable="true">Keskeytetty! Estetyt sovellukset pysyvät palomuurissa.</string>
+    <string name="block" translatable="true">estä</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Suojattu! Yhdistetty DNS + palomuuri + välityspalvelimeen.</string>
+    <string name="bypass_universal" translatable="true">ohita universaali</string>
+    <string name="exclude" translatable="true">Pois sulje</string>
+    <string name="untracked" translatable="true">ei jäljitetty</string>
+    <string name="bypass_dns_firewall" translatable="true">ohita DNS ja palomuuri</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Muuta suojausasetusta napauttamalla</string>
+    <string name="dns_mode_notification_title" translatable="true">Suojattu! Yhdistetty nopeaan ja suojattuun DNS:ään.</string>
 </resources>
