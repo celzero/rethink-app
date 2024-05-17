@@ -4,6 +4,8 @@ plugins {
     // to download blocklists for the headless variant
     id "de.undercouch.download" version "5.3.0"
     id 'kotlin-android'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -247,8 +249,8 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:3c9b203823@aar'
-    implementation 'com.github.celzero:firestack:3c9b203823@aar'
+    download 'com.github.celzero:firestack:d92f398622@aar'
+    implementation 'com.github.celzero:firestack:d92f398622@aar'
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.9.0') {
@@ -288,7 +290,11 @@ dependencies {
 
     playImplementation platform('com.google.firebase:firebase-bom:33.0.0')
     playImplementation 'com.google.firebase:firebase-crashlytics-ktx'
+    playImplementation 'com.google.firebase:firebase-crashlytics-ndk'
 
+    websiteImplementation platform('com.google.firebase:firebase-bom:33.0.0')
+    websiteImplementation 'com.google.firebase:firebase-crashlytics-ktx'
+    websiteImplementation 'com.google.firebase:firebase-crashlytics-ndk'
 }
 
 // github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903
