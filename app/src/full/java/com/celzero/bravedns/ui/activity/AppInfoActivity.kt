@@ -366,7 +366,9 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             if (it.append.endOfPaginationReached) {
                 if (adapter.itemCount < 1) {
                     b.aadMostContactedDomainRl.visibility = View.GONE
-                    b.aadMostContactedIpsRv.visibility = View.GONE
+                } else {
+                    b.aadMostContactedDomainRl.visibility = View.VISIBLE
+
                 }
             }
         }
@@ -386,7 +388,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             if (it.append.endOfPaginationReached) {
                 if (adapter.itemCount < 1) {
                     b.aadMostContactedIpsRl.visibility = View.GONE
-                    b.aadMostContactedDomainRv.visibility = View.GONE
+                } else {
+                    b.aadMostContactedIpsRl.visibility = View.VISIBLE
                 }
             }
         }

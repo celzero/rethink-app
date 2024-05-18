@@ -29,10 +29,12 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -110,14 +112,57 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment() {
             this.dismiss()
             return
         }
+
+        updateAppDetails()
         // making use of the same layout used for ip rules, so changing the text and
         // removing the recycler related changes
-
         b.bsacIpAddressTv.text = domain
         b.bsacIpRuleTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_domain))
 
         b.bsacDomainRuleTxt.visibility = View.GONE
         b.bsacDomainLl.visibility = View.GONE
+    }
+
+    private fun updateAppDetails() {
+        if (uid == -1) return
+
+        io {
+            val appNames = FirewallManager.getAppNamesByUid(uid)
+            if (appNames.isEmpty()) {
+                uiCtx { handleNonApp() }
+                return@io
+            }
+            val pkgName = FirewallManager.getPackageNameByAppName(appNames[0])
+
+            val appCount = appNames.count()
+            uiCtx {
+                if (appCount >= 1) {
+                    b.bsacAppName.text =
+                        if (appCount >= 2) {
+                            getString(
+                                R.string.ctbs_app_other_apps,
+                                appNames[0],
+                                appCount.minus(1).toString()
+                            )
+                        } else {
+                            appNames[0]
+                        }
+                    if (pkgName == null) return@uiCtx
+                    b.bsacAppIcon.setImageDrawable(
+                        Utilities.getIcon(requireContext(), pkgName)
+                    )
+                } else {
+                    // apps which are not available in cache are treated as non app.
+                    // TODO: check packageManager#getApplicationInfo() for appInfo
+                    handleNonApp()
+                }
+            }
+        }
+    }
+
+    private fun handleNonApp() {
+        b.bsacAppName.visibility = View.GONE
+        b.bsacAppIcon.visibility = View.GONE
     }
 
     private fun setRulesUi() {

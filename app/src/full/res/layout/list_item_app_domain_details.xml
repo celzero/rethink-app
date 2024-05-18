@@ -95,7 +95,7 @@
             android:padding="5dp"
             android:singleLine="true"
             android:textAppearance="@android:style/TextAppearance.Material.Subhead"
-            android:textSize="@dimen/default_font_text_view"
+            android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatImageView

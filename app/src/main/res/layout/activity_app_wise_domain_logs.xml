@@ -6,37 +6,6 @@
     android:background="?attr/background"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:id="@+id/awl_app_detail_rl"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
-        android:padding="5dp">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/awl_app_detail_icon"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:alpha="0.75"
-            android:layout_centerVertical="true"
-            android:src="@drawable/dns_icon" />
-
-        <TextView
-            android:id="@+id/awl_app_detail_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@id/awl_app_detail_icon"
-            android:gravity="center"
-            android:padding="5dp"
-            android:textColor="?primaryLightColorText"
-            android:textSize="@dimen/large_font_text_view" />
-
-    </RelativeLayout>
-
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/toggle_group"
         style="@style/toggleButtonStyle"
@@ -98,15 +67,26 @@
             android:gravity="start"
             android:orientation="horizontal">
 
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/awl_app_detail_icon1"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="10dp"
+                android:layout_centerVertical="true"
+                android:alpha="0.75"
+                android:src="@drawable/dns_icon" />
+
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/awl_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_gravity="start"
+                android:layout_toEndOf="@id/awl_app_detail_icon1"
                 android:layout_toStartOf="@id/awl_delete"
                 android:fontFamily="sans-serif"
+                app:searchIcon="@null"
+                app:searchHintIcon="@null"
                 android:isScrollContainer="true"
                 app:iconifiedByDefault="false"
                 app:queryHint="@string/search_custom_domains" />

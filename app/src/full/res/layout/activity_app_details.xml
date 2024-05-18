@@ -426,6 +426,7 @@
             android:id="@+id/aad_most_contacted_domain_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:layout_marginTop="10dp">
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -471,6 +472,7 @@
             android:id="@+id/aad_most_contacted_ips_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:layout_marginTop="20dp">
 
             <androidx.appcompat.widget.AppCompatTextView

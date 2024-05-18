@@ -50,6 +50,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+
 class AppWiseDomainLogsActivity :
     AppCompatActivity(R.layout.activity_app_wise_domain_logs), SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityAppWiseDomainLogsBinding::bind)
@@ -63,7 +64,7 @@ class AppWiseDomainLogsActivity :
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-            Configuration.UI_MODE_NIGHT_YES
+                Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -132,13 +133,21 @@ class AppWiseDomainLogsActivity :
             uiCtx {
                 this.appInfo = appInfo
 
-                b.awlAppDetailName.text = appName(packages.count())
+                val appName = appName(packages.count())
+                updateAppNameInSearchHint(appName)
                 displayIcon(
                     Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
-                    b.awlAppDetailIcon
+                    b.awlAppDetailIcon1
                 )
             }
         }
+    }
+
+    private fun updateAppNameInSearchHint(appName: String) {
+        val appNameTruncated = appName.substring(0, appName.length.coerceAtMost(10))
+        val hint = getString(R.string.two_argument_colon, appNameTruncated, getString(R.string.search_custom_domains))
+        b.awlSearch.queryHint = hint
+        return
     }
 
 
@@ -204,7 +213,6 @@ class AppWiseDomainLogsActivity :
 
     private fun hideRulesUi() {
         b.awlCardViewTop.visibility = android.view.View.GONE
-        b.awlAppDetailRl.visibility = android.view.View.GONE
         b.awlRecyclerConnection.visibility = android.view.View.GONE
     }
 
@@ -214,7 +222,6 @@ class AppWiseDomainLogsActivity :
 
     private fun showRulesUi() {
         b.awlCardViewTop.visibility = android.view.View.VISIBLE
-        b.awlAppDetailRl.visibility = android.view.View.VISIBLE
         b.awlRecyclerConnection.visibility = android.view.View.VISIBLE
     }
 
