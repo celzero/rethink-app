@@ -173,6 +173,7 @@ configurations {
 }
 
 dependencies {
+    implementation 'com.google.firebase:firebase-crashlytics-ktx:19.0.0'
     androidTestImplementation 'androidx.test:rules:1.5.0'
     def room_version = "2.6.1"
     def paging_version = "3.2.1"
@@ -288,13 +289,8 @@ dependencies {
     // barcode scanner for wireguard
     fullImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 
-    playImplementation platform('com.google.firebase:firebase-bom:33.0.0')
-    playImplementation 'com.google.firebase:firebase-crashlytics-ktx'
-    playImplementation 'com.google.firebase:firebase-crashlytics-ndk'
-
-    websiteImplementation platform('com.google.firebase:firebase-bom:33.0.0')
-    websiteImplementation 'com.google.firebase:firebase-crashlytics-ktx'
-    websiteImplementation 'com.google.firebase:firebase-crashlytics-ndk'
+    playImplementation 'com.google.firebase:firebase-crashlytics:19.0.0'
+    playImplementation 'com.google.firebase:firebase-crashlytics-ndk:19.0.0'
 }
 
 // github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903

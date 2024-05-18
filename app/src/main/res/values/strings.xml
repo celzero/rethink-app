@@ -399,18 +399,12 @@
 
     <string name="app_mode_choose" translatable="true">Choose mode</string>
 
-    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>JA Donenfeld 4.0</b><br/><br/>
-        1. Show upload, download stats for WireGuard.<br/>
-        2. Auto recover dropped WireGuard connections.<br/>
-        3. Implement Android\'s <i>seamless handover</i> on network changes.<br/>
-        4. New UI for per-app Network and DNS logs.<br/>
-        5. Support for multiple DNSCrypt relays.<br/>
-        6. Improvement: Show WireGuard Peer handshake time periods.<br/>
-        7. Bug fix: Prevent multi package apps auto-deleting from WireGuard configs.<br/>
-        8. Bug fix: Inaccessible On-device blocklists Configure UI.<br/>
-        9. Bug fix: Close packet capture file when appropriate.<br/>
-        10. Bug fix: Fix crash when stopping WireGuard.<br/>
-        11. Other bug fixed and improvements.<br/><br/>
+    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Inside Job</b><br/><br/>
+        1. New: IP and DNS logs for each app with a new organized view.<br/>
+        2. New: Setting to optionally <i>exclude</i> proxy forwarder apps.<br/>
+        3. Fix DNSCrypt crashing with <i>DNS Booster</i> enabled.<br/>
+        4. Fix IPv6 to IPv4 translation in certain cases.<br/>
+        3. Other bug fixes and improvements.<br/><br/>
 
         <a href="https://svc.rethinkdns.com/r/translate">Help translate this app</a>]]>
     </string>

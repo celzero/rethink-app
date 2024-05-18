@@ -262,8 +262,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // biometric last auth time
     var biometricAuthTime by longPref("biometric_auth_time").withDefault<Long>(INIT_TIME_MS)
 
-    // go logger level, default 2 -> info
-    var goLoggerLevel by longPref("go_logger_level").withDefault<Long>(2)
+    // go logger level, default 3 -> info
+    var goLoggerLevel by longPref("go_logger_level").withDefault<Long>(3)
 
     // previous data usage check timestamp
     var prevDataUsageCheck by longPref("prev_data_usage_check").withDefault<Long>(INIT_TIME_MS)
@@ -279,7 +279,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var proxyDns by booleanPref("proxy_dns").withDefault<Boolean>(true)
 
     // exclude apps which are configured in proxy (socks5, http, dns proxy)
-    var excludeAppsInProxy by booleanPref("exclude_apps_in_proxy").withDefault<Boolean>(false)
+    var excludeAppsInProxy by booleanPref("exclude_apps_in_proxy").withDefault<Boolean>(true)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()

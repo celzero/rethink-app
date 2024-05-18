@@ -125,7 +125,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         if (
             BiometricManager.from(this)
                 .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) ==
-                BiometricManager.BIOMETRIC_SUCCESS
+            BiometricManager.BIOMETRIC_SUCCESS
         ) {
             b.settingsBiometricSwitch.isChecked = persistentState.biometricAuth
         } else {
@@ -149,6 +149,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                         getString(R.string.settings_notification_desc1)
                     )
             }
+
             NotificationActionType.DNS_FIREWALL -> {
                 b.genSettingsNotificationDesc.text =
                     getString(
@@ -156,6 +157,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                         getString(R.string.settings_notification_desc2)
                     )
             }
+
             NotificationActionType.NONE -> {
                 b.genSettingsNotificationDesc.text =
                     getString(
@@ -172,9 +174,11 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             PcapMode.NONE -> {
                 b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_1)
             }
+
             PcapMode.LOGCAT -> {
                 b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_2)
             }
+
             PcapMode.EXTERNAL_FILE -> {
                 b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_3)
             }
@@ -191,6 +195,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                         getString(R.string.settings_theme_dialog_themes_1)
                     )
             }
+
             Themes.LIGHT.id -> {
                 b.genSettingsThemeDesc.text =
                     getString(
@@ -198,6 +203,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                         getString(R.string.settings_theme_dialog_themes_2)
                     )
             }
+
             Themes.DARK.id -> {
                 b.genSettingsThemeDesc.text =
                     getString(
@@ -205,6 +211,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                         getString(R.string.settings_theme_dialog_themes_3)
                     )
             }
+
             else -> {
                 b.genSettingsThemeDesc.text =
                     getString(
@@ -221,9 +228,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 !b.settingsActivityEnableLogsSwitch.isChecked
         }
 
-        b.settingsActivityEnableLogsSwitch.setOnCheckedChangeListener {
-            _: CompoundButton,
-            b: Boolean ->
+        b.settingsActivityEnableLogsSwitch.setOnCheckedChangeListener { _: CompoundButton,
+                                                                        b: Boolean ->
             persistentState.logsEnabled = b
         }
 
@@ -242,9 +248,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 !b.settingsActivityCheckUpdateSwitch.isChecked
         }
 
-        b.settingsActivityCheckUpdateSwitch.setOnCheckedChangeListener {
-            _: CompoundButton,
-            b: Boolean ->
+        b.settingsActivityCheckUpdateSwitch.setOnCheckedChangeListener { _: CompoundButton,
+                                                                         b: Boolean ->
             persistentState.checkForAppUpdate = b
         }
 
@@ -272,9 +277,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 !b.settingsActivityAppNotificationPersistentSwitch.isChecked
         }
 
-        b.settingsActivityAppNotificationPersistentSwitch.setOnCheckedChangeListener {
-            _: CompoundButton,
-            b: Boolean ->
+        b.settingsActivityAppNotificationPersistentSwitch.setOnCheckedChangeListener { _: CompoundButton,
+                                                                                       b: Boolean ->
             persistentState.persistentNotification = b
         }
 
@@ -324,9 +328,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             val locale = languages.getOrDefault(item, "en-US")
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(locale))
         }
-        alertBuilder.setNeutralButton(getString(R.string.settings_locale_dialog_neutral)) {
-            dialog,
-            _ ->
+        alertBuilder.setNeutralButton(getString(R.string.settings_locale_dialog_neutral)) { dialog,
+                                                                                            _ ->
             dialog.dismiss()
             openActionViewIntent(getString(R.string.about_translate_link).toUri())
         }
@@ -386,7 +389,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-            Configuration.UI_MODE_NIGHT_YES
+                Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun showThemeDialog() {
@@ -415,12 +418,15 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                         setThemeRecreate(R.style.AppThemeWhite)
                     }
                 }
+
                 Themes.LIGHT.id -> {
                     setThemeRecreate(R.style.AppThemeWhite)
                 }
+
                 Themes.DARK.id -> {
                     setThemeRecreate(R.style.AppTheme)
                 }
+
                 Themes.TRUE_BLACK.id -> {
                     setThemeRecreate(R.style.AppThemeTrueBlack)
                 }
@@ -483,11 +489,13 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                         getString(R.string.settings_pcap_dialog_option_1)
                     appConfig.setPcap(PcapMode.NONE.id)
                 }
+
                 PcapMode.LOGCAT -> {
                     b.settingsActivityPcapDesc.text =
                         getString(R.string.settings_pcap_dialog_option_2)
                     appConfig.setPcap(PcapMode.LOGCAT.id, PcapMode.ENABLE_PCAP_LOGCAT)
                 }
+
                 PcapMode.EXTERNAL_FILE -> {
                     b.settingsActivityPcapDesc.text =
                         getString(R.string.settings_pcap_dialog_option_3)
@@ -524,6 +532,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     persistentState.notificationActionType =
                         NotificationActionType.PAUSE_STOP.action
                 }
+
                 NotificationActionType.DNS_FIREWALL -> {
                     b.genSettingsNotificationDesc.text =
                         getString(
@@ -533,6 +542,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     persistentState.notificationActionType =
                         NotificationActionType.DNS_FIREWALL.action
                 }
+
                 NotificationActionType.NONE -> {
                     b.genSettingsNotificationDesc.text =
                         getString(
@@ -782,7 +792,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun isNotificationPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-            PackageManager.PERMISSION_GRANTED
+                PackageManager.PERMISSION_GRANTED
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {

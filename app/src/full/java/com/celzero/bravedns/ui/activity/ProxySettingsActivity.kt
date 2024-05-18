@@ -655,7 +655,9 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         val errorTxt: TextView = dialogBinding.dialogProxyErrorText
         val userNameEditText: EditText = dialogBinding.dialogProxyEditUsername
         val passwordEditText: EditText = dialogBinding.dialogProxyEditPassword
+        val udpBlockLayout: LinearLayout = dialogBinding.dialogProxyUdpHeader
         val udpBlockCheckBox: CheckBox = dialogBinding.dialogProxyUdpCheck
+        val excludeAppLayout: LinearLayout = dialogBinding.dialogProxyExcludeAppsHeader
         val excludeAppCheckBox: CheckBox = dialogBinding.dialogProxyExcludeAppsCheck
 
         headerDesc.visibility = View.GONE
@@ -704,6 +706,14 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         lockdownDesc.setOnClickListener {
             dialog.dismiss()
             UIUtils.openVpnProfile(this)
+        }
+
+        excludeAppLayout.setOnClickListener {
+            excludeAppCheckBox.isChecked = !excludeAppCheckBox.isChecked
+        }
+
+        udpBlockLayout.setOnClickListener {
+            udpBlockCheckBox.isChecked = !udpBlockCheckBox.isChecked
         }
 
         applyURLBtn.setOnClickListener {
@@ -849,6 +859,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         val userNameLl: LinearLayout = dialogBinding.dialogProxyUsernameHeader
         val passwordLl: LinearLayout = dialogBinding.dialogProxyPasswordHeader
         val udpBlockLl: LinearLayout = dialogBinding.dialogProxyUdpHeader
+        val excludeAppLayout: LinearLayout = dialogBinding.dialogProxyExcludeAppsHeader
         val excludeAppCheckBox: CheckBox = dialogBinding.dialogProxyExcludeAppsCheck
 
         // do not show the UDP block option for HTTP proxy
@@ -868,6 +879,10 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             UIUtils.openVpnProfile(this)
         }
         lockdownDesc.visibility = if (VpnController.isVpnLockdown()) View.VISIBLE else View.GONE
+
+        excludeAppLayout.setOnClickListener {
+            excludeAppCheckBox.isChecked = !excludeAppCheckBox.isChecked
+        }
 
         val proxySpinnerAdapter =
             ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, appNames)
