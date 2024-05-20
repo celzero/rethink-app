@@ -188,16 +188,16 @@
     <string name="settings_enable_logs" translatable="true">فعال کردن گزارش‌گیری روی دستگاه</string>
     <string name="app_mode_choose" translatable="true">حالت را انتخاب کنید</string>
     <string name="download_update_dialog_title" translatable="true">به‌روزرسانی جدید!</string>
-    <string name="whats_new_version_update" translatable="true"><b>حداکثر تلاش</b> \u0020 
-\n \u0020 
-\n 1. معرفی یک حل‌کننده خصوصی‌تر Rethink، <i>Max</i>. \u0020 
-\n 2. IPv6 را به عنوان آزمایشی علامت گذاری کنید. به طور پیش فرض به IPv4 تغییر دهید. \u0020 
-\n 3. <i>ویژگی جدید</i>: پشتیبان گیری و بازیابی تنظیمات برنامه. \u0020 
-\n 4. <i>ویژگی جدید</i>: حالت قفل برنامه. \u0020 
-\n 5. <i>ویژگی جدید</i>: حالت قفل جهانی. \u0020 
-\n 6. <i>ویژگی جدید</i>: قوانین فایروال را روی شماره پورت اعمال کنید. \u0020 
-\n 7. <i>ویژگی جدید</i>: قوانین فایروال برنامه را به صورت دسته ای اعمال کنید. \u0020 
-\n 8. تازه سازی UI جزئی. \u0020 
+    <string name="whats_new_version_update" translatable="true"><b>حداکثر تلاش</b> \u0020 \u0020
+\n \u0020 \u0020
+\n 1. معرفی یک حل‌کننده خصوصی‌تر Rethink، <i>Max</i>. \u0020 \u0020
+\n 2. IPv6 را به عنوان آزمایشی علامت گذاری کنید. به طور پیش فرض به IPv4 تغییر دهید. \u0020 \u0020
+\n 3. <i>ویژگی جدید</i>: پشتیبان گیری و بازیابی تنظیمات برنامه. \u0020 \u0020
+\n 4. <i>ویژگی جدید</i>: حالت قفل برنامه. \u0020 \u0020
+\n 5. <i>ویژگی جدید</i>: حالت قفل جهانی. \u0020 \u0020
+\n 6. <i>ویژگی جدید</i>: قوانین فایروال را روی شماره پورت اعمال کنید. \u0020 \u0020
+\n 7. <i>ویژگی جدید</i>: قوانین فایروال برنامه را به صورت دسته ای اعمال کنید. \u0020 \u0020
+\n 8. تازه سازی UI جزئی. \u0020 \u0020
 \n 9. رفع حافظه و خرابی دیگر.</string>
     <string name="connection_http3" translatable="true">HTTP3</string>
     <string name="relative_time_today" translatable="true">امروز</string>
