@@ -745,9 +745,12 @@ object Utilities {
         try {
             val exp = (ln(bytes.toDouble()) / ln(unit.toDouble())).toInt()
             val pre = ("KMGTPE")[exp - 1] + if (si) "" else "i"
-            return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
+            val totalBytes = bytes / Math.pow(unit.toDouble(), exp.toDouble())
+            return String.format("%.1f %sB", totalBytes, pre)
         } catch (e: NumberFormatException) {
             Logger.e(LOG_TAG_DOWNLOAD, "Number format exception: ${e.message}", e)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_DOWNLOAD, "err in humanReadableByteCount: ${e.message}", e)
         }
         return ""
     }
