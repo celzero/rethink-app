@@ -289,6 +289,8 @@ dependencies {
     // barcode scanner for wireguard
     fullImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 
+    // only using firebase crashlytics experimentally for stability tracking, only in play variant
+    // not in fdroid or website
     playImplementation 'com.google.firebase:firebase-crashlytics:19.0.0'
     playImplementation 'com.google.firebase:firebase-crashlytics-ndk:19.0.0'
 }
