@@ -76,9 +76,9 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                     newConnection: WgConfigFiles
                 ): Boolean {
                     return (oldConnection.id == newConnection.id &&
-                        oldConnection.name == newConnection.name &&
-                        oldConnection.isActive == newConnection.isActive &&
-                        oldConnection.oneWireGuard == newConnection.oneWireGuard)
+                            oldConnection.name == newConnection.name &&
+                            oldConnection.isActive == newConnection.isActive &&
+                            oldConnection.oneWireGuard == newConnection.oneWireGuard)
                 }
             }
     }
@@ -328,10 +328,12 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                         }
                     } else {
                         config.oneWireGuard = false
-                        b.oneWgCheck.isChecked = false
                         WireguardManager.updateOneWireGuardConfig(config.id, owg = false)
                         WireguardManager.disableConfig(config.toImmutable())
-                        uiCtx { listener.onDnsStatusChanged() }
+                        uiCtx {
+                            b.oneWgCheck.isChecked = false
+                            listener.onDnsStatusChanged()
+                        }
                     }
                 }
             }
