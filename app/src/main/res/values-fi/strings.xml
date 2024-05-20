@@ -137,4 +137,7 @@
     <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink käyttää esteettömyyspalvelua seuratakseen, mitkä sovellukset ovat käytössä (etualalla) ja mitkä sovellukset eivät ole käytössä (taustalla).
 \n
 \nRethink ei kerää tietoja tai vakoile sinua millään tavalla.</string>
+    <string name="status_no_internet" translatable="true">ei internetiä</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">ei suojattu</string>
+    <string name="firewall_mode_info_title" translatable="true">Palomuuri</string>
 </resources>
