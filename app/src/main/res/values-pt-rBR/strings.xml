@@ -1026,4 +1026,6 @@
     <string name="lbl_background_data" translatable="true">Restringindo dados em segundo plano</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Desativar %1$s</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> pode resultar em perda de conectividade. Altere a configuração para permitir que o Rethink use dados e outros recursos quando estiver em segundo plano.</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplicativos de encaminhamento proxy loopback</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Quando desativado, exclui aplicativos de encaminhamento proxy (SOCKS5, HTTP, DNS) do túnel VPN do Rethink.</string>
 </resources>
