@@ -383,6 +383,11 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun invokeImportExport() {
+        if (this.isFinishing || this.isDestroyed) {
+            Logger.w(LOG_TAG_UI, "err opening bkup btmsheet, activity is destroyed")
+            return
+        }
+
         val bottomSheetFragment = BackupRestoreBottomSheet()
         bottomSheetFragment.show(this.supportFragmentManager, bottomSheetFragment.tag)
     }
