@@ -280,7 +280,7 @@ class WgConfigAdapter(private val context: Context) :
                 b.interfaceDetailCard.strokeWidth = 2
                 b.interfaceStatus.visibility = View.VISIBLE
                 b.interfaceConfigStatus.visibility = View.VISIBLE
-                val status: String
+                var status: String
                 b.interfaceActiveLayout.visibility = View.VISIBLE
                 val time = getUpTime(stats)
                 val rxtx = getRxTx(stats)
@@ -333,6 +333,19 @@ class WgConfigAdapter(private val context: Context) :
                                 handShakeTime
                             )
                         }
+                    if (statusId == Backend.TZZ && stats != null) {
+                        // for idle state, if lastOk is less than 2 minutes, then show as connected
+                        if (
+                            stats.lastOK != 0L &&
+                                System.currentTimeMillis() - stats.lastOK <
+                                    2 * DateUtils.MINUTE_IN_MILLIS
+                        ) {
+                            status =
+                                context
+                                    .getString(R.string.dns_connected)
+                                    .replaceFirstChar(Char::titlecase)
+                        }
+                    }
                 } else {
                     b.interfaceDetailCard.strokeColor =
                         UIUtils.fetchColor(context, R.attr.accentBad)

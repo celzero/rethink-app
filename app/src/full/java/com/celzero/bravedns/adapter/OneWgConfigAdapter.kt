@@ -76,9 +76,9 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                     newConnection: WgConfigFiles
                 ): Boolean {
                     return (oldConnection.id == newConnection.id &&
-                            oldConnection.name == newConnection.name &&
-                            oldConnection.isActive == newConnection.isActive &&
-                            oldConnection.oneWireGuard == newConnection.oneWireGuard)
+                        oldConnection.name == newConnection.name &&
+                        oldConnection.isActive == newConnection.isActive &&
+                        oldConnection.oneWireGuard == newConnection.oneWireGuard)
                 }
             }
     }
@@ -192,7 +192,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 b.oneWgCheck.isChecked = true
                 b.interfaceAppsCount.visibility = View.VISIBLE
                 b.interfaceAppsCount.text = context.getString(R.string.one_wg_apps_added)
-                val status: String
+                var status: String
                 val handShakeTime = getHandshakeTime(stats)
                 if (statusId != null) {
                     var resId = UIUtils.getProxyStatusStringRes(statusId)
@@ -225,6 +225,20 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                                 handShakeTime
                             )
                         }
+
+                    if (statusId == Backend.TZZ && stats != null) {
+                        // for idle state, if lastOk is less than 2 minutes, then show as connected
+                        if (
+                            stats.lastOK != 0L &&
+                                System.currentTimeMillis() - stats.lastOK <
+                                    2 * DateUtils.MINUTE_IN_MILLIS
+                        ) {
+                            status =
+                                context
+                                    .getString(R.string.dns_connected)
+                                    .replaceFirstChar(Char::titlecase)
+                        }
+                    }
                 } else {
                     b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.chipTextNegative)
                     b.interfaceDetailCard.strokeWidth = 2
