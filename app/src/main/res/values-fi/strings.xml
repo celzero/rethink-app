@@ -101,5 +101,44 @@
     <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">odottamassa</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Varoitus: Rethink on poistettu käytöstä</string>
     <string name="firewall_mode_notification_title" translatable="true">Suojattu! Yhteys palomuuriin.</string>
-    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">Suojattu</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">suojattu</string>
+    <string name="universal_firewall_explanation" translatable="true">Käytä palomuurisääntöjä kaikissa sovelluksissa laitteen tapahtumien perusteella, esimerkiksi kun laite on lukittu tai kun tietty sovellus ei ole käytössä.</string>
+    <string name="dns_mode_info_title" translatable="true">DNS</string>
+    <string name="failed_using_default" translatable="true">Epäonnistui: käytetään vara-DNS:ää</string>
+    <string name="status_protected_with_tor" translatable="true">suojattu Torilla</string>
+    <string name="notification_action_pause_vpn" translatable="true">Keskeytä</string>
+    <string name="status_protected_with_proxy" translatable="true">suojattu välityspalvelimella</string>
+    <string name="hybrid_mode_info_title" translatable="true">DNS + palomuuri</string>
+    <string name="dns_mode_info_explanation_new" translatable="true">Valvo, estä ja salaa DNS-pyyntöjä.</string>
+    <string name="dns_firewall_mode_info_explanation_new" translatable="true">Kaikki yllä olevat + internet-sensuurin ohittaminen.</string>
+    <string name="status_app_error" translatable="true">sovellusvirhe</string>
+    <string name="status_dns_error" translatable="true">DNS-virhe</string>
+    <string name="status_dns_server_down" translatable="true">DNS-palvelin alas</string>
+    <string name="status_protected_with_private_dns" translatable="true">suojattu yksityisellä DNS:llä</string>
+    <string name="status_protected_with_tor_private_dns" translatable="true">suojattu Torilla ja yksityisellä DNS:llä</string>
+    <string name="status_protected_with_proxy_private_dns" translatable="true">suojattu välityspalvelimella ja yksityisellä DNS:llä</string>
+    <string name="status_protected_with_socks5_private_dns" translatable="true">suojattu socks5:llä ja yksityisellä DNS:llä</string>
+    <string name="status_protected_with_http_private_dns" translatable="true">suojattu HTTP-välityspalvelimella ja yksityisellä DNS:llä</string>
+    <string name="status_protected_with_socks5" translatable="true">suojattu socks-välityspalvelimella</string>
+    <string name="status_protected_with_http" translatable="true">suojattu HTTP-välityspalvelimella</string>
+    <string name="status_protected_with_wg" translatable="true">suojattu WireGuardilla</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">suojattu WireGuardilla ja yksityisellä DNS:llä</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">yksityinen DNS on käytössä</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Yhdistetty RethinkDNS:ään</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">Yhdistetty palomuuriin</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Yhdistetty RethinkDNS:ään ja palomuuriin</string>
+    <string name="notification_action_resume_vpn" translatable="true">Jatka</string>
+    <string name="notification_action_stop_vpn" translatable="true">Lopeta</string>
+    <string name="notification_action_dns_mode" translatable="true">DNS</string>
+    <string name="notification_action_dns_firewall_mode" translatable="true">DNS + palomuuri</string>
+    <string name="firewall_rules" translatable="true">Verkkosäännöt</string>
+    <string name="firewall_mode_info_explanation_new" translatable="true">Valvo verkkotoimintaa ja käytä palomuuria mille tahansa sovellukselle tai IP-osoitteelle.</string>
+    <string name="alert_permission_accessibility" translatable="true">Käyttöoikeus – Esteettömyys</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink käyttää esteettömyyspalvelua seuratakseen, mitkä sovellukset ovat käytössä (etualalla) ja mitkä sovellukset eivät ole käytössä (taustalla).
+\n
+\nRethink ei kerää tietoja tai vakoile sinua millään tavalla.</string>
+    <string name="status_no_internet" translatable="true">ei internetiä</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">ei suojattu</string>
+    <string name="firewall_mode_info_title" translatable="true">Palomuuri</string>
+    <string name="apps_info_title" translatable="true">Sovellukset</string>
 </resources>

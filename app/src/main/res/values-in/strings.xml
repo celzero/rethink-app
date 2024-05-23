@@ -1027,4 +1027,6 @@
     <string name="lbl_background_data" translatable="true">Membatasi data latar belakang</string>
     <string name="lbl_battery_optimization" translatable="true">Optimasi baterai</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> dapat mengakibatkan hilangnya konektivitas. Ubah pengaturan untuk membiarkan Rethink menggunakan data dan sumber daya lainnya saat berada di latar belakang.</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Putar-balik proksi aplikasi penerus</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Ketika dinonaktifkan, kecualikan proksi (SOCKS5, HTTP, DNS) aplikasi penerus dari terowongan VPN Rethink.</string>
 </resources>

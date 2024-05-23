@@ -35,7 +35,7 @@
 \nNúmero de puerto: %2$s</string>
     <string name="dns_proxy_dialog_header_dns">Añadir proxy DNS</string>
     <string name="cd_toast_added">Dominio añadido con éxito</string>
-    <string name="whats_new_version_update">&lt;b&gt;JA Donenfeld 4.0&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Mostrar estadísticas de carga y descarga de WireGuard.&lt;br/&gt; 2. Recuperación automática de conexiones WireGuard caídas.&lt;br/&gt; 3. Implementar &lt;i de Android &gt;transferencia fluida&lt;/i&gt; en cambios de red.&lt;br/&gt; 4. Nueva interfaz de usuario para registros DNS y de red por aplicación.&lt;br/&gt; 5. Compatibilidad con múltiples retransmisiones DNSCrypt.&lt;br/&gt; 6. Mejora: Mostrar WireGuard Períodos de tiempo de intercambio entre pares.&lt;br/&gt; 7. Corrección de errores: evita que las aplicaciones de paquetes múltiples se eliminen automáticamente de las configuraciones de WireGuard.&lt;br/&gt; 8. Corrección de errores: Listas de bloqueo inaccesibles en el dispositivo Configure la interfaz de usuario.&lt;br/&gt; 9. Corrección de errores : Cierre el archivo de captura de paquetes cuando corresponda.&lt;br/&gt; 10. Corrección de errores: solucione el bloqueo al detener WireGuard.&lt;br/&gt; 11. Otros errores corregidos y mejoras.&lt;br/&gt;&lt;br/&gt; &lt;a href=https:/ /svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Trabajo interno&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Nuevo: registros de IP y DNS para cada aplicación con una nueva vista organizada.&lt;br/&gt; 2. Nuevo: configuración para &lt;i&gt;excluir opcionalmente&lt; /i&gt; aplicaciones de reenvío de proxy.&lt;br/&gt; 3. Reparar el bloqueo de DNSCrypt con &lt;i&gt;DNS Booster&lt;/i&gt; habilitado.&lt;br/&gt; 4. Reparar la traducción de IPv6 a IPv4 en ciertos casos.&lt;br/&gt; 3. Otros correcciones de errores y mejoras.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;</string>
     <string name="dc_dns_leaks_desc">Cuando está activado, Rethink captura todos los paquetes en el puerto 53 y los reenvía a un punto de acceso DNS establecido por el usuario</string>
     <string name="about_settings_app_info">Información de la aplicación</string>
     <string name="settings_orbot_disabled_error">Desactive el proxy HTTP(S) y/o SOCKS5 para continuar con la configuración de Tor-como-un-proxy.</string>
@@ -1029,4 +1029,6 @@
     <string name="lbl_background_data" translatable="true">Restringir datos en segundo plano</string>
     <string name="lbl_battery_optimization" translatable="true">Optimización de la batería</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Deshabilitar %1$s</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplicaciones de reenvío proxy en bucle invertido</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Si se desactiva, excluye las aplicaciones proxy (SOCKS5, HTTP, DNS) del túnel VPN de Rethink.</string>
 </resources>
