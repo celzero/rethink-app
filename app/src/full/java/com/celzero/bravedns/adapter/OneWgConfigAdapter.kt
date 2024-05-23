@@ -59,7 +59,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
     }
 
     companion object {
-        private const val ONE_SEC = 1000L
+        private const val ONE_SEC = 1500L
 
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
@@ -206,8 +206,6 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                             b.interfaceDetailCard.strokeColor =
                                 fetchColor(context, R.attr.accentGood)
                         }
-                        // cancel the job, as the status is connected
-                        statusCheckJob?.cancel()
                     } else if (statusId == Backend.TUP || statusId == Backend.TZZ) {
                         b.interfaceDetailCard.strokeColor =
                             fetchColor(context, R.attr.chipTextNeutral)
@@ -226,12 +224,12 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                             )
                         }
 
-                    if (statusId == Backend.TZZ && stats != null) {
-                        // for idle state, if lastOk is less than 2 minutes, then show as connected
+                    if ((statusId == Backend.TZZ || statusId == Backend.TNT) && stats != null) {
+                        // for idle state, if lastOk is less than 30 sec, then show as connected
                         if (
                             stats.lastOK != 0L &&
                                 System.currentTimeMillis() - stats.lastOK <
-                                    2 * DateUtils.MINUTE_IN_MILLIS
+                                    30 * DateUtils.SECOND_IN_MILLIS
                         ) {
                             status =
                                 context

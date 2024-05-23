@@ -53,7 +53,7 @@ class WgConfigAdapter(private val context: Context) :
     private var lifecycleOwner: LifecycleOwner? = null
 
     companion object {
-        private const val ONE_SEC_MS = 1000L
+        private const val ONE_SEC_MS = 1500L
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
 
@@ -311,7 +311,6 @@ class WgConfigAdapter(private val context: Context) :
                             b.interfaceDetailCard.strokeColor =
                                 UIUtils.fetchColor(context, R.attr.accentGood)
                         }
-                        cancelJobIfAny(config.id)
                     } else if (
                         statusId == Backend.TUP ||
                             statusId == Backend.TZZ ||
@@ -333,12 +332,12 @@ class WgConfigAdapter(private val context: Context) :
                                 handShakeTime
                             )
                         }
-                    if (statusId == Backend.TZZ && stats != null) {
-                        // for idle state, if lastOk is less than 2 minutes, then show as connected
+                    if ((statusId == Backend.TZZ || statusId == Backend.TNT) && stats != null) {
+                        // for idle state, if lastOk is less than 30 sec, then show as connected
                         if (
                             stats.lastOK != 0L &&
                                 System.currentTimeMillis() - stats.lastOK <
-                                    2 * DateUtils.MINUTE_IN_MILLIS
+                                    30 * DateUtils.SECOND_IN_MILLIS
                         ) {
                             status =
                                 context
