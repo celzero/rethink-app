@@ -97,6 +97,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_19_20)
                 .addMigrations(MIGRATION_20_21)
                 .addMigrations(MIGRATION_21_22)
+                .fallbackToDestructiveMigration() // will pick the db from assets folder
                 .build()
 
         private val MIGRATION_1_2: Migration =

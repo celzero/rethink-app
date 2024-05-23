@@ -46,7 +46,6 @@ abstract class LogDatabase : RoomDatabase() {
         private const val TABLE_NAME_CONN_TRACKER = "ConnectionTracker"
         private var rethinkDnsDbPath = ""
         var isFreshInstall = true
-        var appVersion = 0
 
         // setJournalMode() is added as part of issue #344
         // modified the journal mode from TRUNCATE to AUTOMATIC.
@@ -56,7 +55,6 @@ abstract class LogDatabase : RoomDatabase() {
         fun buildDatabase(context: Context): LogDatabase {
             rethinkDnsDbPath = context.getDatabasePath(AppDatabase.DATABASE_NAME).toString()
             isFreshInstall = Utilities.isFreshInstall(context)
-            appVersion = getLatestVersion(context)
 
             return Room.databaseBuilder(
                     context.applicationContext,
@@ -70,6 +68,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_4_5)
                 .addMigrations(MIGRATION_5_6)
                 .addMigrations(MIGRATION_6_7)
+                .fallbackToDestructiveMigration() // recreate the database if no migration is found
                 .build()
         }
 
@@ -84,12 +83,6 @@ abstract class LogDatabase : RoomDatabase() {
                     populateDatabase(db)
                 }
             }
-
-        private fun getLatestVersion(context: Context): Int {
-            val pInfo: PackageInfo? =
-                Utilities.getPackageMetadata(context.packageManager, context.packageName)
-            return pInfo?.versionCode ?: 0
-        }
 
         private fun populateDatabase(db: SupportSQLiteDatabase) {
             try {
