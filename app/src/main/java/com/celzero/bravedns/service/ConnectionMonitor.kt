@@ -92,7 +92,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                     "WiFi"
                 } else if (
                     newActiveNetworkCap?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ==
-                        true
+                    true
                 ) {
                     "Cellular"
                 } else {
@@ -171,7 +171,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         Logger.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
         connectivityManager =
             context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
-                as ConnectivityManager
+                    as ConnectivityManager
         try {
             connectivityManager.registerNetworkCallback(networkRequest, this)
         } catch (e: Exception) {
@@ -188,10 +188,14 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
     }
 
     fun onVpnStop() {
-        connectivityManager.unregisterNetworkCallback(this)
-        this.serviceHandler?.removeCallbacksAndMessages(null)
-        serviceHandler?.looper?.quitSafely()
-        this.serviceHandler = null
+        try {
+            this.serviceHandler?.removeCallbacksAndMessages(null)
+            serviceHandler?.looper?.quitSafely()
+            this.serviceHandler = null
+            connectivityManager.unregisterNetworkCallback(this)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_CONNECTION, "ConnectionMonitor: err while unregistering", e)
+        }
     }
 
     private fun handleNetworkChange(
@@ -269,6 +273,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 "104.16.132.229", // cloudflare
                 "31.13.79.53" // whatsapp.net
             )
+
         // probing with domain names is not viable because some domains will resolve to both
         // ipv4 and ipv6 addresses. So, we use ipv6 addresses for probing ipv6 connectivity.
         private val ip6probes =
@@ -277,6 +282,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 "2606:4700::6810:84e5", // cloudflare
                 "2606:4700:3033::ac43:a21b" // rethinkdns
             )
+
         // ref - https://developer.android.com/reference/kotlin/java/util/LinkedHashSet
         // The network list is maintained in a linked-hash-set to preserve insertion and iteration
         // order. This is required because {@link android.net.VpnService#setUnderlyingNetworks}
@@ -295,6 +301,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                     val opPrefs = msg.obj as OpPrefs
                     processActiveNetwork(opPrefs)
                 }
+
                 MSG_ADD_ALL_NETWORKS -> {
                     val opPrefs = msg.obj as OpPrefs
                     processAllNetworks(opPrefs)
@@ -316,8 +323,9 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
 
             Logger.i(
                 LOG_TAG_CONNECTION,
-                "Connected network: ${newActiveNetwork?.networkHandle} ${networkType(newActiveNetworkCap)
-                            }, new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}"
+                "Connected network: ${newActiveNetwork?.networkHandle} ${
+                    networkType(newActiveNetworkCap)
+                }, new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}"
             )
 
             if (isNewNetwork || opPrefs.isForceUpdate) {
@@ -517,10 +525,10 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                         // androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/net/RouteInfo.java#328
                         hasDefaultRoute4 =
                             hasDefaultRoute4 ||
-                                (it.isDefaultRoute && it.destination.address is Inet4Address)
+                                    (it.isDefaultRoute && it.destination.address is Inet4Address)
                         hasDefaultRoute6 =
                             hasDefaultRoute6 ||
-                                (it.isDefaultRoute && it.destination.address is Inet6Address)
+                                    (it.isDefaultRoute && it.destination.address is Inet6Address)
 
                         if (hasDefaultRoute4 && hasDefaultRoute6) return@rloop
                     }
@@ -823,7 +831,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         private fun clos(socket: Closeable?) {
             try {
                 socket?.close()
-            } catch (ignored: IOException) {}
+            } catch (ignored: IOException) {
+            }
         }
 
         private fun hasInternet(network: Network?): Boolean? {

@@ -79,6 +79,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="10dp"
             android:layout_toStartOf="@id/trust_icon"
+            android:textIsSelectable="true"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:textColor="?attr/primaryTextColor"

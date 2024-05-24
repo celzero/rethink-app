@@ -20,6 +20,7 @@
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:textColor="?attr/primaryTextColor"
+        android:textIsSelectable="true"
         android:textSize="@dimen/large_font_text_view" />
 
     <androidx.appcompat.widget.AppCompatImageView

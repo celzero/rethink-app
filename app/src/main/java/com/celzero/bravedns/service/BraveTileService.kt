@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.celzero.bravedns.service
 
+import Logger
+import android.app.PendingIntent
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
@@ -53,15 +55,30 @@ class BraveTileService : TileService(), KoinComponent {
             // Start VPN service when VPN permission has been granted.
             VpnController.start(this)
         } else {
-            // Open Main activity when VPN permission has not been granted.
+            // open Main activity when VPN permission has not been granted.
             val intent =
                 if (Utilities.isHeadlessFlavour()) {
                     Intent(this, PrepareVpnActivity::class.java)
                 } else {
                     Intent(this, HomeScreenActivity::class.java)
                 }
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivityAndCollapse(intent)
+            val pendingIntent = PendingIntent.getActivity(this, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            try {
+                if (Utilities.isAtleastU()) {
+                    startActivityAndCollapse(pendingIntent)
+                } else {
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivityAndCollapse(intent)
+                }
+            } catch (e: UnsupportedOperationException) {
+                // starting activity from TileService using an Intent is not allowed
+                // use PendingIntent instead
+                Logger.w(Logger.LOG_TAG_UI, "Tile: unsupported operation, use send()", e)
+                pendingIntent.send()
+            } catch (e: Exception) {
+                Logger.w(Logger.LOG_TAG_UI, "Tile: err in starting activity", e)
+            }
         }
     }
 }

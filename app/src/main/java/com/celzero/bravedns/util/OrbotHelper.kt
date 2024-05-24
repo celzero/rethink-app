@@ -118,7 +118,8 @@ class OrbotHelper(
     private var httpsIp: String? = null
     private var dnsPort: Int? = null
 
-    @Volatile private var isResponseReceivedFromOrbot: Boolean = false
+    @Volatile
+    private var isResponseReceivedFromOrbot: Boolean = false
 
     private var retryCount = 3
 
@@ -226,15 +227,18 @@ class OrbotHelper(
                         updateOrbotProxyData(intent)
                         setOrbotMode()
                     }
+
                     STATUS_OFF -> {
                         Logger.i(LOG_TAG_VPN, "Orbot is OFF, retry or stop the Orbot")
                         io { waitForOrbot() }
                         unregisterReceiver()
                     }
+
                     STATUS_STARTING -> {
                         Logger.i(LOG_TAG_VPN, "Orbot is STARTING, update the proxy data")
                         updateOrbotProxyData(intent)
                     }
+
                     STATUS_STOPPING -> {
                         Logger.i(LOG_TAG_VPN, "Orbot is STOPPING, stop the Proxy")
                         updateOrbotProxyData(intent)
@@ -376,21 +380,36 @@ class OrbotHelper(
     }
 
     private suspend fun handleOrbotHttpUpdate(): Boolean {
+        if (httpsIp.isNullOrEmpty() || httpsPort == null) {
+            Logger.w(LOG_TAG_VPN, "Orbot: httpsIp or httpsPort is null")
+            return false
+        }
+
         val pMode = ProxyManager.ProxyMode.ORBOT_HTTP
         // store the http address in proxyIp column of ProxyEndpoint table
-        val httpAddress = constructHttpAddress(httpsIp!!, httpsPort!!)
+        val httpAddress = constructHttpAddress(httpsIp, httpsPort)
+        if (httpAddress.isNullOrEmpty()) {
+            Logger.w(LOG_TAG_VPN, "Orbot: httpAddress is empty")
+            return false
+        }
+
         val id = appConfig.getOrbotHttpEndpoint().id
         val proxyEndpoint = constructProxy(id, pMode, httpAddress, 0)
         return if (proxyEndpoint != null) {
             appConfig.updateOrbotHttpProxy(proxyEndpoint)
             true
         } else {
-            Logger.w(LOG_TAG_VPN, "could not setup Orbot http proxy with ${httpsIp}:${httpsPort}")
+            Logger.w(LOG_TAG_VPN, "Orbot: http proxy err ${httpsIp}:${httpsPort}")
             false
         }
     }
 
-    private fun constructHttpAddress(ip: String?, port: Int?): String {
+    private fun constructHttpAddress(ip: String?, port: Int?): String? {
+        if (ip.isNullOrEmpty() || port == null || !isValidPort(port)) {
+            Logger.w(LOG_TAG_VPN, "cannot construct http address: $ip:$port")
+            return null
+        }
+
         val proxyUrl = StringBuilder()
         // Orbot only supports http proxy
         proxyUrl.append("http://")
@@ -407,7 +426,7 @@ class OrbotHelper(
         port: Int?
     ): ProxyEndpoint? {
         if (ip.isNullOrEmpty() || port == null || !isValidPort(port)) {
-            Logger.w(LOG_TAG_VPN, "cannot construct proxy with values ip: $ip, port: $port")
+            Logger.w(LOG_TAG_VPN, "cannot construct proxy: $ip:$port")
             return null
         }
 

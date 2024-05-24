@@ -40,6 +40,9 @@ interface AppInfoDAO {
     @Query("update AppInfo set uid = :newUid where uid = :oldUid and packageName = :pkg")
     fun updateUid(oldUid: Int, pkg: String, newUid: Int): Int
 
+    @Query("select * from AppInfo where uid = :uid and packageName = :pkg")
+    fun isUidPkgExist(uid: Int, pkg: String): AppInfo?
+
     @Delete fun delete(appInfo: AppInfo)
 
     @Query("delete from AppInfo where packageName in (:packageNames)")

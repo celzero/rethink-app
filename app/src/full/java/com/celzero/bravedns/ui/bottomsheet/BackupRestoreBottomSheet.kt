@@ -58,11 +58,11 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import org.koin.android.ext.android.inject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import org.koin.android.ext.android.inject
 
 class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
     private var _binding: ActivityBackupRestoreBinding? = null
@@ -204,13 +204,22 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun restore() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = "*/*"
-        val mimeTypes = arrayOf(INTENT_TYPE_OCTET, INTENT_TYPE_XZIP)
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
+        try {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.type = "*/*"
+            val mimeTypes = arrayOf(INTENT_TYPE_OCTET, INTENT_TYPE_XZIP)
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
 
-        restoreActivityResult.launch(intent)
+            restoreActivityResult.launch(intent)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_BACKUP_RESTORE, "err opening file picker: ${e.message}")
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.blocklist_update_check_failure),
+                Toast.LENGTH_SHORT
+            )
+        }
     }
 
     private fun result() {

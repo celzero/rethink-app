@@ -304,7 +304,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
                 val elapsedMs = SystemClock.elapsedRealtime() - startMs
                 downloadedMB += bytesToMB(bytesRead)
                 val progress =
-                    if (contentLength == Long.MAX_VALUE) 0
+                    if (contentLength == Long.MAX_VALUE || expectedMB == 0.0) 0
                     else (downloadedMB * 100 / expectedMB).toInt()
                 if (elapsedMs >= progressJumpsMs) {
                     updateProgress(context, progress)

@@ -35,26 +35,26 @@ import java.io.File
 
 @Database(
     entities =
-        [
-            AppInfo::class,
-            CustomIp::class,
-            DoHEndpoint::class,
-            DnsCryptEndpoint::class,
-            DnsProxyEndpoint::class,
-            DnsCryptRelayEndpoint::class,
-            ProxyEndpoint::class,
-            CustomDomain::class,
-            RethinkDnsEndpoint::class,
-            RethinkRemoteFileTag::class,
-            RethinkLocalFileTag::class,
-            LocalBlocklistPacksMap::class,
-            RemoteBlocklistPacksMap::class,
-            WgConfigFiles::class,
-            ProxyApplicationMapping::class,
-            TcpProxyEndpoint::class,
-            DoTEndpoint::class,
-            ODoHEndpoint::class
-        ],
+    [
+        AppInfo::class,
+        CustomIp::class,
+        DoHEndpoint::class,
+        DnsCryptEndpoint::class,
+        DnsProxyEndpoint::class,
+        DnsCryptRelayEndpoint::class,
+        ProxyEndpoint::class,
+        CustomDomain::class,
+        RethinkDnsEndpoint::class,
+        RethinkRemoteFileTag::class,
+        RethinkLocalFileTag::class,
+        LocalBlocklistPacksMap::class,
+        RemoteBlocklistPacksMap::class,
+        WgConfigFiles::class,
+        ProxyApplicationMapping::class,
+        TcpProxyEndpoint::class,
+        DoTEndpoint::class,
+        ODoHEndpoint::class
+    ],
     version = 22,
     exportSchema = false
 )
@@ -74,6 +74,7 @@ abstract class AppDatabase : RoomDatabase() {
         // https://developer.android.com/reference/android/arch/persistence/room/RoomDatabase.JournalMode#automatic
         fun buildDatabase(context: Context) =
             Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME)
+                .fallbackToDestructiveMigration() // will pick the db from assets folder
                 .createFromAsset(DATABASE_PATH)
                 .setJournalMode(JournalMode.AUTOMATIC)
                 .addMigrations(MIGRATION_1_2)
@@ -695,19 +696,19 @@ abstract class AppDatabase : RoomDatabase() {
                         )
                         val secWarpPath =
                             context.filesDir.absolutePath +
-                                File.separator +
-                                WIREGUARD_FOLDER_NAME +
-                                File.separator +
-                                SEC_WARP_FILE_NAME
+                                    File.separator +
+                                    WIREGUARD_FOLDER_NAME +
+                                    File.separator +
+                                    SEC_WARP_FILE_NAME
                         execSQL(
                             "INSERT INTO WgConfigFiles(id, name, configPath, serverResponse, isActive, isDeletable) VALUES(0, '$SEC_WARP_NAME', '$secWarpPath', '', 0, 0)"
                         )
                         val path =
                             context.filesDir.absolutePath +
-                                File.separator +
-                                WIREGUARD_FOLDER_NAME +
-                                File.separator +
-                                WARP_FILE_NAME
+                                    File.separator +
+                                    WIREGUARD_FOLDER_NAME +
+                                    File.separator +
+                                    WARP_FILE_NAME
                         execSQL(
                             "INSERT INTO WgConfigFiles(id, name, configPath, serverResponse, isActive, isDeletable) VALUES(1, '$WARP_NAME', '$path', '', 0, 0)"
                         )
@@ -907,28 +908,48 @@ abstract class AppDatabase : RoomDatabase() {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     // fix: migration with the WgConfigFiles seen in play store crash
                     try {
-                        db.execSQL(
-                            "ALTER TABLE WgConfigFiles ADD COLUMN isLockdown INTEGER NOT NULL DEFAULT 0"
-                        )
+                        if (!doesColumnExistInTable(db, "WgConfigFiles", "isLockdown")) {
+                            db.execSQL(
+                                "ALTER TABLE WgConfigFiles ADD COLUMN isLockdown INTEGER NOT NULL DEFAULT 0"
+                            )
+                        }
                     } catch (e: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "isLockdown column already exists, ignore")
                     }
                     try {
-                        db.execSQL(
-                            "ALTER TABLE WgConfigFiles ADD COLUMN isCatchAll INTEGER NOT NULL DEFAULT 0"
-                        )
+                        if (!doesColumnExistInTable(db, "WgConfigFiles", "isCatchAll")) {
+                            db.execSQL(
+                                "ALTER TABLE WgConfigFiles ADD COLUMN isCatchAll INTEGER NOT NULL DEFAULT 0"
+                            )
+                        }
                     } catch (e: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "isCatchAll column already exists, ignore")
                     }
                     try {
-                        db.execSQL(
-                            "ALTER TABLE WgConfigFiles ADD COLUMN oneWireGuard INTEGER NOT NULL DEFAULT 0"
-                        )
+                        if (!doesColumnExistInTable(db, "WgConfigFiles", "oneWireGuard")) {
+                            db.execSQL(
+                                "ALTER TABLE WgConfigFiles ADD COLUMN oneWireGuard INTEGER NOT NULL DEFAULT 0"
+                            )
+                        }
                     } catch (e: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "oneWireGuard column already exists, ignore")
                     }
                 }
             }
+
+        // ref: stackoverflow.com/a/57204285
+        private fun doesColumnExistInTable(
+            db: SupportSQLiteDatabase,
+            tableName: String,
+            columnToCheck: String
+        ): Boolean {
+            try {
+                db.query("SELECT * FROM $tableName LIMIT 0", emptyArray())
+                    .use { cursor -> return cursor.getColumnIndex(columnToCheck) != -1 }
+            } catch (e: Exception) {
+                return false
+            }
+        }
     }
 
     // fixme: revisit the links to remove the pragma for each table

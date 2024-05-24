@@ -1184,7 +1184,16 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setMessage(R.string.hsf_vpn_dialog_message)
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
-            startForResult.launch(prepareVpnIntent)
+            try {
+                startForResult.launch(prepareVpnIntent)
+            } catch (e: ActivityNotFoundException) {
+                Logger.e(LOG_TAG_VPN, "Activity not found to start VPN service", e)
+                showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.hsf_vpn_prepare_failure),
+                    Toast.LENGTH_LONG
+                )
+            }
         }
 
         builder.setNegativeButton(R.string.lbl_cancel) { _, _ ->

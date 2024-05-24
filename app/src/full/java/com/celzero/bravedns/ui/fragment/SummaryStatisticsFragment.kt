@@ -172,6 +172,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun calculatePercentage(value: Long, maxValue: Long): Int {
+        if (maxValue == 0L) return 0
+
         return (value * 100 / maxValue).toInt()
     }
 
