@@ -74,6 +74,7 @@ abstract class AppDatabase : RoomDatabase() {
         // https://developer.android.com/reference/android/arch/persistence/room/RoomDatabase.JournalMode#automatic
         fun buildDatabase(context: Context) =
             Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME)
+                .fallbackToDestructiveMigration() // will pick the db from assets folder
                 .createFromAsset(DATABASE_PATH)
                 .setJournalMode(JournalMode.AUTOMATIC)
                 .addMigrations(MIGRATION_1_2)
@@ -97,7 +98,6 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_19_20)
                 .addMigrations(MIGRATION_20_21)
                 .addMigrations(MIGRATION_21_22)
-                .fallbackToDestructiveMigration() // will pick the db from assets folder
                 .build()
 
         private val MIGRATION_1_2: Migration =
