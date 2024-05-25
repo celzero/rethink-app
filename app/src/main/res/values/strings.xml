@@ -402,6 +402,7 @@
     <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Inside Job</b><br/><br/>
         1. New: IP and DNS logs for each app with a new organized view.<br/>
         2. New: Setting to optionally <i>exclude</i> proxy forwarder apps.<br/>
+        3. New: Bypass apps from all proxies.<br/>
         3. Fix DNSCrypt crashing with <i>DNS Booster</i> enabled.<br/>
         4. Fix IPv6 to IPv4 translation in certain cases.<br/>
         3. Other bug fixes and improvements.<br/><br/>
