@@ -128,7 +128,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.i(LOG_TAG_VPN, "set pcap mode: $pcapFilePath")
             tunnel.setPcap(pcapFilePath)
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "err setting pcap: ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "err setting pcap($pcapFilePath): ${e.message}", e)
         }
         Logger.v(LOG_TAG_VPN, "GoVpnAdapter setPcapMode done")
     }
@@ -228,7 +228,7 @@ class GoVpnAdapter : KoinComponent {
             Intra.addDoHTransport(tunnel, id, url, ips)
             Logger.i(LOG_TAG_VPN, "new doh: $id (${doh?.dohName}), url: $url, ips: $ips")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "connect-tunnel: doh failure", e)
+            Logger.e(LOG_TAG_VPN, "connect-tunnel: doh failure, url: $url", e)
             getResolver()?.remove(id)
             showDnsFailureToast(url ?: "")
         }
@@ -253,7 +253,7 @@ class GoVpnAdapter : KoinComponent {
             Intra.addDoTTransport(tunnel, id, url, ips)
             Logger.i(LOG_TAG_VPN, "new dot: $id (${dot?.name}), url: $url, ips: $ips")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "connect-tunnel: dot failure", e)
+            Logger.e(LOG_TAG_VPN, "connect-tunnel: dot failure, url: $url", e)
             getResolver()?.remove(id)
             showDnsFailureToast(url ?: "")
         }
@@ -273,7 +273,7 @@ class GoVpnAdapter : KoinComponent {
             Intra.addODoHTransport(tunnel, id, proxy, resolver, proxyIps)
             Logger.i(LOG_TAG_VPN, "new odoh: $id (${odoh?.name}), p: $proxy, r: $resolver")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "connect-tunnel: odoh failure", e)
+            Logger.e(LOG_TAG_VPN, "connect-tunnel: odoh failure, res: $resolver", e)
             getResolver()?.remove(id)
             showDnsFailureToast(resolver ?: "")
         }
@@ -332,7 +332,7 @@ class GoVpnAdapter : KoinComponent {
                 Logger.i(LOG_TAG_VPN, "new dot (rdns): $id, url: $convertedUrl, ips: $ips")
             }
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "connect-tunnel: rdns creation failure", e)
+            Logger.e(LOG_TAG_VPN, "connect-tunnel: rdns failure, url: $url", e)
             getResolver()?.remove(id)
             showDnsFailureToast(url)
         }
@@ -506,7 +506,7 @@ class GoVpnAdapter : KoinComponent {
             Intra.addDNSCryptRelay(tunnel, relay.dnsCryptRelayURL)
             Logger.i(LOG_TAG_VPN, "new dnscrypt relay: ${relay.dnsCryptRelayURL}")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "connect-tunnel: dnscrypt add failure", e)
+            Logger.e(LOG_TAG_VPN, "connect-tunnel: dnscrypt relay failure: ${relay.dnsCryptRelayURL}", e)
             appConfig.removeDnscryptRelay(relay.dnsCryptRelayURL)
             getResolver()?.remove(relay.dnsCryptRelayURL)
         }
@@ -635,7 +635,7 @@ class GoVpnAdapter : KoinComponent {
             }
             Intra.addProxyDNS(tunnel, p) // dns transport has same id as the proxy (p)
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "wireguard dns failure", e)
+            Logger.e(LOG_TAG_VPN, "wireguard dns failure($id)", e)
             getResolver()?.remove(id)
             showDnsFailureToast(id)
         }
@@ -909,7 +909,7 @@ class GoVpnAdapter : KoinComponent {
             // no need to set ips for dns53
             return Intra.newDefaultDNS(Backend.DNS53, url, "")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "err new default transport: ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "err new default transport($url): ${e.message}", e)
             // most of the android devices have google dns, so add it as default transport
             // TODO: notify the user that the default transport could not be set
             return Intra.newDefaultDNS(Backend.DNS53, defaultDns, "")
@@ -940,7 +940,7 @@ class GoVpnAdapter : KoinComponent {
                 Intra.addDefaultTransport(tunnel, Backend.DNS53, url, "")
             }
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "err new default transport: ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "err new default transport($url): ${e.message}", e)
             // most of the android devices have google dns, so add it as default transport
             // TODO: notify the user that the default transport could not be set
             try {
@@ -1053,8 +1053,7 @@ class GoVpnAdapter : KoinComponent {
             }
 
             persistentState.localBlocklistStamp = rl.stamp // throws exception if stamp is invalid
-            if (DEBUG)
-                Logger.d(LOG_TAG_VPN, "reset local stamp: ${persistentState.localBlocklistStamp}")
+            Logger.i(LOG_TAG_VPN, "reset local stamp: ${persistentState.localBlocklistStamp}")
         } catch (e: Exception) {
             persistentState.localBlocklistStamp = ""
             Logger.e(LOG_TAG_VPN, "could not reset local stamp: ${e.message}", e)
