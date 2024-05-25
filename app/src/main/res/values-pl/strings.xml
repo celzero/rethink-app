@@ -343,8 +343,7 @@
     <string name="settings_ip_dialog_title" translatable="true">Wybierz wersję IP</string>
     <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (domyślnie)</string>
     <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (eksperymentalny)</string>
-    <string name="settings_ip_dialog_ipv46" translatable="true">Automatyczny (eksperymentalny)
-\nwysyłane są kontrole łączności w celu sprawdzenia osiągalności.</string>
+    <string name="settings_ip_dialog_ipv46" translatable="true">Automatyczny (eksperymentalne)</string>
     <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
     <string name="settings_ip_text_ipv6" translatable="true">IPv6</string>
     <string name="settings_ip_text_ipv46" translatable="true">Automatycznie</string>
@@ -433,7 +432,7 @@
     <string name="cd_dialog_desc" translatable="true">Niestandardowy adres URL (domena) lub dzika karta, aby zezwolić lub zablokować. np. *.test.com, test.com/test</string>
     <string name="cd_dialog_title" translatable="true">Dodaj zasadę domeny</string>
     <string name="cd_dialog_edittext_hint" translatable="true">Wpisz %1$s</string>
-    <string name="cd_dialog_error_invalid_domain" translatable="true">Nieprawidłowy adres URL (domena).</string>
+    <string name="cd_dialog_error_invalid_domain" translatable="true">Nieprawidłowy adres URL lub nazwa domeny</string>
     <string name="cd_dialog_error_invalid_wildcard" translatable="true">Błędny wildcard.</string>
     <string name="cd_no_rule_initial" translatable="true">N</string>
     <string name="cd_no_rule_txt" translatable="true">Nie ma reguły</string>
@@ -679,9 +678,9 @@
     <string name="cd_doh_dialog_resolver_url" translatable="true">Adres URL programu rozpoznawania nazw</string>
     <string name="cd_dnscrypt_relay_heading" translatable="true">Przekaźniki</string>
     <string name="ctbs_app_info_not_available_toast" translatable="true">Nie znaleziono strony z ustawieniami aplikacji</string>
-    <string name="dns_btm_sheet_dialog_message" translatable="true"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s blocklist(s)&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s list blokujących</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">Brak odpowiedzi</string>
-    <string name="dns_btm_sheet_dialog_ips" translatable="true"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="univ_firewall_rule_1" translatable="true">Blokowanie wszystkich aplikacji, gdy urządzenie jest zablokowane</string>
     <string name="univ_firewall_rule_7" translatable="true">Blokowanie IPv4 w IPv6 (eksperymentalnie)</string>
     <string name="dns_btm_latency_ms" translatable="true">%1$sms</string>
@@ -976,4 +975,15 @@
     <string name="one_wg_apps_added" translatable="true">Przekierowywanie wszystkich aplikacji</string>
     <string name="wireguard_disable_failure" translatable="true">\"Zawsze włączony WireGuard\" nie może być wyłączony</string>
     <string name="wg_apps_dialog_title_include" translatable="true">Zawiera %1$s aplikacji</string>
+    <string name="lbl_remaining_apps" translatable="true">Pozostałe aplikacje</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Usunąć punkt końcowy DoT?</string>
+    <string name="settings_connectivity_checks" translatable="true">Wykonaj sprawdzenie połączenia</string>
+    <string name="wireguard_disable_title" translatable="true">Zatrzymaj WireGuard</string>
+    <string name="lbl_unselected" translatable="true">Niewybrane</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">Blokada</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">Wyklucz %1$s aplikacji</string>
+    <string name="lbl_battery_optimization" translatable="true">Optymalizacja baterii</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">Wyłącz %1$s</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Nigdy nie przekierowuj DNS przez proxy</string>
+    <string name="lbl_on_device" translatable="true">na urządzeniu</string>
 </resources>
