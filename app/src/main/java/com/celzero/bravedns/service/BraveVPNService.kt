@@ -3546,7 +3546,7 @@ class BraveVPNService :
         val mustRefresh = durationMs > wgHandshakeTimeout
         Logger.i(LOG_TAG_VPN, "flow: refresh $id after $durationSecs: $mustRefresh")
         if (mustRefresh) {
-            io("refreshProxy") { vpnAdapter?.refreshProxy(id) }
+            io("proxyHandshake") { vpnAdapter?.refreshProxy(id) }
         }
     }
 
