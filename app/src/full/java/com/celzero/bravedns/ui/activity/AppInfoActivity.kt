@@ -345,6 +345,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         b.excludeProxySwitch.setOnCheckedChangeListener { _, isChecked ->
             updateExcludeProxyStatus(isChecked)
         }
+
+        b.excludeProxyRl.setOnClickListener {
+            b.excludeProxySwitch.isChecked = !b.excludeProxySwitch.isChecked
+        }
     }
 
     private fun updateExcludeProxyStatus(isExcluded: Boolean) {
