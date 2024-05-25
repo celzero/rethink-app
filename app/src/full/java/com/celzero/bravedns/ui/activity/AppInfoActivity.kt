@@ -121,6 +121,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 this.appInfo = appInfo
 
                 b.aadAppDetailName.text = appName(packages.count())
+                b.excludeProxySwitch.isChecked = appInfo.isProxyExcluded
                 updateDataUsage()
                 displayIcon(
                     Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
@@ -340,6 +341,16 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         b.aadIpsChip.setOnClickListener { openAppWiseIpLogsActivity() }
 
         b.aadDomainsChip.setOnClickListener { openAppWiseDomainLogsActivity() }
+
+        b.excludeProxySwitch.setOnCheckedChangeListener { _, isChecked ->
+            updateExcludeProxyStatus(isChecked)
+        }
+    }
+
+    private fun updateExcludeProxyStatus(isExcluded: Boolean) {
+        io {
+            FirewallManager.updateIsProxyExcluded(appInfo.uid, isExcluded)
+        }
     }
 
     private fun openAppWiseDomainLogsActivity() {

@@ -596,6 +596,22 @@ object FirewallManager : KoinComponent {
         }
     }
 
+    fun updateIsProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
+        io {
+            mutex.withLock {
+                appInfos.get(uid).forEach {
+                    it.isProxyExcluded = isProxyExcluded
+                }
+            }
+            db.updateProxyExcluded(uid, isProxyExcluded)
+            informObservers()
+        }
+    }
+
+    fun isAppExcludedFromProxy(uid: Int): Boolean {
+        return appInfos.get(uid).firstOrNull()?.isProxyExcluded ?: false
+    }
+
     private fun io(f: suspend () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch { f() }
     }

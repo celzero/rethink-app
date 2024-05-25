@@ -24,6 +24,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -39,6 +40,7 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.getIcon
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -93,6 +95,23 @@ class WgIncludeAppsAdapter(
         RecyclerView.ViewHolder(b.root) {
 
         fun update(mapping: ProxyApplicationMapping) {
+            val isProxyExcluded = FirewallManager.isAppExcludedFromProxy(mapping.uid)
+            if (isProxyExcluded) {
+                b.wgIncludeAppListContainer.isEnabled = false
+                b.wgIncludeAppListCheckbox.isChecked = false
+                // do not allow to click on the card
+                b.wgIncludeCard.isClickable = false
+                b.wgIncludeCard.isFocusable = false
+                b.wgIncludeAppListCheckbox.isClickable = false
+                b.wgIncludeAppListCheckbox.isFocusable = false
+            } else {
+                b.wgIncludeAppListContainer.isEnabled = true
+                b.wgIncludeCard.isClickable = true
+                b.wgIncludeCard.isFocusable = true
+                b.wgIncludeAppListCheckbox.isClickable = true
+                b.wgIncludeAppListCheckbox.isFocusable = true
+            }
+
             b.wgIncludeAppListApkLabelTv.text = mapping.appName
 
             if (mapping.proxyId == "") {
@@ -101,16 +120,21 @@ class WgIncludeAppsAdapter(
                 b.wgIncludeAppListCheckbox.isChecked = false
                 setCardBackground(false)
             } else if (mapping.proxyId != proxyId) {
-                b.wgIncludeAppAppDescTv.text =
-                    context.getString(R.string.wireguard_apps_proxy_map_desc, mapping.proxyName)
+                if (!isProxyExcluded) {
+                    b.wgIncludeAppAppDescTv.text =
+                        context.getString(R.string.wireguard_apps_proxy_map_desc, mapping.proxyName)
+                } else {
+                    b.wgIncludeAppAppDescTv.text = ""
+                }
                 b.wgIncludeAppAppDescTv.visibility = View.VISIBLE
                 b.wgIncludeAppListCheckbox.isChecked = false
                 setCardBackground(false)
             } else {
                 b.wgIncludeAppAppDescTv.text = ""
                 b.wgIncludeAppAppDescTv.visibility = View.GONE
-                b.wgIncludeAppListCheckbox.isChecked = mapping.proxyId == proxyId
-                setCardBackground(true)
+                b.wgIncludeAppListCheckbox.isChecked =
+                    mapping.proxyId == proxyId && !isProxyExcluded
+                setCardBackground(mapping.proxyId == proxyId && !isProxyExcluded)
             }
 
             val isIncluded = mapping.proxyId == proxyId && mapping.proxyId != ""
@@ -157,6 +181,16 @@ class WgIncludeAppsAdapter(
         private fun updateInterfaceDetails(mapping: ProxyApplicationMapping, include: Boolean) {
             io {
                 val appUidList = FirewallManager.getAppNamesByUid(mapping.uid)
+                if (FirewallManager.isAppExcludedFromProxy(mapping.uid)) {
+                    uiCtx {
+                        showToastUiCentered(
+                            context,
+                            context.getString(R.string.exclude_apps_from_proxy_failure_toast),
+                            Toast.LENGTH_LONG
+                        )
+                    }
+                    return@io
+                }
                 uiCtx {
                     if (appUidList.count() > 1) {
                         showDialog(appUidList, mapping, include)

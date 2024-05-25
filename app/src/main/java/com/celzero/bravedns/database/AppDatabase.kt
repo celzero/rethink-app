@@ -55,7 +55,7 @@ import java.io.File
         DoTEndpoint::class,
         ODoHEndpoint::class
     ],
-    version = 22,
+    version = 23,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -63,7 +63,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         const val DATABASE_NAME = "bravedns.db"
-        private const val DATABASE_PATH = "database/rethink_v21.db"
+        private const val DATABASE_PATH = "database/rethink_v22.db"
         private const val PRAGMA = "pragma wal_checkpoint(full)"
 
         // setJournalMode() is added as part of issue #344
@@ -74,7 +74,6 @@ abstract class AppDatabase : RoomDatabase() {
         // https://developer.android.com/reference/android/arch/persistence/room/RoomDatabase.JournalMode#automatic
         fun buildDatabase(context: Context) =
             Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME)
-                .fallbackToDestructiveMigration() // will pick the db from assets folder
                 .createFromAsset(DATABASE_PATH)
                 .setJournalMode(JournalMode.AUTOMATIC)
                 .addMigrations(MIGRATION_1_2)
@@ -98,6 +97,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_19_20)
                 .addMigrations(MIGRATION_20_21)
                 .addMigrations(MIGRATION_21_22)
+                .addMigrations(MIGRATION_22_23)
                 .build()
 
         private val MIGRATION_1_2: Migration =
@@ -934,6 +934,15 @@ abstract class AppDatabase : RoomDatabase() {
                     } catch (e: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "oneWireGuard column already exists, ignore")
                     }
+                }
+            }
+
+        private val MIGRATION_22_23: Migration =
+            object : Migration(22, 23) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        "ALTER TABLE AppInfo ADD COLUMN isProxyExcluded INTEGER NOT NULL DEFAULT 0"
+                    )
                 }
             }
 

@@ -93,4 +93,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     fun updateDataUsageByUid(uid: Int, uploadBytes: Long, downloadBytes: Long) {
         appInfoDAO.updateDataUsageByUid(uid, uploadBytes, downloadBytes)
     }
+
+    fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
+        appInfoDAO.updateProxyExcluded(uid, isProxyExcluded)
+    }
 }

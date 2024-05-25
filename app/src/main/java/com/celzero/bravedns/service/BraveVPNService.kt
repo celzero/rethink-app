@@ -3344,6 +3344,12 @@ class BraveVPNService :
             }
         val connId = connTracker.connId
         val uid = connTracker.uid
+
+        if (FirewallManager.isAppExcludedFromProxy(uid)) {
+            logd("flow: app is excluded from proxy, returning Ipn.Base, $connId, $uid")
+            return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid)
+        }
+
         // check for one-wireguard, if enabled, return wireguard proxy for all connections
         val oneWgId = WireguardManager.getOneWireGuardProxyId()
         if (oneWgId != null && oneWgId != WireguardManager.INVALID_CONF_ID) {
@@ -3540,7 +3546,7 @@ class BraveVPNService :
         val mustRefresh = durationMs > wgHandshakeTimeout
         Logger.i(LOG_TAG_VPN, "flow: refresh $id after $durationSecs: $mustRefresh")
         if (mustRefresh) {
-            vpnAdapter?.refreshProxy(id)
+            io("refreshProxy") { vpnAdapter?.refreshProxy(id) }
         }
     }
 

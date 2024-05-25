@@ -34,6 +34,7 @@ class AppInfo {
     var backgroundAllowed: Boolean = false
     var uploadBytes: Long = 0
     var downloadBytes: Long = 0
+    var isProxyExcluded: Boolean = false
 
     override fun equals(other: Any?): Boolean {
         if (other !is AppInfo) return false
@@ -60,6 +61,9 @@ class AppInfo {
                 "connectionStatus" -> connectionStatus = it.value as Int
                 "screenOffAllowed" -> screenOffAllowed = (it.value as Int == 1)
                 "backgroundAllowed" -> backgroundAllowed = (it.value as Int == 1)
+                "uploadBytes" -> uploadBytes = it.value as Long
+                "downloadBytes" -> downloadBytes = it.value as Long
+                "isProxyExcluded" -> isProxyExcluded = (it.value as Int == 1)
             }
         }
     }
@@ -74,6 +78,7 @@ class AppInfo {
         wifiDataUsed: Long,
         mobileDataUsed: Long,
         connectionStatus: Int,
+        isProxyExcluded: Boolean,
         screenOffAllowed: Boolean,
         backgroundAllowed: Boolean
     ) {
@@ -86,6 +91,7 @@ class AppInfo {
         this.wifiDataUsed = wifiDataUsed
         this.mobileDataUsed = mobileDataUsed
         this.connectionStatus = connectionStatus
+        this.isProxyExcluded = isProxyExcluded
         this.screenOffAllowed = screenOffAllowed
         this.backgroundAllowed = backgroundAllowed
     }

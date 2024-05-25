@@ -149,4 +149,7 @@ interface AppInfoDAO {
         "update AppInfo set  uploadBytes = :uploadBytes, downloadBytes = :downloadBytes where uid = :uid"
     )
     fun updateDataUsageByUid(uid: Int, uploadBytes: Long, downloadBytes: Long)
+
+    @Query("update AppInfo set isProxyExcluded = :isProxyExcluded where uid = :uid")
+    fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean)
 }
