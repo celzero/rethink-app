@@ -862,7 +862,7 @@
     <string name="lbl_preshared_key" translatable="true">Chave pré-compartilhada</string>
     <string name="lbl_optional" translatable="true">(opcional)</string>
     <string name="lbl_persistent_keepalive" translatable="true">Keepalive persistente</string>
-    <string name="settings_allow_lan_heading" translatable="true">Não rotear IPs Privados (experimental)</string>
+    <string name="settings_allow_lan_heading" translatable="true">Não encaminhar IPs privados (experimental)</string>
     <string name="settings_allow_lan_desc" translatable="true">Excluir rotas LAN, loopback, multicast e link-local no túnel VPN do Rethink.</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Não é possível configurar proxies quando a VPN está sendo executada somente no modo DNS.</string>
     <string name="settings_pcap_dialog_option_3" translatable="true">Saída para a pasta Downloads</string>
@@ -981,9 +981,9 @@
     <string name="settings_rinr_desc_enabled" translatable="true">Encaminhando o próprio tráfego do Rethink através do túnel. A menos que você saiba o que está fazendo, desligue-o.</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Encaminhar o próprio tráfego do Rethink, como downloads de listas de bloqueio, verificações de conectividade, conexões DNS, de volta ao túnel.</string>
     <string name="cd_toast_edit" translatable="true">Editado</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Os aplicativos selecionados serão roteados apenas por meio desta VPN WireGuard, independentemente de a VPN estar ativa ou desativada.</string>
-    <string name="one_wg_dialog_desc" translatable="true">Todas as conexões de todos os aplicativos, incluindo DNS, serão roteadas para uma única VPN WireGuard ativa. Outras VPNs WireGuard ativas, se houver, serão interrompidas.</string>
-    <string name="catch_all_wg_dialog_desc" translatable="true">Todas as conexões e aplicativos não roteados por outras VPNs WireGuard serão roteados por esta.</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Os aplicativos selecionados serão encaminhados apenas por meio desta VPN WireGuard, independentemente de a VPN estar ativa ou desativada.</string>
+    <string name="one_wg_dialog_desc" translatable="true">Todas as conexões de todos os aplicativos, incluindo DNS, serão encaminhadas para uma única VPN WireGuard ativa. Outras VPNs WireGuard ativas, se houver, serão interrompidas.</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">Todas as conexões e aplicativos não encaminhadas por outras VPNs WireGuard serão encaminhadas por esta.</string>
     <string name="one_wg_error_toast" translatable="true">Ao mudar para o modo \"Avançado\", desative o WireGuard no modo \"Simples\"</string>
     <string name="wireguard_disable_message" translatable="true">Desativar todas as VPNs WireGuard ativas?</string>
     <string name="lbl_last" translatable="true">Último</string>
@@ -999,13 +999,13 @@
     <string name="lbl_cache" translatable="true">Cache</string>
     <string name="lbl_overall" translatable="true">Total</string>
     <string name="lbl_remaining_apps" translatable="true">Aplicativos restantes</string>
-    <string name="remaining_apps_dialog_desc" translatable="true">Incluir todos os aplicativos restantes não roteados por nenhum outro proxy</string>
-    <string name="routing_remaining_apps" translatable="true">Roteando aplicativos restantes</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Incluir todos os aplicativos restantes não encaminhados por nenhum outro proxy</string>
+    <string name="routing_remaining_apps" translatable="true">Encaminhando aplicativos restantes</string>
     <string name="remaining_apps_dialog_title" translatable="true">Incluir aplicativos restantes</string>
     <string name="wireguard_apps_proxy_map_desc" translatable="true">parte de %1$s</string>
     <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimental)</string>
     <string name="settings_rinr_dialog_desc" translatable="true">Também ativa a configuração de<!--settings_network_all_networks--> %1$s. Continuar?</string>
-    <string name="one_wg_apps_added" translatable="true">Roteando todos os aplicativos</string>
+    <string name="one_wg_apps_added" translatable="true">Encaminhar todos os aplicativos</string>
     <string name="wg_apps_dialog_title_include" translatable="true">Incluir %1$s aplicativo(s)</string>
     <string name="wg_apps_dialog_title_exclude" translatable="true">Excluir %1$s aplicativo(s)</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Sempre Ativa</string>
@@ -1028,4 +1028,7 @@
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> pode resultar em perda de conectividade. Altere a configuração para permitir que o Rethink use dados e outros recursos quando estiver em segundo plano.</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplicativos de encaminhamento proxy loopback</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Quando desativado, exclui aplicativos de encaminhamento proxy (SOCKS5, HTTP, DNS) do túnel VPN do Rethink.</string>
+    <string name="whats_new_version_update" translatable="true">&lt;b&gt;Inside Job&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. New: IP and DNS logs for each app with a new organized view.&lt;br/&gt; 2. New: Setting to optionally &lt;i&gt;exclude&lt;/i&gt; proxy forwarder apps.&lt;br/&gt; 3. New: Bypass apps from all proxies.&lt;br/&gt; 3. Fix DNSCrypt crashing with &lt;i&gt;DNS Booster&lt;/i&gt; enabled.&lt;br/&gt; 4. Fix IPv6 to IPv4 translation in certain cases.&lt;br/&gt; 3. Other bug fixes and improvements.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Help translate this app&lt;/a&gt;</string>
+    <string name="exclude_apps_from_proxy_failure_toast">\"Ignorar aplicativo de todos os proxies\" está ativado</string>
+    <string name="exclude_apps_from_proxy">Ignorar aplicativo de todos os proxies</string>
 </resources>

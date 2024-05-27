@@ -279,4 +279,15 @@
 \nRETHINK אינו אוסף עליך מידע או ריגול בשום דרך.</string>
     <string name="conn_track_clear_logs_message" translatable="true">זה מוחק רק יומני רשת אך לא כללי חומת אש. פעולה זו אינה הפיכה. אתה רוצה להמשיך?</string>
     <string name="dns_query_clear_logs_message" translatable="true">זה מוחק את יומני ה- DNS במכשיר. פעולה זו אינה הפיכה. אתה רוצה להמשיך?</string>
+    <string name="lbl_status" translatable="true">סטטוס</string>
+    <string name="lbl_remove" translatable="true">הסר</string>
+    <string name="lbl_last" translatable="true">אחרון</string>
+    <string name="lbl_starting" translatable="true">להתחיל</string>
+    <string name="lbl_overall" translatable="true">באופן כללי</string>
+    <string name="lbl_stopped" translatable="true">לעצור</string>
+    <string name="lbl_private" translatable="true">פרטי</string>
+    <string name="lbl_listen_port" translatable="true">האזנת נמל</string>
+    <string name="lbl_preshared_key" translatable="true">מפתח משותף מראש</string>
+    <string name="lbl_cache" translatable="true">מטמון</string>
+    <string name="lbl_idle" translatable="true">ביטול</string>
 </resources>

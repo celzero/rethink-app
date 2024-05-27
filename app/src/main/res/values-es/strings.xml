@@ -35,7 +35,7 @@
 \nNúmero de puerto: %2$s</string>
     <string name="dns_proxy_dialog_header_dns">Añadir proxy DNS</string>
     <string name="cd_toast_added">Dominio añadido con éxito</string>
-    <string name="whats_new_version_update">&lt;b&gt;Trabajo interno&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Nuevo: registros de IP y DNS para cada aplicación con una nueva vista organizada.&lt;br/&gt; 2. Nuevo: configuración para &lt;i&gt;excluir opcionalmente&lt; /i&gt; aplicaciones de reenvío de proxy.&lt;br/&gt; 3. Reparar el bloqueo de DNSCrypt con &lt;i&gt;DNS Booster&lt;/i&gt; habilitado.&lt;br/&gt; 4. Reparar la traducción de IPv6 a IPv4 en ciertos casos.&lt;br/&gt; 3. Otros correcciones de errores y mejoras.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Trabajo interno&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Nuevo: registros de IP y DNS para cada aplicación con una nueva vista organizada.&lt;br/&gt; 2. Nuevo: configuración para &lt;i&gt;excluir opcionalmente&lt; /i&gt; aplicaciones de reenvío de proxy.&lt;br/&gt; 3. Nuevo: omitir aplicaciones de todos los servidores proxy.&lt;br/&gt; 3. Solucionar el bloqueo de DNSCrypt con &lt;i&gt;DNS Booster&lt;/i&gt; habilitado.&lt;br/&gt; 4. Solucionar IPv6 a traducción IPv4 en ciertos casos.&lt;br/&gt; 3. Otras correcciones de errores y mejoras.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt; /a&gt;</string>
     <string name="dc_dns_leaks_desc">Cuando está activado, Rethink captura todos los paquetes en el puerto 53 y los reenvía a un punto de acceso DNS establecido por el usuario</string>
     <string name="about_settings_app_info">Información de la aplicación</string>
     <string name="settings_orbot_disabled_error">Desactive el proxy HTTP(S) y/o SOCKS5 para continuar con la configuración de Tor-como-un-proxy.</string>
@@ -329,7 +329,7 @@
     <string name="ada_app_status_unknown">es desconocido</string>
     <string name="ada_app_isolate">Aislamiento</string>
     <string name="ada_app_dns_settings">Configuración DNS</string>
-    <string name="bsac_title_desc">Las normas se aplican únicamente a esta aplicación.</string>
+    <string name="bsac_title_desc">Las reglas se aplican únicamente a esta aplicación.</string>
     <string name="notif_download_content_text">Descarga en curso…</string>
     <string name="network_dns">Sistema DNS</string>
     <string name="notif_download_failure_content">La descarga ha fallado. Inténtelo de nuevo.</string>
@@ -1031,4 +1031,6 @@
     <string name="battery_optimization_dialog_heading" translatable="true">Deshabilitar %1$s</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplicaciones de reenvío proxy en bucle invertido</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Si se desactiva, excluye las aplicaciones proxy (SOCKS5, HTTP, DNS) del túnel VPN de Rethink.</string>
+    <string name="exclude_apps_from_proxy">Omitir la aplicación desde todos los Proxies</string>
+    <string name="exclude_apps_from_proxy_failure_toast">La omisión de la aplicación de todos los Proxies está habilitada</string>
 </resources>
