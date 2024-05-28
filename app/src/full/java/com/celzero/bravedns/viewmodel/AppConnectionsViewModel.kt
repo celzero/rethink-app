@@ -75,10 +75,12 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO) : View
                 startTime.value =
                     System.currentTimeMillis() - ONE_HOUR_MILLIS
             }
+
             TimeCategory.TWENTY_FOUR_HOUR -> {
                 startTime.value =
                     System.currentTimeMillis() - ONE_DAY_MILLIS
             }
+
             TimeCategory.SEVEN_DAYS -> {
                 startTime.value =
                     System.currentTimeMillis() - ONE_WEEK_MILLIS
@@ -102,10 +104,10 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO) : View
     private fun fetchIpLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
         val to = getStartTime()
         return if (input.isEmpty()) {
-                Pager(pagingConfig) { nwlogDao.getAppIpLogs(uid, to) }
-            } else {
-                Pager(pagingConfig) { nwlogDao.getAppIpLogsFiltered(uid, to, "%$input%") }
-            }
+            Pager(pagingConfig) { nwlogDao.getAppIpLogs(uid, to) }
+        } else {
+            Pager(pagingConfig) { nwlogDao.getAppIpLogsFiltered(uid, to, "%$input%") }
+        }
             .liveData
             .cachedIn(viewModelScope)
     }
@@ -113,10 +115,10 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO) : View
     private fun fetchAppDomainLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
         val to = getStartTime()
         return if (input.isEmpty()) {
-                Pager(pagingConfig) { nwlogDao.getAppDomainLogs(uid, to) }
-            } else {
-                Pager(pagingConfig) { nwlogDao.getAppDomainLogsFiltered(uid, to, "%$input%") }
-            }
+            Pager(pagingConfig) { nwlogDao.getAppDomainLogs(uid, to) }
+        } else {
+            Pager(pagingConfig) { nwlogDao.getAppDomainLogsFiltered(uid, to, "%$input%") }
+        }
             .liveData
             .cachedIn(viewModelScope)
     }
@@ -134,13 +136,15 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO) : View
     }
 
     fun getDomainLogsLimited(uid: Int): LiveData<PagingData<AppConnection>> {
-        return Pager(pagingConfig) { nwlogDao.getAppDomainLogsLimited(uid) }
+        val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
+        return Pager(pagingConfig) { nwlogDao.getAppDomainLogsLimited(uid, to) }
             .liveData
             .cachedIn(viewModelScope)
     }
 
     fun getIpLogsLimited(uid: Int): LiveData<PagingData<AppConnection>> {
-        return Pager(pagingConfig) { nwlogDao.getAppIpLogsLimited(uid) }
+        val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
+        return Pager(pagingConfig) { nwlogDao.getAppIpLogsLimited(uid, to) }
             .liveData
             .cachedIn(viewModelScope)
     }

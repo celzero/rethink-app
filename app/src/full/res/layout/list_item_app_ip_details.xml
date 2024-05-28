@@ -90,7 +90,7 @@
             android:background="@drawable/drawable_purple_gradient"
             android:fontFamily="sans-serif-light"
             android:gravity="center"
-            android:maxWidth="40dp"
+            android:maxWidth="60dp"
             android:minWidth="40dp"
             android:padding="5dp"
             android:singleLine="true"
