@@ -141,6 +141,10 @@ object FirewallManager : KoinComponent {
             return this == BYPASS_DNS_FIREWALL
         }
 
+        fun isExclude(): Boolean {
+            return this == EXCLUDE
+        }
+
         fun isolate(): Boolean {
             return this == ISOLATE
         }

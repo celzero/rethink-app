@@ -439,6 +439,19 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
                         if (a == fStatus && c == connStatus) return@io
 
+                        if (VpnController.isVpnLockdown() && fStatus.isExclude()) {
+                            uiCtx {
+                                // reset the spinner to previous selection
+                                updateFirewallRulesUi(a, c)
+                                showToastUiCentered(
+                                    requireContext(),
+                                    getString(R.string.hsf_exclude_error),
+                                    Toast.LENGTH_LONG
+                                )
+                            }
+                            return@io
+                        }
+
                         Logger.i(
                             LOG_TAG_FIREWALL,
                             "Change in firewall rule for app uid: ${info?.uid}, firewall status: $fStatus, conn status: $connStatus"
