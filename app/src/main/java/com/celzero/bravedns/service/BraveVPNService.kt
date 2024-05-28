@@ -167,7 +167,8 @@ class BraveVPNService :
     }
 
     // handshake expiry time for proxy connections
-    private val wgHandshakeTimeout = TimeUnit.MINUTES.toMillis(3L)
+    // 120s (wireguard handshake) + 30s (router#status cache) + 10s buffer = 160s
+    private val wgHandshakeTimeout = TimeUnit.SECONDS.toMillis(160L)
     private val checkpointInterval = TimeUnit.MINUTES.toMillis(1L)
 
     private var isLockDownPrevious: Boolean = false
@@ -3532,19 +3533,21 @@ class BraveVPNService :
             logd("flow: skip refresh for $id, within interval: $cpIntervalSecs")
             return
         }
-        val lastHandShake = stats.lastOK
-        if (lastHandShake <= 0) {
-            Logger.w(LOG_TAG_VPN, "flow: skip refresh, handshake never done for $id")
-            return
-        }
-        logd("flow: handshake check for $id, $lastHandShake, interval: $cpIntervalSecs")
         wgHandShakeCheckpoints[id] = realtime
-        val currTimeMs = System.currentTimeMillis()
-        val durationMs = currTimeMs - lastHandShake
-        val durationSecs = TimeUnit.MILLISECONDS.toSeconds(durationMs)
-        // if the last handshake is older than the timeout, refresh the proxy
-        val mustRefresh = durationMs > wgHandshakeTimeout
-        Logger.i(LOG_TAG_VPN, "flow: refresh $id after $durationSecs: $mustRefresh")
+        val lastHandShake = stats.lastOK
+        val mustRefresh = if (lastHandShake <= 0) {
+            Logger.w(LOG_TAG_VPN, "flow: force refresh, handshake never done for $id")
+            true // always refresh if handshake never done
+        } else {
+            logd("flow: handshake check for $id, $lastHandShake, interval: $cpIntervalSecs")
+            val currTimeMs = System.currentTimeMillis()
+            val durationMs = currTimeMs - lastHandShake
+            val durationSecs = TimeUnit.MILLISECONDS.toSeconds(durationMs)
+            val ref = durationMs > wgHandshakeTimeout
+            Logger.i(LOG_TAG_VPN, "flow: refresh $id after $durationSecs? $ref")
+            // if the last handshake is older than the timeout, refresh the proxy
+            ref
+        }
         if (mustRefresh) {
             io("proxyHandshake") { vpnAdapter?.refreshProxy(id) }
         }
