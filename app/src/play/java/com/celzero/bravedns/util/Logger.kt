@@ -17,9 +17,6 @@ import android.util.Log
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Utilities
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.crashlytics.internal.common.CrashlyticsCore
-import com.google.firebase.crashlytics.internal.common.CrashlyticsReportDataCapture
-import com.google.firebase.crashlytics.internal.model.CrashlyticsReport
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -78,11 +75,15 @@ object Logger : KoinComponent {
     fun crash(tag: String, message: String, e: Exception) {
         log(tag, message, LoggerType.ERROR, e)
         if (Utilities.isPlayStoreFlavour()) {
-            val crashlytics = FirebaseCrashlytics.getInstance()
-            crashlytics.log("$tag: $message")
-            crashlytics.recordException(e)
-            // send the unsent reports, if any as the crash is important to be reported.
-            crashlytics.sendUnsentReports()
+            try {
+                val crashlytics = FirebaseCrashlytics.getInstance()
+                crashlytics.log("$tag: $message")
+                crashlytics.recordException(e)
+                // send the unsent reports, if any as the crash is important to be reported.
+                crashlytics.sendUnsentReports()
+            } catch (ex: Exception) {
+                Log.e(LOG_TAG_APP_UPDATE, "Error in logging to crashlytics: ${ex.message}")
+            }
         }
     }
 
