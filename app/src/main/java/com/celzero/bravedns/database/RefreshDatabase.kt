@@ -195,7 +195,7 @@ internal constructor(
             // must be called after updateExistingPackagesIfNeeded
             refreshDomainRules(packagesToUpdate)
         } catch (e: RuntimeException) {
-            Logger.e(LOG_TAG_APP_DB, e.message ?: "refresh err", e)
+            Logger.crash(LOG_TAG_APP_DB, e.message ?: "refresh err", e)
             throw e
         } finally {
             notifyEmptyFirewallRulesIfNeeded()

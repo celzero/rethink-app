@@ -118,7 +118,7 @@ class RetrofitManager {
                         }
                     }
                 } catch (e: Exception) {
-                    Logger.e(
+                    Logger.crash(
                         Logger.LOG_TAG_DOWNLOAD,
                         "err while getting custom dns: ${e.message}",
                         e

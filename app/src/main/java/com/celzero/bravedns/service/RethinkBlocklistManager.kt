@@ -273,7 +273,7 @@ object RethinkBlocklistManager : KoinComponent {
             Logger.i(LOG_TAG_DNS, "New Remote blocklist files inserted into database")
             return true
         } catch (ioException: IOException) {
-            Logger.e(
+            Logger.crash(
                 LOG_TAG_DNS,
                 "Failure reading json file, blocklist type: remote, timestamp: $timestamp",
                 ioException

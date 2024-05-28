@@ -501,7 +501,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     installStateUpdatedListener
                 ) // Might be play updater or web updater
             } catch (e: Exception) {
-                Logger.e(LOG_TAG_APP_UPDATE, "err in app update check: ${e.message}", e)
+                Logger.crash(LOG_TAG_APP_UPDATE, "err in app update check: ${e.message}", e)
                 showDownloadDialog(
                     AppUpdater.InstallSource.STORE,
                     getString(R.string.download_update_dialog_failure_title),

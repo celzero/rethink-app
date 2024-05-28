@@ -588,7 +588,7 @@ class BraveVPNService :
             }
         } catch (iex: Exception) {
             // TODO: show alerts to user on such exceptions, in a separate ui?
-            Logger.e(LOG_TAG_VPN, "err blocking conn, block anyway", iex)
+            Logger.crash(LOG_TAG_VPN, "unexpected err in firewall(), block anyway", iex)
             return FirewallRuleset.RULE1C
         }
 
@@ -2554,7 +2554,7 @@ class BraveVPNService :
             }
             return builder.establish()
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, e.message ?: "err establishVpn", e)
+            Logger.crash(LOG_TAG_VPN, e.message ?: "err establishVpn", e)
             return null
         }
     }
