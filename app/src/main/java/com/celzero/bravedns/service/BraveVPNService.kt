@@ -406,22 +406,15 @@ class BraveVPNService :
                 return FirewallRuleset.RULE8
             }
 
-            val perAppDomainTentativeRule = getDomainRule(connInfo.query, uid)
-            val perAppIpTentativeRule = uidIpStatus(uid, connInfo.destIP, connInfo.destPort)
-
-            when (perAppDomainTentativeRule) {
+            when (getDomainRule(connInfo.query, uid)) {
                 DomainRulesManager.Status.BLOCK -> {
                     logd("firewall: domain blocked, $uid")
                     return FirewallRuleset.RULE2E
                 }
 
                 DomainRulesManager.Status.TRUST -> {
-                    if (!perAppIpTentativeRule.isBlocked()) {
-                        logd("firewall: domain trusted, $uid")
-                        return FirewallRuleset.RULE2F
-                    } else {
-                        // fall-through, check ip rules
-                    }
+                    logd("firewall: domain trusted, $uid")
+                    return FirewallRuleset.RULE2F
                 }
 
                 DomainRulesManager.Status.NONE -> {
@@ -430,7 +423,7 @@ class BraveVPNService :
             }
 
             // IP rules
-            when (perAppIpTentativeRule) {
+            when (uidIpStatus(uid, connInfo.destIP, connInfo.destPort)) {
                 IpRulesManager.IpRuleStatus.BLOCK -> {
                     logd("firewall: ip blocked, $uid")
                     return FirewallRuleset.RULE2
@@ -464,7 +457,6 @@ class BraveVPNService :
             }
 
             val globalDomainRule = getDomainRule(connInfo.query, UID_EVERYBODY)
-            val globalIpRule = globalIpRule(connInfo.destIP, connInfo.destPort)
 
             // should firewall rules by-pass universal firewall rules (previously whitelist)
             if (appStatus.bypassUniversal()) {
@@ -487,12 +479,8 @@ class BraveVPNService :
             // check for global domain allow/block domains
             when (globalDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
-                    if (!globalIpRule.isBlocked()) {
-                        logd("firewall: global domain trusted, $uid, ${connInfo.query}")
-                        return FirewallRuleset.RULE2I
-                    } else {
-                        // fall-through, check ip rules
-                    }
+                    logd("firewall: global domain trusted, $uid, ${connInfo.query}")
+                    return FirewallRuleset.RULE2I
                 }
 
                 DomainRulesManager.Status.BLOCK -> {
@@ -506,7 +494,7 @@ class BraveVPNService :
             }
 
             // should ip rules by-pass or block universal firewall rules
-            when (globalIpRule) {
+            when (globalIpRule(connInfo.destIP, connInfo.destPort)) {
                 IpRulesManager.IpRuleStatus.BLOCK -> {
                     logd("firewall: global ip blocked, $uid, ${connInfo.destIP}")
                     return FirewallRuleset.RULE2D
