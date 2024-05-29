@@ -276,11 +276,13 @@ class BraveVPNService :
 
         this.protect(fid.toInt())
 
+        if (nws.isEmpty()) {
+            Logger.w(LOG_TAG_VPN, "no network to bind, who: $who, $addrPort")
+            return
+        }
+
         var pfd: ParcelFileDescriptor? = null
         try {
-
-            pfd = ParcelFileDescriptor.adoptFd(fid.toInt())
-
             // split the addrPort to get the IP address and convert it to InetAddress
             val dest = IpRulesManager.splitHostPort(addrPort)
             val destIp = IPAddressString(dest.first).address
@@ -291,12 +293,13 @@ class BraveVPNService :
             // network with zero addresses
             if (
                 (destIp.isZero && who.startsWith(ProxyManager.ID_WG_BASE)) ||
-                destIp.isAnyLocal ||
-                destIp.isLoopback
+                destIp.isZero || destIp.isLoopback
             ) {
                 logd("bind: invalid destIp: $destIp, who: $who, $addrPort")
                 return
             }
+
+            pfd = ParcelFileDescriptor.adoptFd(fid.toInt())
 
             // check if the destination port is DNS port, if so bind to the network where the dns
             // belongs to, else bind to the available network
@@ -324,7 +327,7 @@ class BraveVPNService :
         } finally {
             pfd?.detachFd()
         }
-        logd("bind: no network to bind, ${curnet?.dnsServers?.keys}, who: $who, $addrPort")
+        Logger.w( LOG_TAG_VPN, "bind failed: $who, $addrPort, $fid")
     }
 
     private fun bindToNw(net: Network, pfd: ParcelFileDescriptor): Boolean {
