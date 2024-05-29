@@ -28,6 +28,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.app.UiModeManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -35,6 +36,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
+import android.content.res.Configuration
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -1273,11 +1275,18 @@ class BraveVPNService :
         // 1. Pause / Resume, Stop action button.
         // 2. RethinkDNS modes (dns & dns+firewall mode)
         // 3. No action button.
-        logd("notification action type:  ${persistentState.notificationActionType}")
+        val isAppLockEnabled = persistentState.biometricAuth && !isAppRunningOnTv()
+        // do not show notification action when app lock is enabled
+        val notifActionType = if (isAppLockEnabled) {
+            NotificationActionType.NONE
+        } else {
+            NotificationActionType.getNotificationActionType(
+                persistentState.notificationActionType
+            )
+        }
+        logd("notification action type: ${persistentState.notificationActionType}, $notifActionType")
 
-        when (
-            NotificationActionType.getNotificationActionType(persistentState.notificationActionType)
-        ) {
+        when (notifActionType) {
             NotificationActionType.PAUSE_STOP -> {
                 // Add the action based on AppState (PAUSE/ACTIVE)
                 val openIntent1 =
@@ -1343,6 +1352,7 @@ class BraveVPNService :
 
             NotificationActionType.NONE -> {
                 Logger.i(LOG_TAG_VPN, "No notification action")
+                builder.setContentTitle(contentTitle)
             }
         }
 
@@ -1368,6 +1378,15 @@ class BraveVPNService :
             notification.flags = Notification.FLAG_NO_CLEAR
         }
         return notification
+    }
+
+    private fun isAppRunningOnTv(): Boolean {
+        return try {
+            val uiModeManager: UiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
+            uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
+        } catch (ignored: Exception) {
+            false
+        }
     }
 
     // keep in sync with RefreshDatabase#makeVpnIntent
@@ -1724,6 +1743,11 @@ class BraveVPNService :
             }
 
             PersistentState.NOTIFICATION_ACTION -> {
+                notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+            }
+
+            PersistentState.BIOMETRIC_AUTH -> {
+                // update the notification builder to show the action buttons based on the biometric
                 notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
             }
 
