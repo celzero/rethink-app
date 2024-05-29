@@ -36,7 +36,15 @@ class BraveTileService : TileService(), KoinComponent {
     private val persistentState by inject<PersistentState>()
 
     override fun onCreate() {
-        persistentState.vpnEnabledLiveData.observeForever(this::updateTile)
+        // may be called multiple times, but we only need to observe once
+        // can't use onStartListening() as it is not called when the tile is added
+        // to the quick settings panel
+        super.onCreate()
+        try {
+            persistentState.vpnEnabledLiveData.observeForever(this::updateTile)
+        } catch (e: Exception) {
+            Logger.w(Logger.LOG_TAG_UI, "Tile: err in observing VPN state", e)
+        }
     }
 
     private fun updateTile(enabled: Boolean) {
@@ -46,16 +54,36 @@ class BraveTileService : TileService(), KoinComponent {
         }
     }
 
+    override fun onStartListening() {
+        super.onStartListening()
+        try {
+            persistentState.vpnEnabledLiveData.observeForever(this::updateTile)
+        } catch (e: Exception) {
+            Logger.w(Logger.LOG_TAG_UI, "Tile: err in observing VPN state", e)
+        }
+        updateTile(persistentState.getVpnEnabled())
+    }
+
+    override fun onStopListening() {
+        super.onStopListening()
+        try {
+            persistentState.vpnEnabledLiveData.removeObserver(this::updateTile)
+        } catch (e: Exception) {
+            Logger.w(Logger.LOG_TAG_UI, "Tile: err in removing observer", e)
+        }
+    }
+
     override fun onClick() {
         super.onClick()
-
-        if (VpnController.isOn()) {
+        val isAppLockEnabled = persistentState.biometricAuth
+        // do not start or stop VPN if app lock is enabled
+        if (VpnController.isOn() && !isAppLockEnabled) {
             VpnController.stop(this)
-        } else if (VpnService.prepare(this) == null) {
-            // Start VPN service when VPN permission has been granted.
+        } else if (VpnService.prepare(this) == null && !isAppLockEnabled) {
+            // Start VPN service when VPN permission has been granted
             VpnController.start(this)
         } else {
-            // open Main activity when VPN permission has not been granted.
+            // open the app to handle the VPN start or stop
             val intent =
                 if (Utilities.isHeadlessFlavour()) {
                     Intent(this, PrepareVpnActivity::class.java)
@@ -68,8 +96,9 @@ class BraveTileService : TileService(), KoinComponent {
                 if (Utilities.isAtleastU()) {
                     startActivityAndCollapse(pendingIntent)
                 } else {
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivityAndCollapse(intent)
+                    // For older versions, convert PendingIntent to Intent and start the activity
+                    val newIntent = Intent(intent).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(newIntent)
                 }
             } catch (e: UnsupportedOperationException) {
                 // starting activity from TileService using an Intent is not allowed

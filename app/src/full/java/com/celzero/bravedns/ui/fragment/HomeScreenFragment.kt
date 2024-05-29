@@ -1161,6 +1161,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // versions.
                 // VpnService.prepare() is now registered with requireContext() instead of context.
                 // Issue #469
+                Logger.i(LOG_TAG_VPN, "Preparing VPN service")
                 VpnService.prepare(requireContext())
             } catch (e: NullPointerException) {
                 // This exception is not mentioned in the documentation, but it has been encountered
@@ -1172,9 +1173,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // If the VPN.prepare() is not null, then the first time VPN dialog is shown, Show info
         // dialog before that.
         if (prepareVpnIntent != null) {
+            Logger.i(LOG_TAG_VPN, "VPN service is prepared")
             showFirstTimeVpnDialog(prepareVpnIntent)
             return false
         }
+        Logger.i(LOG_TAG_VPN, "VPN service is prepared, starting VPN service")
         return true
     }
 

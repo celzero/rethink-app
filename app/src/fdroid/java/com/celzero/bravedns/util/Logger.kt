@@ -70,6 +70,10 @@ object Logger : KoinComponent {
         log(tag, message, LoggerType.ERROR, e)
     }
 
+    fun crash(tag: String, message: String, e: Exception) {
+        log(tag, message, LoggerType.ERROR, e)
+    }
+
     fun updateConfigLevel(level: Long) {
         logLevel = level
     }

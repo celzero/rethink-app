@@ -58,6 +58,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val CONNECTIVITY_CHECKS = "connectivity_check"
         const val NOTIFICATION_PERMISSION = "notification_permission_request"
         const val EXCLUDE_APPS_IN_PROXY = "exclude_apps_in_proxy"
+        const val BIOMETRIC_AUTH = "biometric_authentication"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops

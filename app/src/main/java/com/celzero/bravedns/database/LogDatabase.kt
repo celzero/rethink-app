@@ -130,7 +130,7 @@ abstract class LogDatabase : RoomDatabase() {
                 }
                 db.enableWriteAheadLogging()
             } catch (ignored: Exception) {
-                Logger.e(
+                Logger.crash(
                     "MIGRATION",
                     "error migrating from v1to2 on log db: ${ignored.message}",
                     ignored

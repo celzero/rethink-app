@@ -407,6 +407,7 @@ object WireguardManager : KoinComponent {
     }
 
     fun getConfigIdForApp(uid: Int): WgConfigFilesImmutable? {
+        // this method does not account the settings "Bypass all proxies" which is app-specific
         val configId = ProxyManager.getProxyIdForApp(uid)
         if (configId == "" || !configId.contains(ProxyManager.ID_WG_BASE)) {
             Logger.d(LOG_TAG_PROXY, "app config mapping not found for uid: $uid")

@@ -893,7 +893,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    private fun newDefaultTransport(url: String): intra.DefaultDNS {
+    private fun newDefaultTransport(url: String): intra.DefaultDNS? {
         val defaultDns = FALLBACK_DNS
         try {
             // when the url is empty, set the default transport to 8.8.4.4, 2001:4860:4860::8844
@@ -912,7 +912,12 @@ class GoVpnAdapter : KoinComponent {
             Logger.e(LOG_TAG_VPN, "err new default transport($url): ${e.message}", e)
             // most of the android devices have google dns, so add it as default transport
             // TODO: notify the user that the default transport could not be set
-            return Intra.newDefaultDNS(Backend.DNS53, defaultDns, "")
+            try {
+                return Intra.newDefaultDNS(Backend.DNS53, defaultDns, "")
+            } catch (e: Exception) {
+                Logger.crash(LOG_TAG_VPN, "err add $defaultDns transport: ${e.message}", e)
+                return null
+            }
         }
     }
 
@@ -1138,7 +1143,7 @@ class GoVpnAdapter : KoinComponent {
             }
             return tunnel.resolver
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "err get resolver: ${e.message}", e)
+            Logger.crash(LOG_TAG_VPN, "err get resolver: ${e.message}", e)
         }
         return null
     }
@@ -1151,7 +1156,7 @@ class GoVpnAdapter : KoinComponent {
             }
             return tunnel.resolver
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "err get resolver: ${e.message}", e)
+            Logger.crash(LOG_TAG_VPN, "err get resolver: ${e.message}", e)
         }
         return null
     }

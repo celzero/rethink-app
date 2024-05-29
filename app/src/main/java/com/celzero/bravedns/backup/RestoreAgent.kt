@@ -133,7 +133,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
 
             return true
         } catch (e: Exception) {
-            Logger.e(
+            Logger.crash(
                 LOG_TAG_BACKUP_RESTORE,
                 "exception during restore process, reason? ${e.message}",
                 e
@@ -257,7 +257,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             val metadata = stream.bufferedReader().use { it.readText() }
             isVersionSupported(metadata)
         } catch (ignored: Exception) {
-            Logger.e(
+            Logger.crash(
                 LOG_TAG_BACKUP_RESTORE,
                 "error while restoring metadata, reason? ${ignored.message}",
                 ignored
@@ -316,7 +316,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             }
             return false
         } catch (e: Exception) {
-            Logger.e(
+            Logger.crash(
                 LOG_TAG_BACKUP_RESTORE,
                 "exception while restoring shared pref, reason? ${e.message}",
                 e
@@ -340,7 +340,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             // there is only one database), so do not consider the backups prior to that
             return version >= minVersionSupported && persistentState.appVersion >= version
         } catch (e: Exception) {
-            Logger.e(
+            Logger.crash(
                 LOG_TAG_BACKUP_RESTORE,
                 "error while reading metadata, reason? ${e.message}",
                 e
@@ -379,7 +379,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             )
             return true
         } catch (e: Exception) {
-            Logger.e(
+            Logger.crash(
                 LOG_TAG_BACKUP_RESTORE,
                 "exception while restoring shared pref, reason? ${e.message}",
                 e

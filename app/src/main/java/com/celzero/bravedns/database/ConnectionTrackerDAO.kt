@@ -94,9 +94,9 @@ interface ConnectionTrackerDAO {
     fun getAppIpLogs(uid: Int, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, '' as appOrDnsName FROM ConnectionTracker WHERE uid = :uid GROUP BY ipAddress, uid, port ORDER BY count DESC LIMIT 3"
+        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, '' as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to GROUP BY ipAddress, uid, port ORDER BY count DESC LIMIT 3"
     )
-    fun getAppIpLogsLimited(uid: Int): PagingSource<Int, AppConnection>
+    fun getAppIpLogsLimited(uid: Int, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
         "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to and ipAddress like :query GROUP BY ipAddress, uid, port ORDER BY count DESC"
@@ -109,9 +109,9 @@ interface ConnectionTrackerDAO {
     fun getAppDomainLogs(uid: Int, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "SELECT uid, '' as ipAddress, port, COUNT(dnsQuery) as count, flag as flag, 0 as blocked, dnsQuery as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and dnsQuery != '' GROUP BY dnsQuery ORDER BY count DESC LIMIT 3"
+        "SELECT uid, '' as ipAddress, port, COUNT(dnsQuery) as count, flag as flag, 0 as blocked, dnsQuery as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to and dnsQuery != '' GROUP BY dnsQuery ORDER BY count DESC LIMIT 3"
     )
-    fun getAppDomainLogsLimited(uid: Int): PagingSource<Int, AppConnection>
+    fun getAppDomainLogsLimited(uid: Int, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
         "SELECT uid, GROUP_CONCAT(DISTINCT ipAddress) as ipAddress, port, COUNT(dnsQuery) as count, flag as flag, 0 as blocked, dnsQuery as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to and dnsQuery != '' and dnsQuery like :query GROUP BY dnsQuery ORDER BY count DESC"

@@ -28,6 +28,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.app.UiModeManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -35,6 +36,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
+import android.content.res.Configuration
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -167,7 +169,8 @@ class BraveVPNService :
     }
 
     // handshake expiry time for proxy connections
-    private val wgHandshakeTimeout = TimeUnit.MINUTES.toMillis(3L)
+    // 120s (wireguard handshake) + 30s (router#status cache) + 10s buffer = 160s
+    private val wgHandshakeTimeout = TimeUnit.SECONDS.toMillis(160L)
     private val checkpointInterval = TimeUnit.MINUTES.toMillis(1L)
 
     private var isLockDownPrevious: Boolean = false
@@ -275,11 +278,13 @@ class BraveVPNService :
 
         this.protect(fid.toInt())
 
+        if (nws.isEmpty()) {
+            Logger.w(LOG_TAG_VPN, "no network to bind, who: $who, $addrPort")
+            return
+        }
+
         var pfd: ParcelFileDescriptor? = null
         try {
-
-            pfd = ParcelFileDescriptor.adoptFd(fid.toInt())
-
             // split the addrPort to get the IP address and convert it to InetAddress
             val dest = IpRulesManager.splitHostPort(addrPort)
             val destIp = IPAddressString(dest.first).address
@@ -290,12 +295,13 @@ class BraveVPNService :
             // network with zero addresses
             if (
                 (destIp.isZero && who.startsWith(ProxyManager.ID_WG_BASE)) ||
-                destIp.isAnyLocal ||
-                destIp.isLoopback
+                destIp.isZero || destIp.isLoopback
             ) {
                 logd("bind: invalid destIp: $destIp, who: $who, $addrPort")
                 return
             }
+
+            pfd = ParcelFileDescriptor.adoptFd(fid.toInt())
 
             // check if the destination port is DNS port, if so bind to the network where the dns
             // belongs to, else bind to the available network
@@ -323,7 +329,7 @@ class BraveVPNService :
         } finally {
             pfd?.detachFd()
         }
-        logd("bind: no network to bind, ${curnet?.dnsServers?.keys}, who: $who, $addrPort")
+        Logger.w( LOG_TAG_VPN, "bind failed: $who, $addrPort, $fid")
     }
 
     private fun bindToNw(net: Network, pfd: ParcelFileDescriptor): Boolean {
@@ -405,22 +411,15 @@ class BraveVPNService :
                 return FirewallRuleset.RULE8
             }
 
-            val perAppDomainTentativeRule = getDomainRule(connInfo.query, uid)
-            val perAppIpTentativeRule = uidIpStatus(uid, connInfo.destIP, connInfo.destPort)
-
-            when (perAppDomainTentativeRule) {
+            when (getDomainRule(connInfo.query, uid)) {
                 DomainRulesManager.Status.BLOCK -> {
                     logd("firewall: domain blocked, $uid")
                     return FirewallRuleset.RULE2E
                 }
 
                 DomainRulesManager.Status.TRUST -> {
-                    if (!perAppIpTentativeRule.isBlocked()) {
-                        logd("firewall: domain trusted, $uid")
-                        return FirewallRuleset.RULE2F
-                    } else {
-                        // fall-through, check ip rules
-                    }
+                    logd("firewall: domain trusted, $uid")
+                    return FirewallRuleset.RULE2F
                 }
 
                 DomainRulesManager.Status.NONE -> {
@@ -429,7 +428,7 @@ class BraveVPNService :
             }
 
             // IP rules
-            when (perAppIpTentativeRule) {
+            when (uidIpStatus(uid, connInfo.destIP, connInfo.destPort)) {
                 IpRulesManager.IpRuleStatus.BLOCK -> {
                     logd("firewall: ip blocked, $uid")
                     return FirewallRuleset.RULE2
@@ -463,7 +462,6 @@ class BraveVPNService :
             }
 
             val globalDomainRule = getDomainRule(connInfo.query, UID_EVERYBODY)
-            val globalIpRule = globalIpRule(connInfo.destIP, connInfo.destPort)
 
             // should firewall rules by-pass universal firewall rules (previously whitelist)
             if (appStatus.bypassUniversal()) {
@@ -486,12 +484,8 @@ class BraveVPNService :
             // check for global domain allow/block domains
             when (globalDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
-                    if (!globalIpRule.isBlocked()) {
-                        logd("firewall: global domain trusted, $uid, ${connInfo.query}")
-                        return FirewallRuleset.RULE2I
-                    } else {
-                        // fall-through, check ip rules
-                    }
+                    logd("firewall: global domain trusted, $uid, ${connInfo.query}")
+                    return FirewallRuleset.RULE2I
                 }
 
                 DomainRulesManager.Status.BLOCK -> {
@@ -505,7 +499,7 @@ class BraveVPNService :
             }
 
             // should ip rules by-pass or block universal firewall rules
-            when (globalIpRule) {
+            when (globalIpRule(connInfo.destIP, connInfo.destPort)) {
                 IpRulesManager.IpRuleStatus.BLOCK -> {
                     logd("firewall: global ip blocked, $uid, ${connInfo.destIP}")
                     return FirewallRuleset.RULE2D
@@ -588,7 +582,7 @@ class BraveVPNService :
             }
         } catch (iex: Exception) {
             // TODO: show alerts to user on such exceptions, in a separate ui?
-            Logger.e(LOG_TAG_VPN, "err blocking conn, block anyway", iex)
+            Logger.crash(LOG_TAG_VPN, "unexpected err in firewall(), block anyway", iex)
             return FirewallRuleset.RULE1C
         }
 
@@ -1281,11 +1275,18 @@ class BraveVPNService :
         // 1. Pause / Resume, Stop action button.
         // 2. RethinkDNS modes (dns & dns+firewall mode)
         // 3. No action button.
-        logd("notification action type:  ${persistentState.notificationActionType}")
+        val isAppLockEnabled = persistentState.biometricAuth && !isAppRunningOnTv()
+        // do not show notification action when app lock is enabled
+        val notifActionType = if (isAppLockEnabled) {
+            NotificationActionType.NONE
+        } else {
+            NotificationActionType.getNotificationActionType(
+                persistentState.notificationActionType
+            )
+        }
+        logd("notification action type: ${persistentState.notificationActionType}, $notifActionType")
 
-        when (
-            NotificationActionType.getNotificationActionType(persistentState.notificationActionType)
-        ) {
+        when (notifActionType) {
             NotificationActionType.PAUSE_STOP -> {
                 // Add the action based on AppState (PAUSE/ACTIVE)
                 val openIntent1 =
@@ -1351,6 +1352,7 @@ class BraveVPNService :
 
             NotificationActionType.NONE -> {
                 Logger.i(LOG_TAG_VPN, "No notification action")
+                builder.setContentTitle(contentTitle)
             }
         }
 
@@ -1376,6 +1378,15 @@ class BraveVPNService :
             notification.flags = Notification.FLAG_NO_CLEAR
         }
         return notification
+    }
+
+    private fun isAppRunningOnTv(): Boolean {
+        return try {
+            val uiModeManager: UiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
+            uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
+        } catch (ignored: Exception) {
+            false
+        }
     }
 
     // keep in sync with RefreshDatabase#makeVpnIntent
@@ -1732,6 +1743,11 @@ class BraveVPNService :
             }
 
             PersistentState.NOTIFICATION_ACTION -> {
+                notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+            }
+
+            PersistentState.BIOMETRIC_AUTH -> {
+                // update the notification builder to show the action buttons based on the biometric
                 notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
             }
 
@@ -2554,7 +2570,7 @@ class BraveVPNService :
             }
             return builder.establish()
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, e.message ?: "err establishVpn", e)
+            Logger.crash(LOG_TAG_VPN, e.message ?: "err establishVpn", e)
             return null
         }
     }
@@ -3532,19 +3548,21 @@ class BraveVPNService :
             logd("flow: skip refresh for $id, within interval: $cpIntervalSecs")
             return
         }
-        val lastHandShake = stats.lastOK
-        if (lastHandShake <= 0) {
-            Logger.w(LOG_TAG_VPN, "flow: skip refresh, handshake never done for $id")
-            return
-        }
-        logd("flow: handshake check for $id, $lastHandShake, interval: $cpIntervalSecs")
         wgHandShakeCheckpoints[id] = realtime
-        val currTimeMs = System.currentTimeMillis()
-        val durationMs = currTimeMs - lastHandShake
-        val durationSecs = TimeUnit.MILLISECONDS.toSeconds(durationMs)
-        // if the last handshake is older than the timeout, refresh the proxy
-        val mustRefresh = durationMs > wgHandshakeTimeout
-        Logger.i(LOG_TAG_VPN, "flow: refresh $id after $durationSecs: $mustRefresh")
+        val lastHandShake = stats.lastOK
+        val mustRefresh = if (lastHandShake <= 0) {
+            Logger.w(LOG_TAG_VPN, "flow: force refresh, handshake never done for $id")
+            true // always refresh if handshake never done
+        } else {
+            logd("flow: handshake check for $id, $lastHandShake, interval: $cpIntervalSecs")
+            val currTimeMs = System.currentTimeMillis()
+            val durationMs = currTimeMs - lastHandShake
+            val durationSecs = TimeUnit.MILLISECONDS.toSeconds(durationMs)
+            val ref = durationMs > wgHandshakeTimeout
+            Logger.i(LOG_TAG_VPN, "flow: refresh $id after $durationSecs? $ref")
+            // if the last handshake is older than the timeout, refresh the proxy
+            ref
+        }
         if (mustRefresh) {
             io("proxyHandshake") { vpnAdapter?.refreshProxy(id) }
         }

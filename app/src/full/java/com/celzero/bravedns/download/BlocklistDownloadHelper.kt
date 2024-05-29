@@ -164,7 +164,7 @@ class BlocklistDownloadHelper {
                     return processCheckDownloadResponse(r)
                 }
             } catch (ex: Exception) {
-                Logger.e(LOG_TAG_DOWNLOAD, "exception in checkBlocklistUpdate: ${ex.message}", ex)
+                Logger.crash(LOG_TAG_DOWNLOAD, "exception in checkBlocklistUpdate: ${ex.message}", ex)
             }
             Logger.i(
                 LOG_TAG_DOWNLOAD,
@@ -204,7 +204,7 @@ class BlocklistDownloadHelper {
 
                 return BlocklistUpdateServerResponse(version, shouldUpdate, timestamp)
             } catch (e: JSONException) {
-                Logger.e(LOG_TAG_DOWNLOAD, "Error in parsing the response: ${e.message}", e)
+                Logger.crash(LOG_TAG_DOWNLOAD, "Error in parsing the response: ${e.message}", e)
             }
             return null
         }

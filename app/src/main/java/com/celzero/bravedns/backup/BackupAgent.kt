@@ -130,7 +130,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
 
             return zipAndCopyToDestination(tempDir, backupFileUri)
         } catch (e: Exception) {
-            Logger.e(
+            Logger.crash(
                 LOG_TAG_BACKUP_RESTORE,
                 "exception during backup process, reason? ${e.message}",
                 e
@@ -166,7 +166,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             filesPathToZip.add(metadataFile.absolutePath)
             return true
         } catch (e: Exception) {
-            Logger.e(
+            Logger.crash(
                 LOG_TAG_BACKUP_RESTORE,
                 "exception while creating meta data file, ${e.message}",
                 e
@@ -266,7 +266,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             val allPrefs = sharedPrefs.all
             output.writeObject(allPrefs)
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_BACKUP_RESTORE, "exception during shared pref backup, ${e.message}", e)
+            Logger.crash(LOG_TAG_BACKUP_RESTORE, "exception during shared pref backup, ${e.message}", e)
             return false
         } finally {
             try {
