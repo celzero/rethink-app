@@ -188,7 +188,7 @@ class WgInterface private constructor(builder: Builder) {
      *
      * @return the `Interface` represented as a series of "KEY=VALUE" lines
      */
-    fun toWgUserspaceString(): String {
+    fun toWgUserspaceString(skipListenPort: Boolean): String {
         val dnsServerStrings =
             dnsServers
                 .stream()
@@ -201,7 +201,11 @@ class WgInterface private constructor(builder: Builder) {
         sb.append("address=").append(Attribute.join(addresses)).append('\n')
         sb.append("dns=").append(Attribute.join(dnsServerStrings)).append('\n')
         sb.append("mtu=").append(mtu.orElse(1280)).append('\n')
-        listenPort.ifPresent { lp: Int? -> sb.append("listen_port=").append(lp).append('\n') }
+        // Skip the listen port if it's not set or if we're in advanced mode.
+        // In advanced mode, the port may already be in use by another interface.
+        if (!skipListenPort) {
+            listenPort.ifPresent { lp: Int? -> sb.append("listen_port=").append(lp).append('\n') }
+        }
         return sb.toString()
     }
 

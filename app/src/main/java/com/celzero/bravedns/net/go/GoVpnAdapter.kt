@@ -24,7 +24,6 @@ import android.os.ParcelFileDescriptor
 import android.widget.Toast
 import backend.Backend
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.Companion.FALLBACK_DNS
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
@@ -749,11 +748,11 @@ class GoVpnAdapter : KoinComponent {
             }
 
             val wgConfig = WireguardManager.getConfigById(proxyId)
-            val withDNS = WireguardManager.getOneWireGuardProxyId() == proxyId
-            val wgUserSpaceString = wgConfig?.toWgUserspaceString()
+            val isOneWg = WireguardManager.getOneWireGuardProxyId() == proxyId
+            val wgUserSpaceString = wgConfig?.toWgUserspaceString(isOneWg)
             getProxies()?.addProxy(id, wgUserSpaceString)
-            if (withDNS) setWireGuardDns(id)
-            Logger.i(LOG_TAG_VPN, "add wireguard proxy with $id; dns? $withDNS")
+            if (isOneWg) setWireGuardDns(id)
+            Logger.i(LOG_TAG_VPN, "add wireguard proxy with $id; dns? $isOneWg")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "error adding wireguard proxy: ${e.message}", e)
             // do not auto remove failed wg proxy, let the user decide via UI
