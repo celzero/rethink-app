@@ -1290,8 +1290,8 @@
 
     <string name="bypass_dns_firewall_tooltip">%1$s works with Rethink\'s DNS only</string>
 
-    <string name="exclude_apps_from_proxy">Bypass app from all Proxies</string>
-    <string name="exclude_apps_from_proxy_failure_toast">Bypass app from all Proxies is enabled</string>
+    <string name="exclude_apps_from_proxy">Bypass app from all proxies</string>
+    <string name="exclude_apps_from_proxy_failure_toast">This app bypasses proxies</string>
 
     <!-- app info bottom sheet -->
     <string name="bsac_title_desc" translatable="true">Rules apply to this app only.</string>
