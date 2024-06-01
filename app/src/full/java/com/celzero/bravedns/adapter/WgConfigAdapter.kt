@@ -370,12 +370,12 @@ class WgConfigAdapter(private val context: Context) :
             if (stats == null) return ""
             val rx =
                 context.getString(
-                    R.string.symbol_upload,
+                    R.string.symbol_download,
                     Utilities.humanReadableByteCount(stats.rx, true)
                 )
             val tx =
                 context.getString(
-                    R.string.symbol_download,
+                    R.string.symbol_upload,
                     Utilities.humanReadableByteCount(stats.tx, true)
                 )
             return context.getString(R.string.two_argument_space, rx, tx)

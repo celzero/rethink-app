@@ -111,7 +111,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
                 }
                 if (
                     wgInterface?.listenPort?.isPresent == true &&
-                        wgInterface?.listenPort?.get() != 1
+                        wgInterface?.listenPort?.get() != 1 && wgType.isOneWg()
                 ) {
                     b.listenPortText.setText(wgInterface?.listenPort?.get().toString())
                 }

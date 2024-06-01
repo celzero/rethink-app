@@ -317,6 +317,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         b.interfaceEdit.setOnClickListener {
             val intent = Intent(this, WgConfigEditorActivity::class.java)
             intent.putExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, configId)
+            intent.putExtra(INTENT_EXTRA_WG_TYPE, wgType.value)
             this.startActivity(intent)
         }
 
