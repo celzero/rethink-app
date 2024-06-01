@@ -1,9 +1,9 @@
 name: ⚛️ Native Sym
 
 on:
-  push:
-    tags:
-      - "v*"
+  #push:
+    #tags:
+      #- "v*"
   # docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow
   # docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows#workflow_dispatch
   # docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#onworkflow_dispatchinputs
@@ -41,8 +41,8 @@ jobs:
         run: |
           # wget opts: superuser.com/a/689340
           wgetopts="--tries=3 --retry-on-http-error=404 --waitretry=3 --no-dns-cache"
-          wget $wgetopts "https://jitpack.com/com/github/celzero/firestack/${COMMIT:0:10}/firestack-${COMMIT:0:10}-debug.aar" -O "firestack.aar"
-          unzip firestack.aar
+          wget $wgetopts "https://jitpack.com/com/github/celzero/firestack/${COMMIT:0:10}/firestack-${COMMIT:0:10}-debug.aar" -O "firestack.zip"
+          unzip firestack.zip
           firebase crashlytics:symbols:upload --app=${{ secrets.FIREBASE_APP_ID_ANDROID }} ./jni/
         shell: bash
         env:
