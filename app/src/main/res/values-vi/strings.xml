@@ -602,4 +602,21 @@
     <string name="lbl_insecure" translatable="true">(không an toàn)</string>
     <string name="failed_using_default" translatable="true">Bị thất bại: sử dụng DNS dự phòng</string>
     <string name="lbl_cache" translatable="true">Bộ nhớ tạm</string>
+    <string name="remaining_apps_dialog_title" translatable="true">Bao gồm các ứng dụng còn lại</string>
+    <string name="ci_no_rules_text" translatable="true">Không có quy tắc IP hoặc Cổng.</string>
+    <string name="ci_bypass_universal_initial" translatable="true">BU</string>
+    <string name="ci_no_rule_initial" translatable="true">N</string>
+    <string name="ci_bypass_universal" translatable="true">Bỏ qua phổ quát</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Bao gồm tất cả các ứng dụng còn lại chưa được định tuyến bởi bất kỳ Proxy nào khác</string>
+    <string name="ci_blocked_initial" translatable="true">B</string>
+    <string name="ci_no_rule" translatable="true">Không có quy tắc</string>
+    <string name="ci_dialog_error_invalid_ip" translatable="true">Địa chỉ IP, mạng con hoặc cổng không hợp lệ.</string>
+    <string name="ci_dialog_added_success" translatable="true">IP được thêm vào danh sách</string>
+    <string name="ci_bypass_universal_txt" translatable="true">Bỏ qua phổ quát</string>
+    <string name="ci_trust_txt" translatable="true">Đáng tin cậy</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">Chặn phần mềm độc hại và nội dung người lớn. Sử dụng điểm cuối DNS 1.1.1.3 của Cloudflare.</string>
+    <string name="ci_no_rule_txt" translatable="true">Không có quy tắc</string>
+    <string name="cloudflare_dns_desc" translatable="true">Không chặn bất kỳ yêu cầu DNS nào. Sử dụng điểm cuối DNS 1.1.1.1 của Cloudflare.</string>
+    <string name="ci_dialog_edittext_hint" translatable="true">Địa chỉ IP, mạng con hoặc cổng</string>
+    <string name="ci_trust_initial" translatable="true">T</string>
 </resources>

@@ -363,4 +363,8 @@
     <string name="lbl_peer" translatable="true">피어</string>
     <string name="bsct_conn_desc_blocked" translatable="true">%1$s%2$s에서 차단됨</string>
     <string name="bsct_conn_desc_allowed" translatable="true">%1$s%2$s에 허용됨</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">보호되었습니댜! DNS + 방화벽 + 프록시에 연결되었습니다.</string>
+    <string name="lbl_unselected" translatable="true">선택되지 않음</string>
+    <string name="lbl_idle" translatable="true">유휴 상태</string>
+    <string name="lbl_split" translatable="true">분할</string>
 </resources>

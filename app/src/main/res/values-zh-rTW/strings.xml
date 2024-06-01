@@ -240,7 +240,7 @@
     <string name="ada_app_status_whitelist">將繞過全局防火牆規則</string>
     <string name="brbs_title">備份與恢復</string>
     <string name="brbs_backup_complete_toast">備份完畢</string>
-    <string name="ada_noapp_dialog_message">未找到指定應用程式的資訊。此應用程式或許已被解除安裝。</string>
+    <string name="ada_noapp_dialog_message">缺少應用程式資訊。也許這個應用程式已經解除安裝了？</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">此連線因正在設定<i>一鍵 Tor 代理</i>而放行。</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="ci_no_rule">無規則</string>
@@ -308,8 +308,7 @@
     <string name="rbl_security">安全</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="rethink_max_desc">逾 50 處地點；更私密；於 fly.io 運行的遞歸解析服務</string>
-    <string name="settings_ip_dialog_ipv46">自動（實驗性）
-\n發送連線檢查以確保網路可訪問性。</string>
+    <string name="settings_ip_dialog_ipv46">自動（實驗性）</string>
     <string name="firewall_status_allow">已放行</string>
     <string name="new_app_notification_content">Rethink 攔截了新安裝的應用程式， %1$s 。</string>
     <string name="category_name_sys_apps">系統應用程式</string>
@@ -1015,4 +1014,15 @@
     <string name="one_wg_error_toast" translatable="true">停用簡單模式的 WireGuard 以切換至進階模式</string>
     <string name="catch_all_wg_dialog_title" translatable="true">永久連線</string>
     <string name="wireguard_disable_failure" translatable="true">無法關閉「永久連線的 WireGuard 」</string>
+    <string name="lbl_idle" translatable="true">閒置</string>
+    <string name="lbl_split" translatable="true">分割</string>
+    <string name="lbl_on_device" translatable="true">在設備上</string>
+    <string name="settings_connectivity_checks" translatable="true">執行連接檢查</string>
+    <string name="lbl_background_data" translatable="true">限制背景數據</string>
+    <string name="lbl_battery_optimization" translatable="true">電池優化</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">停用 %1$s</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">已受到保護！已連線至 DNS + 防火牆 + 代理。</string>
+    <string name="dc_proxy_dns_heading" translatable="true">從不代理 DNS</string>
+    <string name="exclude_apps_from_proxy">為應用程式繞過所有代理</string>
+    <string name="exclude_apps_from_proxy_failure_toast">已啟用為應用程式繞過所有代理</string>
 </resources>
