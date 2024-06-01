@@ -530,4 +530,12 @@
     <string name="lbl_allowed" translatable="true">Toegestaan</string>
     <string name="lbl_blocked" translatable="true">Geblokkeerd</string>
     <string name="lbl_all" translatable="true">Alle</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">Uit (standaard)</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">Aanhoudende melding</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Maak de melding aanhoudend</string>
+    <string name="lbl_action_required" translatable="true">Actie vereist</string>
+    <string name="lbl_logs" translatable="true">Logboeken</string>
+    <string name="lbl_create" translatable="true">Nieuw</string>
+    <string name="lbl_dns_servers" translatable="true">DNS Servers</string>
+    <string name="lbl_delete" translatable="true">Verwijderen</string>
 </resources>
