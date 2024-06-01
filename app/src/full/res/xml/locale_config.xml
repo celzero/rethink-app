@@ -18,6 +18,7 @@
     <locale android:name="pt-PT" /> <!-- Portuguese (Portugal) -->
     <locale android:name="ru" /> <!-- Russian -->
     <locale android:name="es" /> <!-- Spanish (Spain) -->
+    <locale android:name="ta" /> <!-- Tamil -->
     <locale android:name="tr" /> <!-- Turkish -->
 
     <!--
