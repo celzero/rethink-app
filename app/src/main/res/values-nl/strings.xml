@@ -538,4 +538,175 @@
     <string name="lbl_create" translatable="true">Nieuw</string>
     <string name="lbl_dns_servers" translatable="true">DNS Servers</string>
     <string name="lbl_delete" translatable="true">Verwijderen</string>
+    <string name="lbl_cache" translatable="true">Cache</string>
+    <string name="lbl_status" translatable="true">Status</string>
+    <string name="lbl_remove" translatable="true">Verwijder</string>
+    <string name="lbl_last" translatable="true">Laatste</string>
+    <string name="lbl_starting" translatable="true">Bezig met starten</string>
+    <string name="lbl_stopped" translatable="true">Gestopt</string>
+    <string name="lbl_secure" translatable="true">beveiligde</string>
+    <string name="lbl_anonymous" translatable="true">anoniem</string>
+    <string name="status_dns_server_down" translatable="true">dns server onbereikbaar</string>
+    <string name="failed_using_default" translatable="true">Fout: gebruikt nu terugval DNS</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">beschermd met wireguard &amp; privé dns</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt Relay verwijderd.</string>
+    <string name="settings_general_customize" translatable="true">aanpassen</string>
+    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimenteel)</string>
+    <string name="settings_locale_dialog_neutral" translatable="true">Help ons mee de app te vertalen</string>
+    <string name="settings_biometeric_heading" translatable="true">App-vergrendeling inschakelen</string>
+    <string name="settings_default_dns_heading" translatable="true">Kies een terugval DNS</string>
+    <string name="hs_biometeric_desc" translatable="true">Gebruik biometrische authenticatie om Rethink te ontgrendelen</string>
+    <string name="hs_biometeric_error" translatable="true">Biometische authenticatie fout</string>
+    <string name="collecting_logs_progress_text" translatable="true">Bezig met vastleggen…</string>
+    <string name="notif_channel_desc_vpn_failure" translatable="true">Informeer wanneer RethinkDNS wordt gestopt door Android of door een andere VPN app</string>
+    <string name="cd_toast_deleted" translatable="true">Domein verwijderd uit aangepaste lijst</string>
+    <string name="build__flavor_fdroid" translatable="true">fdroid</string>
+    <string name="cd_dialog_error_invalid_domain" translatable="true">Invalide URL of domeinnaam</string>
+    <string name="cd_toast_edit" translatable="true">Bewerkt</string>
+    <string name="cd_no_rule_txt" translatable="true">Geen regel</string>
+    <string name="ci_dialog_edittext_hint" translatable="true">IP-adres, subnet of poort</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Beschermd! Verbonden met DNS + Firewall + Proxy.</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Verwijder DoT endpoint?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Verwijder de DNS over TLS endpoint van de opgeslagen configuratie.</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">Connectiviteitschecks worden verstuurd om bereikbaarheid te garanderen.</string>
+    <string name="orbot_no_app_toast" translatable="true">Voeg te minste één app toe om Orbot aan te zetten</string>
+    <string name="download_update_dialog_message_ok_title" translatable="true">Up-to-date!</string>
+    <string name="settings_locale_dialog_title" translatable="true">Voorkeurstaal kiezen</string>
+    <string name="public_key_copy_toast_msg" translatable="true">Publieke sleutel gekopieerd.</string>
+    <string name="notif_channel_desc_vpn_notification" translatable="true">Informeren wanneer RethinkDNS actief is en op de achtergrond draait</string>
+    <string name="new_app_bulk_notification_title" translatable="true">Opgelet</string>
+    <string name="notif_channel_desc_proxy_failure" translatable="true">Waarschuwing voor proxy-fouten en anomalieën</string>
+    <string name="notif_dialog_pause_dialog_neutral" translatable="true">Toon</string>
+    <string name="category_name_sys_apps" translatable="true">Systeem Apps</string>
+    <string name="category_name_non_app_sys" translatable="true">Systeemdiensten</string>
+    <string name="category_name_installed" translatable="true">Geïnstalleerde apps</string>
+    <string name="lbl_ip_rules" translatable="true">IP regels</string>
+    <string name="bypass_dns_firewall" translatable="true">Omzeil dns &amp; firewall</string>
+    <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
+    <string name="hsf_whats_new_remove_text" translatable="true">Sluiten…</string>
+    <string name="hsf_blocklist_updating_text" translatable="true">Aanzetten…</string>
+    <string name="dc_other_dns_heading" translatable="true">type</string>
+    <string name="bypass_universal" translatable="true">Omzeil Universeel</string>
+    <string name="build__flavor_website" translatable="true">website</string>
+    <string name="cd_toast_added" translatable="true">Domein succesvol toegevoegd</string>
+    <string name="cd_no_rule_initial" translatable="true">N</string>
+    <string name="status_protected_with_wg" translatable="true">beschermd met wireguard</string>
+    <string name="notification_action_resume_vpn" translatable="true">DOORGAAN</string>
+    <string name="notification_action_pause_vpn" translatable="true">PAUZE</string>
+    <string name="private_dns_dialog_heading" translatable="true">Privé DNS uitzetten</string>
+    <string name="firewall_act_network_monitor_tab" translatable="true">Netwerk</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Verwijder DNSCrypt Relay?</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Verwijder de DNSCrypt relay van de opgeslagen configuratie.</string>
+    <string name="settings_connectivity_checks" translatable="true">Connectiviteitschecks uitvoeren</string>
+    <string name="settings_allow_lan_heading" translatable="true">Privé IPs niet routeren (experimenteel)</string>
+    <string name="settings_locale_heading" translatable="true">Taal Wijzigen</string>
+    <string name="settings_locale_desc" translatable="true">Voorkeurstaal kiezen</string>
+    <string name="settings_biometric_desc" translatable="true">Beveilig deze app met uw schermvergrendeling</string>
+    <string name="hs_biometeric_title" translatable="true">Ontgrendel Rethink</string>
+    <string name="lbl_background_data" translatable="true">Achtergrond gegevens beperken</string>
+    <string name="lbl_battery_optimization" translatable="true">Batterij optimalisatie</string>
+    <string name="about_sponsor_link_text" translatable="true">Sponsor</string>
+    <string name="cd_dns_crypt_relay_name" translatable="true">DNSRelay %1$s</string>
+    <string name="cd_dns_crypt_dialog_title" translatable="true">DNSCrypt Resolver of Relay toevoegen</string>
+    <string name="cd_dns_crypt_dialog_heading" translatable="true">DNSCrypt Resolver of Relay toevoegen</string>
+    <string name="cd_dns_crypt_resolver_heading" translatable="true">Resolver</string>
+    <string name="cd_dns_crypt_relay_heading" translatable="true">Relay</string>
+    <string name="cd_doh_dialog_resolver_name" translatable="true">Resolver Naam</string>
+    <string name="cd_doh_dialog_resolver_url" translatable="true">Resolver URL</string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true">TLS certificaten niet valideren (Alleen aanzetten als je weet wat je doet)</string>
+    <string name="new_app_notification_action_deny" translatable="true">Blijven blokkeren</string>
+    <string name="new_app_notification_action_toast_deny" translatable="true">Netwerkverbinding geweigerd voor de app</string>
+    <string name="notif_dialog_pause_dialog_title" translatable="true">App gepauzeerd!</string>
+    <string name="notif_dialog_pause_dialog_message" translatable="true">Toepassing in pauzetoestand, hervatten om verder te gaan</string>
+    <string name="notif_dialog_pause_dialog_negative" translatable="true">Verwerpen</string>
+    <string name="notif_channel_vpn_notification" translatable="true">Actieve VPN</string>
+    <string name="notif_channel_desc_firewall_alerts" translatable="true">Waarschuwing voor fouten en anomalieën in de firewall</string>
+    <string name="cd_dialog_edit_title" translatable="true">Bewerkt domein regel</string>
+    <string name="cd_remove_dialog_title" translatable="true">Domein verwijderen?</string>
+    <string name="cd_remove_dialog_message" translatable="true">Verwijder het domein uit de opgeslagen configuratie.</string>
+    <string name="cd_deleted_toast" translatable="true">Verwijder alle domein regels</string>
+    <string name="cd_no_rules_text" translatable="true">Geen domein regels gevonden.</string>
+    <string name="cd_dialog_error_invalid_wildcard" translatable="true">Ongeldige wildcard URL of domein</string>
+    <string name="ci_no_rules_text" translatable="true">Geen IP of Poort regels.</string>
+    <string name="ci_bypass_universal_initial" translatable="true">BU</string>
+    <string name="ci_bypass_universal_txt" translatable="true">Omzeil Universeel</string>
+    <string name="ci_no_rule_txt" translatable="true">Geen Regel</string>
+    <string name="cd_dialog_title" translatable="true">Domein regel toevoegen</string>
+    <string name="lbl_wildcard" translatable="true">Wildcard</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">fout</string>
+    <string name="settings_allow_lan_desc" translatable="true">LAN, loopback, multicast, link-local routes uitsluiten van de Rethink VPN tunnel.</string>
+    <string name="new_app_notification_action_toast_allow" translatable="true">Netwerkverbinding toegestaan voor de app</string>
+    <string name="ci_dialog_error_invalid_ip" translatable="true">Ongeldig IP-adres, subnet of poort.</string>
+    <string name="hs_biometeric_failed" translatable="true">Biometische authenticatie gefaald</string>
+    <string name="category_name_others" translatable="true">Overig</string>
+    <string name="lbl_generated" translatable="true">(gegenereerd)</string>
+    <string name="lbl_random" translatable="true">(willekeurig)</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_private_key" translatable="true">Privésleutel</string>
+    <string name="lbl_domain_rules" translatable="true">Domein regels</string>
+    <string name="lbl_auto" translatable="true">(auto)</string>
+    <string name="lbl_select_all" translatable="true">Alles selecteren</string>
+    <string name="lbl_active" translatable="true">Actief</string>
+    <string name="lbl_inactive" translatable="true">Inactief</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="lbl_fast" translatable="true">snel</string>
+    <string name="lbl_slow" translatable="true">langzaam</string>
+    <string name="lbl_very" translatable="true">heel</string>
+    <string name="lbl_app_wise" translatable="true">per applicatie</string>
+    <string name="lbl_sec" translatable="true">s</string>
+    <string name="lbl_min" translatable="true">min</string>
+    <string name="lbl_hour" translatable="true">uur</string>
+    <string name="lbl_day" translatable="true">dag</string>
+    <string name="lbl_preshared_key" translatable="true">Vooraf gedeelde sleutel</string>
+    <string name="lbl_insecure" translatable="true">(onveilig)</string>
+    <string name="lbl_optional" translatable="true">(optioneel)</string>
+    <string name="lbl_allowed_ips" translatable="true">Toegestane IPs</string>
+    <string name="lbl_save" translatable="true">opslaan</string>
+    <string name="private_dns_dialog_desc" translatable="true">De DNS instellingen van Rethink worden overgenomen door Android\'s Privé DNS.
+\n
+\nOm Rethink\'s DNS te gebruiken moet je in de Android Instellingen \"Privé DNS\" uitschakelen.</string>
+    <string name="local_blocklist_redownload" translatable="true">Up-to-date!</string>
+    <string name="hs_biometeric_feature_not_supported" translatable="true">Biometrische authenticatie is niet ondersteund of uitgeschakeld op dit apparaat</string>
+    <string name="about_connect" translatable="true">contact</string>
+    <string name="about_dialog_neutral_button" translatable="true">Functies voorstellen</string>
+    <string name="logs_disclaimer" translatable="true">De eerste 20.000 karakters laten zien</string>
+    <string name="ci_dialog_added_success" translatable="true">IP toegevoegd aan de lijst</string>
+    <string name="ci_dialog_title" translatable="true">IP/Poort regel toevoegen</string>
+    <string name="ci_no_rule_initial" translatable="true">N</string>
+    <string name="ci_trust_initial" translatable="true">T</string>
+    <string name="ci_trust_txt" translatable="true">Vertrouwd</string>
+    <string name="settings_orbot_heading" translatable="true">Orbot Configureren</string>
+    <string name="new_app_notification_content" translatable="true">RethinkDNS blokkeerde onlangs geïnstalleerde app, %1$s.</string>
+    <string name="notif_dialog_pause_dialog_positive" translatable="true">Hervatten</string>
+    <string name="notif_channel_vpn_failure" translatable="true">Inactieve VPN</string>
+    <string name="notif_channel_firewall_alerts" translatable="true">Firewall waarschuwingen</string>
+    <string name="notif_channel_proxy_failure" translatable="true">Proxy waarschuwingen</string>
+    <string name="notif_channel_download" translatable="true">Download Waarschuwingen</string>
+    <string name="ci_blocked_initial" translatable="true">B</string>
+    <string name="ci_no_rule" translatable="true">Geen Regel</string>
+    <string name="orbot_title" translatable="true">Orbot en Proxies</string>
+    <string name="cd_dns_crypt_title" translatable="true">resolvers</string>
+    <string name="orbot_bs_status_trying_connect" translatable="true">Bezig met opzetten van Orbot…</string>
+    <string name="firewall_status_bypass_dns_firewall" translatable="true">omzeilt dns &amp; firewall regels</string>
+    <string name="dc_check_update_heading" translatable="true">Prompt bij blocklist updates</string>
+    <string name="private_dns_error" translatable="true">Kan privé dns scherm niet starten.</string>
+    <string name="cd_dns_alg_desc" translatable="true">Uniek IP toewijzen per DNS aanvraag</string>
+    <string name="cd_dns_alg_heading" translatable="true">Geavanceerde DNS-filtering (experimenteel)</string>
+    <string name="ctbs_app_info_not_available_toast" translatable="true">App instellingen pagina niet gevonden</string>
+    <string name="new_app_bulk_notification_content" translatable="true">RethinkDNS blokkeerde %1$s nieuwe apps. Tik om te bekijken of te wijzigen.</string>
+    <string name="category_name_sys_components" translatable="true">Systeemcomponenten</string>
+    <string name="cd_dialog_desc" translatable="true">Een URL of domeinnaam met een optionele wildcard: *.test.com, test.com/test</string>
+    <string name="cd_blocked_initial" translatable="true">B</string>
+    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">zet</string>
+    <string name="lbl_idle" translatable="true">Inactief</string>
+    <string name="private_dns_dialog_positive" translatable="true">Ga naar Instellingen</string>
+    <string name="search_proxy_add_apps" translatable="true">Zoek apps bij naam</string>
+    <string name="settings_go_log_heading" translatable="true">Logboekniveau</string>
+    <string name="settings_rinr_heading" translatable="true">Loopback (experimenteel)</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Nooit DNS over proxy tunnelen</string>
+    <string name="lbl_private" translatable="true">privé</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="lbl_unselected" translatable="true">Ongeselecteerd</string>
 </resources>
