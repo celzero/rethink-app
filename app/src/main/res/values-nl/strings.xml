@@ -707,4 +707,6 @@
     <string name="settings_rinr_heading" translatable="true">Loopback (experimenteel)</string>
     <string name="dc_proxy_dns_heading" translatable="true">Nooit DNS over proxy tunnelen</string>
     <string name="lbl_private" translatable="true">privé</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="lbl_unselected" translatable="true">Ongeselecteerd</string>
 </resources>
