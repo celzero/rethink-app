@@ -515,4 +515,19 @@
     <string name="lbl_cancel" translatable="true">Annuleren</string>
     <string name="lbl_apply" translatable="true">Toepassen</string>
     <string name="lbl_dismiss" translatable="true">Afwijzen</string>
+    <string name="lbl_disabled" translatable="true">Uitgeschakeld</string>
+    <string name="lbl_domain" translatable="true">Domein</string>
+    <string name="lbl_maybe_blocked" translatable="true">Misschien geblokkeerd</string>
+    <string name="lbl_rules" translatable="true">regels</string>
+    <string name="lbl_configure" translatable="true">Configureren</string>
+    <string name="lbl_network" translatable="true">netwerk</string>
+    <string name="lbl_qr_code" translatable="true">QR Code</string>
+    <string name="lbl_import" translatable="true">Importeren</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_public_key" translatable="true">Publieke sleutel</string>
+    <string name="lbl_addresses" translatable="true">Adressen</string>
+    <string name="lbl_applications" translatable="true">Applicaties</string>
+    <string name="lbl_allowed" translatable="true">Toegestaan</string>
+    <string name="lbl_blocked" translatable="true">Geblokkeerd</string>
+    <string name="lbl_all" translatable="true">Alle</string>
 </resources>
