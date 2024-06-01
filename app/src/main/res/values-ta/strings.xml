@@ -151,7 +151,6 @@
     <string name="error_loading_log_file" translatable="true">பதிவு கோப்பை ஏற்றுவதில் பிழை</string>
     <string name="ctbs_app_info_not_available_toast" translatable="true">பயன்பாட்டு அமைப்புகள் பக்கம் கிடைக்கவில்லை</string>
     <string name="ctbs_app_other_apps" translatable="true">%1 $ s + %2 $ s பிற பயன்பாடுகள்)</string>
-    <string name="dns_btm_sheet_dialog_ips" translatable="true"></string>
     <string name="hs_download_positive_play_store" translatable="true">முழுமையான புதுப்பிப்பு</string>
     <string name="univ_firewall_rule_1" translatable="true">சாதனம் பூட்டப்படும் போது எல்லா பயன்பாடுகளையும் தடுக்கவும்</string>
     <string name="univ_firewall_rule_3" translatable="true">மூல பயன்பாடு தெரியாதபோது தடுக்கவும்</string>
@@ -635,7 +634,6 @@
     <string name="cd_custom_dns_proxy_title" translatable="true">தனிப்பயன் டிஎன்எச் பதிலாள்</string>
     <string name="ctbs_block_other_apps" translatable="true">%1 $ s க்கு பயன்படுத்தப்படும் விதிகள் %2 $ s பிற பயன்பாடுகளுக்கும் பொருந்தும்</string>
     <string name="ctbs_dialog_negative_btn" translatable="true">திரும்பிச் செல்லுங்கள்</string>
-    <string name="dns_btm_sheet_dialog_message" translatable="true"></string>
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">பதில் இல்லை</string>
     <string name="dns_btm_resolved_doh_no_server" translatable="true">தீர்க்கப்பட்ட %1 $ s</string>
     <string name="dns_btm_latency_ms" translatable="true">%1 $ எச்எம்எச்</string>
