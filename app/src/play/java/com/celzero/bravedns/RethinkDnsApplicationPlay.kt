@@ -20,6 +20,9 @@ import android.content.pm.ApplicationInfo
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -33,7 +36,7 @@ class RethinkDnsApplicationPlay : Application() {
 
         RethinkDnsApplication.DEBUG =
             applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE ==
-                ApplicationInfo.FLAG_DEBUGGABLE
+                    ApplicationInfo.FLAG_DEBUGGABLE
 
         startKoin {
             if (BuildConfig.DEBUG) androidLogger()
@@ -50,6 +53,12 @@ class RethinkDnsApplicationPlay : Application() {
             )
         }
 
+        CoroutineScope(SupervisorJob()).launch {
+            scheduleJobs()
+        }
+    }
+
+    private suspend fun scheduleJobs() {
         get<WorkScheduler>().scheduleAppExitInfoCollectionJob()
         get<ScheduleManager>().scheduleDatabaseRefreshJob()
         get<WorkScheduler>().scheduleDataUsageJob()
