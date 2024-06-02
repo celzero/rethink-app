@@ -403,7 +403,15 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 uiCtx {
                     if (!isAdded) return@uiCtx
                     binding.info.visibility = View.VISIBLE
-                    binding.logs.text = inputString?.slice(0 until maxLength)
+                    if (inputString == null) {
+                        binding.logs.text = getString(R.string.error_loading_log_file)
+                        return@uiCtx
+                    }
+                    if (inputString.length > maxLength) {
+                        binding.logs.text = inputString.slice(0 until maxLength)
+                    } else {
+                        binding.logs.text = inputString
+                    }
                 }
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_UI, "err loading log files to textview: ${e.message}", e)
