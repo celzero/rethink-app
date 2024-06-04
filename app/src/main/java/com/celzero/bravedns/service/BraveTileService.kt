@@ -77,7 +77,7 @@ class BraveTileService : TileService(), KoinComponent {
         super.onClick()
         val isAppLockEnabled = persistentState.biometricAuth
         // do not start or stop VPN if app lock is enabled
-        if (VpnController.isOn() && !isAppLockEnabled) {
+        if (VpnController.state().activationRequested && !isAppLockEnabled) {
             VpnController.stop(this)
         } else if (VpnService.prepare(this) == null && !isAppLockEnabled) {
             // Start VPN service when VPN permission has been granted
