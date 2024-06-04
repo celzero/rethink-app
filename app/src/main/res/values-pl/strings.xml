@@ -986,4 +986,6 @@
     <string name="battery_optimization_dialog_heading" translatable="true">Wyłącz %1$s</string>
     <string name="dc_proxy_dns_heading" translatable="true">Nigdy nie przekierowuj DNS przez proxy</string>
     <string name="lbl_on_device" translatable="true">na urządzeniu</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="lbl_split" translatable="true">Podział</string>
 </resources>
