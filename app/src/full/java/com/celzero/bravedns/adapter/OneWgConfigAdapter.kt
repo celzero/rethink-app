@@ -106,7 +106,9 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         fun update(config: WgConfigFiles) {
             b.interfaceNameText.text = config.name
             b.oneWgCheck.isChecked = config.isActive
-            updateStatus(config)
+            io {
+                updateStatus(config)
+            }
             setupClickListeners(config)
             if (config.oneWireGuard) {
                 keepStatusUpdated(config)
@@ -122,7 +124,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         }
 
         private fun keepStatusUpdated(config: WgConfigFiles) {
-            statusCheckJob = ui {
+            statusCheckJob = io {
                 while (true) {
                     updateStatus(config)
                     delay(ONE_SEC)
@@ -158,7 +160,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             }
         }
 
-        private fun updateStatus(config: WgConfigFiles) {
+        private suspend fun updateStatus(config: WgConfigFiles) {
             // if the view is not active then cancel the job
             if (
                 lifecycleOwner
@@ -181,9 +183,11 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 } else {
                     false
                 }
-            updateStatusUi(config, statusId, stats)
-            updateProtocolChip(pair)
-            updateSplitTunnelChip(isSplitTunnel)
+            uiCtx {
+                updateStatusUi(config, statusId, stats)
+                updateProtocolChip(pair)
+                updateSplitTunnelChip(isSplitTunnel)
+            }
         }
 
         private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, stats: Stats?) {
@@ -363,11 +367,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         withContext(Dispatchers.Main) { f() }
     }
 
-    private fun ui(f: suspend () -> Unit): Job? {
-        return lifecycleOwner?.lifecycleScope?.launch(Dispatchers.Main) { f() }
-    }
-
-    private fun io(f: suspend () -> Unit) {
-        lifecycleOwner?.lifecycleScope?.launch(Dispatchers.IO) { f() }
+    private fun io(f: suspend () -> Unit): Job? {
+        return lifecycleOwner?.lifecycleScope?.launch(Dispatchers.IO) { f() }
     }
 }

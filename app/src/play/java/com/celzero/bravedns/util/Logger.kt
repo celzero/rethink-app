@@ -17,6 +17,9 @@ import android.util.Log
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Utilities
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -38,6 +41,7 @@ object Logger : KoinComponent {
     const val LOG_PROVIDER = "BlocklistProvider"
     const val LOG_TAG_PROXY = "ProxyLogs"
     const val LOG_QR_CODE = "QrCodeFromFileScanner"
+    const val LOG_GO_LOGGER = "GoLogger"
 
     enum class LoggerType(val id: Int) {
         VERY_VERBOSE(0),
@@ -45,7 +49,9 @@ object Logger : KoinComponent {
         DEBUG(2),
         INFO(3),
         WARN(4),
-        ERROR(5)
+        ERROR(5),
+        STACKTRACE(6),
+        NONE(7)
     }
 
     fun vv(tag: String, message: String) {
@@ -72,17 +78,20 @@ object Logger : KoinComponent {
         log(tag, message, LoggerType.ERROR, e)
     }
 
-    fun crash(tag: String, message: String, e: Exception) {
+    fun crash(tag: String, message: String, e: Exception? = null) {
         log(tag, message, LoggerType.ERROR, e)
         if (Utilities.isPlayStoreFlavour()) {
-            try {
-                val crashlytics = FirebaseCrashlytics.getInstance()
-                crashlytics.log("$tag: $message")
-                crashlytics.recordException(e)
-                // send the unsent reports, if any as the crash is important to be reported.
-                crashlytics.sendUnsentReports()
-            } catch (ex: Exception) {
-                Log.e(LOG_TAG_APP_UPDATE, "Error in logging to crashlytics: ${ex.message}")
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val crashlytics = FirebaseCrashlytics.getInstance()
+                    crashlytics.log("$tag: $message")
+                    if (e != null) crashlytics.recordException(e)
+                    else crashlytics.recordException(Exception(message))
+                    // send the unsent reports, if any as the crash is important to be reported.
+                    crashlytics.sendUnsentReports()
+                } catch (ex: Exception) {
+                    Log.e(LOG_TAG_APP_UPDATE, "Error in logging to crashlytics: ${ex.message}")
+                }
             }
         }
     }
@@ -107,6 +116,8 @@ object Logger : KoinComponent {
             LoggerType.INFO -> if (logLevel <= LoggerType.INFO.id) Log.i(tag, msg)
             LoggerType.WARN -> if (logLevel <= LoggerType.WARN.id) Log.w(tag, msg, e)
             LoggerType.ERROR -> if (logLevel <= LoggerType.ERROR.id) Log.e(tag, msg, e)
+            LoggerType.STACKTRACE -> if (logLevel <= LoggerType.ERROR.id) Log.e(tag, msg, e)
+            LoggerType.NONE -> {} // Do nothing
         }
     }
 }

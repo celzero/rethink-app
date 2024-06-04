@@ -17,6 +17,7 @@
 package com.celzero.bravedns.service
 
 import Logger
+import Logger.LOG_GO_LOGGER
 import Logger.LOG_TAG_VPN
 import android.app.ActivityManager
 import android.app.ForegroundServiceStartNotAllowedException
@@ -29,6 +30,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.app.UiModeManager
+import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -138,6 +140,7 @@ class BraveVPNService :
 
     companion object {
         const val SERVICE_ID = 1 // Only has to be unique within this app.
+        const val MEMORY_NOTIFICATION_ID = 29001
 
         private const val MAIN_CHANNEL_ID = "vpn"
         private const val WARNING_CHANNEL_ID = "warning"
@@ -329,7 +332,7 @@ class BraveVPNService :
         } finally {
             pfd?.detachFd()
         }
-        Logger.w( LOG_TAG_VPN, "bind failed: $who, $addrPort, $fid")
+        Logger.w(LOG_TAG_VPN, "bind failed: $who, $addrPort, $fid")
     }
 
     private fun bindToNw(net: Network, pfd: ParcelFileDescriptor): Boolean {
@@ -1850,7 +1853,7 @@ class BraveVPNService :
 
         if (ids.isEmpty()) return
 
-        vpnAdapter?.closeConnections(ids)
+        io("closeConn") { vpnAdapter?.closeConnections(ids) }
     }
 
     private suspend fun addTransport() {
@@ -3014,7 +3017,7 @@ class BraveVPNService :
                 ProxyManager.ID_WG_BASE + id
             } else if (WireguardManager.catchAllEnabled()) {
                 // if the enabled wireguard is catchall-wireguard, then return wireguard id
-                val id = WireguardManager.getCatchAllWireGuardProxyId() ?: return Backend.Base
+                val id = WireguardManager.getOptimalCatchAllConfigId() ?: return Backend.Base
                 ProxyManager.ID_WG_BASE + id
             } else {
                 // if the enabled wireguard is not one-wireguard, then return base
@@ -3022,7 +3025,7 @@ class BraveVPNService :
             }
         } else if (WireguardManager.catchAllEnabled()) { // check even if wireguard is not enabled
             // if the enabled wireguard is catchall-wireguard, then return wireguard id
-            val id = WireguardManager.getCatchAllWireGuardProxyId() ?: return Backend.Base
+            val id = WireguardManager.getOptimalCatchAllConfigId() ?: return Backend.Base
             // in this case, no need to check if the proxy is available
             ProxyManager.ID_WG_BASE + id
         } else {
@@ -3044,6 +3047,7 @@ class BraveVPNService :
         // clear the proxy handshake times
         logd("onProxiesStopped; clear the handshake times")
         wgHandShakeCheckpoints.clear()
+        WireguardManager.clearCatchAllCache()
     }
 
     override fun onProxyAdded(id: String) {
@@ -3053,9 +3057,11 @@ class BraveVPNService :
         }
         wgHandShakeCheckpoints[id] = elapsedRealtime()
         // new proxy added, refresh overlay network pair
-        val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
-        logd("onProxyAdded for proxy $id: $nw")
-        onOverlayNetworkChanged(nw ?: OverlayNetworks())
+        io("onProxyAdded") {
+            val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
+            logd("onProxyAdded for proxy $id: $nw")
+            onOverlayNetworkChanged(nw ?: OverlayNetworks())
+        }
     }
 
     override fun onProxyRemoved(id: String) {
@@ -3064,10 +3070,13 @@ class BraveVPNService :
             return
         }
         wgHandShakeCheckpoints.remove(id)
+        WireguardManager.clearCatchAllCacheForApp(id)
         // proxy removed, refresh overlay network pair
-        val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
-        logd("onProxyRemoved for proxy $id: $nw")
-        onOverlayNetworkChanged(nw ?: OverlayNetworks())
+        io("onProxyRemoved") {
+            val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
+            logd("onProxyRemoved for proxy $id: $nw")
+            onOverlayNetworkChanged(nw ?: OverlayNetworks())
+        }
     }
 
     override fun onDNSAdded(id: String) {
@@ -3097,6 +3106,18 @@ class BraveVPNService :
         dipport: String?
     ): Tab {
         return Tab()
+    }
+
+    override fun err(s: String) {
+        Logger.e(LOG_GO_LOGGER, s)
+    }
+
+    override fun log(s: String) {
+        Logger.i(LOG_GO_LOGGER, s)
+    }
+
+    override fun stack(s: String) {
+        Logger.crash(LOG_GO_LOGGER, s)
     }
 
     override fun onSocketClosed(s: SocketSummary?) {
@@ -3523,7 +3544,7 @@ class BraveVPNService :
         return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid)
     }
 
-    private fun handleProxyHandshake(id: String) {
+    private suspend fun handleProxyHandshake(id: String) {
         if (!id.startsWith(ProxyManager.ID_WG_BASE)) {
             // only wireguard proxies are considered for handshakes
             return
@@ -3535,7 +3556,7 @@ class BraveVPNService :
             return
         }
 
-        val stats = vpnAdapter?.getProxyStats(id)
+        val stats = getProxyStats(id)
         if (stats == null) {
             Logger.w(LOG_TAG_VPN, "flow: stats is null for $id")
             return
@@ -3590,12 +3611,16 @@ class BraveVPNService :
         io("refreshWg") { vpnAdapter?.refreshProxies() }
     }
 
-    fun getDnsStatus(id: String): Long? {
+    suspend fun getDnsStatus(id: String): Long? {
         return vpnAdapter?.getDnsStatus(id)
     }
 
     suspend fun getRDNS(type: RethinkBlocklistManager.RethinkBlocklistType): RDNS? {
         return vpnAdapter?.getRDNS(type)
+    }
+
+    suspend fun goBuildVersion(): String {
+        return vpnAdapter?.goBuildVersion() ?: ""
     }
 
     private fun persistAndConstructFlowResponse(
@@ -3702,7 +3727,7 @@ class BraveVPNService :
         )
     }
 
-    fun getProxyStatusById(id: String): Long? {
+    suspend fun getProxyStatusById(id: String): Long? {
         return if (vpnAdapter != null) {
             val status = vpnAdapter?.getProxyStatusById(id)
             status
@@ -3712,7 +3737,7 @@ class BraveVPNService :
         }
     }
 
-    fun getProxyStats(id: String): Stats? {
+    suspend fun getProxyStats(id: String): Stats? {
         return if (vpnAdapter != null) {
             vpnAdapter?.getProxyStats(id)
         } else {
@@ -3721,7 +3746,7 @@ class BraveVPNService :
         }
     }
 
-    fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean>? {
+    suspend fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean>? {
         return if (vpnAdapter != null) {
             vpnAdapter?.getSupportedIpVersion(id)
         } else {
@@ -3730,11 +3755,35 @@ class BraveVPNService :
         }
     }
 
-    fun isSplitTunnelProxy(id: String, pair: Pair<Boolean, Boolean>): Boolean {
+    suspend fun isSplitTunnelProxy(id: String, pair: Pair<Boolean, Boolean>): Boolean {
         return vpnAdapter?.isSplitTunnelProxy(id, pair) ?: false
     }
 
     fun syncP50Latency(id: String) {
         io("syncP50Latency") { vpnAdapter?.syncP50Latency(id) }
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        Logger.i(LOG_TAG_VPN, "onTrimMemory: $level")
+        if (level >= ComponentCallbacks2.TRIM_MEMORY_BACKGROUND) {
+            // TODO: call go to clear the cache
+            // show notification to user, that the app is consuming more memory
+            showMemoryNotification()
+        }
+    }
+
+    private fun showMemoryNotification() {
+        val notification = NotificationCompat.Builder(this, WARNING_CHANNEL_ID)
+            .setContentTitle(getString(R.string.app_name))
+            .setContentText(getString(R.string.memory_notification_text))
+            .setSmallIcon(R.drawable.ic_notification)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .build()
+
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(MEMORY_NOTIFICATION_ID, notification)
     }
 }

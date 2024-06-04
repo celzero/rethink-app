@@ -159,11 +159,7 @@ class DnsCryptEndpointAdapter(private val context: Context, private val appConfi
                 return
             }
 
-            // always use the id as Dnsx.Preffered as it is the primary dns id for now
-            val state = VpnController.getDnsStatus(Backend.Preferred)
-            val status = UIUtils.getDnsStatusStringRes(state)
-            b.dnsCryptEndpointListUrlExplanation.text =
-                context.getString(status).replaceFirstChar(Char::titlecase)
+            updateDnsStatus()
         }
 
         private fun showExplanationOnImageClick(dnsCryptEndpoint: DnsCryptEndpoint) {
@@ -241,6 +237,17 @@ class DnsCryptEndpointAdapter(private val context: Context, private val appConfi
             io {
                 endpoint.isSelected = true
                 appConfig.handleDnscryptChanges(endpoint)
+            }
+        }
+
+        private fun updateDnsStatus() {
+            io {
+                val state = VpnController.getDnsStatus(Backend.Preferred)
+                val status = UIUtils.getDnsStatusStringRes(state)
+                uiCtx {
+                    b.dnsCryptEndpointListUrlExplanation.text =
+                        context.getString(status).replaceFirstChar(Char::titlecase)
+                }
             }
         }
 

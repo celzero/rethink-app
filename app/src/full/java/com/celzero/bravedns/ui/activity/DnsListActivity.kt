@@ -140,23 +140,26 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
     }
 
     private fun updateSelectedStatus() {
-        // always use the id as Dnsx.Preffered as it is the primary dns id for now
-        val state = VpnController.getDnsStatus(Backend.Preferred)
-        val working =
-            if (state == null) {
-                false
-            } else {
-                when (Transaction.Status.fromId(state)) {
-                    Transaction.Status.COMPLETE,
-                    Transaction.Status.START -> {
-                        true
-                    }
-                    else -> {
-                        false
+        io {
+            // always use the id as Dnsx.Preffered as it is the primary dns id for now
+            val state = VpnController.getDnsStatus(Backend.Preferred)
+            val working =
+                if (state == null) {
+                    false
+                } else {
+                    when (Transaction.Status.fromId(state)) {
+                        Transaction.Status.COMPLETE,
+                        Transaction.Status.START -> {
+                            true
+                        }
+
+                        else -> {
+                            false
+                        }
                     }
                 }
-            }
-        highlightSelectedUi(working)
+            uiCtx { highlightSelectedUi(working) }
+        }
     }
 
     private fun highlightSelectedUi(working: Boolean) {

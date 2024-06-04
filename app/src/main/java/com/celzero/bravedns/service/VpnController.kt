@@ -208,19 +208,19 @@ object VpnController : KoinComponent {
         braveVpnService?.decreasePauseDuration(durationMs)
     }
 
-    fun getProxyStatusById(id: String): Long? {
+    suspend fun getProxyStatusById(id: String): Long? {
         return braveVpnService?.getProxyStatusById(id)
     }
 
-    fun getProxyStats(id: String): Stats? {
+    suspend fun getProxyStats(id: String): Stats? {
         return braveVpnService?.getProxyStats(id) ?: null
     }
 
-    fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean> {
+    suspend fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean> {
         return braveVpnService?.getSupportedIpVersion(id) ?: Pair(false, false)
     }
 
-    fun isSplitTunnelProxy(id: String, pair: Pair<Boolean, Boolean>): Boolean {
+    suspend fun isSplitTunnelProxy(id: String, pair: Pair<Boolean, Boolean>): Boolean {
         return braveVpnService?.isSplitTunnelProxy(id, pair) ?: false
     }
 
@@ -300,11 +300,15 @@ object VpnController : KoinComponent {
         braveVpnService?.closeConnectionsIfNeeded(uid)
     }
 
-    fun getDnsStatus(id: String): Long? {
+    suspend fun getDnsStatus(id: String): Long? {
         return braveVpnService?.getDnsStatus(id)
     }
 
     suspend fun getRDNS(type: RethinkBlocklistManager.RethinkBlocklistType): RDNS? {
         return braveVpnService?.getRDNS(type)
+    }
+
+    suspend fun goBuildVersion(): String {
+        return braveVpnService?.goBuildVersion() ?: ""
     }
 }
