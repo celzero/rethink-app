@@ -100,7 +100,7 @@
     <string name="next">Suivant</string>
     <string name="accessibility_service_description">Rethink utilise le service d’accessibilité pour détecter et filtrer les applications en arrière-plan. Rethink ne collecte ni ne vend aucune information.</string>
     <string name="doh_custom_url_remove_dialog_title">Supprimer le point de terminaison DoH \?</string>
-    <string name="refresh_complete">Re-synchronisation de la liste des applications terminée.</string>
+    <string name="refresh_complete"><!-- use dc_refresh_toast --> Resynchronisation de la liste des applications terminée.</string>
     <string name="doh_custom_url_remove_dialog_message">Supprimer le point de terminaison DNS over HTTPS de la configuration sauvegardée.</string>
     <string name="show_logs_disabled_network_message">La journalisation de la connexion a été désactivée. Pour la réactiver, allez sur <i>Paramètres</i> et activez <i>Activer la journalisation embarquée.</i></string>
     <string name="show_logs_disabled_dns_message">La journalisation des requêtes DNS a été désactivée. Pour la réactiver, allez sur <i>Paramètres</i> et activez <i>Activer la journalisation embarquée.</i></string>
@@ -1027,4 +1027,8 @@
     <string name="lbl_split" translatable="true">Séparer</string>
     <string name="lbl_on_device" translatable="true">sur l\'appareil</string>
     <string name="dc_proxy_dns_heading" translatable="true">Ne jamais utiliser de proxy DNS</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Applications transférées par proxy de bouclage</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Lorsque désactivé, exclut les applications de redirecteur proxy (SOCKS5, HTTP, DNS) du tunnel VPN de Rethink.</string>
+    <string name="exclude_apps_from_proxy">Contourner l\'application de tous les proxys</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Contourner l\'application de tous les proxys est activé</string>
 </resources>
