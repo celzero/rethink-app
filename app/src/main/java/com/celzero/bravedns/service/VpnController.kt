@@ -213,7 +213,7 @@ object VpnController : KoinComponent {
     }
 
     suspend fun getProxyStats(id: String): Stats? {
-        return braveVpnService?.getProxyStats(id) ?: null
+        return braveVpnService?.getProxyStats(id)
     }
 
     suspend fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean> {
@@ -222,6 +222,10 @@ object VpnController : KoinComponent {
 
     suspend fun isSplitTunnelProxy(id: String, pair: Pair<Boolean, Boolean>): Boolean {
         return braveVpnService?.isSplitTunnelProxy(id, pair) ?: false
+    }
+
+    suspend fun canRouteIp(proxyId: String, ip: String, default: Boolean): Boolean {
+        return braveVpnService?.canRouteIp(proxyId, ip, default) ?: false
     }
 
     suspend fun syncP50Latency(id: String) {
