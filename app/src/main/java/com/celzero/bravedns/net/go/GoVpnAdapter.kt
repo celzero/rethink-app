@@ -21,6 +21,7 @@ import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.content.res.Resources
 import android.os.ParcelFileDescriptor
+import android.os.SystemClock
 import android.widget.Toast
 import backend.Backend
 import com.celzero.bravedns.R
@@ -72,7 +73,7 @@ class GoVpnAdapter : KoinComponent {
     private val appConfig by inject<AppConfig>()
 
     // The Intra session object from go-tun2socks.  Initially null.
-    private lateinit var tunnel: Tunnel
+    private var tunnel: Tunnel
     private var context: Context
     private var externalScope: CoroutineScope
 
@@ -888,11 +889,15 @@ class GoVpnAdapter : KoinComponent {
     }
 
     suspend fun closeTun() {
-        if (tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "Tunnel disconnect")
-            tunnel.disconnect()
-        } else {
-            Logger.i(LOG_TAG_VPN, "Tunnel already disconnected")
+        try {
+            if (tunnel.isConnected) {
+                Logger.i(LOG_TAG_VPN, "Tunnel disconnect")
+                tunnel.disconnect()
+            } else {
+                Logger.i(LOG_TAG_VPN, "Tunnel already disconnected")
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "err disconnect tunnel: ${e.message}", e)
         }
     }
 
@@ -1120,6 +1125,7 @@ class GoVpnAdapter : KoinComponent {
             // 0 - very verbose, 1 - verbose, 2 - debug, 3 - info, 4 - warn, 5 - error, 6 - stacktrace, 7 - none
             // TODO: setting for console log level?, set as STACKTRACE for now
             Intra.logLevel(level, Logger.LoggerType.STACKTRACE.id.toLong())
+            //Intra.logLevel(level, level)
             Logger.i(LOG_TAG_VPN, "set log level: $level, stacktrace")
         }
     }
@@ -1166,13 +1172,15 @@ class GoVpnAdapter : KoinComponent {
         return null
     }
 
-    suspend private fun getProxies(): backend.Proxies? {
+    private suspend fun getProxies(): backend.Proxies? {
         try {
             if (!tunnel.isConnected) {
                 Logger.w(LOG_TAG_VPN, "Tunnel NOT connected, skip get proxies")
                 return null
             }
-            return tunnel.proxies
+            val t = System.currentTimeMillis()
+            val px = tunnel.proxies
+            return px
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "err get proxies: ${e.message}", e)
         }
@@ -1181,7 +1189,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun canRouteIp(wgId: String, ip: String, default: Boolean): Boolean {
         return try {
-            val router = tunnel.proxies.getProxy(wgId).router()
+            val router = getProxies()?.getProxy(wgId)?.router() ?: return default
             val res = router.contains(ip)
             Logger.i(LOG_TAG_VPN, "canRouteIp($wgId, $ip), res? $res")
             res
@@ -1193,7 +1201,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun getSupportedIpVersion(proxyId: String): Pair<Boolean, Boolean> {
         try {
-            val router = tunnel.proxies.getProxy(proxyId).router()
+            val router = getProxies()?.getProxy(proxyId)?.router() ?: return Pair(false, false)
             val has4 = router.iP4()
             val has6 = router.iP6()
             Logger.i(LOG_TAG_VPN, "supported ip version($proxyId): has4? $has4, has6? $has6")
@@ -1206,7 +1214,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun isSplitTunnelProxy(proxyId: String, pair: Pair<Boolean, Boolean>): Boolean {
         return try {
-            val router = tunnel.proxies.getProxy(proxyId).router()
+            val router = getProxies()?.getProxy(proxyId)?.router() ?: return false
             // if the router contains 0.0.0.0, then it is not split tunnel for ipv4
             // if the router contains ::, then it is not split tunnel for ipv6
             val res: Boolean =
@@ -1234,7 +1242,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun getActiveProxiesIpAndMtu(): BraveVPNService.OverlayNetworks {
         try {
-            val router = tunnel.proxies.router()
+            val router = getProxies()?.router() ?: return BraveVPNService.OverlayNetworks()
             val has4 = router.iP4()
             val has6 = router.iP6()
             val failOpen = !router.iP4() && !router.iP6()
@@ -1265,9 +1273,5 @@ class GoVpnAdapter : KoinComponent {
 
     private fun ui(f: suspend () -> Unit) {
         externalScope.launch(Dispatchers.Main) { f() }
-    }
-
-    private fun io(f: suspend () -> Unit) {
-        externalScope.async(Dispatchers.IO) { f() }
     }
 }
