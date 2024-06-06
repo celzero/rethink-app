@@ -43,7 +43,6 @@ import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
-import java.sql.Time
 import java.util.Locale
 import java.util.concurrent.CopyOnWriteArraySet
 import java.util.concurrent.TimeUnit
@@ -419,7 +418,7 @@ object WireguardManager : KoinComponent {
         }
     }
 
-    suspend fun getConfigIdForApp(uid: Int): WgConfigFilesImmutable? {
+    suspend fun getConfigIdForApp(uid: Int, ip: String): WgConfigFilesImmutable? {
         // this method does not account the settings "Bypass all proxies" which is app-specific
         val configId = ProxyManager.getProxyIdForApp(uid)
 
@@ -439,7 +438,7 @@ object WireguardManager : KoinComponent {
                 Logger.d(LOG_TAG_PROXY, "catch all config not found for uid: $uid")
                 null
             } else {
-                val optimalId = fetchOptimalCatchAllConfig(uid)
+                val optimalId = fetchOptimalCatchAllConfig(uid, ip)
                 if (optimalId == null) {
                     Logger.d(LOG_TAG_PROXY, "no catch all config found for uid: $uid")
                     null
@@ -482,13 +481,12 @@ object WireguardManager : KoinComponent {
         uids.forEach { catchAllAppConfigCache.value -= it }
     }
 
-    private suspend fun fetchOptimalCatchAllConfig(uid: Int): Int? {
+    private suspend fun fetchOptimalCatchAllConfig(uid: Int, ip: String): Int? {
         val available = catchAllAppConfigCache.value.containsKey(uid)
         if (available) {
             val wgId = catchAllAppConfigCache.value[uid]
             if (wgId != null) {
-                val stat = VpnController.getProxyStats(ProxyManager.ID_WG_BASE + wgId)
-                if (stat != null && isValidLastOk(stat.lastOK)) {
+                if (isProxyConnectionValid(wgId, ip)) {
                     Logger.d(LOG_TAG_PROXY, "optimalCatchAllConfig: returning cached wgId: $wgId")
                     return wgId // return the already mapped wgId which is active
                 }
@@ -499,8 +497,7 @@ object WireguardManager : KoinComponent {
         Logger.d(LOG_TAG_PROXY, "optimalCatchAllConfig: fetching new wgId for uid: $uid")
         val catchAllList = mappings.filter { it.isActive && it.isCatchAll }
         catchAllList.forEach {
-            val stat = VpnController.getProxyStats(ProxyManager.ID_WG_BASE + it.id)
-            if (stat != null && isValidLastOk(stat.lastOK)) {
+            if (isProxyConnectionValid(it.id, ip)) {
                 // note the uid and wgid in a cache, so that we can use it for further requests
                 catchAllAppConfigCache.value += uid to it.id
                 Logger.d(LOG_TAG_PROXY, "optimalCatchAllConfig: returning new wgId: ${it.id}")
@@ -511,9 +508,21 @@ object WireguardManager : KoinComponent {
         return catchAllList.firstOrNull()?.id
     }
 
-    private fun isValidLastOk(lastOk: Long): Boolean {
-        // also check if the handshake is less than 3 minutes (VALID_LAST_OK_SEC)
-        return lastOk > 0L && ((System.currentTimeMillis() - lastOk) < VALID_LAST_OK_SEC)
+    private suspend fun isProxyConnectionValid(wgId: Int, ip: String, default: Boolean = false): Boolean {
+        // check if the handshake is less than 3 minutes (VALID_LAST_OK_SEC)
+        // and if the ip can be routed
+        val id = ProxyManager.ID_WG_BASE + wgId
+        val canRoute = VpnController.canRouteIp(id, ip, default)
+        Logger.d(LOG_TAG_PROXY, "isProxyConnectionValid: $wgId? can route?$canRoute")
+        return isValidLastOk(wgId) && canRoute
+    }
+
+    private suspend fun isValidLastOk(wgId: Int): Boolean {
+        val id = ProxyManager.ID_WG_BASE + wgId
+        val stat = VpnController.getProxyStats(id) ?: return false
+        val lastOk = stat.lastOK
+        Logger.d(LOG_TAG_PROXY, "isValidLastOk: $wgId? lastOk: $lastOk")
+        return (System.currentTimeMillis() - lastOk) < VALID_LAST_OK_SEC
     }
 
     private fun parseNewConfigJsonResponse(privateKey: WgKey, jsonObject: JSONObject?): Config? {
@@ -916,8 +925,7 @@ object WireguardManager : KoinComponent {
     suspend fun getOptimalCatchAllConfigId(): Int? {
         val configs = mappings.filter { it.isCatchAll && it.isActive }
         configs.forEach {
-            val stat = VpnController.getProxyStats(ProxyManager.ID_WG_BASE + it.id)
-            if (stat != null && isValidLastOk(stat.lastOK)) {
+            if (isValidLastOk(it.id)) {
                 Logger.d(LOG_TAG_PROXY, "found optimal catch all config: ${it.id}")
                 return it.id
             }
