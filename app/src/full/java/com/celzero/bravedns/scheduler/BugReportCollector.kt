@@ -77,7 +77,7 @@ class BugReportCollector(val context: Context, workerParameters: WorkerParameter
         return file
     }
 
-    private fun storePrefs(file: File) {
+    private suspend fun storePrefs(file: File) {
         // write all the shared preferences values into the file
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         BugReportZipper.dumpPrefs(prefs, file)

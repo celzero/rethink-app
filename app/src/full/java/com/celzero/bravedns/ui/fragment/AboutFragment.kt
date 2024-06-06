@@ -22,8 +22,10 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.os.SystemClock
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -48,8 +50,10 @@ import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.scheduler.BugReportZipper.FILE_PROVIDER_NAME
 import com.celzero.bravedns.scheduler.BugReportZipper.getZipFileName
+import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
@@ -293,22 +297,52 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     // ref: https://developer.android.com/guide/components/intents-filters
     private fun emailBugReport() {
-        val emailIntent = Intent(Intent.ACTION_SEND)
-        emailIntent.type = "text/plain"
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.about_mail_to)))
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_bugreport_subject))
-        emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.about_mail_bugreport_text))
-        // Get the bug_report.zip file
-        val dir = requireContext().filesDir
-        val file = File(getZipFileName(dir))
-        val uri = getFileUri(file)
-        emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
+        try {
+            // get the rethink.tombstone file
+            val tombstoneFile = EnhancedBugReport.getTombstoneZipFile(requireContext())
+            // Get the bug_report.zip file
+            val dir = requireContext().filesDir
+            val file = File(getZipFileName(dir))
+            val uri = getFileUri(file)
 
-        emailIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-        emailIntent.flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        startActivity(
-            Intent.createChooser(emailIntent, getString(R.string.about_mail_bugreport_share_title))
-        )
+            val emailIntent = if (tombstoneFile != null) {
+                Intent(Intent.ACTION_SEND_MULTIPLE)
+            } else {
+                Intent(Intent.ACTION_SEND)
+            }
+            emailIntent.type = "text/plain"
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.about_mail_to)))
+            emailIntent.putExtra(
+                Intent.EXTRA_SUBJECT,
+                getString(R.string.about_mail_bugreport_subject)
+            )
+            emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.about_mail_bugreport_text))
+
+            // attach extra as list or single file based on the availability
+            if (tombstoneFile != null) {
+                val tombstoneUri = getFileUri(tombstoneFile)
+                // send multiple attachments
+                emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, arrayListOf(uri, tombstoneUri))
+            } else {
+                emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
+            }
+            Logger.i(LOG_TAG_UI, "email with attachment: $uri, ${tombstoneFile?.path}")
+            emailIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            emailIntent.flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            startActivity(
+                Intent.createChooser(
+                    emailIntent,
+                    getString(R.string.about_mail_bugreport_share_title)
+                )
+            )
+        } catch (e: Exception) {
+            showToastUiCentered(
+                requireContext(),
+                getString(R.string.error_loading_log_file),
+                Toast.LENGTH_SHORT
+            )
+            Logger.e(LOG_TAG_UI, "error sending email: ${e.message}", e)
+        }
     }
 
     private fun getFileUri(file: File): Uri? {
@@ -412,6 +446,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                     } else {
                         binding.logs.text = inputString
                     }
+                }
+                if (isAtleastO()) {
+                    EnhancedBugReport.addLogsToZipFile(requireContext())
                 }
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_UI, "err loading log files to textview: ${e.message}", e)

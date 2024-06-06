@@ -17,9 +17,6 @@ import android.util.Log
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Utilities
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -37,12 +34,14 @@ object Logger : KoinComponent {
     const val LOG_TAG_DOWNLOAD = "DownloadManager"
     const val LOG_TAG_UI = "ActivityManager"
     const val LOG_TAG_SCHEDULER = "JobScheduler"
+    const val LOG_TAG_BUG_REPORT = "BugReport"
     const val LOG_TAG_BACKUP_RESTORE = "BackupRestore"
     const val LOG_PROVIDER = "BlocklistProvider"
     const val LOG_TAG_PROXY = "ProxyLogs"
     const val LOG_QR_CODE = "QrCodeFromFileScanner"
-    const val LOG_GO_LOGGER = "GoLogger"
+    const val LOG_GO_LOGGER = "LibLogger"
 
+    // github.com/celzero/firestack/blob/bce8de917fec5e48a41ed1e96c9d942ee0f7996b/intra/log/logger.go#L76
     enum class LoggerType(val id: Int) {
         VERY_VERBOSE(0),
         VERBOSE(1),
@@ -81,17 +80,15 @@ object Logger : KoinComponent {
     fun crash(tag: String, message: String, e: Exception? = null) {
         log(tag, message, LoggerType.ERROR, e)
         if (Utilities.isPlayStoreFlavour()) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val crashlytics = FirebaseCrashlytics.getInstance()
-                    crashlytics.log("$tag: $message")
-                    if (e != null) crashlytics.recordException(e)
-                    else crashlytics.recordException(Exception(message))
-                    // send the unsent reports, if any as the crash is important to be reported.
-                    crashlytics.sendUnsentReports()
-                } catch (ex: Exception) {
-                    Log.e(LOG_TAG_APP_UPDATE, "Error in logging to crashlytics: ${ex.message}")
-                }
+            try {
+                val crashlytics = FirebaseCrashlytics.getInstance()
+                crashlytics.log("$tag: $message")
+                if (e != null) crashlytics.recordException(e)
+                else crashlytics.recordException(Exception(message))
+                // send the unsent reports, if any as the crash is important to be reported.
+                crashlytics.sendUnsentReports()
+            } catch (ex: Exception) {
+                Log.e(LOG_TAG_APP_UPDATE, "Error in logging to crashlytics: ${ex.message}")
             }
         }
     }

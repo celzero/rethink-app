@@ -73,6 +73,8 @@ import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
+import com.celzero.bravedns.scheduler.BugReportZipper
+import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.NotificationHandlerDialog
@@ -3109,15 +3111,18 @@ class BraveVPNService :
     }
 
     override fun err(s: String) {
-        Logger.e(LOG_GO_LOGGER, s)
+        // no-op
+        // TODO: write the logs to the file, send it along the bug report
     }
 
     override fun log(s: String) {
-        Logger.i(LOG_GO_LOGGER, s)
+        // no-op
+        // TODO: write the logs to the file, send it along the bug report
     }
 
     override fun stack(s: String) {
-        Logger.crash(LOG_GO_LOGGER, s)
+        Logger.crash(LOG_GO_LOGGER, s) // log the stack trace
+        EnhancedBugReport.writeLogsToFile(this, s)
     }
 
     override fun onSocketClosed(s: SocketSummary?) {
@@ -3392,8 +3397,8 @@ class BraveVPNService :
         if (oneWgId != null && oneWgId != WireguardManager.INVALID_CONF_ID) {
             val proxyId = "${ProxyManager.ID_WG_BASE}${oneWgId}"
             // regardless of whether this proxyId exists in go, use it to avoid leaks
-            val canRoute = vpnAdapter?.canRouteIp(proxyId, connTracker.destIP, true)
-            return if (canRoute == true) {
+            val canRoute = canRouteIp(proxyId, connTracker.destIP, true)
+            return if (canRoute) {
                 handleProxyHandshake(proxyId)
                 logd("flow: one-wg is enabled, returning $proxyId, $connId, $uid")
                 persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
@@ -3406,7 +3411,7 @@ class BraveVPNService :
             }
         }
 
-        val wgConfig = WireguardManager.getConfigIdForApp(uid) // also accounts for catch-all
+        val wgConfig = WireguardManager.getConfigIdForApp(uid, connTracker.destIP) // also accounts for catch-all
         if (wgConfig != null && wgConfig.id != WireguardManager.INVALID_CONF_ID) {
             val proxyId = "${ProxyManager.ID_WG_BASE}${wgConfig.id}"
             // even if inactive, route connections to wg if lockdown/catch-all is enabled to
@@ -3418,9 +3423,9 @@ class BraveVPNService :
                 // will have the effect of blocking all connections
                 // ie, if lockdown is enabled, split-tunneling happens as expected but if
                 // lockdown is disabled, it has the effect of blocking all connections
-                val canRoute = vpnAdapter?.canRouteIp(proxyId, connTracker.destIP, true)
+                val canRoute = canRouteIp(proxyId, connTracker.destIP, true)
                 logd("flow: wg is active/lockdown/catch-all; $proxyId, $connId, $uid; canRoute? $canRoute")
-                return if (canRoute == true) {
+                return if (canRoute) {
                     handleProxyHandshake(proxyId)
                     persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
                 } else {
@@ -3757,6 +3762,10 @@ class BraveVPNService :
 
     suspend fun isSplitTunnelProxy(id: String, pair: Pair<Boolean, Boolean>): Boolean {
         return vpnAdapter?.isSplitTunnelProxy(id, pair) ?: false
+    }
+
+    suspend fun canRouteIp(id: String, ip: String, default: Boolean): Boolean {
+        return vpnAdapter?.canRouteIp(id, ip, default) ?: false
     }
 
     fun syncP50Latency(id: String) {
