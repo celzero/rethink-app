@@ -49,7 +49,33 @@ object Logger : KoinComponent {
         WARN(4),
         ERROR(5),
         STACKTRACE(6),
-        NONE(7)
+        USR(7),
+        NONE(8);
+
+        companion object {
+            fun fromId(id: Int): LoggerType {
+                return when (id) {
+                    0 -> VERY_VERBOSE
+                    1 -> VERBOSE
+                    2 -> DEBUG
+                    3 -> INFO
+                    4 -> WARN
+                    5 -> ERROR
+                    6 -> STACKTRACE
+                    7 -> USR
+                    8 -> NONE
+                    else -> NONE
+                }
+            }
+        }
+
+        fun stacktrace(): Boolean {
+            return this == STACKTRACE
+        }
+
+        fun user(): Boolean {
+            return this == USR
+        }
     }
 
     fun vv(tag: String, message: String) {
@@ -101,6 +127,7 @@ object Logger : KoinComponent {
             LoggerType.WARN -> if (logLevel <= LoggerType.WARN.id) Log.w(tag, msg, e)
             LoggerType.ERROR -> if (logLevel <= LoggerType.ERROR.id) Log.e(tag, msg, e)
             LoggerType.STACKTRACE -> if (logLevel <= LoggerType.ERROR.id) Log.e(tag, msg, e)
+            LoggerType.USR -> {} // Do nothing
             LoggerType.NONE -> {} // Do nothing
         }
     }

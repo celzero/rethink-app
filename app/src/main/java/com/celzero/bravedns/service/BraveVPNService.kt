@@ -73,7 +73,6 @@ import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
-import com.celzero.bravedns.scheduler.BugReportZipper
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.ui.HomeScreenActivity
@@ -143,6 +142,7 @@ class BraveVPNService :
     companion object {
         const val SERVICE_ID = 1 // Only has to be unique within this app.
         const val MEMORY_NOTIFICATION_ID = 29001
+        const val NW_ENGINE_NOTIFICATION_ID = 29002
 
         private const val MAIN_CHANNEL_ID = "vpn"
         private const val WARNING_CHANNEL_ID = "warning"
@@ -3110,19 +3110,39 @@ class BraveVPNService :
         return Tab()
     }
 
-    override fun err(s: String) {
-        // no-op
-        // TODO: write the logs to the file, send it along the bug report
+    override fun log(level: Int, msg: String) {
+        val l = Logger.LoggerType.fromId(level)
+        if (l.stacktrace()) {
+            Logger.crash(LOG_GO_LOGGER, msg) // log the stack trace
+            EnhancedBugReport.writeLogsToFile(this, msg)
+        } else if (l.user()) {
+            showNwEngineNotification(msg)
+        } else {
+            Logger.i(LOG_GO_LOGGER, msg)
+        }
     }
 
-    override fun log(s: String) {
-        // no-op
-        // TODO: write the logs to the file, send it along the bug report
-    }
+    private fun showNwEngineNotification(msg: String) {
+        if (msg.isEmpty()) {
+            return
+        }
 
-    override fun stack(s: String) {
-        Logger.crash(LOG_GO_LOGGER, s) // log the stack trace
-        EnhancedBugReport.writeLogsToFile(this, s)
+        val pendingIntent =
+            Utilities.getActivityPendingIntent(
+                this,
+                Intent(this, HomeScreenActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT,
+                mutable = false
+            )
+        val builder = NotificationCompat.Builder(this, WARNING_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification_icon)
+            .setContentTitle(msg)
+            .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+        builder.color =
+            ContextCompat.getColor(this, getAccentColor(persistentState.theme))
+        notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
     }
 
     override fun onSocketClosed(s: SocketSummary?) {
@@ -3783,16 +3803,23 @@ class BraveVPNService :
     }
 
     private fun showMemoryNotification() {
-        val notification = NotificationCompat.Builder(this, WARNING_CHANNEL_ID)
-            .setContentTitle(getString(R.string.app_name))
-            .setContentText(getString(R.string.memory_notification_text))
-            .setSmallIcon(R.drawable.ic_notification)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setAutoCancel(true)
-            .build()
+        val pendingIntent =
+            Utilities.getActivityPendingIntent(
+                this,
+                Intent(this, HomeScreenActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT,
+                mutable = false
+            )
 
+        val builder = NotificationCompat.Builder(this, WARNING_CHANNEL_ID)
+            .setContentTitle(getString(R.string.memory_notification_text))
+            .setSmallIcon(R.drawable.ic_notification_icon)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+        builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(MEMORY_NOTIFICATION_ID, notification)
+        notificationManager.notify(MEMORY_NOTIFICATION_ID, builder.build())
     }
 }

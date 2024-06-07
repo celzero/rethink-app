@@ -75,7 +75,8 @@ object EnhancedBugReport {
                 Logger.e(LOG_TAG_BUG_REPORT, "file name is null, cannot write logs to file")
                 return
             }
-            file.appendText(logs, Charset.defaultCharset())
+            val l = logs + "\n" // append a new line character
+            file.appendText(l, Charset.defaultCharset())
         } catch (e: Exception) {
             Logger.e(LOG_TAG_BUG_REPORT, "err writing logs to file: ${e.message}", e)
         }
