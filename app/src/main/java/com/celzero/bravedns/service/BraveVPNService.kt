@@ -2142,7 +2142,21 @@ class BraveVPNService :
                     reason =
                     "mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}); routes? $isRoutesChanged"
                 )
+                // only after set links and routes, wg can be refreshed
+                if (isRoutesChanged) {
+                    Logger.v(LOG_TAG_VPN, "refresh wg after network change")
+                    refreshProxies()
+                }
             }
+        }
+        // check if already refresh is triggered, if not, trigger refresh
+        if (!isRoutesChanged && isBoundNetworksChanged) {
+            // Workaround for WireGuard connection issues after network change
+            // WireGuard may fail to connect to the server when the network changes.
+            // refresh will do a configuration refresh in tunnel to ensure a successful
+            // reconnection after detecting a network change event
+            Logger.v(LOG_TAG_VPN, "refresh wg after network change")
+            refreshProxies()
         }
 
         // no need to close the existing connections if the bound networks are changed
@@ -2157,14 +2171,6 @@ class BraveVPNService :
             logd("bound networks changed, close connections")
             io("boundNetworksChanged") { vpnAdapter?.closeAllConnections() }
         } */
-
-        // Workaround for WireGuard connection issues after network change
-        // WireGuard may fail to connect to the server when the network changes.
-        // refresh will do a configuration refresh in tunnel to ensure a successful
-        // reconnection after detecting a network change event
-        if (isBoundNetworksChanged && appConfig.isWireGuardEnabled()) {
-            refreshProxies()
-        }
     }
 
     private fun hasRouteChangedInAutoMode(out: NetworkChanges): Boolean {
