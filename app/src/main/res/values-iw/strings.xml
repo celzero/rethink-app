@@ -299,4 +299,5 @@
     <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">שירות הנגישות של RethinkDNS נעצר או קרס. <i><b>עבור להגדרות וכפה עצירה</b></i> לחשוב מחדש על DNS והפעל אותו שוב כדי להשתמש בתכונת <i>חסום כל אפליקציה שאינה בשימוש</i>.
 \n
 \nRethinkDNS משתמש בשירות נגישות כדי לעקוב אחר אילו אפליקציות נמצאות בשימוש (בחזית) לעומת אלו שאינן בשימוש (ברקע).</string>
+    <string name="lbl_split" translatable="true">פיצול</string>
 </resources>
