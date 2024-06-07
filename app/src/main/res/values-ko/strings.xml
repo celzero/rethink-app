@@ -370,4 +370,5 @@
     <string name="doh_custom_url_remove_dialog_message" translatable="true">저장된 구성에서 DNS over Https 엔드포인트를 삭제합니다.</string>
     <string name="doh_custom_url_remove_success" translatable="true">엔드포인트가 삭제되었습니다.</string>
     <string name="lbl_on_device" translatable="true">기기 내</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">DoT 엔드포인트 삭제?</string>
 </resources>

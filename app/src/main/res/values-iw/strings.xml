@@ -283,11 +283,16 @@
     <string name="lbl_remove" translatable="true">הסר</string>
     <string name="lbl_last" translatable="true">אחרון</string>
     <string name="lbl_starting" translatable="true">להתחיל</string>
-    <string name="lbl_overall" translatable="true">באופן כללי</string>
+    <string name="lbl_overall" translatable="true">כללי</string>
     <string name="lbl_stopped" translatable="true">לעצור</string>
     <string name="lbl_private" translatable="true">פרטי</string>
     <string name="lbl_listen_port" translatable="true">האזנת נמל</string>
     <string name="lbl_preshared_key" translatable="true">מפתח משותף מראש</string>
     <string name="lbl_cache" translatable="true">מטמון</string>
     <string name="lbl_idle" translatable="true">ביטול</string>
+    <string name="lbl_anonymous" translatable="true">אנונימי</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">מוגן! מחובר ל- DNS + Firewall + proxy.</string>
+    <string name="failed_using_default" translatable="true">תגית: Fallback DNS</string>
+    <string name="lbl_unselected" translatable="true">לא נבחר</string>
+    <string name="lbl_on_device" translatable="true">on-device</string>
 </resources>
