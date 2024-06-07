@@ -1194,7 +1194,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.i(LOG_TAG_VPN, "canRouteIp($wgId, $ip), res? $res")
             res
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "err canRouteIp($wgId, $ip): ${e.message}", e)
+            Logger.w(LOG_TAG_VPN, "err canRouteIp($wgId, $ip): ${e.message}")
             default
         }
     }
