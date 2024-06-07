@@ -18,6 +18,8 @@ package com.celzero.bravedns.util
 
 import Logger
 import Logger.LOG_BATCH_LOGGER
+import kotlinx.coroutines.CloseableCoroutineDispatcher
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -36,17 +38,13 @@ import kotlinx.coroutines.withContext
 // channel buffer receives batched entries of batchsize or once every waitms from a batching
 // producer or a time-based monitor (signal) running in a single-threaded co-routine context.
 class NetLogBatcher<T, V>(
-    val tag: String,
-    val processor: suspend (List<T>) -> Unit,
-    val updator: suspend (List<V>) -> Unit = { _ -> }
+    private val tag: String,
+    private val looper: CoroutineDispatcher,
+    private val processor: suspend (List<T>) -> Unit,
+    private val updator: suspend (List<V>) -> Unit = { _ -> }
 ) {
     // i keeps track of currently in-use buffer
     var lsn = 0
-
-    // a single thread to run sig and batch co-routines in;
-    // to avoid use of mutex/semaphores over shared-state
-    @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-    val looper = newSingleThreadContext(tag + "Looper")
 
     private val nprod = CoroutineName(tag + "Producer") // batches writes
     private val nsig = CoroutineName(tag + "Signal")
@@ -64,6 +62,8 @@ class NetLogBatcher<T, V>(
 
     // buffer channel, holds at most 2 buffers, and drops the oldest
     private val buffersCh = Channel<List<T>>(qsize, BufferOverflow.DROP_OLDEST)
+
+    // update channel, holds at most 2 buffers, and drops the oldest
     private val updatesCh = Channel<List<V>>(qsize, BufferOverflow.DROP_OLDEST)
 
     // signal channel, holds at most 1 signal, and drops the oldest
@@ -73,11 +73,11 @@ class NetLogBatcher<T, V>(
     private var updates = mutableListOf<V>()
 
     fun begin(scope: CoroutineScope) {
-        Logger.i(LOG_BATCH_LOGGER, "begin")
         // launch suspend fns sig and consume asynchronously
         scope.async { sig() }
         scope.async { consumeAdd() }
         scope.async { consumeUpdate() }
+
         // monitor for cancellation on the default dispatcher
         scope.launch { monitorCancellation() }
     }
@@ -88,7 +88,6 @@ class NetLogBatcher<T, V>(
             awaitCancellation()
         } finally {
             withContext(NonCancellable) {
-                looper.close()
                 signal.close()
                 buffersCh.close()
                 updatesCh.close()
@@ -113,14 +112,14 @@ class NetLogBatcher<T, V>(
 
     private suspend fun txswap() {
         val b = batches
-        batches = mutableListOf() // swap buffers
+        batches = mutableListOf<T>() // swap buffers
         buffersCh.send(b)
 
         val u = updates
-        updates = mutableListOf()
+        updates = mutableListOf<V>() // swap buffers
         updatesCh.send(u)
 
-        Logger.d(LOG_BATCH_LOGGER, "transfer and swap (${lsn}) u: ${u.size}, b: ${b.size}")
+        Logger.d(LOG_BATCH_LOGGER, "txswap (${lsn}) b: ${b.size}, u: ${u.size}")
 
         lsn = (lsn + 1)
     }
