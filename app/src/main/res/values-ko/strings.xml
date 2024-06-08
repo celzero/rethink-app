@@ -15,12 +15,12 @@
     <string name="lbl_cancel" translatable="true">취소</string>
     <string name="lbl_apply" translatable="true">적용</string>
     <string name="status_protected_with_http" translatable="true">HTTPS 프록시로 보호됨</string>
-    <string name="dns_query_clear_logs_title" translatable="true">모든 DNS 로그를 삭제하시겠습니까\?</string>
+    <string name="dns_query_clear_logs_title" translatable="true">모든 DNS 로그를 삭제하시겠습니까?</string>
     <string name="conn_track_clear_logs_title" translatable="true">모든 네트워크 로그를 삭제하시겠습니까\?</string>
     <string name="bsct_block_domain" translatable="true"><u>이 앱</u>의 <u>도메인</u>을 차단 및 신뢰</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink는 어떤 앱이 사용 중(포그라운드)인지, 사용 중이 아닌 앱(백그라운드)인지 추적하기 위해 접근성 서비스를 사용합니다.
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink는 접근성 서비스를 사용하여 사용 중인 앱(포그라운드)과 사용 중이 아닌 앱(백그라운드)을 추적합니다.
 \n
-\nRethink는 정보를 수집하거나 어떤 식으로든 사용자를 염탐하지 않습니다.</string>
+\nRethink는 어떤 방식으로도 정보를 수집하거나 사용자를 감시하지 않습니다.</string>
     <string name="universal_firewall_explanation" translatable="true">기기의 이벤트를 기반으로 모든 앱에 방화벽을 적용합니다. 예를 들어 기기가 잠겨 있거나 특정 앱을 사용하지 않을 때 방화벽이 적용됩니다.</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">경고: Rethink가 비활성화되었습니다</string>
     <string name="lbl_import" translatable="true">불러오기</string>
@@ -34,7 +34,7 @@
     <string name="pause_mode_notification_title" translatable="true">일시정지되었습니다! 차단된 앱은 방화벽으로 차단됩니다.</string>
     <string name="lbl_sec" translatable="true">초</string>
     <string name="lbl_proceed" translatable="true">진행</string>
-    <string name="notification_action_dns_firewall_mode" translatable="true">DNS 및 방화벽</string>
+    <string name="notification_action_dns_firewall_mode" translatable="true">DNS + 방화벽</string>
     <string name="lbl_hour" translatable="true">시간</string>
     <string name="lbl_persistent_keepalive" translatable="true">지속적 킵얼라이브</string>
     <string name="status_protected_with_http_private_dns" translatable="true">HTTPS 프록시 및 프라이빗 DNS로 보호됨</string>
@@ -60,7 +60,7 @@
     <string name="firewall_mode_info_explanation_new" translatable="true">모든 앱과 IP 주소에 대한 네트워크 활동을 모니터링하고 방화벽을 설정합니다.</string>
     <string name="block" translatable="true">차단</string>
     <string name="lbl_generated" translatable="true">(생성됨)</string>
-    <string name="dns_firewall_mode_info_explanation_new" translatable="true">위의 모든 기능 이외에도 인터넷 검열을 우회합니다.</string>
+    <string name="dns_firewall_mode_info_explanation_new" translatable="true">위의 모든 기능 + 인터넷 검열 우회.</string>
     <string name="slide_1_title" translatable="true">무료 및 오픈 소스</string>
     <string name="bypass_dns_firewall" translatable="true">DNS 및 방화벽 우회</string>
     <string name="notification_action_resume_vpn" translatable="true">재개</string>
@@ -78,11 +78,11 @@
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">실패</string>
     <string name="lbl_addresses" translatable="true">주소</string>
     <string name="lbl_active" translatable="true">활성</string>
-    <string name="dns_query_clear_logs_message" translatable="true">장치의 DNS 로그를 삭제합니다. 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까\?</string>
+    <string name="dns_query_clear_logs_message" translatable="true">장치의 DNS 로그를 삭제합니다. 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?</string>
     <string name="isolate" translatable="true">격리</string>
     <string name="lbl_dns_servers" translatable="true">DNS 서버</string>
     <string name="slide_2_desc" translatable="true">Rethink는 안드로이드 기기에서 네트워크 활동을 모니터링하고, 인터넷 검열을 우회하고, 방화벽으로 앱을 보호하는 가장 쉬운 방법입니다.</string>
-    <string name="default_dns_name" translatable="true">RDNS 기본값</string>
+    <string name="default_dns_name" translatable="true">RDNS 기본</string>
     <string name="bypass_universal" translatable="true">범용 방화벽 우회</string>
     <string name="lbl_app_wise" translatable="true">앱 당</string>
     <string name="status_app_error" translatable="true">앱 오류</string>
@@ -97,7 +97,7 @@
     <string name="lbl_min" translatable="true">분</string>
     <string name="lbl_private_key" translatable="true">개인 키</string>
     <string name="status_protected_with_proxy" translatable="true">프록시로 보호됨</string>
-    <string name="hybrid_mode_info_title" translatable="true">DNS 및 방화벽</string>
+    <string name="hybrid_mode_info_title" translatable="true">DNS + 방화벽</string>
     <string name="apps_info_title" translatable="true">앱</string>
     <string name="hybrid_mode_notification_title" translatable="true">보호되었습니다! DNS 및 방화벽에 연결되었습니다.</string>
     <string name="lbl_preshared_key" translatable="true">사전 공유 키</string>
@@ -129,7 +129,7 @@
     <string name="lbl_listen_port" translatable="true">열린 포트</string>
     <string name="brave_dns_connect_mode_change_firewall" translatable="true">모드를 선택하세요.</string>
     <string name="slide_2_title" translatable="true">환영합니다</string>
-    <string name="conn_track_clear_logs_message" translatable="true">네트워크 로그만 삭제되고 방화벽 규칙은 삭제되지 않습니다. 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까\?</string>
+    <string name="conn_track_clear_logs_message" translatable="true">이렇게 하면 네트워크 로그만 삭제되고 방화벽 규칙은 삭제되지 않습니다. 이 작업은 되돌릴 수 없습니다. 계속 진행하시겠습니까?</string>
     <string name="lbl_random" translatable="true">(무작위)</string>
     <string name="lbl_blocked" translatable="true">차단됨</string>
     <string name="lbl_domain" translatable="true">도메인</string>
@@ -367,4 +367,9 @@
     <string name="lbl_unselected" translatable="true">선택되지 않음</string>
     <string name="lbl_idle" translatable="true">유휴 상태</string>
     <string name="lbl_split" translatable="true">분할</string>
+    <string name="doh_custom_url_remove_dialog_message" translatable="true">저장된 구성에서 DNS over Https 엔드포인트를 삭제합니다.</string>
+    <string name="doh_custom_url_remove_success" translatable="true">엔드포인트가 삭제되었습니다.</string>
+    <string name="lbl_on_device" translatable="true">기기 내</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">DoT 엔드포인트를 삭제합니까?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">저장된 구성에서 DNS over TLS 엔드포인트를 삭제합니다.</string>
 </resources>

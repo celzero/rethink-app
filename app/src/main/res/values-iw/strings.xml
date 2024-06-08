@@ -283,11 +283,21 @@
     <string name="lbl_remove" translatable="true">הסר</string>
     <string name="lbl_last" translatable="true">אחרון</string>
     <string name="lbl_starting" translatable="true">להתחיל</string>
-    <string name="lbl_overall" translatable="true">באופן כללי</string>
+    <string name="lbl_overall" translatable="true">כללי</string>
     <string name="lbl_stopped" translatable="true">לעצור</string>
     <string name="lbl_private" translatable="true">פרטי</string>
-    <string name="lbl_listen_port" translatable="true">האזנת נמל</string>
-    <string name="lbl_preshared_key" translatable="true">מפתח משותף מראש</string>
+    <string name="lbl_listen_port" translatable="true">נמל</string>
+    <string name="lbl_preshared_key" translatable="true">מפתח משותף</string>
     <string name="lbl_cache" translatable="true">מטמון</string>
     <string name="lbl_idle" translatable="true">ביטול</string>
+    <string name="lbl_anonymous" translatable="true">אנונימי</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">מוגן! מחובר ל- DNS + Firewall + proxy.</string>
+    <string name="failed_using_default" translatable="true">תגית: Fallback DNS</string>
+    <string name="lbl_unselected" translatable="true">לא נבחר</string>
+    <string name="lbl_on_device" translatable="true">on-device</string>
+    <string name="lbl_secure" translatable="true">מאובטח</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">שירות הנגישות של RethinkDNS נעצר או קרס. <i><b>עבור להגדרות וכפה עצירה</b></i> לחשוב מחדש על DNS והפעל אותו שוב כדי להשתמש בתכונת <i>חסום כל אפליקציה שאינה בשימוש</i>.
+\n
+\nRethinkDNS משתמש בשירות נגישות כדי לעקוב אחר אילו אפליקציות נמצאות בשימוש (בחזית) לעומת אלו שאינן בשימוש (ברקע).</string>
+    <string name="lbl_split" translatable="true">פיצול</string>
 </resources>
