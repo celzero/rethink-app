@@ -44,7 +44,7 @@ jobs:
           wget $wgetopts "https://jitpack.io/com/github/celzero/firestack/${COMMIT:0:10}/firestack-${COMMIT:0:10}-debug.aar" -O "firestack.aar"
           ls -ltr .
           unzip ./firestack.aar
-          firebase crashlytics:symbols:upload --app=${{ secrets.FIREBASE_APP_ID_ANDROID }} --debug --generator=csym jni/
+          firebase crashlytics:symbols:upload --app=${{ secrets.FIREBASE_APP_ID_ANDROID }} --debug jni/
         shell: bash
         env:
           COMMIT: ${{ env.COMMIT }}
