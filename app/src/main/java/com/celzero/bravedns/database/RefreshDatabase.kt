@@ -444,6 +444,10 @@ internal constructor(
     }
 
     private suspend fun updateApp(oldUid: Int, newUid: Int, pkg: String) {
+        if (oldUid == newUid) {
+            Logger.i(LOG_TAG_APP_DB, "update app; uid: $oldUid == $newUid, no-op")
+            return
+        }
         Logger.i(LOG_TAG_APP_DB, "update app; oldUid: $oldUid, newUid: $newUid, pkg: $pkg")
         FirewallManager.updateUid(oldUid, newUid, pkg)
     }

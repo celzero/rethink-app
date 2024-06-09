@@ -65,7 +65,7 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
                     newConnection: RethinkDnsEndpoint
                 ): Boolean {
                     return (oldConnection.url == newConnection.url &&
-                        oldConnection.isActive == newConnection.isActive)
+                            oldConnection.isActive == newConnection.isActive)
                 }
 
                 override fun areContentsTheSame(
@@ -73,7 +73,7 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
                     newConnection: RethinkDnsEndpoint
                 ): Boolean {
                     return (oldConnection.url == newConnection.url &&
-                        oldConnection.isActive != newConnection.isActive)
+                            oldConnection.isActive != newConnection.isActive)
                 }
             }
     }
@@ -127,7 +127,7 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
         }
 
         private fun keepSelectedStatusUpdated(endpoint: RethinkDnsEndpoint) {
-            statusCheckJob = ui {
+            statusCheckJob = io {
                 while (true) {
                     updateBlocklistStatusText(endpoint)
                     delay(ONE_SEC)
@@ -135,37 +135,44 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
             }
         }
 
-        private fun updateBlocklistStatusText(endpoint: RethinkDnsEndpoint) {
+        private suspend fun updateBlocklistStatusText(endpoint: RethinkDnsEndpoint) {
             // if the view is not active then cancel the job
             if (
                 lifecycleOwner
                     ?.lifecycle
                     ?.currentState
                     ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false ||
-                    bindingAdapterPosition == RecyclerView.NO_POSITION
+                bindingAdapterPosition == RecyclerView.NO_POSITION
             ) {
                 statusCheckJob?.cancel()
                 return
             }
 
+            updateDnsStatus(endpoint)
+        }
+
+        private suspend fun updateDnsStatus(endpoint: RethinkDnsEndpoint) {
             val state = VpnController.getDnsStatus(Backend.Preferred)
             val status = UIUtils.getDnsStatusStringRes(state)
-            // show the status as it is if it is not connected
-            if (status != R.string.dns_connected) {
-                b.rethinkEndpointListUrlExplanation.text =
-                    context.getString(status).replaceFirstChar(Char::titlecase)
-                return
+            uiCtx {
+                // show the status as it is if it is not connected
+                if (status != R.string.dns_connected) {
+                    b.rethinkEndpointListUrlExplanation.text =
+                        context.getString(status).replaceFirstChar(Char::titlecase)
+                    return@uiCtx
+                }
+
+                if (endpoint.blocklistCount > 0) {
+                    b.rethinkEndpointListUrlExplanation.text =
+                        context.getString(
+                            R.string.dns_connected_rethink_plus,
+                            endpoint.blocklistCount.toString()
+                        )
+                } else {
+                    b.rethinkEndpointListUrlExplanation.text = context.getString(status)
+                }
             }
 
-            if (endpoint.blocklistCount > 0) {
-                b.rethinkEndpointListUrlExplanation.text =
-                    context.getString(
-                        R.string.dns_connected_rethink_plus,
-                        endpoint.blocklistCount.toString()
-                    )
-            } else {
-                b.rethinkEndpointListUrlExplanation.text = context.getString(status)
-            }
         }
 
         private fun showIcon(endpoint: RethinkDnsEndpoint) {
@@ -198,21 +205,18 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
             builder.setMessage(endpoint.url + "\n\n" + endpoint.desc)
             builder.setCancelable(true)
             if (endpoint.isEditable(context)) {
-                builder.setPositiveButton(context.getString(R.string.rt_edit_dialog_positive)) {
-                    _,
-                    _ ->
+                builder.setPositiveButton(context.getString(R.string.rt_edit_dialog_positive)) { _,
+                                                                                                 _ ->
                     openEditConfiguration(endpoint)
                 }
             } else {
-                builder.setPositiveButton(context.getString(R.string.dns_info_positive)) {
-                    dialogInterface,
-                    _ ->
+                builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface,
+                                                                                           _ ->
                     dialogInterface.dismiss()
                 }
             }
-            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) {
-                _: DialogInterface,
-                _: Int ->
+            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface,
+                                                                                     _: Int ->
                 clipboardCopy(
                     context,
                     endpoint.url,
@@ -248,12 +252,12 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
             context.startActivity(intent)
         }
 
-        private fun ui(f: suspend () -> Unit): Job? {
-            return lifecycleOwner?.lifecycleScope?.launch { withContext(Dispatchers.Main) { f() } }
+        private suspend fun uiCtx(f: suspend () -> Unit) {
+            withContext(Dispatchers.Main) { f() }
         }
 
-        private fun io(f: suspend () -> Unit) {
-            lifecycleOwner?.lifecycleScope?.launch { withContext(Dispatchers.IO) { f() } }
+        private fun io(f: suspend () -> Unit): Job? {
+            return lifecycleOwner?.lifecycleScope?.launch { withContext(Dispatchers.IO) { f() } }
         }
     }
 }

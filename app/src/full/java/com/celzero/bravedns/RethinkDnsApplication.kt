@@ -3,10 +3,14 @@ package com.celzero.bravedns
 import Logger
 import Logger.LOG_TAG_SCHEDULER
 import android.app.Application
+import android.content.ComponentCallbacks2
 import android.content.pm.ApplicationInfo
 import android.os.StrictMode
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -36,7 +40,7 @@ class RethinkDnsApplication : Application() {
         super.onCreate()
         DEBUG =
             applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE ==
-                ApplicationInfo.FLAG_DEBUGGABLE
+                    ApplicationInfo.FLAG_DEBUGGABLE
 
         startKoin {
             if (DEBUG) androidLogger()
@@ -46,6 +50,12 @@ class RethinkDnsApplication : Application() {
 
         turnOnStrictMode()
 
+        CoroutineScope(SupervisorJob()).launch {
+            scheduleJobs()
+        }
+    }
+
+    private suspend fun scheduleJobs() {
         Logger.d(LOG_TAG_SCHEDULER, "Schedule job")
         get<WorkScheduler>().scheduleAppExitInfoCollectionJob()
         // database refresh is used in both headless and main project

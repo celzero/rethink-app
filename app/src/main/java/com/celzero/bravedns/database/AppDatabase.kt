@@ -75,6 +75,7 @@ abstract class AppDatabase : RoomDatabase() {
         fun buildDatabase(context: Context) =
             Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME)
                 .createFromAsset(DATABASE_PATH)
+                .addCallback(roomCallback)
                 .setJournalMode(JournalMode.AUTOMATIC)
                 .addMigrations(MIGRATION_1_2)
                 .addMigrations(MIGRATION_2_3)
@@ -99,6 +100,24 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_21_22)
                 .addMigrations(MIGRATION_22_23)
                 .build()
+
+        private val roomCallback: Callback =
+            object : Callback() {
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                    super.onCreate(db)
+                    Logger.i(LOG_TAG_APP_DB, "Database created, ${db.version}")
+                }
+
+                override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
+                    super.onDestructiveMigration(db)
+                    Logger.i(LOG_TAG_APP_DB, "Database destructively migrated, ${db.version}")
+                }
+
+                override fun onOpen(db: SupportSQLiteDatabase) {
+                    super.onOpen(db)
+                    Logger.i(LOG_TAG_APP_DB, "Database opened, ${db.version}")
+                }
+            }
 
         private val MIGRATION_1_2: Migration =
             object : Migration(1, 2) {
@@ -806,6 +825,7 @@ abstract class AppDatabase : RoomDatabase() {
                     db.execSQL(
                         "UPDATE DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAEjE0OS4xMTIuMTEyLjk6ODQ0MyBnyEe4yHWM0SAkVUO-dWdG3zTfHYTAC4xHA2jfgh2GPhkyLmRuc2NyeXB0LWNlcnQucXVhZDkubmV0' where id = 4"
                     )
+                    Logger.i(LOG_TAG_APP_DB, "Migrating to version 20")
                 }
             }
 
@@ -900,6 +920,7 @@ abstract class AppDatabase : RoomDatabase() {
                         "INSERT INTO ProxyEndpoint (proxyName, proxyMode, proxyType, proxyAppName, proxyIP, userName, password, proxyPort, isSelected, isCustom, isUDP, modifiedDataTime, latency) VALUES('HTTP Orbot', 3, 'NONE', 'org.torproject.android', '', '', '', 0, 0, 0, 0, 0, 0)"
                     )
                     db.execSQL("DROP TABLE IF EXISTS ProxyEndpoint_backup")
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_20_21: added DoT and ODoH endpoints")
                 }
             }
 
@@ -913,6 +934,7 @@ abstract class AppDatabase : RoomDatabase() {
                                 "ALTER TABLE WgConfigFiles ADD COLUMN isLockdown INTEGER NOT NULL DEFAULT 0"
                             )
                         }
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_21_22: added isLockdown column")
                     } catch (e: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "isLockdown column already exists, ignore")
                     }
@@ -922,6 +944,7 @@ abstract class AppDatabase : RoomDatabase() {
                                 "ALTER TABLE WgConfigFiles ADD COLUMN isCatchAll INTEGER NOT NULL DEFAULT 0"
                             )
                         }
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_21_22: added isCatchAll column")
                     } catch (e: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "isCatchAll column already exists, ignore")
                     }
@@ -931,6 +954,7 @@ abstract class AppDatabase : RoomDatabase() {
                                 "ALTER TABLE WgConfigFiles ADD COLUMN oneWireGuard INTEGER NOT NULL DEFAULT 0"
                             )
                         }
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_21_22: added oneWireGuard column")
                     } catch (e: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "oneWireGuard column already exists, ignore")
                     }
@@ -943,6 +967,7 @@ abstract class AppDatabase : RoomDatabase() {
                     db.execSQL(
                         "ALTER TABLE AppInfo ADD COLUMN isProxyExcluded INTEGER NOT NULL DEFAULT 0"
                     )
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_22_23: added isProxyExcluded column")
                 }
             }
 

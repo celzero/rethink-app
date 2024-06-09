@@ -132,7 +132,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
                 // FIXME: add metadata instead of boolean
                 failedFavIconUrls.put(fdqnUrl, true)
             }
-            Logger.e(LOG_TAG_DNS, "Glide, no fav icon available for the url: $subUrl")
+            Logger.i(LOG_TAG_DNS, "Glide, no fav icon available for the url: $subUrl")
         } finally {
             Glide.with(context.applicationContext).clear(futureTarget)
         }

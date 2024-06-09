@@ -30,8 +30,15 @@ import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.util.NetLogBatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.Calendar
@@ -55,19 +62,29 @@ internal constructor(
 
     private var dnsBatcher: NetLogBatcher<DnsLog, Nothing>? = null
     private var ipBatcher: NetLogBatcher<ConnectionTracker, ConnectionSummary>? = null
-    private var rinrBatcher: NetLogBatcher<RethinkLog, ConnectionSummary>? = null
+    private var rrBatcher :NetLogBatcher<RethinkLog, ConnectionSummary>? = null
 
+    // a single thread to run sig and batch co-routines in;
+    // to avoid use of mutex/semaphores over shared-state
+    // looper is never closed / cancelled and is always active
+    @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+    private val looper = newSingleThreadContext("nlbLooper")
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun restart(s: CoroutineScope) {
         this.scope = s
 
         // create new batchers on every new scope as their lifecycle is tied to the scope
-        this.dnsBatcher = NetLogBatcher("dns", dnsdb::insertBatch)
-        this.ipBatcher = NetLogBatcher("ip", ipdb::insertBatch, ipdb::updateBatch)
-        this.rinrBatcher = NetLogBatcher("rinr", ipdb::insertRethinkBatch, ipdb::updateRethinkBatch)
+        val b1 = NetLogBatcher<DnsLog, Nothing>("dns", looper, dnsdb::insertBatch)
+        val b2 = NetLogBatcher<ConnectionTracker, ConnectionSummary>("ip", looper, ipdb::insertBatch, ipdb::updateBatch)
+        val b3 = NetLogBatcher<RethinkLog, ConnectionSummary>("rr", looper, ipdb::insertRethinkBatch, ipdb::updateRethinkBatch)
 
-        dnsBatcher!!.begin(s)
-        ipBatcher!!.begin(s)
-        rinrBatcher!!.begin(s)
+        b1.begin(s)
+        b2.begin(s)
+        b3.begin(s)
+        this.dnsBatcher = b1
+        this.ipBatcher = b2
+        this.rrBatcher = b3
     }
 
     fun writeIpLog(info: ConnTrackerMetaData) {
@@ -84,7 +101,7 @@ internal constructor(
 
         io("writeRethinkLog") {
             val rlog = ipdb.makeRethinkLogs(info) ?: return@io
-            rinrBatcher?.add(rlog)
+            rrBatcher?.add(rlog)
         }
     }
 
@@ -114,7 +131,7 @@ internal constructor(
                     summary
                 }
 
-            rinrBatcher?.update(s)
+            rrBatcher?.update(s)
         }
     }
 

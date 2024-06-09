@@ -469,30 +469,40 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.settingsActivityWireguardDesc.text = getString(R.string.wireguard_description)
             return
         }
+        io {
+            var wgStatus = ""
+            activeWgs.forEach {
+                val id = ProxyManager.ID_WG_BASE + it.getId()
+                val statusId = VpnController.getProxyStatusById(id)
+                uiCtx {
+                    if (statusId != null) {
+                        val resId = UIUtils.getProxyStatusStringRes(statusId)
+                        val s = getString(resId).replaceFirstChar(Char::titlecase)
+                        wgStatus += getString(
+                            R.string.ci_ip_label,
+                            it.getName(),
+                            s.padStart(1, ' ')
+                        ) + "\n"
+                        Logger.d(LOG_TAG_PROXY, "current proxy status for $id: $s")
+                    } else {
+                        wgStatus +=
+                            getString(
+                                R.string.ci_ip_label,
+                                it.getName(),
+                                getString(R.string.status_waiting)
+                                    .replaceFirstChar(Char::titlecase)
+                                    .padStart(1, ' ')
+                            ) + "\n"
+                        Logger.d(LOG_TAG_PROXY, "current proxy status is null for $id")
+                    }
 
-        var wgStatus = ""
-        activeWgs.forEach {
-            val id = ProxyManager.ID_WG_BASE + it.getId()
-            val statusId = VpnController.getProxyStatusById(id)
-            if (statusId != null) {
-                val resId = UIUtils.getProxyStatusStringRes(statusId)
-                val s = getString(resId).replaceFirstChar(Char::titlecase)
-                wgStatus += getString(R.string.ci_ip_label, it.getName(), s.padStart(1, ' ')) + "\n"
-                Logger.d(LOG_TAG_PROXY, "current proxy status for $id: $s")
-            } else {
-                wgStatus +=
-                    getString(
-                        R.string.ci_ip_label,
-                        it.getName(),
-                        getString(R.string.status_waiting)
-                            .replaceFirstChar(Char::titlecase)
-                            .padStart(1, ' ')
-                    ) + "\n"
-                Logger.d(LOG_TAG_PROXY, "current proxy status is null for $id")
+                }
+            }
+            wgStatus = wgStatus.trimEnd()
+            uiCtx {
+                b.settingsActivityWireguardDesc.text = wgStatus
             }
         }
-        wgStatus = wgStatus.trimEnd()
-        b.settingsActivityWireguardDesc.text = wgStatus
     }
 
     private fun displaySocks5Ui() {

@@ -147,10 +147,17 @@ class DoTEndpointAdapter(private val context: Context, private val appConfig: Ap
                 return
             }
 
-            // always use the id as Dnsx.Preffered as it is the primary dns id for now
-            val state = VpnController.getDnsStatus(Backend.Preferred)
-            val status = getDnsStatusStringRes(state)
-            b.endpointDesc.text = context.getString(status).replaceFirstChar(Char::titlecase)
+            updateDnsStatus()
+        }
+
+        private fun updateDnsStatus() {
+            io {
+                val state = VpnController.getDnsStatus(Backend.Preferred)
+                val status = getDnsStatusStringRes(state)
+                uiCtx {
+                    b.endpointDesc.text = context.getString(status).replaceFirstChar(Char::titlecase)
+                }
+            }
         }
 
         private fun showIcon(endpoint: DoTEndpoint) {

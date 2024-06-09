@@ -34,18 +34,49 @@ object Logger : KoinComponent {
     const val LOG_TAG_DOWNLOAD = "DownloadManager"
     const val LOG_TAG_UI = "ActivityManager"
     const val LOG_TAG_SCHEDULER = "JobScheduler"
+    const val LOG_TAG_BUG_REPORT = "BugReport"
     const val LOG_TAG_BACKUP_RESTORE = "BackupRestore"
     const val LOG_PROVIDER = "BlocklistProvider"
     const val LOG_TAG_PROXY = "ProxyLogs"
     const val LOG_QR_CODE = "QrCodeFromFileScanner"
+    const val LOG_GO_LOGGER = "LibLogger"
 
+    // github.com/celzero/firestack/blob/bce8de917fec5e48a41ed1e96c9d942ee0f7996b/intra/log/logger.go#L76
     enum class LoggerType(val id: Int) {
         VERY_VERBOSE(0),
         VERBOSE(1),
         DEBUG(2),
         INFO(3),
         WARN(4),
-        ERROR(5)
+        ERROR(5),
+        STACKTRACE(6),
+        USR(7),
+        NONE(8);
+
+        companion object {
+            fun fromId(id: Int): LoggerType {
+                return when (id) {
+                    0 -> VERY_VERBOSE
+                    1 -> VERBOSE
+                    2 -> DEBUG
+                    3 -> INFO
+                    4 -> WARN
+                    5 -> ERROR
+                    6 -> STACKTRACE
+                    7 -> USR
+                    8 -> NONE
+                    else -> NONE
+                }
+            }
+        }
+
+        fun stacktrace(): Boolean {
+            return this == STACKTRACE
+        }
+
+        fun user(): Boolean {
+            return this == USR
+        }
     }
 
     fun vv(tag: String, message: String) {
@@ -72,13 +103,14 @@ object Logger : KoinComponent {
         log(tag, message, LoggerType.ERROR, e)
     }
 
-    fun crash(tag: String, message: String, e: Exception) {
+    fun crash(tag: String, message: String, e: Exception? = null) {
         log(tag, message, LoggerType.ERROR, e)
         if (Utilities.isPlayStoreFlavour()) {
             try {
                 val crashlytics = FirebaseCrashlytics.getInstance()
                 crashlytics.log("$tag: $message")
-                crashlytics.recordException(e)
+                if (e != null) crashlytics.recordException(e)
+                else crashlytics.recordException(Exception(message))
                 // send the unsent reports, if any as the crash is important to be reported.
                 crashlytics.sendUnsentReports()
             } catch (ex: Exception) {
@@ -107,6 +139,9 @@ object Logger : KoinComponent {
             LoggerType.INFO -> if (logLevel <= LoggerType.INFO.id) Log.i(tag, msg)
             LoggerType.WARN -> if (logLevel <= LoggerType.WARN.id) Log.w(tag, msg, e)
             LoggerType.ERROR -> if (logLevel <= LoggerType.ERROR.id) Log.e(tag, msg, e)
+            LoggerType.STACKTRACE -> if (logLevel <= LoggerType.ERROR.id) Log.e(tag, msg, e)
+            LoggerType.USR -> {} // Do nothing
+            LoggerType.NONE -> {} // Do nothing
         }
     }
 }

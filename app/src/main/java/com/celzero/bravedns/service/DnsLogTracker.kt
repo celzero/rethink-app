@@ -182,7 +182,8 @@ internal constructor(
         return getFlag(hostAddress)
     }
 
-    suspend fun insertBatch(dnsLogs: List<DnsLog>) {
+    suspend fun insertBatch(logs: List<*>) {
+        val dnsLogs = (logs as? List<DnsLog>) ?: return
         dnsLogRepository.insertBatch(dnsLogs)
     }
 

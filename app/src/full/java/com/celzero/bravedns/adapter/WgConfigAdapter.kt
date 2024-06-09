@@ -45,6 +45,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class WgConfigAdapter(private val context: Context) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
@@ -69,10 +70,10 @@ class WgConfigAdapter(private val context: Context) :
                     newConnection: WgConfigFiles
                 ): Boolean {
                     return (oldConnection.id == newConnection.id &&
-                        oldConnection.name == newConnection.name &&
-                        oldConnection.isActive == newConnection.isActive &&
-                        oldConnection.isCatchAll == newConnection.isCatchAll &&
-                        oldConnection.isLockdown == newConnection.isLockdown)
+                            oldConnection.name == newConnection.name &&
+                            oldConnection.isActive == newConnection.isActive &&
+                            oldConnection.isCatchAll == newConnection.isCatchAll &&
+                            oldConnection.isLockdown == newConnection.isLockdown)
                 }
             }
     }
@@ -150,7 +151,7 @@ class WgConfigAdapter(private val context: Context) :
         }
 
         private fun updateProxyStatusContinuously(config: WgConfigFiles): Job? {
-            return ui {
+            return io {
                 while (true) {
                     updateStatus(config)
                     delay(ONE_SEC_MS)
@@ -203,7 +204,7 @@ class WgConfigAdapter(private val context: Context) :
             configs.clear()
         }
 
-        private fun updateStatus(config: WgConfigFiles) {
+        private suspend fun updateStatus(config: WgConfigFiles) {
             val id = ProxyManager.ID_WG_BASE + config.id
             val appsCount = ProxyManager.getAppCountForProxy(id)
             val statusId = VpnController.getProxyStatusById(id)
@@ -220,18 +221,20 @@ class WgConfigAdapter(private val context: Context) :
             // if the view is not active then cancel the job
             if (
                 lifecycleOwner != null &&
-                    lifecycleOwner
-                        ?.lifecycle
-                        ?.currentState
-                        ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
+                lifecycleOwner
+                    ?.lifecycle
+                    ?.currentState
+                    ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
             ) {
                 cancelAllJobs()
                 return
             }
-            updateStatusUi(config, statusId, stats)
-            updateUi(config, appsCount)
-            updateProtocolChip(pair)
-            updateSplitTunnelChip(isSplitTunnel)
+            uiCtx {
+                updateStatusUi(config, statusId, stats)
+                updateUi(config, appsCount)
+                updateProtocolChip(pair)
+                updateSplitTunnelChip(isSplitTunnel)
+            }
         }
 
         private fun updateUi(config: WgConfigFiles, appsCount: Int) {
@@ -313,8 +316,8 @@ class WgConfigAdapter(private val context: Context) :
                         }
                     } else if (
                         statusId == Backend.TUP ||
-                            statusId == Backend.TZZ ||
-                            statusId == Backend.TNT
+                        statusId == Backend.TZZ ||
+                        statusId == Backend.TNT
                     ) {
                         b.interfaceDetailCard.strokeColor =
                             UIUtils.fetchColor(context, R.attr.chipTextNeutral)
@@ -336,8 +339,8 @@ class WgConfigAdapter(private val context: Context) :
                         // for idle state, if lastOk is less than 30 sec, then show as connected
                         if (
                             stats.lastOK != 0L &&
-                                System.currentTimeMillis() - stats.lastOK <
-                                    30 * DateUtils.SECOND_IN_MILLIS
+                            System.currentTimeMillis() - stats.lastOK <
+                            30 * DateUtils.SECOND_IN_MILLIS
                         ) {
                             status =
                                 context
@@ -455,10 +458,14 @@ class WgConfigAdapter(private val context: Context) :
         }
     }
 
-    private fun ui(f: suspend () -> Unit): Job? {
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
+    }
+
+    private fun io(f: suspend () -> Unit): Job? {
         if (lifecycleOwner == null) {
             return null
         }
-        return lifecycleOwner?.lifecycleScope?.launch(Dispatchers.Main) { f() }
+        return lifecycleOwner?.lifecycleScope?.launch(Dispatchers.IO) { f() }
     }
 }

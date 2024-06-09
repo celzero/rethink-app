@@ -17,6 +17,7 @@
 package com.celzero.bravedns.service
 
 import Logger
+import Logger.LOG_GO_LOGGER
 import Logger.LOG_TAG_VPN
 import android.app.ActivityManager
 import android.app.ForegroundServiceStartNotAllowedException
@@ -29,6 +30,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.app.UiModeManager
+import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -71,6 +73,7 @@ import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
+import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.NotificationHandlerDialog
@@ -138,6 +141,8 @@ class BraveVPNService :
 
     companion object {
         const val SERVICE_ID = 1 // Only has to be unique within this app.
+        const val MEMORY_NOTIFICATION_ID = 29001
+        const val NW_ENGINE_NOTIFICATION_ID = 29002
 
         private const val MAIN_CHANNEL_ID = "vpn"
         private const val WARNING_CHANNEL_ID = "warning"
@@ -329,7 +334,7 @@ class BraveVPNService :
         } finally {
             pfd?.detachFd()
         }
-        Logger.w( LOG_TAG_VPN, "bind failed: $who, $addrPort, $fid")
+        Logger.w(LOG_TAG_VPN, "bind failed: $who, $addrPort, $fid")
     }
 
     private fun bindToNw(net: Network, pfd: ParcelFileDescriptor): Boolean {
@@ -1850,7 +1855,7 @@ class BraveVPNService :
 
         if (ids.isEmpty()) return
 
-        vpnAdapter?.closeConnections(ids)
+        io("closeConn") { vpnAdapter?.closeConnections(ids) }
     }
 
     private suspend fun addTransport() {
@@ -2062,7 +2067,7 @@ class BraveVPNService :
             } else {
                 // create a new vpn adapter
                 vpnAdapter = GoVpnAdapter(this, vpnScope, tunFd, opts) // may throw
-                GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel)
+                GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
                 vpnAdapter!!.initResolverProxiesPcap(opts)
                 return ok
             }
@@ -2137,7 +2142,21 @@ class BraveVPNService :
                     reason =
                     "mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}); routes? $isRoutesChanged"
                 )
+                // only after set links and routes, wg can be refreshed
+                if (isRoutesChanged) {
+                    Logger.v(LOG_TAG_VPN, "refresh wg after network change")
+                    refreshProxies()
+                }
             }
+        }
+        // check if already refresh is triggered, if not, trigger refresh
+        if (!isRoutesChanged && isBoundNetworksChanged) {
+            // Workaround for WireGuard connection issues after network change
+            // WireGuard may fail to connect to the server when the network changes.
+            // refresh will do a configuration refresh in tunnel to ensure a successful
+            // reconnection after detecting a network change event
+            Logger.v(LOG_TAG_VPN, "refresh wg after network change")
+            refreshProxies()
         }
 
         // no need to close the existing connections if the bound networks are changed
@@ -2152,14 +2171,6 @@ class BraveVPNService :
             logd("bound networks changed, close connections")
             io("boundNetworksChanged") { vpnAdapter?.closeAllConnections() }
         } */
-
-        // Workaround for WireGuard connection issues after network change
-        // WireGuard may fail to connect to the server when the network changes.
-        // refresh will do a configuration refresh in tunnel to ensure a successful
-        // reconnection after detecting a network change event
-        if (isBoundNetworksChanged && appConfig.isWireGuardEnabled()) {
-            refreshProxies()
-        }
     }
 
     private fun hasRouteChangedInAutoMode(out: NetworkChanges): Boolean {
@@ -3014,7 +3025,7 @@ class BraveVPNService :
                 ProxyManager.ID_WG_BASE + id
             } else if (WireguardManager.catchAllEnabled()) {
                 // if the enabled wireguard is catchall-wireguard, then return wireguard id
-                val id = WireguardManager.getCatchAllWireGuardProxyId() ?: return Backend.Base
+                val id = WireguardManager.getOptimalCatchAllConfigId() ?: return Backend.Base
                 ProxyManager.ID_WG_BASE + id
             } else {
                 // if the enabled wireguard is not one-wireguard, then return base
@@ -3022,7 +3033,7 @@ class BraveVPNService :
             }
         } else if (WireguardManager.catchAllEnabled()) { // check even if wireguard is not enabled
             // if the enabled wireguard is catchall-wireguard, then return wireguard id
-            val id = WireguardManager.getCatchAllWireGuardProxyId() ?: return Backend.Base
+            val id = WireguardManager.getOptimalCatchAllConfigId() ?: return Backend.Base
             // in this case, no need to check if the proxy is available
             ProxyManager.ID_WG_BASE + id
         } else {
@@ -3044,6 +3055,7 @@ class BraveVPNService :
         // clear the proxy handshake times
         logd("onProxiesStopped; clear the handshake times")
         wgHandShakeCheckpoints.clear()
+        WireguardManager.clearCatchAllCache()
     }
 
     override fun onProxyAdded(id: String) {
@@ -3053,9 +3065,11 @@ class BraveVPNService :
         }
         wgHandShakeCheckpoints[id] = elapsedRealtime()
         // new proxy added, refresh overlay network pair
-        val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
-        logd("onProxyAdded for proxy $id: $nw")
-        onOverlayNetworkChanged(nw ?: OverlayNetworks())
+        io("onProxyAdded") {
+            val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
+            logd("onProxyAdded for proxy $id: $nw")
+            onOverlayNetworkChanged(nw ?: OverlayNetworks())
+        }
     }
 
     override fun onProxyRemoved(id: String) {
@@ -3064,10 +3078,13 @@ class BraveVPNService :
             return
         }
         wgHandShakeCheckpoints.remove(id)
+        WireguardManager.clearCatchAllCacheForApp(id)
         // proxy removed, refresh overlay network pair
-        val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
-        logd("onProxyRemoved for proxy $id: $nw")
-        onOverlayNetworkChanged(nw ?: OverlayNetworks())
+        io("onProxyRemoved") {
+            val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
+            logd("onProxyRemoved for proxy $id: $nw")
+            onOverlayNetworkChanged(nw ?: OverlayNetworks())
+        }
     }
 
     override fun onDNSAdded(id: String) {
@@ -3097,6 +3114,41 @@ class BraveVPNService :
         dipport: String?
     ): Tab {
         return Tab()
+    }
+
+    override fun log(level: Int, msg: String) {
+        val l = Logger.LoggerType.fromId(level)
+        if (l.stacktrace()) {
+            Logger.crash(LOG_GO_LOGGER, msg) // log the stack trace
+            EnhancedBugReport.writeLogsToFile(this, msg)
+        } else if (l.user()) {
+            showNwEngineNotification(msg)
+        } else {
+            Logger.i(LOG_GO_LOGGER, msg)
+        }
+    }
+
+    private fun showNwEngineNotification(msg: String) {
+        if (msg.isEmpty()) {
+            return
+        }
+
+        val pendingIntent =
+            Utilities.getActivityPendingIntent(
+                this,
+                Intent(this, HomeScreenActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT,
+                mutable = false
+            )
+        val builder = NotificationCompat.Builder(this, WARNING_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification_icon)
+            .setContentTitle(msg)
+            .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+        builder.color =
+            ContextCompat.getColor(this, getAccentColor(persistentState.theme))
+        notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
     }
 
     override fun onSocketClosed(s: SocketSummary?) {
@@ -3371,8 +3423,8 @@ class BraveVPNService :
         if (oneWgId != null && oneWgId != WireguardManager.INVALID_CONF_ID) {
             val proxyId = "${ProxyManager.ID_WG_BASE}${oneWgId}"
             // regardless of whether this proxyId exists in go, use it to avoid leaks
-            val canRoute = vpnAdapter?.canRouteIp(proxyId, connTracker.destIP, true)
-            return if (canRoute == true) {
+            val canRoute = canRouteIp(proxyId, connTracker.destIP, true)
+            return if (canRoute) {
                 handleProxyHandshake(proxyId)
                 logd("flow: one-wg is enabled, returning $proxyId, $connId, $uid")
                 persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
@@ -3385,7 +3437,7 @@ class BraveVPNService :
             }
         }
 
-        val wgConfig = WireguardManager.getConfigIdForApp(uid) // also accounts for catch-all
+        val wgConfig = WireguardManager.getConfigIdForApp(uid, connTracker.destIP) // also accounts for catch-all
         if (wgConfig != null && wgConfig.id != WireguardManager.INVALID_CONF_ID) {
             val proxyId = "${ProxyManager.ID_WG_BASE}${wgConfig.id}"
             // even if inactive, route connections to wg if lockdown/catch-all is enabled to
@@ -3397,9 +3449,9 @@ class BraveVPNService :
                 // will have the effect of blocking all connections
                 // ie, if lockdown is enabled, split-tunneling happens as expected but if
                 // lockdown is disabled, it has the effect of blocking all connections
-                val canRoute = vpnAdapter?.canRouteIp(proxyId, connTracker.destIP, true)
+                val canRoute = canRouteIp(proxyId, connTracker.destIP, true)
                 logd("flow: wg is active/lockdown/catch-all; $proxyId, $connId, $uid; canRoute? $canRoute")
-                return if (canRoute == true) {
+                return if (canRoute) {
                     handleProxyHandshake(proxyId)
                     persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
                 } else {
@@ -3523,7 +3575,7 @@ class BraveVPNService :
         return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid)
     }
 
-    private fun handleProxyHandshake(id: String) {
+    private suspend fun handleProxyHandshake(id: String) {
         if (!id.startsWith(ProxyManager.ID_WG_BASE)) {
             // only wireguard proxies are considered for handshakes
             return
@@ -3535,7 +3587,7 @@ class BraveVPNService :
             return
         }
 
-        val stats = vpnAdapter?.getProxyStats(id)
+        val stats = getProxyStats(id)
         if (stats == null) {
             Logger.w(LOG_TAG_VPN, "flow: stats is null for $id")
             return
@@ -3590,12 +3642,16 @@ class BraveVPNService :
         io("refreshWg") { vpnAdapter?.refreshProxies() }
     }
 
-    fun getDnsStatus(id: String): Long? {
+    suspend fun getDnsStatus(id: String): Long? {
         return vpnAdapter?.getDnsStatus(id)
     }
 
     suspend fun getRDNS(type: RethinkBlocklistManager.RethinkBlocklistType): RDNS? {
         return vpnAdapter?.getRDNS(type)
+    }
+
+    suspend fun goBuildVersion(): String {
+        return vpnAdapter?.goBuildVersion() ?: ""
     }
 
     private fun persistAndConstructFlowResponse(
@@ -3702,7 +3758,7 @@ class BraveVPNService :
         )
     }
 
-    fun getProxyStatusById(id: String): Long? {
+    suspend fun getProxyStatusById(id: String): Long? {
         return if (vpnAdapter != null) {
             val status = vpnAdapter?.getProxyStatusById(id)
             status
@@ -3712,7 +3768,7 @@ class BraveVPNService :
         }
     }
 
-    fun getProxyStats(id: String): Stats? {
+    suspend fun getProxyStats(id: String): Stats? {
         return if (vpnAdapter != null) {
             vpnAdapter?.getProxyStats(id)
         } else {
@@ -3721,7 +3777,7 @@ class BraveVPNService :
         }
     }
 
-    fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean>? {
+    suspend fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean>? {
         return if (vpnAdapter != null) {
             vpnAdapter?.getSupportedIpVersion(id)
         } else {
@@ -3730,11 +3786,50 @@ class BraveVPNService :
         }
     }
 
-    fun isSplitTunnelProxy(id: String, pair: Pair<Boolean, Boolean>): Boolean {
+    suspend fun isSplitTunnelProxy(id: String, pair: Pair<Boolean, Boolean>): Boolean {
         return vpnAdapter?.isSplitTunnelProxy(id, pair) ?: false
+    }
+
+    suspend fun canRouteIp(id: String, ip: String, default: Boolean): Boolean {
+        return vpnAdapter?.canRouteIp(id, ip, default) ?: false
+    }
+
+    suspend fun initiateWgPing(id: String) {
+        vpnAdapter?.initiateWgPing(id)
     }
 
     fun syncP50Latency(id: String) {
         io("syncP50Latency") { vpnAdapter?.syncP50Latency(id) }
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        Logger.i(LOG_TAG_VPN, "onTrimMemory: $level")
+        if (level >= ComponentCallbacks2.TRIM_MEMORY_BACKGROUND) {
+            // TODO: call go to clear the cache
+            // show notification to user, that the app is consuming more memory
+            showMemoryNotification()
+        }
+    }
+
+    private fun showMemoryNotification() {
+        val pendingIntent =
+            Utilities.getActivityPendingIntent(
+                this,
+                Intent(this, HomeScreenActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT,
+                mutable = false
+            )
+
+        val builder = NotificationCompat.Builder(this, WARNING_CHANNEL_ID)
+            .setContentTitle(getString(R.string.memory_notification_text))
+            .setSmallIcon(R.drawable.ic_notification_icon)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+        builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(MEMORY_NOTIFICATION_ID, builder.build())
     }
 }

@@ -60,7 +60,7 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
                     newConnection: DoHEndpoint
                 ): Boolean {
                     return (oldConnection.id == newConnection.id &&
-                        oldConnection.isSelected == newConnection.isSelected)
+                            oldConnection.isSelected == newConnection.isSelected)
                 }
 
                 override fun areContentsTheSame(
@@ -68,7 +68,7 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
                     newConnection: DoHEndpoint
                 ): Boolean {
                     return (oldConnection.id == newConnection.id &&
-                        oldConnection.isSelected != newConnection.isSelected)
+                            oldConnection.isSelected != newConnection.isSelected)
                 }
             }
     }
@@ -140,16 +140,25 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
                     ?.lifecycle
                     ?.currentState
                     ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false ||
-                    bindingAdapterPosition == RecyclerView.NO_POSITION
+                bindingAdapterPosition == RecyclerView.NO_POSITION
             ) {
                 statusCheckJob?.cancel()
                 return
             }
 
-            // always use the id as Dnsx.Preffered as it is the primary dns id for now
-            val state = VpnController.getDnsStatus(Backend.Preferred)
-            val status = getDnsStatusStringRes(state)
-            b.endpointDesc.text = context.getString(status).replaceFirstChar(Char::titlecase)
+            updateDnsStatus()
+        }
+
+        private fun updateDnsStatus() {
+            io {
+                // always use the id as Dnsx.Preffered as it is the primary dns id for now
+                val state = VpnController.getDnsStatus(Backend.Preferred)
+                val status = getDnsStatusStringRes(state)
+                uiCtx {
+                    b.endpointDesc.text =
+                        context.getString(status).replaceFirstChar(Char::titlecase)
+                }
+            }
         }
 
         private fun showIcon(endpoint: DoHEndpoint) {
@@ -198,14 +207,12 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
             builder.setTitle(title)
             builder.setMessage(url + "\n\n" + getDnsDesc(message))
             builder.setCancelable(true)
-            builder.setPositiveButton(context.getString(R.string.dns_info_positive)) {
-                dialogInterface,
-                _ ->
+            builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface,
+                                                                                       _ ->
                 dialogInterface.dismiss()
             }
-            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) {
-                _: DialogInterface,
-                _: Int ->
+            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface,
+                                                                                     _: Int ->
                 clipboardCopy(context, url, context.getString(R.string.copy_clipboard_label))
                 Utilities.showToastUiCentered(
                     context,

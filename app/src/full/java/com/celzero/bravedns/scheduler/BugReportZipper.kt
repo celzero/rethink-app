@@ -17,15 +17,17 @@
 package com.celzero.bravedns.scheduler
 
 import Logger
-import Logger.LOG_TAG_SCHEDULER
+import Logger.LOG_TAG_BUG_REPORT
 import android.app.ApplicationExitInfo
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.celzero.bravedns.BuildConfig
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities
 import com.google.common.io.Files
+import intra.Intra
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -80,10 +82,10 @@ object BugReportZipper {
         return try {
             ZipFile(getZipFileName(dir))
         } catch (e: FileNotFoundException) {
-            Logger.w(LOG_TAG_SCHEDULER, "File not found exception while creating zip file", e)
+            Logger.w(LOG_TAG_BUG_REPORT, "File not found exception while creating zip file", e)
             null
         } catch (e: ZipException) {
-            Logger.w(LOG_TAG_SCHEDULER, "Zip exception while creating zip file", e)
+            Logger.w(LOG_TAG_BUG_REPORT, "Zip exception while creating zip file", e)
             null
         }
     }
@@ -96,7 +98,7 @@ object BugReportZipper {
 
     // Get the oldest file modified in the zip file to replace
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun getOldestEntry(directory: ZipFile?): String {
+    fun getOldestEntry(directory: ZipFile?): String {
         if (directory?.entries() == null) return ""
 
         val entries = directory.entries().toList().sortedBy { it.lastModifiedTime.toMillis() }
@@ -153,7 +155,7 @@ object BugReportZipper {
     private fun addNewZipEntry(zo: ZipOutputStream, file: File) {
         if (file.isDirectory) return
 
-        Logger.i(LOG_TAG_SCHEDULER, "Add new file: ${file.name} to bug_report.zip")
+        Logger.i(LOG_TAG_BUG_REPORT, "Add new file: ${file.name} to bug_report.zip")
         val entry = ZipEntry(file.name)
         zo.putNextEntry(entry)
         FileInputStream(file).use { inStream -> copy(inStream, zo) }
@@ -168,7 +170,7 @@ object BugReportZipper {
         while (entries.hasMoreElements()) {
             val e = entries.nextElement()
             if (ignoreFileName == e.name) {
-                Logger.i(LOG_TAG_SCHEDULER, "Ignoring file to be replaced: ${e.name}")
+                Logger.i(LOG_TAG_BUG_REPORT, "Ignoring file to be replaced: ${e.name}")
                 continue
             }
 
@@ -213,11 +215,16 @@ object BugReportZipper {
         }
     }
 
-    fun dumpPrefs(prefs: SharedPreferences, file: File) {
+    suspend fun dumpPrefs(prefs: SharedPreferences, file: File) {
         val prefsMap = prefs.all
         val prefsDetails = StringBuilder()
-        prefsMap.forEach { (key, value) -> prefsDetails.append("$key=$value\n") }
+        prefsMap.forEach { (key, value) -> prefsDetails.append("\n$key=$value") }
         file.appendText(prefsDetails.toString())
+        val separator = "--------------------------------------------\n"
+        file.appendText(separator)
+        val build = VpnController.goBuildVersion()
+        file.appendText(build)
+        file.appendText(separator)
     }
 
     private fun copy(input: InputStream, output: OutputStream) {

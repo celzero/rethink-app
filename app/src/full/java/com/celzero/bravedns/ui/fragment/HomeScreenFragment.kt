@@ -397,47 +397,51 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val proxyType = AppConfig.ProxyType.of(appConfig.getProxyType())
 
         if (proxyType.isProxyTypeWireguard()) {
-            val proxies = WireguardManager.getEnabledConfigs()
-            var active = 0
-            var failing = 0
-            proxies.forEach {
-                val proxyId = "${ProxyManager.ID_WG_BASE}${it.getId()}"
-                val status = VpnController.getProxyStatusById(proxyId)
-                if (status != null) {
-                    // consider starting and up as active
-                    if (status == Backend.TOK || status == Backend.TUP || status == Backend.TZZ) {
-                        active++
+            io {
+                val proxies = WireguardManager.getEnabledConfigs()
+                var active = 0
+                var failing = 0
+                proxies.forEach {
+                    val proxyId = "${ProxyManager.ID_WG_BASE}${it.getId()}"
+                    val status = VpnController.getProxyStatusById(proxyId)
+                    if (status != null) {
+                        // consider starting and up as active
+                        if (status == Backend.TOK || status == Backend.TUP || status == Backend.TZZ) {
+                            active++
+                        } else {
+                            failing++
+                        }
                     } else {
                         failing++
                     }
-                } else {
-                    failing++
                 }
-            }
-            b.fhsCardOtherProxyCount.visibility = View.VISIBLE
-            // show as 3 active 1 failing, if failing is 0 show as 4 active
-            if (failing > 0) {
-                b.fhsCardProxyCount.text =
-                    getString(
-                        R.string.orbot_stop_dialog_message_combo,
-                        getString(
-                            R.string.two_argument_space,
-                            active.toString(),
-                            getString(R.string.lbl_active)
-                        ),
-                        getString(
-                            R.string.two_argument_space,
-                            failing.toString(),
-                            getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
-                        )
-                    )
-            } else {
-                b.fhsCardProxyCount.text =
-                    getString(
-                        R.string.two_argument_space,
-                        active.toString(),
-                        getString(R.string.lbl_active)
-                    )
+                uiCtx {
+                    b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+                    // show as 3 active 1 failing, if failing is 0 show as 4 active
+                    if (failing > 0) {
+                        b.fhsCardProxyCount.text =
+                            getString(
+                                R.string.orbot_stop_dialog_message_combo,
+                                getString(
+                                    R.string.two_argument_space,
+                                    active.toString(),
+                                    getString(R.string.lbl_active)
+                                ),
+                                getString(
+                                    R.string.two_argument_space,
+                                    failing.toString(),
+                                    getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
+                                )
+                            )
+                    } else {
+                        b.fhsCardProxyCount.text =
+                            getString(
+                                R.string.two_argument_space,
+                                active.toString(),
+                                getString(R.string.lbl_active)
+                            )
+                    }
+                }
             }
         } else {
             b.fhsCardProxyCount.text = getString(R.string.lbl_active)
@@ -493,10 +497,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             if (it in 0L..19L) {
                 val string =
                     getString(
-                            R.string.ci_desc,
-                            getString(R.string.lbl_very),
-                            getString(R.string.lbl_fast)
-                        )
+                        R.string.ci_desc,
+                        getString(R.string.lbl_very),
+                        getString(R.string.lbl_fast)
+                    )
                         .replaceFirstChar(Char::titlecase)
                 b.fhsCardDnsLatency.text = string
             } else if (it in 20L..50L) {
@@ -508,10 +512,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else {
                 val string =
                     getString(
-                            R.string.ci_desc,
-                            getString(R.string.lbl_very),
-                            getString(R.string.lbl_slow)
-                        )
+                        R.string.ci_desc,
+                        getString(R.string.lbl_very),
+                        getString(R.string.lbl_slow)
+                    )
                         .replaceFirstChar(Char::titlecase)
                 b.fhsCardDnsLatency.text = string
             }
@@ -674,7 +678,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 val bypassCount =
                     copy.count { a ->
                         a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id ||
-                            a.firewallStatus ==
+                                a.firewallStatus ==
                                 FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL.id
                     }
                 val excludedCount =
@@ -810,7 +814,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             Logger.d(LOG_TAG_UI, "above P, background restricted: ${am.isBackgroundRestricted}")
             am.isBackgroundRestricted ||
-                isBackgroundRestricted == ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED
+                    isBackgroundRestricted == ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED
         } else {
             isBackgroundRestricted == ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED
         }
@@ -1093,6 +1097,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 ScreenType.ALERTS -> Intent(requireContext(), AlertsActivity::class.java)
                 ScreenType.RETHINK ->
                     Intent(requireContext(), ConfigureRethinkBasicActivity::class.java)
+
                 ScreenType.PROXY_WIREGUARD -> Intent(requireContext(), WgMainActivity::class.java)
             }
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
@@ -1222,8 +1227,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun registerForActivityResult() {
         startForResult =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                result: ActivityResult ->
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
                 when (result.resultCode) {
                     Activity.RESULT_OK -> {
                         startVpnService()
@@ -1250,10 +1254,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 } else {
                     Logger.w(LOG_TAG_UI, "User rejected notification permission")
                     Snackbar.make(
-                            requireActivity().findViewById<View>(android.R.id.content).rootView,
-                            getString(R.string.hsf_notification_permission_failure),
-                            Snackbar.LENGTH_LONG
-                        )
+                        requireActivity().findViewById<View>(android.R.id.content).rootView,
+                        getString(R.string.hsf_notification_permission_failure),
+                        Snackbar.LENGTH_LONG
+                    )
                         .show()
                 }
             }
@@ -1272,7 +1276,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         if (appConfig.getBraveMode().isFirewallMode()) {
             status.connectionState = BraveVPNService.State.WORKING
         }
-
         if (status.on) {
             colorId = fetchTextColor(R.color.accentGood)
             statusId =
@@ -1339,7 +1342,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 statusId = R.string.status_protected_with_tor
             } else if (
                 (appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) &&
-                    isPrivateDnsActive(requireContext())
+                isPrivateDnsActive(requireContext())
             ) { // SOCKS5 + Http + PrivateDns
                 statusId = R.string.status_protected_with_proxy_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)

@@ -99,6 +99,9 @@
     <string name="lbl_on_device" translatable="true">on-device</string>
     <string name="lbl_ip" translatable="false">IP</string>
     <string name="lbl_unselected" translatable="true">Unselected</string>
+    <string name="lbl_notification" translatable="true">notification</string>
+
+    <string name="memory_notification_text">Rethink is experiencing low memory. System actions may be limited.</string>
 
     <string name="symbol_upload" translatable="false">%1$s 🔺</string>
     <string name="symbol_download" translatable="false">%1$s 🔻</string>
@@ -399,13 +402,13 @@
 
     <string name="app_mode_choose" translatable="true">Choose mode</string>
 
-    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Inside Job</b><br/><br/>
-        1. New: IP and DNS logs for each app with a new organized view.<br/>
-        2. New: Setting to optionally <i>exclude</i> proxy forwarder apps.<br/>
-        3. New: Bypass apps from all proxies.<br/>
-        3. Fix DNSCrypt crashing with <i>DNS Booster</i> enabled.<br/>
-        4. Fix IPv6 to IPv4 translation in certain cases.<br/>
-        3. Other bug fixes and improvements.<br/><br/>
+    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Don\'t Panic 2</b><br/><br/>
+        1. New: Capture network engine errors in user bug reports.<br/>
+        2. New: use System DNS for "undelegated" domain names iff Prevent DNS leaks is ON.<br/>
+        3. Improvement: Dual-stack (IPv4 + IPv6) WireGuard connectivity.<br/>
+        4. Improvement: Avoid blocking the UI elements when the network engine is unresponsive.<br/>
+        5. Fix: Connection timeouts with Advanced DNS filtering turned ON.<br/>
+        6. Fix: WireGuard peer endpoints with domain names hang on network changes.<br/><br/>
 
         <a href="https://svc.rethinkdns.com/r/translate">Help translate this app</a>]]>
     </string>
@@ -544,6 +547,8 @@
     <string name="settings_gologger_dialog_option_3" translatable="false">Info (default)</string>
     <string name="settings_gologger_dialog_option_4" translatable="false">Warn</string>
     <string name="settings_gologger_dialog_option_5" translatable="false">Error</string>
+    <string name="settings_gologger_dialog_option_6" translatable="false">Stack trace</string>
+    <string name="settings_gologger_dialog_option_7" translatable="false">None</string>
 
     <string name="settings_http_proxy_desc" translatable="true">Forwarding to %1$s</string>
     <string name="settings_http_proxy_dialog_title" translatable="true">Custom Server URL</string>
@@ -1290,8 +1295,8 @@
 
     <string name="bypass_dns_firewall_tooltip">%1$s works with Rethink\'s DNS only</string>
 
-    <string name="exclude_apps_from_proxy">Bypass app from all Proxies</string>
-    <string name="exclude_apps_from_proxy_failure_toast">Bypass app from all Proxies is enabled</string>
+    <string name="exclude_apps_from_proxy">Bypass app from all proxies</string>
+    <string name="exclude_apps_from_proxy_failure_toast">This app bypasses proxies</string>
 
     <!-- app info bottom sheet -->
     <string name="bsac_title_desc" translatable="true">Rules apply to this app only.</string>

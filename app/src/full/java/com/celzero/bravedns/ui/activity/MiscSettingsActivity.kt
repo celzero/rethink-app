@@ -451,7 +451,9 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 getString(R.string.settings_gologger_dialog_option_2),
                 getString(R.string.settings_gologger_dialog_option_3),
                 getString(R.string.settings_gologger_dialog_option_4),
-                getString(R.string.settings_gologger_dialog_option_5)
+                getString(R.string.settings_gologger_dialog_option_5),
+                getString(R.string.settings_gologger_dialog_option_6),
+                getString(R.string.settings_gologger_dialog_option_7)
             )
         val checkedItem = persistentState.goLoggerLevel.toInt()
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
@@ -461,7 +463,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             }
 
             persistentState.goLoggerLevel = which.toLong()
-            GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel)
+            GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
             updateConfigLevel(persistentState.goLoggerLevel)
         }
         alertBuilder.create().show()

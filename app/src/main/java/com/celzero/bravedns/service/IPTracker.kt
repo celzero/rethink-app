@@ -108,20 +108,24 @@ internal constructor(
         return s
     }
 
-    suspend fun insertBatch(conns: List<ConnectionTracker>) {
+    suspend fun insertBatch(logs: List<*>) {
+        val conns = logs as? List<ConnectionTracker> ?: return
         connectionTrackerRepository.insertBatch(conns)
     }
 
-    suspend fun insertRethinkBatch(conns: List<RethinkLog>) {
+    suspend fun insertRethinkBatch(logs: List<*>) {
+        val conns = logs as? List<RethinkLog> ?: return
         rethinkLogRepository.insertBatch(conns)
     }
 
-    suspend fun updateBatch(summary: List<ConnectionSummary>) {
-        connectionTrackerRepository.updateBatch(summary)
+    suspend fun updateBatch(logs: List<*>) {
+        val smms = logs as? List<ConnectionSummary> ?: return
+        connectionTrackerRepository.updateBatch(smms)
     }
 
-    suspend fun updateRethinkBatch(summary: List<ConnectionSummary>) {
-        rethinkLogRepository.updateBatch(summary)
+    suspend fun updateRethinkBatch(logs: List<*>) {
+        val smms = logs as? List<ConnectionSummary> ?: return
+        rethinkLogRepository.updateBatch(smms)
     }
 
     private fun convertIpV6ToIpv4IfNeeded(ip: String): InetAddress? {
