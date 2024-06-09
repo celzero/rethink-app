@@ -463,7 +463,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             }
 
             persistentState.goLoggerLevel = which.toLong()
-            GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel)
+            GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
             updateConfigLevel(persistentState.goLoggerLevel)
         }
         alertBuilder.create().show()
