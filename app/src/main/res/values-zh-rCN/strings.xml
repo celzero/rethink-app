@@ -1028,4 +1028,5 @@
     <string name="settings_connectivity_checks_desc" translatable="true">进行互联检查，以确定可达性。</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">保护! 连接DNS+防火墙+Proxy.</string>
     <string name="lbl_background_data" translatable="true">限制背景数据</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">如果残疾,将代理人(SOCKS5、HTTP、DNS)从Rethink\'s TER隧道中排除.</string>
 </resources>
