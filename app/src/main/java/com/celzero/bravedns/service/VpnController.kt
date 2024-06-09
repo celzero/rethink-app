@@ -300,6 +300,10 @@ object VpnController : KoinComponent {
         braveVpnService?.refreshProxies()
     }
 
+    suspend fun initiateWgPing(wgId: String) {
+        braveVpnService?.initiateWgPing(wgId)
+    }
+
     fun closeConnectionsIfNeeded(uid: Int = INVALID_UID) {
         braveVpnService?.closeConnectionsIfNeeded(uid)
     }

@@ -1121,11 +1121,10 @@ class GoVpnAdapter : KoinComponent {
             return ""
         }
 
-        fun setLogLevel(level: Long) {
+        fun setLogLevel(level: Int) {
             // 0 - very verbose, 1 - verbose, 2 - debug, 3 - info, 4 - warn, 5 - error, 6 - stacktrace, 7 - none
             // TODO: setting for console log level?, set as STACKTRACE for now
-            Intra.logLevel(level, Logger.LoggerType.STACKTRACE.id.toLong())
-            //Intra.logLevel(level, level)
+            Intra.logLevel(level, Logger.LoggerType.STACKTRACE.id)
             Logger.i(LOG_TAG_VPN, "set log level: $level, stacktrace")
         }
     }
@@ -1237,6 +1236,15 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "err isSplitTunnelProxy($proxyId): ${e.message}")
             false
+        }
+    }
+
+    suspend fun initiateWgPing(wgId: String) {
+        try {
+            val res = getProxies()?.getProxy(wgId)?.ping()
+            Logger.i(LOG_TAG_VPN, "initiateWgPing($wgId): $res")
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "err initiateWgPing($wgId): ${e.message}")
         }
     }
 

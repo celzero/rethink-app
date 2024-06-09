@@ -504,8 +504,20 @@ object WireguardManager : KoinComponent {
                 return it.id
             }
         }
-        // if no catch-all config is active, return any catch-all config
-        return catchAllList.firstOrNull()?.id
+        // none of the catch-all has valid connection, send ping to all catch-all configs
+        pingCatchAllConfigs(catchAllList)
+        // return any catch-all config
+        return catchAllList.random().id
+    }
+
+    private fun pingCatchAllConfigs(catchAllConfigs: List<WgConfigFilesImmutable>) {
+        io {
+            // ping the catch-all config
+            catchAllConfigs.forEach {
+                val id = ProxyManager.ID_WG_BASE + it.id
+                VpnController.initiateWgPing(id)
+            }
+        }
     }
 
     private suspend fun isProxyConnectionValid(wgId: Int, ip: String, default: Boolean = false): Boolean {
@@ -931,7 +943,8 @@ object WireguardManager : KoinComponent {
             }
         }
         Logger.d(LOG_TAG_PROXY, "no optimal catch all config found, returning any catchall")
-        return configs.firstOrNull()?.id
+        // if no catch-all config is active, return any catch-all config
+        return configs.random()?.id
     }
 
     private fun io(f: suspend () -> Unit) {

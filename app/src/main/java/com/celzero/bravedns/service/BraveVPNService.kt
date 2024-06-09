@@ -2067,7 +2067,7 @@ class BraveVPNService :
             } else {
                 // create a new vpn adapter
                 vpnAdapter = GoVpnAdapter(this, vpnScope, tunFd, opts) // may throw
-                GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel)
+                GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
                 vpnAdapter!!.initResolverProxiesPcap(opts)
                 return ok
             }
@@ -3792,6 +3792,10 @@ class BraveVPNService :
 
     suspend fun canRouteIp(id: String, ip: String, default: Boolean): Boolean {
         return vpnAdapter?.canRouteIp(id, ip, default) ?: false
+    }
+
+    suspend fun initiateWgPing(id: String) {
+        vpnAdapter?.initiateWgPing(id)
     }
 
     fun syncP50Latency(id: String) {
