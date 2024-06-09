@@ -1029,4 +1029,5 @@
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">保护! 连接DNS+防火墙+Proxy.</string>
     <string name="lbl_background_data" translatable="true">限制背景数据</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">如果残疾,将代理人(SOCKS5、HTTP、DNS)从Rethink\'s TER隧道中排除.</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">关闭后，将代理（SOCKS5、HTTP、DNS）转发器应用程序从 Rethink 的 VPN 隧道中排除。</string>
 </resources>
