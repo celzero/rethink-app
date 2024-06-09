@@ -35,7 +35,7 @@
 \nNúmero de puerto: %2$s</string>
     <string name="dns_proxy_dialog_header_dns">Añadir proxy DNS</string>
     <string name="cd_toast_added">Dominio añadido con éxito</string>
-    <string name="whats_new_version_update">&lt;b&gt;Trabajo interno&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Nuevo: registros de IP y DNS para cada aplicación con una nueva vista organizada.&lt;br/&gt; 2. Nuevo: configuración para &lt;i&gt;excluir opcionalmente&lt; /i&gt; aplicaciones de reenvío de proxy.&lt;br/&gt; 3. Nuevo: omitir aplicaciones de todos los servidores proxy.&lt;br/&gt; 3. Solucionar el bloqueo de DNSCrypt con &lt;i&gt;DNS Booster&lt;/i&gt; habilitado.&lt;br/&gt; 4. Solucionar IPv6 a traducción IPv4 en ciertos casos.&lt;br/&gt; 3. Otras correcciones de errores y mejoras.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt; /a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Que no cunda el pánico 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Nuevo: Captura de errores del motor de red en los informes de errores de los usuarios.&lt;br/&gt; 2. Nuevo: use el DNS del sistema para nombres de dominio no delegados si la opción Evitar fugas de DNS está activada.&lt;br/&gt; 3. Mejora: Conectividad WireGuard de doble pila (IPv4 + IPv6).&lt;br/&gt; 4. Mejora: Evite bloquear los elementos de la interfaz de usuario cuando el motor de red no responde.&lt;br/&gt; 5. Corrección: Tiempos de espera de conexión con el filtrado de DNS avanzado activado.&lt;br/&gt; 6. Corrección: Los terminales de pares de WireGuard con nombres de dominio se bloquean en los cambios de red.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Help traducir esta aplicación&lt;/a&gt;</string>
     <string name="dc_dns_leaks_desc">Cuando está activado, Rethink captura todos los paquetes en el puerto 53 y los reenvía a un punto de acceso DNS establecido por el usuario</string>
     <string name="about_settings_app_info">Información de la aplicación</string>
     <string name="settings_orbot_disabled_error">Desactive el proxy HTTP(S) y/o SOCKS5 para continuar con la configuración de Tor-como-un-proxy.</string>
@@ -1031,8 +1031,8 @@
     <string name="battery_optimization_dialog_heading" translatable="true">Deshabilitar %1$s</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplicaciones de reenvío proxy en bucle invertido</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Si se desactiva, excluye las aplicaciones proxy (SOCKS5, HTTP, DNS) del túnel VPN de Rethink.</string>
-    <string name="exclude_apps_from_proxy">Omitir la aplicación desde todos los Proxies</string>
-    <string name="exclude_apps_from_proxy_failure_toast">La omisión de la aplicación de todos los Proxies está habilitada</string>
+    <string name="exclude_apps_from_proxy">Omitir la aplicación desde todos los proxies</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Esta aplicación evita los servidores proxy</string>
     <string name="lbl_notification" translatable="true">notification</string>
     <string name="memory_notification_text">Rethink tiene poca memoria. Las acciones del sistema pueden estar limitadas.</string>
 </resources>
