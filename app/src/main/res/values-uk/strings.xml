@@ -160,7 +160,7 @@
 \nRethink не збирає жодної інформації та жодним чином не шпигує за вами.</string>
     <string name="download_update_dialog_message" translatable="true">Нова версія застосунку доступна для завантаження з вебсайту. Ви бажаєте продовжити\?</string>
     <string name="settings_locale_dialog_neutral" translatable="true">Допоможіть перекласти цей застосунок</string>
-    <string name="settings_biometeric_heading" translatable="true">Увімкнути блокування застосунків</string>
+    <string name="settings_biometeric_heading" translatable="true">Увімкнути блокування застосунку</string>
     <string name="settings_biometric_desc" translatable="true">Захистіть цей застосунок за допомогою блокування екрана</string>
     <string name="apps_icon_content_desc" translatable="true">Іконка застосунку</string>
     <string name="ct_bs_app_info_error" translatable="true">Інформація про застосунок не знайдено</string>
@@ -510,4 +510,6 @@
     <string name="lbl_private" translatable="true">приватний</string>
     <string name="lbl_unselected" translatable="true">Не обрано</string>
     <string name="lbl_stopped" translatable="true">Зупинено</string>
+    <string name="settings_go_log_heading" translatable="true">Рівень логування</string>
+    <string name="settings_go_log_desc" translatable="true">Для налагодження</string>
 </resources>
