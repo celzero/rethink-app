@@ -119,6 +119,18 @@ object Logger : KoinComponent {
         }
     }
 
+    fun enableCrashlytics() {
+        if (Utilities.isPlayStoreFlavour()) {
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
+        }
+    }
+
+    fun disableCrashlytics() {
+        if (Utilities.isPlayStoreFlavour()) {
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false)
+        }
+    }
+
     fun updateConfigLevel(level: Long) {
         logLevel = level
     }

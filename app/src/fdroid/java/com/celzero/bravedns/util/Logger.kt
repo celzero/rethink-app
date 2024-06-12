@@ -105,6 +105,14 @@ object Logger : KoinComponent {
         log(tag, message, LoggerType.ERROR, e)
     }
 
+    fun enableCrashlytics() {
+        // no-op, crashlytics is not used for F-Droid builds
+    }
+
+    fun disableCrashlytics() {
+        // no-op, crashlytics is not used for F-Droid builds
+    }
+
     fun updateConfigLevel(level: Long) {
         logLevel = level
     }

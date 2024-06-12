@@ -106,6 +106,14 @@ object Logger : KoinComponent {
         log(tag, message, LoggerType.ERROR, e)
     }
 
+    fun enableCrashlytics() {
+        // no-op, Crashlytics is not used for website variant
+    }
+
+    fun disableCrashlytics() {
+        // no-op, Crashlytics is not used for website variant
+    }
+
     fun updateConfigLevel(level: Long) {
         logLevel = level
     }

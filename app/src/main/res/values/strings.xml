@@ -628,6 +628,9 @@
 
     <string name="pcap_failure_toast" translatable="true">Error creating pcap file, Try again!</string>
 
+    <string name="settings_crashlytics_title" translatable="true">Stablility improvement program</string>
+    <string name="settings_crashlytics_desc" translatable="true">When app encounters an error, error logs are obtained and analysed to produce a solution.</string>
+
     <!-- AppDetailActivity -->
     <string name="apps_icon_content_desc" translatable="true">Application Icon</string>
 
