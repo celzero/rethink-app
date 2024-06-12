@@ -509,4 +509,5 @@
     <string name="lbl_secure" translatable="true">безпечний</string>
     <string name="lbl_private" translatable="true">приватний</string>
     <string name="lbl_unselected" translatable="true">Не обрано</string>
+    <string name="lbl_stopped" translatable="true">Зупинено</string>
 </resources>
