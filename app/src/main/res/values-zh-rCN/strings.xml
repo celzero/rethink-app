@@ -56,7 +56,7 @@
     <string name="firewall_rule_block_ip_univ_desc">一项用户定义的全局防火墙规则拦截了此<i>目标 IP / 端口</i>。<br/><br/>若需更改，请移步<i>全局</i>选项卡。</string>
     <string name="firewall_rule_global_lockdown_desc">此连接因全局闭关模式而被拦截。<br/><br/>若需更改，请至<i>全局</i>选项卡。</string>
     <string name="category_name_sys_components">系统组件</string>
-    <string name="cd_dialog_error_invalid_wildcard">无效通配符、 URL 或域名。</string>
+    <string name="cd_dialog_error_invalid_wildcard">无效通配符、 URL 或域名</string>
     <string name="ci_no_rule">无规则</string>
     <string name="rt_dialog_message">您是否想要应用新配置的屏蔽名单？</string>
     <string name="dc_dns_proxy">DNS 代理</string>
@@ -207,7 +207,7 @@
     <string name="settings_proxy_header">代理</string>
     <string name="settings_http_proxy_error_text2">无效端口</string>
     <string name="settings_dns_proxy_dialog_username">帐号</string>
-    <string name="settings_ip_dialog_ipv46">自动（测试功能）</string>
+    <string name="settings_ip_dialog_ipv46">自动（实验性）</string>
     <string name="firewall_status_block_unmetered">已阻止连接非收费（ WiFi ）网络</string>
     <string name="firewall_status_blocked">已拦截</string>
     <string name="dns_card_latency_inactive">请启用 DNS 模式。</string>
@@ -225,7 +225,7 @@
     <string name="firewall_rule_device_lock">设备已锁定</string>
     <string name="notif_dialog_pause_dialog_title">应用已暂停！</string>
     <string name="notif_channel_vpn_failure">VPN 未启用</string>
-    <string name="cd_dialog_error_invalid_domain">无效 URL 或域名。</string>
+    <string name="cd_dialog_error_invalid_domain">无效 URL 或域名</string>
     <string name="ci_dialog_edittext_hint">IP 地址、子网或端口</string>
     <string name="ada_noapp_dialog_message">未找到指定应用的信息。此应用或许已被卸载。</string>
     <string name="rt_dialog_title">保存更改</string>
@@ -653,7 +653,7 @@
     <string name="settings_notification_dialog_option_2">"
 \nDNS / DNS + 防火墙：
 \n显示两个按钮来快速在省电的 DNS 模式和普通的 DNS + 防火墙模式间切换。"</string>
-    <string name="contributors_list">&lt;i&gt;Rethink 开源项目&lt;/i&gt;的存在归功于这些在其开发工作上倾泻大量时间的志愿者。&lt;br/&gt; &lt;br/&gt;🛡️ Android 应用程序 &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 网络引擎 &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 解析服务 &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ 社区协管 &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;Andersen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 IP 地理位置数据库 &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ 翻译 &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 图标 &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 构建服务器 &lt;br/&gt;&lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list">&lt;i&gt;Rethink 开源项目&lt;/i&gt;的存在归功于这些在其开发工作上倾泻大量时间的志愿者。&lt;br/&gt; &lt;br/&gt;🛡️ Android 应用程序 &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 网络引擎 &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Lanius-collaris&gt;Lanius-collaris&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 解析服务 &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ 社区协管 &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;Andersen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 IP 地理位置数据库 &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ 翻译 &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 图标 &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 构建服务器 &lt;br/&gt;&lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="hs_download_positive_default">确定</string>
     <string name="firewall_rule_block_app_unmetered_desc">一项用户定义的防火墙规则在此<i>应用</i>尝试连接至<i>非收费网络</i>时将其拦截。<br/><br/>若需更改，请移步<i>所有应用</i>选项卡。</string>
     <string name="settings_protocol_translation_dns_inactive">切换至 DNS 或 DNS + 防火墙模式以启用此设置</string>
@@ -728,7 +728,7 @@
     <string name="rt_filter_hint">正显示<u>所有</u>屏蔽名单</string>
     <string name="firewall_rule_block_univ_ip">IP / 端口（全局）</string>
     <string name="ada_app_isolate">隔离</string>
-    <string name="rt_filter_parent_selected">已选择</string>
+    <string name="rt_filter_parent_selected">已选</string>
     <string name="rt_filter_desc">正显示 <u>%1$s</u> 个屏蔽名单</string>
     <string name="rt_filter_desc_subgroups">正显示 %2$s 组与子分组 %3$s 的 <u>%1$s</u> 个屏蔽名单</string>
     <string name="about_app_translate">翻译</string>
@@ -848,7 +848,7 @@
     <string name="ada_app_firewall" translatable="true">防火墙</string>
     <string name="brbs_backup_restore_desc" translatable="true">无法跨版本使用</string>
     <string name="bypass_dns_firewall_tooltip">%1$s 仅于 Rethink 的 DNS 生效</string>
-    <string name="lbl_maybe_blocked" translatable="true">可能被封锁</string>
+    <string name="lbl_maybe_blocked" translatable="true">或被拦截</string>
     <string name="lbl_network" translatable="true">网络</string>
     <string name="settings_allow_lan_desc" translatable="true">将局域网、环回、多播与本地链路路由排除于 Rethink 的 VPN 隧道外。</string>
     <string name="settings_allow_lan_heading" translatable="true">勿路由私有 IP （实验性）</string>
@@ -885,7 +885,7 @@
     <string name="lbl_dns_servers" translatable="true">DNS 服务器</string>
     <string name="lbl_applications" translatable="true">应用程序</string>
     <string name="lbl_include" translatable="true">包含</string>
-    <string name="lbl_select_all" translatable="true">全部选择</string>
+    <string name="lbl_select_all" translatable="true">全选</string>
     <string name="lbl_active" translatable="true">已启用</string>
     <string name="lbl_generated" translatable="true">（生成）</string>
     <string name="lbl_random" translatable="true">（随机）</string>
@@ -988,7 +988,7 @@
     <string name="settings_rinr_dialog_desc" translatable="true">这会同时启用“<!--settings_network_all_networks--> %1$s”设置。您是否想要继续？</string>
     <string name="one_wg_apps_added" translatable="true">正在路由所有应用</string>
     <string name="wg_lockdown_dialog_title" translatable="true">闭关</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">选定的应用程序只能通过该 WireGuard VPN 路由，无论连接是否成功。</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">所选应用将仅由此 WireGuard VPN 路由，无论是否成功连接此 VPN 。</string>
     <string name="one_wg_dialog_desc" translatable="true">包括 DNS 在内的来自所有应用的流量将被单个活跃的 WireGuard VPN 路由。其他活跃的 WireGuard VPN 将被停止。</string>
     <string name="catch_all_wg_dialog_title" translatable="true">永久连接</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">所有未被其他 WireGuard VPN 路由的应用的连接将经此 VPN 路由。</string>
@@ -1014,20 +1014,24 @@
     <string name="wg_apps_dialog_title_exclude" translatable="true">排除 %1$s 个应用</string>
     <string name="wireguard_disable_title" translatable="true">停止 WireGuard</string>
     <string name="wireguard_disable_message" translatable="true">是否停止所有活跃 WireGuard VPN ？</string>
-    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> 可能会导致连接丢失。 更改设置以让 Rethink 在后台调用数据和其他资源。</string>
-    <string name="toast_allow_bypass_disabled" translatable="true">由于代理处于活动状态，%1$s 被禁用</string>
-    <string name="lbl_unselected" translatable="true">未选中的</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> 可能导致连接丢失。 更改设置以允许 Rethink 在后台使用数据和其他资源。</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">因已启用代理， %1$s 已被禁用</string>
+    <string name="lbl_unselected" translatable="true">未选</string>
     <string name="battery_optimization_dialog_heading" translatable="true">禁用 %1$s</string>
     <string name="dc_proxy_dns_heading" translatable="true">从不代理 DNS</string>
-    <string name="dc_proxy_dns_desc" translatable="true">不要通过Always-on WireGuard、SOCKS5、HTTP 代理来代理 DNS。</string>
+    <string name="dc_proxy_dns_desc" translatable="true">勿由永久连接的 WireGuard 、 SOCKS5 、 HTTP 代理来代理 DNS 。</string>
     <string name="lbl_battery_optimization" translatable="true">电池优化</string>
-    <string name="lbl_idle" translatable="true">空闲</string>
-    <string name="lbl_split" translatable="true">分录</string>
-    <string name="lbl_on_device" translatable="true">设备上</string>
-    <string name="settings_connectivity_checks" translatable="true">进行连接性测试</string>
-    <string name="settings_connectivity_checks_desc" translatable="true">进行互联检查，以确定可达性。</string>
-    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">保护! 连接DNS+防火墙+Proxy.</string>
-    <string name="lbl_background_data" translatable="true">限制背景数据</string>
-    <string name="settings_exclude_proxy_apps_heading" translatable="true">环回代理转发器应用</string>
-    <string name="settings_exclude_proxy_apps_desc" translatable="true">关闭后，将代理（SOCKS5、HTTP、DNS）转发器应用程序从 Rethink 的 VPN 隧道中排除。</string>
+    <string name="lbl_idle" translatable="true">闲置</string>
+    <string name="lbl_split" translatable="true">拆分</string>
+    <string name="lbl_on_device" translatable="true">本地</string>
+    <string name="settings_connectivity_checks" translatable="true">检查连接</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">发送连接检查以确保网络连通性。</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">已保护！已连接至 DNS + 防火牆 + 代理。</string>
+    <string name="lbl_background_data" translatable="true">限制后台数据</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">环回转发代理应用</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">禁用后，将转发代理（ SOCKS5 、 HTTP 、 DNS ）应用从 Rethink 的 VPN 隧道中排除。</string>
+    <string name="lbl_notification" translatable="true">通知</string>
+    <string name="memory_notification_text">Rethink 当前可用内存过低。系统操作可能受限。</string>
+    <string name="exclude_apps_from_proxy">为应用绕行所有代理</string>
+    <string name="exclude_apps_from_proxy_failure_toast">此应用绕行代理</string>
 </resources>
