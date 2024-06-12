@@ -370,4 +370,18 @@
     <string name="lbl_anonymous" translatable="true">ناشناس</string>
     <string name="lbl_split" translatable="true">شکاف</string>
     <string name="lbl_on_device" translatable="true">روی دستگاه</string>
+    <string name="settings_dns_proxy_dialog_header" translatable="true">پراکسی SOCKS5 را تنظیم کنید</string>
+    <string name="settings_dns_proxy_dialog_port_number" translatable="true">شماره پورت</string>
+    <string name="settings_socks_forwarding_desc_no_app" translatable="true">بازارسال به %1$s:%2$s</string>
+    <string name="settings_dns_proxy_dialog_password" translatable="true">پسوورد</string>
+    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">ست</string>
+    <string name="settings_dns_proxy_dialog_hostname" translatable="true">نام میزبان</string>
+    <string name="settings_dns_proxy_dialog_username" translatable="true">نام کاربری</string>
+    <string name="settings_socks_forwarding_desc" translatable="true">بازارسال به %1$s:%2$s، %3$s</string>
+    <string name="lbl_notification" translatable="true">اطلاع</string>
+    <string name="memory_notification_text">حافظه کم را تجربه می کند.اقدامات سیستم ممکن است محدود باشد.</string>
+    <string name="settings_rinr_dialog_title" translatable="true">برگشت حلقه (تجربی)</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">همچنین <!--settings_network_all_networks--> تنظیمات %1$s را فعال می کند. \u0020آیا شما می خواهید ادامه دهید؟</string>
+    <string name="settings_dns_proxy_dialog_app" translatable="true">برنامه</string>
+    <string name="settings_app_list_default_app" translatable="true">هیچ یک</string>
 </resources>

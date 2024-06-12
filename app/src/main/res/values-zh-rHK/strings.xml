@@ -552,8 +552,8 @@
     <string name="cd_toast_added">加咗網域</string>
     <string name="cd_remove_dialog_title">係咪刪除網域？</string>
     <string name="cd_dialog_edittext_hint">輸入 %1$s</string>
-    <string name="cd_dialog_error_invalid_domain">冇效嘅 URL 或者網域。</string>
-    <string name="cd_dialog_error_invalid_wildcard">冇效嘅通配符、 URL 或者網域。</string>
+    <string name="cd_dialog_error_invalid_domain">冇效嘅 URL 或者網域</string>
+    <string name="cd_dialog_error_invalid_wildcard">冇效嘅通配符、 URL 或者網域</string>
     <string name="cd_no_rule_initial">冇</string>
     <string name="cd_no_rule_txt">冇規則</string>
     <string name="ci_dialog_title">加 IP / 埠規則</string>
@@ -1024,4 +1024,5 @@
     <string name="lbl_battery_optimization" translatable="true">電池優化</string>
     <string name="battery_optimization_dialog_heading" translatable="true">禁用 %1$s</string>
     <string name="lbl_background_data" translatable="true">限制背景數據</string>
+    <string name="lbl_notification" translatable="true">通知</string>
 </resources>
