@@ -1,9 +1,9 @@
 name: ⚛️ Native Sym
 
 on:
-  #push:
-    #tags:
-      #- "v*"
+  push:
+    tags:
+      - "v*"
   # docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow
   # docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows#workflow_dispatch
   # docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#onworkflow_dispatchinputs
@@ -24,6 +24,7 @@ jobs:
 
     env:
       COMMIT: ${{ github.event.inputs.commit || github.sha }}
+      GIT_REF: ${{ github.event.inputs.git-ref || github.ref }}
 
     steps:
       - name: 🥏 Checkout
@@ -32,7 +33,19 @@ jobs:
       - name: 🎱 Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 21
+          node-version: 22.x
+
+      - name: 🚨 Release?
+        # docs.github.com/en/actions/learn-github-actions/contexts#github-context
+        if: ${{ github.event_name != 'workflow_dispatch' && github.ref_type == 'tag' }}
+        run: |
+          # playImplementation 'com.github.celzero:firestack:ee0a5ac71f:debug@aar' -> firestack:ee0a5ac71f -> ee0a5ac71f
+          LOI=$(grep -m1 app/build.gradle "playImplementation 'com.github.celzero:firestack")
+          HASH=$(echo $LOI | grep -o "firestack:[^@]*" | cut -d':' -f2)
+          echo "COMMIT=${HASH}" >> $GITHUB_ENV
+          echo "https://github.com/celzero/firestack/tree/${HASH}"
+          echo "::notice::Releasing SYMs for ${GIT_REF} @ ${LOI}"
+        shell: bash
 
       - name: 🎨 Deps
         run: npm install -g firebase-tools
