@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.adapter
 
+import Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
@@ -37,6 +38,10 @@ import com.celzero.bravedns.databinding.ListItemWgOneInterfaceBinding
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
@@ -105,27 +110,23 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
         fun update(config: WgConfigFiles) {
             b.interfaceNameText.text = config.name
-            b.oneWgCheck.isChecked = config.isActive
-            io {
-                updateStatus(config)
-            }
+            val isWgActive = config.isActive && VpnController.hasTunnel()
+            b.oneWgCheck.isChecked = isWgActive
             setupClickListeners(config)
-            if (config.oneWireGuard) {
+            if (isWgActive) {
                 keepStatusUpdated(config)
             } else {
-                b.interfaceDetailCard.strokeWidth = 0
-                b.interfaceAppsCount.visibility = View.GONE
-                b.protocolInfoChipGroup.visibility = View.GONE
-                b.interfaceActiveLayout.visibility = View.GONE
-                b.oneWgCheck.isChecked = false
-                b.interfaceStatus.text =
-                    context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
+                disableInterface()
             }
         }
 
         private fun keepStatusUpdated(config: WgConfigFiles) {
+            if (statusCheckJob?.isActive == true) return
+
             statusCheckJob = io {
-                while (true) {
+                for (i in 0 until 10) {
+                    if (statusCheckJob?.isActive == false) return@io
+
                     updateStatus(config)
                     delay(ONE_SEC)
                 }
@@ -172,6 +173,11 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 return
             }
 
+            if (config.isActive && !VpnController.hasTunnel()) {
+                disableInterface()
+                return
+            }
+
             val id = ProxyManager.ID_WG_BASE + config.id
             val statusId = VpnController.getProxyStatusById(id)
             val pair = VpnController.getSupportedIpVersion(id)
@@ -191,7 +197,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         }
 
         private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, stats: Stats?) {
-            if (config.isActive) {
+            if (config.isActive && VpnController.hasTunnel()) {
                 b.interfaceDetailCard.strokeWidth = 2
                 b.oneWgCheck.isChecked = true
                 b.interfaceAppsCount.visibility = View.VISIBLE
@@ -210,7 +216,10 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                             b.interfaceDetailCard.strokeColor =
                                 fetchColor(context, R.attr.accentGood)
                         }
-                    } else if (statusId == Backend.TUP || statusId == Backend.TZZ) {
+                    } else if (statusId == Backend.TUP ||
+                        statusId == Backend.TZZ ||
+                        statusId == Backend.TNT
+                    ) {
                         b.interfaceDetailCard.strokeColor =
                             fetchColor(context, R.attr.chipTextNeutral)
                     } else {
@@ -265,13 +274,19 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 }
                 b.interfaceActiveRxTx.text = rxtx
             } else {
-                b.interfaceDetailCard.strokeWidth = 0
-                b.interfaceAppsCount.visibility = View.GONE
-                b.oneWgCheck.isChecked = false
-                b.interfaceActiveLayout.visibility = View.GONE
-                b.interfaceStatus.text =
-                    context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
+                disableInterface()
             }
+        }
+
+        private fun disableInterface() {
+            statusCheckJob?.cancel()
+            b.interfaceDetailCard.strokeWidth = 0
+            b.protocolInfoChipGroup.visibility = View.GONE
+            b.interfaceAppsCount.visibility = View.GONE
+            b.oneWgCheck.isChecked = false
+            b.interfaceActiveLayout.visibility = View.GONE
+            b.interfaceStatus.text =
+                context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
         }
 
         private fun getUpTime(stats: Stats?): CharSequence {
@@ -327,32 +342,98 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 val isChecked = b.oneWgCheck.isChecked
                 io {
                     if (isChecked) {
-                        if (WireguardManager.canEnableConfig(config.toImmutable())) {
-                            config.oneWireGuard = true
-                            WireguardManager.updateOneWireGuardConfig(config.id, owg = true)
-                            WireguardManager.enableConfig(config.toImmutable())
-                            uiCtx { listener.onDnsStatusChanged() }
-                        } else {
-                            uiCtx {
-                                b.oneWgCheck.isChecked = false
-                                Utilities.showToastUiCentered(
-                                    context,
-                                    context.getString(R.string.wireguard_enabled_failure),
-                                    Toast.LENGTH_LONG
-                                )
-                            }
-                        }
+                        enableWgIfPossible(config)
                     } else {
-                        config.oneWireGuard = false
-                        WireguardManager.updateOneWireGuardConfig(config.id, owg = false)
-                        WireguardManager.disableConfig(config.toImmutable())
-                        uiCtx {
-                            b.oneWgCheck.isChecked = false
-                            listener.onDnsStatusChanged()
-                        }
+                        disableWgIfPossible(config)
                     }
                 }
             }
+        }
+
+        private suspend fun enableWgIfPossible(config: WgConfigFiles) {
+            if (!VpnController.hasTunnel()) {
+                Logger.i(LOG_TAG_PROXY, "VPN not active, cannot enable WireGuard")
+                uiCtx {
+                    Utilities.showToastUiCentered(
+                        context,
+                        ERR_CODE_VPN_NOT_ACTIVE + context.getString(R.string.settings_socks5_vpn_disabled_error),
+                        Toast.LENGTH_LONG
+                    )
+                    // reset the check box
+                    b.oneWgCheck.isChecked = false
+                }
+                return
+            }
+
+            if (!WireguardManager.canEnableProxy()) {
+                Logger.i(LOG_TAG_PROXY, "not in DNS+Firewall mode, cannot enable WireGuard")
+                uiCtx {
+                    // reset the check box
+                    b.oneWgCheck.isChecked = false
+                    Utilities.showToastUiCentered(
+                        context,
+                        ERR_CODE_VPN_NOT_FULL + context.getString(R.string.wireguard_enabled_failure),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return
+            }
+
+            if (WireguardManager.isAnyOtherOneWgEnabled(config.id)) {
+                Logger.i(LOG_TAG_PROXY, "another WireGuard is already enabled")
+                uiCtx {
+                    // reset the check box
+                    b.oneWgCheck.isChecked = false
+                    Utilities.showToastUiCentered(
+                        context,
+                        ERR_CODE_OTHER_WG_ACTIVE + context.getString(R.string.wireguard_enabled_failure),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return
+            }
+
+            if (!WireguardManager.isValidConfig(config.id)) {
+                Logger.i(LOG_TAG_PROXY, "invalid WireGuard config")
+                uiCtx {
+                    // reset the check box
+                    b.oneWgCheck.isChecked = false
+                    Utilities.showToastUiCentered(
+                        context,
+                        ERR_CODE_WG_INVALID + context.getString(R.string.wireguard_enabled_failure),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return
+            }
+
+            Logger.i(LOG_TAG_PROXY, "enabling WireGuard, id: ${config.id}")
+            WireguardManager.updateOneWireGuardConfig(config.id, owg = true)
+            config.oneWireGuard = true
+            WireguardManager.enableConfig(config.toImmutable())
+            uiCtx { listener.onDnsStatusChanged() }
+        }
+
+        private suspend fun disableWgIfPossible(config: WgConfigFiles) {
+            if (!VpnController.hasTunnel()) {
+                Logger.i(LOG_TAG_PROXY, "VPN not active, cannot disable WireGuard")
+                uiCtx {
+                    Utilities.showToastUiCentered(
+                        context,
+                        ERR_CODE_VPN_NOT_ACTIVE + context.getString(R.string.settings_socks5_vpn_disabled_error),
+                        Toast.LENGTH_LONG
+                    )
+                    // reset the check box
+                    b.oneWgCheck.isChecked = true
+                }
+                return
+            }
+
+            Logger.i(LOG_TAG_PROXY, "disabling WireGuard, id: ${config.id}")
+            WireguardManager.updateOneWireGuardConfig(config.id, owg = false)
+            config.oneWireGuard = false
+            WireguardManager.disableConfig(config.toImmutable())
+            uiCtx { listener.onDnsStatusChanged() }
         }
 
         private fun launchConfigDetail(id: Int) {

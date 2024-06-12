@@ -64,6 +64,7 @@ import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
+import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
@@ -109,6 +110,13 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
         // check for app updates
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
+        // crashlytics
+        if (isPlayStoreFlavour()) {
+            b.settingsCrashlyticsRl.visibility = View.VISIBLE
+            b.settingsActivityCrashlyticsSwitch.isChecked = persistentState.crashlyticsEnabled
+        } else {
+            b.settingsCrashlyticsRl.visibility = View.GONE
+        }
 
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {
@@ -306,6 +314,24 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             persistentState.biometricAuth = checked
             // Reset the biometric auth time
             persistentState.biometricAuthTime = Constants.INIT_TIME_MS
+        }
+
+        b.settingsCrashlyticsRl.setOnClickListener {
+            b.settingsActivityCrashlyticsSwitch.isChecked =
+                !b.settingsActivityCrashlyticsSwitch.isChecked
+        }
+
+        b.settingsActivityCrashlyticsSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean
+            ->
+            // only for play store version
+            persistentState.crashlyticsEnabled = b
+            if (b) {
+                // enable crashlytics
+                Logger.enableCrashlytics()
+            } else {
+                // disable crashlytics
+                Logger.disableCrashlytics()
+            }
         }
     }
 

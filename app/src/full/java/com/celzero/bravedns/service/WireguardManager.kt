@@ -78,6 +78,12 @@ object WireguardManager : KoinComponent {
     const val WARP_ID = 1
     const val WARP_FILE_NAME = "wg1.conf"
 
+    // let the error code be a string, so that it can be concatenated with the error message
+    const val ERR_CODE_VPN_NOT_ACTIVE = "1"
+    const val ERR_CODE_VPN_NOT_FULL = "2"
+    const val ERR_CODE_OTHER_WG_ACTIVE = "3"
+    const val ERR_CODE_WG_INVALID = "4"
+
     // invalid config id
     const val INVALID_CONF_ID = -1
 
@@ -229,21 +235,29 @@ object WireguardManager : KoinComponent {
         return
     }
 
-    fun canEnableConfig(map: WgConfigFilesImmutable): Boolean {
-        val canEnable = appConfig.canEnableProxy() && appConfig.canEnableWireguardProxy()
-        if (!canEnable) {
-            return false
-        }
-        // if one wireguard is enabled, don't allow to enable another
-        if (oneWireGuardEnabled()) {
-            return false
-        }
-        val config = configs.find { it.getId() == map.id }
+    fun canEnableProxy(): Boolean {
+        return appConfig.canEnableProxy()
+    }
+
+    fun isValidConfig(id: Int): Boolean {
+        val config = configs.find { it.getId() == id }
         if (config == null) {
-            Logger.e(LOG_TAG_PROXY, "canEnableConfig: wg not found, id: ${map.id}, ${configs.size}")
+            Logger.e(LOG_TAG_PROXY, "canEnableConfig: wg not found, id: ${id}, ${configs.size}")
             return false
         }
         return true
+    }
+
+    fun isAnyOtherOneWgEnabled(id: Int): Boolean {
+        return mappings.any { it.oneWireGuard && it.isActive && it.id != id }
+    }
+
+    fun canEnableWg(): Boolean {
+        val canEnableProxy = appConfig.canEnableProxy()
+        val canEnableWireGuardProxy = appConfig.canEnableWireguardProxy()
+        val canEnable = canEnableProxy && canEnableWireGuardProxy
+        Logger.i(LOG_TAG_PROXY, "canEnableConfig? $canEnableProxy && $canEnableWireGuardProxy")
+        return canEnable
     }
 
     fun canDisableConfig(map: WgConfigFilesImmutable): Boolean {
@@ -435,15 +449,15 @@ object WireguardManager : KoinComponent {
             // there maybe catch-all config enabled, so return the active catch-all config
             val catchAllConfig = mappings.find { it.isActive && it.isCatchAll }
             return if (catchAllConfig == null) {
-                Logger.d(LOG_TAG_PROXY, "catch all config not found for uid: $uid")
+                Logger.i(LOG_TAG_PROXY, "catch all config not found for uid: $uid")
                 null
             } else {
                 val optimalId = fetchOptimalCatchAllConfig(uid, ip)
                 if (optimalId == null) {
-                    Logger.d(LOG_TAG_PROXY, "no catch all config found for uid: $uid")
+                    Logger.i(LOG_TAG_PROXY, "no catch all config found for uid: $uid")
                     null
                 } else {
-                    Logger.d(LOG_TAG_PROXY, "catch all config found for uid: $uid, $optimalId")
+                    Logger.i(LOG_TAG_PROXY, "catch all config found for uid: $uid, $optimalId")
                     mappings.find { it.id == optimalId }
                 }
             }
