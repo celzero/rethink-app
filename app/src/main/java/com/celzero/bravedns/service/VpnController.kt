@@ -139,11 +139,11 @@ object VpnController : KoinComponent {
         Logger.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
     }
 
-    fun stop(context: Context) {
+    fun stop(reason: String, context: Context) {
         Logger.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
         connectionState = null
         onConnectionStateChanged(connectionState)
-        braveVpnService?.signalStopService(userInitiated = true)
+        braveVpnService?.signalStopService(reason, userInitiated = true)
     }
 
     fun state(): VpnState {

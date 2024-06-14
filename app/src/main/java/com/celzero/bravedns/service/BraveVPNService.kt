@@ -1437,19 +1437,19 @@ class BraveVPNService :
             if (isAtleastU()) {
                 var ok = startForegroundService(FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED)
                 if (!ok) {
-                    Logger.i(LOG_TAG_VPN, "start service failed, retrying with connected device")
+                    Logger.w(LOG_TAG_VPN, "start service failed, retrying with connected device")
                     ok = startForegroundService(FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
                 }
                 if (!ok) {
-                    Logger.i(LOG_TAG_VPN, "start service failed, stopping service")
-                    signalStopService(userInitiated = false) // notify and stop
+                    Logger.w(LOG_TAG_VPN, "start service failed, stopping service")
+                    signalStopService("startFg1", userInitiated = false) // notify and stop
                     return@ui
                 }
             } else {
                 val ok = startForegroundService()
                 if (!ok) {
-                    Logger.i(LOG_TAG_VPN, "start service failed ( > U ), stopping service")
-                    signalStopService(userInitiated = false) // notify and stop
+                    Logger.w(LOG_TAG_VPN, "start service failed ( > U ), stopping service")
+                    signalStopService("startFg2", userInitiated = false) // notify and stop
                     return@ui
                 }
             }
@@ -1623,7 +1623,7 @@ class BraveVPNService :
             // conn-monitor and go-vpn-adapter exist, but persistent-state tracking vpn goes out
             // of sync
             Logger.e(LOG_TAG_VPN, "stop-vpn(updateTun), tracking vpn is out of sync")
-            io("outOfSync") { signalStopService(userInitiated = false) }
+            io("outOfSync") { signalStopService("outOfSync", userInitiated = false) }
             return
         }
 
@@ -1633,7 +1633,7 @@ class BraveVPNService :
         // VpnController#onStartComplete
         if (ok == false) {
             Logger.w(LOG_TAG_VPN, "Cannot handle vpn adapter changes, no tunnel")
-            io("noTunnel") { signalStopService(userInitiated = false) }
+            io("noTunnel") { signalStopService("noTunnel", userInitiated = false) }
             return
         }
         notifyConnectionStateChangeIfNeeded()
@@ -1923,11 +1923,10 @@ class BraveVPNService :
         vpnAdapter?.setDnsAlg()
     }
 
-    fun signalStopService(userInitiated: Boolean = true) {
+    fun signalStopService(reason: String, userInitiated: Boolean = true) {
         if (!userInitiated) notifyUserOnVpnFailure()
-        stopVpnAdapter()
         stopSelf()
-        Logger.i(LOG_TAG_VPN, "stopped vpn adapter and vpn service")
+        Logger.i(LOG_TAG_VPN, "stopped vpn adapter & service: $reason, $userInitiated")
     }
 
     private fun stopVpnAdapter() {
@@ -1991,7 +1990,7 @@ class BraveVPNService :
                 "$why, stop-vpn(restartVpn), tracking vpn is out of sync",
                 Log.ERROR
             )
-            io("outOfSyncRestart") { signalStopService(userInitiated = false) }
+            io("outOfSyncRestart") { signalStopService("outOfSyncRestart", userInitiated = false) }
             return
         }
 
@@ -1999,14 +1998,14 @@ class BraveVPNService :
         val tunFd = establishVpn(networks)
         if (tunFd == null) {
             logAndToastIfNeeded("$why, cannot restart-vpn, no tun-fd", Log.ERROR)
-            io("noTunRestart") { signalStopService(userInitiated = false) }
+            io("noTunRestart") { signalStopService("noTunRestart1", userInitiated = false) }
             return
         }
 
         val ok = makeOrUpdateVpnAdapter(tunFd, opts, vpnProtos) // vpnProtos set in establishVpn()
         if (!ok) {
             logAndToastIfNeeded("$why, cannot restart-vpn, no vpn-adapter", Log.ERROR)
-            io("noTunnelRestart") { signalStopService(userInitiated = false) }
+            io("noTunnelRestart") { signalStopService("noTunRestart2", userInitiated = false) }
             return
         } else {
             logAndToastIfNeeded("$why, vpn restarted", Log.INFO)
@@ -2101,7 +2100,7 @@ class BraveVPNService :
 
     override fun onNetworkRegistrationFailed() {
         Logger.i(LOG_TAG_VPN, "recd nw registration failed, stop vpn service with notification")
-        signalStopService(userInitiated = false)
+        signalStopService("nwRegFail", userInitiated = false)
     }
 
     override fun onNetworkConnected(networks: ConnectionMonitor.UnderlyingNetworks) {
@@ -3118,14 +3117,19 @@ class BraveVPNService :
 
     override fun log(level: Int, msg: String) {
         val l = Logger.LoggerType.fromId(level)
+        writeConsoleLog(msg)
         if (l.stacktrace()) {
             Logger.crash(LOG_GO_LOGGER, msg) // log the stack trace
             EnhancedBugReport.writeLogsToFile(this, msg)
         } else if (l.user()) {
             showNwEngineNotification(msg)
         } else {
-            Logger.i(LOG_GO_LOGGER, msg)
+            // no-op
         }
+    }
+
+    fun writeConsoleLog(msg: String) {
+        netLogTracker.writeConsoleLog(msg)
     }
 
     private fun showNwEngineNotification(msg: String) {
@@ -3803,6 +3807,8 @@ class BraveVPNService :
     }
 
     override fun onTrimMemory(level: Int) {
+        // override onLowMemory is deprecated, so use onTrimMemory
+        // ref: developer.android.com/reference/android/net/VpnService
         super.onTrimMemory(level)
         Logger.i(LOG_TAG_VPN, "onTrimMemory: $level")
         if (level >= ComponentCallbacks2.TRIM_MEMORY_BACKGROUND) {
@@ -3831,5 +3837,14 @@ class BraveVPNService :
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(MEMORY_NOTIFICATION_ID, builder.build())
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        Logger.w(LOG_TAG_VPN, "onUnbind, stop vpn adapter")
+        // onUnbind is called when the vpn is disconnected by signalStopService or if
+        // some other vpn service is started by the user, so stop the vpn adapter in onUnbind which
+        // will close tunFd which is a prerequisite for onDestroy()
+        stopVpnAdapter()
+        return super.onUnbind(intent)
     }
 }

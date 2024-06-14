@@ -95,7 +95,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     }
 
     private fun stopVpn(context: Context) {
-        VpnController.stop(context)
+        VpnController.stop("notif", context)
     }
 
     private fun pauseApp(context: Context) {

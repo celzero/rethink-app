@@ -1138,7 +1138,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun stopVpnService() {
-        VpnController.stop(requireContext())
+        VpnController.stop("home", requireContext())
     }
 
     private fun startVpnService() {
