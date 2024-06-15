@@ -37,6 +37,7 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:allowNativeHeapPointerTagging="false"
+        android:gwpAsanMode="never"
         android:memtagMode="off"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
