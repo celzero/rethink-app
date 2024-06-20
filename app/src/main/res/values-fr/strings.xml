@@ -1031,4 +1031,6 @@
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Lorsque désactivé, exclut les applications de redirecteur proxy (SOCKS5, HTTP, DNS) du tunnel VPN de Rethink.</string>
     <string name="exclude_apps_from_proxy">Contourner l\'application de tous les proxys</string>
     <string name="exclude_apps_from_proxy_failure_toast">Contourner l\'application de tous les proxys est activé</string>
+    <string name="lbl_notification" translatable="true">notification</string>
+    <string name="memory_notification_text">Rethink connaît une mémoire insuffisante. Les actions du système peuvent être limitées.</string>
 </resources>
