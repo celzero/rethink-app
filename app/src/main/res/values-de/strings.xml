@@ -950,4 +950,16 @@
     <string name="lbl_listen_port" translatable="true">Port belauschen</string>
     <string name="wireguard_connection_error">Problem beim Verbinden mit der WireGuard-Konfiguration</string>
     <string name="illegal_filename_error" translatable="true">Ungültiger Dateiname „%s“</string>
+    <string name="lbl_status" translatable="true">Status</string>
+    <string name="lbl_remove" translatable="true">Entfernen</string>
+    <string name="lbl_stopped" translatable="true">Gestoppt</string>
+    <string name="lbl_overall" translatable="true">Insgesamt</string>
+    <string name="lbl_notification" translatable="true">Benachrichtigung</string>
+    <string name="lbl_private" translatable="true">privat</string>
+    <string name="lbl_secure" translatable="true">sicher</string>
+    <string name="lbl_split" translatable="true">Teilen</string>
+    <string name="lbl_idle" translatable="true">Leerlauf</string>
+    <string name="lbl_anonymous" translatable="true">anonym</string>
+    <string name="lbl_unselected" translatable="true">Unausgewählt</string>
+    <string name="lbl_on_device" translatable="true">auf dem Gerät</string>
 </resources>
