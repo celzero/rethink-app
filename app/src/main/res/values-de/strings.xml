@@ -953,4 +953,5 @@
     <string name="lbl_status" translatable="true">Status</string>
     <string name="lbl_remove" translatable="true">Entfernen</string>
     <string name="lbl_stopped" translatable="true">gestoppt</string>
+    <string name="lbl_overall" translatable="true">Insgesamt</string>
 </resources>
