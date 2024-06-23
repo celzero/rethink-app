@@ -954,4 +954,8 @@
     <string name="lbl_remove" translatable="true">Entfernen</string>
     <string name="lbl_stopped" translatable="true">gestoppt</string>
     <string name="lbl_overall" translatable="true">Insgesamt</string>
+    <string name="lbl_notification" translatable="true">Benachrichtigung</string>
+    <string name="lbl_private" translatable="true">privat</string>
+    <string name="lbl_secure" translatable="true">sicher</string>
+    <string name="lbl_split" translatable="true">Teilen</string>
 </resources>
