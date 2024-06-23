@@ -950,4 +950,7 @@
     <string name="lbl_listen_port" translatable="true">Port belauschen</string>
     <string name="wireguard_connection_error">Problem beim Verbinden mit der WireGuard-Konfiguration</string>
     <string name="illegal_filename_error" translatable="true">Ungültiger Dateiname „%s“</string>
+    <string name="lbl_status" translatable="true">Status</string>
+    <string name="lbl_remove" translatable="true">Entfernen</string>
+    <string name="lbl_stopped" translatable="true">gestoppt</string>
 </resources>
