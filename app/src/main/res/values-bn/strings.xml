@@ -64,7 +64,7 @@
     <string name="firewall_status_excluded">dns এবং ফায়ারওয়াল থেকে বাদ</string>
     <string name="firewall_status_unknown">অজানা</string>
     <string name="firewall_card_text_inactive">ফায়ারওয়াল মোড সক্ষম করুন।</string>
-    <string name="lbl_proceed">এগিয়ে যান</string>
+    <string name="lbl_proceed">আরম্ভ করুন</string>
     <string name="hsf_pause_vpn_failure">বিরতি দেওয়া যাবে না: রিথিঙ্কডিএনএস সক্রিয় নয়</string>
     <string name="about_dialog_positive_button">চলো যাই</string>
     <string name="about_mail_to_string">mailto:</string>
@@ -728,4 +728,69 @@
 \n1. VPN লকডাউন মোডে আছে (যেমন, <i>VPN ছাড়া সংযোগ ব্লক করুন</i> সক্ষম করা আছে)।
 \n
 \n2. <i>সমস্ত উপলব্ধ নেটওয়ার্ক ব্যবহার করুন</i> সেটিং সক্ষম করা আছে৷</string>
+    <string name="lbl_status" translatable="true">স্ট্যাটাস</string>
+    <string name="lbl_remove" translatable="true">সরান</string>
+    <string name="lbl_last" translatable="true">শেষ</string>
+    <string name="lbl_overall" translatable="true">সামগ্রিকভাবে</string>
+    <string name="lbl_stopped" translatable="true">বন্ধ করা হয়েছে</string>
+    <string name="lbl_secure" translatable="true">নিরাপদ</string>
+    <string name="lbl_anonymous" translatable="true">বেনামী</string>
+    <string name="lbl_private" translatable="true">ব্যক্তিগত</string>
+    <string name="lbl_rules" translatable="true">নিয়ম</string>
+    <string name="lbl_configure" translatable="true">সজ্জিত করা</string>
+    <string name="lbl_logs" translatable="true">লগ্স</string>
+    <string name="lbl_cache" translatable="true">ক্যাশ</string>
+    <string name="lbl_starting" translatable="true">শুরু হচ্ছে</string>
+    <string name="lbl_split" translatable="true">বিভক্ত</string>
+    <string name="lbl_notification" translatable="true">বিজ্ঞপ্তি</string>
+    <string name="lbl_maybe_blocked" translatable="true">হয়তো অবরুদ্ধ</string>
+    <string name="lbl_network" translatable="true">নেটওয়ার্ক</string>
+    <string name="lbl_create" translatable="true">বানান</string>
+    <string name="lbl_qr_code" translatable="true">QR কোড</string>
+    <string name="lbl_import" translatable="true">আমদানি</string>
+    <string name="lbl_wireguard" translatable="true">ওয়্যারগার্ড</string>
+    <string name="lbl_public_key" translatable="true">সর্বজনীন চাবি</string>
+    <string name="lbl_addresses" translatable="true">ঠিকানা</string>
+    <string name="lbl_dns_servers" translatable="true">DNS সার্ভার</string>
+    <string name="lbl_applications" translatable="true">অ্যাপ্লিকেশন</string>
+    <string name="lbl_delete" translatable="true">ডিলিট করুন</string>
+    <string name="lbl_private_key" translatable="true">ব্যক্তিগত চাবি</string>
+    <string name="lbl_generated" translatable="true">(উৎপাদিত)</string>
+    <string name="lbl_random" translatable="true">(এলোমেলো ভাবে)</string>
+    <string name="lbl_mtu" translatable="true">এমটিইউ</string>
+    <string name="lbl_auto" translatable="true">(স্বয়ংক্রিয় ভাবে)</string>
+    <string name="lbl_include" translatable="true">অন্তর্ভুক্ত করুন</string>
+    <string name="lbl_select_all" translatable="true">সব নির্বাচন করুন</string>
+    <string name="lbl_active" translatable="true">সক্রিয়</string>
+    <string name="lbl_inactive" translatable="true">নিষ্ক্রিয়</string>
+    <string name="lbl_socks5" translatable="true">শক৫</string>
+    <string name="lbl_http" translatable="true">এইচটিটিপি</string>
+    <string name="lbl_fast" translatable="true">দ্রুত</string>
+    <string name="lbl_slow" translatable="true">আস্তে</string>
+    <string name="lbl_very" translatable="true">খুব</string>
+    <string name="lbl_app_wise" translatable="true">প্রতি অ্যাপ</string>
+    <string name="lbl_sec" translatable="true">সেকেন্ড</string>
+    <string name="lbl_min" translatable="true">মিনিট</string>
+    <string name="lbl_hour" translatable="true">ঘন্টা</string>
+    <string name="lbl_day" translatable="true">দিন</string>
+    <string name="lbl_preshared_key" translatable="true">পূর্বেভাগ করা চাবি</string>
+    <string name="lbl_insecure" translatable="true">(অনিরাপদ)</string>
+    <string name="lbl_optional" translatable="true">(ঐচ্ছিক)</string>
+    <string name="lbl_persistent_keepalive" translatable="true">অবিরাম চালু রাখুন</string>
+    <string name="lbl_allowed_ips" translatable="true">অনুমোদিত আইপি</string>
+    <string name="lbl_save" translatable="true">সংরক্ষণ</string>
+    <string name="lbl_cancel" translatable="true">বাতিল করুন</string>
+    <string name="lbl_apply" translatable="true">আবেদন</string>
+    <string name="lbl_dismiss" translatable="true">বাদ দিন</string>
+    <string name="lbl_all" translatable="true">সব</string>
+    <string name="lbl_allowed" translatable="true">অনুমোদিত</string>
+    <string name="lbl_ip_rules" translatable="true">আইপি নিয়মসমূহ</string>
+    <string name="lbl_blocked" translatable="true">অবরুদ্ধ</string>
+    <string name="lbl_disabled" translatable="true">অক্ষম</string>
+    <string name="lbl_wildcard" translatable="true">ওয়াইল্ডকার্ড</string>
+    <string name="lbl_action_required" translatable="true">কাজ করা দরকার</string>
+    <string name="lbl_domain_rules" translatable="true">ডোমেইন এর নিয়মসমূহ</string>
+    <string name="lbl_unselected" translatable="true">অনির্বাচিত</string>
+    <string name="lbl_idle" translatable="true">নিষ্ক্রিয়</string>
+    <string name="lbl_on_device" translatable="true">ডিভাইসে</string>
 </resources>
