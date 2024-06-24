@@ -46,7 +46,6 @@ import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
-import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -56,7 +55,6 @@ import kotlinx.coroutines.withContext
 class WgConfigAdapter(private val context: Context) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
 
-    private var configs: ConcurrentHashMap<Int, Job> = ConcurrentHashMap()
     private var lifecycleOwner: LifecycleOwner? = null
 
     companion object {
@@ -97,18 +95,20 @@ class WgConfigAdapter(private val context: Context) :
                 parent,
                 false
             )
-        lifecycleOwner = parent.findViewTreeLifecycleOwner()
+        if (lifecycleOwner == null) {
+            lifecycleOwner = parent.findViewTreeLifecycleOwner()
+        }
         return WgInterfaceViewHolder(itemBinding)
     }
 
     override fun onViewDetachedFromWindow(holder: WgInterfaceViewHolder) {
         super.onViewDetachedFromWindow(holder)
-        configs.values.forEach { it.cancel() }
-        configs.clear()
+        holder.cancelJobIfAny()
     }
 
     inner class WgInterfaceViewHolder(private val b: ListItemWgGeneralInterfaceBinding) :
         RecyclerView.ViewHolder(b.root) {
+        private var job: Job? = null
 
         fun update(config: WgConfigFiles) {
             b.interfaceNameText.text = config.name
@@ -119,13 +119,9 @@ class WgConfigAdapter(private val context: Context) :
 
         private fun updateStatusJob(config: WgConfigFiles) {
             if (config.isActive && VpnController.hasTunnel()) {
-                val job = updateProxyStatusContinuously(config)
-                if (job != null) {
-                    // cancel the job if it already exists for the same config
-                    cancelJobIfAny(config.id)
-                    configs[config.id] = job
-                }
+                job = updateProxyStatusContinuously(config)
             } else {
+                cancelJobIfAny()
                 disableInactiveConfig(config)
             }
         }
@@ -152,8 +148,6 @@ class WgConfigAdapter(private val context: Context) :
                 b.interfaceConfigStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
-            // cancel the job if it already exists for the config, as the config is disabled
-            cancelJobIfAny(config.id)
         }
 
         private fun updateProxyStatusContinuously(config: WgConfigFiles): Job? {
@@ -199,15 +193,10 @@ class WgConfigAdapter(private val context: Context) :
             }
         }
 
-        private fun cancelJobIfAny(id: Int) {
-            val job = configs[id]
-            job?.cancel()
-            configs.remove(id)
-        }
-
-        private fun cancelAllJobs() {
-            configs.values.forEach { it.cancel() }
-            configs.clear()
+        fun cancelJobIfAny() {
+            if (job?.isActive == true) {
+                job?.cancel()
+            }
         }
 
         private suspend fun updateStatus(config: WgConfigFiles) {
@@ -232,7 +221,7 @@ class WgConfigAdapter(private val context: Context) :
                     ?.currentState
                     ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
             ) {
-                cancelAllJobs()
+                cancelJobIfAny()
                 return
             }
             uiCtx {
@@ -387,7 +376,7 @@ class WgConfigAdapter(private val context: Context) :
                     R.string.symbol_upload,
                     Utilities.humanReadableByteCount(stats.tx, true)
                 )
-            return context.getString(R.string.two_argument_space, rx, tx)
+            return context.getString(R.string.two_argument_space, tx, rx)
         }
 
         private fun getUpTime(stats: Stats?): CharSequence {
@@ -455,12 +444,14 @@ class WgConfigAdapter(private val context: Context) :
             if (WireguardManager.canDisableConfig(cfg)) {
                 WireguardManager.disableConfig(cfg)
             } else {
-                Utilities.showToastUiCentered(
-                    context,
-                    context.getString(R.string.wireguard_disable_failure),
-                    Toast.LENGTH_LONG
-                )
-                b.interfaceSwitch.isChecked = true
+                uiCtx {
+                    Utilities.showToastUiCentered(
+                        context,
+                        context.getString(R.string.wireguard_disable_failure),
+                        Toast.LENGTH_LONG
+                    )
+                    b.interfaceSwitch.isChecked = true
+                }
             }
 
             WireguardManager.disableConfig(cfg)

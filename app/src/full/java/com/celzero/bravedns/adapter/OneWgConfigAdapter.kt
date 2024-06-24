@@ -100,13 +100,20 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 parent,
                 false
             )
-        lifecycleOwner = parent.findViewTreeLifecycleOwner()
+        if (lifecycleOwner == null) {
+            lifecycleOwner = parent.findViewTreeLifecycleOwner()
+        }
         return WgInterfaceViewHolder(itemBinding)
+    }
+
+    override fun onViewDetachedFromWindow(holder: WgInterfaceViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+        holder.cancelJobIfAny()
     }
 
     inner class WgInterfaceViewHolder(private val b: ListItemWgOneInterfaceBinding) :
         RecyclerView.ViewHolder(b.root) {
-        private var statusCheckJob: Job? = null
+        private var job: Job? = null
 
         fun update(config: WgConfigFiles) {
             b.interfaceNameText.text = config.name
@@ -116,17 +123,20 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             if (isWgActive) {
                 keepStatusUpdated(config)
             } else {
+                cancelJobIfAny()
                 disableInterface()
             }
         }
 
+        fun cancelJobIfAny() {
+            if (job?.isActive == true) {
+                job?.cancel()
+            }
+        }
+
         private fun keepStatusUpdated(config: WgConfigFiles) {
-            if (statusCheckJob?.isActive == true) return
-
-            statusCheckJob = io {
-                for (i in 0 until 10) {
-                    if (statusCheckJob?.isActive == false) return@io
-
+            job = io {
+                while (true) {
                     updateStatus(config)
                     delay(ONE_SEC)
                 }
@@ -169,7 +179,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                     ?.currentState
                     ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
             ) {
-                statusCheckJob?.cancel()
+                job?.cancel()
                 return
             }
 
@@ -279,7 +289,6 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         }
 
         private fun disableInterface() {
-            statusCheckJob?.cancel()
             b.interfaceDetailCard.strokeWidth = 0
             b.protocolInfoChipGroup.visibility = View.GONE
             b.interfaceAppsCount.visibility = View.GONE
@@ -315,7 +324,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                     R.string.symbol_upload,
                     Utilities.humanReadableByteCount(stats.tx, true)
                 )
-            return context.getString(R.string.two_argument_space, rx, tx)
+            return context.getString(R.string.two_argument_space, tx, rx)
         }
 
         private fun getHandshakeTime(stats: Stats?): CharSequence {
@@ -418,13 +427,13 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             if (!VpnController.hasTunnel()) {
                 Logger.i(LOG_TAG_PROXY, "VPN not active, cannot disable WireGuard")
                 uiCtx {
+                    // reset the check box
+                    b.oneWgCheck.isChecked = true
                     Utilities.showToastUiCentered(
                         context,
                         ERR_CODE_VPN_NOT_ACTIVE + context.getString(R.string.settings_socks5_vpn_disabled_error),
                         Toast.LENGTH_LONG
                     )
-                    // reset the check box
-                    b.oneWgCheck.isChecked = true
                 }
                 return
             }
