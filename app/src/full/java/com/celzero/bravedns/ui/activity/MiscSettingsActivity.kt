@@ -333,6 +333,15 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 Logger.disableCrashlytics()
             }
         }
+
+        b.settingsConsoleLogRl.setOnClickListener {
+            openConsoleLogActivity()
+        }
+    }
+
+    private fun openConsoleLogActivity() {
+        val intent = Intent(this, ConsoleLogActivity::class.java)
+        startActivity(intent)
     }
 
     private fun invokeChangeLocaleDialog() {
