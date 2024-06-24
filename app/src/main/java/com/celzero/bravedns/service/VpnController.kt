@@ -31,6 +31,7 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
@@ -318,5 +319,9 @@ object VpnController : KoinComponent {
 
     suspend fun goBuildVersion(): String {
         return braveVpnService?.goBuildVersion() ?: ""
+    }
+
+    fun writeConsoleLog(message: String) {
+        braveVpnService?.writeConsoleLog(message)
     }
 }

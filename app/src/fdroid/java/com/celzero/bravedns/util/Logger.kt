@@ -15,6 +15,7 @@
  */
 import android.util.Log
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -40,7 +41,7 @@ object Logger : KoinComponent {
     const val LOG_GO_LOGGER = "LibLogger"
 
     // github.com/celzero/firestack/blob/bce8de917fec5e48a41ed1e96c9d942ee0f7996b/intra/log/logger.go#L76
-    enum class LoggerType(val id: Int) {
+    enum class LoggerType(val id: Long) {
         VERY_VERBOSE(0),
         VERBOSE(1),
         DEBUG(2),
@@ -70,6 +71,10 @@ object Logger : KoinComponent {
 
         fun stacktrace(): Boolean {
             return this == STACKTRACE
+        }
+
+        fun isLessThan(level: LoggerType): Boolean {
+            return this.id < level.id
         }
 
         fun user(): Boolean {
@@ -136,6 +141,19 @@ object Logger : KoinComponent {
             LoggerType.STACKTRACE -> if (logLevel <= LoggerType.ERROR.id) Log.e(tag, msg, e)
             LoggerType.USR -> {} // Do nothing
             LoggerType.NONE -> {} // Do nothing
+        }
+        if (type.id >= logLevel) {
+            // get the first letter of the level and append it to the tag
+            val l = when (type) {
+                LoggerType.VERBOSE -> "V"
+                LoggerType.DEBUG -> "D"
+                LoggerType.INFO -> "I"
+                LoggerType.WARN -> "W"
+                LoggerType.ERROR -> "E"
+                LoggerType.STACKTRACE -> "E"
+                else -> "V"
+            }
+            VpnController.writeConsoleLog("$l $tag: $msg")
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 RethinkDNS and its authors
+ * Copyright 2024 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,22 @@
  */
 package com.celzero.bravedns.service
 
-import com.celzero.bravedns.database.RefreshDatabase
-import org.koin.android.ext.koin.androidContext
-import org.koin.dsl.module
+import com.celzero.bravedns.database.ConsoleLog
+import com.celzero.bravedns.database.ConsoleLogRepository
 
-object ServiceModule {
-    private val serviceModules = module {
-        single { PersistentState(androidContext()) }
-        single { QueryTracker(get()) }
-        single { NetLogTracker(androidContext(), get(), get(), get(), get(), get()) }
-        single { RefreshDatabase(androidContext(), get(), get(), get()) }
+class ConsoleLogManager(private val repository: ConsoleLogRepository) {
+
+    suspend fun insert(log: ConsoleLog) {
+        repository.insert(log)
     }
 
-    val modules = listOf(serviceModules)
+    private suspend fun deleteOldLogs(limit: Int) {
+        repository.deleteOldLogs(limit)
+    }
+
+    suspend fun insertBatch(logs: List<*>) {
+        val l = logs as? List<ConsoleLog> ?: return
+
+        repository.insertBatch(l)
+    }
 }
