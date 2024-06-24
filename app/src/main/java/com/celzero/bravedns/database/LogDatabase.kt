@@ -31,7 +31,7 @@ import com.celzero.bravedns.util.Utilities
 
 @Database(
     entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -68,6 +68,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_4_5)
                 .addMigrations(MIGRATION_5_6)
                 .addMigrations(MIGRATION_6_7)
+                .addMigrations(MIGRATION_7_8)
                 .fallbackToDestructiveMigration() // recreate the database if no migration is found
                 .build()
         }
@@ -259,6 +260,16 @@ abstract class LogDatabase : RoomDatabase() {
                     // add a new column upstreamBlock to DNS log table with default as false
                     db.execSQL(
                         "ALTER TABLE DnsLogs ADD COLUMN upstreamBlock INTEGER DEFAULT 0 NOT NULL"
+                    )
+                }
+            }
+
+        private val MIGRATION_7_8: Migration =
+            object : Migration(7, 8) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    // add a new column region to DNS log table with default as empty string
+                    db.execSQL(
+                        "ALTER TABLE DnsLogs ADD COLUMN region TEXT DEFAULT '' NOT NULL"
                     )
                 }
             }

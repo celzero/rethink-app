@@ -85,6 +85,7 @@ internal constructor(
         transaction.relayName = summary.relayServer ?: ""
         transaction.msg = summary.msg ?: ""
         transaction.upstreamBlock = summary.upstreamBlocks
+        transaction.region = summary.region
         return transaction
     }
 
@@ -103,6 +104,7 @@ internal constructor(
         dnsLog.time = transaction.responseCalendar.timeInMillis
         dnsLog.msg = transaction.msg
         dnsLog.upstreamBlock = transaction.upstreamBlock
+        dnsLog.region = transaction.region
         val typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt())
         if (typeName == ResourceRecordTypes.UNKNOWN) {
             dnsLog.typeName = transaction.type.toString()
