@@ -15,7 +15,6 @@
         android:id="@+id/custom_ip_app_name_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="10dp">
@@ -45,6 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/custom_ip_app_name_container"
+        android:layout_margin="5dp"
         android:padding="5dp">
 
         <androidx.appcompat.widget.AppCompatTextView
