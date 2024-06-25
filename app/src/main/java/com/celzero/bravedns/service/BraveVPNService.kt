@@ -1942,6 +1942,11 @@ class BraveVPNService :
         }
     }
 
+    override fun onRevoke() {
+        stopVpnAdapter()
+        super.onRevoke()
+    }
+
     private suspend fun restartVpnWithNewAppConfig(
         underlyingNws: ConnectionMonitor.UnderlyingNetworks? = underlyingNetworks,
         overlayNws: OverlayNetworks = overlayNetworks,
