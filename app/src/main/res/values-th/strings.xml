@@ -5,4 +5,7 @@
 \n …”“‘­­–——\t
 \n …”“‘­­–——\t
 \n …”“‘­­–——</string>
+    <string name="title_settings" translatable="true">ตั้งค่า</string>
+    <string name="title_statistics" translatable="true">สถานะ</string>
+    <string name="pause_title_desc" translatable="true">หยุดชั่วคราว</string>
 </resources>
