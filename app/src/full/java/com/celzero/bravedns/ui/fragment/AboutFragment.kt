@@ -55,6 +55,7 @@ import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.activity.ConsoleLogActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.UIUtils.openAppInfo
@@ -96,6 +97,16 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutAppUpdate.visibility = View.GONE
         }
 
+        val followUs = getString(R.string.lbl_follow_us)
+        b.aboutTwitter.text =
+            getString(R.string.two_argument_space, followUs, getString(R.string.lbl_twitter))
+        b.aboutReddit.text =
+            getString(R.string.two_argument_space, followUs, getString(R.string.lbl_reddit))
+        b.aboutMastodon.text =
+            getString(R.string.two_argument_space, followUs, getString(R.string.lbl_mastodon))
+        b.aboutElement.text =
+            getString(R.string.two_argument_space, followUs, getString(R.string.lbl_element))
+
         b.aboutSponsor.setOnClickListener(this)
         b.aboutWebsite.setOnClickListener(this)
         b.aboutTwitter.setOnClickListener(this)
@@ -104,6 +115,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutPrivacyPolicy.setOnClickListener(this)
         b.aboutMail.setOnClickListener(this)
         b.aboutTelegram.setOnClickListener(this)
+        b.aboutReddit.setOnClickListener(this)
+        b.aboutMastodon.setOnClickListener(this)
+        b.aboutElement.setOnClickListener(this)
         b.aboutFaq.setOnClickListener(this)
         b.mozillaImg.setOnClickListener(this)
         b.fossImg.setOnClickListener(this)
@@ -216,6 +230,15 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.aboutPrivacyPolicy -> {
                 openActionViewIntent(getString(R.string.about_privacy_policy_link).toUri())
+            }
+            b.aboutReddit -> {
+                openActionViewIntent(getString(R.string.about_reddit_handle).toUri())
+            }
+            b.aboutMastodon -> {
+                openActionViewIntent(getString(R.string.about_mastodom_handle).toUri())
+            }
+            b.aboutElement -> {
+                openActionViewIntent(getString(R.string.about_matrix_handle).toUri())
             }
         }
     }
