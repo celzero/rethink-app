@@ -41,7 +41,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.Closeable
 import java.io.IOException
-import java.net.DatagramSocket
 import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.InetAddress
@@ -111,6 +110,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         val testReachability: Boolean
     )
 
+    data class ProbeResult(val ip: String, val ok: Boolean, val capabilities: NetworkCapabilities?)
+
     interface NetworkListener {
         fun onNetworkDisconnected(networks: UnderlyingNetworks)
 
@@ -158,14 +159,25 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         handleNetworkChange(isForceUpdate = true)
     }
 
+    suspend fun probeIp(ip: String): ProbeResult? {
+        Logger.d(LOG_TAG_CONNECTION, "pingIp: $ip")
+        return serviceHandler?.let {
+            val res = it.probeIp(ip, networkSet)
+            Logger.d(LOG_TAG_CONNECTION, "pingIp: $ip, $res")
+            res
+        }
+    }
+
     /**
      * Force updates the VPN's underlying network based on the preference. Will be initiated when
-     * the VPN start is completed.
+     * the VPN start is completed. Always called from the main thread
      */
-    fun onVpnStart(context: Context) {
+    fun onVpnStart(context: Context): Boolean {
+        val isNewVpn = serviceHandler == null
+
         if (this.serviceHandler != null) {
             Logger.w(LOG_TAG_CONNECTION, "connection monitor is already running")
-            return
+            return isNewVpn
         }
 
         Logger.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
@@ -177,16 +189,24 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         } catch (e: Exception) {
             Logger.w(LOG_TAG_CONNECTION, "Exception while registering network callback", e)
             networkListener.onNetworkRegistrationFailed()
-            return
+            return isNewVpn
         }
 
         val handlerThread = HandlerThread(NetworkRequestHandler::class.simpleName)
         handlerThread.start()
+        val ips = IpsToProbe(
+            persistentState.pingv4Ips.split(",").map { it.trim() },
+            persistentState.pingv6Ips.split(",").map { it.trim() }
+        )
         this.serviceHandler =
-            NetworkRequestHandler(connectivityManager, handlerThread.looper, networkListener)
+            NetworkRequestHandler(connectivityManager, handlerThread.looper, networkListener, ips)
         handleNetworkChange(isForceUpdate = true)
+
+        return isNewVpn
     }
 
+
+    // Always called from the main thread
     fun onVpnStop() {
         try {
             this.serviceHandler?.removeCallbacksAndMessages(null)
@@ -251,11 +271,17 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         val dnsServers: Map<InetAddress, Network>
     )
 
+    data class IpsToProbe(
+        val ip4probes: Collection<String>,
+        val ip6probes: Collection<String>
+    )
+
     // Handles the network messages from the callback from the connectivity manager
     private class NetworkRequestHandler(
         val connectivityManager: ConnectivityManager,
         looper: Looper,
-        val listener: NetworkListener
+        val listener: NetworkListener,
+        ips: IpsToProbe
     ) : Handler(looper) {
 
         // number of times the reachability check is performed due to failures
@@ -267,21 +293,10 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             private const val MIN_MTU = 1280
         }
 
-        private val ip4probes =
-            listOf(
-                "216.239.32.27", // google org
-                "104.16.132.229", // cloudflare
-                "31.13.79.53" // whatsapp.net
-            )
-
+        val ip4probes = ips.ip4probes
         // probing with domain names is not viable because some domains will resolve to both
         // ipv4 and ipv6 addresses. So, we use ipv6 addresses for probing ipv6 connectivity.
-        private val ip6probes =
-            listOf(
-                "2001:4860:4802:32::1b", // google org
-                "2606:4700::6810:84e5", // cloudflare
-                "2606:4700:3033::ac43:a21b" // rethinkdns
-            )
+        val ip6probes = ips.ip6probes
 
         // ref - https://developer.android.com/reference/kotlin/java/util/LinkedHashSet
         // The network list is maintained in a linked-hash-set to preserve insertion and iteration
@@ -503,7 +518,10 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                     // for active network, ICMP echo is additionally used with TCP and UDP checks
                     // but ICMP echo will always return reachable when app is in rinr mode
                     // so till we have checks for rinr mode, we should not use ICMP reachability
-                    val canUseIcmp = false // for now, need to check for rinr mode
+
+                    // icmp checks won't work on rinr mode, because
+                    // the socket is not accessible to protect, so always return false
+                    val canUseIcmp = false
                     val useIcmp = isActive && canUseIcmp
                     val has4 = probeConnectivity(ip4probes, network, useIcmp)
                     val has6 = probeConnectivity(ip6probes, network, useIcmp)
@@ -697,12 +715,24 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             return@runBlocking ok
         }
 
+        suspend fun probeIp(ip: String, nws: Set<Network>): ProbeResult {
+            nws.forEach { nw ->
+                if (isReachableTcpUdp(nw, ip)) {
+                    val cap = connectivityManager.getNetworkCapabilities(nw)
+                    val ln = connectivityManager.getLinkProperties(nw)
+                    val nwType = networkType(cap)
+                    return ProbeResult(ip, true, cap)
+                }
+            }
+            return ProbeResult(ip, false, null)
+        }
+
         private suspend fun isReachableTcpUdp(nw: Network?, host: String): Boolean {
             try {
                 // https://developer.android.com/reference/android/net/Network#bindSocket(java.net.Socket)
                 TrafficStats.setThreadStatsTag(Thread.currentThread().id.toIntOrDefault())
 
-                val yes = tcp80(nw, host) || udp53(nw, host) || tcp53(nw, host)
+                val yes = tcp80(nw, host) || tcp53(nw, host)
 
                 Logger.d(LOG_TAG_CONNECTION, "$host isReachable on network($nw): $yes")
                 return yes
@@ -747,6 +777,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 val s = InetSocketAddress(host, port80)
                 socket = Socket()
                 nw?.bindSocket(socket)
+                VpnController.protectSocket(socket)
                 socket.connect(s, timeout)
                 val c = socket.isConnected
                 val b = socket.isBound
@@ -778,6 +809,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 socket = Socket()
                 val s = InetSocketAddress(host, port53)
                 nw?.bindSocket(socket)
+                VpnController.protectSocket(socket)
                 socket.connect(s, timeout)
                 val c = socket.isConnected
                 val b = socket.isBound
@@ -792,36 +824,6 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 Logger.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
             } catch (e: SecurityException) {
                 Logger.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
-            } finally {
-                clos(socket)
-            }
-            return false
-        }
-
-        private suspend fun udp53(nw: Network?, host: String): Boolean {
-            val timeout = 500 // ms
-            val port53 = 53 // port
-            var socket: DatagramSocket? = null
-
-            try {
-                socket = DatagramSocket()
-                val s = InetSocketAddress(host, port53)
-                nw?.bindSocket(socket)
-                socket.soTimeout = timeout
-                socket.connect(s)
-                val c = socket.isConnected
-                val b = socket.isBound
-                Logger.d(LOG_TAG_CONNECTION, "udpEcho: $host, ${nw?.networkHandle}: $c, $b")
-                return true
-            } catch (e: IOException) {
-                Logger.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}, ${e.cause}")
-                val cause: Throwable = e.cause ?: return false
-
-                return (cause is ErrnoException && cause.errno == ECONNREFUSED)
-            } catch (e: IllegalArgumentException) {
-                Logger.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}, ${e.cause}")
-            } catch (e: SecurityException) {
-                Logger.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}, ${e.cause}")
             } finally {
                 clos(socket)
             }

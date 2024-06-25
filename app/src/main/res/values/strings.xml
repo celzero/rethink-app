@@ -105,6 +105,7 @@
     <string name="lbl_mastodon" translatable="false">Mastodon</string>
     <string name="lbl_element" translatable="false">Element</string>
     <string name="lbl_reddit" translatable="false">Reddit</string>
+    <string name="lbl_test" translatable="true">test</string>
 
     <string name="memory_notification_text">Rethink is experiencing low memory. System actions may be limited.</string>
 
@@ -635,6 +636,9 @@
 
     <string name="settings_crashlytics_title" translatable="true">Stablility improvement program</string>
     <string name="settings_crashlytics_desc" translatable="true">When app encounters an error, error logs are obtained and analysed to produce a solution.</string>
+
+    <string name="settings_probe_ips">Custom Probe IPs</string>
+    <string name="settings_probe_ips_desc">Add custom IPs to probe for network connectivity.</string>
 
     <!-- AppDetailActivity -->
     <string name="apps_icon_content_desc" translatable="true">Application Icon</string>

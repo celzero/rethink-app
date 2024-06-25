@@ -38,6 +38,8 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.net.Socket
+import kotlin.coroutines.cancellation.CancellationException
 
 object VpnController : KoinComponent {
 
@@ -97,8 +99,12 @@ object VpnController : KoinComponent {
         states?.cancel()
         vpnStartElapsedTime = SystemClock.elapsedRealtime()
         try {
+            externalScope?.coroutineContext?.get(Job)?.cancel("VPNController - onVpnDestroyed")
             externalScope?.cancel("VPNController - onVpnDestroyed")
-        } catch (ignored: IllegalStateException) {}
+        } catch (ignored: IllegalStateException) {
+        } catch (ignored: CancellationException) {
+        } catch (ignored: Exception) {
+        }
     }
 
     fun uptimeMs(): Long {
@@ -321,7 +327,16 @@ object VpnController : KoinComponent {
         return braveVpnService?.goBuildVersion() ?: ""
     }
 
-    fun writeConsoleLog(message: String) {
-        braveVpnService?.writeConsoleLog(message)
+    fun protectSocket(socket: Socket) {
+        braveVpnService?.protectSocket(socket)
     }
+
+    suspend fun probeIp(ip: String): ConnectionMonitor.ProbeResult? {
+        return braveVpnService?.probeIp(ip)
+    }
+
+    suspend fun notifyConnectionMonitor() {
+        braveVpnService?.notifyConnectionMonitor()
+    }
+
 }

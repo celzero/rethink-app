@@ -20,6 +20,7 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.InternetProtocol
@@ -283,6 +284,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var excludeAppsInProxy by booleanPref("exclude_apps_in_proxy").withDefault<Boolean>(true)
 
     var crashlyticsEnabled by booleanPref("crashlytics_enabled").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
+
+    var pingv4Ips by stringPref("ping_ipv4_ips").withDefault<String>(Constants.ip4probes.joinToString(","))
+
+    var pingv6Ips by stringPref("ping_ipv6_ips").withDefault<String>(Constants.ip6probes.joinToString(","))
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
