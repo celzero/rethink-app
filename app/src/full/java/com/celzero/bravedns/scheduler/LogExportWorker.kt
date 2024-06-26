@@ -46,7 +46,7 @@ class LogExportWorker(context: Context, workerParams: WorkerParameters) :
             }
 
             ZipOutputStream(BufferedOutputStream(FileOutputStream(filePath))).use { zos ->
-                val zipEntry = ZipEntry("log.txt")
+                val zipEntry = ZipEntry("log_${System.currentTimeMillis()}.txt")
                 zos.putNextEntry(zipEntry)
                 if (cursor.moveToFirst()) {
                     do {
@@ -60,7 +60,6 @@ class LogExportWorker(context: Context, workerParams: WorkerParameters) :
                 }
                 zos.closeEntry()
             }
-            cursor.close()
 
             Logger.i(LOG_TAG_BUG_REPORT, "Logs exported to ${file.absolutePath}")
             return true

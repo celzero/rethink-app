@@ -228,8 +228,15 @@ object BugReportZipper {
     }
 
     private fun copy(input: InputStream, output: OutputStream) {
-        while (input.read() != -1) {
-            output.write(input.readBytes())
+        try {
+            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+            var bytesRead: Int
+            while (input.read(buffer).also { bytesRead = it } != -1) {
+                output.write(buffer, 0, bytesRead)
+            }
+            output.close()
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BUG_REPORT, "Exception while copying the file", e)
         }
     }
 }
