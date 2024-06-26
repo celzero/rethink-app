@@ -371,7 +371,6 @@
     <string name="dc_local_block_heading" translatable="true">ऑन-डिवाइस ब्लॉकलिस्ट</string>
     <string name="about_privacy_policy" translatable="true">गोपनीयता नीति पढ़े</string>
     <string name="about_settings_app_info" translatable="true">ऐप जानकारी</string>
-    <string name="about_twitter" translatable="true">ट्वीटर पर हमें फोलो करे</string>
     <string name="about_app_translate" translatable="true">अनुवाद करे</string>
     <string name="about_mail_bugreport_text" translatable="true">इस ईमेल को यहां भेजें: hello@celzero.com</string>
     <string name="intent_launch_error" translatable="true">%1$s लॉन्च नहीं हुए</string>

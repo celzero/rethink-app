@@ -381,7 +381,6 @@
     <string name="hsf_chip_appearance" translatable="true">Chủ đề: %1$s</string>
     <string name="dc_custom_dns_radio" translatable="true">DNS khác</string>
     <string name="dc_dns_website_heading" translatable="true">Hiển thị biểu tượng trong nhật ký DNS (thử nghiệm)</string>
-    <string name="about_twitter" translatable="true">Theo dõi chúng tôi trên Twitter</string>
     <string name="about_app_update_check" translatable="true">Kiểm tra các bản cập nhật ứng dụng</string>
     <string name="about_dialog_neutral_button" translatable="true">Đề xuất các tính năng</string>
     <string name="vpn_profile_error" translatable="true">Không thể khởi chạy cấu hình VPN.</string>
