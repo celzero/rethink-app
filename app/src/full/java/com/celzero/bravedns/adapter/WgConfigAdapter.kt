@@ -74,10 +74,10 @@ class WgConfigAdapter(private val context: Context) :
                     newConnection: WgConfigFiles
                 ): Boolean {
                     return (oldConnection.id == newConnection.id &&
-                            oldConnection.name == newConnection.name &&
-                            oldConnection.isActive == newConnection.isActive &&
-                            oldConnection.isCatchAll == newConnection.isCatchAll &&
-                            oldConnection.isLockdown == newConnection.isLockdown)
+                        oldConnection.name == newConnection.name &&
+                        oldConnection.isActive == newConnection.isActive &&
+                        oldConnection.isCatchAll == newConnection.isCatchAll &&
+                        oldConnection.isLockdown == newConnection.isLockdown)
                 }
             }
     }
@@ -111,7 +111,12 @@ class WgConfigAdapter(private val context: Context) :
         private var job: Job? = null
 
         fun update(config: WgConfigFiles) {
-            b.interfaceNameText.text = config.name
+            b.interfaceNameText.text =
+                context.getString(
+                    R.string.about_version_install_source,
+                    config.name.take(11),
+                    config.id.toString()
+                )
             b.interfaceSwitch.isChecked = config.isActive && VpnController.hasTunnel()
             setupClickListeners(config)
             updateStatusJob(config)
@@ -216,10 +221,10 @@ class WgConfigAdapter(private val context: Context) :
             // if the view is not active then cancel the job
             if (
                 lifecycleOwner != null &&
-                lifecycleOwner
-                    ?.lifecycle
-                    ?.currentState
-                    ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
+                    lifecycleOwner
+                        ?.lifecycle
+                        ?.currentState
+                        ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
             ) {
                 cancelJobIfAny()
                 return
@@ -311,8 +316,8 @@ class WgConfigAdapter(private val context: Context) :
                         }
                     } else if (
                         statusId == Backend.TUP ||
-                        statusId == Backend.TZZ ||
-                        statusId == Backend.TNT
+                            statusId == Backend.TZZ ||
+                            statusId == Backend.TNT
                     ) {
                         b.interfaceDetailCard.strokeColor =
                             UIUtils.fetchColor(context, R.attr.chipTextNeutral)
@@ -334,8 +339,8 @@ class WgConfigAdapter(private val context: Context) :
                         // for idle state, if lastOk is less than 30 sec, then show as connected
                         if (
                             stats.lastOK != 0L &&
-                            System.currentTimeMillis() - stats.lastOK <
-                            30 * DateUtils.SECOND_IN_MILLIS
+                                System.currentTimeMillis() - stats.lastOK <
+                                    30 * DateUtils.SECOND_IN_MILLIS
                         ) {
                             status =
                                 context
@@ -432,7 +437,8 @@ class WgConfigAdapter(private val context: Context) :
                 uiCtx {
                     Utilities.showToastUiCentered(
                         context,
-                        ERR_CODE_VPN_NOT_ACTIVE + context.getString(R.string.settings_socks5_vpn_disabled_error),
+                        ERR_CODE_VPN_NOT_ACTIVE +
+                            context.getString(R.string.settings_socks5_vpn_disabled_error),
                         Toast.LENGTH_LONG
                     )
                     // reset the check box
@@ -464,7 +470,8 @@ class WgConfigAdapter(private val context: Context) :
                 uiCtx {
                     Utilities.showToastUiCentered(
                         context,
-                        ERR_CODE_VPN_NOT_ACTIVE + context.getString(R.string.settings_socks5_vpn_disabled_error),
+                        ERR_CODE_VPN_NOT_ACTIVE +
+                            context.getString(R.string.settings_socks5_vpn_disabled_error),
                         Toast.LENGTH_LONG
                     )
                     // reset the check box
@@ -474,16 +481,14 @@ class WgConfigAdapter(private val context: Context) :
             }
 
             if (!WireguardManager.canEnableProxy()) {
-                Logger.i(
-                    LOG_TAG_PROXY,
-                    "not in DNS+Firewall mode, cannot enable WireGuard"
-                )
+                Logger.i(LOG_TAG_PROXY, "not in DNS+Firewall mode, cannot enable WireGuard")
                 uiCtx {
                     // reset the check box
                     b.interfaceSwitch.isChecked = false
                     Utilities.showToastUiCentered(
                         context,
-                        ERR_CODE_VPN_NOT_FULL + context.getString(R.string.wireguard_enabled_failure),
+                        ERR_CODE_VPN_NOT_FULL +
+                            context.getString(R.string.wireguard_enabled_failure),
                         Toast.LENGTH_LONG
                     )
                 }
@@ -498,9 +503,8 @@ class WgConfigAdapter(private val context: Context) :
                     b.interfaceSwitch.isChecked = false
                     Utilities.showToastUiCentered(
                         context,
-                        ERR_CODE_OTHER_WG_ACTIVE + context.getString(
-                            R.string.wireguard_enabled_failure
-                        ),
+                        ERR_CODE_OTHER_WG_ACTIVE +
+                            context.getString(R.string.wireguard_enabled_failure),
                         Toast.LENGTH_LONG
                     )
                 }

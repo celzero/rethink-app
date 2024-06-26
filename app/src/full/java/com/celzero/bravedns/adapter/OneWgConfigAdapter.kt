@@ -116,7 +116,13 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         private var job: Job? = null
 
         fun update(config: WgConfigFiles) {
-            b.interfaceNameText.text = config.name
+            // limit the config name to 12 characters
+            b.interfaceNameText.text =
+                context.getString(
+                    R.string.about_version_install_source,
+                    config.name.take(11),
+                    config.id.toString()
+                )
             val isWgActive = config.isActive && VpnController.hasTunnel()
             b.oneWgCheck.isChecked = isWgActive
             setupClickListeners(config)
@@ -226,9 +232,10 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                             b.interfaceDetailCard.strokeColor =
                                 fetchColor(context, R.attr.accentGood)
                         }
-                    } else if (statusId == Backend.TUP ||
-                        statusId == Backend.TZZ ||
-                        statusId == Backend.TNT
+                    } else if (
+                        statusId == Backend.TUP ||
+                            statusId == Backend.TZZ ||
+                            statusId == Backend.TNT
                     ) {
                         b.interfaceDetailCard.strokeColor =
                             fetchColor(context, R.attr.chipTextNeutral)
@@ -365,7 +372,8 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 uiCtx {
                     Utilities.showToastUiCentered(
                         context,
-                        ERR_CODE_VPN_NOT_ACTIVE + context.getString(R.string.settings_socks5_vpn_disabled_error),
+                        ERR_CODE_VPN_NOT_ACTIVE +
+                            context.getString(R.string.settings_socks5_vpn_disabled_error),
                         Toast.LENGTH_LONG
                     )
                     // reset the check box
@@ -381,7 +389,8 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                     b.oneWgCheck.isChecked = false
                     Utilities.showToastUiCentered(
                         context,
-                        ERR_CODE_VPN_NOT_FULL + context.getString(R.string.wireguard_enabled_failure),
+                        ERR_CODE_VPN_NOT_FULL +
+                            context.getString(R.string.wireguard_enabled_failure),
                         Toast.LENGTH_LONG
                     )
                 }
@@ -395,7 +404,8 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                     b.oneWgCheck.isChecked = false
                     Utilities.showToastUiCentered(
                         context,
-                        ERR_CODE_OTHER_WG_ACTIVE + context.getString(R.string.wireguard_enabled_failure),
+                        ERR_CODE_OTHER_WG_ACTIVE +
+                            context.getString(R.string.wireguard_enabled_failure),
                         Toast.LENGTH_LONG
                     )
                 }
@@ -431,7 +441,8 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                     b.oneWgCheck.isChecked = true
                     Utilities.showToastUiCentered(
                         context,
-                        ERR_CODE_VPN_NOT_ACTIVE + context.getString(R.string.settings_socks5_vpn_disabled_error),
+                        ERR_CODE_VPN_NOT_ACTIVE +
+                            context.getString(R.string.settings_socks5_vpn_disabled_error),
                         Toast.LENGTH_LONG
                     )
                 }
