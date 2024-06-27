@@ -514,6 +514,7 @@
     <string name="about_bug_no_log_dialog_message" translatable="true">Nie można pobrać logów awarii (błędów). Czy chcesz ręcznie zgłosić swój błąd\?</string>
     <string name="about_bug_no_log_dialog_positive_btn" translatable="true">Wyślij e-mail</string>
     <string name="about_website" translatable="true">Odwiedź stronę rethinkdns.com</string>
+    <string name="about_twitter" translatable="true">Dołącz do nas na Twitterze</string>
     <string name="about_github" translatable="true">Wesprzyj nas na Github</string>
     <string name="about_faq" translatable="true">Zobacz FAQs</string>
     <string name="about_version_install_source" translatable="true">v%1$s (%2$s)</string>

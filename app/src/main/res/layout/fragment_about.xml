@@ -477,12 +477,11 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_twitter"
                 android:drawablePadding="20dp"
+                android:text="@string/about_twitter"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:text="@string/about_twitter"
                 android:textSize="@dimen/large_font_text_view" />
-
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_reddit"
@@ -495,6 +494,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_reddit"
                 android:drawablePadding="20dp"
+                android:text="@string/lbl_reddit"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
@@ -512,6 +512,7 @@
                 android:drawableStart="@drawable/ic_mastodon"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
+                android:text="@string/lbl_mastodon"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:textSize="@dimen/large_font_text_view" />
@@ -527,6 +528,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_element"
                 android:drawablePadding="20dp"
+                android:text="@string/lbl_matrix"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"

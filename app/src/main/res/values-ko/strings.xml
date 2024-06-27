@@ -290,6 +290,7 @@
     <string name="about_connect" translatable="true">연락처</string>
     <string name="about_faq" translatable="true">자주 묻는 질문 보기</string>
     <string name="about_mozilla" translatable="true">Rethink는 Mozilla Builders, FOSS United Foundation, OSOM Products Inc.가 지원합니다.</string>
+    <string name="about_twitter" translatable="true">Twitter에서 우리를 팔로우 하기</string>
     <string name="about_whats_new" translatable="true">%1$s에서 새로운 것들</string>
     <string name="about_app_update_check" translatable="true">앱 업데이트 확인하기</string>
     <string name="about_app_contributors" translatable="true">저자</string>

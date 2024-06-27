@@ -624,6 +624,7 @@
     <string name="about_settings" translatable="true">மண்டலம்</string>
     <string name="about_settings_app_info" translatable="true">பயன்பாட்டு செய்தி</string>
     <string name="about_settings_vpn_profile" translatable="true">VPN சுயவிவரம்</string>
+    <string name="about_twitter" translatable="true">Twitter இல் எங்களை பின்தொடரவும்</string>
     <string name="about_app_update_check" translatable="true">பயன்பாட்டு புதுப்பிப்புகளைச் சரிபார்க்கவும்</string>
     <string name="about_mail_bugreport_share_title" translatable="true">மின்னஞ்சல் வழங்குநரைத் தேர்ந்தெடுக்கவும்</string>
     <string name="about_dialog_neutral_button" translatable="true">அம்சங்களை பரிந்துரைக்கவும்</string>

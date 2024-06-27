@@ -218,6 +218,7 @@
     <string name="about_settings_vpn_profile" translatable="true">VPNプロファイル</string>
     <string name="about_settings_notification" translatable="true">通知設定</string>
     <string name="about_whats_new" translatable="true">%1$s の新機能</string>
+    <string name="about_twitter" translatable="true">Twitterでフォローしてください</string>
     <string name="about_mozilla" translatable="true">RethinkDNSは、Mozilla Builders MVPプログラムの一部です。</string>
     <string name="about_app_update_check" translatable="true">更新を確認する</string>
     <string name="about_app_contributors" translatable="true">開発者</string>

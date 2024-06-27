@@ -100,10 +100,9 @@
     <string name="lbl_ip" translatable="false">IP</string>
     <string name="lbl_unselected" translatable="true">Unselected</string>
     <string name="lbl_notification" translatable="true">notification</string>
-    <string name="lbl_follow_us" translatable="true">follow us on</string>
     <string name="lbl_twitter" translatable="false">X</string>
     <string name="lbl_mastodon" translatable="false">Mastodon</string>
-    <string name="lbl_element" translatable="false">Element</string>
+    <string name="lbl_matrix" translatable="false">Matrix</string>
     <string name="lbl_reddit" translatable="false">Reddit</string>
     <string name="lbl_test" translatable="true">test</string>
 
@@ -775,6 +774,7 @@
     <string name="about_settings_vpn_profile" translatable="true">VPN Profile</string>
     <string name="about_settings_notification" translatable="true">Notification Settings</string>
     <string name="about_whats_new" translatable="true">What\'s new in %1$s</string>
+    <string name="about_twitter" translatable="true">Follow us on Twitter</string>
     <string name="about_mozilla" translatable="true">Rethink is supported by Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
     <string name="about_app_update_check" translatable="true">Check for app updates</string>
     <string name="about_app_contributors" translatable="true">Authors</string>
