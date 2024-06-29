@@ -6,20 +6,23 @@ import androidx.work.WorkerParameters
 import com.celzero.bravedns.database.ConsoleLogRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.concurrent.TimeUnit
 
 class PurgeConsoleLogs(val context: Context, workerParameters: WorkerParameters) :
     CoroutineWorker(context, workerParameters), KoinComponent {
 
-    companion object {
-        const val LOG_LIMIT = 20000
-    }
-
     private val consoleLogRepository by inject<ConsoleLogRepository>()
 
+    companion object {
+        const val MAX_TIME: Long = 4
+    }
     override suspend fun doWork(): Result {
-        // delete old logs will limit the logs count to 20000
-        consoleLogRepository.deleteOldLogs(LOG_LIMIT)
-        Logger.v(Logger.LOG_TAG_APP_DB, "Purging console logs")
+        // delete logs which are older than MAX_TIME hrs
+        val threshold = TimeUnit.HOURS.toMillis(MAX_TIME)
+        val currTime = System.currentTimeMillis()
+        val time = currTime - threshold
+
+        consoleLogRepository.deleteOldLogs(time)
         return Result.success()
     }
 
