@@ -234,7 +234,6 @@ object BugReportZipper {
             while (input.read(buffer).also { bytesRead = it } != -1) {
                 output.write(buffer, 0, bytesRead)
             }
-            output.close()
         } catch (e: Exception) {
             Logger.w(LOG_TAG_BUG_REPORT, "Exception while copying the file", e)
         }
