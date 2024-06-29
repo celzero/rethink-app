@@ -18,6 +18,7 @@ package com.celzero.bravedns.adapter
 import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.format.DateUtils
@@ -43,6 +44,7 @@ import com.celzero.bravedns.databinding.ListItemCustomIpBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
@@ -278,6 +280,19 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             b.customIpExpandIcon.setOnClickListener { toggleActionsUi() }
 
             b.customIpContainer.setOnClickListener { toggleActionsUi() }
+
+            b.customIpSeeMoreChip.setOnClickListener { openAppWiseRulesActivity(customIp.uid) }
+        }
+
+        private fun openAppWiseRulesActivity(uid: Int) {
+            val intent = Intent(context, CustomRulesActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+            intent.putExtra(
+                Constants.VIEW_PAGER_SCREEN_TO_LOAD,
+                CustomRulesActivity.Tabs.IP_RULES.screen
+            )
+            intent.putExtra(Constants.INTENT_UID, uid)
+            context.startActivity(intent)
         }
 
         private fun getAppName(uid: Int, appNames: List<String>): String {

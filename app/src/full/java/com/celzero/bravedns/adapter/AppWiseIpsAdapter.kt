@@ -37,7 +37,7 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
 import kotlin.math.log2
 
-class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner, val uid: Int) :
+class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner, val uid: Int, val isRethink: Boolean) :
     PagingDataAdapter<AppConnection, AppWiseIpsAdapter.ConnectionDetailsViewHolder>(DIFF_CALLBACK),
     AppIpRulesBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
@@ -109,6 +109,10 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
         private fun openBottomSheet(conn: AppConnection) {
             if (context !is AppCompatActivity) {
                 Logger.w(LOG_TAG_UI, "err opening the app conn bottom sheet")
+                return
+            }
+
+            if (isRethink) {
                 return
             }
 

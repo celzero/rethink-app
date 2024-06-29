@@ -80,6 +80,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     private var showBypassToolTip: Boolean = true
 
+    private var isRethinkApp: Boolean = false
+
     companion object {
         const val UID_INTENT_NAME = "UID"
     }
@@ -121,6 +123,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 this.appInfo = appInfo
 
                 b.aadAppDetailName.text = appName(packages.count())
+                b.aadPkgName.text = appInfo.packageName
                 b.excludeProxySwitch.isChecked = appInfo.isProxyExcluded
                 updateDataUsage()
                 displayIcon(
@@ -130,21 +133,29 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
                 // do not show the firewall status if the app is Rethink
                 if (appInfo.packageName == rethinkPkgName) {
+                    isRethinkApp = true
                     b.aadFirewallStatus.visibility = View.GONE
                     hideFirewallStatusUi()
                     hideDomainBlockUi()
                     hideIpBlockUi()
-                    return@uiCtx
+                    hideBypassProxyUi()
+                    setRethinkDomainLogsAdapter()
+                    setRethinkIpLogsAdapter()
+                } else {
+                    updateFirewallStatusUi(appStatus, connStatus)
+                    setDomainsAdapter()
+                    setIpAdapter()
                 }
-                updateFirewallStatusUi(appStatus, connStatus)
-                setDomainsAdapter()
-                setIpAdapter()
             }
         }
     }
 
     private fun hideFirewallStatusUi() {
         b.aadAppSettingsCard.visibility = View.GONE
+    }
+
+    private fun hideBypassProxyUi() {
+        b.excludeProxyRl.visibility = View.GONE
     }
 
     private fun hideDomainBlockUi() {
@@ -372,7 +383,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private fun setDomainsAdapter() {
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedDomainRv.layoutManager = layoutManager
-        val adapter = AppWiseDomainsAdapter(this, this, uid)
+        val adapter = AppWiseDomainsAdapter(this, this, uid, isRethinkApp)
         networkLogsViewModel.getDomainLogsLimited(uid).observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -390,11 +401,51 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
     }
 
+    private fun setRethinkDomainLogsAdapter() {
+        val layoutManager = LinearLayoutManager(this)
+        b.aadMostContactedDomainRv.layoutManager = layoutManager
+        val adapter = AppWiseDomainsAdapter(this, this, uid, isRethinkApp)
+        networkLogsViewModel.getRethinkDomainLogsLimited().observe(this) {
+            adapter.submitData(this.lifecycle, it)
+        }
+        b.aadMostContactedDomainRv.adapter = adapter
+
+        adapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (adapter.itemCount < 1) {
+                    b.aadMostContactedDomainRl.visibility = View.GONE
+                } else {
+                    b.aadMostContactedDomainRl.visibility = View.VISIBLE
+                }
+            }
+        }
+    }
+
+    private fun setRethinkIpLogsAdapter() {
+        val layoutManager = LinearLayoutManager(this)
+        b.aadMostContactedIpsRv.layoutManager = layoutManager
+        val adapter = AppWiseIpsAdapter(this, this, uid, isRethinkApp)
+        networkLogsViewModel.getRethinkIpLogsLimited().observe(this) {
+            adapter.submitData(this.lifecycle, it)
+        }
+        b.aadMostContactedIpsRv.adapter = adapter
+
+        adapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (adapter.itemCount < 1) {
+                    b.aadMostContactedIpsRl.visibility = View.GONE
+                } else {
+                    b.aadMostContactedIpsRl.visibility = View.VISIBLE
+                }
+            }
+        }
+    }
+
     private fun setIpAdapter() {
         b.aadMostContactedIpsRv.setHasFixedSize(true)
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedIpsRv.layoutManager = layoutManager
-        val adapter = AppWiseIpsAdapter(this, this, uid)
+        val adapter = AppWiseIpsAdapter(this, this, uid, isRethinkApp)
         networkLogsViewModel.getIpLogsLimited(uid).observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
