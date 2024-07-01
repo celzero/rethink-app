@@ -30,7 +30,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import backend.Backend
-import backend.Stats
+import backend.RouterStats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgConfigFilesImmutable
@@ -277,7 +277,7 @@ class WgConfigAdapter(private val context: Context) :
             }
         }
 
-        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, stats: Stats?) {
+        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, stats: RouterStats?) {
             if (config.isActive) {
                 b.interfaceSwitch.isChecked = true
                 b.interfaceDetailCard.strokeWidth = 2
@@ -369,7 +369,7 @@ class WgConfigAdapter(private val context: Context) :
             }
         }
 
-        private fun getRxTx(stats: Stats?): String {
+        private fun getRxTx(stats: RouterStats?): String {
             if (stats == null) return ""
             val rx =
                 context.getString(
@@ -384,7 +384,7 @@ class WgConfigAdapter(private val context: Context) :
             return context.getString(R.string.two_argument_space, tx, rx)
         }
 
-        private fun getUpTime(stats: Stats?): CharSequence {
+        private fun getUpTime(stats: RouterStats?): CharSequence {
             if (stats == null) {
                 return ""
             }
@@ -398,7 +398,7 @@ class WgConfigAdapter(private val context: Context) :
             )
         }
 
-        private fun getHandshakeTime(stats: Stats?): CharSequence {
+        private fun getHandshakeTime(stats: RouterStats?): CharSequence {
             if (stats == null) {
                 return ""
             }

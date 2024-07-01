@@ -31,7 +31,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import backend.Backend
-import backend.Stats
+import backend.RouterStats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ListItemWgOneInterfaceBinding
@@ -212,7 +212,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             }
         }
 
-        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, stats: Stats?) {
+        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, stats: RouterStats?) {
             if (config.isActive && VpnController.hasTunnel()) {
                 b.interfaceDetailCard.strokeWidth = 2
                 b.oneWgCheck.isChecked = true
@@ -305,7 +305,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                 context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
         }
 
-        private fun getUpTime(stats: Stats?): CharSequence {
+        private fun getUpTime(stats: RouterStats?): CharSequence {
             if (stats == null) {
                 return ""
             }
@@ -319,7 +319,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             )
         }
 
-        private fun getRxTx(stats: Stats?): String {
+        private fun getRxTx(stats: RouterStats?): String {
             if (stats == null) return ""
             val rx =
                 context.getString(
@@ -334,7 +334,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             return context.getString(R.string.two_argument_space, tx, rx)
         }
 
-        private fun getHandshakeTime(stats: Stats?): CharSequence {
+        private fun getHandshakeTime(stats: RouterStats?): CharSequence {
             if (stats == null) {
                 return ""
             }
