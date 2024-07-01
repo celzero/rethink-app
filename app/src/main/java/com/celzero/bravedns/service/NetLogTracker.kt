@@ -23,6 +23,8 @@ import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
+import com.celzero.bravedns.database.ConsoleLog
+import com.celzero.bravedns.database.ConsoleLogRepository
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.database.RethinkLog
@@ -36,6 +38,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.withContext
@@ -49,6 +52,7 @@ internal constructor(
     connectionTrackerRepository: ConnectionTrackerRepository,
     rethinkLogRepository: RethinkLogRepository,
     dnsLogRepository: DnsLogRepository,
+    consoleLogRepository: ConsoleLogRepository,
     private val persistentState: PersistentState
 ) : KoinComponent {
 
@@ -59,16 +63,22 @@ internal constructor(
     private var dnsdb: DnsLogTracker = DnsLogTracker(dnsLogRepository, persistentState, context)
     private var ipdb: IPTracker =
         IPTracker(connectionTrackerRepository, rethinkLogRepository, context)
+    private var consoleLogDb: ConsoleLogManager = ConsoleLogManager(consoleLogRepository)
 
     private var dnsBatcher: NetLogBatcher<DnsLog, Nothing>? = null
     private var ipBatcher: NetLogBatcher<ConnectionTracker, ConnectionSummary>? = null
     private var rrBatcher :NetLogBatcher<RethinkLog, ConnectionSummary>? = null
+    private var consoleLogBatcher: NetLogBatcher<ConsoleLog, Nothing>? = null
 
     // a single thread to run sig and batch co-routines in;
     // to avoid use of mutex/semaphores over shared-state
     // looper is never closed / cancelled and is always active
     @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     private val looper = newSingleThreadContext("nlbLooper")
+
+    companion object {
+        private const val UPDATE_DELAY = 2500L
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun restart(s: CoroutineScope) {
@@ -78,13 +88,17 @@ internal constructor(
         val b1 = NetLogBatcher<DnsLog, Nothing>("dns", looper, dnsdb::insertBatch)
         val b2 = NetLogBatcher<ConnectionTracker, ConnectionSummary>("ip", looper, ipdb::insertBatch, ipdb::updateBatch)
         val b3 = NetLogBatcher<RethinkLog, ConnectionSummary>("rr", looper, ipdb::insertRethinkBatch, ipdb::updateRethinkBatch)
+        val b4 = NetLogBatcher<ConsoleLog, Nothing>("lc", looper, consoleLogDb::insertBatch)
 
         b1.begin(s)
         b2.begin(s)
         b3.begin(s)
+        b4.begin(s)
+
         this.dnsBatcher = b1
         this.ipBatcher = b2
         this.rrBatcher = b3
+        this.consoleLogBatcher = b4
     }
 
     fun writeIpLog(info: ConnTrackerMetaData) {
@@ -107,14 +121,18 @@ internal constructor(
 
     fun updateIpSummary(summary: ConnectionSummary) {
         if (!persistentState.logsEnabled) return
-
+        val d = Logger.LoggerType.fromId(persistentState.goLoggerLevel.toInt())
+        val debug = d.isLessThan(Logger.LoggerType.DEBUG)
         io("updateIpSmm") {
             val s =
-                if (DEBUG && summary.targetIp?.isNotEmpty() == true) {
+                if (debug && summary.targetIp?.isNotEmpty() == true) {
                     ipdb.makeSummaryWithTarget(summary)
                 } else {
                     summary
                 }
+
+            // add a delay to ensure the insert is complete before updating
+            delay(UPDATE_DELAY)
 
             ipBatcher?.update(s)
         }
@@ -130,6 +148,9 @@ internal constructor(
                 } else {
                     summary
                 }
+
+            // add a delay to ensure the insert is complete before updating
+            delay(UPDATE_DELAY)
 
             rrBatcher?.update(s)
         }
@@ -151,6 +172,13 @@ internal constructor(
 
         val dnsLog = dnsdb.makeDnsLogObj(transaction)
         io("writeDnsLog") { dnsBatcher?.add(dnsLog) }
+    }
+
+    fun writeConsoleLog(msg: String) {
+        io("writeConsoleLog") {
+            val log = ConsoleLog(0, msg, System.currentTimeMillis())
+            consoleLogBatcher?.add(log)
+        }
     }
 
     private fun io(s: String, f: suspend () -> Unit) =

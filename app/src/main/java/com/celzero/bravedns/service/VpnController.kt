@@ -31,12 +31,15 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.net.Socket
+import kotlin.coroutines.cancellation.CancellationException
 
 object VpnController : KoinComponent {
 
@@ -96,8 +99,12 @@ object VpnController : KoinComponent {
         states?.cancel()
         vpnStartElapsedTime = SystemClock.elapsedRealtime()
         try {
+            externalScope?.coroutineContext?.get(Job)?.cancel("VPNController - onVpnDestroyed")
             externalScope?.cancel("VPNController - onVpnDestroyed")
-        } catch (ignored: IllegalStateException) {}
+        } catch (ignored: IllegalStateException) {
+        } catch (ignored: CancellationException) {
+        } catch (ignored: Exception) {
+        }
     }
 
     fun uptimeMs(): Long {
@@ -139,11 +146,11 @@ object VpnController : KoinComponent {
         Logger.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
     }
 
-    fun stop(context: Context) {
+    fun stop(reason: String, context: Context) {
         Logger.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
         connectionState = null
         onConnectionStateChanged(connectionState)
-        braveVpnService?.signalStopService(userInitiated = true)
+        braveVpnService?.signalStopService(reason, userInitiated = true)
     }
 
     fun state(): VpnState {
@@ -319,4 +326,17 @@ object VpnController : KoinComponent {
     suspend fun goBuildVersion(): String {
         return braveVpnService?.goBuildVersion() ?: ""
     }
+
+    fun protectSocket(socket: Socket) {
+        braveVpnService?.protectSocket(socket)
+    }
+
+    suspend fun probeIp(ip: String): ConnectionMonitor.ProbeResult? {
+        return braveVpnService?.probeIp(ip)
+    }
+
+    suspend fun notifyConnectionMonitor() {
+        braveVpnService?.notifyConnectionMonitor()
+    }
+
 }

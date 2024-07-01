@@ -20,6 +20,8 @@ import Logger.LOG_TAG_BUG_REPORT
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Utilities
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -75,7 +77,8 @@ object EnhancedBugReport {
                 Logger.e(LOG_TAG_BUG_REPORT, "file name is null, cannot write logs to file")
                 return
             }
-            val l = logs + "\n" // append a new line character
+            val time = Utilities.convertLongToTime(System.currentTimeMillis(), Constants.TIME_FORMAT_3)
+            val l = "$time: $logs\n" // append a new line character
             file.appendText(l, Charset.defaultCharset())
         } catch (e: Exception) {
             Logger.e(LOG_TAG_BUG_REPORT, "err writing logs to file: ${e.message}", e)

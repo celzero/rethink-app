@@ -87,6 +87,15 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
         b.logsActViewpager.setCurrentItem(fragmentIndex, false)
 
         observeAppState()
+
+        b.appLogs.setOnClickListener {
+            openConsoleLogActivity()
+        }
+    }
+
+    private fun openConsoleLogActivity() {
+        val intent = Intent(this, ConsoleLogActivity::class.java)
+        startActivity(intent)
     }
 
     private fun getCount(): Int {

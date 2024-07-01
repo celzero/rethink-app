@@ -44,6 +44,7 @@ object ViewModelModule {
         viewModel { ODoHEndpointViewModel(get()) }
         viewModel { RethinkLogViewModel(get()) }
         viewModel { AlertsViewModel(get(), get()) }
+        viewModel { ConsoleLogViewModel(get()) }
     }
 
     val modules = listOf(viewModelModule)

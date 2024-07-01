@@ -18,6 +18,7 @@ package com.celzero.bravedns.adapter
 import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.format.DateUtils
@@ -43,6 +44,8 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
 import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
 import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.ui.activity.AppInfoActivity
+import com.celzero.bravedns.ui.activity.AppWiseDomainLogsActivity
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.fetchColor
@@ -420,8 +423,21 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
                     b.customDomainExpandIcon.setOnClickListener { toggleActionsUi() }
 
                     b.customDomainContainer.setOnClickListener { toggleActionsUi() }
+
+                    b.customDomainSeeMoreChip.setOnClickListener { openAppWiseRulesActivity(cd.uid) }
                 }
             }
+        }
+
+        private fun openAppWiseRulesActivity(uid: Int) {
+            val intent = Intent(context, CustomRulesActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+            intent.putExtra(
+                Constants.VIEW_PAGER_SCREEN_TO_LOAD,
+                CustomRulesActivity.Tabs.DOMAIN_RULES.screen
+            )
+            intent.putExtra(Constants.INTENT_UID, uid)
+            context.startActivity(intent)
         }
 
         private fun getAppName(uid: Int, appNames: List<String>): String {

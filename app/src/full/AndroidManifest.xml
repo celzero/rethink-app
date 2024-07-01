@@ -113,6 +113,8 @@
         <activity
             android:name=".ui.activity.AppWiseDomainLogsActivity"
             android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.ConsoleLogActivity"
+            android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.NotificationHandlerDialog"
             android:excludeFromRecents="true"

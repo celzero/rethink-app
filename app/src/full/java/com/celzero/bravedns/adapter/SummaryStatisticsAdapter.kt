@@ -160,7 +160,7 @@ class SummaryStatisticsAdapter(
                     R.string.symbol_upload,
                     Utilities.humanReadableByteCount(appConnection.uploadBytes, true)
                 )
-            val total = context.getString(R.string.two_argument, download, upload)
+            val total = context.getString(R.string.two_argument, upload, download)
             itemBinding.ssDataUsage.text = total
             itemBinding.ssCount.text = appConnection.count.toString()
         }

@@ -62,6 +62,7 @@ class RethinkDnsApplication : Application() {
         get<ScheduleManager>().scheduleDatabaseRefreshJob()
         get<WorkScheduler>().scheduleDataUsageJob()
         get<WorkScheduler>().schedulePurgeConnectionsLog()
+        get<WorkScheduler>().schedulePurgeConsoleLogs()
     }
 
     private fun turnOnStrictMode() {

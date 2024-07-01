@@ -20,6 +20,7 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -31,7 +32,6 @@ import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityAppWiseIpLogsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
@@ -56,10 +56,10 @@ class AppWiseIpLogsActivity :
 
     private val persistentState by inject<PersistentState>()
     private val networkLogsViewModel: AppConnectionsViewModel by viewModel()
-    private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
     private var uid: Int = INVALID_UID
     private var layoutManager: RecyclerView.LayoutManager? = null
     private lateinit var appInfo: AppInfo
+    private var isRethink = false
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -73,10 +73,18 @@ class AppWiseIpLogsActivity :
         if (uid == INVALID_UID) {
             finish()
         }
-        init()
-        setAdapter()
-        observeNetworkLogSize()
-        setClickListener()
+        if (Utilities.getApplicationInfo(this, this.packageName)?.uid == uid) {
+            isRethink = true
+            init()
+            setRethinkAdapter()
+            observeRethinkNetworkLogSize()
+            b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
+        } else {
+            init()
+            setAdapter()
+            observeNetworkLogSize()
+            setClickListener()
+        }
     }
 
     private fun init() {
@@ -94,10 +102,11 @@ class AppWiseIpLogsActivity :
             uiCtx {
                 this.appInfo = appInfo
 
-                b.awlAppDetailName.text = appName(packages.count())
+                val appName = appName(packages.count())
+                updateAppNameInSearchHint(appName)
                 displayIcon(
                     Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
-                    b.awlAppDetailIcon
+                    b.awlAppDetailIcon1
                 )
             }
         }
@@ -171,46 +180,106 @@ class AppWiseIpLogsActivity :
         b.awlRecyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(this)
         b.awlRecyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = AppWiseIpsAdapter(this, this, uid)
+        val recyclerAdapter = AppWiseIpsAdapter(this, this, uid, isRethink)
         networkLogsViewModel.appIpLogs.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
+
+        recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    showNoRulesUi()
+                    hideRulesUi()
+                } else {
+                    hideNoRulesUi()
+                    showRulesUi()
+                }
+            }
+        }
+    }
+
+    private fun setRethinkAdapter() {
+        networkLogsViewModel.setUid(uid)
+        b.awlRecyclerConnection.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(this)
+        b.awlRecyclerConnection.layoutManager = layoutManager
+        val recyclerAdapter = AppWiseIpsAdapter(this, this, uid, isRethink)
+        networkLogsViewModel.rinrIpLogs.observe(this) {
+            recyclerAdapter.submitData(this.lifecycle, it)
+        }
+        b.awlRecyclerConnection.adapter = recyclerAdapter
+
+        recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    showNoRulesUi()
+                    hideRulesUi()
+                } else {
+                    hideNoRulesUi()
+                    showRulesUi()
+                }
+            }
+        }
     }
 
     private fun observeNetworkLogSize() {
-        networkLogsViewModel.getConnectionsCount(uid).observe(this) {
+        networkLogsViewModel.getIpCount(uid).observe(this) {
             if (it == null) return@observe
 
             if (it <= 0) {
                 showNoRulesUi()
                 hideRulesUi()
-                return@observe
+            } else {
+                hideNoRulesUi()
+                showRulesUi()
             }
-
-            hideNoRulesUi()
-            showRulesUi()
         }
     }
 
+    private fun observeRethinkNetworkLogSize() {
+        networkLogsViewModel.getRinrIpCount().observe(this) {
+            if (it == null) return@observe
+
+            if (it <= 0) {
+                showNoRulesUi()
+                hideRulesUi()
+            } else {
+                hideNoRulesUi()
+                showRulesUi()
+            }
+        }
+    }
+
+    private fun updateAppNameInSearchHint(appName: String) {
+        val appNameTruncated = appName.substring(0, appName.length.coerceAtMost(10))
+        val hint = getString(
+            R.string.two_argument_colon,
+            appNameTruncated,
+            getString(R.string.search_universal_ips)
+        )
+        b.awlSearch.queryHint = hint
+        b.awlSearch.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text).textSize =
+            14f
+        return
+    }
+
     private fun showNoRulesUi() {
-        b.awlNoRulesRl.visibility = android.view.View.VISIBLE
+        b.awlNoRulesRl.visibility = View.VISIBLE
     }
 
     private fun hideRulesUi() {
-        b.awlCardViewTop.visibility = android.view.View.GONE
-        b.awlAppDetailRl.visibility = android.view.View.GONE
-        b.awlRecyclerConnection.visibility = android.view.View.GONE
+        b.awlCardViewTop.visibility = View.GONE
+        b.awlRecyclerConnection.visibility = View.GONE
     }
 
     private fun hideNoRulesUi() {
-        b.awlNoRulesRl.visibility = android.view.View.GONE
+        b.awlNoRulesRl.visibility = View.GONE
     }
 
     private fun showRulesUi() {
-        b.awlCardViewTop.visibility = android.view.View.VISIBLE
-        b.awlAppDetailRl.visibility = android.view.View.VISIBLE
-        b.awlRecyclerConnection.visibility = android.view.View.VISIBLE
+        b.awlCardViewTop.visibility = View.VISIBLE
+        b.awlRecyclerConnection.visibility = View.VISIBLE
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
@@ -239,7 +308,9 @@ class AppWiseIpLogsActivity :
     }
 
     private fun deleteAppLogs() {
-        io { connectionTrackerRepository.clearLogsByUid(uid) }
+        io {
+            networkLogsViewModel.deleteLogs(uid)
+        }
     }
 
     private fun io(f: suspend () -> Unit): Job {

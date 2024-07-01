@@ -22,10 +22,8 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.os.SystemClock
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -53,7 +51,6 @@ import com.celzero.bravedns.scheduler.BugReportZipper.getZipFileName
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
@@ -104,6 +101,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutPrivacyPolicy.setOnClickListener(this)
         b.aboutMail.setOnClickListener(this)
         b.aboutTelegram.setOnClickListener(this)
+        b.aboutReddit.setOnClickListener(this)
+        b.aboutMastodon.setOnClickListener(this)
+        b.aboutElement.setOnClickListener(this)
         b.aboutFaq.setOnClickListener(this)
         b.mozillaImg.setOnClickListener(this)
         b.fossImg.setOnClickListener(this)
@@ -216,6 +216,15 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.aboutPrivacyPolicy -> {
                 openActionViewIntent(getString(R.string.about_privacy_policy_link).toUri())
+            }
+            b.aboutReddit -> {
+                openActionViewIntent(getString(R.string.about_reddit_handle).toUri())
+            }
+            b.aboutMastodon -> {
+                openActionViewIntent(getString(R.string.about_mastodom_handle).toUri())
+            }
+            b.aboutElement -> {
+                openActionViewIntent(getString(R.string.about_matrix_handle).toUri())
             }
         }
     }
