@@ -328,4 +328,5 @@
     <string name="univ_firewall_dialog_title" translatable="true">למחוק את כלל ה-IP?</string>
     <string name="dns_proxy_remove_dialog_title" translatable="true">למחוק פרוקסי DNS?</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">מחק את הDNS פרוקסי מהתצורה השמורה.</string>
+    <string name="memory_notification_text">Rethink חווה זיכרון נמוך. פעולות המערכת עשויות להיות מוגבלות.</string>
 </resources>
