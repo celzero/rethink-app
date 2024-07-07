@@ -116,4 +116,5 @@
     <string name="pause_title_desc" translatable="true">dřímám…</string>
     <string name="lbl_mtu" translatable="true">MTU</string>
     <string name="lbl_on_device" translatable="true">v zařízení</string>
+    <string name="memory_notification_text">Rethink zažívá nízkou paměť. Systémové akce mohou být omezené.</string>
 </resources>

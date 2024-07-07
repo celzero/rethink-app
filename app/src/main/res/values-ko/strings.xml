@@ -464,4 +464,8 @@
     <string name="settings_notification_desc" translatable="true">Rethink 알림과 함께 표시할 작업 버튼: %1$s</string>
     <string name="settings_locale_heading" translatable="true">언어 변경 Change language</string>
     <string name="firewall_status_unknown" translatable="true">알 수 없음</string>
+    <string name="settings_connectivity_checks" translatable="true">연결 체크 수행</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">연결성 검사는 ascertain Reachability에 보내집니다.</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback 프록시 포워더 앱</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">비활성화되면 프록시(SOCKS5, HTTP, DNS) 포워더 앱을 Rethink의 VPN 터널에서 제외합니다.</string>
 </resources>
