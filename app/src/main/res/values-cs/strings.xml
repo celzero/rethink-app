@@ -76,5 +76,44 @@
     <string name="lbl_idle" translatable="true">Nečinný</string>
     <string name="lbl_private" translatable="true">privátní</string>
     <string name="lbl_secure" translatable="true">bezpečné</string>
-    <string name="lbl_anonymous" translatable="true">anonymita</string>
+    <string name="lbl_anonymous" translatable="true">anonymní</string>
+    <string name="block" translatable="true">blok</string>
+    <string name="exclude" translatable="true">vynechat</string>
+    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">čekám</string>
+    <string name="status_protected_with_socks5_private_dns" translatable="true">chrání sock5 a privátní dns</string>
+    <string name="status_protected_with_http_private_dns" translatable="true">chrání http proxy a privátní dns</string>
+    <string name="notification_action_resume_vpn" translatable="true">OBNOVIT</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">chráněn</string>
+    <string name="status_protected_with_http" translatable="true">chrání http proxy</string>
+    <string name="status_protected_with_proxy" translatable="true">chrání proxy</string>
+    <string name="status_protected_with_wg" translatable="true">chrání wireguard</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">nechráněn</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">Firewall připojen</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">chrání wireguard a privátní dns</string>
+    <string name="notification_action_stop_vpn" translatable="true">STOP</string>
+    <string name="notification_action_dns_mode" translatable="true">DNS</string>
+    <string name="notification_action_dns_firewall_mode" translatable="true">DNS + Firewall</string>
+    <string name="allow" translatable="true">povol</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Upozornění: Rethink byl deaktivován</string>
+    <string name="isolate" translatable="true">izolovat</string>
+    <string name="untracked" translatable="true">nesledován</string>
+    <string name="lbl_notification" translatable="true">oznámení</string>
+    <string name="slide_1_title" translatable="true">Zdarma a otevřený zdroj</string>
+    <string name="status_app_error" translatable="true">chyba app</string>
+    <string name="status_dns_error" translatable="true">chyba dns</string>
+    <string name="status_no_internet" translatable="true">bez internetu</string>
+    <string name="status_dns_server_down" translatable="true">dns server neběží</string>
+    <string name="status_protected_with_tor" translatable="true">chrání tor</string>
+    <string name="status_protected_with_private_dns" translatable="true">chrání privátní dns</string>
+    <string name="status_protected_with_tor_private_dns" translatable="true">chrání tor a privátní dns</string>
+    <string name="status_protected_with_proxy_private_dns" translatable="true">chrání proxy a privátní dns</string>
+    <string name="status_protected_with_socks5" translatable="true">chrání socks proxy</string>
+    <string name="notification_action_pause_vpn" translatable="true">PAUZA</string>
+    <string name="dns_mode_info_title" translatable="true">DNS</string>
+    <string name="lbl_unselected" translatable="true">Nevybrán</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">privátní dns povoleno</string>
+    <string name="lbl_split" translatable="true">Rozdělit</string>
+    <string name="pause_title_desc" translatable="true">dřímám…</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_on_device" translatable="true">v zařízení</string>
 </resources>
