@@ -37,4 +37,7 @@
     <string name="lbl_save" translatable="true">uložit</string>
     <string name="slide_2_desc" translatable="true">Rethink je nejjednodušší způsob, jak sledovat síťovou aktivitu, obcházet cenzuru internetu a aplikovat firewall na aplikace v zařízení se systémem Android.</string>
     <string name="slide_2_title" translatable="true">Vítejte</string>
+    <string name="lbl_cache" translatable="true">Mezipaměť</string>
+    <string name="lbl_status" translatable="true">Stav</string>
+    <string name="lbl_remove" translatable="true">Odstranit</string>
 </resources>
