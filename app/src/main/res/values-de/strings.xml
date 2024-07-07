@@ -984,7 +984,8 @@
     <string name="settings_rinr_desc_enabled" translatable="true">Leite Rethinks eigenen Verkehr zurück in den Tunnel. Solange du nicht weißt, was du tust schalte es aus.</string>
     <string name="lbl_background_data" translatable="true">Hintergrunddaten einschränken</string>
     <string name="orbot_no_app_toast" translatable="true">Mindestens eine App aktivieren, um Orbot zu starten</string>
-    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> kann zu Konnektivitätsverlust führen. Ändern Sie die Einstellung, um Rethink verwenden Daten und andere Ressourcen, wenn im Hintergrund.</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> kann zu Verbindungsabbrüchen führen. Ändern Sie die Einstellung, um Rethink Daten und andere Ressourcen nutzen zu lassen, wenn es sich im Hintergrund befindet.</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback Proxy-Forwarder-Apps</string>
     <string name="lbl_battery_optimization" translatable="true">Akkuoptimierung</string>
+    <string name="dc_proxy_dns_heading" translatable="true">DNS niemals durch Proxy leiten</string>
 </resources>
