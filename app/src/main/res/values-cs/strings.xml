@@ -127,4 +127,5 @@
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Chráněno! Připojeno DNS + Firewall + Proxy.</string>
     <string name="pause_mode_notification_title" translatable="true">Pauza! Blokované aplikace zůstanou za firewallem.</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">selhává</string>
+    <string name="failed_using_default" translatable="true">Vypnuto: pomocí zpětného DNS</string>
 </resources>
