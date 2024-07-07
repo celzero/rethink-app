@@ -896,7 +896,7 @@
     <string name="key_length_explanation_hex" translatable="true">: WireGuard Hex-Schlüssel müssen 64 Zeichen (32 Bytes) lang sein</string>
     <string name="crypt_relay_singapore" translatable="true">Anonymisiertes DNS-Relay, gehostet in Singapur.</string>
     <string name="lbl_hour" translatable="true">Std.</string>
-    <string name="wireguard_enabled_failure">Schalten Sie andere Proxys aus, um WireGuard zu aktivieren</string>
+    <string name="wireguard_enabled_failure">Schalten Sie andere aktive Proxys aus, um WireGuard zu aktivieren</string>
     <string name="lbl_save" translatable="true">speichern</string>
     <string name="cd_deleted_toast" translatable="true">Alle Domain-Regeln gelöscht</string>
     <string name="lbl_optional" translatable="true">(optional)</string>
@@ -909,7 +909,7 @@
     <string name="bad_config_reason_missing_attribute" translatable="true">Fehlendes Attribut</string>
     <string name="bad_config_explanation_positive_number" translatable="true">: Muss positiv sein</string>
     <string name="bad_config_reason_missing_section" translatable="true">Fehlende Sektion</string>
-    <string name="wireguard_no_config_msg">Keine WireGuard-Konfigurationen</string>
+    <string name="wireguard_no_config_msg">Keine WireGuard-VPNs. Hinzufügen um zu starten.</string>
     <string name="new_warp_error_toast" translatable="true">WARP-Konfiguration kann nicht abgerufen werden</string>
     <string name="settings_go_log_heading" translatable="true">Protokollierungsstufe</string>
     <string name="bad_config_explanation_udp_port" translatable="true">: Muss eine gültige UDP-Portnummer sein</string>
@@ -947,7 +947,7 @@
     <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS mit sicherer Suche und Blockierung von Inhalten für Erwachsene.</string>
     <string name="bad_config_reason_syntax_error" translatable="true">Syntaxfehler</string>
     <string name="lbl_listen_port" translatable="true">Port belauschen</string>
-    <string name="wireguard_connection_error">Problem beim Verbinden mit der WireGuard-Konfiguration</string>
+    <string name="wireguard_connection_error">Wireguard-VPN konnte nicht verbunden werden</string>
     <string name="illegal_filename_error" translatable="true">Ungültiger Dateiname „%s“</string>
     <string name="lbl_status" translatable="true">Status</string>
     <string name="lbl_remove" translatable="true">Entfernen</string>
@@ -1002,5 +1002,23 @@
     <string name="exclude_apps_from_proxy_failure_toast">Diese App umgeht Proxies</string>
     <string name="key_length_explanation_base64" translatable="true">: WireGuard base64 Schlüssel müssen 44 Zeichen (32 Byte) bestehen.</string>
     <string name="bad_config_context" translatable="true">%1$s\'s %2$s</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Ausgewählte Apps werden nur über dieses WireGuard VPN geleitet, egal ob es ausfällt oder verbunden ist.</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Ausgewählte Apps werden ausschließlich über WireGuard VPN geleitet, unabhängig davon, ob das VPN aktiv ist oder nicht.</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">%1$s Apps ausschließen</string>
+    <string name="wireguard_disable_title" translatable="true">Stoppe WireGuard</string>
+    <string name="wireguard_disclaimer" translatable="true">DNS wird an %1$s weitergeleitet, ICMP (ping) wird zum darunterliegenden Netzwerk gesendet.</string>
+    <string name="remaining_apps_dialog_title" translatable="true">Restliche Apps einschließen</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Schließe alle übrigen Apps ein, die nicht durch einen anderen Proxy geleitet werden</string>
+    <string name="one_wg_error_toast" translatable="true">Um zum erweiterten Modus zu schalten, stoppe WireGuard im einfachen Modus</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">%1$s Apps einschließen</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">Blockiert Schadprogramme und Inhalte für Erwachsene. Nutzt Cloudflares 1.1.1.3 DNS Endpunkt.</string>
+    <string name="routing_remaining_apps" translatable="true">Verbleibende Apps routen</string>
+    <string name="wireguard_disable_message" translatable="true">Alle aktiven WireGuard VPNs stoppen?</string>
+    <string name="lbl_remaining_apps" translatable="true">Restliche Apps</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">Blockiert böswilligen Inhalt. Nutzt Cloudflares 1.1.1.2 DNS Endpunkt.</string>
+    <string name="google_dns_desc" translatable="true">Blockt keinerlei DNS Anfragen. Benutzt Googles DNS Endpunkt.</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">Immer an</string>
+    <string name="add_peer" translatable="true">Peer hinzufügen</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">Teil von %1$s</string>
+    <string name="cloudflare_dns_desc" translatable="true">Blockiert keinerlei DNS Anfragen. Benutzt Cloudflares 1.1.1.1 DNS Endpunkt.</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">Der Familienfilter blockiert den Zugang zu allen nicht jugendfreien, pornografischen und expliziten Websites. Er blockiert auch Proxy- und VPN-Domänen, die zur Umgehung unserer Filter verwendet werden könnten. Websites mit gemischten Inhalten (wie Reddit) werden ebenfalls blockiert. Google, Bing und Youtube sind auf den sicheren Modus eingestellt.</string>
 </resources>
