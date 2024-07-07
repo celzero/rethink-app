@@ -76,4 +76,5 @@
     <string name="lbl_idle" translatable="true">Nečinný</string>
     <string name="lbl_private" translatable="true">privátní</string>
     <string name="lbl_secure" translatable="true">bezpečné</string>
+    <string name="lbl_anonymous" translatable="true">anonymita</string>
 </resources>
