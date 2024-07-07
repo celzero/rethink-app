@@ -302,11 +302,11 @@
     <string name="lbl_split" translatable="true">פיצול</string>
     <string name="lbl_peer" translatable="true">עמית</string>
     <string name="dns_act_configure_tab" translatable="true">הגדר</string>
-    <string name="doh_custom_url_remove_dialog_title" translatable="true">מחק נקודת סיום שלDOH?</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">מחק נקודת קצה שלDoH?</string>
     <string name="lbl_notification" translatable="true">התראה</string>
     <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink מריץ VPN במצב <i>סגר</i>. יצירתו תגרום לאובדן החיבור לרשת בפרופיל המשתמש הזה. האם אתה רוצה להמשיך בכל מקרה?</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: חוסם אפליקציה להתחבר לאינטרנט.
-\n <u>#2</u>: חוסם כל אפליקציה להתחבר ל-IP מסוים.
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: חוסם אפליקציה מלהתחבר לרשת.
+\n <u>#2</u>: חוסם כל אפליקציה מלהתחבר ל-IP מסוים.
 \n <u>#3</u>: חוסם את כל החיבורים כשהמכשיר נעול (חומת אש אוניברסלית).
 \n <u>#4</u>: חוסם כל אפליקציה שאינה בשימוש (חומת אש אוניברסלית).
 \n <u>#5</u>: חוסם חיבורים כאשר אפליקציית המקור אינה ידועה (חומת אש אוניברסלית).
@@ -321,12 +321,15 @@
     <string name="local_blocklist_redownload" translatable="true">עדכני!</string>
     <string name="local_blocklist_redownload_desc" translatable="true">רשימות חסימות במכשיר כבר נמצאות בגרסה האחרונה v%1$s.</string>
     <string name="blocklist_update_check_failure" translatable="true">משהו השתבש. נסה שוב מאוחר יותר!</string>
-    <string name="always_on_dialog_stop_message" translatable="true">VPN תמיד מופעל עבור Rethink. האם אתה בטוח שאתה רוצה להפסיק את Rethink בכל זאת?</string>
+    <string name="always_on_dialog_stop_message" translatable="true">VPN שתמיד מופעל מאופשר עבור Rethink. האם אתה בטוח שאתה רוצה להפסיק את Rethink בכל זאת?</string>
     <string name="private_dns_dialog_desc" translatable="true">הגדרות ה-DNS של Rethink מוחלפות על ידי ה-DNS הפרטי של אנדרואיד.
 \n
-\nכדי להשתמש ב-DNS של Rethink עבור להגדרות אנדרואיד וכבה את \"DNS פרטי\".</string>
+\nכדי להשתמש ב-DNS של Rethink עבור להגדרות אנדרואיד וכבה \"DNS פרטי\".</string>
     <string name="univ_firewall_dialog_title" translatable="true">למחוק את כלל ה-IP?</string>
     <string name="dns_proxy_remove_dialog_title" translatable="true">למחוק פרוקסי DNS?</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">מחק את הDNS פרוקסי מהתצורה השמורה.</string>
     <string name="memory_notification_text">Rethink חווה זיכרון נמוך. פעולות המערכת עשויות להיות מוגבלות.</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">מחק נקודת קצה של DoT?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">מחק נקודת קצה של DND over TLS מהתצורה השמורה.</string>
+    <string name="doh_custom_url_remove_dialog_message" translatable="true">מחק את נקודת הקצה של DNS over Https מהתצורה השמורה.</string>
 </resources>
