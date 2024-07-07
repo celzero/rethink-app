@@ -1002,4 +1002,5 @@
     <string name="exclude_apps_from_proxy_failure_toast">Diese App umgeht Proxies</string>
     <string name="key_length_explanation_base64" translatable="true">: WireGuard base64 Schlüssel müssen 44 Zeichen (32 Byte) bestehen.</string>
     <string name="bad_config_context" translatable="true">%1$s\'s %2$s</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Ausgewählte Apps werden nur über dieses WireGuard VPN geleitet, egal ob es ausfällt oder verbunden ist.</string>
 </resources>
