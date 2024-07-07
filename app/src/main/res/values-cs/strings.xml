@@ -69,7 +69,7 @@
     <string name="lbl_optional" translatable="true">(volitelné)</string>
     <string name="lbl_persistent_keepalive" translatable="true">Vždy naživu</string>
     <string name="lbl_allowed_ips" translatable="true">Povolené IP adresy</string>
-    <string name="lbl_stopped" translatable="true">Zastaveno</string>
+    <string name="lbl_stopped" translatable="true">Zastaven</string>
     <string name="lbl_last" translatable="true">Poslední</string>
     <string name="lbl_starting" translatable="true">Startuje</string>
     <string name="lbl_overall" translatable="true">Celkový</string>
