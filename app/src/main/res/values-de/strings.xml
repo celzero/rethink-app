@@ -141,7 +141,7 @@
     <string name="univ_firewall_dialog_title">IP-Regel löschen\?</string>
     <string name="univ_firewall_dialog_message">Das Löschen dieser Regel würde jeder Anwendung erlauben, sich mit dieser IP zu verbinden. Möchten Sie fortfahren\?</string>
     <string name="blocklist_update_check_failure">Ein Fehler ist aufgetreten. Versuchen Sie es später noch einmal!</string>
-    <string name="refresh_complete">Neusynchronisierung der App-Liste abgeschlossen.</string>
+    <string name="refresh_complete"><!-- use dc_refresh_toast --> Neusynchronisierung der App-Liste abgeschlossen.</string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
     <string name="configure_dns_connected_dns_proxy_status">DNS-Proxy</string>
     <string name="configure_dns_connection_name">Verbunden mit %1$s</string>
@@ -223,7 +223,7 @@
     <string name="orbot_app_issue">Orbot konnte nicht gestartet werden. Ist es installiert\?</string>
     <string name="settings_general_header">Allgemein</string>
     <string name="settings_network_all_networks">Alle verfügbaren Netze nutzen (experimentell)</string>
-    <string name="settings_https_heading">HTTP(S)-Proxy einrichten</string>
+    <string name="settings_https_heading">HTTP(S) CONNECT-Proxy einrichten</string>
     <string name="orbot_http">HTTP Proxy</string>
     <string name="orbot_bs_status_1">Weiterleitung von %1$s Verbindungen an Orbot.</string>
     <string name="isolate">isolieren</string>
@@ -275,8 +275,7 @@
     <string name="firewall_rule_block_ip_desc">Eine benutzerdefinierte Firewall-Regel hat die <i>Ziel-IP</i> blockiert.<br/><br/>Zur Änderung den Bildschirm <i>App-spezifische Firewall</i> benutzen.</string>
     <string name="settings_app_notification_a13_desc">Benachrichtigungserlaubnis für die App aktivieren</string>
     <string name="settings_http_proxy_error_text4">Verbindung mit dem Host fehlgeschlagen. Versuchen Sie es erneut.</string>
-    <string name="settings_ip_dialog_ipv46">Auto (experimentell)
-\nVerbindungsüberprüfungen werden gesendet, um die Verfügbarkeit sicher zu stellen.</string>
+    <string name="settings_ip_dialog_ipv46">Auto (experimentell)</string>
     <string name="settings_socks5_dialog_hint_password">Passwort (optional)</string>
     <string name="settings_dns_proxy_dialog_app_desc">Die gewählte Anwendung wird vom VPN ausgeschlossen, damit es in Ihrem Namen Verbindungen projizieren kann.</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (experimentell)</string>
@@ -833,7 +832,7 @@
     <string name="pcap_failure_toast" translatable="true">Fehler beim Erstellen der pcap-Datei, versuchen Sie es erneut!</string>
     <string name="brbs_backup_restore_desc" translatable="true">Funktioniert nicht über App-Versionen oder Geräte hinweg</string>
     <string name="bsct_block_domain" translatable="true">Blockiere, vertraue <u>Domain(s)</u> für <u>diese App</u></string>
-    <string name="settings_lock_down_proxy_desc" translatable="true">Proxies können nicht aufgesetzt werden, während VPN in DNS only- oder Lockdown-Modus läuft. <u>Gehe zu VPN-Einstellungen</u></string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Proxies können nicht aufgesetzt werden, während das VPN im DNS only - Modus läuft.</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Sollen universelle DNS- &amp; Firewall-Regeln für <i>aufgelisteten</i> Apps umgangen werden\?</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Vertrauenswürdige Domäne (Univ)</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true">Diese Verbindung wurde blockiert, da die <i>Domäne</i> von der nutzerbevorzugten DNS blockiert wird.<br/><br/> Um das zu ändern, gehe zum <i>Konfiguriere DNS</i>-Reiter.</string>
@@ -851,7 +850,7 @@
     <string name="lbl_network" translatable="true">Netzwerk</string>
     <string name="bypass_dns_firewall_tooltip">%1$s funktioniert nur mit Rethink\'s DNS</string>
     <string name="settings_allow_lan_heading" translatable="true">Private IPs nicht umlenken (experimentell)</string>
-    <string name="settings_allow_lan_desc" translatable="true">LAN, Loopback und link-local Routen von Rethinks VPN ausschließen.</string>
+    <string name="settings_allow_lan_desc" translatable="true">LAN, Loopback, Multicast und Link-Local Routen von Rethinks VPN-Tunnel ausschließen.</string>
     <string name="lbl_import" translatable="true">Importieren</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
     <string name="lbl_http" translatable="true">HTTP</string>
@@ -962,4 +961,27 @@
     <string name="lbl_anonymous" translatable="true">anonym</string>
     <string name="lbl_unselected" translatable="true">Unausgewählt</string>
     <string name="lbl_on_device" translatable="true">auf dem Gerät</string>
+    <string name="lbl_cache" translatable="true">Cache</string>
+    <string name="lbl_starting" translatable="true">Wird gestartet</string>
+    <string name="failed_using_default" translatable="true">Fehler: Verwenden des Fallback DNS</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">DoT Endpunkt löschen?</string>
+    <string name="memory_notification_text">Rethink erkennt eine geringe Speicherkapazität. Einige Funktionen könnten eingeschränkt sein.</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Aufrechterhaltung der Verbindung</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Geschützt! Verbunden mit DNS + Firewall + Proxy.</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="settings_rinr_heading" translatable="true">Loopback (experimentell)</string>
+    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimentell)</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">Aktiviert auch die<!--settings_network_all_networks--> %1$s Einstellung. Fortfahren?</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">Dauerhafte Benachrichtigung</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Zu dauerhafter Benachrichtigung machen</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Route Rethinks eigenen Netzwerkverkehr, wie z.B. Blocklisten-Downloads, Verbindungschecks oder DNS Verbindungen zurück in den Tunnel.</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Bei Deaktivierung werden Proxy-Apps (SOCKS5, HTTP, DNS) aus Rethinks VPN-Tunnel ausgeschlossen.</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">DNS over TLS Endpunkt aus der gespeicherten Konfiguration löschen.</string>
+    <string name="http_proxy_dialog_desc" translatable="true">Richte die URL in der Form \"&lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;\" ein. Beispiel: https://proxy.example.com:8080/</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">%1$s deaktivieren</string>
+    <string name="settings_connectivity_checks" translatable="true">Verbindungstests durchführen</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">Verbindungstests werden durchgeführt, um die Erreichbarkeit zu ermitteln.</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">Leite Rethinks eigenen Verkehr zurück in den Tunnel. Solange du nicht weißt, was du tust schalte es aus.</string>
+    <string name="lbl_background_data" translatable="true">Hintergrunddaten einschränken</string>
+    <string name="orbot_no_app_toast" translatable="true">Mindestens eine App aktivieren, um Orbot zu starten</string>
 </resources>
