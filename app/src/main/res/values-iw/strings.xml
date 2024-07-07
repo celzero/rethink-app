@@ -332,4 +332,17 @@
     <string name="dot_custom_url_remove_dialog_title" translatable="true">מחק נקודת קצה של DoT?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">מחק נקודת קצה של DND over TLS מהתצורה השמורה.</string>
     <string name="doh_custom_url_remove_dialog_message" translatable="true">מחק את נקודת הקצה של DNS over Https מהתצורה השמורה.</string>
+    <string name="show_logs_disabled_network_message" translatable="true">הכניסה לחיבור כבר הייתה זמינה. כדי ליצור מחדש, לך -ל[x57X] הגדרות &lt;/i&gt; והדלק &lt;i&gt; אפשר רישום במכשיר</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">למחוק את פותר DNSCrypt?</string>
+    <string name="dns_crypt_url_remove_dialog_message" translatable="true">מחק את פותר ה-DNSCrypt מהתצורה השמורה.</string>
+    <string name="dns_crypt_url_remove_success" translatable="true">פותר DNSCrypt נמחק.</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">למחוק את הודעת ה-DNSCrypt מתוך תצורה השמורה.</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt Relay נמחק.</string>
+    <string name="refresh_complete" translatable="true">[x0X] רשימת האפליקציות הושלמה.</string>
+    <string name="show_logs_disabled_dns_message" translatable="true">רישום בקשות DNS הושבת. כדי להפעיל מחדש, עבור אל <i>הגדרות</i> והפעל את <i>אפשר רישום במכשיר.</i></string>
+    <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
+    <string name="configure_dns_connected_dns_proxy_status" translatable="true">DNS Proxy</string>
+    <string name="configure_dns_connection_name" translatable="true">מחובר ל-%1$s</string>
+    <string name="configure_dns_connected_doh_status" translatable="true">DNS מעל HTTPS</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">האם למחוק את DNSCrypt?</string>
 </resources>
