@@ -988,4 +988,5 @@
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback Proxy-Forwarder-Apps</string>
     <string name="lbl_battery_optimization" translatable="true">Akkuoptimierung</string>
     <string name="dc_proxy_dns_heading" translatable="true">DNS niemals durch Proxy leiten</string>
+    <string name="dc_proxy_dns_desc" translatable="true">Praktizieren Sie DNS nicht über Always-on WireGuard, SOCKS5, HTTP-Proxies.</string>
 </resources>
