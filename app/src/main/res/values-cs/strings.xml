@@ -127,5 +127,24 @@
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Chráněno! Připojeno DNS + Firewall + Proxy.</string>
     <string name="pause_mode_notification_title" translatable="true">Pauza! Blokované aplikace zůstanou za firewallem.</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">selhává</string>
-    <string name="failed_using_default" translatable="true">Vypnuto: pomocí zpětného DNS</string>
+    <string name="failed_using_default" translatable="true">Selhalo: použito záložní DNS</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Připojeno k RethinkDNS a Firewall</string>
+    <string name="firewall_mode_info_explanation_new" translatable="true">Monitorovat aktivitu sítě a firewallu, jakoukoliv aplikaci nebo IP adresu.</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Připojeno k RethinkDNS</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">Zvolit mód.</string>
+    <string name="apps_info_title" translatable="true">Aplikace</string>
+    <string name="hybrid_mode_info_title" translatable="true">DNS + firewall</string>
+    <string name="universal_firewall_explanation" translatable="true">Použij pravidla firewallu na všechny aplikace na základě událostí zařízení, například firewall, když je zařízení zamčeno, nebo když se konkrétní aplikace nepoužívá.</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink využívá službu přístupnosti, pro zjištění které aplikace se používají (vpopředí) oproti těm, které nejsou používány (na pozadí).
+\n
+\nRethink neshromažďuje žádné informace, ani vás nešpehuje jakýmkoli způsobem.</string>
+    <string name="dns_mode_info_explanation_new" translatable="true">Hlídat, blokovat a šifrovat DNS požadavky.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Služba rethink přístupnosti přestala nebo spadl. <i><b>Přejděte na Nastavení a Force Stop</b></i> Rethink a začněte znovu používat <i>Block žádnou aplikaci, která není v použití</i> funkce.
+\n
+\nRethink využívá službu přístupnosti, ke kterým se aplikace používají (foreground) oproti těm, které nejsou používány (background).</string>
+    <string name="firewall_rules" translatable="true">Pravidla sítě</string>
+    <string name="firewall_mode_info_title" translatable="true">Firewall</string>
+    <string name="dns_firewall_mode_info_explanation_new" translatable="true">Vše výše + obejít cenzuru internetu.</string>
+    <string name="alert_permission_accessibility" translatable="true">Povolení - Přístupnost</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">Nastavení expozic Přístupů. Vyzkoušejte znovu!</string>
 </resources>
