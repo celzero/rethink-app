@@ -73,6 +73,6 @@
     <string name="lbl_last" translatable="true">Poslední</string>
     <string name="lbl_starting" translatable="true">Startuje</string>
     <string name="lbl_overall" translatable="true">Celkový</string>
-    <string name="lbl_idle" translatable="true">Nečinnost</string>
-    <string name="lbl_private" translatable="true">soukromé, privátní</string>
+    <string name="lbl_idle" translatable="true">Nečinný</string>
+    <string name="lbl_private" translatable="true">privátní</string>
 </resources>
