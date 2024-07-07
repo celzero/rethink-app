@@ -116,5 +116,15 @@
     <string name="pause_title_desc" translatable="true">dřímám…</string>
     <string name="lbl_mtu" translatable="true">MTU</string>
     <string name="lbl_on_device" translatable="true">v zařízení</string>
-    <string name="memory_notification_text">Rethink zažívá nízkou paměť. Systémové akce mohou být omezené.</string>
+    <string name="memory_notification_text">Rethink má málo paměťi. Systémové akce mohou být omezené.</string>
+    <string name="bypass_dns_firewall" translatable="true">obejít dns a firewall</string>
+    <string name="bypass_universal" translatable="true">obejít univerzální</string>
+    <string name="hybrid_mode_notification_title" translatable="true">Chráněno! Připojeno DNS + Firewall.</string>
+    <string name="dns_mode_notification_title" translatable="true">Chráněno! Připojeno k rychlé a bezpečné DNS.</string>
+    <string name="firewall_mode_notification_title" translatable="true">Chráněno! Připojen Firewall.</string>
+    <string name="slide_1_desc" translatable="true">Rethink je program s otevřeným zdrojem podpořen Mozilla Builders MVP programem.</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Klepněte pro nastavení ochrany</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Chráněno! Připojeno DNS + Firewall + Proxy.</string>
+    <string name="pause_mode_notification_title" translatable="true">Pauza! Blokované aplikace zůstanou za firewallem.</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">selhává</string>
 </resources>
