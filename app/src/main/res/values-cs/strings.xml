@@ -75,5 +75,5 @@
     <string name="lbl_overall" translatable="true">Celkový</string>
     <string name="lbl_idle" translatable="true">Nečinný</string>
     <string name="lbl_private" translatable="true">privátní</string>
-    <string name="lbl_secure" translatable="true">zabezpečené</string>
+    <string name="lbl_secure" translatable="true">bezpečné</string>
 </resources>
