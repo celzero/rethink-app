@@ -989,4 +989,6 @@
     <string name="lbl_peer" translatable="true">Peer</string>
     <string name="lbl_split" translatable="true">Podział</string>
     <string name="lbl_idle" translatable="true">Bezczynność</string>
+    <string name="lbl_notification" translatable="true">powiadomienie</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Pod ochroną! Połączono z DNS + Firewall + Proxy.</string>
 </resources>

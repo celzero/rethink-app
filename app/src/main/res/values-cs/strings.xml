@@ -37,4 +37,114 @@
     <string name="lbl_save" translatable="true">uložit</string>
     <string name="slide_2_desc" translatable="true">Rethink je nejjednodušší způsob, jak sledovat síťovou aktivitu, obcházet cenzuru internetu a aplikovat firewall na aplikace v zařízení se systémem Android.</string>
     <string name="slide_2_title" translatable="true">Vítejte</string>
+    <string name="lbl_cache" translatable="true">Mezipaměť</string>
+    <string name="lbl_status" translatable="true">Stav</string>
+    <string name="lbl_remove" translatable="true">Odebrat</string>
+    <string name="settings_title_desc" translatable="true">Vysoce přizpůsobitelný DNS a firewall</string>
+    <string name="accessibility_service_description" translatable="true">Rethink využívá službu přístupnosti pro detekci a firewall aplikaci na pozadí. Rethink neshromažďuje ani neprodává žádné informace.</string>
+    <string name="lbl_all" translatable="true">Vše</string>
+    <string name="lbl_maybe_blocked" translatable="true">Možná blokováno</string>
+    <string name="lbl_domain" translatable="true">Doména</string>
+    <string name="lbl_wildcard" translatable="true">Zástupný znak</string>
+    <string name="lbl_action_required" translatable="true">Požadována akce</string>
+    <string name="lbl_disabled" translatable="true">Vypnuto</string>
+    <string name="lbl_import" translatable="true">Importovat</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_domain_rules" translatable="true">Pravidla domény</string>
+    <string name="lbl_proceed" translatable="true">Pokračovat</string>
+    <string name="lbl_listen_port" translatable="true">Poslouchej port</string>
+    <string name="lbl_auto" translatable="true">(auto)</string>
+    <string name="lbl_include" translatable="true">Zahrnout</string>
+    <string name="lbl_active" translatable="true">Aktivní</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_inactive" translatable="true">Neaktivní</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS a SOCKS5</string>
+    <string name="lbl_app_wise" translatable="true">dle aplikace</string>
+    <string name="lbl_sec" translatable="true">s</string>
+    <string name="lbl_min" translatable="true">m</string>
+    <string name="lbl_hour" translatable="true">h</string>
+    <string name="lbl_preshared_key" translatable="true">Předsdílený klíč</string>
+    <string name="lbl_insecure" translatable="true">(nebezpečné)</string>
+    <string name="lbl_optional" translatable="true">(volitelné)</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Vždy naživu</string>
+    <string name="lbl_allowed_ips" translatable="true">Povolené IP adresy</string>
+    <string name="lbl_stopped" translatable="true">Zastaven</string>
+    <string name="lbl_last" translatable="true">Poslední</string>
+    <string name="lbl_starting" translatable="true">Startuje</string>
+    <string name="lbl_overall" translatable="true">Celkový</string>
+    <string name="lbl_idle" translatable="true">Nečinný</string>
+    <string name="lbl_private" translatable="true">privátní</string>
+    <string name="lbl_secure" translatable="true">bezpečné</string>
+    <string name="lbl_anonymous" translatable="true">anonymní</string>
+    <string name="block" translatable="true">blok</string>
+    <string name="exclude" translatable="true">vynechat</string>
+    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">čekám</string>
+    <string name="status_protected_with_socks5_private_dns" translatable="true">chrání sock5 a privátní dns</string>
+    <string name="status_protected_with_http_private_dns" translatable="true">chrání http proxy a privátní dns</string>
+    <string name="notification_action_resume_vpn" translatable="true">OBNOVIT</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">chráněn</string>
+    <string name="status_protected_with_http" translatable="true">chrání http proxy</string>
+    <string name="status_protected_with_proxy" translatable="true">chrání proxy</string>
+    <string name="status_protected_with_wg" translatable="true">chrání wireguard</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">nechráněn</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">Firewall připojen</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">chrání wireguard a privátní dns</string>
+    <string name="notification_action_stop_vpn" translatable="true">STOP</string>
+    <string name="notification_action_dns_mode" translatable="true">DNS</string>
+    <string name="notification_action_dns_firewall_mode" translatable="true">DNS + Firewall</string>
+    <string name="allow" translatable="true">povol</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Upozornění: Rethink byl deaktivován</string>
+    <string name="isolate" translatable="true">izolovat</string>
+    <string name="untracked" translatable="true">nesledován</string>
+    <string name="lbl_notification" translatable="true">oznámení</string>
+    <string name="slide_1_title" translatable="true">Zdarma a otevřený zdroj</string>
+    <string name="status_app_error" translatable="true">chyba app</string>
+    <string name="status_dns_error" translatable="true">chyba dns</string>
+    <string name="status_no_internet" translatable="true">bez internetu</string>
+    <string name="status_dns_server_down" translatable="true">dns server neběží</string>
+    <string name="status_protected_with_tor" translatable="true">chrání tor</string>
+    <string name="status_protected_with_private_dns" translatable="true">chrání privátní dns</string>
+    <string name="status_protected_with_tor_private_dns" translatable="true">chrání tor a privátní dns</string>
+    <string name="status_protected_with_proxy_private_dns" translatable="true">chrání proxy a privátní dns</string>
+    <string name="status_protected_with_socks5" translatable="true">chrání socks proxy</string>
+    <string name="notification_action_pause_vpn" translatable="true">PAUZA</string>
+    <string name="dns_mode_info_title" translatable="true">DNS</string>
+    <string name="lbl_unselected" translatable="true">Nevybrán</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">privátní dns povoleno</string>
+    <string name="lbl_split" translatable="true">Rozdělit</string>
+    <string name="pause_title_desc" translatable="true">dřímám…</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_on_device" translatable="true">v zařízení</string>
+    <string name="memory_notification_text">Rethink má málo paměťi. Systémové akce mohou být omezené.</string>
+    <string name="bypass_dns_firewall" translatable="true">obejít dns a firewall</string>
+    <string name="bypass_universal" translatable="true">obejít univerzální</string>
+    <string name="hybrid_mode_notification_title" translatable="true">Chráněno! Připojeno DNS + Firewall.</string>
+    <string name="dns_mode_notification_title" translatable="true">Chráněno! Připojeno k rychlé a bezpečné DNS.</string>
+    <string name="firewall_mode_notification_title" translatable="true">Chráněno! Připojen Firewall.</string>
+    <string name="slide_1_desc" translatable="true">Rethink je program s otevřeným zdrojem podpořen Mozilla Builders MVP programem.</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Klepněte pro nastavení ochrany</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Chráněno! Připojeno DNS + Firewall + Proxy.</string>
+    <string name="pause_mode_notification_title" translatable="true">Pauza! Blokované aplikace zůstanou za firewallem.</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">selhává</string>
+    <string name="failed_using_default" translatable="true">Selhalo: použito záložní DNS</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Připojeno k RethinkDNS a Firewall</string>
+    <string name="firewall_mode_info_explanation_new" translatable="true">Monitorovat aktivitu sítě a firewallu, jakoukoliv aplikaci nebo IP adresu.</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Připojeno k RethinkDNS</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">Zvolit mód.</string>
+    <string name="apps_info_title" translatable="true">Aplikace</string>
+    <string name="hybrid_mode_info_title" translatable="true">DNS + firewall</string>
+    <string name="universal_firewall_explanation" translatable="true">Použij pravidla firewallu na všechny aplikace na základě událostí zařízení, například firewall, když je zařízení zamčeno, nebo když se konkrétní aplikace nepoužívá.</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink využívá službu přístupnosti, pro zjištění které aplikace se používají (vpopředí) oproti těm, které nejsou používány (na pozadí).
+\n
+\nRethink neshromažďuje žádné informace, ani vás nešpehuje jakýmkoli způsobem.</string>
+    <string name="dns_mode_info_explanation_new" translatable="true">Hlídat, blokovat a šifrovat DNS požadavky.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Služba rethink přístupnosti přestala nebo spadl. <i><b>Přejděte na Nastavení a Force Stop</b></i> Rethink a začněte znovu používat <i>Block žádnou aplikaci, která není v použití</i> funkce.
+\n
+\nRethink využívá službu přístupnosti, ke kterým se aplikace používají (foreground) oproti těm, které nejsou používány (background).</string>
+    <string name="firewall_rules" translatable="true">Pravidla sítě</string>
+    <string name="firewall_mode_info_title" translatable="true">Firewall</string>
+    <string name="dns_firewall_mode_info_explanation_new" translatable="true">Vše výše + obejít cenzuru internetu.</string>
+    <string name="alert_permission_accessibility" translatable="true">Povolení - Přístupnost</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">Nastavení expozic Přístupů. Vyzkoušejte znovu!</string>
 </resources>

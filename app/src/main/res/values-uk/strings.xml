@@ -222,7 +222,7 @@
 \n <u>№5</u>: блокує з’єднання, якщо вихідний застосунок невідомий (універсальний брандмауер).
 \n <u>№6</u>: блокує весь трафік UDP, крім DNS (універсальний брандмауер).
 \n <u>№7</u>: блокувати підключення, коли DNS обходиться (універсальний брандмауер).</string>
-    <string name="settings_allow_bypass_desc" translatable="true">Дозволити застосункам, які запитують, обходити брандмауер RethinkDNS за вимогою. Для належної роботи деяких застосунків для аудіо/відеоконференцій, як-от Zoom і WhatsApp, може знадобитися обхід на вимогу.</string>
+    <string name="settings_allow_bypass_desc" translatable="true">Дозволити застосункам, що запитують, доступ до всіх доступних мереж. Ці застосунки можуть обходити VPN тунель Rethink за вимогою. Деякі застосунки для аудіо чи відео конференцій, такі як Zoom та Meet, можуть потребувати цього для належної роботи.</string>
     <string name="settings_https_desc" translatable="true">Цей налаштування є лише рекомендацією, і можливо, застосунки проігнорують його. Застосунки, які використовують проксі HTTP(S), обходять правила брандмауера та DNS.</string>
     <string name="whats_new_version_update" translatable="true">&lt;b&gt;РА Фішер!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Нова функція&lt;/i&gt;: повністю новий екран статистики.&lt;br/&gt; 2. &lt;i&gt;Нова функція&lt;/i&gt; : захистіть цей застосунок за допомогою блокування екрана.&lt;br/&gt; 3. &lt;i&gt;Нова функція&lt;/i&gt;: виберіть потрібну мову в налаштуваннях застосунку.&lt;br/&gt; 4. &lt;i&gt;Нова функція&lt;/i&gt;: RDNS+ &lt; i&gt;Простий&lt;/i&gt; перегляд показує лише добре підібрані списки.&lt;br/&gt; 5. Перейменувати: режим &lt;i&gt;блокування застосунку&lt;/i&gt; тепер є режимом &lt;i&gt;ізоляції&lt;/i&gt;.&lt;br/&gt; 6 . Перейменування: &lt;i&gt;Обхід правил застосунку&lt;/i&gt; тепер називається &lt;i&gt;Довіра&lt;/i&gt; IP.&lt;br/&gt; 7. Виправлено збій, коли Rethink інстальовано в робочому профілі.&lt;br/&gt; 8. Зараз видалення спеціальних правил застосунку, коли застосунок видалено.&lt;br/&gt; 9. Інші незначні зміни інтерфейсу користувача та виправлення помилок.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/ translate&gt;Допоможіть перекласти цей застосунок&lt;/a&gt;</string>
     <string name="orbot_explanation" translatable="true">Orbot – це безплатний застосунок-проксі, яка дає змогу іншим застосункам <u>безпечніше</u> використовувати Інтернет.
@@ -512,4 +512,26 @@
     <string name="lbl_stopped" translatable="true">Зупинено</string>
     <string name="settings_go_log_heading" translatable="true">Рівень логування</string>
     <string name="settings_go_log_desc" translatable="true">Для налагодження</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">Перевірка зв\'язку надсилається, щоб переконатися в доступності.</string>
+    <string name="settings_orbot_notification_action" translatable="true">Відкрити Orbot</string>
+    <string name="settings_autostart_bootup_desc" translatable="true">Після ввімкнення пристрою запуститься Rethink, якщо він був запущений перед вимкненням.</string>
+    <string name="settings_network_all_networks" translatable="true">Використовувати всі доступні мережі (експериментально)</string>
+    <string name="settings_general_header" translatable="true">загальні</string>
+    <string name="settings_general_customize" translatable="true">персоналізація</string>
+    <string name="settings_autostart_bootup_heading" translatable="true">Автозапуск при увімкненні пристрою (експериментально)</string>
+    <string name="settings_custom_downloader_desc" translatable="true">Якщо вимкнено, використовуватиметься вбудований <i>Менеджер завантажень</i> Android</string>
+    <string name="settings_https_disabled_error" translatable="true">Підключено до %1$s. Вимкніть, щоб продовжити.</string>
+    <string name="settings_network_all_networks_desc" translatable="true">Коли ввімкнено, Rethink використовуватиме всі доступні мережі для підключення до Інтернету. Якщо вимкнено, він використовуватиме ту мережу, яка вважається <i>активною</i> операційною системою Android.</string>
+    <string name="settings_rinr_dialog_title" translatable="true">Зворотний цикл (експериментально)</string>
+    <string name="settings_socks5_disabled_error" translatable="true">Підключено до %1$s. Вимкніть, щоб продовжити.</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">Постійне повідомлення</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Зробити повідомлення постійним</string>
+    <string name="settings_rinr_heading" translatable="true">Зворотний цикл (експериментально)</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Направляти власний трафік Rethink, наприклад, завантаження блок листів, перевірку з\'єднання, DNS з\'єднання, назад у тунель.</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">Перенаправлення власного трафіку Rethink через тунель. Якщо ви не знаєте, що робите, вимкніть це.</string>
+    <string name="settings_socks5_vpn_disabled_error" translatable="true">Запустіть Rethink, щоб продовжити.</string>
+    <string name="settings_orbot_disabled_error" translatable="true">Вимкніть HTTP(S) та/або SOCKS5 проксі, щоб продовжити налаштування Tor як проксі.</string>
+    <string name="settings_import_export_heading" translatable="true">Резервне копіювання та відновлення</string>
+    <string name="orbot_no_app_toast" translatable="true">Додайте принаймні один застосунок, щоб увімкнути Orbot</string>
+    <string name="settings_theme_desc" translatable="true">Темна/світла тема</string>
 </resources>

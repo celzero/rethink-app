@@ -27,7 +27,7 @@
     <string name="lbl_allowed_ips" translatable="true">허용된 IP</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
     <string name="lbl_add" translatable="true">추가</string>
-    <string name="alert_firewall_accessibility_exception" translatable="true">접근성 설정을 열지 못했습니다. 나중에 다시 시도해 보세요!</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">접근성 설정을 열지 못했습니다. 나중에 다시 시도하십시오!</string>
     <string name="lbl_http" translatable="true">HTTP</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
     <string name="lbl_mtu" translatable="true">MTU</string>
@@ -127,7 +127,7 @@
     <string name="status_dns_server_down" translatable="true">DNS 서버 다운</string>
     <string name="status_no_internet" translatable="true">인터넷 연결 없음</string>
     <string name="lbl_listen_port" translatable="true">열린 포트</string>
-    <string name="brave_dns_connect_mode_change_firewall" translatable="true">모드를 선택하세요.</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">모드를 선택합니다.</string>
     <string name="slide_2_title" translatable="true">환영합니다</string>
     <string name="conn_track_clear_logs_message" translatable="true">이렇게 하면 네트워크 로그만 삭제되고 방화벽 규칙은 삭제되지 않습니다. 이 작업은 되돌릴 수 없습니다. 계속 진행하시겠습니까?</string>
     <string name="lbl_random" translatable="true">(무작위)</string>
@@ -372,4 +372,125 @@
     <string name="lbl_on_device" translatable="true">기기 내</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">DoT 엔드포인트를 삭제합니까?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">저장된 구성에서 DNS over TLS 엔드포인트를 삭제합니다.</string>
+    <string name="lbl_notification" translatable="true">알림</string>
+    <string name="memory_notification_text">Rethink이(가) 메모리 부족 상태에 있습니다. 이로 인해 일부 시스템 작업이 제한될 수 있습니다.</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">DNSCrypt 릴레이를 삭제하시겠습니까?</string>
+    <string name="http_proxy_dialog_heading" translatable="true">HTTP(S) 프록시 설정</string>
+    <string name="settings_dns_proxy_dialog_app" translatable="true">앱</string>
+    <string name="settings_selected_theme" translatable="true">현재 테마: %1$s</string>
+    <string name="settings_protocol_translation_dns_inactive" translatable="true">이 설정을 사용하려면 DNS/DNS+방화벽 모드로 전환하세요.</string>
+    <string name="settings_biometric_desc" translatable="true">화면 잠금을 사용하여 이 앱을 보호하세요.</string>
+    <string name="settings_locale_dialog_neutral" translatable="true">이 앱을 번역하도록 도와주세요.</string>
+    <string name="firewall_status_block_unmetered" translatable="true">무제한(wifi) 네트워크에서 차단됨</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">DNS 프록시를 삭제하시겠습니까?</string>
+    <string name="dns_proxy_remove_dialog_message" translatable="true">저장된 구성에서 DNS 프록시를 삭제합니다.</string>
+    <string name="settings_notification_dialog_option_3" translatable="true">"
+\n없음:
+\n버튼이 표시되지 않습니다.
+\n"</string>
+    <string name="apps_icon_content_desc" translatable="true">애플리케이션 아이콘</string>
+    <string name="settings_dns_proxy_dialog_hostname" translatable="true">호스트 이름</string>
+    <string name="whats_new_version_update" translatable="true">&lt;b&gt;LAN 파티!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;새로운 기능&lt;/i&gt;: 사설 IP 제외(LAN / 링크 로컬).&lt;br/&gt; 2. 우회 DNS 만들기 &amp; 방화벽 설정 작업.&lt;br/&gt; 3. 방화벽에 의해 차단되었을 수 있는 도메인에 대한 DNS 로그에 차단 가능성 표시.&lt;br/&gt; 4. 지원되는 경우 적응형 아이콘 표시.&lt;br/&gt; 5. 생체 인증 프롬프트 15분마다 한 번씩.&lt;br/&gt; 6. 6개의 기타 UI 및 성능 개선.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;이 앱 번역을 도와주세요.&lt;/ 가&gt;</string>
+    <string name="settings_ip_text_ipv6" translatable="true">IPv6</string>
+    <string name="settings_default_dns_desc" translatable="true">드물게 사용자 기본 설정 DNS를 확인할 수 없는 경우 폴백 DNS가 사용됩니다.</string>
+    <string name="firewall_status_block_metered" translatable="true">종량제(모바일) 네트워크에서 차단됨</string>
+    <string name="ct_bs_app_info_error" translatable="true">앱 정보를 찾을 수 없음</string>
+    <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
+    <string name="settings_socks5_dialog_hint_username" translatable="true">사용자이름 (선택)</string>
+    <string name="settings_theme_dialog_themes_3" translatable="true">다크 테마</string>
+    <string name="settings_ip_dialog_ipv46" translatable="true">자동 (실험적)</string>
+    <string name="settings_notification_desc1" translatable="true">일시 중지/중지(기본값)</string>
+    <string name="firewall_status_whitelisted" translatable="true">범용 방화벽 규칙 우회</string>
+    <string name="firewall_act_universal_tab" translatable="true">만능인</string>
+    <string name="dns_crypt_url_remove_success" translatable="true">DNSCrypt 리졸버가 삭제되었습니다.</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">저장된 구성에서 DNSCrypt 릴레이를 삭제합니다.</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">DNSCrypt 리졸버를 삭제하시겠습니까?</string>
+    <string name="dns_crypt_url_remove_dialog_message" translatable="true">저장된 구성에서 DNSCrypt 리졸버를 삭제합니다.</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt 릴레이가 삭제되었습니다.</string>
+    <string name="dns_proxy_remove_success" translatable="true">DNS 프록시가 삭제되었습니다.</string>
+    <string name="settings_orbot_desc" translatable="true">HTTPS/SOCKS5를 사용하는 비vpn 모드의 Orbot.</string>
+    <string name="settings_http_proxy_error_text1" translatable="true">포트 범위는 1024~65535여야 합니다.</string>
+    <string name="settings_http_proxy_error_text2" translatable="true">잘못된 포트</string>
+    <string name="settings_http_proxy_error_text3" translatable="true">호스트 이름이 비어 있습니다.</string>
+    <string name="settings_http_proxy_error_text4" translatable="true">호스트 연결에 실패했습니다. 다시 시도하십시오.</string>
+    <string name="settings_dns_proxy_dialog_username" translatable="true">사용자명</string>
+    <string name="settings_dns_proxy_dialog_password" translatable="true">비밀번호</string>
+    <string name="settings_http_proxy_toast_success" translatable="true">HTTP 프록시가 설정됨</string>
+    <string name="settings_dns_proxy_dialog_header" translatable="true">SOCKS5 프록시 설정</string>
+    <string name="settings_dns_proxy_dialog_port_number" translatable="true">포트 번호</string>
+    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">세트</string>
+    <string name="settings_app_list_default_app" translatable="true">아무것도 없음</string>
+    <string name="settings_socks_forwarding_desc" translatable="true">%1$s:%2$s, %3$s로 포워딩</string>
+    <string name="settings_socks_forwarding_desc_no_app" translatable="true">%1$s:%2$s로 포워딩</string>
+    <string name="settings_socks_forwarding_default_desc" translatable="true">SOCKS5 엔드포인트로 연결을 전달합니다.</string>
+    <string name="settings_socks5_dialog_hint_ip" translatable="true">IP 주소</string>
+    <string name="settings_socks5_dialog_hint_port" translatable="true">포트</string>
+    <string name="settings_socks5_dialog_hint_password" translatable="true">비밀번호 (선택)</string>
+    <string name="settings_theme_dialog_title" translatable="true">형상</string>
+    <string name="settings_theme_dialog_themes_1" translatable="true">시스템에서 설정</string>
+    <string name="settings_theme_dialog_themes_2" translatable="true">밝음</string>
+    <string name="settings_theme_dialog_themes_4" translatable="true">트루 블랙</string>
+    <string name="settings_ip_dialog_title" translatable="true">IP 버전 선택</string>
+    <string name="settings_ip_dialog_ipv4" translatable="true">IPv4(기본값)</string>
+    <string name="settings_ip_dialog_ipv6" translatable="true">IPv6(실험적)</string>
+    <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
+    <string name="settings_ip_text_ipv46" translatable="true">자동</string>
+    <string name="settings_notification_heading" translatable="true">알림 작업 선택</string>
+    <string name="settings_notification_desc2" translatable="true">DNS / DNS + 방화벽</string>
+    <string name="settings_notification_desc3" translatable="true">없음</string>
+    <string name="settings_notification_dialog_title" translatable="true">알림 작업 선택</string>
+    <string name="settings_notification_dialog_option_1" translatable="true">"
+\n일시 중지/중지(기본값):
+\nRethink를 빠르게 일시 중지하고 중지하는 두 개의 버튼을 표시합니다."</string>
+    <string name="settings_notification_dialog_option_2" translatable="true">"
+\nDNS / DNS + 방화벽:
+\n배터리 절약 DNS 모드와 일반 DNS + 방화벽 모드 사이를 빠르게 전환하는 두 개의 버튼이 표시됩니다."</string>
+    <string name="settings_locale_desc" translatable="true">선호하는 언어를 선택하세요</string>
+    <string name="settings_locale_dialog_title" translatable="true">선호하는 언어를 선택하세요</string>
+    <string name="settings_biometeric_heading" translatable="true">앱 잠금 사용</string>
+    <string name="settings_default_dns_heading" translatable="true">대체 DNS 선택</string>
+    <string name="settings_pcap_heading" translatable="true">패킷 캡처</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">꺼짐 (기본값)</string>
+    <string name="settings_pcap_dialog_option_2" translatable="true">Logcat으로 출력</string>
+    <string name="settings_pcap_dialog_option_3" translatable="true">다운로드 폴더로 출력</string>
+    <string name="pcap_failure_toast" translatable="true">pcap 파일을 생성하는 중 오류가 발생했습니다. 다시 시도하십시오!</string>
+    <string name="firewall_status_allow" translatable="true">허용된</string>
+    <string name="firewall_status_excluded" translatable="true">DNS 및 방화벽에서 제외</string>
+    <string name="firewall_status_isolate" translatable="true">외딴</string>
+    <string name="firewall_status_bypass_dns_firewall" translatable="true">DNS 및 방화벽 규칙 우회</string>
+    <string name="firewall_status_blocked" translatable="true">차단됨</string>
+    <string name="hs_biometeric_title" translatable="true">Rethink 잠금 해제</string>
+    <string name="hs_biometeric_desc" translatable="true">생체 인증을 사용하여 Rethink 잠금 해제</string>
+    <string name="settings_notification_desc" translatable="true">Rethink 알림과 함께 표시할 작업 버튼: %1$s</string>
+    <string name="settings_locale_heading" translatable="true">언어 변경 Change language</string>
+    <string name="firewall_status_unknown" translatable="true">알 수 없음</string>
+    <string name="settings_connectivity_checks" translatable="true">연결 체크 수행</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">연결성 검사는 ascertain Reachability에 보내집니다.</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback 프록시 포워더 앱</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">비활성화되면 프록시(SOCKS5, HTTP, DNS) 포워더 앱을 Rethink의 VPN 터널에서 제외합니다.</string>
+    <string name="logs_card_network_count" translatable="true">%1$s 연결</string>
+    <string name="logs_card_duration" translatable="true">%1$s부터</string>
+    <string name="hsf_vpn_dialog_header" translatable="true">주목!</string>
+    <string name="firewall_card_universal_rules" translatable="true">%1$s 보편적인 규칙</string>
+    <string name="firewall_card_text_active" translatable="true">%1$s 차단됨, %2$s 우회됨, %3$s 제외됨, %4$s 격리됨</string>
+    <string name="hsf_start_btn_state" translatable="true">시작</string>
+    <string name="hsf_vpn_prepare_failure" translatable="true">VPN 권한이 없거나 다른 앱이 Always-on VPN 모드에 있습니다.</string>
+    <string name="rules_card_domain_count" translatable="true">%1$s 도메인 규칙</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">Rethink는 장치의 DNS 요청을 암호화하고 네트워크 모니터를 구현하고 방화벽 규칙을 적용하기 위해 로컬 VPN을 설정하는 권한이 필요합니다.
+\n
+\nRethink는 정보를 수집하거나 어떤 식으로든 사용자를 염탐하지 않습니다.</string>
+    <string name="hsf_start_dialog_header" translatable="true">시작 %1$s</string>
+    <string name="hs_biometeric_feature_not_supported" translatable="true">이 기기에서는 생체 인증이 지원되지 않거나 비활성화됩니다.</string>
+    <string name="hs_biometeric_failed" translatable="true">생체인증 실패</string>
+    <string name="hs_biometeric_error" translatable="true">생체인증 오류</string>
+    <string name="firewall_card_status_active" translatable="true">%1$s 앱</string>
+    <string name="firewall_card_text_inactive" translatable="true">방화벽 모드를 활성화합니다.</string>
+    <string name="dns_card_latency_active" translatable="true">대기 시간: %1$sms</string>
+    <string name="dns_card_latency_inactive" translatable="true">DNS 모드를 활성화합니다.</string>
+    <string name="apps_card_ips_count" translatable="true">%1$s IP 및 포트 규칙</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s 쿼리</string>
+    <string name="hsf_stop_btn_state" translatable="true">중지</string>
+    <string name="hsf_downtime" translatable="true">(%1$s 이후 비활성)</string>
+    <string name="hsf_notification_permission_failure" translatable="true">설정 화면에서 알림 권한 활성화</string>
+    <string name="hsf_start_dialog_message" translatable="true">안전하고 안전한 Android에서 한 걸음 떨어져 있습니다. 네트워크 활동을 즉시 확인하고 웹사이트, IP 및 오작동하는 앱을 차단합니다.</string>
 </resources>

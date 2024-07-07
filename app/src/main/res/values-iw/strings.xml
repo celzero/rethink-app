@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="about_title_desc" translatable="true">זיהוי וחסום איומי אבטחת רשת</string>
+    <string name="about_title_desc" translatable="true">זיהוי וחסימת איומי אבטחת רשת</string>
     <string name="txt_home" translatable="true">בית</string>
     <string name="next" translatable="true">הבא</string>
-    <string name="skip" translatable="true">דלג</string>
-    <string name="lbl_cancel" translatable="true">בטל</string>
+    <string name="skip" translatable="true">דילוג</string>
+    <string name="lbl_cancel" translatable="true">ביטול</string>
     <string name="lbl_apply" translatable="true">החלה</string>
     <string name="lbl_dismiss" translatable="true">התעלם</string>
     <string name="lbl_all" translatable="true">הכול</string>
@@ -12,10 +12,10 @@
     <string name="lbl_blocked" translatable="true">נחסם</string>
     <string name="slide_2_title" translatable="true">ברוך הבא</string>
     <string name="block" translatable="true">חסום</string>
-    <string name="isolate" translatable="true">לְבוּדֵד</string>
+    <string name="isolate" translatable="true">בידוד</string>
     <string name="dns_mode_notification_title" translatable="true">מוּגָן! מחובר ל-DNS מהיר ומאובטח.</string>
     <string name="hybrid_mode_notification_title" translatable="true">מוּגָן! מחובר ל-DNS + חומת אש.</string>
-    <string name="pause_mode_notification_title" translatable="true">מושהה! אפליקציות חסומות ימשיכו להיות חסומות חומת אש.</string>
+    <string name="pause_mode_notification_title" translatable="true">מושהה! אפליקציות חסומות ימשיכו להיות חסומות בחומת האש.</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline." translatable="true">ממתין</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">נכשל</string>
     <string name="status_app_error" translatable="true">שגיאה באפליקציה</string>
@@ -39,28 +39,28 @@
     <string name="alert_firewall_accessibility_exception" translatable="true">פתיחת הגדרות הנגישות נכשלה. נסה שוב מאוחר יותר!</string>
     <string name="brave_dns_connect_mode_change_dns" translatable="true">בחר מצב.</string>
     <string name="custom_url_error_invalid_url" translatable="true">כתובת האתר לא תקינה</string>
-    <string name="bsct_app_info" translatable="true">מידע אפליקציה</string>
+    <string name="bsct_app_info" translatable="true">מידע על האפליקציה</string>
     <string name="bsct_block_ip" translatable="true">חסום, סמוך על <u>IP זה</u> עבור <u>אפליקציה זו</u></string>
-    <string name="bsct_block" translatable="true">חסום, עוקף, אי הכללה, בידוד <u>האפליקציה הזו</u></string>
-    <string name="bsct_conn_block_desc" translatable="true">חסום %1$s על ידי %2$s</string>
+    <string name="bsct_block" translatable="true">חסום, עקוף, הוצא מן הכלל, בודד את <u>האפליקציה הזו</u></string>
+    <string name="bsct_conn_block_desc" translatable="true">%1$s נחסם ע\"י %2$s</string>
     <string name="title_about" translatable="true">אודות</string>
     <string name="finish" translatable="true">סיום</string>
     <string name="title_settings" translatable="true">הגדרות</string>
     <string name="firewall_mode_notification_title" translatable="true">מוּגָן! מחובר לחומת האש.</string>
-    <string name="allow" translatable="true">התר</string>
+    <string name="allow" translatable="true">אפשר</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">הקש כדי לשנות את הגדרת ההגנה</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">מוּגָן</string>
     <string name="status_no_internet" translatable="true">אין אינטרנט</string>
     <string name="dns_explanation_firewall_connected" translatable="true">מחובר לחומת אש</string>
-    <string name="universal_firewall_explanation" translatable="true">החל כללי חומת אש על כל היישומים המבוססים על אירועי מכשיר, למשל, חומת אש כשהמכשיר נעול או כאשר אפליקציה מסוימת אינה בשימוש.</string>
+    <string name="universal_firewall_explanation" translatable="true">החל כללי חומת אש על כל היישומים בהתבססות על אירועי מכשיר, למשל, חומת אש כשהמכשיר נעול או כאשר אפליקציה מסוימת אינה בשימוש.</string>
     <string name="brave_dns_connect_mode_change_firewall" translatable="true">בחר מצב.</string>
     <string name="pause_title_desc" translatable="true">מנמנם…</string>
     <string name="settings_title_desc" translatable="true">DNS וחומת אש הניתנים להתאמה אישית גבוהה</string>
     <string name="accessibility_service_description" translatable="true">Rethink משתמשת בשירות הנגישות כדי לזהות ולחסום יישומי רקע. Rethink אינה אוספת או מוכרת מידע כלשהו.</string>
     <string name="untracked" translatable="true">ללא מעקב</string>
-    <string name="bypass_dns_firewall" translatable="true">לעקוף dns וחומת אש</string>
-    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">אזהרה: RethinkDNS הושבתה</string>
-    <string name="bsct_conn_block_desc_device" translatable="true">חסום %1$s במכשיר</string>
+    <string name="bypass_dns_firewall" translatable="true">עקוף כללי dns וחומת אש</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">אזהרה: Rethink הושבת</string>
+    <string name="bsct_conn_block_desc_device" translatable="true">%1$s נחסם על המכשיר</string>
     <string name="bsct_conn_desc_allowed" translatable="true">מותר ב-%1$s %2$s</string>
     <string name="bsct_conn_desc_blocked" translatable="true">חסום ב-%1$s %2$s</string>
     <string name="dns_explanation_dns_connected" translatable="true">מחובר ל-RethinkDNS</string>
@@ -212,12 +212,12 @@
     <string name="title_statistics" translatable="true">סטטיסטיקות</string>
     <string name="lbl_maybe_blocked" translatable="true">אולי חסום</string>
     <string name="lbl_ip_rules" translatable="true">כללי IP</string>
-    <string name="lbl_logs" translatable="true">יומן</string>
+    <string name="lbl_logs" translatable="true">יומנים</string>
     <string name="lbl_network" translatable="true">רשת</string>
     <string name="lbl_domain_rules" translatable="true">כללי דומיין</string>
     <string name="slide_1_title" translatable="true">תוכנה חופשית וקוד פתוח</string>
     <string name="conn_track_clear_logs_title" translatable="true">למחוק את כל יומני הרשת?</string>
-    <string name="lbl_create" translatable="true">ליצור</string>
+    <string name="lbl_create" translatable="true">יצירה</string>
     <string name="lbl_qr_code" translatable="true">ברקוד</string>
     <string name="lbl_import" translatable="true">ייבוא</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
@@ -227,16 +227,16 @@
     <string name="lbl_mtu" translatable="true">MTU</string>
     <string name="lbl_auto" translatable="true">(אוטומטי)</string>
     <string name="lbl_include" translatable="true">לכלול</string>
-    <string name="lbl_select_all" translatable="true">בחר הכל</string>
+    <string name="lbl_select_all" translatable="true">בחירת הכל</string>
     <string name="lbl_active" translatable="true">פעיל</string>
     <string name="lbl_inactive" translatable="true">לא פעיל</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
     <string name="lbl_http" translatable="true">HTTP</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
     <string name="lbl_fast" translatable="true">מהיר</string>
-    <string name="lbl_allowed_ips" translatable="true">כתובות רשת מותרות</string>
+    <string name="lbl_allowed_ips" translatable="true">כתובות IP מותרות</string>
     <string name="lbl_save" translatable="true">שמירה</string>
-    <string name="exclude" translatable="true">תכלול</string>
+    <string name="exclude" translatable="true">הוצאה מן הכלל</string>
     <string name="status_protected_with_socks5_private_dns" translatable="true">מוגן באמצעות SOCKS5 ו- DNS פרטי</string>
     <string name="status_protected_with_http_private_dns" translatable="true">מוגן באמצעות פרוקסי HTTP ו- DNS פרטי</string>
     <string name="status_protected_with_socks5" translatable="true">מוגן באמצעות socks proxy</string>
@@ -253,7 +253,7 @@
     <string name="lbl_configure" translatable="true">הגדר</string>
     <string name="slide_1_desc" translatable="true">Rethink היא תוכנת קוד פתוח המגובה על ידי תוכנית MVP של Mozilla Builders.</string>
     <string name="rdns_plus" translatable="true">RDNS Plus</string>
-    <string name="bypass_universal" translatable="true">עוקף אוניברסלי</string>
+    <string name="bypass_universal" translatable="true">מעקוף כללים אוניברסליים</string>
     <string name="lbl_applications" translatable="true">יישומים</string>
     <string name="lbl_delete" translatable="true">מחק</string>
     <string name="lbl_proceed" translatable="true">להמשיך</string>
@@ -263,7 +263,7 @@
     <string name="lbl_slow" translatable="true">איטי</string>
     <string name="lbl_very" translatable="true">מאוד</string>
     <string name="lbl_min" translatable="true">דקות</string>
-    <string name="lbl_day" translatable="true">יום</string>
+    <string name="lbl_day" translatable="true">ימים</string>
     <string name="lbl_add" translatable="true">הוסף</string>
     <string name="lbl_app_wise" translatable="true">לאפליקציה</string>
     <string name="lbl_sec" translatable="true">שניות</string>
@@ -274,30 +274,75 @@
     <string name="slide_2_desc" translatable="true">Rethink הוא הדרך הקלה ביותר לפקח על פעילות הרשת, לעקוף צנזורה באינטרנט ואפליקציות חומת אש במכשיר אנדרואיד שלך.</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">מוגן באמצעות Wireguard ו- DNS פרטי</string>
     <string name="alert_permission_accessibility" translatable="true">הרשאה - נגישות</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink משתמש בשירות נגישות כדי לעקוב אחר האפליקציות הן בשימוש (חזית) לעומת אלה שאינם בשימוש (רקע).
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink משתמש בשירות נגישות כדי לעקוב אילו אפליקציות הן בשימוש (חזית) לעומת אלה שאינם בשימוש (רקע).
 \n
-\nRETHINK אינו אוסף עליך מידע או ריגול בשום דרך.</string>
+\nRETHINK אינו אוסף עליך מידע או מרגל אחריך בשום דרך.</string>
     <string name="conn_track_clear_logs_message" translatable="true">זה מוחק רק יומני רשת אך לא כללי חומת אש. פעולה זו אינה הפיכה. אתה רוצה להמשיך?</string>
     <string name="dns_query_clear_logs_message" translatable="true">זה מוחק את יומני ה- DNS במכשיר. פעולה זו אינה הפיכה. אתה רוצה להמשיך?</string>
     <string name="lbl_status" translatable="true">סטטוס</string>
     <string name="lbl_remove" translatable="true">הסר</string>
     <string name="lbl_last" translatable="true">אחרון</string>
-    <string name="lbl_starting" translatable="true">להתחיל</string>
+    <string name="lbl_starting" translatable="true">מתחיל</string>
     <string name="lbl_overall" translatable="true">כללי</string>
-    <string name="lbl_stopped" translatable="true">לעצור</string>
+    <string name="lbl_stopped" translatable="true">נעצר</string>
     <string name="lbl_private" translatable="true">פרטי</string>
-    <string name="lbl_listen_port" translatable="true">נמל</string>
+    <string name="lbl_listen_port" translatable="true">פתח האזנה</string>
     <string name="lbl_preshared_key" translatable="true">מפתח משותף</string>
     <string name="lbl_cache" translatable="true">מטמון</string>
-    <string name="lbl_idle" translatable="true">ביטול</string>
+    <string name="lbl_idle" translatable="true">במנוחה</string>
     <string name="lbl_anonymous" translatable="true">אנונימי</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">מוגן! מחובר ל- DNS + Firewall + proxy.</string>
-    <string name="failed_using_default" translatable="true">תגית: Fallback DNS</string>
+    <string name="failed_using_default" translatable="true">נכשל: משתמש בDNS חלופי</string>
     <string name="lbl_unselected" translatable="true">לא נבחר</string>
     <string name="lbl_on_device" translatable="true">on-device</string>
     <string name="lbl_secure" translatable="true">מאובטח</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">שירות הנגישות של RethinkDNS נעצר או קרס. <i><b>עבור להגדרות וכפה עצירה</b></i> לחשוב מחדש על DNS והפעל אותו שוב כדי להשתמש בתכונת <i>חסום כל אפליקציה שאינה בשימוש</i>.
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">שירות הנגישות של RethinkDNS נעצר או קרס. &lt;i&gt;&lt;b&gt;עבור להגדרות כפה עצירה&lt;/i&gt;&lt;/b&gt; על Rethink והפעל אותו מחדש כדי להשתמש בתכונת &lt;i&gt;חסום כל אפליקציה שאינה בשימוש&lt;/i&gt;.
 \n
-\nRethinkDNS משתמש בשירות נגישות כדי לעקוב אחר אילו אפליקציות נמצאות בשימוש (בחזית) לעומת אלו שאינן בשימוש (ברקע).</string>
+\nRethink משתמש בשירות נגישות כדי לעקוב אחר אילו אפליקציות נמצאות בשימוש (בחזית) לעומת אלו שאינן בשימוש (ברקע).</string>
     <string name="lbl_split" translatable="true">פיצול</string>
+    <string name="lbl_peer" translatable="true">עמית</string>
+    <string name="dns_act_configure_tab" translatable="true">הגדר</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">מחק נקודת קצה שלDoH?</string>
+    <string name="lbl_notification" translatable="true">התראה</string>
+    <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink מריץ VPN במצב <i>סגר</i>. יצירתו תגרום לאובדן החיבור לרשת בפרופיל המשתמש הזה. האם אתה רוצה להמשיך בכל מקרה?</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: חוסם אפליקציה מלהתחבר לרשת.
+\n <u>#2</u>: חוסם כל אפליקציה מלהתחבר ל-IP מסוים.
+\n <u>#3</u>: חוסם את כל החיבורים כשהמכשיר נעול (חומת אש אוניברסלית).
+\n <u>#4</u>: חוסם כל אפליקציה שאינה בשימוש (חומת אש אוניברסלית).
+\n <u>#5</u>: חוסם חיבורים כאשר אפליקציית המקור אינה ידועה (חומת אש אוניברסלית).
+\n <u>#6</u>: חוסם את כל תעבורת UDP למעט תעבורת DNS (חומת אש אוניברסלית).
+\n <u>#7</u>: חסום חיבורים כאשר DNS עוקף חסימה (חומת אש אוניברסלית).</string>
+    <string name="doh_custom_url_remove_success" translatable="true">נקודת הקצה נמחקה.</string>
+    <string name="blocklist_update_check_not_required" translatable="true">רשימות החסימה כבר נמצאות בגרסה האחרונה.</string>
+    <string name="bsct_block_domain" translatable="true">חסום, סמוך על <u>דומיינים</u> עבור <u>אפליקציה זו</u></string>
+    <string name="dns_proxy_remove_success" translatable="true">פרוקסי DNS נמחק.</string>
+    <string name="local_blocklist_download" translatable="true">הורד רשימות חסימה</string>
+    <string name="local_blocklist_download_desc" translatable="true">להוריד רשימות חסימה (בסביבות 60MB) כדי להשתמש בתכונה זו?</string>
+    <string name="local_blocklist_redownload" translatable="true">עדכני!</string>
+    <string name="local_blocklist_redownload_desc" translatable="true">רשימות חסימות במכשיר כבר נמצאות בגרסה האחרונה v%1$s.</string>
+    <string name="blocklist_update_check_failure" translatable="true">משהו השתבש. נסה שוב מאוחר יותר!</string>
+    <string name="always_on_dialog_stop_message" translatable="true">VPN שתמיד מופעל מאופשר עבור Rethink. האם אתה בטוח שאתה רוצה להפסיק את Rethink בכל זאת?</string>
+    <string name="private_dns_dialog_desc" translatable="true">הגדרות ה-DNS של Rethink מוחלפות על ידי ה-DNS הפרטי של אנדרואיד.
+\n
+\nכדי להשתמש ב-DNS של Rethink עבור להגדרות אנדרואיד וכבה \"DNS פרטי\".</string>
+    <string name="univ_firewall_dialog_title" translatable="true">למחוק את כלל ה-IP?</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">למחוק פרוקסי DNS?</string>
+    <string name="dns_proxy_remove_dialog_message" translatable="true">מחק את הDNS פרוקסי מהתצורה השמורה.</string>
+    <string name="memory_notification_text">Rethink חווה זיכרון נמוך. פעולות המערכת עשויות להיות מוגבלות.</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">מחק נקודת קצה של DoT?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">מחק נקודת קצה של DND over TLS מהתצורה השמורה.</string>
+    <string name="doh_custom_url_remove_dialog_message" translatable="true">מחק את נקודת הקצה של DNS over Https מהתצורה השמורה.</string>
+    <string name="show_logs_disabled_network_message" translatable="true">הכניסה לחיבור כבר הייתה זמינה. כדי ליצור מחדש, לך -ל[x57X] הגדרות &lt;/i&gt; והדלק &lt;i&gt; אפשר רישום במכשיר</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">למחוק את פותר DNSCrypt?</string>
+    <string name="dns_crypt_url_remove_dialog_message" translatable="true">מחק את פותר ה-DNSCrypt מהתצורה השמורה.</string>
+    <string name="dns_crypt_url_remove_success" translatable="true">פותר DNSCrypt נמחק.</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">למחוק את הודעת ה-DNSCrypt מתוך תצורה השמורה.</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt Relay נמחק.</string>
+    <string name="refresh_complete" translatable="true">[x0X] רשימת האפליקציות הושלמה.</string>
+    <string name="show_logs_disabled_dns_message" translatable="true">רישום בקשות DNS הושבת. כדי להפעיל מחדש, עבור אל <i>הגדרות</i> והפעל את <i>אפשר רישום במכשיר.</i></string>
+    <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
+    <string name="configure_dns_connected_dns_proxy_status" translatable="true">DNS Proxy</string>
+    <string name="configure_dns_connection_name" translatable="true">מחובר ל-%1$s</string>
+    <string name="configure_dns_connected_doh_status" translatable="true">DNS מעל HTTPS</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">האם למחוק את DNSCrypt?</string>
 </resources>
