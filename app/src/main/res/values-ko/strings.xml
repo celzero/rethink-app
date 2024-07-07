@@ -468,4 +468,29 @@
     <string name="settings_connectivity_checks_desc" translatable="true">연결성 검사는 ascertain Reachability에 보내집니다.</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback 프록시 포워더 앱</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">비활성화되면 프록시(SOCKS5, HTTP, DNS) 포워더 앱을 Rethink의 VPN 터널에서 제외합니다.</string>
+    <string name="logs_card_network_count" translatable="true">%1$s 연결</string>
+    <string name="logs_card_duration" translatable="true">%1$s부터</string>
+    <string name="hsf_vpn_dialog_header" translatable="true">주목!</string>
+    <string name="firewall_card_universal_rules" translatable="true">%1$s 보편적인 규칙</string>
+    <string name="firewall_card_text_active" translatable="true">%1$s 차단됨, %2$s 우회됨, %3$s 제외됨, %4$s 격리됨</string>
+    <string name="hsf_start_btn_state" translatable="true">시작</string>
+    <string name="hsf_vpn_prepare_failure" translatable="true">VPN 권한이 없거나 다른 앱이 Always-on VPN 모드에 있습니다.</string>
+    <string name="rules_card_domain_count" translatable="true">%1$s 도메인 규칙</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">Rethink는 장치의 DNS 요청을 암호화하고 네트워크 모니터를 구현하고 방화벽 규칙을 적용하기 위해 로컬 VPN을 설정하는 권한이 필요합니다.
+\n
+\nRethink는 정보를 수집하거나 어떤 식으로든 사용자를 염탐하지 않습니다.</string>
+    <string name="hsf_start_dialog_header" translatable="true">시작 %1$s</string>
+    <string name="hs_biometeric_feature_not_supported" translatable="true">이 기기에서는 생체 인증이 지원되지 않거나 비활성화됩니다.</string>
+    <string name="hs_biometeric_failed" translatable="true">생체인증 실패</string>
+    <string name="hs_biometeric_error" translatable="true">생체인증 오류</string>
+    <string name="firewall_card_status_active" translatable="true">%1$s 앱</string>
+    <string name="firewall_card_text_inactive" translatable="true">방화벽 모드를 활성화합니다.</string>
+    <string name="dns_card_latency_active" translatable="true">대기 시간: %1$sms</string>
+    <string name="dns_card_latency_inactive" translatable="true">DNS 모드를 활성화합니다.</string>
+    <string name="apps_card_ips_count" translatable="true">%1$s IP 및 포트 규칙</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s 쿼리</string>
+    <string name="hsf_stop_btn_state" translatable="true">중지</string>
+    <string name="hsf_downtime" translatable="true">(%1$s 이후 비활성)</string>
+    <string name="hsf_notification_permission_failure" translatable="true">설정 화면에서 알림 권한 활성화</string>
+    <string name="hsf_start_dialog_message" translatable="true">안전하고 안전한 Android에서 한 걸음 떨어져 있습니다. 네트워크 활동을 즉시 확인하고 웹사이트, IP 및 오작동하는 앱을 차단합니다.</string>
 </resources>
