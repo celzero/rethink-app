@@ -372,4 +372,5 @@
     <string name="lbl_on_device" translatable="true">기기 내</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">DoT 엔드포인트를 삭제합니까?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">저장된 구성에서 DNS over TLS 엔드포인트를 삭제합니다.</string>
+    <string name="lbl_notification" translatable="true">알림</string>
 </resources>
