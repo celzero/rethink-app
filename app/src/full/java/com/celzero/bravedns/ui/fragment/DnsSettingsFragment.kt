@@ -16,12 +16,15 @@
 package com.celzero.bravedns.ui.fragment
 
 import Logger
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.CompoundButton
+import android.widget.RadioButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -40,11 +43,14 @@ import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.activity.DnsListActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.bottomsheet.LocalBlocklistsBottomSheet
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
@@ -331,6 +337,13 @@ class DnsSettingsFragment :
         }
 
         b.networkDnsRb.setOnClickListener {
+            if (isSystemDns()) {
+                io {
+                    val sysDns = VpnController.getSystemDns()
+                    uiCtx { showSystemDnsDialog(sysDns) }
+                }
+                return@setOnClickListener
+            }
             // network dns proxy
             setNetworkDns()
         }
@@ -374,6 +387,30 @@ class DnsSettingsFragment :
                 }
             }
         }
+    }
+
+    private fun showSystemDnsDialog(dns: String) {
+        val builder = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.network_dns)
+            .setMessage(dns)
+            .setCancelable(true)
+            .setPositiveButton(R.string.ada_noapp_dialog_positive) { di, _ ->
+                di.dismiss()
+            }
+            .setNeutralButton(requireContext().getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
+                UIUtils.clipboardCopy(
+                    requireContext(),
+                    dns,
+                    requireContext().getString(R.string.copy_clipboard_label)
+                )
+                Utilities.showToastUiCentered(
+                    requireContext(),
+                    requireContext().getString(R.string.info_dialog_url_copy_toast_msg),
+                    Toast.LENGTH_SHORT
+                )
+            }
+        val dialog = builder.create()
+        dialog.show()
     }
 
     private fun initAnimation() {
@@ -426,6 +463,10 @@ class DnsSettingsFragment :
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 
     override fun onBtmSheetDismiss() {
