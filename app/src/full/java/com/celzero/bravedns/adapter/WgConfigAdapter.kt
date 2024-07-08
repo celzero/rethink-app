@@ -111,12 +111,8 @@ class WgConfigAdapter(private val context: Context) :
         private var job: Job? = null
 
         fun update(config: WgConfigFiles) {
-            b.interfaceNameText.text =
-                context.getString(
-                    R.string.about_version_install_source,
-                    config.name.take(11),
-                    config.id.toString()
-                )
+            b.interfaceNameText.text = config.name.take(12)
+            b.interfaceIdText.text = context.getString(R.string.single_argument_parenthesis, config.id.toString())
             b.interfaceSwitch.isChecked = config.isActive && VpnController.hasTunnel()
             setupClickListeners(config)
             updateStatusJob(config)

@@ -116,13 +116,8 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         private var job: Job? = null
 
         fun update(config: WgConfigFiles) {
-            // limit the config name to 12 characters
-            b.interfaceNameText.text =
-                context.getString(
-                    R.string.about_version_install_source,
-                    config.name.take(11),
-                    config.id.toString()
-                )
+            b.interfaceNameText.text = config.name.take(12)
+            b.interfaceIdText.text = context.getString(R.string.single_argument_parenthesis, config.id.toString())
             val isWgActive = config.isActive && VpnController.hasTunnel()
             b.oneWgCheck.isChecked = isWgActive
             setupClickListeners(config)
