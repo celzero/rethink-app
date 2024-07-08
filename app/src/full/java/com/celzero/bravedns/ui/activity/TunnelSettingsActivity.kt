@@ -46,6 +46,7 @@ import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
+import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import inet.ipaddr.IPAddress.IPVersion
 import inet.ipaddr.IPAddressString
@@ -90,7 +91,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         // connectivity check
         b.settingsActivityConnectivityChecksSwitch.isChecked = persistentState.connectivityChecks
         // show ping ips
-        b.settingsActivityPingIpsRl.visibility = if (persistentState.connectivityChecks) View.VISIBLE else View.GONE
+        b.settingsActivityPingIpsBtn.visibility = if (persistentState.connectivityChecks) View.VISIBLE else View.GONE
         // exclude apps in proxy
         b.settingsActivityExcludeProxyAppsSwitch.isChecked = !persistentState.excludeAppsInProxy
         // for protocol translation, enable only on DNS/DNS+Firewall mode
@@ -235,13 +236,13 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityConnectivityChecksSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.connectivityChecks = isChecked
             if (isChecked) {
-                b.settingsActivityPingIpsRl.visibility = View.VISIBLE
+                b.settingsActivityPingIpsBtn.visibility = View.VISIBLE
             } else {
-                b.settingsActivityPingIpsRl.visibility = View.GONE
+                b.settingsActivityPingIpsBtn.visibility = View.GONE
             }
         }
 
-        b.settingsActivityPingIpsRl.setOnClickListener {
+        b.settingsActivityPingIpsBtn.setOnClickListener {
             showPingIpsDialog()
         }
     }
@@ -304,8 +305,9 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         val errorDrawable = ContextCompat.getDrawable(this, R.drawable.edittext_error)
 
         val saveBtn: AppCompatButton = dialogView.findViewById(R.id.save_button)
-        val testBtn: AppCompatButton = dialogView.findViewById(R.id.test_button)
+        val testBtn: AppCompatImageView = dialogView.findViewById(R.id.test_button)
         val cancelBtn: AppCompatButton = dialogView.findViewById(R.id.cancel_button)
+        val resetChip: Chip = dialogView.findViewById(R.id.reset_chip)
 
         val errorMsg: AppCompatTextView = dialogView.findViewById(R.id.error_message)
 
@@ -333,6 +335,16 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         ip63.setText(items6.getOrNull(2) ?: "")
 
         val dialog = alertBuilder.create()
+
+        resetChip.setOnClickListener {
+            // reset to default values
+            ip41.setText(Constants.ip4probes[0])
+            ip42.setText(Constants.ip4probes[1])
+            ip43.setText(Constants.ip4probes[2])
+            ip61.setText(Constants.ip6probes[0])
+            ip62.setText(Constants.ip6probes[1])
+            ip63.setText(Constants.ip6probes[2])
+        }
 
         testBtn.setOnClickListener {
             try {
@@ -406,7 +418,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
                 if (!valid41 || !valid42 || !valid43 || !valid61 || !valid62 || !valid63) {
                     errorMsg.visibility = View.VISIBLE
-                    errorMsg.text = "Invalid IP address. Please enter a valid IP address."
+                    errorMsg.text = getString(R.string.cd_dns_proxy_error_text_1)
                     return@setOnClickListener
                 } else {
                     errorMsg.visibility = View.VISIBLE
@@ -485,13 +497,16 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         }
     }
 
-
     private fun isValidIp(ipString: String, type: IPVersion): Boolean {
-        if (type.isIPv4) {
-            return IPAddressString(ipString).isValid()
-        }
-        if (type.isIPv6) {
-            return IPAddressString(ipString).isValid()
+        try {
+            if (type.isIPv4) {
+                return IPAddressString(ipString).toAddress().isIPv4
+            }
+            if (type.isIPv6) {
+                return IPAddressString(ipString).toAddress().isIPv6
+            }
+        } catch (e: Exception) {
+            Logger.i(LOG_TAG_UI, "err on ip validation: ${e.message}")
         }
         return false
     }

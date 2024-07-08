@@ -39,6 +39,28 @@
                 android:textColor="?attr/secondaryTextColor"
                 android:textSize="18sp" />
 
+            <com.google.android.material.chip.Chip
+                android:id="@+id/reset_chip"
+                style="@style/ThinnerChip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center"
+                android:layout_marginEnd="10dp"
+                android:text="@string/brbs_restore_title"
+                android:textColor="?attr/chipTextPositive"
+                android:textSize="@dimen/large_font_text_view"
+                android:visibility="visible"
+                app:chipBackgroundColor="?attr/chipBgColorPositive"
+                app:chipSurfaceColor="@null" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/test_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="5dp"
+                android:src="@drawable/ic_refresh_white" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -281,38 +303,29 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/test_button"
+                android:id="@+id/cancel_button"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                 android:background="@drawable/rectangle_border_background"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
                 android:padding="5dp"
                 android:layout_marginEnd="5dp"
-                android:text="@string/lbl_test" />
+                android:textColor="?attr/primaryTextColor"
+                android:text="@string/lbl_cancel" />
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/cancel_button"
+                android:id="@+id/save_button"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                 android:background="@drawable/rectangle_border_background"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 android:layout_marginStart="5dp"
                 android:layout_weight="0.5"
-                android:text="@string/lbl_cancel" />
+                android:text="@string/lbl_save" />
 
         </LinearLayout>
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/save_button"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:layout_margin="5dp"
-            android:background="@drawable/rectangle_border_background"
-            android:text="@string/lbl_save"
-            android:textColor="?attr/accentGood" />
-
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
