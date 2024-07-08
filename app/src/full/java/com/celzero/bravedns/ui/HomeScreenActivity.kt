@@ -31,11 +31,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.os.SystemClock
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -55,6 +57,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
 import com.celzero.bravedns.service.AppUpdater
@@ -88,7 +91,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
 
     private val persistentState by inject<PersistentState>()
-    private val appConfig by inject<AppConfig>()
+    private val appInfoDb by inject<AppInfoRepository>()
     private val appUpdateManager by inject<AppUpdater>()
     private val rdb by inject<RefreshDatabase>()
 
@@ -122,7 +125,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // do not launch on board activity when app is running on TV
         if (persistentState.firstTimeLaunch && !isAppRunningOnTv()) {
             launchOnboardActivity()
-            rdnsRemote()
             return
         }
         updateNewVersion()
@@ -393,18 +395,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
         // to SystemClock.elapsedRealtime
         persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
-    }
-
-    private fun rdnsRemote() {
-        // enforce the dns to sky for play store build, and max for website and f-droid build
-        // on first time launch
-        io {
-            if (isPlayStoreFlavour()) {
-                appConfig.switchRethinkDnsToSky()
-            } else {
-                appConfig.switchRethinkDnsToMax()
-            }
-        }
+        // set the rethink app in firewall mode as allowed by default
+        appInfoDb.resetRethinkAppFirewallMode()
     }
 
     // fixme: find a cleaner way to implement this, move this to some other place
@@ -603,17 +595,22 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
 
     private fun showUpdateCompleteSnackbar() {
-        val snack =
-            Snackbar.make(
-                b.container,
-                getString(R.string.update_complete_snack_message),
-                Snackbar.LENGTH_INDEFINITE
-            )
-        snack.setAction(getString(R.string.update_complete_action_snack)) {
-            appUpdateManager.completeUpdate()
+        try {
+            val container: View = findViewById(R.id.container)
+            val snack =
+                Snackbar.make(
+                    container,
+                    getString(R.string.update_complete_snack_message),
+                    Snackbar.LENGTH_INDEFINITE
+                )
+            snack.setAction(getString(R.string.update_complete_action_snack)) {
+                appUpdateManager.completeUpdate()
+            }
+            snack.setActionTextColor(ContextCompat.getColor(this, R.color.primaryLightColorText))
+            snack.show()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "Error showing update complete snackbar: ${e.message}", e)
         }
-        snack.setActionTextColor(ContextCompat.getColor(this, R.color.primaryLightColorText))
-        snack.show()
     }
 
     private fun showDownloadDialog(
