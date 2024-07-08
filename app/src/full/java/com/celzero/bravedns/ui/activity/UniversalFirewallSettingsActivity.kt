@@ -23,23 +23,41 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.ConnectionTracker
+import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityUniversalFirewallSettingsBinding
+import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.BackgroundAccessibilityService
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class UniversalFirewallSettingsActivity :
     AppCompatActivity(R.layout.activity_universal_firewall_settings) {
     private val b by viewBinding(ActivityUniversalFirewallSettingsBinding::bind)
     private val persistentState by inject<PersistentState>()
+    private val connTrackerRepository by inject<ConnectionTrackerRepository>()
+
+    private lateinit var blockedUniversalRules : List<ConnectionTracker>
+
+    companion object {
+        const val RULES_SEARCH_ID = "R:"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
@@ -69,6 +87,7 @@ class UniversalFirewallSettingsActivity :
         b.firewallUnivLockdownCheck.isChecked = persistentState.getUniversalLockdown()
 
         setupClickListeners()
+        updateStats()
     }
 
     private fun setupClickListeners() {
@@ -164,6 +183,25 @@ class UniversalFirewallSettingsActivity :
         b.firewallUnivLockdownTxt.setOnClickListener {
             b.firewallUnivLockdownCheck.isChecked = !b.firewallUnivLockdownCheck.isChecked
         }
+
+        // click listener for the stats
+        b.firewallDeviceLockedRl.setOnClickListener { startActivity(FirewallRuleset.RULE3.id) }
+
+        b.firewallNotInUseRl.setOnClickListener { startActivity(FirewallRuleset.RULE4.id) }
+
+        b.firewallUnknownRl.setOnClickListener { startActivity(FirewallRuleset.RULE5.id) }
+
+        b.firewallUdpRl.setOnClickListener { startActivity(FirewallRuleset.RULE6.id) }
+
+        b.firewallDnsBypassRl.setOnClickListener { startActivity(FirewallRuleset.RULE7.id) }
+
+        b.firewallNewAppRl.setOnClickListener { startActivity(FirewallRuleset.RULE8.id) }
+
+        b.firewallMeteredRl.setOnClickListener { startActivity(FirewallRuleset.RULE1F.id) }
+
+        b.firewallHttpRl.setOnClickListener { startActivity(FirewallRuleset.RULE10.id) }
+
+        b.firewallLockdownRl.setOnClickListener { startActivity(FirewallRuleset.RULE11.id) }
     }
 
     private fun recheckFirewallBackgroundMode(isChecked: Boolean) {
@@ -249,6 +287,18 @@ class UniversalFirewallSettingsActivity :
         }
     }
 
+    private var maxValue: Double = 0.0
+
+    private fun calculatePercentage(c: Double): Int {
+        if (maxValue == 0.0) return 0
+        if (c > maxValue) {
+            maxValue = c
+            return 100
+        }
+        val percentage = (c / maxValue) * 100
+        return percentage.toInt()
+    }
+
     private fun showPermissionAlert() {
         val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(R.string.alert_permission_accessibility)
@@ -274,5 +324,157 @@ class UniversalFirewallSettingsActivity :
             )
             Logger.e(LOG_TAG_FIREWALL, "Failure accessing accessibility settings: ${e.message}", e)
         }
+    }
+
+    private fun updateStats() {
+        io {
+            // get stats for all the firewall rules
+            // update the UI with the stats
+            // 1. device locked - 2. background mode - 3. unknown 4. udp 5. dns bypass 6. new app 7.
+            // metered 8. http 9. universal lockdown
+            // instead get all the stats in one go and update the UI
+            blockedUniversalRules = connTrackerRepository.getBlockedUniversalRulesCount()
+            val deviceLocked =
+                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE3.id) }
+            val backgroundMode =
+                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE4.id) }
+            val unknown =
+                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE5.id) }
+            val udp =
+                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE6.id) }
+            val dnsBypass =
+                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE7.id) }
+            val newApp =
+                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE8.id) }
+            val metered =
+                blockedUniversalRules.filter {
+                    it.blockedByRule.contains(FirewallRuleset.RULE1F.id)
+                }
+            val http =
+                blockedUniversalRules.filter {
+                    it.blockedByRule.contains(FirewallRuleset.RULE10.id)
+                }
+            val universalLockdown =
+                blockedUniversalRules.filter {
+                    it.blockedByRule.contains(FirewallRuleset.RULE11.id)
+                }
+
+            val blockedCountList =
+                listOf(
+                    deviceLocked.size,
+                    backgroundMode.size,
+                    unknown.size,
+                    udp.size,
+                    dnsBypass.size,
+                    newApp.size,
+                    metered.size,
+                    http.size,
+                    universalLockdown.size
+                )
+
+            maxValue = blockedCountList.maxOrNull()?.toDouble() ?: 0.0
+
+            uiCtx {
+                b.firewallDeviceLockedShimmerLayout.postDelayed(
+                    {
+                        if (!canPerformUiAction()) return@postDelayed
+
+                        stopShimmer()
+                        hideShimmer()
+
+                        b.deviceLockedProgress.progress =
+                            calculatePercentage(blockedCountList[0].toDouble())
+                        b.notInUseProgress.progress =
+                            calculatePercentage(blockedCountList[1].toDouble())
+                        b.unknownProgress.progress =
+                            calculatePercentage(blockedCountList[2].toDouble())
+                        b.udpProgress.progress = calculatePercentage(blockedCountList[3].toDouble())
+                        b.dnsBypassProgress.progress =
+                            calculatePercentage(blockedCountList[4].toDouble())
+                        b.newAppProgress.progress =
+                            calculatePercentage(blockedCountList[5].toDouble())
+                        b.meteredProgress.progress =
+                            calculatePercentage(blockedCountList[6].toDouble())
+                        b.httpProgress.progress =
+                            calculatePercentage(blockedCountList[7].toDouble())
+                        b.lockdownProgress.progress =
+                            calculatePercentage(blockedCountList[8].toDouble())
+
+                        b.firewallDeviceLockedStats.text = deviceLocked.size.toString()
+                        b.firewallNotInUseStats.text = backgroundMode.size.toString()
+                        b.firewallUnknownStats.text = unknown.size.toString()
+                        b.firewallUdpStats.text = udp.size.toString()
+                        b.firewallDnsBypassStats.text = dnsBypass.size.toString()
+                        b.firewallNewAppStats.text = newApp.size.toString()
+                        b.firewallMeteredStats.text = metered.size.toString()
+                        b.firewallHttpStats.text = http.size.toString()
+                        b.firewallLockdownStats.text = universalLockdown.size.toString()
+                    },
+                    500
+                )
+            }
+        }
+    }
+
+    private fun canPerformUiAction(): Boolean {
+        return !isFinishing &&
+            !isDestroyed &&
+            lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED) &&
+            !isChangingConfigurations
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopShimmer()
+    }
+
+    private fun stopShimmer() {
+        if (!canPerformUiAction()) return
+
+        b.firewallUdpShimmerLayout.stopShimmer()
+        b.firewallDeviceLockedShimmerLayout.stopShimmer()
+        b.firewallNotInUseShimmerLayout.stopShimmer()
+        b.firewallUnknownShimmerLayout.stopShimmer()
+        b.firewallDnsBypassShimmerLayout.stopShimmer()
+        b.firewallNewAppShimmerLayout.stopShimmer()
+        b.firewallMeteredShimmerLayout.stopShimmer()
+        b.firewallHttpShimmerLayout.stopShimmer()
+        b.firewallLockdownShimmerLayout.stopShimmer()
+    }
+
+    private fun hideShimmer() {
+        if (!canPerformUiAction()) return
+
+        b.firewallUdpShimmerLayout.visibility = View.GONE
+        b.firewallDeviceLockedShimmerLayout.visibility = View.GONE
+        b.firewallNotInUseShimmerLayout.visibility = View.GONE
+        b.firewallUnknownShimmerLayout.visibility = View.GONE
+        b.firewallDnsBypassShimmerLayout.visibility = View.GONE
+        b.firewallNewAppShimmerLayout.visibility = View.GONE
+        b.firewallMeteredShimmerLayout.visibility = View.GONE
+        b.firewallHttpShimmerLayout.visibility = View.GONE
+        b.firewallLockdownShimmerLayout.visibility = View.GONE
+    }
+
+    private fun startActivity(rule: String?) {
+        if (rule.isNullOrEmpty()) return
+
+        // if the rules are not blocked, then no need to start the activity
+        val size = blockedUniversalRules.filter { it.blockedByRule.contains(rule) }.size
+        if (size == 0) return
+
+        val intent = Intent(this, NetworkLogsActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        val searchParam = RULES_SEARCH_ID + rule
+        intent.putExtra(Constants.SEARCH_QUERY, searchParam)
+        startActivity(intent)
+    }
+
+    private fun io(f: suspend () -> Unit): Job {
+        return lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }

@@ -82,4 +82,8 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
     suspend fun getDataUsage(before: Long, current: Long): List<DataUsage> {
         return connectionTrackerDAO.getDataUsage(before, current)
     }
+
+    suspend fun getBlockedUniversalRulesCount(): List<ConnectionTracker> {
+        return connectionTrackerDAO.getBlockedUniversalRulesCount()
+    }
 }

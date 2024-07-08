@@ -34,6 +34,7 @@ import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
 import com.celzero.bravedns.util.Utilities
@@ -77,7 +78,15 @@ class ConnectionTrackerFragment :
         initView()
         if (arguments != null) {
             val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
-            b.connectionSearch.setQuery(query, true)
+            if (query.contains(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)) {
+                val rule = query.split(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)[1]
+                filterCategories.add(rule)
+                filterType = TopLevelFilter.BLOCKED
+                viewModel.setFilter(filterQuery, filterCategories, filterType)
+                hideSearchLayout()
+            } else {
+                b.connectionSearch.setQuery(query, true)
+            }
         }
     }
 
@@ -121,6 +130,10 @@ class ConnectionTrackerFragment :
 
         remakeParentFilterChipsUi()
         remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
+    }
+
+    private fun hideSearchLayout() {
+        b.connectionCardViewTop.visibility = View.GONE
     }
 
     override fun onResume() {

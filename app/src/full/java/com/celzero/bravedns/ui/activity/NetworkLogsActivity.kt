@@ -30,6 +30,7 @@ import com.celzero.bravedns.databinding.ActivityNetworkLogsBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity.Companion.RULES_SEARCH_ID
 import com.celzero.bravedns.ui.fragment.ConnectionTrackerFragment
 import com.celzero.bravedns.ui.fragment.DnsLogFragment
 import com.celzero.bravedns.ui.fragment.RethinkLogFragment
@@ -42,6 +43,9 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
     private val b by viewBinding(ActivityNetworkLogsBinding::bind)
     private var fragmentIndex = 0
     private var searchParam = ""
+    // to handle search navigation from universal firewall, to show only the search results
+    // of the selected universal rule, show only network logs tab
+    private var isUnivNavigated = false
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
@@ -57,6 +61,9 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
         super.onCreate(savedInstanceState)
         fragmentIndex = intent.getIntExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, 0)
         searchParam = intent.getStringExtra(Constants.SEARCH_QUERY) ?: ""
+        if (searchParam.contains(RULES_SEARCH_ID)) {
+            isUnivNavigated = true
+        }
         init()
     }
 
@@ -99,6 +106,10 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
     }
 
     private fun getCount(): Int {
+        if (isUnivNavigated) {
+            return 1
+        }
+
         var count = 0
         if (persistentState.routeRethinkInRethink) {
             count = 1
@@ -111,6 +122,9 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
     }
 
     private fun getFragment(position: Int): Fragment {
+        if (isUnivNavigated) {
+            return ConnectionTrackerFragment.newInstance(searchParam)
+        }
         return when (position) {
             0 -> {
                 if (appConfig.getBraveMode().isDnsMode()) {

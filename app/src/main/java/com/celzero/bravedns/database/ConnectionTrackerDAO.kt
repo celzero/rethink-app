@@ -89,17 +89,17 @@ interface ConnectionTrackerDAO {
     fun getBlockedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to GROUP BY ipAddress, uid, port ORDER BY count DESC"
+        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to GROUP BY uid, ipAddress, port ORDER BY count DESC"
     )
     fun getAppIpLogs(uid: Int, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, '' as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to GROUP BY ipAddress, uid, port ORDER BY count DESC LIMIT 3"
+        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, '' as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to GROUP BY uid, ipAddress, port ORDER BY count DESC LIMIT 3"
     )
     fun getAppIpLogsLimited(uid: Int, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to and ipAddress like :query GROUP BY ipAddress, uid, port ORDER BY count DESC"
+        "SELECT uid, ipAddress, port, COUNT(ipAddress) as count, flag as flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as appOrDnsName FROM ConnectionTracker WHERE uid = :uid and timeStamp > :to and ipAddress like :query GROUP BY  uid, ipAddress, port ORDER BY count DESC"
     )
     fun getAppIpLogsFiltered(uid: Int, to: Long, query: String): PagingSource<Int, AppConnection>
 
@@ -159,6 +159,9 @@ interface ConnectionTrackerDAO {
     @Query("delete from ConnectionTracker") fun clearAllData()
 
     @Query("delete from ConnectionTracker where uid = :uid") fun clearLogsByUid(uid: Int)
+
+    @Query("delete from ConnectionTracker where uid = :uid and timeStamp > :time")
+    fun clearLogsByTime(uid: Int, time: Long)
 
     @Query("DELETE FROM ConnectionTracker WHERE  timeStamp < :date") fun purgeLogsByDate(date: Long)
 
@@ -298,4 +301,7 @@ interface ConnectionTrackerDAO {
         "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, ict.meteredDataUsage as meteredDataUsage from ConnectionTracker as ct join (select sum(downloadBytes + uploadBytes) as meteredDataUsage from ConnectionTracker where connType like :meteredTxt and timeStamp > :to) as ict where timeStamp > :to"
     )
     fun getTotalUsages(to: Long, meteredTxt: String): DataUsageSummary
+
+    @Query("select * from ConnectionTracker where blockedByRule in ('Rule #1B', 'Rule #1F', 'Rule #3', 'Rule #4', 'Rule #5', 'Rule #6', 'Http block', 'Universal Lockdown')")
+    fun getBlockedUniversalRulesCount(): List<ConnectionTracker>
 }
