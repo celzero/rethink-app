@@ -1,3 +1,18 @@
+/*
+ * Copyright 2024 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.scheduler
 
 import Logger
@@ -15,12 +30,15 @@ import java.util.zip.ZipOutputStream
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.BufferedOutputStream
-import java.util.zip.ZipFile
 
 class LogExportWorker(context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), KoinComponent {
 
     private val consoleLogDao by inject<ConsoleLogDAO>()
+
+    companion object {
+        private const val query = "SELECT * FROM ConsoleLog order by id"
+    }
 
     override suspend fun doWork(): Result {
         return try {
@@ -36,7 +54,7 @@ class LogExportWorker(context: Context, workerParams: WorkerParameters) :
     private fun exportLogsToCsvStream(filePath: String): Boolean {
         var cursor: Cursor? = null
         try {
-            val query = SimpleSQLiteQuery("SELECT * FROM ConsoleLog order by id")
+            val query = SimpleSQLiteQuery(query)
             cursor = consoleLogDao.getLogsCursor(query)
 
             val file = File(filePath)
@@ -45,19 +63,21 @@ class LogExportWorker(context: Context, workerParams: WorkerParameters) :
                 file.delete()
             }
 
+            val stringBuilder = StringBuilder()
+            cursor?.let {
+                if (it.moveToFirst()) {
+                    do {
+                        val timestamp = it.getLong(it.getColumnIndexOrThrow("timestamp"))
+                        val message = it.getString(it.getColumnIndexOrThrow("message"))
+                        stringBuilder.append("$timestamp,$message\n")
+                    } while (it.moveToNext())
+                }
+            }
+
             ZipOutputStream(BufferedOutputStream(FileOutputStream(filePath))).use { zos ->
                 val zipEntry = ZipEntry("log_${System.currentTimeMillis()}.txt")
                 zos.putNextEntry(zipEntry)
-                if (cursor.moveToFirst()) {
-                    do {
-                        val timestamp =
-                            cursor.getLong(cursor.getColumnIndexOrThrow("timestamp"))
-                        val message =
-                            cursor.getString(cursor.getColumnIndexOrThrow("message"))
-                        val logEntry = "$timestamp,$message\n"
-                        zos.write(logEntry.toByteArray())
-                    } while (cursor.moveToNext())
-                }
+                zos.write(stringBuilder.toString().toByteArray())
                 zos.closeEntry()
             }
 
@@ -65,7 +85,7 @@ class LogExportWorker(context: Context, workerParams: WorkerParameters) :
             return true
         } catch (e: Exception) {
             Logger.e(LOG_TAG_BUG_REPORT, "Error exporting logs", e)
-        } finally{
+        } finally {
             cursor?.close()
         }
         return false
