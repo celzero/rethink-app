@@ -152,4 +152,10 @@ interface AppInfoDAO {
 
     @Query("update AppInfo set isProxyExcluded = :isProxyExcluded where uid = :uid")
     fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean)
+
+    @Query("update AppInfo set firewallStatus = 5, connectionStatus = 3 where packageName = 'com.celzero.bravedns'")
+    fun resetRethinkAppFirewallMode()
+
+    @Query("select uid from AppInfo where packageName = :packageName")
+    fun getAppInfoUidForPackageName(packageName: String): Int
 }
