@@ -66,7 +66,7 @@ class RethinkLogAdapter(private val context: Context) :
                 override fun areContentsTheSame(
                     oldConnection: RethinkLog,
                     newConnection: RethinkLog
-                ) = oldConnection == newConnection
+                ) = oldConnection.id == newConnection.id
             }
 
         private const val MAX_BYTES = 500000 // 500 KB
