@@ -24,6 +24,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -152,6 +153,19 @@ class WgMainActivity :
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         init()
+        onBackPressedDispatcher.addCallback(
+            this /* lifecycle owner */,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (b.createFab.visibility == View.VISIBLE) {
+                        collapseFab()
+                    } else {
+                        finish()
+                    }
+                    return
+                }
+            }
+        )
     }
 
     private fun init() {
@@ -161,13 +175,7 @@ class WgMainActivity :
         observeDnsName()
         setupClickListeners()
 
-        onBackPressedDispatcher.addCallback(this /* lifecycle owner */) {
-            if (b.createFab.visibility == View.VISIBLE) {
-                collapseFab()
-            } else {
-                finish()
-            }
-        }
+
     }
 
     private fun setAdapter() {
