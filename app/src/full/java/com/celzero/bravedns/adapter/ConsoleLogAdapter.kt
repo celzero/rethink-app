@@ -52,7 +52,7 @@ class ConsoleLogAdapter(private val context: Context) :
     }
 
     override fun onBindViewHolder(holder: ConsoleLogViewHolder, position: Int) {
-        val logInfo: ConsoleLog = getItem(position) ?: return
+        val logInfo = getItem(position) ?: return
         holder.update(logInfo)
     }
 
@@ -61,7 +61,7 @@ class ConsoleLogAdapter(private val context: Context) :
 
         fun update(log: ConsoleLog) {
             // update the textview color with the first letter of the log level
-            val logLevel = log.message.first()
+            val logLevel = log.message.firstOrNull() ?: 'V'
             when (logLevel) {
                 'V' ->
                     b.logDetail.setTextColor(
@@ -91,7 +91,7 @@ class ConsoleLogAdapter(private val context: Context) :
             b.logDetail.text = log.message
             if (DEBUG) {
                 b.logTimestamp.text =
-                    " ${log.id} ${Utilities.convertLongToTime(log.timestamp, TIME_FORMAT_1)}"
+                    "${log.id}\n${Utilities.convertLongToTime(log.timestamp, TIME_FORMAT_1)}"
             } else {
                 b.logTimestamp.text = Utilities.convertLongToTime(log.timestamp, TIME_FORMAT_1)
             }
