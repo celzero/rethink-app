@@ -25,16 +25,26 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
+import android.text.method.LinkMovementMethod
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -42,16 +52,21 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConsoleLogAdapter
 import com.celzero.bravedns.databinding.ActivityConsoleLogBinding
+import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastR
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.ConsoleLogViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -88,7 +103,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-            Configuration.UI_MODE_NIGHT_YES
+                Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,12 +111,28 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
         super.onCreate(savedInstanceState)
         initView()
         setupClickListener()
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (persistentState.consoleLogEnabled) {
+                        showStopDialog()
+                    } else {
+                        finish()
+                    }
+                    return
+                }
+            }
+        )
     }
 
     private fun initView() {
         setAdapter()
+        // update the text view with the time since logs are available
         io {
             val sinceTime = consoleLogViewModel.sinceTime()
+            if (sinceTime == 0L) return@io
+
             val since = Utilities.convertLongToTime(sinceTime, Constants.TIME_FORMAT_3)
             uiCtx {
                 val desc = getString(R.string.console_log_desc)
@@ -110,27 +141,43 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
                 b.consoleLogInfoText.text = descWithTime
             }
         }
+        if (persistentState.consoleLogEnabled) {
+            b.consoleLogStartStop.text = getString(R.string.hsf_stop_btn_state)
+        } else {
+            b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
+            showStartDialog() // show dialog to user to start logging
+        }
     }
 
+    var recyclerAdapter: ConsoleLogAdapter? = null
+
     private fun setAdapter() {
-        var shouldScroll = true
         b.consoleLogList.setHasFixedSize(true)
-        layoutManager = CustomLinearLayoutManager(this)
+        layoutManager = LinearLayoutManager(this@ConsoleLogActivity)
         b.consoleLogList.layoutManager = layoutManager
-        val recyclerAdapter = ConsoleLogAdapter(this)
-        consoleLogViewModel.logs.observe(this) {
-            recyclerAdapter.submitData(this.lifecycle, it)
-            if (b.consoleLogList.scrollState == RecyclerView.SCROLL_STATE_IDLE && shouldScroll) {
-                b.consoleLogList.post {
-                    b.consoleLogList.scrollToPosition(0) // scroll to top if not scrolling
+        recyclerAdapter = ConsoleLogAdapter(this)
+        b.consoleLogList.adapter = recyclerAdapter
+        observeLog()
+
+        /*lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                consoleLogViewModel.logs.collectLatest { pagingData ->
+                    recyclerAdapter.submitData(pagingData)
                 }
-            } else if (b.consoleLogList.scrollState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                shouldScroll = false // user is scrolling, don't scroll to top
-            } else if (b.consoleLogList.scrollState == RecyclerView.SCROLL_STATE_SETTLING) {
-                shouldScroll = false // user is scrolling, don't scroll to top
+            }
+        }*/
+    }
+
+    private fun observeLog() {
+        consoleLogViewModel.logs.observe(this) { l ->
+            lifecycleScope.launch {
+                recyclerAdapter?.submitData(l)
             }
         }
-        b.consoleLogList.adapter = recyclerAdapter
+    }
+
+    private fun unobserveLog1() {
+        consoleLogViewModel.logs.removeObservers(this)
     }
 
     private fun setupClickListener() {
@@ -159,6 +206,134 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
             }
             handleSaveOrShareLogs(filePath, SaveType.SHARE)
         }
+        b.consoleLogStartStop.setOnClickListener {
+            persistentState.consoleLogEnabled = !persistentState.consoleLogEnabled
+            if (persistentState.consoleLogEnabled) {
+                b.consoleLogStartStop.text = getString(R.string.hsf_stop_btn_state)
+            } else {
+                b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
+            }
+        }
+        b.consoleStatInfo.setOnClickListener { showStatsDialog() }
+    }
+
+    private fun showStartDialog() {
+        //unobserveLog()
+        val handler = Handler(Looper.getMainLooper())
+        val builder = MaterialAlertDialogBuilder(this)
+        val title = getString(R.string.console_log_title)
+        builder.setTitle(title)
+        builder.setCancelable(true)
+        builder.setPositiveButton(getString(R.string.hsf_start_btn_state)) { dialogInterface, _ ->
+            handler.post {
+                persistentState.consoleLogEnabled = true
+                b.consoleLogStartStop.text = getString(R.string.hsf_stop_btn_state)
+                showToastUiCentered(
+                    this,
+                    getString(R.string.config_add_success_toast),
+                    Toast.LENGTH_SHORT
+                )
+                observeLog()
+            }
+            dialogInterface.dismiss()
+        }
+
+        builder.setNeutralButton(getString(R.string.lbl_cancel)) { dialogInterface, _ ->
+            handler.post {
+                b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
+                observeLog()
+            }
+            dialogInterface.dismiss()
+        }
+        builder.setOnCancelListener {
+            handler.post {
+                observeLog()
+            }
+        }
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.setCancelable(true)
+        alertDialog.show()
+    }
+
+    private fun showStopDialog() {
+       // unobserveLog()
+        val handler = Handler(Looper.getMainLooper())
+        val builder = MaterialAlertDialogBuilder(this)
+        val title = getString(R.string.console_log_title)
+        builder.setTitle(title)
+        builder.setCancelable(true)
+        builder.setPositiveButton(getString(R.string.hsf_stop_btn_state)) { dialogInterface, _ ->
+            handler.post {
+                persistentState.consoleLogEnabled = false
+                b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
+                showToastUiCentered(
+                    this,
+                    getString(R.string.config_add_success_toast),
+                    Toast.LENGTH_SHORT
+                )
+            }
+            dialogInterface.dismiss()
+            handler.post { finish() }
+        }
+
+        builder.setNeutralButton(getString(R.string.lbl_cancel)) { dialogInterface, _ ->
+            dialogInterface.dismiss()
+            handler.post { finish() }
+        }
+        builder.setOnCancelListener {
+            observeLog()
+        }
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.setCancelable(true)
+        alertDialog.show()
+    }
+
+    private fun showStatsDialog() {
+        //unobserveLog()
+        io {
+            val stat = VpnController.getNetStat()
+            val formatedStat = UIUtils.formatNetStat(stat)
+            uiCtx {
+                val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
+                val builder = MaterialAlertDialogBuilder(this).setView(dialogBinding.root)
+                val lp = WindowManager.LayoutParams()
+                val dialog = builder.create()
+                dialog.show()
+                lp.copyFrom(dialog.window?.attributes)
+                lp.width = WindowManager.LayoutParams.MATCH_PARENT
+                lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+
+                dialog.setCancelable(true)
+                dialog.window?.attributes = lp
+
+                val heading = dialogBinding.infoRulesDialogRulesTitle
+                val okBtn = dialogBinding.infoRulesDialogCancelImg
+                val descText = dialogBinding.infoRulesDialogRulesDesc
+                dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
+
+                heading.text = "Network Stats"
+                heading.setCompoundDrawablesWithIntrinsicBounds(
+                    ContextCompat.getDrawable(this, R.drawable.ic_info_white),
+                    null,
+                    null,
+                    null
+                )
+
+                descText.movementMethod = LinkMovementMethod.getInstance()
+                descText.text = formatedStat
+
+                okBtn.setOnClickListener {
+                    dialog.dismiss()
+                    observeLog()
+                }
+
+                dialog.setOnCancelListener {
+                    observeLog()
+                }
+
+                dialog.show()
+            }
+        }
     }
 
     private fun handleSaveOrShareLogs(filePath: String, type: SaveType) {
@@ -184,7 +359,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
                 workManager.pruneWork()
             } else if (
                 WorkInfo.State.CANCELLED == workInfo.state ||
-                    WorkInfo.State.FAILED == workInfo.state
+                WorkInfo.State.FAILED == workInfo.state
             ) {
                 onFailure()
                 workManager.pruneWork()
@@ -199,14 +374,19 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
         // show success message
         Logger.i(LOG_TAG_BUG_REPORT, "Logs saved successfully")
         b.consoleLogProgressBar.visibility = View.GONE
-        Toast.makeText(this, "Logs saved successfully", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(R.string.config_add_success_toast), Toast.LENGTH_LONG).show()
     }
 
     private fun onFailure() {
         // show failure message
         Logger.i(LOG_TAG_BUG_REPORT, "Logs save failed")
         b.consoleLogProgressBar.visibility = View.GONE
-        Toast.makeText(this, "Logs save failed", Toast.LENGTH_LONG).show()
+        Toast.makeText(
+            this,
+            getString(R.string.download_update_dialog_failure_title),
+            Toast.LENGTH_LONG
+        )
+            .show()
     }
 
     private fun showLogGenerationProgressUi() {
@@ -264,7 +444,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
 
     private fun makeConsoleLogFile(type: SaveType): String? {
         return try {
-            val appVersion = getVersionName()
+            val appVersion = getVersionName() + "_" + System.currentTimeMillis()
             return if (type.isShare()) {
                 // create file in filesdir, no need to check for permissions
                 val dir = filesDir.canonicalPath + File.separator
@@ -366,8 +546,8 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
             Environment.isExternalStorageManager()
         } else {
             // below version 11
-            val write =
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            val write = 3
+            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             val read =
                 ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
             read == PackageManager.PERMISSION_GRANTED && write == PackageManager.PERMISSION_GRANTED

@@ -21,12 +21,15 @@ class ConsoleLogRepository(private val consoleLogDAO: ConsoleLogDAO) {
         consoleLogDAO.insert(log)
     }
 
-    suspend fun deleteOldLogs(limit: Int) {
-        consoleLogDAO.deleteOldLogs(limit)
+    suspend fun deleteOldLogs(to: Long) {
+        consoleLogDAO.deleteOldLogs(to)
     }
 
     suspend fun insertBatch(logs: List<ConsoleLog>) {
         consoleLogDAO.insertBatch(logs)
     }
 
+    suspend fun getLogCount(): Int {
+        return consoleLogDAO.getLogCount()
+    }
 }

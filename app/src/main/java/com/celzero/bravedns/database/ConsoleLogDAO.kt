@@ -23,14 +23,12 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SimpleSQLiteQuery
+import com.celzero.bravedns.util.Constants
 
 @Dao
 interface ConsoleLogDAO {
     @Insert
     suspend fun insert(log: ConsoleLog)
-
-    @Query("SELECT * FROM ConsoleLog order by timestamp desc")
-    suspend fun getAllLogs(): List<ConsoleLog>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertBatch(log: List<ConsoleLog>)
@@ -38,12 +36,18 @@ interface ConsoleLogDAO {
     @RawQuery
     fun getLogsCursor(query: SimpleSQLiteQuery): Cursor
 
-    @Query("select * from ConsoleLog order by id desc")
+    @Query("select * from ConsoleLog order by id desc LIMIT ${Constants.MAX_LOGS}")
     fun getLogs(): PagingSource<Int, ConsoleLog>
 
-    @Query("DELETE FROM ConsoleLog WHERE id IN (SELECT id FROM ConsoleLog ORDER BY id ASC LIMIT :limit)")
-    suspend fun deleteOldLogs(limit: Int)
+    @Query("DELETE FROM ConsoleLog WHERE timestamp < :to")
+    suspend fun deleteOldLogs(to: Long)
 
-    @Query("select timestamp from ConsoleLog order by timestamp desc limit 1")
+    @Query("select timestamp from ConsoleLog order by id limit 1")
     suspend fun sinceTime(): Long
+
+    @Query("select count(*) from ConsoleLog")
+    suspend fun getLogCount(): Int
+
+    @Query("SELECT * FROM ConsoleLog ORDER BY timestamp DESC LIMIT :limit OFFSET :offset")
+    suspend fun getLogs(offset: Int, limit: Int): List<ConsoleLog>
 }

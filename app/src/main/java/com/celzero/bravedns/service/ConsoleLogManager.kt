@@ -24,13 +24,10 @@ class ConsoleLogManager(private val repository: ConsoleLogRepository) {
         repository.insert(log)
     }
 
-    private suspend fun deleteOldLogs(limit: Int) {
-        repository.deleteOldLogs(limit)
-    }
-
     suspend fun insertBatch(logs: List<*>) {
         val l = logs as? List<ConsoleLog> ?: return
 
+        l.sortedBy { it.id }
         repository.insertBatch(l)
     }
 }
