@@ -39,6 +39,7 @@ import android.provider.Settings
 import android.text.format.DateUtils
 import android.util.TypedValue
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -125,6 +126,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         initializeValues()
         initializeClickListeners()
         observeVpnState()
@@ -406,10 +408,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     val status = VpnController.getProxyStatusById(proxyId)
                     if (status != null) {
                         // consider starting and up as active
-                        if (status == Backend.TOK || status == Backend.TUP || status == Backend.TZZ) {
-                            active++
-                        } else {
+                        if (status == Backend.TKO) {
                             failing++
+                        } else {
+                            active++
                         }
                     } else {
                         failing++
@@ -526,6 +528,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
             updateUiWithDnsStates(it)
         }
+
+        VpnController.getRegionLiveData().observe(viewLifecycleOwner) {
+            if (it != null) {
+                b.fhsCardRegion.text = it
+            }
+        }
     }
 
     private fun updateUiWithDnsStates(dnsName: String) {
@@ -554,7 +562,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         failing = false
                         if (isAdded) {
                             b.fhsCardDnsLatency.visibility = View.VISIBLE
-                            b.fhsCardDnsFailure.visibility = View.GONE
+                            b.fhsCardDnsFailure.visibility = View.INVISIBLE
                         }
                         return@ui
                     }
@@ -563,7 +571,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     failing = true
                 }
                 if (failing && isAdded) {
-                    b.fhsCardDnsLatency.visibility = View.GONE
+                    b.fhsCardDnsLatency.visibility = View.INVISIBLE
                     b.fhsCardDnsFailure.visibility = View.VISIBLE
                     b.fhsCardDnsFailure.text = getString(R.string.failed_using_default)
                 }
@@ -621,6 +629,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun unobserveDnsStates() {
         persistentState.median.removeObservers(viewLifecycleOwner)
         appConfig.getConnectedDnsObservable().removeObservers(viewLifecycleOwner)
+        VpnController.getRegionLiveData().removeObservers(viewLifecycleOwner)
     }
 
     private fun observeUniversalStates() {
@@ -926,15 +935,52 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun startTrafficStats() {
         trafficStatsTicker =
             ui("trafficStatsTicker") {
+                var counter = 0
                 while (true) {
-                    fetchTrafficStats()
-                    kotlinx.coroutines.delay(1500L)
+                    if (counter % 2 == 0) {
+                        fetchTrafficStats()
+                    } else {
+                        fetchNetStats()
+                    }
+                    kotlinx.coroutines.delay(2500L)
+                    counter++
                 }
             }
     }
 
+    private fun fetchNetStats() {
+        val stat = VpnController.getNetStat()
+        val nic = stat?.nic()
+
+        // show the stats in MB/s
+        val txBytes = String.format("%.2f", (nic?.txBytes ?: 0) / 1000000.0)
+        val rxBytes = String.format("%.2f", (nic?.rxBytes ?: 0) / 1000000.0)
+
+        b.fhsInternetSpeed.visibility = View.VISIBLE
+        b.fhsInternetSpeedUnit.visibility = View.VISIBLE
+        b.fhsInternetSpeed.text =
+            getString(
+                R.string.two_argument_space,
+                getString(
+                    R.string.two_argument_space,
+                    txBytes,
+                    getString(R.string.symbol_black_up)
+                ),
+                getString(
+                    R.string.two_argument_space,
+                    rxBytes,
+                    getString(R.string.symbol_black_down)
+                )
+            )
+        b.fhsInternetSpeedUnit.text = getString(R.string.symbol_mbs)
+    }
+
     private fun stopTrafficStats() {
-        trafficStatsTicker.cancel()
+        try {
+            trafficStatsTicker.cancel()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "error stopping traffic stats ticker", e)
+        }
     }
 
     data class TxRx(
@@ -982,6 +1028,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     getString(R.string.symbol_black_down)
                 )
             )
+        b.fhsInternetSpeedUnit.text = getString(R.string.symbol_kbs)
     }
 
     /**

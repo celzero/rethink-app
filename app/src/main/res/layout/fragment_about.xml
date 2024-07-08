@@ -451,6 +451,23 @@
                 android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_twitter"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="5dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_twitter"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_twitter"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_mail"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
@@ -466,22 +483,6 @@
                 android:text="@string/about_email"
                 android:textSize="@dimen/large_font_text_view" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/about_twitter"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="5dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:drawableStart="@drawable/ic_twitter"
-                android:drawablePadding="20dp"
-                android:text="@string/about_twitter"
-                android:gravity="start|center_vertical"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
-                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_reddit"
@@ -494,10 +495,28 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_reddit"
                 android:drawablePadding="20dp"
-                android:text="@string/lbl_reddit"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
+                android:text="@string/lbl_reddit"
+                android:textSize="@dimen/large_font_text_view" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_element"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="5dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_element"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/lbl_matrix"
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -512,27 +531,11 @@
                 android:drawableStart="@drawable/ic_mastodon"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
-                android:text="@string/lbl_mastodon"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
+                android:text="@string/lbl_mastodon"
                 android:textSize="@dimen/large_font_text_view" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/about_element"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="5dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:drawableStart="@drawable/ic_element"
-                android:drawablePadding="20dp"
-                android:text="@string/lbl_matrix"
-                android:gravity="start|center_vertical"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
-                android:textSize="@dimen/large_font_text_view" />
 
         </LinearLayout>
 
@@ -587,6 +590,22 @@
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_settings_vpn_profile"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_stats"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_log_level"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="Network Stats"
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView

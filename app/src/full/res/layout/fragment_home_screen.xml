@@ -112,12 +112,25 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_below="@id/fhs_card_dns_title"
-                            android:layout_marginStart="7dp"
+                            android:layout_marginStart="10dp"
                             android:layout_marginTop="10dp"
                             android:ellipsize="marquee"
                             android:marqueeRepeatLimit="marquee_forever"
                             android:singleLine="true"
                             android:textSize="@dimen/extra_large_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fhs_card_region"
+                            style="@style/TextAppearance.Widget.HomeScreen.Desc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/fhs_card_dns_failure"
+                            android:layout_marginStart="7dp"
+                            android:layout_marginTop="5dp"
+                            android:ellipsize="marquee"
+                            android:marqueeRepeatLimit="marquee_forever"
+                            android:singleLine="true"
+                            android:textSize="@dimen/default_font_text_view" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fhs_card_dns_connected_dns"
@@ -126,14 +139,15 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentBottom="true"
                             android:layout_gravity="bottom"
-                            android:layout_marginStart="10dp"
+                            android:layout_marginStart="7dp"
                             android:layout_marginTop="10dp"
                             android:layout_marginBottom="10dp"
                             android:ellipsize="marquee"
                             android:marqueeRepeatLimit="marquee_forever"
-                            android:maxLines="2"
-                            android:padding="5dp"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:singleLine="true"
+                            android:textSize="@dimen/small_font_text_view" />
 
 
                     </RelativeLayout>
