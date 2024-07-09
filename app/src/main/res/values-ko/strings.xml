@@ -419,7 +419,7 @@
     <string name="settings_dns_proxy_dialog_header" translatable="true">SOCKS5 프록시 설정</string>
     <string name="settings_dns_proxy_dialog_port_number" translatable="true">포트 번호</string>
     <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">세트</string>
-    <string name="settings_app_list_default_app" translatable="true">아무것도 없음</string>
+    <string name="settings_app_list_default_app" translatable="true">없음</string>
     <string name="settings_socks_forwarding_desc" translatable="true">%1$s:%2$s, %3$s로 포워딩</string>
     <string name="settings_socks_forwarding_desc_no_app" translatable="true">%1$s:%2$s로 포워딩</string>
     <string name="settings_socks_forwarding_default_desc" translatable="true">SOCKS5 엔드포인트로 연결을 전달합니다.</string>
@@ -493,4 +493,47 @@
     <string name="hsf_downtime" translatable="true">(%1$s 이후 비활성)</string>
     <string name="hsf_notification_permission_failure" translatable="true">설정 화면에서 알림 권한 활성화</string>
     <string name="hsf_start_dialog_message" translatable="true">안전하고 안전한 Android에서 한 걸음 떨어져 있습니다. 네트워크 활동을 즉시 확인하고 웹사이트, IP 및 오작동하는 앱을 차단합니다.</string>
+    <string name="dc_local_block_desc_1" translatable="true">195개 이상의 차단 목록 중에서 선택하세요. 차단 목록을 다운로드하거나 구성하려면 여기를 클릭하십시오.</string>
+    <string name="dc_custom_block_heading" translatable="true">도메인 규칙</string>
+    <string name="dc_local_block_heading" translatable="true">온디바이스 차단 목록</string>
+    <string name="dc_dns_website_heading" translatable="true">DNS 로그에 웹사이트 아이콘 표시(실험)</string>
+    <string name="dc_dns_website_desc" translatable="true"><i>nextdns.io</i> 및 <i>duckduckgo.com</i>에서 웹사이트 아이콘을 가져옵니다. 최대 350MB의 디스크 공간을 사용합니다.</string>
+    <string name="dc_dns_leaks_heading" translatable="true">DNS 유출 방지</string>
+    <string name="dc_dns_leaks_desc" translatable="true">활성화되면, Rethink는 포트 53에서 모든 패킷을 캡처하고 사용자가 설정한 DNS 엔드포인트로 전달합니다</string>
+    <string name="cd_dns_proxy_error_text_3" translatable="true">잘못된 포트</string>
+    <string name="cd_dns_crypt_dialog_title" translatable="true">DNSCrypt 리졸버 또는 릴레이 추가</string>
+    <string name="lbl_background_data" translatable="true">백그라운드 데이터 제한</string>
+    <string name="dc_entries" translatable="true">%1$s 항목 »</string>
+    <string name="dc_proxy_dns_heading" translatable="true">DNS 프록시 사용 안 함</string>
+    <string name="cd_custom_dns_proxy_default_app" translatable="true">없음</string>
+    <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
+    <string name="about_bravedns_toreport_text" translatable="true">도움말 및 피드백</string>
+    <string name="cd_dns_proxy_mode_internal" translatable="true">내부의</string>
+    <string name="hsf_pause_vpn_failure" translatable="true">일시 중지할 수 없음: Rethink가 비활성화되어 있습니다</string>
+    <string name="about_bug_report" translatable="true">버그 보고서</string>
+    <string name="hsf_start_dialog_positive" translatable="true">시작</string>
+    <string name="hsf_whats_new_chip_text" translatable="true">새로운 기능</string>
+    <string name="hsf_packet_capture_chip_text" translatable="true">패킷 캡처 활성화</string>
+    <string name="hsf_blocklist_chip_text_no_data" translatable="true">RDNS+ 활성화</string>
+    <string name="hsf_proxy_chip_text" translatable="true">프록시 활성화</string>
+    <string name="hsf_exclude_error" translatable="true">VPN 잠금 모드에서는 제외할 수 없습니다.</string>
+    <string name="hsf_proxy_chip_removed_toast" translatable="true">프록시 제거됨</string>
+    <string name="hsf_proxy_chip_remove_text" translatable="true">중지 중…</string>
+    <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">패킷 캡처 비활성화됨</string>
+    <string name="hsf_whats_new_remove_text" translatable="true">종료 중…</string>
+    <string name="hsf_blocklist_updating_text" translatable="true">활성화 중…</string>
+    <string name="hsf_chip_appearance" translatable="true">테마: %1$s</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i>를 사용하면 연결이 끊길 수 있습니다. 설정을 변경하여 Rethink가 백그라운드에서 데이터 및 기타 리소스를 사용하도록 허용하세요.</string>
+    <string name="dc_block_heading" translatable="true">규칙</string>
+    <string name="dc_other_dns_heading" translatable="true">유형</string>
+    <string name="dc_custom_dns_radio" translatable="true">기타 DNS</string>
+    <string name="dc_check_update_heading" translatable="true">차단 목록 업데이트에 대한 프롬프트</string>
+    <string name="dc_check_update_desc" translatable="true"><i>3</i>일마다 차단 목록 업데이트 확인</string>
+    <string name="about_bravedns_explantion" translatable="true">Rethink는 안드로이드 기기에서 앱 활동을 모니터링하고 인터넷 검열을 우회하며 방화벽 앱을 운영하는 가장 쉬운 방법입니다.</string>
+    <string name="about_bravedns_whoarewe" translatable="true">Rethink는 Amazon, IBM 및 Scientific Games의 전직 엔지니어가 이끄는 무료 오픈 소스 프로젝트입니다.</string>
+    <string name="about_bug_report_desc" translatable="true">이메일 충돌 로그</string>
+    <string name="about_join_telegram" translatable="true">텔레그램</string>
+    <string name="cd_dns_proxy_mode_external" translatable="true">외부의</string>
+    <string name="cd_dns_proxy_error_text_1" translatable="true">잘못된 IP 주소 입니다</string>
+    <string name="cd_dns_proxy_error_text_2" translatable="true">포트 범위는 1024~65535여야 합니다.</string>
 </resources>
