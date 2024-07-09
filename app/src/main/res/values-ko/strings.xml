@@ -538,4 +538,5 @@
     <string name="cd_dns_proxy_error_text_2" translatable="true">포트 범위는 1024~65535여야 합니다.</string>
     <string name="dc_proxy_dns_desc" translatable="true">항상 WireGuard, SOCKS5, HTTP 프록시에서 DNS를 프록시하지 마십시오.</string>
     <string name="battery_optimization_dialog_heading" translatable="true">비활성화 %1$s</string>
+    <string name="lbl_battery_optimization" translatable="true">배터리 최적화</string>
 </resources>
