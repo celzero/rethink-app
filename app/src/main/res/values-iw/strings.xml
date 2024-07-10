@@ -354,4 +354,32 @@
     <string name="search_custom_domains" translatable="true"><font size="12">חפש שמות דומיינים</font></string>
     <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">חפש רשימות חסימה</font></string>
     <string name="public_key_copy_toast_msg" translatable="true">מפתח ציבורי הועתק.</string>
+    <string name="connection_http3" translatable="true">HTTP3</string>
+    <string name="settings_allow_lan_heading" translatable="true">לא לנתב כתובות IP פרטיות(ניסיוני)</string>
+    <string name="settings_https_heading" translatable="true">הגדרת פרוקסי HTTP(S) CONNECT</string>
+    <string name="settings_enable_logs_desc" translatable="true">אחסן יומני DNS וחומת אש מקומית על המכשיר.</string>
+    <string name="settings_enable_logs" translatable="true">אפשר רישום על המכשיר של יומנים</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">אפשרויות מסוימות לא זמינות כשהVPN במצב סגר <u>ראה הגדרות VPN </u>.</string>
+    <string name="settings_orbot_header" translatable="true">Orbot\t❯</string>
+    <string name="settings_socks5_heading" translatable="true">הגדרת פרוקסי SOCKS5</string>
+    <string name="orbot_status_arg_2" translatable="true">TCP</string>
+    <string name="http_proxy_dialog_heading" translatable="true">קבע פרוקסי HTTP(S) CONNECT</string>
+    <string name="http_proxy_dialog_desc" translatable="true">קבע כתובת בצורת &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt; לדוגמה: http://proxy.example.com:8080/</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">בדיקות חיבור נשלחות כדי לבדוק גישה.</string>
+    <string name="settings_allow_bypass_heading" translatable="true">אפשר היראות רשת</string>
+    <string name="settings_allow_bypass_desc" translatable="true">אפשר לאפליקציות מבקשות לעקוף את חומת האש של RethinkDNS לפי דרישה. אפליקציות ועידות אודיו/וידאו מסוימות כמו Zoom ו-Meet עשויות לדרוש מעקף לפי דרישה כדי לתפקד כראוי.</string>
+    <string name="settings_https_desc" translatable="true">‪העברת חיבורים לנקודת קצה של HTTP(S) CONNECT.</string>
+    <string name="orbot_none" translatable="true">אין (ברירת מחדל)</string>
+    <string name="orbot_none_desc" translatable="true">אף אחד מן הנראים לעיל.</string>
+    <string name="orbot_bs_status_1" translatable="true">%1$s חיבורים מועברים לOrbot.</string>
+    <string name="orbot_bs_status_2" translatable="true">פרוקסי HTTP מוגדרת.</string>
+    <string name="orbot_bs_status_3" translatable="true">מעביר %1$s לOrbot, פרוקסי HTTP גם קבועה.</string>
+    <string name="orbot_bs_status_4" translatable="true">הגדרת Tor-כפרוקסי (Orbot) בלחיצה אחת.</string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">אי אפשר להגדיר פרוקסי כשהVPN רץ במצב DNS בלבד.</string>
+    <string name="orbot_both_desc" translatable="true">כל הרשומים לעיל.</string>
+    <string name="settings_socks5_desc" translatable="true">העברת חיבורים לנקודת קצה של SOCKS5.</string>
+    <string name="orbot_no_app_toast" translatable="true">יש להוסיף לפחות אפליקציה אחת כדי לאפשר Orbot</string>
+    <string name="settings_connectivity_checks" translatable="true">בצע בדיקות חיבור</string>
+    <string name="orbot_install_dialog_neutral" translatable="true">website</string>
+    <string name="settings_orbot_heading" translatable="true">הגדרת Orbot</string>
 </resources>
