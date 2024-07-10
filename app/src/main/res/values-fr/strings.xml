@@ -364,7 +364,7 @@
     <string name="rt_chip_check_update">Vérifier MàJ</string>
     <string name="brbs_restore_desc">Restaure à partir d’un fichier de sauvegarde</string>
     <string name="firewall_rule_exempt_orbot_setup">Configuration Orbot</string>
-    <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
+    <string name="dns_btm_sheet_dialog_ips"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="blocklist_update_check_not_required">Les listes de blocage sont déjà à la dernière version.</string>
     <string name="download_update_dialog_message_ok">Vous êtes déjà sur la dernière version.</string>
     <string name="info_dialog_url_copy_toast_msg">URL copiée</string>
@@ -483,7 +483,7 @@
     <string name="brbs_backup_dialog_message">Sauvegarde les paramètres de l’application ainsi que les journaux réseau et DNS dans un fichier. Cela redémarre le VPN.</string>
     <string name="brbs_restore_dialog_failure_title">Échec de la restauration</string>
     <string name="cd_dns_crypt_error_text_1">Le stamp ne peut être vide</string>
-    <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s liste(s) de blocage&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
+    <string name="dns_btm_sheet_dialog_message"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s liste(s) de blocage</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
     <string name="settings_dns_proxy_dialog_app_desc">L’application sélectionnée sera exclue du VPN pour lui permettre d’établir des connexions par proxy pour votre compte.</string>
     <string name="always_on_dialog_neutral">Paramètres</string>
     <string name="dns_crypt_relay_remove_dialog_message">Supprimer le relais DNSCrypt de la configuration enregistrée.</string>
@@ -994,7 +994,7 @@
     <string name="lbl_anonymous" translatable="true">Anonyme</string>
     <string name="lbl_overall" translatable="true">Vue d\'ensemble</string>
     <string name="wg_lockdown_dialog_title" translatable="true">Confinement</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Les applications sélectionnées seront uniquement acheminées via ce VPN WireGuard, que le VPN soit rompu ou connecté.</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Les applications sélectionnées seront uniquement acheminées via ce VPN WireGuard, que le VPN soit activé ou désactivé.</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Toujours en marche</string>
     <string name="routing_remaining_apps" translatable="true">Routage des applications restantes</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Routage du trafic propre à Rethink à travers le tunnel. À moins que vous sachiez ce que vous faites, désactivez cette fonction.</string>
@@ -1026,11 +1026,11 @@
     <string name="lbl_idle" translatable="true">Au repos</string>
     <string name="lbl_split" translatable="true">Séparer</string>
     <string name="lbl_on_device" translatable="true">sur l\'appareil</string>
-    <string name="dc_proxy_dns_heading" translatable="true">Ne jamais utiliser de proxy DNS</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Ne jamais utiliser de proxy pour DNS</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Applications transférées par proxy de bouclage</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Lorsque désactivé, exclut les applications de redirecteur proxy (SOCKS5, HTTP, DNS) du tunnel VPN de Rethink.</string>
     <string name="exclude_apps_from_proxy">Contourner l\'application de tous les proxys</string>
-    <string name="exclude_apps_from_proxy_failure_toast">Contourner l\'application de tous les proxys est activé</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Cette application contourne tous les proxys</string>
     <string name="lbl_notification" translatable="true">notification</string>
     <string name="memory_notification_text">Rethink connaît une mémoire insuffisante. Les actions du système peuvent être limitées.</string>
 </resources>
