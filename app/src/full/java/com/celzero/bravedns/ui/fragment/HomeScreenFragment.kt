@@ -952,7 +952,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val stat = VpnController.getNetStat()
         val nic = stat?.nic()
 
-        // show the stats in MB/s
+        // show the stats in MB
         val txBytes = String.format("%.2f", (nic?.txBytes ?: 0) / 1000000.0)
         val rxBytes = String.format("%.2f", (nic?.rxBytes ?: 0) / 1000000.0)
 
@@ -972,7 +972,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     getString(R.string.symbol_black_down)
                 )
             )
-        b.fhsInternetSpeedUnit.text = getString(R.string.symbol_mbs)
+        b.fhsInternetSpeedUnit.text = getString(R.string.symbol_mb)
     }
 
     private fun stopTrafficStats() {
