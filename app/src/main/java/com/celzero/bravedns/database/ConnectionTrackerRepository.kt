@@ -20,8 +20,13 @@ import com.celzero.bravedns.RethinkDnsApplication
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.data.DataUsage
+import com.celzero.bravedns.service.PersistentState
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO) {
+class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO): KoinComponent {
+
+    private val persistentState by inject<PersistentState>()
 
     suspend fun insert(connectionTracker: ConnectionTracker) {
         connectionTrackerDAO.insert(connectionTracker)
@@ -32,9 +37,12 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
     }
 
     suspend fun updateBatch(summary: List<ConnectionSummary>) {
+        val d = Logger.LoggerType.fromId(persistentState.goLoggerLevel.toInt())
+        val debug = d.isLessThan(Logger.LoggerType.INFO) // debug, verbose, very verbose
+
         summary.forEach {
             // update the flag and target ip if in debug mode
-            if (DEBUG && !it.targetIp.isNullOrEmpty()) {
+            if (debug && !it.targetIp.isNullOrEmpty()) {
                 val flag = it.flag ?: ""
                 connectionTrackerDAO.updateSummary(
                     it.connId,

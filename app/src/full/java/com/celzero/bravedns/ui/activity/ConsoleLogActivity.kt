@@ -42,6 +42,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ReportFragment.Companion.reportFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -51,6 +52,7 @@ import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConsoleLogAdapter
+import com.celzero.bravedns.database.ConsoleLogRepository
 import com.celzero.bravedns.databinding.ActivityConsoleLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.scheduler.WorkScheduler
@@ -78,6 +80,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
     private val persistentState by inject<PersistentState>()
 
     private val consoleLogViewModel by inject<ConsoleLogViewModel>()
+    private val consoleLogRepository by inject<ConsoleLogRepository>()
     private val workScheduler by inject<WorkScheduler>()
 
     companion object {
@@ -210,8 +213,10 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
             persistentState.consoleLogEnabled = !persistentState.consoleLogEnabled
             if (persistentState.consoleLogEnabled) {
                 b.consoleLogStartStop.text = getString(R.string.hsf_stop_btn_state)
+                consoleLogRepository.consoleLogStartTimestamp = System.currentTimeMillis()
             } else {
                 b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
+                consoleLogRepository.consoleLogStartTimestamp = 0L
             }
         }
         b.consoleStatInfo.setOnClickListener { showStatsDialog() }
@@ -227,6 +232,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
         builder.setPositiveButton(getString(R.string.hsf_start_btn_state)) { dialogInterface, _ ->
             handler.post {
                 persistentState.consoleLogEnabled = true
+                consoleLogRepository.consoleLogStartTimestamp = System.currentTimeMillis()
                 b.consoleLogStartStop.text = getString(R.string.hsf_stop_btn_state)
                 showToastUiCentered(
                     this,
@@ -265,6 +271,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
         builder.setPositiveButton(getString(R.string.hsf_stop_btn_state)) { dialogInterface, _ ->
             handler.post {
                 persistentState.consoleLogEnabled = false
+                consoleLogRepository.consoleLogStartTimestamp = 0L
                 b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
                 showToastUiCentered(
                     this,
