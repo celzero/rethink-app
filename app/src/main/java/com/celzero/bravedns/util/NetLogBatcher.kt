@@ -18,6 +18,8 @@ package com.celzero.bravedns.util
 
 import Logger
 import Logger.LOG_BATCH_LOGGER
+import android.util.Log
+import co.touchlab.stately.concurrency.AtomicBoolean
 import kotlinx.coroutines.CloseableCoroutineDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
@@ -43,13 +45,17 @@ class NetLogBatcher<T, V>(
     private val processor: suspend (List<T>) -> Unit,
     private val updator: suspend (List<V>) -> Unit = { _ -> }
 ) {
+    companion object {
+        private const val DEBUG = true
+    }
+
     // i keeps track of currently in-use buffer
     var lsn = 0
 
     private val nprod = CoroutineName(tag + "Producer") // batches writes
     private val nsig = CoroutineName(tag + "Signal")
     private val ncons = CoroutineName(tag + "Consumer") // writes batches to db
-
+    private val closed = AtomicBoolean(false)
     // dispatch buffer to consumer if greater than batch size
     private val batchSize = 20
 
@@ -77,23 +83,16 @@ class NetLogBatcher<T, V>(
         scope.async { sig() }
         scope.async { consumeAdd() }
         scope.async { consumeUpdate() }
-
-        // monitor for cancellation on the default dispatcher
-        scope.launch { monitorCancellation() }
     }
 
     // stackoverflow.com/a/68905423
-    private suspend fun monitorCancellation() {
-        try {
-            awaitCancellation()
-        } finally {
-            withContext(NonCancellable) {
-                signal.close()
-                buffersCh.close()
-                updatesCh.close()
-                Logger.i(LOG_BATCH_LOGGER, "end")
-            }
-        }
+    suspend fun close() = withContext(NonCancellable) {
+                if (closed.compareAndSet(false, true)) {
+                    signal.close()
+                    buffersCh.close()
+                    updatesCh.close()
+                    logd("$tag end")
+                }
     }
 
     private suspend fun consumeAdd() =
@@ -110,6 +109,11 @@ class NetLogBatcher<T, V>(
             }
         }
 
+    private fun logd(msg: String) {
+        // write batcher logs only in DEBUG mode to avoid log spam
+        if (DEBUG) Log.d(LOG_BATCH_LOGGER, msg)
+    }
+
     private suspend fun txswap() {
         val b = batches
         batches = mutableListOf<T>() // swap buffers
@@ -119,7 +123,7 @@ class NetLogBatcher<T, V>(
         updates = mutableListOf<V>() // swap buffers
         updatesCh.send(u)
 
-        Logger.d(LOG_BATCH_LOGGER, "txswap (${lsn}) b: ${b.size}, u: ${u.size}")
+        logd( "txswap (${lsn}) b: ${b.size}, u: ${u.size}")
 
         lsn = (lsn + 1)
     }
@@ -150,25 +154,22 @@ class NetLogBatcher<T, V>(
             // consume all signals
             for (tracklsn in signal) {
                 if (tracklsn < lsn) {
-                    Logger.d(LOG_BATCH_LOGGER, "dup signal skip $tracklsn")
+                    logd("dup signal skip $tracklsn")
                     continue
                 }
                 // do not honor the signal for 'l' if a[l] is empty
                 // this can happen if the signal for 'l' is processed
                 // after the fact that 'l' has been swapped out by 'batch'
                 if (batches.size <= 0 && updates.size <= 0) {
-                    Logger.d(LOG_BATCH_LOGGER, "signal continue")
+                    logd("signal continue")
                     continue
                 } else {
-                    Logger.d(LOG_BATCH_LOGGER, "signal sleep $waitms ms")
+                    logd("signal sleep $waitms ms")
                 }
 
                 // wait for 'batch' to dispatch
                 delay(waitms)
-                Logger.d(
-                    LOG_BATCH_LOGGER,
-                    "signal wait over, sz(b: ${batches.size}, u: ${updates.size}) / cur-buf(${lsn})"
-                )
+                logd("signal wait over, sz(b: ${batches.size}, u: ${updates.size}) / cur-buf(${lsn})")
 
                 // 'l' is the current buffer, that is, 'l == i',
                 // and 'batch' hasn't dispatched it,
