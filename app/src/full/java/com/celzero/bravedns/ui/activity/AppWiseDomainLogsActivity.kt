@@ -78,12 +78,10 @@ class AppWiseDomainLogsActivity :
             isRethink = true
             init()
             setRethinkAdapter()
-            observeRethinkNetworkLogSize()
             b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
         } else {
             init()
             setAdapter()
-            observeNetworkLogSize()
             setClickListener()
         }
     }
@@ -233,34 +231,6 @@ class AppWiseDomainLogsActivity :
                     hideNoRulesUi()
                     showRulesUi()
                 }
-            }
-        }
-    }
-
-    private fun observeNetworkLogSize() {
-        networkLogsViewModel.getDomainCount(uid).observe(this) {
-            if (it == null) return@observe
-
-            if (it <= 0) {
-                showNoRulesUi()
-                hideRulesUi()
-            } else {
-                hideNoRulesUi()
-                showRulesUi()
-            }
-        }
-    }
-
-    private fun observeRethinkNetworkLogSize() {
-        networkLogsViewModel.getRinRDomainCount().observe(this) {
-            if (it == null) return@observe
-
-            if (it <= 0) {
-                showNoRulesUi()
-                hideRulesUi()
-            } else {
-                hideNoRulesUi()
-                showRulesUi()
             }
         }
     }

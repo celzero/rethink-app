@@ -85,11 +85,6 @@ interface RethinkLogDao {
     @Query("select count(DISTINCT(ipAddress)) from RethinkLog")
     fun getAppConnectionsCount(): LiveData<Int>
 
-    @Query(
-        "select count(DISTINCT(dnsQuery)) from ConnectionTracker where dnsQuery != ''"
-    )
-    fun getAppDomainConnectionsCount(): LiveData<Int>
-
     @Query("select * from RethinkLog where isBlocked = 1 order by id desc LIMIT $MAX_LOGS")
     fun getBlockedConnectionsFiltered(): PagingSource<Int, RethinkLog>
 
