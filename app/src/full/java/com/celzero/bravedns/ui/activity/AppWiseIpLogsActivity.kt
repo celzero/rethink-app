@@ -77,12 +77,10 @@ class AppWiseIpLogsActivity :
             isRethink = true
             init()
             setRethinkAdapter()
-            observeRethinkNetworkLogSize()
             b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
         } else {
             init()
             setAdapter()
-            observeNetworkLogSize()
             setClickListener()
         }
     }
