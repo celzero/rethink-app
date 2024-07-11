@@ -16,8 +16,7 @@ class PurgeConsoleLogs(val context: Context, workerParameters: WorkerParameters)
     private val persistentState by inject<PersistentState>()
 
     companion object {
-        const val MAX_TIME: Long = 4
-        const val MAX_LOGS: Int = 200000
+        const val MAX_TIME: Long = 3
     }
     override suspend fun doWork(): Result {
         // delete logs which are older than MAX_TIME hrs
@@ -27,9 +26,10 @@ class PurgeConsoleLogs(val context: Context, workerParameters: WorkerParameters)
 
         consoleLogRepository.deleteOldLogs(time)
         if (persistentState.consoleLogEnabled) {
-            // check if the logs are too many, if so stop the logging
-            val count = consoleLogRepository.getLogCount()
-            if (count > MAX_LOGS) {
+            val startTime = consoleLogRepository.consoleLogStartTimestamp
+            // stop the console log if it exceeds max time
+            if (currTime - startTime > TimeUnit.HOURS.toMillis(MAX_TIME)) {
+                consoleLogRepository.consoleLogStartTimestamp = 0
                 persistentState.consoleLogEnabled = false
             }
         }

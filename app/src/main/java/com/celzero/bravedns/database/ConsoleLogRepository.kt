@@ -17,6 +17,8 @@ package com.celzero.bravedns.database
 
 class ConsoleLogRepository(private val consoleLogDAO: ConsoleLogDAO) {
 
+    var consoleLogStartTimestamp: Long = 0
+
     suspend fun insert(log: ConsoleLog) {
         consoleLogDAO.insert(log)
     }
