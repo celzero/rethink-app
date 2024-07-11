@@ -231,6 +231,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/dns_block_blocked_desc"
             android:layout_centerHorizontal="true"
+            android:fontFamily="sans-serif-smallcaps"
             android:gravity="center"
             android:padding="5dp"
             android:textColor="?attr/primaryLightColorText"
