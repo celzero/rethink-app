@@ -22,13 +22,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import backend.RDNS
-import backend.Stats
+import backend.RouterStats
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.service.BraveVPNService.Companion.FAIL_OPEN_ON_NO_NETWORK
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
+import java.net.Socket
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -38,8 +42,6 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.net.Socket
-import kotlin.coroutines.cancellation.CancellationException
 
 object VpnController : KoinComponent {
 
@@ -101,10 +103,8 @@ object VpnController : KoinComponent {
         try {
             externalScope?.coroutineContext?.get(Job)?.cancel("VPNController - onVpnDestroyed")
             externalScope?.cancel("VPNController - onVpnDestroyed")
-        } catch (ignored: IllegalStateException) {
-        } catch (ignored: CancellationException) {
-        } catch (ignored: Exception) {
-        }
+        } catch (ignored: IllegalStateException) {} catch (
+            ignored: CancellationException) {} catch (ignored: Exception) {}
     }
 
     fun uptimeMs(): Long {
@@ -219,7 +219,7 @@ object VpnController : KoinComponent {
         return braveVpnService?.getProxyStatusById(id)
     }
 
-    suspend fun getProxyStats(id: String): Stats? {
+    suspend fun getProxyStats(id: String): RouterStats? {
         return braveVpnService?.getProxyStats(id)
     }
 
@@ -237,6 +237,10 @@ object VpnController : KoinComponent {
 
     suspend fun syncP50Latency(id: String) {
         braveVpnService?.syncP50Latency(id)
+    }
+
+    fun getRegionLiveData(): LiveData<String> {
+        return braveVpnService?.getRegionLiveData() ?: MutableLiveData()
     }
 
     fun protocols(): String {
@@ -339,4 +343,15 @@ object VpnController : KoinComponent {
         braveVpnService?.notifyConnectionMonitor()
     }
 
+    suspend fun getSystemDns(): String {
+        return braveVpnService?.getSystemDns() ?: ""
+    }
+
+    fun getNetStat(): backend.NetStat? {
+        return braveVpnService?.getNetStat()
+    }
+
+    fun writeConsoleLog(log: ConsoleLog) {
+        braveVpnService?.writeConsoleLog(log)
+    }
 }
