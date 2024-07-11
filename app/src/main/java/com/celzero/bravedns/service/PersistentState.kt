@@ -289,6 +289,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     var pingv6Ips by stringPref("ping_ipv6_ips").withDefault<String>(Constants.ip6probes.joinToString(","))
 
+    // TODO: do we need this? instead use in-memory variable
+    var consoleLogEnabled by booleanPref("console_log_enabled").withDefault<Boolean>(false)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
@@ -427,7 +430,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     }
 
     fun getProxyStatus(): MutableLiveData<Int> {
-        if (proxyStatus.value == null) updateProxyStatus()
+        if (proxyStatus.value == null || proxyStatus.value == -1) updateProxyStatus()
         return proxyStatus
     }
 
