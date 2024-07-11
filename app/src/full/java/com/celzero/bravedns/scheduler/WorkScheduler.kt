@@ -46,14 +46,14 @@ class WorkScheduler(val context: Context) {
 
         const val APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS: Long = 7
         const val PURGE_LOGS_TIME_INTERVAL_HOURS: Long = 4
-        const val PURGE_CONSOLE_LOGS_TIME_INTERVAL_HOURS: Long = 4
+        const val PURGE_CONSOLE_LOGS_TIME_INTERVAL_HOURS: Long = 3
         const val BLOCKLIST_UPDATE_CHECK_INTERVAL_DAYS: Long = 3
         const val DATA_USAGE_TIME_INTERVAL_MINS: Long = 20
 
         fun isWorkRunning(context: Context, tag: String): Boolean {
             val instance = WorkManager.getInstance(context)
             val statuses: ListenableFuture<List<WorkInfo>> = instance.getWorkInfosByTag(tag)
-            Logger.d(LOG_TAG_SCHEDULER, "Job $tag already running check")
+            Logger.i(LOG_TAG_SCHEDULER, "Job $tag already running check")
             return try {
                 var running = false
                 val workInfos = statuses.get()
@@ -79,7 +79,7 @@ class WorkScheduler(val context: Context) {
         fun isWorkScheduled(context: Context, tag: String): Boolean {
             val instance = WorkManager.getInstance(context)
             val statuses: ListenableFuture<List<WorkInfo>> = instance.getWorkInfosByTag(tag)
-            Logger.d(LOG_TAG_SCHEDULER, "Job $tag already scheduled check")
+            Logger.i(LOG_TAG_SCHEDULER, "Job $tag already scheduled check")
             return try {
                 var running = false
                 val workInfos = statuses.get()
@@ -108,7 +108,7 @@ class WorkScheduler(val context: Context) {
         // app exit info is supported from R+
         if (!Utilities.isAtleastR()) return
 
-        Logger.d(LOG_TAG_SCHEDULER, "App exit info job scheduled")
+        Logger.i(LOG_TAG_SCHEDULER, "App exit info job scheduled")
         val bugReportCollector =
             PeriodicWorkRequest.Builder(
                     BugReportCollector::class.java,
@@ -135,7 +135,7 @@ class WorkScheduler(val context: Context) {
                 .addTag(PURGE_CONNECTION_LOGS_JOB_TAG)
                 .build()
 
-        Logger.d(LOG_TAG_SCHEDULER, "purge connection logs job scheduled")
+        Logger.i(LOG_TAG_SCHEDULER, "purge connection logs job scheduled")
         WorkManager.getInstance(context.applicationContext)
             .enqueueUniquePeriodicWork(
                 PURGE_CONNECTION_LOGS_JOB_TAG,
@@ -154,7 +154,7 @@ class WorkScheduler(val context: Context) {
                 .addTag(PURGE_CONSOLE_LOGS_JOB_TAG)
                 .build()
 
-        Logger.d(LOG_TAG_SCHEDULER, "purge console logs job scheduled")
+        Logger.i(LOG_TAG_SCHEDULER, "purge console logs job scheduled")
         WorkManager.getInstance(context.applicationContext)
             .enqueueUniquePeriodicWork(
                 PURGE_CONSOLE_LOGS_JOB_TAG,
