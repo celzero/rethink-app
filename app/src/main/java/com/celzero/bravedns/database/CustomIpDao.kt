@@ -97,7 +97,7 @@ interface CustomIpDao {
     fun getAppWiseCustomIp(query: String, uid: Int): PagingSource<Int, CustomIp>
 
     @Query(
-        "select * from CustomIp where ipAddress like :query and isActive = 1 and uid != $UID_EVERYBODY order by uid"
+        "SELECT * FROM (SELECT *, (SELECT COUNT(*) FROM CustomIp ci2 WHERE ci2.uid = ci1.uid AND ci2.rowid <= ci1.rowid) row_num FROM CustomIp ci1 WHERE ipAddress LIKE :query AND isActive = 1 AND uid != $UID_EVERYBODY) WHERE row_num <= 5 ORDER BY uid, row_num"
     )
     fun getAllCustomIpRules(query: String): PagingSource<Int, CustomIp>
 

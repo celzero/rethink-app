@@ -11,7 +11,7 @@
         android:alpha="0.2"
         android:background="?attr/primaryLightColorText" />
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/custom_domain_app_name_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -35,9 +35,27 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:padding="5dp"
+            android:layout_toEndOf="@id/custom_domain_app_icon_iv"
+            android:layout_toStartOf="@id/custom_domain_see_more_chip"
             android:textColor="?attr/secondaryTextColor"
             android:textSize="@dimen/extra_large_font_text_view" />
-    </LinearLayout>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/custom_domain_see_more_chip"
+            style="@style/ThinnerChip.Action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:layout_gravity="end"
+            android:layout_marginEnd="10dp"
+            android:text="@string/ssv_see_more"
+            android:textColor="?attr/chipTextPositive"
+            android:textSize="@dimen/large_font_text_view"
+            android:visibility="visible"
+            app:chipBackgroundColor="?attr/chipBgColorPositive"
+            app:chipSurfaceColor="@null" />
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/custom_domain_container"
