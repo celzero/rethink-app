@@ -76,7 +76,7 @@
     <string name="always_on_dialog_positive" translatable="true">עצור</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">רשת</string>
     <string name="private_dns_dialog_positive" translatable="true">מעבר להגדרות</string>
-    <string name="firewall_act_universal_tab" translatable="true">אוניברסלי</string>
+    <string name="firewall_act_universal_tab" translatable="true">אוניברסליים</string>
     <string name="download_update_dialog_failure_title" translatable="true">משהו השתבש!</string>
     <string name="download_update_dialog_trylater_title" translatable="true">לא ניתן לעדכן כרגע</string>
     <string name="download_update_dialog_trylater_message" translatable="true">לא ניתן לבצע את העדכון כעת, אנא נסה שוב מאוחר יותר.</string>
@@ -175,7 +175,7 @@
     <string name="always_on_dialog_positive_btn" translatable="true">מעבר להגדרות</string>
     <string name="download_update_dialog_failure_message" translatable="true">השרתים שלנו מושבתים או שלא ניתן היה ליצור חיבור. אנא נסה שוב מאוחר יותר.</string>
     <string name="download_update_dialog_message_ok_title" translatable="true">מעודכן!</string>
-    <string name="always_on_dialog" translatable="true">\"VPN תמיד פועל\" מופעל במכשיר זה. כדי להפעיל את Rethink, עבור אל אפליקציית ההגדרות והשבת את \"VPN תמיד פועל\".</string>
+    <string name="always_on_dialog" translatable="true">\"VPN תמיד פועל\" מאופשר במכשיר זה. כדי להפעיל את Rethink, עבור אל אפליקציית ההגדרות והשבת את \"VPN תמיד פועל\".</string>
     <string name="univ_delete_firewall_dialog_title" translatable="true">למחוק את כל כללי ה-IP\?</string>
     <string name="univ_firewall_dialog_message" translatable="true">מחיקת כלל זה תאפשר לכלל האפליקציות להתחבר ל-IP זה. האם אתה רוצה להמשיך\?</string>
     <string name="download_update_dialog_message_ok" translatable="true">אתה כבר משתמש בגרסה העדכנית ביותר.</string>
@@ -310,7 +310,7 @@
 \n <u>#3</u>: חוסם את כל החיבורים כשהמכשיר נעול (חומת אש אוניברסלית).
 \n <u>#4</u>: חוסם כל אפליקציה שאינה בשימוש (חומת אש אוניברסלית).
 \n <u>#5</u>: חוסם חיבורים כאשר אפליקציית המקור אינה ידועה (חומת אש אוניברסלית).
-\n <u>#6</u>: חוסם את כל תעבורת UDP למעט תעבורת DNS (חומת אש אוניברסלית).
+\n <u>#6</u>: חוסם כל תעבורת UDP למעט תעבורת DNS (חומת אש אוניברסלית).
 \n <u>#7</u>: חסום חיבורים כאשר DNS עוקף חסימה (חומת אש אוניברסלית).</string>
     <string name="doh_custom_url_remove_success" translatable="true">נקודת הקצה נמחקה.</string>
     <string name="blocklist_update_check_not_required" translatable="true">רשימות החסימה כבר נמצאות בגרסה האחרונה.</string>
@@ -332,17 +332,54 @@
     <string name="dot_custom_url_remove_dialog_title" translatable="true">מחק נקודת קצה של DoT?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">מחק נקודת קצה של DND over TLS מהתצורה השמורה.</string>
     <string name="doh_custom_url_remove_dialog_message" translatable="true">מחק את נקודת הקצה של DNS over Https מהתצורה השמורה.</string>
-    <string name="show_logs_disabled_network_message" translatable="true">הכניסה לחיבור כבר הייתה זמינה. כדי ליצור מחדש, לך -ל[x57X] הגדרות &lt;/i&gt; והדלק &lt;i&gt; אפשר רישום במכשיר</string>
+    <string name="show_logs_disabled_network_message" translatable="true">הכניסה לחיבור כבר הייתה זמינה. כדי ליצור מחדש, לך -ל<i>הגדרות </i> והדלק <i> אפשר רישום במכשיר</i></string>
     <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">למחוק את פותר DNSCrypt?</string>
     <string name="dns_crypt_url_remove_dialog_message" translatable="true">מחק את פותר ה-DNSCrypt מהתצורה השמורה.</string>
     <string name="dns_crypt_url_remove_success" translatable="true">פותר DNSCrypt נמחק.</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">למחוק את הודעת ה-DNSCrypt מתוך תצורה השמורה.</string>
     <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt Relay נמחק.</string>
-    <string name="refresh_complete" translatable="true">[x0X] רשימת האפליקציות הושלמה.</string>
+    <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast -->סנכרון רשימת האפליקציות הושלם.</string>
     <string name="show_logs_disabled_dns_message" translatable="true">רישום בקשות DNS הושבת. כדי להפעיל מחדש, עבור אל <i>הגדרות</i> והפעל את <i>אפשר רישום במכשיר.</i></string>
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
     <string name="configure_dns_connected_dns_proxy_status" translatable="true">DNS Proxy</string>
     <string name="configure_dns_connection_name" translatable="true">מחובר ל-%1$s</string>
     <string name="configure_dns_connected_doh_status" translatable="true">DNS מעל HTTPS</string>
     <string name="dns_crypt_relay_remove_dialog_title" translatable="true">האם למחוק את DNSCrypt?</string>
+    <string name="search_firewall_all_apps" translatable="true"><font size="12">חפש אפליקציות באמצעות מזהה מיוחד,שם</font></string>
+    <string name="info_dialog_rethink_toast_msg" translatable="true">הועתק ככתובת DNS-over-HTTPS של RDNS+</string>
+    <string name="search_universal_ips" translatable="true"><font size="12">חפש כתובות IP</font></string>
+    <string name="configure_dns_crypt" translatable="true">DNSCrypt: %1$s פותרים</string>
+    <string name="search_dns_logs" translatable="true"><font size="12">חפש שמות דומיינים או כתובות IP</font></string>
+    <string name="search_proxy_add_apps" translatable="true">חפש אפליקציות באמצעות שם</string>
+    <string name="search_custom_domains" translatable="true"><font size="12">חפש שמות דומיינים</font></string>
+    <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">חפש רשימות חסימה</font></string>
+    <string name="public_key_copy_toast_msg" translatable="true">מפתח ציבורי הועתק.</string>
+    <string name="connection_http3" translatable="true">HTTP3</string>
+    <string name="settings_allow_lan_heading" translatable="true">לא לנתב כתובות IP פרטיות(ניסיוני)</string>
+    <string name="settings_https_heading" translatable="true">הגדרת פרוקסי HTTP(S) CONNECT</string>
+    <string name="settings_enable_logs_desc" translatable="true">אחסן יומני DNS וחומת אש מקומית על המכשיר.</string>
+    <string name="settings_enable_logs" translatable="true">אפשר רישום על המכשיר של יומנים</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">אפשרויות מסוימות לא זמינות כשהVPN במצב סגר <u>ראה הגדרות VPN </u>.</string>
+    <string name="settings_orbot_header" translatable="true">Orbot\t❯</string>
+    <string name="settings_socks5_heading" translatable="true">הגדרת פרוקסי SOCKS5</string>
+    <string name="orbot_status_arg_2" translatable="true">TCP</string>
+    <string name="http_proxy_dialog_heading" translatable="true">קבע פרוקסי HTTP(S) CONNECT</string>
+    <string name="http_proxy_dialog_desc" translatable="true">קבע כתובת בצורת &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt; לדוגמה: http://proxy.example.com:8080/</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">בדיקות חיבור נשלחות כדי לבדוק גישה.</string>
+    <string name="settings_allow_bypass_heading" translatable="true">אפשר היראות רשת</string>
+    <string name="settings_allow_bypass_desc" translatable="true">אפשר לאפליקציות מבקשות לעקוף את חומת האש של RethinkDNS לפי דרישה. אפליקציות ועידות אודיו/וידאו מסוימות כמו Zoom ו-Meet עשויות לדרוש מעקף לפי דרישה כדי לתפקד כראוי.</string>
+    <string name="settings_https_desc" translatable="true">‪העברת חיבורים לנקודת קצה של HTTP(S) CONNECT.</string>
+    <string name="orbot_none" translatable="true">אין (ברירת מחדל)</string>
+    <string name="orbot_none_desc" translatable="true">אף אחד מן הנראים לעיל.</string>
+    <string name="orbot_bs_status_1" translatable="true">%1$s חיבורים מועברים לOrbot.</string>
+    <string name="orbot_bs_status_2" translatable="true">פרוקסי HTTP מוגדרת.</string>
+    <string name="orbot_bs_status_3" translatable="true">מעביר %1$s לOrbot, פרוקסי HTTP גם קבועה.</string>
+    <string name="orbot_bs_status_4" translatable="true">הגדרת Tor-כפרוקסי (Orbot) בלחיצה אחת.</string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">אי אפשר להגדיר פרוקסי כשהVPN רץ במצב DNS בלבד.</string>
+    <string name="orbot_both_desc" translatable="true">כל הרשומים לעיל.</string>
+    <string name="settings_socks5_desc" translatable="true">העברת חיבורים לנקודת קצה של SOCKS5.</string>
+    <string name="orbot_no_app_toast" translatable="true">יש להוסיף לפחות אפליקציה אחת כדי לאפשר Orbot</string>
+    <string name="settings_connectivity_checks" translatable="true">בצע בדיקות חיבור</string>
+    <string name="orbot_install_dialog_neutral" translatable="true">website</string>
+    <string name="settings_orbot_heading" translatable="true">הגדרת Orbot</string>
 </resources>
