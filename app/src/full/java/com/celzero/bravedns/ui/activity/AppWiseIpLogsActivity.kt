@@ -223,34 +223,6 @@ class AppWiseIpLogsActivity :
         }
     }
 
-    private fun observeNetworkLogSize() {
-        networkLogsViewModel.getIpCount(uid).observe(this) {
-            if (it == null) return@observe
-
-            if (it <= 0) {
-                showNoRulesUi()
-                hideRulesUi()
-            } else {
-                hideNoRulesUi()
-                showRulesUi()
-            }
-        }
-    }
-
-    private fun observeRethinkNetworkLogSize() {
-        networkLogsViewModel.getRinrIpCount().observe(this) {
-            if (it == null) return@observe
-
-            if (it <= 0) {
-                showNoRulesUi()
-                hideRulesUi()
-            } else {
-                hideNoRulesUi()
-                showRulesUi()
-            }
-        }
-    }
-
     private fun updateAppNameInSearchHint(appName: String) {
         val appNameTruncated = appName.substring(0, appName.length.coerceAtMost(10))
         val hint = getString(

@@ -170,14 +170,6 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
         return startTime.value ?: (System.currentTimeMillis() - ONE_HOUR_MILLIS)
     }
 
-    fun getIpCount(uid: Int): LiveData<Int> {
-        return nwlogDao.getAppConnectionsCount(uid)
-    }
-
-    fun getRinrIpCount(): LiveData<Int> {
-        return rinrDao.getAppConnectionsCount()
-    }
-
     fun getDomainLogsLimited(uid: Int): LiveData<PagingData<AppConnection>> {
         val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
         return Pager(pagingConfig) { nwlogDao.getAppDomainLogsLimited(uid, to) }

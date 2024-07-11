@@ -122,9 +122,6 @@ interface ConnectionTrackerDAO {
         query: String
     ): PagingSource<Int, AppConnection>
 
-    @Query("select count(DISTINCT(ipAddress)) from ConnectionTracker where uid = :uid")
-    fun getAppConnectionsCount(uid: Int): LiveData<Int>
-
     @Query(
         "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 order by id desc LIMIT $MAX_LOGS"
     )
