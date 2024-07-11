@@ -631,6 +631,22 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             return newNetworks
         }
 
+        private fun rearrangeNetworks(nws: Set<Network>): Set<Network> {
+            val newNetworks: LinkedHashSet<Network> = linkedSetOf()
+            val activeNetwork = connectivityManager.activeNetwork
+            val n = nws.firstOrNull { isNetworkSame(it, activeNetwork) }
+            if (n != null) {
+                newNetworks.add(n)
+            }
+            nws
+                .filter { isConnectionNotMetered(connectivityManager.getNetworkCapabilities(it)) }
+                .forEach { newNetworks.add(it) }
+            nws
+                .filter { !isConnectionNotMetered(connectivityManager.getNetworkCapabilities(it)) }
+                .forEach { newNetworks.add(it) }
+            return newNetworks
+        }
+
         private fun isConnectionNotMetered(capabilities: NetworkCapabilities?): Boolean {
             return capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
                 ?: false
@@ -716,11 +732,10 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         }
 
         suspend fun probeIp(ip: String, nws: Set<Network>): ProbeResult {
-            nws.forEach { nw ->
+            val newNws = rearrangeNetworks(nws)
+            newNws.forEach { nw ->
                 if (isReachableTcpUdp(nw, ip)) {
                     val cap = connectivityManager.getNetworkCapabilities(nw)
-                    val ln = connectivityManager.getLinkProperties(nw)
-                    val nwType = networkType(cap)
                     return ProbeResult(ip, true, cap)
                 }
             }
