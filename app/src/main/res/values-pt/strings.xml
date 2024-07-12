@@ -1031,4 +1031,5 @@
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> pode resultar em perda de conetividade. Altere a definição para permitir que o Rethink utilize dados e outros recursos quando estiver em segundo plano.</string>
     <string name="exclude_apps_from_proxy">Ignorar a aplicação de todos os Proxies</string>
     <string name="exclude_apps_from_proxy_failure_toast">Ignorar a aplicação de todos os Proxies está ativado</string>
+    <string name="lbl_notification" translatable="true">notificação</string>
 </resources>
