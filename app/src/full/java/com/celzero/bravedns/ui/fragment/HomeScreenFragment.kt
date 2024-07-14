@@ -958,17 +958,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         b.fhsInternetSpeed.visibility = View.VISIBLE
         b.fhsInternetSpeedUnit.visibility = View.VISIBLE
+        // for netstack: rx: up, tx: down
         b.fhsInternetSpeed.text =
             getString(
                 R.string.two_argument_space,
                 getString(
                     R.string.two_argument_space,
-                    txBytes,
+                    rxBytes,
                     getString(R.string.symbol_black_up)
                 ),
                 getString(
                     R.string.two_argument_space,
-                    rxBytes,
+                    txBytes,
                     getString(R.string.symbol_black_down)
                 )
             )
