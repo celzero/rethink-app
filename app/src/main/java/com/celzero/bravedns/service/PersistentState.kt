@@ -283,8 +283,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // exclude apps which are configured in proxy (socks5, http, dns proxy)
     var excludeAppsInProxy by booleanPref("exclude_apps_in_proxy").withDefault<Boolean>(true)
 
-    var crashlyticsEnabled by booleanPref("crashlytics_enabled").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
-
     var pingv4Ips by stringPref("ping_ipv4_ips").withDefault<String>(Constants.ip4probes.joinToString(","))
 
     var pingv6Ips by stringPref("ping_ipv6_ips").withDefault<String>(Constants.ip6probes.joinToString(","))

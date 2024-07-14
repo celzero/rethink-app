@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import android.util.Log
+import com.celzero.bravedns.database.ConsoleLog
+import com.celzero.bravedns.database.ConsoleLogRepository
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.service.VpnController
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -43,7 +43,7 @@ object Logger : KoinComponent {
     const val LOG_QR_CODE = "QrCodeFromFileScanner"
     const val LOG_GO_LOGGER = "LibLogger"
 
-    // github.com/celzero/firestack/blob/bce8de917fec5e48a41ed1e96c9d942ee0f7996b/intra/log/logger.go#L76
+    // github.com/celzero/firestack/blob/bce8de917f/intra/log/logger.go#L76
     enum class LoggerType(val id: Long) {
         VERY_VERBOSE(0),
         VERBOSE(1),
@@ -111,30 +111,6 @@ object Logger : KoinComponent {
 
     fun crash(tag: String, message: String, e: Exception? = null) {
         log(tag, message, LoggerType.ERROR, e)
-        if (Utilities.isPlayStoreFlavour()) {
-            try {
-                val crashlytics = FirebaseCrashlytics.getInstance()
-                crashlytics.log("$tag: $message")
-                if (e != null) crashlytics.recordException(e)
-                else crashlytics.recordException(Exception(message))
-                // send the unsent reports, if any as the crash is important to be reported.
-                crashlytics.sendUnsentReports()
-            } catch (ex: Exception) {
-                Log.e(LOG_TAG_APP_UPDATE, "Error in logging to crashlytics: ${ex.message}")
-            }
-        }
-    }
-
-    fun enableCrashlytics() {
-        if (Utilities.isPlayStoreFlavour()) {
-            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
-        }
-    }
-
-    fun disableCrashlytics() {
-        if (Utilities.isPlayStoreFlavour()) {
-            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(false)
-        }
     }
 
     fun updateConfigLevel(level: Long) {
@@ -170,24 +146,42 @@ object Logger : KoinComponent {
     }
 
     private fun dbWrite(tag: String, msg: String, type: LoggerType, e: Exception? = null) {
-        if (type.id >= logLevel) {
-            // get the first letter of the level and append it to the tag
-            val l = when (type) {
-                LoggerType.VERBOSE -> "V"
-                LoggerType.DEBUG -> "D"
-                LoggerType.INFO -> "I"
-                LoggerType.WARN -> "W"
-                LoggerType.ERROR -> "E"
-                LoggerType.STACKTRACE -> "E"
-                else -> "V"
-            }
-            val log = if (tag.isEmpty()) {
-                ConsoleLog(0, msg, System.currentTimeMillis())
+        // write to the database only if console log is set to true
+        if (!persistentState.consoleLogEnabled) return
+
+        try {
+            // cannot check for log levels when tag is empty; tag is empty for logs coming from go
+            if (tag.isEmpty()) {
+                val log = ConsoleLog(0, msg, System.currentTimeMillis())
+                VpnController.writeConsoleLog(log)
+                // TODO: use send instead of trySend
+                //inMemDb.logChannel.trySend(log)
+            } else if (type.id >= logLevel) {
+                val l = when (type) {
+                    LoggerType.VERBOSE -> "V"
+                    LoggerType.DEBUG -> "D"
+                    LoggerType.INFO -> "I"
+                    LoggerType.WARN -> "W"
+                    LoggerType.ERROR -> "E"
+                    LoggerType.STACKTRACE -> "E"
+                    else -> "V"
+                }
+                val log = if (e != null) {
+                    ConsoleLog(
+                        0,
+                        "$l $tag: $msg\n${Log.getStackTraceString(e)}",
+                        System.currentTimeMillis()
+                    )
+                } else {
+                    ConsoleLog(0, "$l $tag: $msg", System.currentTimeMillis())
+                }
+                //inMemDb.logChannel.trySend(log)
+                VpnController.writeConsoleLog(log)
             } else {
-                ConsoleLog(0, "$l $tag: $msg", System.currentTimeMillis())
+                // Do nothing
             }
-            // insert the log to the database via channel
-            inMemDb.logChannel.trySend(log)
+        } catch (ex: Exception) {
+            Log.e(LOG_GO_LOGGER, "err while writing log to the database: ${ex.message}", ex)
         }
     }
 }

@@ -4,8 +4,6 @@ plugins {
     // to download blocklists for the headless variant
     id "de.undercouch.download" version "5.3.0"
     id 'kotlin-android'
-    id 'com.google.gms.google-services'
-    id 'com.google.firebase.crashlytics'
 }
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -173,7 +171,6 @@ configurations {
 }
 
 dependencies {
-    androidTestImplementation 'androidx.test:rules:1.5.0'
     def room_version = "2.6.1"
     def paging_version = "3.3.0"
 
@@ -249,11 +246,11 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:364ac37a66@aar'
-    websiteImplementation 'com.github.celzero:firestack:364ac37a66@aar'
-    fdroidImplementation 'com.github.celzero:firestack:364ac37a66@aar'
+    download 'com.github.celzero:firestack:1044953166@aar'
+    websiteImplementation 'com.github.celzero:firestack:1044953166@aar'
+    fdroidImplementation 'com.github.celzero:firestack:1044953166@aar'
     // debug symbols for crashlytics
-    playImplementation 'com.github.celzero:firestack:364ac37a66:debug@aar'
+    playImplementation 'com.github.celzero:firestack:1044953166:debug@aar'
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.9.0') {
@@ -270,8 +267,9 @@ dependencies {
     implementation 'com.github.seancfoley:ipaddress:5.4.0'
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    androidTestImplementation 'androidx.test:rules:1.6.1'
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
 
@@ -290,11 +288,6 @@ dependencies {
 
     // barcode scanner for wireguard
     fullImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
-
-    // only using firebase crashlytics experimentally for stability tracking, only in play variant
-    // not in fdroid or website
-    playImplementation 'com.google.firebase:firebase-crashlytics:19.0.1'
-    playImplementation 'com.google.firebase:firebase-crashlytics-ndk:19.0.1'
 }
 
 // github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903
