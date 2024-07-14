@@ -48,7 +48,7 @@
 \n <u>##5</u>: Bloqueia as ligações quando a aplicação de origem é desconhecida (firewall universal).
 \n<u>##6</u>: Bloqueia todo o tráfego UDP exceto DNS (firewall universal).
 \n <u>#7</u>: Bloqueia ligações quando o DNS é ignorado (firewall universal).</string>
-    <string name="whats_new_version_update">&lt;b&gt;Trabalho interno&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Novo: Registos de IP e DNS para cada aplicação com uma nova vista organizada.&lt;br/&gt; 2. Novo: Configuração para opcionalmente &lt;i&gt;excluir&lt;/i&gt; aplicativos de encaminhamento de proxy.&lt;br/&gt; 3. Novo: Ignorar aplicativos de todos os proxies.&lt;br/&gt; 3. Correção do bloqueio do DNSCrypt com &lt;i&gt;DNS Booster&lt;/i&gt; ativado.&lt;br/&gt; 4. Corrigir a tradução de IPv6 para IPv4 em certos casos.&lt;br/&gt; 3. Outras correções de bugs e melhorias.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ajude a traduzir este aplicativo&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Não entres em pânico 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Novo: Capturar erros do motor de rede nos relatórios de erros dos utilizadores.&lt;br/&gt; 2. Novo: utilizar o DNS do sistema para nomes de domínio não delegados se Prevent DNS estiver ativado.&lt;br/&gt;3. Melhoria: Conectividade WireGuard de pilha dupla (IPv4 + IPv6).&lt;br/&gt;4. Melhoria: Evitar o bloqueio dos elementos da IU quando o motor de rede não responde.&lt;br/&gt; 5. Correção: Tempo limite de ligação com a filtragem avançada de DNS ativada.&lt;br/&gt; 6. Correção: Os pontos de extremidade de pares do WireGuard com nomes de domínio ficam suspensos em alterações de rede.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ajuda a traduzir esta aplicação&lt;/a&gt;</string>
     <string name="relative_time_yesterday">Ontem</string>
     <string name="always_on_dialog_heading">Desativar VPN sempre ativa</string>
     <string name="always_on_dialog">A opção \"VPN sempre ativa\" está ativada neste dispositivo. Para iniciar Rethink, aceda às definições da VPN Android e desative a opção \"VPN sempre ativa\".</string>
@@ -1029,6 +1029,8 @@
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplicações do reencaminhador proxy de retorno</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Quando desativado, exclui aplicações de encaminhamento de proxy (SOCKS5, HTTP, DNS) do túnel VPN do Rethink.</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> pode resultar em perda de conetividade. Altere a definição para permitir que o Rethink utilize dados e outros recursos quando estiver em segundo plano.</string>
-    <string name="exclude_apps_from_proxy">Ignorar a aplicação de todos os Proxies</string>
-    <string name="exclude_apps_from_proxy_failure_toast">Ignorar a aplicação de todos os Proxies está ativado</string>
+    <string name="exclude_apps_from_proxy">Ignorar a aplicação de todos os proxies</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Esta aplicação contorna os proxies</string>
+    <string name="lbl_notification" translatable="true">notificação</string>
+    <string name="memory_notification_text">O Rethink está com pouca memória. As ações do sistema podem ser limitadas.</string>
 </resources>
