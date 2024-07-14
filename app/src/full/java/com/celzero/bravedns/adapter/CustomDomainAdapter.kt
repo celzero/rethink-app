@@ -77,8 +77,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
                     oldConnection: CustomDomain,
                     newConnection: CustomDomain
                 ): Boolean {
-                    return (oldConnection.domain == newConnection.domain &&
-                        oldConnection.status != newConnection.status)
+                    return oldConnection == newConnection
                 }
             }
     }

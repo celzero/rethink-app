@@ -39,11 +39,16 @@ class AppInfo {
     override fun equals(other: Any?): Boolean {
         if (other !is AppInfo) return false
         if (packageName != other.packageName) return false
+        if (firewallStatus != other.firewallStatus) return false
+        if (connectionStatus != other.connectionStatus) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.packageName.hashCode()
+        var result = this.packageName.hashCode()
+        result += result * 31 + this.firewallStatus
+        result += result * 31 + this.connectionStatus
+        return result
     }
 
     constructor(values: ContentValues?) {

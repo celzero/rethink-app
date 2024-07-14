@@ -72,8 +72,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                         oldConnection.status == newConnection.status
 
                 override fun areContentsTheSame(oldConnection: CustomIp, newConnection: CustomIp) =
-                    oldConnection.ipAddress == newConnection.ipAddress &&
-                        oldConnection.status != newConnection.status
+                    oldConnection == newConnection
             }
     }
 

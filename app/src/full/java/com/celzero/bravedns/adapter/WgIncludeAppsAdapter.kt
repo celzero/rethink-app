@@ -74,8 +74,7 @@ class WgIncludeAppsAdapter(
                     oldConnection: ProxyApplicationMapping,
                     newConnection: ProxyApplicationMapping
                 ): Boolean {
-                    return (oldConnection.proxyId == newConnection.proxyId &&
-                        oldConnection.uid == newConnection.uid)
+                    return oldConnection == newConnection
                 }
             }
     }

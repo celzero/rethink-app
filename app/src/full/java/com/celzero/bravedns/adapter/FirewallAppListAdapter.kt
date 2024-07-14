@@ -43,10 +43,10 @@ import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.UID_INTENT_NAM
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit
 
 class FirewallAppListAdapter(
     private val context: Context,
@@ -60,16 +60,14 @@ class FirewallAppListAdapter(
                     oldConnection: AppInfo,
                     newConnection: AppInfo
                 ): Boolean {
-                    return oldConnection == newConnection
+                    return oldConnection.packageName == newConnection.packageName
                 }
 
                 override fun areContentsTheSame(
                     oldConnection: AppInfo,
                     newConnection: AppInfo
                 ): Boolean {
-                    return (oldConnection.packageName == newConnection.packageName &&
-                        oldConnection.firewallStatus == newConnection.firewallStatus &&
-                        oldConnection.connectionStatus == newConnection.connectionStatus)
+                    return oldConnection == newConnection
                 }
             }
     }
@@ -101,9 +99,7 @@ class FirewallAppListAdapter(
                     b.firewallAppLabelTv.text = appInfo.appName
                     b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
                     displayIcon(
-                        getIcon(context, appInfo.packageName, appInfo.appName),
-                        b.firewallAppIconIv
-                    )
+                        getIcon(context, appInfo.packageName, appInfo.appName), b.firewallAppIconIv)
                     if (appInfo.packageName == context.packageName) {
                         b.firewallAppToggleWifi.visibility = View.GONE
                         b.firewallAppToggleMobileData.visibility = View.GONE
@@ -199,38 +195,32 @@ class FirewallAppListAdapter(
 
         private fun showMobileDataDisabled() {
             b.firewallAppToggleMobileData.setImageDrawable(
-                ContextCompat.getDrawable(context, R.drawable.ic_firewall_data_off)
-            )
+                ContextCompat.getDrawable(context, R.drawable.ic_firewall_data_off))
         }
 
         private fun showMobileDataEnabled() {
             b.firewallAppToggleMobileData.setImageDrawable(
-                ContextCompat.getDrawable(context, R.drawable.ic_firewall_data_on)
-            )
+                ContextCompat.getDrawable(context, R.drawable.ic_firewall_data_on))
         }
 
         private fun showWifiDisabled() {
             b.firewallAppToggleWifi.setImageDrawable(
-                ContextCompat.getDrawable(context, R.drawable.ic_firewall_wifi_off)
-            )
+                ContextCompat.getDrawable(context, R.drawable.ic_firewall_wifi_off))
         }
 
         private fun showWifiEnabled() {
             b.firewallAppToggleWifi.setImageDrawable(
-                ContextCompat.getDrawable(context, R.drawable.ic_firewall_wifi_on)
-            )
+                ContextCompat.getDrawable(context, R.drawable.ic_firewall_wifi_on))
         }
 
         private fun showMobileDataUnused() {
             b.firewallAppToggleMobileData.setImageDrawable(
-                ContextCompat.getDrawable(context, R.drawable.ic_firewall_data_on_grey)
-            )
+                ContextCompat.getDrawable(context, R.drawable.ic_firewall_data_on_grey))
         }
 
         private fun showWifiUnused() {
             b.firewallAppToggleWifi.setImageDrawable(
-                ContextCompat.getDrawable(context, R.drawable.ic_firewall_wifi_on_grey)
-            )
+                ContextCompat.getDrawable(context, R.drawable.ic_firewall_wifi_on_grey))
         }
 
         private fun showAppHint(mIconIndicator: TextView, appInfo: AppInfo) {
@@ -243,45 +233,37 @@ class FirewallAppListAdapter(
                             when (connStatus) {
                                 FirewallManager.ConnectionStatus.ALLOW -> {
                                     mIconIndicator.setBackgroundColor(
-                                        context.getColor(R.color.colorGreen_900)
-                                    )
+                                        context.getColor(R.color.colorGreen_900))
                                 }
                                 FirewallManager.ConnectionStatus.METERED -> {
                                     mIconIndicator.setBackgroundColor(
-                                        context.getColor(R.color.colorAmber_900)
-                                    )
+                                        context.getColor(R.color.colorAmber_900))
                                 }
                                 FirewallManager.ConnectionStatus.UNMETERED -> {
                                     mIconIndicator.setBackgroundColor(
-                                        context.getColor(R.color.colorAmber_900)
-                                    )
+                                        context.getColor(R.color.colorAmber_900))
                                 }
                                 FirewallManager.ConnectionStatus.BOTH -> {
                                     mIconIndicator.setBackgroundColor(
-                                        context.getColor(R.color.colorAmber_900)
-                                    )
+                                        context.getColor(R.color.colorAmber_900))
                                 }
                             }
                         }
                         FirewallManager.FirewallStatus.EXCLUDE -> {
                             mIconIndicator.setBackgroundColor(
-                                context.getColor(R.color.primaryLightColorText)
-                            )
+                                context.getColor(R.color.primaryLightColorText))
                         }
                         FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
                             mIconIndicator.setBackgroundColor(
-                                context.getColor(R.color.primaryLightColorText)
-                            )
+                                context.getColor(R.color.primaryLightColorText))
                         }
                         FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL -> {
                             mIconIndicator.setBackgroundColor(
-                                context.getColor(R.color.primaryLightColorText)
-                            )
+                                context.getColor(R.color.primaryLightColorText))
                         }
                         FirewallManager.FirewallStatus.ISOLATE -> {
                             mIconIndicator.setBackgroundColor(
-                                context.getColor(R.color.colorAmber_900)
-                            )
+                                context.getColor(R.color.colorAmber_900))
                         }
                         FirewallManager.FirewallStatus.UNTRACKED -> {
                             /* no-op */
@@ -360,29 +342,25 @@ class FirewallAppListAdapter(
                     updateFirewallStatus(
                         appInfo.uid,
                         FirewallManager.FirewallStatus.NONE,
-                        FirewallManager.ConnectionStatus.ALLOW
-                    )
+                        FirewallManager.ConnectionStatus.ALLOW)
                 }
                 FirewallManager.ConnectionStatus.UNMETERED -> {
                     updateFirewallStatus(
                         appInfo.uid,
                         FirewallManager.FirewallStatus.NONE,
-                        FirewallManager.ConnectionStatus.BOTH
-                    )
+                        FirewallManager.ConnectionStatus.BOTH)
                 }
                 FirewallManager.ConnectionStatus.BOTH -> {
                     updateFirewallStatus(
                         appInfo.uid,
                         FirewallManager.FirewallStatus.NONE,
-                        FirewallManager.ConnectionStatus.UNMETERED
-                    )
+                        FirewallManager.ConnectionStatus.UNMETERED)
                 }
                 FirewallManager.ConnectionStatus.ALLOW -> {
                     updateFirewallStatus(
                         appInfo.uid,
                         FirewallManager.FirewallStatus.NONE,
-                        FirewallManager.ConnectionStatus.METERED
-                    )
+                        FirewallManager.ConnectionStatus.METERED)
                 }
             }
         }
@@ -399,29 +377,25 @@ class FirewallAppListAdapter(
                     updateFirewallStatus(
                         appInfo.uid,
                         FirewallManager.FirewallStatus.NONE,
-                        FirewallManager.ConnectionStatus.BOTH
-                    )
+                        FirewallManager.ConnectionStatus.BOTH)
                 }
                 FirewallManager.ConnectionStatus.UNMETERED -> {
                     updateFirewallStatus(
                         appInfo.uid,
                         FirewallManager.FirewallStatus.NONE,
-                        FirewallManager.ConnectionStatus.ALLOW
-                    )
+                        FirewallManager.ConnectionStatus.ALLOW)
                 }
                 FirewallManager.ConnectionStatus.BOTH -> {
                     updateFirewallStatus(
                         appInfo.uid,
                         FirewallManager.FirewallStatus.NONE,
-                        FirewallManager.ConnectionStatus.METERED
-                    )
+                        FirewallManager.ConnectionStatus.METERED)
                 }
                 FirewallManager.ConnectionStatus.ALLOW -> {
                     updateFirewallStatus(
                         appInfo.uid,
                         FirewallManager.FirewallStatus.NONE,
-                        FirewallManager.ConnectionStatus.UNMETERED
-                    )
+                        FirewallManager.ConnectionStatus.UNMETERED)
                 }
             }
         }
@@ -444,8 +418,8 @@ class FirewallAppListAdapter(
             builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
             val count = packageList.count()
             builderSingle.setTitle(
-                context.getString(R.string.ctbs_block_other_apps, appInfo.appName, count.toString())
-            )
+                context.getString(
+                    R.string.ctbs_block_other_apps, appInfo.appName, count.toString()))
 
             val arrayAdapter =
                 ArrayAdapter<String>(context, android.R.layout.simple_list_item_activated_1)
