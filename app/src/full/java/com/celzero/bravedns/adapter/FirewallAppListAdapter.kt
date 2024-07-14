@@ -18,7 +18,9 @@ package com.celzero.bravedns.adapter
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,6 +54,10 @@ class FirewallAppListAdapter(
     private val context: Context,
     private val lifecycleOwner: LifecycleOwner
 ) : PagingDataAdapter<AppInfo, FirewallAppListAdapter.AppListViewHolder>(DIFF_CALLBACK) {
+
+    private val packageManager: PackageManager = context.packageManager
+    private val systemAppColor: Int by lazy { getColorFromAttr(R.attr.textColorAccentBad) }
+    private val userAppColor: Int by lazy { getColorFromAttr(R.attr.primaryTextColor) }
 
     companion object {
         private val DIFF_CALLBACK =
@@ -99,6 +105,17 @@ class FirewallAppListAdapter(
                 val connStatus = FirewallManager.connectionStatus(appInfo.uid)
                 uiCtx {
                     b.firewallAppLabelTv.text = appInfo.appName
+                    if (appInfo.hasInternetPermission(appInfo.packageName, packageManager)) {
+                        if (appInfo.isSystemApp) {
+                            b.firewallAppLabelTv.setTextColor(systemAppColor)
+                        } else {
+                            b.firewallAppLabelTv.setTextColor(userAppColor)
+                            b.firewallAppLabelTv.alpha = 1f
+                        }
+                    } else {
+                        b.firewallAppLabelTv.setTextColor(userAppColor)
+                        b.firewallAppLabelTv.alpha = 0.7f
+                    }
                     b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
                     displayIcon(
                         getIcon(context, appInfo.packageName, appInfo.appName),
@@ -500,5 +517,11 @@ class FirewallAppListAdapter(
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.IO) { f() }
+    }
+
+    private fun getColorFromAttr(attr: Int): Int {
+        val typedValue = TypedValue()
+        context.theme.resolveAttribute(attr, typedValue, true)
+        return ContextCompat.getColor(context, typedValue.resourceId)
     }
 }
