@@ -359,13 +359,13 @@
     <string name="settings_https_heading" translatable="true">הגדרת פרוקסי HTTP(S) CONNECT</string>
     <string name="settings_enable_logs_desc" translatable="true">אחסן יומני DNS וחומת אש מקומית על המכשיר.</string>
     <string name="settings_enable_logs" translatable="true">אפשר רישום על המכשיר של יומנים</string>
-    <string name="settings_lock_down_mode_desc" translatable="true">אפשרויות מסוימות לא זמינות כשהVPN במצב סגר <u>ראה הגדרות VPN </u>.</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">אפשרויות מסוימות לא זמינות כשהVPN במצב סגר. <u>ראה הגדרות VPN </u>.</string>
     <string name="settings_orbot_header" translatable="true">Orbot\t❯</string>
     <string name="settings_socks5_heading" translatable="true">הגדרת פרוקסי SOCKS5</string>
     <string name="orbot_status_arg_2" translatable="true">TCP</string>
     <string name="http_proxy_dialog_heading" translatable="true">קבע פרוקסי HTTP(S) CONNECT</string>
     <string name="http_proxy_dialog_desc" translatable="true">קבע כתובת בצורת &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt; לדוגמה: http://proxy.example.com:8080/</string>
-    <string name="settings_connectivity_checks_desc" translatable="true">בדיקות חיבור נשלחות כדי לבדוק גישה.</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">בדיקות חיבור נשלחות כדי לאמת גישה.</string>
     <string name="settings_allow_bypass_heading" translatable="true">אפשר היראות רשת</string>
     <string name="settings_allow_bypass_desc" translatable="true">אפשר לאפליקציות מבקשות לעקוף את חומת האש של RethinkDNS לפי דרישה. אפליקציות ועידות אודיו/וידאו מסוימות כמו Zoom ו-Meet עשויות לדרוש מעקף לפי דרישה כדי לתפקד כראוי.</string>
     <string name="settings_https_desc" translatable="true">‪העברת חיבורים לנקודת קצה של HTTP(S) CONNECT.</string>
@@ -382,4 +382,32 @@
     <string name="settings_connectivity_checks" translatable="true">בצע בדיקות חיבור</string>
     <string name="orbot_install_dialog_neutral" translatable="true">website</string>
     <string name="settings_orbot_heading" translatable="true">הגדרת Orbot</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">הפוך את ההתראה למתמדת</string>
+    <string name="settings_go_log_heading" translatable="true">רמת רישום</string>
+    <string name="settings_dns_proxy_dialog_hostname" translatable="true">שם מארח</string>
+    <string name="settings_theme_heading" translatable="true">מראה</string>
+    <string name="settings_theme_desc" translatable="true">מצב בהיר/כהה</string>
+    <string name="settings_go_log_desc" translatable="true">למטרות ניפוי באגים</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">נתב את התנועה של Rerhink עצמו, כגון הורדת רשימות חסימה, בדיקות חיבור, חיבורי DNS, חזרה למנהרה.</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">מנתב את התנועה של Rethink עצמו דרך המנהרה. כבה את זה אם אתה לא יודע מה אתה עושה.</string>
+    <string name="settings_http_proxy_desc" translatable="true">מעביר ל%1$s</string>
+    <string name="settings_http_proxy_dialog_title" translatable="true">כתובת שרת מותאם אישית</string>
+    <string name="settings_http_proxy_toast_success" translatable="true">פרוקסי HTTP קבועה</string>
+    <string name="settings_rinr_heading" translatable="true">לולאה חוזרת (ניסיוני)</string>
+    <string name="settings_rinr_dialog_title" translatable="true">לולאה חוזרת (ניסיוני)</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">גם מאפשר <!--settings_network_all_networks-->%1$s. האם אתה רוצה להמשיך?</string>
+    <string name="settings_dns_proxy_dialog_port_number" translatable="true">מספר פִּתְחָה</string>
+    <string name="settings_http_proxy_error_text2" translatable="true">פִּתְחָה לא תקפה</string>
+    <string name="settings_http_proxy_error_text3" translatable="true">שם המארח ריק</string>
+    <string name="settings_http_proxy_error_text4" translatable="true">חיבור למארח נכשל. נסה שוב.</string>
+    <string name="settings_dns_proxy_dialog_header" translatable="true">קביעת פרוקסי SOCKS5</string>
+    <string name="settings_dns_proxy_dialog_app" translatable="true">אפליקציה</string>
+    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">קבע</string>
+    <string name="settings_http_proxy_error_text1" translatable="true">טווח פִּתחות אמור להיות מ1024 ל65535</string>
+    <string name="settings_socks5_dialog_hint_port" translatable="true">פִּתְחָה</string>
+    <string name="settings_app_list_default_app" translatable="true">כלום</string>
+    <string name="settings_socks_forwarding_desc" translatable="true">מעביר ל%1$s%2$s%3$s</string>
+    <string name="settings_socks_forwarding_desc_no_app" translatable="true">מעביר ל%1$s%2$s</string>
+    <string name="settings_socks_forwarding_default_desc" translatable="true">העברת חיבורים לנקודת קצה של SOCKS5.</string>
+    <string name="settings_socks5_dialog_hint_ip" translatable="true">כתובת IP</string>
 </resources>
