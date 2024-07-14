@@ -100,17 +100,18 @@
     <string name="lbl_ip" translatable="false">IP</string>
     <string name="lbl_unselected" translatable="true">Unselected</string>
     <string name="lbl_notification" translatable="true">notification</string>
-    <string name="lbl_twitter" translatable="false">X</string>
     <string name="lbl_mastodon" translatable="false">Mastodon</string>
     <string name="lbl_matrix" translatable="false">Matrix</string>
     <string name="lbl_reddit" translatable="false">Reddit</string>
     <string name="lbl_test" translatable="true">test</string>
+
 
     <string name="memory_notification_text">Rethink is experiencing low memory. System actions may be limited.</string>
 
     <string name="symbol_upload" translatable="false">%1$s 🔺</string>
     <string name="symbol_download" translatable="false">%1$s 🔻</string>
     <string name="single_argument" translatable="false">%1$s</string>
+    <string name="single_argument_parenthesis" translatable="false">(%1$s)</string>
     <string name="two_argument_space" translatable="false">%1$s %2$s</string>
     <string name="two_argument_colon" translatable="false">%1$s: %2$s</string>
     <string name="two_argument" translatable="false">%1$s / %2$s</string>
@@ -130,6 +131,8 @@
     <string name="symbol_black_up" translatable="false">\u25b4</string>
     <string name="symbol_lockdown" translatable="false">🔒</string>
     <string name="symbol_lightening" translatable="false">⚡</string>
+    <string name="symbol_kbs" translatable="false">KB/S</string>
+    <string name="symbol_mb" translatable="false">MB</string>
 
     <string name="numeric_one" translatable="false">1</string>
     <string name="numeric_twenty_four" translatable="false">24</string>
@@ -633,9 +636,6 @@
 
     <string name="pcap_failure_toast" translatable="true">Error creating pcap file, Try again!</string>
 
-    <string name="settings_crashlytics_title" translatable="true">Stablility improvement program</string>
-    <string name="settings_crashlytics_desc" translatable="true">When app encounters an error, error logs are obtained and analysed to produce a solution.</string>
-
     <string name="settings_probe_ips">Custom Probe IPs</string>
     <string name="settings_probe_ips_desc">Add custom IPs to probe for network connectivity.</string>
 
@@ -790,14 +790,14 @@
     <string name="about_docs_link" translatable="false">https://docs.rethinkdns.com/</string>
     <string name="about_faq_link" translatable="false">https://www.rethinkdns.com/faq</string>
     <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
-    <string name="about_twitter_handle" translatable="false">https://twitter.com/rethinkdns</string>
+    <string name="about_twitter_handle" translatable="false">https://x.com/rethinkdns</string>
     <string name="about_website_link" translatable="false">https://www.rethinkdns.com/</string>
     <string name="about_mozilla_alumni_link" translatable="false">https://builders.mozilla.community/old/alumni.html</string>
     <string name="about_foss_link" translatable="false">https://fossunited.org/grants</string>
     <string name="about_osom_link" translatable="false">https://www.osomprivacy.com</string>
     <string name="about_translate_link" translatable="false">https://svc.rethinkdns.com/r/translate</string>
     <string name="about_privacy_policy_link" translatable="false">https://www.rethinkdns.com/privacy</string>
-    <string name="about_mastodom_handle" translatable="false">https://joinmastodom.social</string>
+    <string name="about_mastodom_handle" translatable="false">https://mastodon.social/@rdns</string>
     <string name="about_reddit_handle" translatable="false">https://www.reddit.com/r/rethinkdns</string>
     <string name="about_matrix_handle" translatable="false">https://matrix.to/#/!jrTSpJiEkFNNBMhSaE:matrix.org</string>
     <string name="about_version" translatable="false">%1$s</string> <!-- remove this string name="about_version" translatable="false">v%1$s</string> -->
@@ -1556,8 +1556,8 @@
     <string name="crypt_relay_singapore" translatable="true">Anonymized DNS relay hosted in Singapore.</string>
 
     <!-- console logs -->
-    <string name="console_log_title" translatable="true">Application Log</string>
-    <string name="console_log_desc" translatable="true">The below logs contains your sensitive information. Please do not share it to any public platform.</string>
+    <string name="console_log_title" translatable="true">App Log</string>
+    <string name="console_log_desc" translatable="true">Logs may contain sensitive information.</string>
 
     <!-- alert, commenting out for now in v055b -->
 
