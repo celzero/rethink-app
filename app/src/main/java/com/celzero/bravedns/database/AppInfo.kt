@@ -98,7 +98,7 @@ class AppInfo {
         this.backgroundAllowed = backgroundAllowed
     }
 
-    fun hasInternetPermission(packageName: String, packageManager: PackageManager): Boolean {
+    fun hasInternetPermission(packageManager: PackageManager): Boolean {
         // INTERNET permission if defined, can not be denied so this is safe to use
         return packageManager.checkPermission(Manifest.permission.INTERNET, packageName) == PackageManager.PERMISSION_GRANTED
     }

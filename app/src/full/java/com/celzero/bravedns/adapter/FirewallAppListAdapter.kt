@@ -42,6 +42,7 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.UID_INTENT_NAME
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -56,8 +57,8 @@ class FirewallAppListAdapter(
 ) : PagingDataAdapter<AppInfo, FirewallAppListAdapter.AppListViewHolder>(DIFF_CALLBACK) {
 
     private val packageManager: PackageManager = context.packageManager
-    private val systemAppColor: Int by lazy { getColorFromAttr(R.attr.textColorAccentBad) }
-    private val userAppColor: Int by lazy { getColorFromAttr(R.attr.primaryTextColor) }
+    private val systemAppColor: Int by lazy { UIUtils.fetchColor(context, R.attr.textColorAccentBad) }
+    private val userAppColor: Int by lazy { UIUtils.fetchColor(context, R.attr.primaryTextColor) }
 
     companion object {
         private val DIFF_CALLBACK =
@@ -105,7 +106,7 @@ class FirewallAppListAdapter(
                 val connStatus = FirewallManager.connectionStatus(appInfo.uid)
                 uiCtx {
                     b.firewallAppLabelTv.text = appInfo.appName
-                    if (appInfo.hasInternetPermission(appInfo.packageName, packageManager)) {
+                    if (appInfo.hasInternetPermission(packageManager)) {
                         if (appInfo.isSystemApp) {
                             b.firewallAppLabelTv.setTextColor(systemAppColor)
                         } else {
@@ -114,7 +115,7 @@ class FirewallAppListAdapter(
                         }
                     } else {
                         b.firewallAppLabelTv.setTextColor(userAppColor)
-                        b.firewallAppLabelTv.alpha = 0.7f
+                        b.firewallAppLabelTv.alpha = 0.6f
                     }
                     b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
                     displayIcon(
@@ -517,11 +518,5 @@ class FirewallAppListAdapter(
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.IO) { f() }
-    }
-
-    private fun getColorFromAttr(attr: Int): Int {
-        val typedValue = TypedValue()
-        context.theme.resolveAttribute(attr, typedValue, true)
-        return ContextCompat.getColor(context, typedValue.resourceId)
     }
 }
