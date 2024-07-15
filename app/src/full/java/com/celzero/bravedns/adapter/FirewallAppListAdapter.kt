@@ -106,15 +106,14 @@ class FirewallAppListAdapter(
                 val connStatus = FirewallManager.connectionStatus(appInfo.uid)
                 uiCtx {
                     b.firewallAppLabelTv.text = appInfo.appName
-                    if (appInfo.hasInternetPermission(packageManager)) {
-                        if (appInfo.isSystemApp) {
-                            b.firewallAppLabelTv.setTextColor(systemAppColor)
-                        } else {
-                            b.firewallAppLabelTv.setTextColor(userAppColor)
-                            b.firewallAppLabelTv.alpha = 1f
-                        }
+                    if (appInfo.isSystemApp) {
+                        b.firewallAppLabelTv.setTextColor(systemAppColor)
                     } else {
                         b.firewallAppLabelTv.setTextColor(userAppColor)
+                    }
+                    if (appInfo.hasInternetPermission(packageManager)) {
+                        b.firewallAppLabelTv.alpha = 1f
+                    } else {
                         b.firewallAppLabelTv.alpha = 0.6f
                     }
                     b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
