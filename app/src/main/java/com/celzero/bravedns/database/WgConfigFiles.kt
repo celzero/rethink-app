@@ -46,11 +46,18 @@ class WgConfigFiles {
     override fun equals(other: Any?): Boolean {
         if (other !is WgConfigFiles) return false
         if (id != other.id) return false
+        if (name != other.name) return false
+        if (isActive != other.isActive) return false
+        if (isCatchAll != other.isCatchAll) return false
+        if (oneWireGuard != other.oneWireGuard) return false
+        if (isLockdown != other.isLockdown) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.id.hashCode()
+        var result = this.id.hashCode()
+        result += result * 31 + this.name.hashCode()
+        return result
     }
 
     @Ignore

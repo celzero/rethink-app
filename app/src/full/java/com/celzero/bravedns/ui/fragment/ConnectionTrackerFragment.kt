@@ -63,6 +63,7 @@ class ConnectionTrackerFragment :
 
     companion object {
         const val PROTOCOL_FILTER_PREFIX = "P:"
+        private const val QUERY_TEXT_TIMEOUT: Long = 600
 
         fun newInstance(param: String): ConnectionTrackerFragment {
             val args = Bundle()
@@ -105,6 +106,7 @@ class ConnectionTrackerFragment :
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
+        recyclerAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.connectionTrackerList.observe(viewLifecycleOwner) { it ->
@@ -266,7 +268,7 @@ class ConnectionTrackerFragment :
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(500, lifecycleScope) {
+        Utilities.delay(QUERY_TEXT_TIMEOUT, lifecycleScope) {
             if (this.isAdded) {
                 this.filterQuery = query
                 viewModel.setFilter(query, filterCategories, filterType)

@@ -69,7 +69,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 override fun areContentsTheSame(
                     oldConnection: ConnectionTracker,
                     newConnection: ConnectionTracker
-                ) = oldConnection.id == newConnection.id
+                ) = oldConnection == newConnection
             }
 
         private const val MAX_BYTES = 500000 // 500 KB

@@ -66,18 +66,14 @@ class WgConfigAdapter(private val context: Context) :
                     oldConnection: WgConfigFiles,
                     newConnection: WgConfigFiles
                 ): Boolean {
-                    return (oldConnection == newConnection)
+                    return oldConnection == newConnection
                 }
 
                 override fun areContentsTheSame(
                     oldConnection: WgConfigFiles,
                     newConnection: WgConfigFiles
                 ): Boolean {
-                    return (oldConnection.id == newConnection.id &&
-                        oldConnection.name == newConnection.name &&
-                        oldConnection.isActive == newConnection.isActive &&
-                        oldConnection.isCatchAll == newConnection.isCatchAll &&
-                        oldConnection.isLockdown == newConnection.isLockdown)
+                    return oldConnection == newConnection
                 }
             }
     }

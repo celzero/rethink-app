@@ -73,17 +73,14 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                     oldConnection: WgConfigFiles,
                     newConnection: WgConfigFiles
                 ): Boolean {
-                    return (oldConnection == newConnection)
+                    return oldConnection == newConnection
                 }
 
                 override fun areContentsTheSame(
                     oldConnection: WgConfigFiles,
                     newConnection: WgConfigFiles
                 ): Boolean {
-                    return (oldConnection.id == newConnection.id &&
-                        oldConnection.name == newConnection.name &&
-                        oldConnection.isActive == newConnection.isActive &&
-                        oldConnection.oneWireGuard == newConnection.oneWireGuard)
+                    return oldConnection == newConnection
                 }
             }
     }
