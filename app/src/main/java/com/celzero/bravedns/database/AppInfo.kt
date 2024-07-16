@@ -15,7 +15,9 @@
  */
 package com.celzero.bravedns.database
 
+import android.Manifest
 import android.content.ContentValues
+import android.content.pm.PackageManager
 import androidx.room.Entity
 import com.celzero.bravedns.service.FirewallManager
 
@@ -94,5 +96,10 @@ class AppInfo {
         this.isProxyExcluded = isProxyExcluded
         this.screenOffAllowed = screenOffAllowed
         this.backgroundAllowed = backgroundAllowed
+    }
+
+    fun hasInternetPermission(packageManager: PackageManager): Boolean {
+        // INTERNET permission if defined, can not be denied so this is safe to use
+        return packageManager.checkPermission(Manifest.permission.INTERNET, packageName) == PackageManager.PERMISSION_GRANTED
     }
 }
