@@ -85,7 +85,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         fun isDefault() = this == DEFAULT
 
         companion object {
-            fun fromInt(value: Int) = entries.first { it.value == value }
+            fun fromInt(value: Int) = entries.firstOrNull { it.value == value } ?: DEFAULT
         }
     }
 

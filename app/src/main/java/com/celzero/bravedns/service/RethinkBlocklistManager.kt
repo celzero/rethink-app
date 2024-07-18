@@ -182,7 +182,7 @@ object RethinkBlocklistManager : KoinComponent {
                         key.pack,
                         key.level,
                         packsBlocklistMapping.get(key).toList(),
-                        dbFileTagLocal.first { it.pack?.contains(key.pack) == true }.group
+                        dbFileTagLocal.firstOrNull { it.pack?.contains(key.pack) == true }?.group ?: ""
                     )
                 }
             )
@@ -266,7 +266,7 @@ object RethinkBlocklistManager : KoinComponent {
                         key.pack,
                         key.level,
                         packsBlocklistMapping.get(key).toList(),
-                        dbFileTagRemote.first { it.pack?.contains(key.pack) == true }.group
+                        dbFileTagRemote.firstOrNull { it.pack?.contains(key.pack) == true }?.group ?: ""
                     )
                 }
             )
