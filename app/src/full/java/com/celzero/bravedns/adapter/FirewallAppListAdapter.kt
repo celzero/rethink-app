@@ -57,8 +57,8 @@ class FirewallAppListAdapter(
 ) : PagingDataAdapter<AppInfo, FirewallAppListAdapter.AppListViewHolder>(DIFF_CALLBACK) {
 
     private val packageManager: PackageManager = context.packageManager
-    private val systemAppColor: Int by lazy { UIUtils.fetchColor(context, R.attr.textColorAccentBad) }
-    private val userAppColor: Int by lazy { UIUtils.fetchColor(context, R.attr.primaryTextColor) }
+    // private val systemAppColor: Int by lazy { UIUtils.fetchColor(context, R.attr.textColorAccentBad) }
+    // private val userAppColor: Int by lazy { UIUtils.fetchColor(context, R.attr.primaryTextColor) }
 
     companion object {
         private val DIFF_CALLBACK =
@@ -104,11 +104,15 @@ class FirewallAppListAdapter(
                 val connStatus = FirewallManager.connectionStatus(appInfo.uid)
                 uiCtx {
                     b.firewallAppLabelTv.text = appInfo.appName
-                    if (appInfo.isSystemApp) {
+                    // setting the appname with different color for system and user apps
+                    // causes conflict with the firewall status like blocked and isolated
+                    // so removing the color change for now
+                    /* if (appInfo.isSystemApp) {
                         b.firewallAppLabelTv.setTextColor(systemAppColor)
                     } else {
                         b.firewallAppLabelTv.setTextColor(userAppColor)
-                    }
+                    } */
+                    // set the alpha based on internet permission
                     if (appInfo.hasInternetPermission(packageManager)) {
                         b.firewallAppLabelTv.alpha = 1f
                     } else {
