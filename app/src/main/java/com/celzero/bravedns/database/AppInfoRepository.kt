@@ -86,23 +86,23 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.deleteByUid(uid)
     }
 
-    fun getDataUsageByUid(uid: Int): DataUsage {
+    suspend fun getDataUsageByUid(uid: Int): DataUsage {
         return appInfoDAO.getDataUsageByUid(uid)
     }
 
-    fun updateDataUsageByUid(uid: Int, uploadBytes: Long, downloadBytes: Long) {
+    suspend fun updateDataUsageByUid(uid: Int, uploadBytes: Long, downloadBytes: Long) {
         appInfoDAO.updateDataUsageByUid(uid, uploadBytes, downloadBytes)
     }
 
-    fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
+    suspend fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         appInfoDAO.updateProxyExcluded(uid, isProxyExcluded)
     }
 
-    fun resetRethinkAppFirewallMode() {
+    suspend fun resetRethinkAppFirewallMode() {
         appInfoDAO.resetRethinkAppFirewallMode()
     }
 
-    fun getAppInfoUidForPackageName(packageName: String): Int {
+    suspend fun getAppInfoUidForPackageName(packageName: String): Int {
         return appInfoDAO.getAppInfoUidForPackageName(packageName)
     }
 }
