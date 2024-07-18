@@ -396,7 +396,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // to SystemClock.elapsedRealtime
         persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
         // set the rethink app in firewall mode as allowed by default
-        appInfoDb.resetRethinkAppFirewallMode()
+        io { appInfoDb.resetRethinkAppFirewallMode() }
     }
 
     // fixme: find a cleaner way to implement this, move this to some other place
