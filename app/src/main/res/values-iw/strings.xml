@@ -286,7 +286,7 @@
     <string name="lbl_overall" translatable="true">כללי</string>
     <string name="lbl_stopped" translatable="true">נעצר</string>
     <string name="lbl_private" translatable="true">פרטי</string>
-    <string name="lbl_listen_port" translatable="true">פתח האזנה</string>
+    <string name="lbl_listen_port" translatable="true">פִּתחת האזנה</string>
     <string name="lbl_preshared_key" translatable="true">מפתח משותף</string>
     <string name="lbl_cache" translatable="true">מטמון</string>
     <string name="lbl_idle" translatable="true">במנוחה</string>
@@ -296,7 +296,7 @@
     <string name="lbl_unselected" translatable="true">לא נבחר</string>
     <string name="lbl_on_device" translatable="true">on-device</string>
     <string name="lbl_secure" translatable="true">מאובטח</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">שירות הנגישות של RethinkDNS נעצר או קרס. &lt;i&gt;&lt;b&gt;עבור להגדרות כפה עצירה&lt;/i&gt;&lt;/b&gt; על Rethink והפעל אותו מחדש כדי להשתמש בתכונת &lt;i&gt;חסום כל אפליקציה שאינה בשימוש&lt;/i&gt;.
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">שירות הנגישות של Rethink נעצר או קרס. <i><b>עבור להגדרות, כפה עצירה</b></i> על Rethink והפעל אותו מחדש כדי להשתמש בתכונת <i>חסום כל אפליקציה שאינה בשימוש</i>.
 \n
 \nRethink משתמש בשירות נגישות כדי לעקוב אחר אילו אפליקציות נמצאות בשימוש (בחזית) לעומת אלו שאינן בשימוש (ברקע).</string>
     <string name="lbl_split" translatable="true">פיצול</string>
@@ -337,11 +337,11 @@
     <string name="dns_crypt_url_remove_dialog_message" translatable="true">מחק את פותר ה-DNSCrypt מהתצורה השמורה.</string>
     <string name="dns_crypt_url_remove_success" translatable="true">פותר DNSCrypt נמחק.</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">למחוק את הודעת ה-DNSCrypt מתוך תצורה השמורה.</string>
-    <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt Relay נמחק.</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">ממסר DNSCrypt נמחק.</string>
     <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast -->סנכרון רשימת האפליקציות הושלם.</string>
     <string name="show_logs_disabled_dns_message" translatable="true">רישום בקשות DNS הושבת. כדי להפעיל מחדש, עבור אל <i>הגדרות</i> והפעל את <i>אפשר רישום במכשיר.</i></string>
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
-    <string name="configure_dns_connected_dns_proxy_status" translatable="true">DNS Proxy</string>
+    <string name="configure_dns_connected_dns_proxy_status" translatable="true">פרוקסי DNS</string>
     <string name="configure_dns_connection_name" translatable="true">מחובר ל-%1$s</string>
     <string name="configure_dns_connected_doh_status" translatable="true">DNS מעל HTTPS</string>
     <string name="dns_crypt_relay_remove_dialog_title" translatable="true">האם למחוק את DNSCrypt?</string>
@@ -410,4 +410,8 @@
     <string name="settings_socks_forwarding_desc_no_app" translatable="true">מעביר ל%1$s%2$s</string>
     <string name="settings_socks_forwarding_default_desc" translatable="true">העברת חיבורים לנקודת קצה של SOCKS5.</string>
     <string name="settings_socks5_dialog_hint_ip" translatable="true">כתובת IP</string>
+    <string name="settings_ptrans_heading" translatable="true">כפה יציאת IPv4</string>
+    <string name="settings_allow_lan_desc" translatable="true">אל תכלול LAN, loopback, קישורים מקומיים במנהרת ה-VPN של Rethink.</string>
+    <string name="whats_new_version_update" translatable="true">&lt;b&gt;טעון במיוחד!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;תכונה חדשה&lt;/i&gt;: סינון DNS מתקדם; החל את כללי הדומיין רק כאשר יישומים מתחברים.&lt;br/&gt; 2. &lt;i&gt;תכונה חדשה&lt;/i&gt;: אפשר או דחה דומיינים לכל אפליקציה.&lt;br/&gt; 3. &lt;i&gt;תכונה חדשה&lt;/i&gt;: אפשר או דחה דומיינים עבור כל היישומים.&lt;br/&gt; 4. &lt;i&gt;תכונה חדשה&lt;/i&gt;: עקיפת כללי DNS וחומת אש לכל אפליקציה.&lt;br/&gt; 5. &lt;i&gt;תכונה חדשה&lt;/i&gt;: לכידת מנות (PCAP ).&lt;br/&gt; 6. &lt;i&gt;תכונה חדשה&lt;/i&gt;: מגבר DNS; התאחדו בקשות, תגובות מטמון.&lt;br/&gt; 7. &lt;i&gt;תכונה חדשה&lt;/i&gt;: עריכת כללי דומיין ו-IP.&lt;br/&gt; 8. ושינויים קלים אחרים בממשק המשתמש ותיקוני באגים.&lt;br/&gt;&lt;br/ &gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;עזור לתרגם את האפליקציה הזו&lt;/a&gt;</string>
+    <string name="settings_ptrans_desc" translatable="true">תרגם תעבורת IPv6 יוצאת ל-IPv4 במכשיר. הפעל אם אתה מחובר לרשת IPv4 בלבד.</string>
 </resources>
