@@ -521,6 +521,15 @@ class WgConfigAdapter(private val context: Context) :
         }
 
         private fun launchConfigDetail(id: Int) {
+            if (!VpnController.hasTunnel()) {
+                Utilities.showToastUiCentered(
+                    context,
+                    context.getString(R.string.ssv_toast_start_rethink),
+                    Toast.LENGTH_SHORT
+                )
+                return
+            }
+
             val intent = Intent(context, WgConfigDetailActivity::class.java)
             intent.putExtra(INTENT_EXTRA_WG_ID, id)
             intent.putExtra(
