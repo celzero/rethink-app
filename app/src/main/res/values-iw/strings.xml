@@ -550,4 +550,5 @@
     <string name="settings_pcap_dialog_option_2" translatable="true">הוצא פלט ל-Logcat</string>
     <string name="hs_biometeric_title" translatable="true">בטל את הנעילה של Rethink</string>
     <string name="lbl_battery_optimization" translatable="true">מיטוב סוללה</string>
+    <string name="about_website" translatable="true">בקר בrethinkdns.com</string>
 </resources>
