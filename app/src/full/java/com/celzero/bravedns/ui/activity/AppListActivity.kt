@@ -20,8 +20,6 @@ import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.Animation
@@ -118,14 +116,18 @@ class AppListActivity :
         ALL(0),
         ALLOWED(1),
         BLOCKED(2),
-        BYPASS(3),
-        EXCLUDED(4),
-        LOCKDOWN(5);
+        BLOCKED_WIFI(3),
+        BLOCKED_MOBILE_DATA(4),
+        BYPASS(5),
+        EXCLUDED(6),
+        LOCKDOWN(7);
 
         fun getFilter(): Set<Int> {
             return when (this) {
                 ALL -> setOf(0, 1, 2, 3, 4, 5, 7)
                 ALLOWED -> setOf(5)
+                BLOCKED_WIFI -> setOf(5)
+                BLOCKED_MOBILE_DATA -> setOf(5)
                 BLOCKED -> setOf(5)
                 BYPASS -> setOf(2, 7)
                 EXCLUDED -> setOf(3)
@@ -137,7 +139,9 @@ class AppListActivity :
             return when (this) {
                 ALL -> setOf(0, 1, 2, 3)
                 ALLOWED -> setOf(3)
-                BLOCKED -> setOf(0, 1, 2)
+                BLOCKED_WIFI -> setOf(1)
+                BLOCKED_MOBILE_DATA -> setOf(2)
+                BLOCKED -> setOf(0)
                 BYPASS -> setOf(0, 1, 2, 3)
                 EXCLUDED -> setOf(0, 1, 2, 3)
                 LOCKDOWN -> setOf(0, 1, 2, 3)
@@ -148,6 +152,8 @@ class AppListActivity :
             return when (this) {
                 ALL -> context.getString(R.string.lbl_all)
                 ALLOWED -> context.getString(R.string.lbl_allowed)
+                BLOCKED_WIFI -> context.getString(R.string.two_argument_colon, context.getString(R.string.lbl_blocked), context.getString(R.string.firewall_rule_block_unmetered))
+                BLOCKED_MOBILE_DATA -> context.getString(R.string.two_argument_colon, context.getString(R.string.lbl_blocked), context.getString(R.string.firewall_rule_block_metered))
                 BLOCKED -> context.getString(R.string.lbl_blocked)
                 BYPASS -> context.getString(R.string.fapps_firewall_filter_bypass_universal)
                 EXCLUDED -> context.getString(R.string.fapps_firewall_filter_excluded)
@@ -160,6 +166,8 @@ class AppListActivity :
                 return when (id) {
                     ALL.id -> ALL
                     ALLOWED.id -> ALLOWED
+                    BLOCKED_WIFI.id -> BLOCKED_WIFI
+                    BLOCKED_MOBILE_DATA.id -> BLOCKED_MOBILE_DATA
                     BLOCKED.id -> BLOCKED
                     BYPASS.id -> BYPASS
                     EXCLUDED.id -> EXCLUDED
@@ -491,6 +499,21 @@ class AppListActivity :
             makeFirewallChip(FirewallFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
         val blocked =
             makeFirewallChip(FirewallFilter.BLOCKED.id, getString(R.string.lbl_blocked), false)
+        val blockedWifiTxt = getString(
+            R.string.two_argument_colon,
+            getString(R.string.lbl_blocked),
+            getString(R.string.firewall_rule_block_unmetered)
+        )
+        val blockedWifi =
+            makeFirewallChip(FirewallFilter.BLOCKED_WIFI.id, blockedWifiTxt, false)
+        val blockedMobileDataTxt = getString(
+            R.string.two_argument_colon,
+            getString(R.string.lbl_blocked),
+            getString(R.string.firewall_rule_block_metered)
+        )
+        val blockedMobileData =
+            makeFirewallChip(FirewallFilter.BLOCKED_MOBILE_DATA.id, blockedMobileDataTxt, false)
+
         val bypassUniversal =
             makeFirewallChip(
                 FirewallFilter.BYPASS.id,
@@ -510,6 +533,8 @@ class AppListActivity :
         b.ffaFirewallChipGroup.addView(none)
         b.ffaFirewallChipGroup.addView(allowed)
         b.ffaFirewallChipGroup.addView(blocked)
+        b.ffaFirewallChipGroup.addView(blockedWifi)
+        b.ffaFirewallChipGroup.addView(blockedMobileData)
         b.ffaFirewallChipGroup.addView(bypassUniversal)
         b.ffaFirewallChipGroup.addView(excluded)
         b.ffaFirewallChipGroup.addView(lockdown)
