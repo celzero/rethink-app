@@ -26,6 +26,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.view.isVisible
@@ -63,6 +64,9 @@ import kotlinx.coroutines.withContext
 class CustomIpAdapter(private val context: Context, private val type: CustomRulesActivity.RULES) :
     PagingDataAdapter<CustomIp, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
 
+    private val selectedItems = mutableSetOf<CustomIp>()
+    private var isSelectionMode = false
+
     companion object {
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<CustomIp>() {
@@ -97,9 +101,11 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val customIp: CustomIp = getItem(position) ?: return
+
         when (holder) {
             is CustomIpAdapter.CustomIpsViewHolderWithHeader -> {
                 holder.update(customIp)
+
             }
             is CustomIpAdapter.CustomIpsViewHolderWithoutHeader -> {
                 holder.update(customIp)
@@ -124,6 +130,14 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         } else {
             R.layout.list_item_custom_ip
         }
+    }
+
+    fun getSelectedItems(): List<CustomIp> = selectedItems.toList()
+
+    fun clearSelection() {
+        selectedItems.clear()
+        isSelectionMode = false
+        notifyDataSetChanged()
     }
 
     private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
@@ -234,6 +248,10 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         private lateinit var customIp: CustomIp
 
         fun update(ci: CustomIp) {
+            customIp = ci
+
+            b.customIpCheckbox.isChecked = selectedItems.contains(customIp)
+            b.customIpCheckbox.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
             io {
                 val appNames = FirewallManager.getAppNamesByUid(ci.uid)
                 val appName = getAppName(ci.uid, appNames)
@@ -251,7 +269,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                 }
             }
 
-            customIp = ci
+
             b.customIpLabelTv.text =
                 context.getString(
                     R.string.ci_ip_label,
@@ -278,9 +296,32 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
 
             b.customIpExpandIcon.setOnClickListener { toggleActionsUi() }
 
-            b.customIpContainer.setOnClickListener { toggleActionsUi() }
+            b.customIpContainer.setOnClickListener {
+                if (isSelectionMode) {
+                    toggleSelection(customIp)
+                } else {
+                    toggleActionsUi()
+                }
+            }
 
             b.customIpSeeMoreChip.setOnClickListener { openAppWiseRulesActivity(customIp.uid) }
+
+            b.customIpContainer.setOnLongClickListener {
+                isSelectionMode = true
+                selectedItems.add(customIp)
+                notifyDataSetChanged()
+                true
+            }
+        }
+
+        private fun toggleSelection(item: CustomIp) {
+            if (selectedItems.contains(item)) {
+                selectedItems.remove(item)
+                b.customIpCheckbox.isChecked = false
+            } else {
+                selectedItems.add(item)
+                b.customIpCheckbox.isChecked = true
+            }
         }
 
         private fun openAppWiseRulesActivity(uid: Int) {
@@ -514,6 +555,9 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
 
         fun update(ci: CustomIp) {
             customIp = ci
+            b.customIpCheckbox.isChecked = selectedItems.contains(customIp)
+            b.customIpCheckbox.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
+
             b.customIpLabelTv.text =
                 context.getString(
                     R.string.ci_ip_label,
@@ -540,7 +584,30 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
 
             b.customIpExpandIcon.setOnClickListener { toggleActionsUi() }
 
-            b.customIpContainer.setOnClickListener { toggleActionsUi() }
+            b.customIpContainer.setOnClickListener {
+                if (isSelectionMode) {
+                    toggleSelection(customIp)
+                } else {
+                    toggleActionsUi()
+                }
+            }
+
+            b.customIpContainer.setOnLongClickListener {
+                isSelectionMode = true
+                selectedItems.add(customIp)
+                notifyDataSetChanged()
+                true
+            }
+        }
+
+        private fun toggleSelection(item: CustomIp) {
+            if (selectedItems.contains(item)) {
+                selectedItems.remove(item)
+                b.customIpCheckbox.isChecked = false
+            } else {
+                selectedItems.add(item)
+                b.customIpCheckbox.isChecked = true
+            }
         }
 
         private fun showBypassUi(uid: Int) {

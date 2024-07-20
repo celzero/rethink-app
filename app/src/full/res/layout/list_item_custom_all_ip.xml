@@ -62,14 +62,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/custom_ip_app_name_container"
-        android:layout_margin="5dp"
         android:padding="5dp">
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/custom_ip_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:visibility="gone" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/custom_ip_flag"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_alignParentStart="true"
+            android:layout_toEndOf="@id/custom_ip_checkbox"
             android:layout_centerVertical="true"
             android:alpha="0.75"
             android:gravity="center"
