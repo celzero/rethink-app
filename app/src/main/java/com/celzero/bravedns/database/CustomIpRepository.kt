@@ -60,6 +60,6 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
     }
 
     suspend fun deleteRules(list: List<CustomIp>) {
-        list.forEach { customIpDao.delete(it) }
+        customIpDao.deleteAll(list)
     }
 }

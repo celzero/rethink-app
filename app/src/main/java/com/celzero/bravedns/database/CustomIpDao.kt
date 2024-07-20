@@ -36,6 +36,8 @@ interface CustomIpDao {
 
     @Delete fun delete(customIp: CustomIp)
 
+    @Delete fun deleteAll(customIp: List<CustomIp>)
+
     @Transaction
     @Query("select * from CustomIp order by uid")
     fun getCustomIpRules(): List<CustomIp>
