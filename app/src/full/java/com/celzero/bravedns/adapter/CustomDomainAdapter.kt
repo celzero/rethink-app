@@ -61,6 +61,9 @@ import kotlinx.coroutines.withContext
 class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RULES) :
     PagingDataAdapter<CustomDomain, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
 
+    private val selectedItems = mutableSetOf<CustomDomain>()
+    private var isSelectionMode = false
+
     companion object {
 
         private val DIFF_CALLBACK =
@@ -114,6 +117,14 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
             Logger.w(LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
             return
         }
+    }
+
+    fun getSelectedItems(): List<CustomDomain> = selectedItems.toList()
+
+    fun clearSelection() {
+        selectedItems.clear()
+        isSelectionMode = false
+        notifyDataSetChanged()
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -385,6 +396,10 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         private lateinit var customDomain: CustomDomain
 
         fun update(cd: CustomDomain) {
+            this.customDomain = cd
+
+            b.customDomainCheckbox.isChecked = selectedItems.contains(cd)
+            b.customDomainCheckbox.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
             io {
                 val appInfo = FirewallManager.getAppInfoByUid(cd.uid)
                 val appNames = FirewallManager.getAppNamesByUid(cd.uid)
@@ -401,30 +416,53 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
                         b.customDomainAppIconIv
                     )
 
-                    this.customDomain = cd
+
                     b.customDomainLabelTv.text = customDomain.domain
                     b.customDomainToggleGroup.tag = 1
 
                     // update toggle group button based on the status
-                    updateToggleGroup(customDomain.status)
+                    updateToggleGroup(cd.status)
                     // whether to show the toggle group or not
                     toggleActionsUi()
                     // update status in desc and status flag (N/B/W)
                     updateStatusUi(
-                        DomainRulesManager.Status.getStatus(customDomain.status),
-                        customDomain.modifiedTs
+                        DomainRulesManager.Status.getStatus(cd.status),
+                        cd.modifiedTs
                     )
 
                     b.customDomainToggleGroup.addOnButtonCheckedListener(domainRulesGroupListener)
 
-                    b.customDomainEditIcon.setOnClickListener { showEditDomainDialog(customDomain) }
+                    b.customDomainEditIcon.setOnClickListener { showEditDomainDialog(cd) }
 
                     b.customDomainExpandIcon.setOnClickListener { toggleActionsUi() }
 
-                    b.customDomainContainer.setOnClickListener { toggleActionsUi() }
+                    b.customDomainContainer.setOnClickListener {
+                        if (isSelectionMode) {
+                            toggleSelection(cd)
+                        } else {
+                            toggleActionsUi()
+                        }
+                    }
 
                     b.customDomainSeeMoreChip.setOnClickListener { openAppWiseRulesActivity(cd.uid) }
+
+                    b.customDomainContainer.setOnLongClickListener {
+                        isSelectionMode = true
+                        selectedItems.add(cd)
+                        notifyDataSetChanged()
+                        true
+                    }
                 }
+            }
+        }
+
+        private fun toggleSelection(item: CustomDomain) {
+            if (selectedItems.contains(item)) {
+                selectedItems.remove(item)
+                b.customDomainCheckbox.isChecked = false
+            } else {
+                selectedItems.add(item)
+                b.customDomainCheckbox.isChecked = true
             }
         }
 
@@ -596,6 +634,8 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
 
         fun update(cd: CustomDomain) {
             this.customDomain = cd
+            b.customDomainCheckbox.isChecked = selectedItems.contains(cd)
+            b.customDomainCheckbox.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
             b.customDomainLabelTv.text = customDomain.domain
             b.customDomainToggleGroup.tag = 1
 
@@ -615,7 +655,30 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
 
             b.customDomainExpandIcon.setOnClickListener { toggleActionsUi() }
 
-            b.customDomainContainer.setOnClickListener { toggleActionsUi() }
+            b.customDomainContainer.setOnClickListener {
+                if (isSelectionMode) {
+                    toggleSelection(cd)
+                } else {
+                    toggleActionsUi()
+                }
+            }
+
+            b.customDomainContainer.setOnLongClickListener {
+                isSelectionMode = true
+                selectedItems.add(cd)
+                notifyDataSetChanged()
+                true
+            }
+        }
+
+        private fun toggleSelection(item: CustomDomain) {
+            if (selectedItems.contains(item)) {
+                selectedItems.remove(item)
+                b.customDomainCheckbox.isChecked = false
+            } else {
+                selectedItems.add(item)
+                b.customDomainCheckbox.isChecked = true
+            }
         }
 
         private fun updateToggleGroup(id: Int) {

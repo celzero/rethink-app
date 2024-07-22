@@ -36,6 +36,8 @@ interface CustomDomainDAO {
 
     @Delete fun delete(customDomain: CustomDomain)
 
+    @Delete fun deleteAll(customDomains: List<CustomDomain>)
+
     @Transaction
     @Query("select * from CustomDomain order by modifiedTs desc")
     fun getAllDomains(): List<CustomDomain>

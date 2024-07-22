@@ -84,4 +84,8 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
     fun getRulesCursor(): Cursor {
         return customDomainDAO.getRulesCursor()
     }
+
+    suspend fun deleteRules(list: List<CustomDomain>) {
+        return customDomainDAO.deleteAll(list)
+    }
 }
