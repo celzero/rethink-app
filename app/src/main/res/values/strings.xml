@@ -1532,6 +1532,8 @@
     <string name="remaining_apps_dialog_title" translatable="true">Include remaining apps</string>
     <string name="remaining_apps_dialog_desc" translatable="true">Include all remaining apps not routed by any other Proxy</string>
 
+    <string name="config_invalid_desc" translatable="true">Invalid WireGuard configuration</string>
+
     <!-- dns description -->
     <string name="cloudflare_dns_desc" translatable="true">Does not block any DNS requests. Uses Cloudflare\'s 1.1.1.1 DNS endpoint.</string>
     <string name="cloudflare_family_dns_desc" translatable="true">Blocks malware and adult content. Uses Cloudflare\'s 1.1.1.3 DNS endpoint.</string>

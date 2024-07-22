@@ -108,6 +108,18 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun init() {
+        if (!VpnController.hasTunnel()) {
+            Logger.i(LOG_TAG_PROXY, "VPN not active, config may not be available")
+            Utilities.showToastUiCentered(
+                this,
+                ERR_CODE_VPN_NOT_ACTIVE +
+                        getString(R.string.settings_socks5_vpn_disabled_error),
+                Toast.LENGTH_LONG
+            )
+            finish()
+            return
+        }
+
         b.globalLockdownTitleTv.text =
             getString(
                 R.string.two_argument_space,
@@ -142,7 +154,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         val mapping = WireguardManager.getConfigFilesById(configId)
 
         if (config == null) {
-            finish()
+            showInvalidConfigDialog()
             return
         }
 
@@ -171,6 +183,20 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }*/
 
         prefillConfig(config)
+    }
+
+    private fun showInvalidConfigDialog() {
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setTitle(getString(R.string.lbl_wireguard))
+        builder.setMessage(getString(R.string.config_invalid_desc))
+        builder.setCancelable(false)
+        builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { _, _ ->
+            finish()
+        }
+        builder.setNeutralButton(getString(R.string.lbl_delete)) { _, _ ->
+            WireguardManager.deleteConfig(configId)
+        }
+        builder.create().show()
     }
 
     private fun shouldObserveAppsCount(): Boolean {
