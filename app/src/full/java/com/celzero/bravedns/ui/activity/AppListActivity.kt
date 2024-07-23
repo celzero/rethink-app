@@ -19,9 +19,12 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.graphics.Rect
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.CompoundButton
@@ -201,6 +204,7 @@ class AppListActivity :
     override fun onResume() {
         super.onResume()
         setFirewallFilter(filters.value?.firewallFilter)
+        b.ffaAppList.requestFocus()
     }
 
     private fun initObserver() {
@@ -239,11 +243,14 @@ class AppListActivity :
 
     override fun onPause() {
         filters.postValue(Filters())
+        b.ffaSearch.clearFocus()
+        b.ffaAppList.requestFocus()
         super.onPause()
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
         addQueryToFilters(query)
+        b.ffaSearch.clearFocus()
         return true
     }
 
@@ -720,6 +727,44 @@ class AppListActivity :
         b.ffaSearch.setOnQueryTextListener(this)
         addAnimation()
         remakeFirewallChipsUi()
+        handleKeyboardEvent()
+    }
+
+    private fun handleKeyboardEvent() {
+        // ref: stackoverflow.com/a/36259261
+        val rootView = findViewById<View>(android.R.id.content)
+
+        rootView.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
+            private var alreadyOpen = false
+            private val defaultKeyboardHeightDP = 100
+            private val EstimatedKeyboardDP = defaultKeyboardHeightDP + 48
+            private val rect = Rect()
+
+            override fun onGlobalLayout() {
+                val estimatedKeyboardHeight = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    EstimatedKeyboardDP.toFloat(),
+                    rootView.resources.displayMetrics
+                ).toInt()
+                rootView.getWindowVisibleDisplayFrame(rect)
+                val heightDiff = rootView.rootView.height - (rect.bottom - rect.top)
+                val isShown = heightDiff >= estimatedKeyboardHeight
+
+                if (isShown == alreadyOpen) {
+                    return // nothing to do
+                }
+
+                alreadyOpen = isShown
+
+                if (!isShown) {
+                    if (b.ffaSearch.hasFocus()) {
+                        // clear focus from search view when keyboard is closed
+                        b.ffaSearch.clearFocus()
+                    }
+                }
+            }
+        })
     }
 
     private fun initListAdapter() {
@@ -761,9 +806,5 @@ class AppListActivity :
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
-    }
-
-    private fun ui(f: () -> Unit) {
-        lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 }
