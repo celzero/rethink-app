@@ -116,7 +116,7 @@ class FirewallAppListAdapter(
                     if (appInfo.hasInternetPermission(packageManager)) {
                         b.firewallAppLabelTv.alpha = 1f
                     } else {
-                        b.firewallAppLabelTv.alpha = 0.6f
+                        b.firewallAppLabelTv.alpha = 0.4f
                     }
                     b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
                     displayIcon(
