@@ -3409,7 +3409,7 @@ class BraveVPNService :
         if (trapVpnPrivateDns) {
             logd("flow: dns-over-tls, returning Ipn.Block, $uid")
             cm.isBlocked = true
-            cm.blockedByRule = FirewallRuleset.RULE1C.id
+            cm.blockedByRule = FirewallRuleset.RULE14.id
             return@runBlocking persistAndConstructFlowResponse(cm, Backend.Block, connId, uid)
         }
 

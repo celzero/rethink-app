@@ -1146,6 +1146,7 @@
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Domain (Univ)</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Trusted Domain (Univ)</string>
     <string name="firewall_rule_proxied" translatable="true">Proxied</string>
+    <string name="firewall_rule_private_dns" translatable="true">Private DNS</string>
 
     <string name="firewall_rule_no_rule_desc" translatable="true">No firewall rules matched this connection.</string>
     <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[A user-set firewall rule blocked this <i>app</i>.<br/><br/> To change go to <i>All Apps</i> tab.]]></string>
@@ -1175,6 +1176,7 @@
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[This connection was blocked because the <i>domain</i> is set as blocked in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.]]></string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[This connection was allowed because the <i>domain</i> is set as trusted in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.]]></string>
     <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[This connection was forwarded to user-preferred Proxy.<br/><br/> To change go to <i>Proxy</i> from <i>Configure</i> screen.]]></string>
+    <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[This connection was blocked because the <i>Private DNS</i> is enabled.<br/><br/> To change this behaviour disable <i>Private DNS</i> from <i>Android Settings</i> screen.]]></string>
 
     <!-- New app install Notification -->
     <string name="new_app_bulk_notification_title" translatable="true">Attention</string>
