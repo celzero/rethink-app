@@ -40,6 +40,8 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.ListItemFirewallAppBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
+import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.UID_INTENT_NAME
 import com.celzero.bravedns.util.UIUtils
@@ -132,9 +134,28 @@ class FirewallAppListAdapter(
                     b.firewallAppToggleWifi.visibility = View.VISIBLE
                     b.firewallAppToggleMobileData.visibility = View.VISIBLE
                     displayConnectionStatus(appStatus, connStatus)
-                    showAppHint(b.firewallAppStatusIndicator, appInfo)
+                    displayDataUsage(appInfo)
+                    maybeDisplayProxyStatus(appInfo)
                 }
             }
+        }
+
+        private fun displayDataUsage(appInfo: AppInfo) {
+            val u = Utilities.humanReadableByteCount(appInfo.uploadBytes, true)
+            val uploadBytes = context.getString(R.string.symbol_upload, u)
+            val d = Utilities.humanReadableByteCount(appInfo.downloadBytes, true)
+            val downloadBytes = context.getString(R.string.symbol_download, d)
+            b.firewallAppDataUsage.text =
+                context.getString(R.string.two_argument, uploadBytes, downloadBytes)
+        }
+
+        private fun maybeDisplayProxyStatus(appInfo: AppInfo) {
+            // show key icon in drawable right of b.firewallAppDataUsage
+            val proxy = ProxyManager.getProxyIdForApp(appInfo.uid)
+            if (proxy.isEmpty() || proxy == ID_NONE) {
+                return
+            }
+            b.firewallAppLabelTv.append(context.getString(R.string.symbol_key))
         }
 
         private fun getFirewallText(
@@ -242,56 +263,6 @@ class FirewallAppListAdapter(
         private fun showWifiUnused() {
             b.firewallAppToggleWifi.setImageDrawable(
                 ContextCompat.getDrawable(context, R.drawable.ic_firewall_wifi_on_grey))
-        }
-
-        private fun showAppHint(mIconIndicator: TextView, appInfo: AppInfo) {
-            io {
-                val connStatus = FirewallManager.connectionStatus(appInfo.uid)
-                val appStatus = FirewallManager.appStatus(appInfo.uid)
-                uiCtx {
-                    when (appStatus) {
-                        FirewallManager.FirewallStatus.NONE -> {
-                            when (connStatus) {
-                                FirewallManager.ConnectionStatus.ALLOW -> {
-                                    mIconIndicator.setBackgroundColor(
-                                        context.getColor(R.color.colorGreen_900))
-                                }
-                                FirewallManager.ConnectionStatus.METERED -> {
-                                    mIconIndicator.setBackgroundColor(
-                                        context.getColor(R.color.colorAmber_900))
-                                }
-                                FirewallManager.ConnectionStatus.UNMETERED -> {
-                                    mIconIndicator.setBackgroundColor(
-                                        context.getColor(R.color.colorAmber_900))
-                                }
-                                FirewallManager.ConnectionStatus.BOTH -> {
-                                    mIconIndicator.setBackgroundColor(
-                                        context.getColor(R.color.colorAmber_900))
-                                }
-                            }
-                        }
-                        FirewallManager.FirewallStatus.EXCLUDE -> {
-                            mIconIndicator.setBackgroundColor(
-                                context.getColor(R.color.primaryLightColorText))
-                        }
-                        FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
-                            mIconIndicator.setBackgroundColor(
-                                context.getColor(R.color.primaryLightColorText))
-                        }
-                        FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL -> {
-                            mIconIndicator.setBackgroundColor(
-                                context.getColor(R.color.primaryLightColorText))
-                        }
-                        FirewallManager.FirewallStatus.ISOLATE -> {
-                            mIconIndicator.setBackgroundColor(
-                                context.getColor(R.color.colorAmber_900))
-                        }
-                        FirewallManager.FirewallStatus.UNTRACKED -> {
-                            /* no-op */
-                        }
-                    }
-                }
-            }
         }
 
         private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
