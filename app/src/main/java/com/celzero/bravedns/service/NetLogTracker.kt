@@ -37,6 +37,7 @@ import java.util.Calendar
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
@@ -74,13 +75,15 @@ internal constructor(
     // looper is never closed / cancelled and is always active
     private val looper = Daemons.make("netlog")
 
+    private val consoleLogLooper = Daemons.make("consoleLog")
+
     companion object {
         private const val UPDATE_DELAY = 2500L
     }
 
     suspend fun restart(s: CoroutineScope) {
         this.scope = s
-        serializer("restart") {
+        serializer("restart", looper) {
 
             // create new batchers on every new scope as their lifecycle is tied to the scope
             val b1 = NetLogBatcher<DnsLog, Nothing>("dns", looper, dnsdb::insertBatch)
@@ -99,7 +102,7 @@ internal constructor(
                     ipdb::updateRethinkBatch
                 )
             val b4 =
-                NetLogBatcher<ConsoleLog, Nothing>("console", looper, consoleLogDb::insertBatch)
+                NetLogBatcher<ConsoleLog, Nothing>("console", consoleLogLooper, consoleLogDb::insertBatch)
 
             b1.begin(s)
             b2.begin(s)
@@ -125,12 +128,15 @@ internal constructor(
                 dnsBatcher?.close()
                 ipBatcher?.close()
                 rrBatcher?.close()
-                consoleLogBatcher?.close()
                 dnsBatcher = null
                 ipBatcher = null
                 rrBatcher = null
-                consoleLogBatcher = null
                 Logger.d(LOG_BATCH_LOGGER, "tracker: close scope")
+            }
+            withContext(consoleLogLooper + NonCancellable) {
+                consoleLogBatcher?.close()
+                consoleLogBatcher = null
+                Logger.d(LOG_BATCH_LOGGER, "tracker: close consoleLogLooper")
             }
         }
     }
@@ -138,7 +144,7 @@ internal constructor(
     fun writeIpLog(info: ConnTrackerMetaData) {
         if (!persistentState.logsEnabled) return
 
-        serializer("writeIpLog") {
+        serializer("writeIpLog", looper) {
             val connTracker = ipdb.makeConnectionTracker(info)
             ipBatcher?.add(connTracker)
         }
@@ -147,7 +153,7 @@ internal constructor(
     fun writeRethinkLog(info: ConnTrackerMetaData) {
         if (!persistentState.logsEnabled) return
 
-        serializer("writeRethinkLog") {
+        serializer("writeRethinkLog", looper) {
             val rlog = ipdb.makeRethinkLogs(info) ?: return@serializer
             rrBatcher?.add(rlog)
         }
@@ -158,7 +164,7 @@ internal constructor(
         val d = Logger.LoggerType.fromId(persistentState.goLoggerLevel.toInt())
         val debug = d.isLessThan(Logger.LoggerType.INFO) // debug, verbose, very verbose
 
-        serializer("updateIpSmm") {
+        serializer("updateIpSmm", looper) {
             val s =
                 if (debug && summary.targetIp?.isNotEmpty() == true) {
                     ipdb.makeSummaryWithTarget(summary)
@@ -176,7 +182,7 @@ internal constructor(
     fun updateRethinkSummary(summary: ConnectionSummary) {
         if (!persistentState.logsEnabled) return
 
-        serializer("updateRethinkSmm") {
+        serializer("updateRethinkSmm", looper) {
             val s =
                 if (DEBUG && summary.targetIp?.isNotEmpty() == true) {
                     ipdb.makeSummaryWithTarget(summary)
@@ -198,7 +204,7 @@ internal constructor(
 
         transaction.responseCalendar = Calendar.getInstance()
         // TODO: move this to generic Dispatcher.IO; serializer is not required
-        serializer("refreshDnsLatency") { dnsLatencyTracker.refreshLatencyIfNeeded(transaction) }
+        serializer("refreshDnsLatency", looper) { dnsLatencyTracker.refreshLatencyIfNeeded(transaction) }
 
         // TODO: This method should be part of BraveVPNService
         dnsdb.updateVpnConnectionState(transaction)
@@ -206,20 +212,16 @@ internal constructor(
         if (!persistentState.logsEnabled) return
 
         val dnsLog = dnsdb.makeDnsLogObj(transaction)
-        serializer("writeDnsLog") { dnsBatcher?.add(dnsLog) }
+        serializer("writeDnsLog", looper) { dnsBatcher?.add(dnsLog) }
     }
 
     fun writeConsoleLog(log: ConsoleLog) {
-        io("writeConsoleLog") {
+        serializer("writeConsoleLog", consoleLogLooper) {
             consoleLogBatcher?.add(log)
         }
     }
 
-    private fun serializer(s: String, f: suspend () -> Unit) =
-        scope?.launch(CoroutineName(s) + looper) { f() }
-            ?: Log.e(LOG_BATCH_LOGGER, "scope is null", Exception())
-
-    private fun io(s: String, f: suspend () -> Unit) =
-        scope?.launch(CoroutineName(s) + Dispatchers.IO) { f() }
+    private fun serializer(s: String, e: ExecutorCoroutineDispatcher, f: suspend () -> Unit) =
+        scope?.launch(CoroutineName(s) + e) { f() }
             ?: Log.e(LOG_BATCH_LOGGER, "scope is null", Exception())
 }
