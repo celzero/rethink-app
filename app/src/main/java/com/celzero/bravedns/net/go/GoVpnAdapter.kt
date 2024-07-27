@@ -118,7 +118,7 @@ class GoVpnAdapter : KoinComponent {
         setRDNS()
         addTransport()
         setDnsAlg()
-        maybeSlowdown()
+        notifyLoopback()
         Logger.v(LOG_TAG_VPN, "GoVpnAdapter initResolverProxiesPcap done")
     }
 
@@ -757,6 +757,8 @@ class GoVpnAdapter : KoinComponent {
             val wgUserSpaceString = wgConfig?.toWgUserspaceString(isOneWg)
             getProxies()?.addProxy(id, wgUserSpaceString)
             if (isOneWg) setWireGuardDns(id)
+            // initiate a ping request to the wg proxy
+            initiateWgPing(id)
             Logger.i(LOG_TAG_VPN, "add wireguard proxy with $id; dns? $isOneWg")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "err adding wireguard proxy: ${e.message}", e)
@@ -987,13 +989,13 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun maybeSlowdown() {
+    suspend fun notifyLoopback() {
         val t = persistentState.routeRethinkInRethink || VpnController.isVpnLockdown()
         try {
-            Intra.slowdown(t)
-            Logger.i(LOG_TAG_VPN, "maybe slowdown? $t")
+            Intra.loopback(t)
+            Logger.i(LOG_TAG_VPN, "notify loopback? $t")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "err slowdown? $t, ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "err notify loopback? $t, ${e.message}", e)
         }
     }
 

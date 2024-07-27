@@ -1848,7 +1848,7 @@ class BraveVPNService :
                 // restart vpn to allow/disallow rethink traffic in rethink
                 io("routeRethinkInRethink") {
                     restartVpnWithNewAppConfig(reason = "routeRethinkInRethink")
-                    vpnAdapter?.maybeSlowdown()
+                    vpnAdapter?.notifyLoopback()
                 }
             }
 
@@ -2445,7 +2445,7 @@ class BraveVPNService :
         Logger.i(LOG_TAG_VPN, "vpn lockdown mode change, restarting")
         io("lockdownSync") {
             restartVpnWithNewAppConfig(reason = "lockdownSync")
-            vpnAdapter?.maybeSlowdown()
+            vpnAdapter?.notifyLoopback()
         }
     }
 
