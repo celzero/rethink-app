@@ -128,21 +128,21 @@ class WgConfigAdapter(private val context: Context) :
             if (config.isLockdown) {
                 b.protocolInfoChipGroup.visibility = View.GONE
                 b.interfaceActiveLayout.visibility = View.GONE
-                b.interfaceConfigStatus.text =
+                b.interfaceStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
                 val id = ProxyManager.ID_WG_BASE + config.id
                 val appsCount = ProxyManager.getAppCountForProxy(id)
                 updateUi(config, appsCount)
             } else {
-                b.interfaceStatus.visibility = View.GONE
+                b.interfaceConfigStatus.visibility = View.GONE
                 b.interfaceAppsCount.visibility = View.GONE
                 b.interfaceActiveLayout.visibility = View.GONE
                 b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.background)
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceSwitch.isChecked = false
                 b.protocolInfoChipGroup.visibility = View.GONE
-                b.interfaceConfigStatus.visibility = View.VISIBLE
-                b.interfaceConfigStatus.text =
+                b.interfaceStatus.visibility = View.VISIBLE
+                b.interfaceStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
         }
@@ -353,10 +353,10 @@ class WgConfigAdapter(private val context: Context) :
                 b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.background)
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceSwitch.isChecked = false
-                b.interfaceStatus.visibility = View.GONE
+                b.interfaceConfigStatus.visibility = View.GONE
                 b.interfaceAppsCount.visibility = View.GONE
-                b.interfaceConfigStatus.visibility = View.VISIBLE
-                b.interfaceConfigStatus.text =
+                b.interfaceStatus.visibility = View.VISIBLE
+                b.interfaceStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
         }

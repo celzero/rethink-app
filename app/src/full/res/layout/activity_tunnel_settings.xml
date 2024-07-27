@@ -579,7 +579,7 @@
                 </RelativeLayout>
 
 
-                <androidx.appcompat.widget.AppCompatButton
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/settings_activity_ping_ips_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -588,7 +588,10 @@
                     android:layout_gravity="end"
                     android:layout_marginEnd="10dp"
                     android:layout_marginBottom="15dp"
-                    android:padding="5dp"
+                    android:paddingTop="7dp"
+                    android:paddingBottom="7dp"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
                     android:textColor="?attr/primaryTextColor"
                     />
 
