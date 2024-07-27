@@ -38,11 +38,12 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
@@ -125,7 +126,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 b.aadAppDetailName.text = appName(packages.count())
                 b.aadPkgName.text = appInfo.packageName
                 b.excludeProxySwitch.isChecked = appInfo.isProxyExcluded
-                updateDataUsage()
+                displayDataUsage()
+                displayProxyStatus()
                 displayIcon(
                     Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
                     b.aadAppDetailIcon
@@ -148,6 +150,16 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 }
             }
         }
+    }
+
+    private fun displayProxyStatus() {
+        val proxy = ProxyManager.getProxyIdForApp(appInfo.uid)
+        if (proxy.isEmpty() || proxy == ID_NONE) {
+            b.aadProxyDetails.visibility = View.GONE
+            return
+        }
+        b.aadProxyDetails.visibility = View.VISIBLE
+        b.aadProxyDetails.text = getString(R.string.wireguard_apps_proxy_map_desc, proxy)
     }
 
     private fun hideFirewallStatusUi() {
@@ -185,7 +197,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         startActivity(intent)
     }
 
-    private fun updateDataUsage() {
+    private fun displayDataUsage() {
         val u = Utilities.humanReadableByteCount(appInfo.uploadBytes, true)
         val uploadBytes = getString(R.string.symbol_upload, u)
         val d = Utilities.humanReadableByteCount(appInfo.downloadBytes, true)
