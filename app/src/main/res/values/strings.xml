@@ -104,6 +104,7 @@
     <string name="lbl_matrix" translatable="false">Matrix</string>
     <string name="lbl_reddit" translatable="false">Reddit</string>
     <string name="lbl_test" translatable="true">test</string>
+    <string name="lbl_protos" translatable="true">protos</string>
 
 
     <string name="memory_notification_text">Rethink is experiencing low memory. System actions may be limited.</string>
@@ -131,7 +132,7 @@
     <string name="symbol_black_up" translatable="false">\u25b4</string>
     <string name="symbol_lockdown" translatable="false">🔒</string>
     <string name="symbol_lightening" translatable="false">⚡</string>
-    <string name="symbol_kbs" translatable="false">KB/S</string>
+    <string name="symbol_ps" translatable="false">%1$s/S</string>
     <string name="symbol_mb" translatable="false">MB</string>
 
     <string name="numeric_one" translatable="false">1</string>
@@ -636,9 +637,6 @@
 
     <string name="pcap_failure_toast" translatable="true">Error creating pcap file, Try again!</string>
 
-    <string name="settings_probe_ips">Custom Probe IPs</string>
-    <string name="settings_probe_ips_desc">Add custom IPs to probe for network connectivity.</string>
-
     <!-- AppDetailActivity -->
     <string name="apps_icon_content_desc" translatable="true">Application Icon</string>
 
@@ -829,6 +827,7 @@
                                               <a href="https://github.com/Uldiniad">Uldiniad</a><br/>
                                               <a href="https://github.com/Poussinou">Poussinou</a><br/>
                                               <a href="https://github.com/pjosingh">pjosingh</a><br/>
+                                              <a href="https://github.com/RohitSurwase">RohitSurwase</a><br/>
                                               <br/>🚂 Network engine <br/>
                                               <a href="https://github.com/alalamav">alalamav</a><br/>
                                               <a href="https://github.com/bemasc">bemasc</a><br/>
@@ -1176,7 +1175,7 @@
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[This connection was blocked because the <i>domain</i> is set as blocked in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.]]></string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[This connection was allowed because the <i>domain</i> is set as trusted in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.]]></string>
     <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[This connection was forwarded to user-preferred Proxy.<br/><br/> To change go to <i>Proxy</i> from <i>Configure</i> screen.]]></string>
-    <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[This connection was blocked because the <i>Private DNS</i> is enabled.<br/><br/> To change this behaviour disable <i>Private DNS</i> from <i>Android Settings</i> screen.]]></string>
+    <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[This connection is looking for a <i>Private DNS</i> server that doesn\'t exist.]]></string>
 
     <!-- New app install Notification -->
     <string name="new_app_bulk_notification_title" translatable="true">Attention</string>
