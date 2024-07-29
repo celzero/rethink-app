@@ -262,7 +262,7 @@
                             android:layout_toStartOf="@id/interface_edit"
                             android:text=""
                             android:textAppearance="?attr/textAppearanceHeadline6"
-                            android:textColor="?attr/secondaryTextColor" />
+                            android:textColor="?attr/primaryTextColor" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/interface_edit"
