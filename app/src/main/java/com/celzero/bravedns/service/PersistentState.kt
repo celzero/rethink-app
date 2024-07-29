@@ -290,6 +290,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // TODO: do we need this? instead use in-memory variable
     var consoleLogEnabled by booleanPref("console_log_enabled").withDefault<Boolean>(false)
 
+    // camera and mic access
+    var micCamAccess by booleanPref("mic_camera_access").withDefault<Boolean>(false)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()

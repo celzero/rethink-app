@@ -42,6 +42,7 @@ object Logger : KoinComponent {
     const val LOG_TAG_PROXY = "ProxyLogs"
     const val LOG_QR_CODE = "QrCodeFromFileScanner"
     const val LOG_GO_LOGGER = "LibLogger"
+    const val LOG_TAG_APP_OPS = "AppOpsService"
 
     // github.com/celzero/firestack/blob/bce8de917f/intra/log/logger.go#L76
     enum class LoggerType(val id: Long) {
