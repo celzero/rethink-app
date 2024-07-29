@@ -45,7 +45,13 @@
 
         </RelativeLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
         <LinearLayout
+            android:id="@+id/fhs_card_top_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
@@ -263,6 +269,7 @@
             android:layout_marginRight="15dp"
             android:baselineAligned="true"
             android:orientation="horizontal"
+            android:layout_below="@id/fhs_card_top_ll"
             android:weightSum="1">
 
             <LinearLayout
@@ -428,6 +435,17 @@
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
         </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/fhs_sponsor_bottom"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:alpha="0.5"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_plus_accent"
+            />
+
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
