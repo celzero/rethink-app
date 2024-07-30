@@ -551,4 +551,17 @@
     <string name="hs_biometeric_title" translatable="true">בטל את הנעילה של Rethink</string>
     <string name="lbl_battery_optimization" translatable="true">מיטוב סוללה</string>
     <string name="about_website" translatable="true">בקר בrethinkdns.com</string>
+    <string name="app_info_error" translatable="true">לא ניתן היה לפתוח את פרטי האפליקציה.</string>
+    <string name="hsf_start_dialog_positive" translatable="true">התחלה</string>
+    <string name="about_app_contributors" translatable="true">יוצרים</string>
+    <string name="about_mail_bugreport_subject" translatable="true">[Rethink]: דוח באג</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">העבר תנועה מישומי פרוקסי חזרה דרך המנהרה</string>
+    <string name="hsf_blocklist_updating_text" translatable="true">מפעיל…</string>
+    <string name="hsf_chip_appearance" translatable="true">נושא: %1$s</string>
+    <string name="lbl_background_data" translatable="true">מגביל נתוני רקע</string>
+    <string name="about_mail_bugreport_text" translatable="true">שלח דוא\"ל זה אל: hello@celzero.com</string>
+    <string name="about_mail_subject" translatable="true">[Rethink]:</string>
+    <string name="about_mail_bugreport_share_title" translatable="true">בחר ספק דוא\"ל</string>
+    <string name="about_dialog_neutral_button" translatable="true">הצע תכונות</string>
+    <string name="hsf_pause_vpn_failure" translatable="true">לא ניתן להשהות: Rethink לא פעיל</string>
 </resources>
