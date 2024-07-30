@@ -120,6 +120,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             return
         }
 
+        b.editBtn.text = getString(R.string.rt_edit_dialog_positive).lowercase()
         b.globalLockdownTitleTv.text =
             getString(
                 R.string.two_argument_space,
@@ -210,15 +211,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         if (wgInterface == null) {
             return
         }
+        b.configNameText.visibility = View.VISIBLE
         b.configNameText.text = config.getName()
-        b.publicKeyText.text = wgInterface?.getKeyPair()?.getPublicKey()?.base64()
+        b.configIdText.text = getString(R.string.single_argument_parenthesis, config.getId().toString())
 
-        if (wgInterface?.getAddresses()?.isEmpty() == true) {
-            b.addressesLabel.visibility = View.GONE
-            b.addressesText.visibility = View.GONE
-        } else {
-            b.addressesText.text = wgInterface?.getAddresses()?.joinToString { it.toString() }
-        }
         setPeersAdapter()
         // show dns servers if in one-wg mode
         if (wgType.isOneWg()) {
@@ -238,7 +234,16 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.dnsServersText.visibility = View.GONE
         }
 
-        // uncomment this if we want to show the dns servers, listen port and mtu
+        // uncomment this if we want to show the public key, addresses, listen port and mtu
+        /*b.publicKeyText.text = wgInterface?.getKeyPair()?.getPublicKey()?.base64()
+
+        if (wgInterface?.getAddresses()?.isEmpty() == true) {
+            b.addressesLabel.visibility = View.GONE
+            b.addressesText.visibility = View.GONE
+        } else {
+            b.addressesText.text = wgInterface?.getAddresses()?.joinToString { it.toString() }
+        }*/
+
         /*if (wgInterface?.dnsServers?.isEmpty() == true) {
                     b.dnsServersText.visibility = View.GONE
               b.dnsServersLabel.visibility = View.GONE
@@ -347,7 +352,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun setupClickListeners() {
-        b.interfaceEdit.setOnClickListener {
+        b.editBtn.setOnClickListener {
             val intent = Intent(this, WgConfigEditorActivity::class.java)
             intent.putExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, configId)
             intent.putExtra(INTENT_EXTRA_WG_TYPE, wgType.value)
@@ -361,7 +366,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             openAppsDialog(proxyName)
         }
 
-        b.interfaceDelete.setOnClickListener { showDeleteInterfaceDialog() }
+        b.deleteBtn.setOnClickListener { showDeleteInterfaceDialog() }
 
         /*b.newConfLayout.setOnClickListener {
             b.newConfProgressBar.visibility = View.VISIBLE

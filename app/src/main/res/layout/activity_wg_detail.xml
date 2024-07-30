@@ -56,34 +56,233 @@
 
             </LinearLayout>
 
-            <RelativeLayout
-                android:id="@+id/wg_header"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/interface_detail_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="45dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp"
+                app:cardUseCompatPadding="true"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
-                    android:id="@+id/wg_header_tv"
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="wrap_content"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:lineSpacingExtra="5dp"
-                    android:padding="5dp"
-                    android:text="@string/lbl_wireguard"
-                    android:textColor="?attr/accentGood"
-                    android:textSize="@dimen/extra_large_font_text_view"
-                    android:textStyle="bold" />
+                    android:paddingStart="15dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="15dp"
+                    android:paddingBottom="20dp">
 
-            </RelativeLayout>
+                    <LinearLayout
+                        android:id="@+id/config_title_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/config_name_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="5dp"
+                            android:text=""
+                            android:textAppearance="?attr/textAppearanceHeadline6"
+                            android:textColor="?attr/primaryTextColor" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/config_id_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginEnd="3dp"
+                            android:alpha="0.7"
+                            android:maxLength="5" />
+
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/public_key_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:labelFor="@+id/config_public_key_text"
+                        android:text="@string/lbl_public_key"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/config_title_layout" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/public_key_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/public_key_label" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/addresses_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:labelFor="@+id/config_addresses_text"
+                        android:text="@string/lbl_addresses"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/public_key_text" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/addresses_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/addresses_label" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_servers_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:labelFor="@+id/dns_servers_text"
+                        android:text="@string/lbl_dns_servers"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/addresses_text" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_servers_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/dns_servers_label"
+                        tools:text="" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_search_domains_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:labelFor="@+id/dns_search_domain_text"
+                        android:text=""
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/dns_servers_text" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_search_domains_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/dns_search_domains_label"
+                        tools:text="zx2c4.com" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/listen_port_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:labelFor="@+id/listen_port_text"
+                        android:text=""
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toStartOf="@id/mtu_label"
+                        app:layout_constraintHorizontal_weight="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/dns_search_domains_text" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/listen_port_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toStartOf="@id/mtu_label"
+                        app:layout_constraintHorizontal_weight="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/listen_port_label"
+                        tools:text="51820" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/mtu_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:labelFor="@+id/mtu_text"
+                        android:text=""
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_weight="0.5"
+                        app:layout_constraintLeft_toRightOf="@id/listen_port_label"
+                        app:layout_constraintStart_toEndOf="@id/listen_port_label"
+                        app:layout_constraintTop_toBottomOf="@id/dns_search_domains_text" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/mtu_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_weight="0.5"
+                        app:layout_constraintStart_toEndOf="@id/listen_port_label"
+                        app:layout_constraintStart_toStartOf="@+id/mtu_label"
+                        app:layout_constraintTop_toBottomOf="@+id/mtu_label"
+                        tools:text="1500" />
+
+                    <LinearLayout
+                        android:id="@+id/edit_delete_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:orientation="horizontal"
+                        android:weightSum="1"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/mtu_text">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/edit_btn"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="0.5"
+                            android:background="@drawable/home_screen_button_stop_bg"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:gravity="center"
+                            android:padding="10dp"
+                            android:text="@string/rt_edit_dialog_positive"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/heading_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/delete_btn"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="0.5"
+                            android:background="@drawable/home_screen_button_stop_bg"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:gravity="center"
+                            android:padding="10dp"
+                            android:text="@string/ci_delete"
+                            android:textColor="?attr/accentBad"
+                            android:textSize="@dimen/heading_font_text_view" />
+
+                    </LinearLayout>
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/other_settings_card"
@@ -93,14 +292,23 @@
                 app:cardElevation="8dp"
                 app:cardUseCompatPadding="true"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/wg_header">
+                app:layout_constraintTop_toBottomOf="@id/interface_detail_card">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingTop="5dp"
                     android:paddingBottom="20dp">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/wg_header_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:paddingTop="15dp"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textColor="?attr/primaryTextColor" />
 
                     <RelativeLayout
                         android:id="@+id/lockdown_rl"
@@ -197,7 +405,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
-                        android:layout_marginTop="10dp"
                         android:layout_marginEnd="15dp"
                         android:paddingTop="10dp"
                         android:paddingBottom="10dp"
@@ -228,200 +435,13 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/interface_detail_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
-                app:cardUseCompatPadding="true"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/other_settings_card">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="15dp"
-                    android:paddingTop="15dp"
-                    android:paddingEnd="15dp"
-                    android:paddingBottom="20dp">
-
-                    <RelativeLayout
-                        android:id="@+id/config_title_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/config_name_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_centerVertical="true"
-                            android:layout_toStartOf="@id/interface_edit"
-                            android:text=""
-                            android:textAppearance="?attr/textAppearanceHeadline6"
-                            android:textColor="?attr/primaryTextColor" />
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/interface_edit"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginEnd="20dp"
-                            android:layout_toStartOf="@id/interface_delete"
-                            android:src="@drawable/ic_edit_icon_grey" />
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/interface_delete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:src="@drawable/ic_delete" />
-
-                    </RelativeLayout>
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/public_key_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:labelFor="@+id/config_public_key_text"
-                        android:text="@string/lbl_public_key"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/config_title_layout" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/public_key_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:singleLine="true"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/public_key_label" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/addresses_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:labelFor="@+id/config_addresses_text"
-                        android:text="@string/lbl_addresses"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/public_key_text" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/addresses_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/addresses_label" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/dns_servers_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:labelFor="@+id/dns_servers_text"
-                        android:text="@string/lbl_dns_servers"
-                        android:visibility="gone"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/addresses_text" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/dns_servers_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/dns_servers_label"
-                        tools:text="" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/dns_search_domains_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:labelFor="@+id/dns_search_domain_text"
-                        android:text=""
-                        android:visibility="gone"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/dns_servers_text" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/dns_search_domains_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/dns_search_domains_label"
-                        tools:text="zx2c4.com" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/listen_port_label"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:labelFor="@+id/listen_port_text"
-                        android:text=""
-                        android:visibility="gone"
-                        app:layout_constraintEnd_toStartOf="@id/mtu_label"
-                        app:layout_constraintHorizontal_weight="0.5"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/dns_search_domains_text" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/listen_port_text"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        app:layout_constraintEnd_toStartOf="@id/mtu_label"
-                        app:layout_constraintHorizontal_weight="0.5"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/listen_port_label"
-                        tools:text="51820" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/mtu_label"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:labelFor="@+id/mtu_text"
-                        android:text=""
-                        android:visibility="gone"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_weight="0.5"
-                        app:layout_constraintLeft_toRightOf="@id/listen_port_label"
-                        app:layout_constraintStart_toEndOf="@id/listen_port_label"
-                        app:layout_constraintTop_toBottomOf="@id/dns_search_domains_text" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/mtu_text"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_weight="0.5"
-                        app:layout_constraintStart_toEndOf="@id/listen_port_label"
-                        app:layout_constraintStart_toStartOf="@+id/mtu_label"
-                        app:layout_constraintTop_toBottomOf="@+id/mtu_label"
-                        tools:text="1500" />
-
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/peers_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/interface_detail_card" />
+                app:layout_constraintTop_toBottomOf="@+id/other_settings_card" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -433,7 +453,9 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="25dp"
         android:layout_marginBottom="40dp"
+        android:clickable="true"
         android:contentDescription="@string/add_peer"
+        android:focusable="true"
         android:text="@string/add_peer"
         android:textColor="?attr/primaryTextColor"
         app:backgroundTint="?attr/chipColorBgNormal"
@@ -441,8 +463,6 @@
         app:icon="@drawable/ic_add"
         app:iconTint="@android:color/transparent"
         app:iconTintMode="add"
-        android:clickable="true"
-        android:focusable="true"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

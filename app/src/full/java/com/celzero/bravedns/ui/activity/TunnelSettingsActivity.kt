@@ -592,17 +592,14 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         if (isLockdown) {
             b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
             b.settingsActivityAllowBypassRl.alpha = 0.5f
-            b.settingsActivityLanTrafficRl.alpha = 0.5f
             b.settingsActivityExcludeProxyAppsRl.alpha = 0.5f
         } else {
             b.settingsActivityVpnLockdownDesc.visibility = View.GONE
             b.settingsActivityAllowBypassRl.alpha = 1f
-            b.settingsActivityLanTrafficRl.alpha = 1f
             b.settingsActivityExcludeProxyAppsRl.alpha = 1f
         }
         b.settingsActivityAllowBypassSwitch.isEnabled = !isLockdown
         b.settingsActivityAllowBypassRl.isEnabled = !isLockdown
-        b.settingsActivityLanTrafficSwitch.isEnabled = !isLockdown
         b.settingsActivityLanTrafficRl.isEnabled = !isLockdown
         b.settingsActivityExcludeProxyAppsSwitch.isEnabled = !isLockdown
         b.settingsActivityExcludeProxyAppsRl.isEnabled = !isLockdown
