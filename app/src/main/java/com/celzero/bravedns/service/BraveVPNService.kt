@@ -2835,12 +2835,14 @@ class BraveVPNService :
     }
 
     private fun addRoute6(b: Builder): Builder {
+        // TODO: as of now, vpn lockdown mode is not handled, check if this is required
         if (persistentState.privateIps) {
             Logger.i(LOG_TAG_VPN, "addRoute6: privateIps is true, adding routes")
             // exclude LAN traffic, add only unicast routes
             // add only unicast routes
             // range 0000:0000:0000:0000:0000:0000:0000:0000-
             // 0000:0000:0000:0000:ffff:ffff:ffff:ffff
+            // fixme: see if the ranges overlap with the default route
             b.addRoute("0000::", 64)
             b.addRoute("2000::", 3) // 2000:: - 3fff::
             b.addRoute("4000::", 3) // 4000:: - 5fff::
@@ -2867,6 +2869,7 @@ class BraveVPNService :
     }
 
     private fun addRoute4(b: Builder): Builder {
+        // TODO: as of now, vpn lockdown mode is not handled, check if this is required
         if (persistentState.privateIps) {
             Logger.i(LOG_TAG_VPN, "addRoute4: privateIps is true, adding routes")
             // https://developer.android.com/reference/android/net/VpnService.Builder.html#addRoute(java.lang.String,%20int)
