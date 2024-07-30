@@ -2567,11 +2567,13 @@ class BraveVPNService :
     fun pauseApp() {
         startPauseTimer()
         handleVpnServiceOnAppStateChange()
+        Logger.i(LOG_TAG_VPN, "App paused")
     }
 
     fun resumeApp() {
         stopPauseTimer()
         handleVpnServiceOnAppStateChange()
+        Logger.i(LOG_TAG_VPN, "App resumed")
     }
 
     private fun handleVpnServiceOnAppStateChange() { // paused or resumed
