@@ -564,4 +564,5 @@
     <string name="about_mail_bugreport_share_title" translatable="true">בחר ספק דוא\"ל</string>
     <string name="about_dialog_neutral_button" translatable="true">הצע תכונות</string>
     <string name="hsf_pause_vpn_failure" translatable="true">לא ניתן להשהות: Rethink לא פעיל</string>
+    <string name="private_dns_error" translatable="true">לא ניתן להפעיל מסך DNS פרטי.</string>
 </resources>
