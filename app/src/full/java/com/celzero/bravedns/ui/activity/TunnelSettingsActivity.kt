@@ -304,10 +304,13 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         val defaultDrawable = ContextCompat.getDrawable(this, R.drawable.edittext_default)
         val errorDrawable = ContextCompat.getDrawable(this, R.drawable.edittext_error)
 
-        val saveBtn: AppCompatButton = dialogView.findViewById(R.id.save_button)
+        val saveBtn: AppCompatTextView = dialogView.findViewById(R.id.save_button)
         val testBtn: AppCompatImageView = dialogView.findViewById(R.id.test_button)
-        val cancelBtn: AppCompatButton = dialogView.findViewById(R.id.cancel_button)
+        val cancelBtn: AppCompatTextView = dialogView.findViewById(R.id.cancel_button)
         val resetChip: Chip = dialogView.findViewById(R.id.reset_chip)
+
+        saveBtn.text = getString(R.string.lbl_save).uppercase()
+        cancelBtn.text = getString(R.string.lbl_cancel).uppercase()
 
         val errorMsg: AppCompatTextView = dialogView.findViewById(R.id.error_message)
 
@@ -522,6 +525,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                     )
                 b.settingsActivityPtransRl.visibility = View.GONE
                 b.settingsActivityConnectivityChecksRl.visibility = View.GONE
+                b.settingsActivityPingIpsBtn.visibility = View.GONE
             }
             InternetProtocol.IPv6.id -> {
                 b.genSettingsIpDesc.text =
@@ -531,6 +535,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                     )
                 b.settingsActivityPtransRl.visibility = View.VISIBLE
                 b.settingsActivityConnectivityChecksRl.visibility = View.GONE
+                b.settingsActivityPingIpsBtn.visibility = View.GONE
             }
             InternetProtocol.IPv46.id -> {
                 b.genSettingsIpDesc.text =
@@ -540,6 +545,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                     )
                 b.settingsActivityPtransRl.visibility = View.GONE
                 b.settingsActivityConnectivityChecksRl.visibility = View.VISIBLE
+                b.settingsActivityPingIpsBtn.visibility = View.VISIBLE
             }
             else -> {
                 b.genSettingsIpDesc.text =

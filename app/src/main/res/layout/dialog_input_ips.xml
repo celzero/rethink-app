@@ -302,25 +302,26 @@
             android:layout_margin="5dp"
             android:orientation="horizontal">
 
-            <androidx.appcompat.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/cancel_button"
-                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                 android:background="@drawable/rectangle_border_background"
                 android:layout_width="0dp"
+                android:gravity="center"
+                android:padding="10dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
-                android:padding="5dp"
                 android:layout_marginEnd="5dp"
                 android:textColor="?attr/primaryTextColor"
                 android:text="@string/lbl_cancel" />
 
-            <androidx.appcompat.widget.AppCompatButton
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/save_button"
-                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                 android:background="@drawable/rectangle_border_background"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:padding="5dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:textColor="?attr/accentGood"
                 android:layout_marginStart="5dp"
                 android:layout_weight="0.5"
                 android:text="@string/lbl_save" />
