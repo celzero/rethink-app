@@ -1008,7 +1008,7 @@
     <string name="settings_rinr_dialog_title" translatable="true">Loopback (экспериментальный)</string>
     <string name="cd_dialog_edit_title" translatable="true">Изменить правило домена</string>
     <string name="one_wg_apps_added" translatable="true">Маршрутизация всех приложений</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Выбранные приложения будут проходить только через этот WireGuard VPN, независимо от того, не работает он или подключен.</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Выбранные приложения будут проходить только через этот WireGuard VPN, независимо от того, активен он или отключён.</string>
     <string name="cd_toast_edit" translatable="true">Отредактировано</string>
     <string name="wg_lockdown_dialog_title" translatable="true">Блокировка</string>
     <string name="dc_proxy_dns_desc" translatable="true">Не проксировать DNS поверх Всегда-Включённый WireGuard, SOCKS5, HTTP прокси.</string>
@@ -1029,4 +1029,13 @@
     <string name="remaining_apps_dialog_desc" translatable="true">Включите все остальные приложения не маршрутизируемые другим Прокси</string>
     <string name="lbl_battery_optimization" translatable="true">Оптимизация батареи</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Отключить %1$s</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Приложения для переадресации прокси-серверов с обратной связью</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Когда этот параметр отключен, приложения для пересылки прокси-серверов (SOCKS5, HTTP, DNS) исключаются из VPN-туннеля Rethink.</string>
+    <string name="lbl_background_data" translatable="true">Ограничение фоновых данных</string>
+    <string name="exclude_apps_from_proxy">Обход приложения со всех прокси-серверов</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Это приложение обходит прокси-серверы</string>
+    <string name="lbl_notification" translatable="true">уведомление</string>
+    <string name="memory_notification_text">Rethink испытывает нехватку памяти. Системные действия могут быть ограничены.</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> может привести к потере подключения. Измените настройки, чтобы разрешить Rethink использовать данные и другие ресурсы в фоновом режиме.</string>
+    <string name="lbl_unselected" translatable="true">Невыбранный</string>
 </resources>
