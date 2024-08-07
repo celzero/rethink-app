@@ -623,4 +623,5 @@
     <string name="univ_firewall_rule_2" translatable="true">חסום כל אפליקציה שאינה בשימוש</string>
     <string name="univ_firewall_rule_3" translatable="true">חסום כאשר אפליקציית המקור אינה ידועה</string>
     <string name="univ_firewall_rule_5" translatable="true">חסום כאשר הDNS נעקף</string>
+    <string name="univ_accessibility_dialog_negative" translatable="true">סרב</string>
 </resources>
