@@ -564,4 +564,110 @@
     <string name="about_mail_bugreport_share_title" translatable="true">בחר ספק דוא\"ל</string>
     <string name="about_dialog_neutral_button" translatable="true">הצע תכונות</string>
     <string name="hsf_pause_vpn_failure" translatable="true">לא ניתן להשהות: Rethink לא פעיל</string>
+    <string name="private_dns_error" translatable="true">לא היה ניתן להפעיל מסך DNS פרטי.</string>
+    <string name="cd_custom_dns_proxy_title" translatable="true">פרוקסי DNS מותאם אישית</string>
+    <string name="cd_custom_dns_proxy_name_default" translatable="true">מתווך</string>
+    <string name="cd_custom_dns_proxy_name" translatable="true">פרוקסי %1$s</string>
+    <string name="log_file_not_available" translatable="true">לא נמצא דוח קריסה</string>
+    <string name="logs_disclaimer" translatable="true">מציג 20 אלף תווים ראשונים</string>
+    <string name="cd_custom_doh_dialog_title" translatable="true">כתובת אתר מותאמת אישית של שרת</string>
+    <string name="cd_custom_doh_url_name" translatable="true">DoH %1$s</string>
+    <string name="notification_screen_error" translatable="true">לא ניתן היה להפעיל את מסך ההתראות של האפליקציה.</string>
+    <string name="error_loading_log_file" translatable="true">שגיאה בטעינת קובץ היומן</string>
+    <string name="cd_dns_crypt_title" translatable="true">פותרים</string>
+    <string name="cd_custom_doh_url_name_default" translatable="true">DoH</string>
+    <string name="contributors_list" translatable="true">&lt;i&gt;פרויקט המקור הפתוח של Rethink&lt;/i&gt; חייב את קיומו למתנדבים אלה שמקדישים אינספור שעות לפיתוח שלו.&lt;br/&gt; &lt;br/&gt;🛡️ אפליקציית אנדרואיד &lt;br/&gt; &lt;a href=https://github .com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev &gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous &gt;חסרת מידע&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt; a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br /&gt; &lt;br/&gt;🚂 מנוע רשת &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt; bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a &gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/ &gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/ &gt; &lt;br/&gt;📚 פותר &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt; /a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt; br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt; a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt; a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https ://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github .com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github .com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ אופני קהילה &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https: //t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t. me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt; kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https: //db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ תרגומים &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a &gt;&lt;br/&gt; &lt;br/&gt;🦆 סמלים &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;סמלים&lt;/a&gt;&lt;br/&gt; &lt;br/&gt; 📦 בניית שרתים &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/ &gt;</string>
+    <string name="cd_custom_dns_proxy_default_app" translatable="true">ללא</string>
+    <string name="cd_dns_crypt_dialog_heading" translatable="true">הוסף ממסר או פותר DNSCrypt</string>
+    <string name="cd_dns_crypt_resolver_heading" translatable="true">פותר</string>
+    <string name="univ_firewall_rule_8" translatable="true">חסום תעבורת פיתחה 80 (HTTP לא מאובטח)</string>
+    <string name="no_browser_error" translatable="true">לא ניתן לפתוח דף אינטרנט מהדפדפן.</string>
+    <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s אפליקציות נוספות</string>
+    <string name="cd_dnscrypt_relay_heading" translatable="true">ממסרים</string>
+    <string name="ctbs_block_other_apps" translatable="true">כללים החלים עבור %1$s יחולו גם על %2$s אפליקציות אחרות</string>
+    <string name="univ_accessibility_dialog_positive" translatable="true">הענקה</string>
+    <string name="dns_btm_sheet_chip_no_answer" translatable="true">אין תשובה</string>
+    <string name="univ_view_blocked_ip" translatable="true">כללי Port ו IP</string>
+    <string name="univ_firewall_rule_9" translatable="true">חסימה ברשת מדודה (סלולרית)</string>
+    <string name="cd_doh_dialog_resolver_url" translatable="true">כתובת אתר של פותר</string>
+    <string name="dns_log_dialog_positive" translatable="true">מחק יומנים</string>
+    <string name="dc_other_dns_heading" translatable="true">סוג</string>
+    <string name="about_dialog_positive_button" translatable="true">בוא נלך</string>
+    <string name="about_mail_to_string" translatable="true">mailto:</string>
+    <string name="contributors_dialog_title" translatable="true">יוצרים</string>
+    <string name="cd_dns_proxy_error_text_2" translatable="true">טווח הפתחות צריך להיות בין 1024–65535</string>
+    <string name="cd_dns_proxy_error_text_3" translatable="true">פתחה לא תקפה</string>
+    <string name="cd_dns_crypt_dialog_title" translatable="true">הוסף פותר או ממסר DNSCrypt</string>
+    <string name="cd_dns_crypt_name_default" translatable="true">DNSCrypt</string>
+    <string name="cd_dns_crypt_relay_name" translatable="true">DNSRelay %1$s</string>
+    <string name="cd_doh_dialog_resolver_name" translatable="true">שם פותר</string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true">אל תאמת אישורי TLS של שרת (אפשר רק אם אתה יודע מה אתה עושה)</string>
+    <string name="cd_dns_alg_heading" translatable="true">סינון DNS מתקדם (ניסיוני)</string>
+    <string name="dns_btm_latency_ms" translatable="true">%1$sמילי-שניות</string>
+    <string name="dns_btm_sheet_chip" translatable="true">+%1$s כתובות IP אחרות</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">נפתרה <u>באופן אנונימי</u> %1$s על ידי %2$s דרך %3$s</string>
+    <string name="dns_btm_resolved_doh" translatable="true">נפתר %1$s על ידי %2$s</string>
+    <string name="dns_btm_resolved_doh_no_server" translatable="true">נפתר %1$s</string>
+    <string name="dns_btm_record_type" translatable="true">סוג שאילתה: %1$s</string>
+    <string name="hs_download_positive_default" translatable="true">בסדר</string>
+    <string name="hs_download_positive_play_store" translatable="true">השלמת עדכון</string>
+    <string name="hs_download_positive_website" translatable="true">ביקור באתר</string>
+    <string name="univ_firewall_rule_6" translatable="true">חסום אפליקציות שהותקנו לאחרונה כברירת מחדל</string>
+    <string name="univ_firewall_rule_7" translatable="true">חסימת IPv4 ב-IPv6 (ניסיוני)</string>
+    <string name="univ_firewall_rule_10" translatable="true">חסום הכל חוץ מישומים וכתובות עם מעקף</string>
+    <string name="univ_accessibility_crash_dialog_positive" translatable="true">לך להגדרות</string>
+    <string name="cd_dns_crypt_name" translatable="true">DNSCrypt %1$s</string>
+    <string name="univ_firewall_rule_1" translatable="true">חסום את כל האפליקציות כשהמכשיר נעול</string>
+    <string name="univ_firewall_rule_4" translatable="true">חסום UDP למעט DNS ו-NTP</string>
+    <string name="hs_download_negative_default" translatable="true">הזכר לי מאוחר יותר</string>
+    <string name="univ_firewall_rule_2" translatable="true">חסום כל אפליקציה שאינה בשימוש</string>
+    <string name="univ_firewall_rule_3" translatable="true">חסום כאשר אפליקציית המקור אינה ידועה</string>
+    <string name="univ_firewall_rule_5" translatable="true">חסום כאשר הDNS נעקף</string>
+    <string name="univ_accessibility_dialog_negative" translatable="true">סירוב</string>
+    <string name="fapps_filter_parent_installed" translatable="true">מותקן</string>
+    <string name="fapps_filter_parent_system" translatable="true">מערכת</string>
+    <string name="fapps_unmetered_unblock_dialog_message">אפשר חיבורים ברשת לא מדודה (WiFi) עבור אפליקציות <i>רשומות</i>\?</string>
+    <string name="fapps_firewall_filter_bypass_universal" translatable="true">עוקף</string>
+    <string name="fapps_firewall_filter_excluded" translatable="true">מוצא מן הכלל</string>
+    <string name="fapps_firewall_filter_isolate" translatable="true">מְבוּדָד</string>
+    <string name="dns_crypt_relay_error_toast" translatable="true">לא נבחר פותר</string>
+    <string name="fapps_info_dialog_positive_btn" translatable="true">אישור</string>
+    <string name="fapps_bypass_block_dialog_title" translatable="true">עקוף ישומים</string>
+    <string name="fapps_unblock_dialog_title" translatable="true">אפשר אפליקציות</string>
+    <string name="dns_proxy_dialog_header_dns" translatable="true">הוסף פרוקסי DNS</string>
+    <string name="dns_proxy_app" translatable="true">אפליקציה</string>
+    <string name="app_ip_domain_rules" translatable="true">כללי IP / Domain לפי אפליקציה</string>
+    <string name="app_ip_domain_rules_desc" translatable="true">שינוי כללי IP / Domain לפי אפליקציה.</string>
+    <string name="dns_proxy_dialog_message" translatable="true">שם האפליקציה: %1$s
+\n
+\nכתובת IP: %2$s
+\n
+\nמספר יציאה: %3$s</string>
+    <string name="dns_proxy_dialog_message_no_app" translatable="true">כתובת IP: %1$s
+\n
+\nמספר יציאה: %2$s</string>
+    <string name="dns_query_latency" translatable="true">%1$sמילי-שניות</string>
+    <string name="dns_proxy_name" translatable="true">שם פרוקסי</string>
+    <string name="dns_proxy_ip_address" translatable="true">כתובת IP</string>
+    <string name="dns_proxy_port" translatable="true">מספר פתחה</string>
+    <string name="fapps_filter_filter_heading" translatable="true">סוג</string>
+    <string name="fapps_filter_categories_heading" translatable="true">קטגוריות</string>
+    <string name="fapps_filter_clear_btn" translatable="true">ניקוי</string>
+    <string name="fapps_info_dialog_message" translatable="true">חסום אפליקציות מלהתחבר לאינטרנט. הגבלת הגישה לאינטרנט עוזרת למנוע שימוש לא רצוי בנתונים, כמו גם לחסוך בסוללה.</string>
+    <string name="fapps_info_unmetered_msg" translatable="true">אפשר/חסום ברשת לא מדודה (WiFi).</string>
+    <string name="fapps_info_metered_msg" translatable="true">אפשר / חסום ברשת מדודה (סלולרית).</string>
+    <string name="fapps_info_bypass_msg" translatable="true">עקוף כללי חומת אש אוניברסלית.</string>
+    <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">עקוף כללי DNS &amp; Firewall.</string>
+    <string name="fapps_info_exclude_msg" translatable="true">הוצא מן הכלל ב-DNS + חומת אש.</string>
+    <string name="fapps_info_isolate_msg" translatable="true">חסום את כולם מלבד כתובות IP מהימנות.</string>
+    <string name="fapps_unmetered_unblock_dialog_title" translatable="true">אפשר בלא מדוד</string>
+    <string name="fapps_unmetered_block_dialog_title" translatable="true">חסום בלא מדוד</string>
+    <string name="fapps_metered_block_dialog_title" translatable="true">חסום במדוד</string>
+    <string name="fapps_metered_block_dialog_message" translatable="true">לחסום חיבורים ברשת מדודה (סלולרית) עבור אפליקציות <i>רשומות</i>\?</string>
+    <string name="fapps_metered_unblock_dialog_title" translatable="true">אפשר במדוד</string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true">לעקוף כללי חומת אש אוניברסליים עבור אפליקציות <i>ברשימה</i>\?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">עקוף לאפליקציות</string>
+    <string name="univ_firewall_heading" translatable="true">כללי חומת אש אוניברסליים</string>
+    <string name="fapps_unmetered_block_dialog_message" translatable="true">לחסום חיבורים ברשת לא מדודה (WiFi) עבור אפליקציות <i>רשומות</i>\?</string>
+    <string name="fapps_metered_unblock_dialog_message" translatable="true">האם לאפשר חיבורים ברשת מדודה (סלולרית) עבור אפליקציות <i>רשומות</i>\?</string>
 </resources>
