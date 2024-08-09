@@ -51,6 +51,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     private val viewModel: CustomIpViewModel by viewModel()
     private var uid = UID_EVERYBODY
     private var rules = CustomRulesActivity.RULES.APP_SPECIFIC_RULES
+    private lateinit var adapter: CustomIpAdapter
 
     companion object {
         fun newInstance(uid: Int, rules: CustomRulesActivity.RULES): CustomIpFragment {
@@ -148,8 +149,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
 
     private fun setupAdapterForApp() {
         observeAppSpecificRules()
-        val adapter =
-            CustomIpAdapter(requireContext(), CustomRulesActivity.RULES.APP_SPECIFIC_RULES)
+        adapter = CustomIpAdapter(requireContext(), CustomRulesActivity.RULES.APP_SPECIFIC_RULES)
         viewModel.setUid(uid)
         viewModel.customIpDetails.observe(viewLifecycleOwner) {
             adapter.submitData(this.lifecycle, it)
@@ -159,7 +159,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
 
     private fun setupAdapterForAllApps() {
         observeAllAppsRules()
-        val adapter = CustomIpAdapter(requireContext(), CustomRulesActivity.RULES.ALL_RULES)
+        adapter = CustomIpAdapter(requireContext(), CustomRulesActivity.RULES.ALL_RULES)
         viewModel.allIpRules.observe(viewLifecycleOwner) { adapter.submitData(this.lifecycle, it) }
         b.cipRecycler.adapter = adapter
     }
@@ -265,10 +265,16 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
             io {
-                if (rules == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
-                    IpRulesManager.deleteRulesByUid(uid)
+                val selectedItems = adapter.getSelectedItems()
+                if (selectedItems.isNotEmpty()) {
+                    IpRulesManager.deleteRules(selectedItems)
+                    uiCtx { adapter.clearSelection() }
                 } else {
-                    IpRulesManager.deleteAllAppsRules()
+                    if (rules == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
+                        IpRulesManager.deleteRulesByUid(uid)
+                    } else {
+                        IpRulesManager.deleteAllAppsRules()
+                    }
                 }
             }
             Utilities.showToastUiCentered(
@@ -279,7 +285,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
         }
 
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
-            // no-op
+            adapter.clearSelection()
         }
 
         builder.setCancelable(true)
@@ -288,6 +294,10 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 
     private fun io(f: suspend () -> Unit) {

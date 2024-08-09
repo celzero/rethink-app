@@ -18,6 +18,7 @@ package com.celzero.bravedns.adapter
 import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.format.DateUtils
@@ -43,6 +44,8 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
 import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
 import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.ui.activity.AppInfoActivity
+import com.celzero.bravedns.ui.activity.AppWiseDomainLogsActivity
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.fetchColor
@@ -57,6 +60,9 @@ import kotlinx.coroutines.withContext
 
 class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RULES) :
     PagingDataAdapter<CustomDomain, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
+
+    private val selectedItems = mutableSetOf<CustomDomain>()
+    private var isSelectionMode = false
 
     companion object {
 
@@ -74,8 +80,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
                     oldConnection: CustomDomain,
                     newConnection: CustomDomain
                 ): Boolean {
-                    return (oldConnection.domain == newConnection.domain &&
-                        oldConnection.status != newConnection.status)
+                    return oldConnection == newConnection
                 }
             }
     }
@@ -112,6 +117,14 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
             Logger.w(LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
             return
         }
+    }
+
+    fun getSelectedItems(): List<CustomDomain> = selectedItems.toList()
+
+    fun clearSelection() {
+        selectedItems.clear()
+        isSelectionMode = false
+        notifyDataSetChanged()
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -383,6 +396,10 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         private lateinit var customDomain: CustomDomain
 
         fun update(cd: CustomDomain) {
+            this.customDomain = cd
+
+            b.customDomainCheckbox.isChecked = selectedItems.contains(cd)
+            b.customDomainCheckbox.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
             io {
                 val appInfo = FirewallManager.getAppInfoByUid(cd.uid)
                 val appNames = FirewallManager.getAppNamesByUid(cd.uid)
@@ -399,29 +416,65 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
                         b.customDomainAppIconIv
                     )
 
-                    this.customDomain = cd
+
                     b.customDomainLabelTv.text = customDomain.domain
                     b.customDomainToggleGroup.tag = 1
 
                     // update toggle group button based on the status
-                    updateToggleGroup(customDomain.status)
+                    updateToggleGroup(cd.status)
                     // whether to show the toggle group or not
                     toggleActionsUi()
                     // update status in desc and status flag (N/B/W)
                     updateStatusUi(
-                        DomainRulesManager.Status.getStatus(customDomain.status),
-                        customDomain.modifiedTs
+                        DomainRulesManager.Status.getStatus(cd.status),
+                        cd.modifiedTs
                     )
 
                     b.customDomainToggleGroup.addOnButtonCheckedListener(domainRulesGroupListener)
 
-                    b.customDomainEditIcon.setOnClickListener { showEditDomainDialog(customDomain) }
+                    b.customDomainEditIcon.setOnClickListener { showEditDomainDialog(cd) }
 
                     b.customDomainExpandIcon.setOnClickListener { toggleActionsUi() }
 
-                    b.customDomainContainer.setOnClickListener { toggleActionsUi() }
+                    b.customDomainContainer.setOnClickListener {
+                        if (isSelectionMode) {
+                            toggleSelection(cd)
+                        } else {
+                            toggleActionsUi()
+                        }
+                    }
+
+                    b.customDomainSeeMoreChip.setOnClickListener { openAppWiseRulesActivity(cd.uid) }
+
+                    b.customDomainContainer.setOnLongClickListener {
+                        isSelectionMode = true
+                        selectedItems.add(cd)
+                        notifyDataSetChanged()
+                        true
+                    }
                 }
             }
+        }
+
+        private fun toggleSelection(item: CustomDomain) {
+            if (selectedItems.contains(item)) {
+                selectedItems.remove(item)
+                b.customDomainCheckbox.isChecked = false
+            } else {
+                selectedItems.add(item)
+                b.customDomainCheckbox.isChecked = true
+            }
+        }
+
+        private fun openAppWiseRulesActivity(uid: Int) {
+            val intent = Intent(context, CustomRulesActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+            intent.putExtra(
+                Constants.VIEW_PAGER_SCREEN_TO_LOAD,
+                CustomRulesActivity.Tabs.DOMAIN_RULES.screen
+            )
+            intent.putExtra(Constants.INTENT_UID, uid)
+            context.startActivity(intent)
         }
 
         private fun getAppName(uid: Int, appNames: List<String>): String {
@@ -581,6 +634,8 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
 
         fun update(cd: CustomDomain) {
             this.customDomain = cd
+            b.customDomainCheckbox.isChecked = selectedItems.contains(cd)
+            b.customDomainCheckbox.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
             b.customDomainLabelTv.text = customDomain.domain
             b.customDomainToggleGroup.tag = 1
 
@@ -600,7 +655,30 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
 
             b.customDomainExpandIcon.setOnClickListener { toggleActionsUi() }
 
-            b.customDomainContainer.setOnClickListener { toggleActionsUi() }
+            b.customDomainContainer.setOnClickListener {
+                if (isSelectionMode) {
+                    toggleSelection(cd)
+                } else {
+                    toggleActionsUi()
+                }
+            }
+
+            b.customDomainContainer.setOnLongClickListener {
+                isSelectionMode = true
+                selectedItems.add(cd)
+                notifyDataSetChanged()
+                true
+            }
+        }
+
+        private fun toggleSelection(item: CustomDomain) {
+            if (selectedItems.contains(item)) {
+                selectedItems.remove(item)
+                b.customDomainCheckbox.isChecked = false
+            } else {
+                selectedItems.add(item)
+                b.customDomainCheckbox.isChecked = true
+            }
         }
 
         private fun updateToggleGroup(id: Int) {

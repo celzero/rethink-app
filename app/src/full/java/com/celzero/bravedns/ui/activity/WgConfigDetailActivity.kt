@@ -28,12 +28,18 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.WgConfigAdapter
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.adapter.WgPeersAdapter
 import com.celzero.bravedns.databinding.ActivityWgDetailBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
 import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
@@ -79,7 +85,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         fun isDefault() = this == DEFAULT
 
         companion object {
-            fun fromInt(value: Int) = entries.first { it.value == value }
+            fun fromInt(value: Int) = entries.firstOrNull { it.value == value } ?: DEFAULT
         }
     }
 
@@ -102,6 +108,19 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun init() {
+        if (!VpnController.hasTunnel()) {
+            Logger.i(LOG_TAG_PROXY, "VPN not active, config may not be available")
+            Utilities.showToastUiCentered(
+                this,
+                ERR_CODE_VPN_NOT_ACTIVE +
+                        getString(R.string.settings_socks5_vpn_disabled_error),
+                Toast.LENGTH_LONG
+            )
+            finish()
+            return
+        }
+
+        b.editBtn.text = getString(R.string.rt_edit_dialog_positive).lowercase()
         b.globalLockdownTitleTv.text =
             getString(
                 R.string.two_argument_space,
@@ -136,7 +155,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         val mapping = WireguardManager.getConfigFilesById(configId)
 
         if (config == null) {
-            finish()
+            showInvalidConfigDialog()
             return
         }
 
@@ -167,6 +186,20 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         prefillConfig(config)
     }
 
+    private fun showInvalidConfigDialog() {
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setTitle(getString(R.string.lbl_wireguard))
+        builder.setMessage(getString(R.string.config_invalid_desc))
+        builder.setCancelable(false)
+        builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { _, _ ->
+            finish()
+        }
+        builder.setNeutralButton(getString(R.string.lbl_delete)) { _, _ ->
+            WireguardManager.deleteConfig(configId)
+        }
+        builder.create().show()
+    }
+
     private fun shouldObserveAppsCount(): Boolean {
         return !wgType.isOneWg() && !b.catchAllCheck.isChecked
     }
@@ -178,15 +211,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         if (wgInterface == null) {
             return
         }
+        b.configNameText.visibility = View.VISIBLE
         b.configNameText.text = config.getName()
-        b.publicKeyText.text = wgInterface?.getKeyPair()?.getPublicKey()?.base64()
+        b.configIdText.text = getString(R.string.single_argument_parenthesis, config.getId().toString())
 
-        if (wgInterface?.getAddresses()?.isEmpty() == true) {
-            b.addressesLabel.visibility = View.GONE
-            b.addressesText.visibility = View.GONE
-        } else {
-            b.addressesText.text = wgInterface?.getAddresses()?.joinToString { it.toString() }
-        }
         setPeersAdapter()
         // show dns servers if in one-wg mode
         if (wgType.isOneWg()) {
@@ -206,7 +234,16 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.dnsServersText.visibility = View.GONE
         }
 
-        // uncomment this if we want to show the dns servers, listen port and mtu
+        // uncomment this if we want to show the public key, addresses, listen port and mtu
+        /*b.publicKeyText.text = wgInterface?.getKeyPair()?.getPublicKey()?.base64()
+
+        if (wgInterface?.getAddresses()?.isEmpty() == true) {
+            b.addressesLabel.visibility = View.GONE
+            b.addressesText.visibility = View.GONE
+        } else {
+            b.addressesText.text = wgInterface?.getAddresses()?.joinToString { it.toString() }
+        }*/
+
         /*if (wgInterface?.dnsServers?.isEmpty() == true) {
                     b.dnsServersText.visibility = View.GONE
               b.dnsServersLabel.visibility = View.GONE
@@ -300,6 +337,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.peersList.visibility = View.VISIBLE
         }
     */
+
     private fun handleAppsCount() {
         val id = ProxyManager.ID_WG_BASE + configId
         b.applicationsBtn.isEnabled = true
@@ -314,7 +352,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun setupClickListeners() {
-        b.interfaceEdit.setOnClickListener {
+        b.editBtn.setOnClickListener {
             val intent = Intent(this, WgConfigEditorActivity::class.java)
             intent.putExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, configId)
             intent.putExtra(INTENT_EXTRA_WG_TYPE, wgType.value)
@@ -328,7 +366,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             openAppsDialog(proxyName)
         }
 
-        b.interfaceDelete.setOnClickListener { showDeleteInterfaceDialog() }
+        b.deleteBtn.setOnClickListener { showDeleteInterfaceDialog() }
 
         /*b.newConfLayout.setOnClickListener {
             b.newConfProgressBar.visibility = View.VISIBLE
@@ -377,32 +415,77 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun updateCatchAll(enabled: Boolean) {
         io {
-            val config = WireguardManager.getConfigFilesById(configId)
-            if (config == null) {
-                Logger.e(LOG_TAG_PROXY, "updateCatchAll: config not found for $configId")
-                return@io
-            }
-            if (WireguardManager.canEnableConfig(config)) {
-                WireguardManager.updateCatchAllConfig(configId, enabled)
-                uiCtx {
-                    b.lockdownCheck.isEnabled = !enabled
-                    b.applicationsBtn.isEnabled = !enabled
-                    if (enabled) {
-                        b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
-                    } else {
-                        handleAppsCount()
-                    }
-                }
-            } else {
+            if (!VpnController.hasTunnel()) {
                 uiCtx {
                     Utilities.showToastUiCentered(
                         this,
-                        getString(R.string.wireguard_enabled_failure),
+                        ERR_CODE_VPN_NOT_ACTIVE + getString(R.string.settings_socks5_vpn_disabled_error),
                         Toast.LENGTH_LONG
                     )
-                    b.catchAllCheck.isChecked = false
+                    b.catchAllCheck.isChecked = !enabled
                 }
                 return@io
+            }
+
+            if (!WireguardManager.canEnableProxy()) {
+                Logger.i(
+                    LOG_TAG_PROXY,
+                    "not in DNS+Firewall mode, cannot enable WireGuard"
+                )
+                uiCtx {
+                    // reset the check box
+                    b.catchAllCheck.isChecked = false
+                    Utilities.showToastUiCentered(
+                        this,
+                        ERR_CODE_VPN_NOT_FULL + getString(R.string.wireguard_enabled_failure),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return@io
+            }
+
+            if (WireguardManager.oneWireGuardEnabled()) {
+                // this should not happen, ui is disabled if one wireGuard is enabled
+                Logger.w(LOG_TAG_PROXY, "one wireGuard is already enabled")
+                uiCtx {
+                    // reset the check box
+                    b.catchAllCheck.isChecked = false
+                    Utilities.showToastUiCentered(
+                        this,
+                        ERR_CODE_OTHER_WG_ACTIVE + getString(
+                            R.string.wireguard_enabled_failure
+                        ),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return@io
+            }
+
+
+            val config = WireguardManager.getConfigFilesById(configId)
+            if (config == null) {
+                Logger.e(LOG_TAG_PROXY, "updateCatchAll: config not found for $configId")
+                uiCtx {
+                    // reset the check box
+                    b.catchAllCheck.isChecked = false
+                    Utilities.showToastUiCentered(
+                        this,
+                        ERR_CODE_WG_INVALID + getString(R.string.wireguard_enabled_failure),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return@io
+            }
+
+            WireguardManager.updateCatchAllConfig(configId, enabled)
+            uiCtx {
+                b.lockdownCheck.isEnabled = !enabled
+                b.applicationsBtn.isEnabled = !enabled
+                if (enabled) {
+                    b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
+                } else {
+                    handleAppsCount()
+                }
             }
         }
     }

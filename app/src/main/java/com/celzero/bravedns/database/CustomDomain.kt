@@ -35,11 +35,14 @@ class CustomDomain {
     override fun equals(other: Any?): Boolean {
         if (other !is CustomDomain) return false
         if (domain != other.domain) return false
+        if (status != other.status) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.domain.hashCode()
+        var result = this.domain.hashCode()
+        result += result * 31 + this.status
+        return result
     }
 
     constructor(values: ContentValues?) {

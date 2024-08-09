@@ -34,6 +34,7 @@ import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
 import com.celzero.bravedns.util.Utilities
@@ -62,6 +63,7 @@ class ConnectionTrackerFragment :
 
     companion object {
         const val PROTOCOL_FILTER_PREFIX = "P:"
+        private const val QUERY_TEXT_TIMEOUT: Long = 600
 
         fun newInstance(param: String): ConnectionTrackerFragment {
             val args = Bundle()
@@ -77,7 +79,15 @@ class ConnectionTrackerFragment :
         initView()
         if (arguments != null) {
             val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
-            b.connectionSearch.setQuery(query, true)
+            if (query.contains(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)) {
+                val rule = query.split(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)[1]
+                filterCategories.add(rule)
+                filterType = TopLevelFilter.BLOCKED
+                viewModel.setFilter(filterQuery, filterCategories, filterType)
+                hideSearchLayout()
+            } else {
+                b.connectionSearch.setQuery(query, true)
+            }
         }
     }
 
@@ -96,6 +106,7 @@ class ConnectionTrackerFragment :
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
+        recyclerAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.connectionTrackerList.observe(viewLifecycleOwner) { it ->
@@ -121,6 +132,10 @@ class ConnectionTrackerFragment :
 
         remakeParentFilterChipsUi()
         remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
+    }
+
+    private fun hideSearchLayout() {
+        b.connectionCardViewTop.visibility = View.GONE
     }
 
     override fun onResume() {
@@ -253,7 +268,7 @@ class ConnectionTrackerFragment :
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(500, lifecycleScope) {
+        Utilities.delay(QUERY_TEXT_TIMEOUT, lifecycleScope) {
             if (this.isAdded) {
                 this.filterQuery = query
                 viewModel.setFilter(query, filterCategories, filterType)

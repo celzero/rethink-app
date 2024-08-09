@@ -45,6 +45,7 @@ import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
@@ -288,7 +289,34 @@ object Utilities {
 
     fun showToastUiCentered(context: Context, message: String, toastLength: Int) {
         try {
-            Toast.makeText(context, message, toastLength).show()
+            // check if the context is ui context or not
+            if (context is androidx.appcompat.app.AppCompatActivity) {
+                context.runOnUiThread {
+                    Toast.makeText(context, message, toastLength).show()
+                }
+                return
+            } else if (context is androidx.fragment.app.FragmentActivity) {
+                context.runOnUiThread {
+                    Toast.makeText(context, message, toastLength).show()
+                }
+                return
+            } else if (context is android.app.Activity) {
+                context.runOnUiThread {
+                    Toast.makeText(context, message, toastLength).show()
+                }
+                return
+            } else if (context is android.app.Application) {
+                Logger.w(LOG_TAG_VPN, "toast err: context not found")
+                if (DEBUG) { // for testing purpose
+                    Toast.makeText(context, message, toastLength).show()
+                }
+            } else {
+                Logger.w(LOG_TAG_VPN, "toast err: context not found")
+                if (DEBUG) { // for testing purpose
+                    Toast.makeText(context, message, toastLength).show()
+                }
+            }
+
         } catch (e: IllegalStateException) {
             Logger.w(LOG_TAG_VPN, "toast err: ${e.message}")
         } catch (e: IllegalAccessException) {

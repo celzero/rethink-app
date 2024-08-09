@@ -29,11 +29,15 @@ class ProxyApplicationMapping {
 
     override fun equals(other: Any?): Boolean {
         if (other !is ProxyApplicationMapping) return false
-        return packageName == other.packageName
+        if (packageName != other.packageName) return false
+        if (uid != other.uid) return false
+        return true
     }
 
     override fun hashCode(): Int {
-        return this.packageName.hashCode()
+        var result = this.uid.hashCode()
+        result += result * 31 + this.packageName.hashCode()
+        return result
     }
 
     constructor(

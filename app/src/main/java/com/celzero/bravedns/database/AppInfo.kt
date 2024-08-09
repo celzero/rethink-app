@@ -41,11 +41,16 @@ class AppInfo {
     override fun equals(other: Any?): Boolean {
         if (other !is AppInfo) return false
         if (packageName != other.packageName) return false
+        if (firewallStatus != other.firewallStatus) return false
+        if (connectionStatus != other.connectionStatus) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.packageName.hashCode()
+        var result = this.packageName.hashCode()
+        result += result * 31 + this.firewallStatus
+        result += result * 31 + this.connectionStatus
+        return result
     }
 
     constructor(values: ContentValues?) {
@@ -99,6 +104,8 @@ class AppInfo {
     }
 
     fun hasInternetPermission(packageManager: PackageManager): Boolean {
+        if (packageName.startsWith("no_package_")) return true
+
         // INTERNET permission if defined, can not be denied so this is safe to use
         return packageManager.checkPermission(Manifest.permission.INTERNET, packageName) == PackageManager.PERMISSION_GRANTED
     }

@@ -101,7 +101,7 @@ interface AppInfoDAO {
     ): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and appCategory in (:filter)  and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus)  order by lower(appName)"
+        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and appCategory in (:filter)  and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
     fun getAppInfos(
         search: String,
@@ -152,4 +152,10 @@ interface AppInfoDAO {
 
     @Query("update AppInfo set isProxyExcluded = :isProxyExcluded where uid = :uid")
     fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean)
+
+    @Query("update AppInfo set firewallStatus = 5, connectionStatus = 3 where packageName = 'com.celzero.bravedns'")
+    fun resetRethinkAppFirewallMode()
+
+    @Query("select uid from AppInfo where packageName = :packageName")
+    fun getAppInfoUidForPackageName(packageName: String): Int
 }

@@ -8,11 +8,30 @@
     android:orientation="vertical"
     tools:context=".ui.activity.FirewallActivity">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/logs_act_tabLayout"
-        style="@style/TabbedLayoutDefault"
+    <RelativeLayout
+        android:id="@+id/logs_tab_rl"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/logs_act_tabLayout"
+            style="@style/TabbedLayoutDefault"
+            android:layout_width="match_parent"
+            android:layout_toStartOf="@id/app_logs"
+            android:layout_height="wrap_content" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/app_logs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="5dp"
+            android:layout_centerVertical="true"
+            android:alpha="0.7"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/report_bug_icon" />
+
+    </RelativeLayout>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/logs_act_viewpager"

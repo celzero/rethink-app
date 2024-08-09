@@ -125,6 +125,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         initializeValues()
         initializeClickListeners()
         observeVpnState()
@@ -193,6 +194,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         b.fhsSponsor.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
+            startActivity(intent)
+        }
+
+        b.fhsSponsorBottom.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
             startActivity(intent)
         }
@@ -406,10 +412,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     val status = VpnController.getProxyStatusById(proxyId)
                     if (status != null) {
                         // consider starting and up as active
-                        if (status == Backend.TOK || status == Backend.TUP || status == Backend.TZZ) {
-                            active++
-                        } else {
+                        if (status == Backend.TKO) {
                             failing++
+                        } else {
+                            active++
                         }
                     } else {
                         failing++
@@ -526,6 +532,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
             updateUiWithDnsStates(it)
         }
+
+        VpnController.getRegionLiveData().observe(viewLifecycleOwner) {
+            if (it != null) {
+                b.fhsCardRegion.text = it
+            }
+        }
     }
 
     private fun updateUiWithDnsStates(dnsName: String) {
@@ -554,7 +566,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         failing = false
                         if (isAdded) {
                             b.fhsCardDnsLatency.visibility = View.VISIBLE
-                            b.fhsCardDnsFailure.visibility = View.GONE
+                            b.fhsCardDnsFailure.visibility = View.INVISIBLE
                         }
                         return@ui
                     }
@@ -563,7 +575,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     failing = true
                 }
                 if (failing && isAdded) {
-                    b.fhsCardDnsLatency.visibility = View.GONE
+                    b.fhsCardDnsLatency.visibility = View.INVISIBLE
                     b.fhsCardDnsFailure.visibility = View.VISIBLE
                     b.fhsCardDnsFailure.text = getString(R.string.failed_using_default)
                 }
@@ -621,6 +633,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun unobserveDnsStates() {
         persistentState.median.removeObservers(viewLifecycleOwner)
         appConfig.getConnectedDnsObservable().removeObservers(viewLifecycleOwner)
+        VpnController.getRegionLiveData().removeObservers(viewLifecycleOwner)
     }
 
     private fun observeUniversalStates() {
@@ -919,6 +932,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         syncDnsStatus()
         handleLockdownModeIfNeeded()
         startTrafficStats()
+        b.fhsSponsorBottom.bringToFront()
     }
 
     private lateinit var trafficStatsTicker: Job
@@ -926,15 +940,60 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun startTrafficStats() {
         trafficStatsTicker =
             ui("trafficStatsTicker") {
+                var counter = 0
                 while (true) {
-                    fetchTrafficStats()
-                    kotlinx.coroutines.delay(1500L)
+                    // make it as 3 options and add the protos
+                    if (!isAdded) return@ui
+
+                    if (counter % 3 == 0) {
+                        displayTrafficStatsRate()
+                    } else if (counter % 3 == 1) {
+                        displayTrafficStatsBW()
+                    } else {
+                        displayProtos()
+                    }
+                    // show protos
+                    kotlinx.coroutines.delay(2500L)
+                    counter++
                 }
             }
     }
 
+    private fun displayProtos() {
+        b.fhsInternetSpeed.visibility = View.VISIBLE
+        b.fhsInternetSpeedUnit.visibility = View.VISIBLE
+        b.fhsInternetSpeed.text = VpnController.protocols()
+        b.fhsInternetSpeedUnit.text = getString(R.string.lbl_protos)
+    }
+
+    private fun displayTrafficStatsBW() {
+        val txRx = convertToCommonUnit(txRx.tx, txRx.rx)
+
+        b.fhsInternetSpeed.visibility = View.VISIBLE
+        b.fhsInternetSpeedUnit.visibility = View.VISIBLE
+        b.fhsInternetSpeed.text =
+            getString(
+                R.string.two_argument_space,
+                getString(
+                    R.string.two_argument_space,
+                    txRx.first,
+                    getString(R.string.symbol_black_up)
+                ),
+                getString(
+                    R.string.two_argument_space,
+                    txRx.second,
+                    getString(R.string.symbol_black_down)
+                )
+            )
+        b.fhsInternetSpeedUnit.text = getCommonUnit(this.txRx.tx, this.txRx.rx)
+    }
+
     private fun stopTrafficStats() {
-        trafficStatsTicker.cancel()
+        try {
+            trafficStatsTicker.cancel()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "error stopping traffic stats ticker", e)
+        }
     }
 
     data class TxRx(
@@ -945,7 +1004,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private var txRx = TxRx()
 
-    private fun fetchTrafficStats() {
+    private fun displayTrafficStatsRate() {
         val curr = TxRx()
         if (txRx.time <= 0L) {
             txRx = curr
@@ -960,12 +1019,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             b.fhsInternetSpeedUnit.visibility = View.GONE
             return
         }
-
         val tx = curr.tx - txRx.tx
         val rx = curr.rx - txRx.rx
         txRx = curr
-        val txBytes = String.format("%.2f", ((tx / dur) / 1000.0))
-        val rxBytes = String.format("%.2f", ((rx / dur) / 1000.0))
+        val txRx = convertToCommonUnit(tx/dur, rx/dur)
         b.fhsInternetSpeed.visibility = View.VISIBLE
         b.fhsInternetSpeedUnit.visibility = View.VISIBLE
         b.fhsInternetSpeed.text =
@@ -973,16 +1030,46 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 R.string.two_argument_space,
                 getString(
                     R.string.two_argument_space,
-                    txBytes,
+                    txRx.first,
                     getString(R.string.symbol_black_up)
                 ),
                 getString(
                     R.string.two_argument_space,
-                    rxBytes,
+                    txRx.second,
                     getString(R.string.symbol_black_down)
                 )
             )
+        b.fhsInternetSpeedUnit.text = getString(R.string.symbol_ps, getCommonUnit(tx/dur, rx/dur))
     }
+
+    // TODO: Move this to a common utility class
+    private fun getCommonUnit(bytes1: Long, bytes2: Long): String {
+        val maxBytes = maxOf(bytes1, bytes2)
+        return when {
+            maxBytes >= 1024L * 1024L * 1024L * 1024L -> "TB"
+            maxBytes >= 1024L * 1024L * 1024L -> "GB"
+            maxBytes >= 1024L * 1024L -> "MB"
+            maxBytes >= 1024L -> "KB"
+            else -> "B"
+        }
+    }
+
+    private fun convertToCommonUnit(bytes1: Long, bytes2: Long): Pair<String, String> {
+        val unit = getCommonUnit(bytes1, bytes2)
+        val v = when (unit) {
+            "TB" -> Pair(bytesToTB(bytes1), bytesToTB(bytes2))
+            "GB" -> Pair(bytesToGB(bytes1), bytesToGB(bytes2))
+            "MB" -> Pair(bytesToMB(bytes1), bytesToMB(bytes2))
+            "KB" -> Pair(bytesToKB(bytes1), bytesToKB(bytes2))
+            else -> Pair(bytes1.toDouble(), bytes2.toDouble())
+        }
+        return Pair(String.format(Locale.ROOT, "%.2f", v.first), String.format(Locale.ROOT, "%.2f", v.second))
+    }
+
+    private fun bytesToKB(bytes: Long): Double = bytes / 1024.0
+    private fun bytesToMB(bytes: Long): Double = bytes / (1024.0 * 1024.0)
+    private fun bytesToGB(bytes: Long): Double = bytes / (1024.0 * 1024.0 * 1024.0)
+    private fun bytesToTB(bytes: Long): Double = bytes / (1024.0 * 1024.0 * 1024.0 * 1024.0)
 
     /**
      * Issue fix - https://github.com/celzero/rethink-app/issues/57 When the application
@@ -1138,7 +1225,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun stopVpnService() {
-        VpnController.stop(requireContext())
+        VpnController.stop("home", requireContext())
     }
 
     private fun startVpnService() {

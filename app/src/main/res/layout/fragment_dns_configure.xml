@@ -72,7 +72,7 @@
                         android:layout_marginTop="5dp"
                         android:paddingTop="5dp">
 
-                        <RadioButton
+                        <androidx.appcompat.widget.AppCompatRadioButton
                             android:id="@+id/wireguard_rb"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
@@ -87,7 +87,7 @@
                             android:text="@string/lbl_wireguard"
                             android:visibility="gone" />
 
-                        <RadioButton
+                        <androidx.appcompat.widget.AppCompatRadioButton
                             android:id="@+id/network_dns_rb"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
@@ -96,13 +96,14 @@
                             android:layout_marginEnd="10dp"
                             android:layout_marginBottom="10dp"
                             android:checked="false"
+                            android:drawableEnd="@drawable/ic_info_white_16"
                             android:enabled="true"
                             android:minHeight="48dp"
                             android:padding="10dp"
                             android:text="@string/network_dns" />
 
 
-                        <RadioButton
+                        <androidx.appcompat.widget.AppCompatRadioButton
                             android:id="@+id/custom_dns_rb"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
@@ -118,7 +119,7 @@
                             android:padding="10dp"
                             android:text="@string/dc_custom_dns_radio" />
 
-                        <RadioButton
+                        <androidx.appcompat.widget.AppCompatRadioButton
                             android:id="@+id/rethink_plus_dns_rb"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"

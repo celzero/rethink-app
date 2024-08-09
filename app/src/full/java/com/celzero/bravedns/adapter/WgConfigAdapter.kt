@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.adapter
 
+import Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
@@ -29,18 +30,22 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import backend.Backend
-import backend.Stats
+import backend.RouterStats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.WgConfigFiles
+import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.ListItemWgGeneralInterfaceBinding
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
-import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -50,7 +55,6 @@ import kotlinx.coroutines.withContext
 class WgConfigAdapter(private val context: Context) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
 
-    private var configs: ConcurrentHashMap<Int, Job> = ConcurrentHashMap()
     private var lifecycleOwner: LifecycleOwner? = null
 
     companion object {
@@ -62,18 +66,14 @@ class WgConfigAdapter(private val context: Context) :
                     oldConnection: WgConfigFiles,
                     newConnection: WgConfigFiles
                 ): Boolean {
-                    return (oldConnection == newConnection)
+                    return oldConnection == newConnection
                 }
 
                 override fun areContentsTheSame(
                     oldConnection: WgConfigFiles,
                     newConnection: WgConfigFiles
                 ): Boolean {
-                    return (oldConnection.id == newConnection.id &&
-                            oldConnection.name == newConnection.name &&
-                            oldConnection.isActive == newConnection.isActive &&
-                            oldConnection.isCatchAll == newConnection.isCatchAll &&
-                            oldConnection.isLockdown == newConnection.isLockdown)
+                    return oldConnection == newConnection
                 }
             }
     }
@@ -91,35 +91,34 @@ class WgConfigAdapter(private val context: Context) :
                 parent,
                 false
             )
-        lifecycleOwner = parent.findViewTreeLifecycleOwner()
+        if (lifecycleOwner == null) {
+            lifecycleOwner = parent.findViewTreeLifecycleOwner()
+        }
         return WgInterfaceViewHolder(itemBinding)
     }
 
     override fun onViewDetachedFromWindow(holder: WgInterfaceViewHolder) {
         super.onViewDetachedFromWindow(holder)
-        configs.values.forEach { it.cancel() }
-        configs.clear()
+        holder.cancelJobIfAny()
     }
 
     inner class WgInterfaceViewHolder(private val b: ListItemWgGeneralInterfaceBinding) :
         RecyclerView.ViewHolder(b.root) {
+        private var job: Job? = null
 
         fun update(config: WgConfigFiles) {
-            b.interfaceNameText.text = config.name
-            b.interfaceSwitch.isChecked = config.isActive
+            b.interfaceNameText.text = config.name.take(12)
+            b.interfaceIdText.text = context.getString(R.string.single_argument_parenthesis, config.id.toString())
+            b.interfaceSwitch.isChecked = config.isActive && VpnController.hasTunnel()
             setupClickListeners(config)
             updateStatusJob(config)
         }
 
         private fun updateStatusJob(config: WgConfigFiles) {
-            if (config.isActive) {
-                val job = updateProxyStatusContinuously(config)
-                if (job != null) {
-                    // cancel the job if it already exists for the same config
-                    cancelJobIfAny(config.id)
-                    configs[config.id] = job
-                }
+            if (config.isActive && VpnController.hasTunnel()) {
+                job = updateProxyStatusContinuously(config)
             } else {
+                cancelJobIfAny()
                 disableInactiveConfig(config)
             }
         }
@@ -129,25 +128,23 @@ class WgConfigAdapter(private val context: Context) :
             if (config.isLockdown) {
                 b.protocolInfoChipGroup.visibility = View.GONE
                 b.interfaceActiveLayout.visibility = View.GONE
-                b.interfaceConfigStatus.text =
+                b.interfaceStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
                 val id = ProxyManager.ID_WG_BASE + config.id
                 val appsCount = ProxyManager.getAppCountForProxy(id)
                 updateUi(config, appsCount)
             } else {
-                b.interfaceStatus.visibility = View.GONE
+                b.interfaceConfigStatus.visibility = View.GONE
                 b.interfaceAppsCount.visibility = View.GONE
                 b.interfaceActiveLayout.visibility = View.GONE
                 b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.background)
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceSwitch.isChecked = false
                 b.protocolInfoChipGroup.visibility = View.GONE
-                b.interfaceConfigStatus.visibility = View.VISIBLE
-                b.interfaceConfigStatus.text =
+                b.interfaceStatus.visibility = View.VISIBLE
+                b.interfaceStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
-            // cancel the job if it already exists for the config, as the config is disabled
-            cancelJobIfAny(config.id)
         }
 
         private fun updateProxyStatusContinuously(config: WgConfigFiles): Job? {
@@ -193,15 +190,10 @@ class WgConfigAdapter(private val context: Context) :
             }
         }
 
-        private fun cancelJobIfAny(id: Int) {
-            val job = configs[id]
-            job?.cancel()
-            configs.remove(id)
-        }
-
-        private fun cancelAllJobs() {
-            configs.values.forEach { it.cancel() }
-            configs.clear()
+        fun cancelJobIfAny() {
+            if (job?.isActive == true) {
+                job?.cancel()
+            }
         }
 
         private suspend fun updateStatus(config: WgConfigFiles) {
@@ -221,12 +213,12 @@ class WgConfigAdapter(private val context: Context) :
             // if the view is not active then cancel the job
             if (
                 lifecycleOwner != null &&
-                lifecycleOwner
-                    ?.lifecycle
-                    ?.currentState
-                    ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
+                    lifecycleOwner
+                        ?.lifecycle
+                        ?.currentState
+                        ?.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED) == false
             ) {
-                cancelAllJobs()
+                cancelJobIfAny()
                 return
             }
             uiCtx {
@@ -277,7 +269,7 @@ class WgConfigAdapter(private val context: Context) :
             }
         }
 
-        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, stats: Stats?) {
+        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, stats: RouterStats?) {
             if (config.isActive) {
                 b.interfaceSwitch.isChecked = true
                 b.interfaceDetailCard.strokeWidth = 2
@@ -316,14 +308,14 @@ class WgConfigAdapter(private val context: Context) :
                         }
                     } else if (
                         statusId == Backend.TUP ||
-                        statusId == Backend.TZZ ||
-                        statusId == Backend.TNT
+                            statusId == Backend.TZZ ||
+                            statusId == Backend.TNT
                     ) {
                         b.interfaceDetailCard.strokeColor =
                             UIUtils.fetchColor(context, R.attr.chipTextNeutral)
                     } else {
                         b.interfaceDetailCard.strokeColor =
-                            UIUtils.fetchColor(context, R.attr.accentBad)
+                            UIUtils.fetchColor(context, R.attr.chipTextNegative)
                     }
                     status =
                         if (stats?.lastOK == 0L) {
@@ -339,8 +331,8 @@ class WgConfigAdapter(private val context: Context) :
                         // for idle state, if lastOk is less than 30 sec, then show as connected
                         if (
                             stats.lastOK != 0L &&
-                            System.currentTimeMillis() - stats.lastOK <
-                            30 * DateUtils.SECOND_IN_MILLIS
+                                System.currentTimeMillis() - stats.lastOK <
+                                    30 * DateUtils.SECOND_IN_MILLIS
                         ) {
                             status =
                                 context
@@ -361,15 +353,15 @@ class WgConfigAdapter(private val context: Context) :
                 b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.background)
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceSwitch.isChecked = false
-                b.interfaceStatus.visibility = View.GONE
+                b.interfaceConfigStatus.visibility = View.GONE
                 b.interfaceAppsCount.visibility = View.GONE
-                b.interfaceConfigStatus.visibility = View.VISIBLE
-                b.interfaceConfigStatus.text =
+                b.interfaceStatus.visibility = View.VISIBLE
+                b.interfaceStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
         }
 
-        private fun getRxTx(stats: Stats?): String {
+        private fun getRxTx(stats: RouterStats?): String {
             if (stats == null) return ""
             val rx =
                 context.getString(
@@ -381,10 +373,10 @@ class WgConfigAdapter(private val context: Context) :
                     R.string.symbol_upload,
                     Utilities.humanReadableByteCount(stats.tx, true)
                 )
-            return context.getString(R.string.two_argument_space, rx, tx)
+            return context.getString(R.string.two_argument_space, tx, rx)
         }
 
-        private fun getUpTime(stats: Stats?): CharSequence {
+        private fun getUpTime(stats: RouterStats?): CharSequence {
             if (stats == null) {
                 return ""
             }
@@ -398,7 +390,7 @@ class WgConfigAdapter(private val context: Context) :
             )
         }
 
-        private fun getHandshakeTime(stats: Stats?): CharSequence {
+        private fun getHandshakeTime(stats: RouterStats?): CharSequence {
             if (stats == null) {
                 return ""
             }
@@ -421,33 +413,123 @@ class WgConfigAdapter(private val context: Context) :
             b.interfaceSwitch.setOnCheckedChangeListener(null)
             b.interfaceSwitch.setOnClickListener {
                 val cfg = config.toImmutable()
-                if (b.interfaceSwitch.isChecked) {
-                    if (WireguardManager.canEnableConfig(cfg)) {
-                        WireguardManager.enableConfig(cfg)
+                io {
+                    if (b.interfaceSwitch.isChecked) {
+                        enableWgIfPossible(cfg)
                     } else {
-                        Utilities.showToastUiCentered(
-                            context,
-                            context.getString(R.string.wireguard_enabled_failure),
-                            Toast.LENGTH_LONG
-                        )
-                        b.interfaceSwitch.isChecked = false
-                    }
-                } else {
-                    if (WireguardManager.canDisableConfig(cfg)) {
-                        WireguardManager.disableConfig(cfg)
-                    } else {
-                        Utilities.showToastUiCentered(
-                            context,
-                            context.getString(R.string.wireguard_disable_failure),
-                            Toast.LENGTH_LONG
-                        )
-                        b.interfaceSwitch.isChecked = true
+                        disableWgIfPossible(cfg)
                     }
                 }
             }
         }
 
+        private suspend fun disableWgIfPossible(cfg: WgConfigFilesImmutable) {
+            if (!VpnController.hasTunnel()) {
+                Logger.i(LOG_TAG_PROXY, "VPN not active, cannot enable WireGuard")
+                uiCtx {
+                    Utilities.showToastUiCentered(
+                        context,
+                        ERR_CODE_VPN_NOT_ACTIVE +
+                            context.getString(R.string.settings_socks5_vpn_disabled_error),
+                        Toast.LENGTH_LONG
+                    )
+                    // reset the check box
+                    b.interfaceSwitch.isChecked = true
+                }
+                return
+            }
+
+            if (WireguardManager.canDisableConfig(cfg)) {
+                WireguardManager.disableConfig(cfg)
+            } else {
+                uiCtx {
+                    Utilities.showToastUiCentered(
+                        context,
+                        context.getString(R.string.wireguard_disable_failure),
+                        Toast.LENGTH_LONG
+                    )
+                    b.interfaceSwitch.isChecked = true
+                }
+            }
+
+            WireguardManager.disableConfig(cfg)
+        }
+
+        private suspend fun enableWgIfPossible(cfg: WgConfigFilesImmutable) {
+
+            if (!VpnController.hasTunnel()) {
+                Logger.i(LOG_TAG_PROXY, "VPN not active, cannot enable WireGuard")
+                uiCtx {
+                    Utilities.showToastUiCentered(
+                        context,
+                        ERR_CODE_VPN_NOT_ACTIVE +
+                            context.getString(R.string.settings_socks5_vpn_disabled_error),
+                        Toast.LENGTH_LONG
+                    )
+                    // reset the check box
+                    b.interfaceSwitch.isChecked = false
+                }
+                return
+            }
+
+            if (!WireguardManager.canEnableProxy()) {
+                Logger.i(LOG_TAG_PROXY, "not in DNS+Firewall mode, cannot enable WireGuard")
+                uiCtx {
+                    // reset the check box
+                    b.interfaceSwitch.isChecked = false
+                    Utilities.showToastUiCentered(
+                        context,
+                        ERR_CODE_VPN_NOT_FULL +
+                            context.getString(R.string.wireguard_enabled_failure),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return
+            }
+
+            if (WireguardManager.oneWireGuardEnabled()) {
+                // this should not happen, ui is disabled if one wireGuard is enabled
+                Logger.w(LOG_TAG_PROXY, "one wireGuard is already enabled")
+                uiCtx {
+                    // reset the check box
+                    b.interfaceSwitch.isChecked = false
+                    Utilities.showToastUiCentered(
+                        context,
+                        ERR_CODE_OTHER_WG_ACTIVE +
+                            context.getString(R.string.wireguard_enabled_failure),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return
+            }
+
+            if (!WireguardManager.isValidConfig(cfg.id)) {
+                Logger.i(LOG_TAG_PROXY, "invalid WireGuard config")
+                uiCtx {
+                    // reset the check box
+                    b.interfaceSwitch.isChecked = false
+                    Utilities.showToastUiCentered(
+                        context,
+                        ERR_CODE_WG_INVALID + context.getString(R.string.wireguard_enabled_failure),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return
+            }
+
+            WireguardManager.enableConfig(cfg)
+        }
+
         private fun launchConfigDetail(id: Int) {
+            if (!VpnController.hasTunnel()) {
+                Utilities.showToastUiCentered(
+                    context,
+                    context.getString(R.string.ssv_toast_start_rethink),
+                    Toast.LENGTH_SHORT
+                )
+                return
+            }
+
             val intent = Intent(context, WgConfigDetailActivity::class.java)
             intent.putExtra(INTENT_EXTRA_WG_ID, id)
             intent.putExtra(

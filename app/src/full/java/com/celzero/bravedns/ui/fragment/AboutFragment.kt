@@ -22,10 +22,8 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.os.SystemClock
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -57,6 +55,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.sendEmailIntent
@@ -104,6 +103,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutPrivacyPolicy.setOnClickListener(this)
         b.aboutMail.setOnClickListener(this)
         b.aboutTelegram.setOnClickListener(this)
+        b.aboutReddit.setOnClickListener(this)
+        b.aboutMastodon.setOnClickListener(this)
+        b.aboutElement.setOnClickListener(this)
         b.aboutFaq.setOnClickListener(this)
         b.mozillaImg.setOnClickListener(this)
         b.fossImg.setOnClickListener(this)
@@ -117,6 +119,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppVersion.setOnClickListener(this)
         b.aboutAppContributors.setOnClickListener(this)
         b.aboutAppTranslate.setOnClickListener(this)
+        b.aboutStats.setOnClickListener(this)
 
         try {
             val version = getVersionName() ?: ""
@@ -216,6 +219,59 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.aboutPrivacyPolicy -> {
                 openActionViewIntent(getString(R.string.about_privacy_policy_link).toUri())
+            }
+            b.aboutReddit -> {
+                openActionViewIntent(getString(R.string.about_reddit_handle).toUri())
+            }
+            b.aboutMastodon -> {
+                openActionViewIntent(getString(R.string.about_mastodom_handle).toUri())
+            }
+            b.aboutElement -> {
+                openActionViewIntent(getString(R.string.about_matrix_handle).toUri())
+            }
+            b.aboutStats -> {
+                openStatsDialog()
+            }
+        }
+    }
+
+    private fun openStatsDialog() {
+        io {
+            val stat = VpnController.getNetStat()
+            val formatedStat = UIUtils.formatNetStat(stat)
+            uiCtx {
+                val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
+                val builder =
+                    MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+                val lp = WindowManager.LayoutParams()
+                val dialog = builder.create()
+                dialog.show()
+                lp.copyFrom(dialog.window?.attributes)
+                lp.width = WindowManager.LayoutParams.MATCH_PARENT
+                lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+
+                dialog.setCancelable(true)
+                dialog.window?.attributes = lp
+
+                val heading = dialogBinding.infoRulesDialogRulesTitle
+                val okBtn = dialogBinding.infoRulesDialogCancelImg
+                val descText = dialogBinding.infoRulesDialogRulesDesc
+                dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
+
+                heading.text = "Network Stats"
+                heading.setCompoundDrawablesWithIntrinsicBounds(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_log_level),
+                    null,
+                    null,
+                    null
+                )
+
+                descText.movementMethod = LinkMovementMethod.getInstance()
+                descText.text = formatedStat
+
+                okBtn.setOnClickListener { dialog.dismiss() }
+
+                dialog.show()
             }
         }
     }

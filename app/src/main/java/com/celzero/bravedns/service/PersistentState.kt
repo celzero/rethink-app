@@ -20,6 +20,7 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.InternetProtocol
@@ -282,6 +283,16 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // exclude apps which are configured in proxy (socks5, http, dns proxy)
     var excludeAppsInProxy by booleanPref("exclude_apps_in_proxy").withDefault<Boolean>(true)
 
+    var pingv4Ips by stringPref("ping_ipv4_ips").withDefault<String>(Constants.ip4probes.joinToString(","))
+
+    var pingv6Ips by stringPref("ping_ipv6_ips").withDefault<String>(Constants.ip6probes.joinToString(","))
+
+    // TODO: do we need this? instead use in-memory variable
+    var consoleLogEnabled by booleanPref("console_log_enabled").withDefault<Boolean>(false)
+
+    // camera and mic access
+    var micCamAccess by booleanPref("mic_camera_access").withDefault<Boolean>(false)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
@@ -420,7 +431,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     }
 
     fun getProxyStatus(): MutableLiveData<Int> {
-        if (proxyStatus.value == null) updateProxyStatus()
+        if (proxyStatus.value == null || proxyStatus.value == -1) updateProxyStatus()
         return proxyStatus
     }
 

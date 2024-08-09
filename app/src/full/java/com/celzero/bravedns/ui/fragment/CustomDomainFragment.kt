@@ -50,6 +50,7 @@ class CustomDomainFragment :
 
     private val b by viewBinding(FragmentCustomDomainBinding::bind)
     private var layoutManager: RecyclerView.LayoutManager? = null
+    private lateinit var adapter: CustomDomainAdapter
 
     private val viewModel by inject<CustomDomainViewModel>()
 
@@ -101,7 +102,7 @@ class CustomDomainFragment :
 
     private fun setupAppSpecificRules(rule: CustomRulesActivity.RULES) {
         observeCustomRules()
-        val adapter = CustomDomainAdapter(requireContext(), rule)
+        adapter = CustomDomainAdapter(requireContext(), rule)
         b.cdaRecycler.adapter = adapter
         viewModel.setUid(uid)
         viewModel.customDomains.observe(this as LifecycleOwner) {
@@ -111,7 +112,7 @@ class CustomDomainFragment :
 
     private fun setupAllRules(rule: CustomRulesActivity.RULES) {
         observeAllRules()
-        val adapter = CustomDomainAdapter(requireContext(), rule)
+        adapter = CustomDomainAdapter(requireContext(), rule)
         b.cdaRecycler.adapter = adapter
         viewModel.allDomainRules.observe(this as LifecycleOwner) {
             adapter.submitData(this.lifecycle, it)
@@ -300,11 +301,18 @@ class CustomDomainFragment :
         builder.setTitle(R.string.univ_delete_firewall_dialog_title)
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
+
             io {
-                if (rule == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
-                    DomainRulesManager.deleteRulesByUid(uid)
+                val selectedItems = adapter.getSelectedItems()
+                if (selectedItems.isNotEmpty()) {
+                    uiCtx { adapter.clearSelection() }
+                    DomainRulesManager.deleteRules(selectedItems)
                 } else {
-                    DomainRulesManager.deleteAllRules()
+                    if (rule == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
+                        DomainRulesManager.deleteRulesByUid(uid)
+                    } else {
+                        DomainRulesManager.deleteAllRules()
+                    }
                 }
             }
             Utilities.showToastUiCentered(
@@ -315,7 +323,7 @@ class CustomDomainFragment :
         }
 
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
-            // no-op
+            adapter.clearSelection()
         }
 
         builder.setCancelable(true)
@@ -324,5 +332,9 @@ class CustomDomainFragment :
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private fun uiCtx(f: suspend () -> Unit) {
+        lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 }

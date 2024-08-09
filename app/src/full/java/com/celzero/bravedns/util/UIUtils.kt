@@ -632,4 +632,20 @@ object UIUtils {
 
         return result.toString().trim()
     }
+
+    fun formatNetStat(stat: backend.NetStat?): String {
+        val ip = stat?.ip()?.toString()
+        val udp = stat?.udp()?.toString()
+        val tcp = stat?.tcp()?.toString()
+        val fwd = stat?.fwd()?.toString()
+        val icmp = stat?.icmp()?.toString()
+        val nic = stat?.nic()?.toString()
+
+        var stats = nic + fwd + ip + icmp + tcp + udp
+        stats = stats.replace("{", "\n")
+        stats = stats.replace("}", "\n\n")
+        stats = stats.replace(",", "\n")
+
+        return stats
+    }
 }

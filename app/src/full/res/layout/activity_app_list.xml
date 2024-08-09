@@ -4,6 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/background"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
@@ -38,6 +40,7 @@
                         android:layout_gravity="start"
                         android:layout_weight="0.8"
                         android:fontFamily="sans-serif"
+                        android:focusable="false"
                         android:isScrollContainer="true"
                         app:iconifiedByDefault="false"
                         app:queryHint="@string/search_firewall_all_apps" />
