@@ -373,6 +373,19 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
+    suspend fun unlink() {
+        if (!tunnel.isConnected) {
+            Logger.i(LOG_TAG_VPN, "Tunnel NOT connected, skip unlink")
+            return
+        }
+        try {
+            tunnel.unlink()
+            Logger.i(LOG_TAG_VPN, "tunnel unlinked")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "err dispose: ${e.message}", e)
+        }
+    }
+
     private suspend fun getRdnsStamp(url: String): String {
         val s = url.split(RETHINKDNS_DOMAIN)[1]
         val stamp =
