@@ -384,4 +384,57 @@
     <string name="settings_rinr_dialog_desc" translatable="true">همچنین <!--settings_network_all_networks--> تنظیمات %1$s را فعال می کند. \u0020آیا شما می خواهید ادامه دهید؟</string>
     <string name="settings_dns_proxy_dialog_app" translatable="true">برنامه</string>
     <string name="settings_app_list_default_app" translatable="true">هیچ یک</string>
+    <string name="settings_socks5_dialog_hint_ip" translatable="true">نشانی IP</string>
+    <string name="settings_socks5_dialog_hint_port" translatable="true">درگاه (port)</string>
+    <string name="settings_ip_dialog_ipv46" translatable="true">خودکار (تجربی)</string>
+    <string name="settings_ip_text_ipv46" translatable="true">خودکار</string>
+    <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
+    <string name="settings_biometric_desc" translatable="true">این برنامه را با قفل صفحهٔ نمایشتان ایمن کنید</string>
+    <string name="settings_protocol_translation_dns_inactive" translatable="true">برای فعال کردن این گزینه حالت DNS/DNS+دیوارهٔ آتش را روشن کنید</string>
+    <string name="settings_default_dns_heading" translatable="true">DNS پشتیبان را انتخاب کنید</string>
+    <string name="settings_default_dns_desc" translatable="true">در موارد نادر، هنگامی که نمی‌توان از DNS مورد نظر کاربر استفاده کرد، از DNS پشتیبان استفاده می‌شود.</string>
+    <string name="logs_card_duration" translatable="true">از %1$s</string>
+    <string name="settings_socks5_dialog_hint_username" translatable="true">نام کاربری (اختیاری)</string>
+    <string name="settings_theme_dialog_themes_2" translatable="true">روشن</string>
+    <string name="settings_ip_text_ipv6" translatable="true">IPv6</string>
+    <string name="settings_notification_desc3" translatable="true">هیچ کدام</string>
+    <string name="dns_card_latency_active" translatable="true">%1$s پیامک</string>
+    <string name="hsf_vpn_dialog_header" translatable="true">توجه!</string>
+    <string name="settings_socks5_dialog_hint_password" translatable="true">رمز (اختیاری)</string>
+    <string name="settings_notification_dialog_option_2" translatable="true">"
+\nDNS / DNS + دیوارهٔ آتش:
+\nدو دکمه را برای تغییر سریع بین حالت ذخیرهٔ-باتری DNS و حالت عادی DNS + دیوارهٔ آتش نشان می دهد."</string>
+    <string name="firewall_status_blocked" translatable="true">مسدود</string>
+    <string name="settings_socks_forwarding_default_desc" translatable="true">انتقال اتصالات به SOCKS5 endpoint.</string>
+    <string name="dns_card_latency_inactive" translatable="true">روشن کردن حالت DNS.</string>
+    <string name="settings_locale_dialog_title" translatable="true">زبان مورد نظرتان را انتخاب کنید</string>
+    <string name="settings_locale_dialog_neutral" translatable="true">به ترجمهٔ این برنامه کمک کنید</string>
+    <string name="settings_biometeric_heading" translatable="true">فعال کردن قفل برنامه</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">خاموش (پیش‌فرض)</string>
+    <string name="settings_notification_desc1" translatable="true">مکث / توقف (پیش‌فرض)</string>
+    <string name="settings_notification_dialog_option_3" translatable="true">"
+\nهیچ کدام:
+\nهیچ دکمه ای را نشان نمی‌دهد.
+\n"</string>
+    <string name="settings_locale_heading" translatable="true">تغییر زبان</string>
+    <string name="settings_selected_theme" translatable="true">پوستهٔ فعلی: %1$s</string>
+    <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
+    <string name="settings_pcap_dialog_option_2" translatable="true">خروجی به Logcat</string>
+    <string name="apps_icon_content_desc" translatable="true">آیکون برنامه</string>
+    <string name="firewall_status_allow" translatable="true">مجاز</string>
+    <string name="firewall_status_unknown" translatable="true">نامشخص</string>
+    <string name="hs_biometeric_title" translatable="true">بازکردن Rethink</string>
+    <string name="firewall_card_text_inactive" translatable="true">روشن کردن حالت دیوارهٔ آتش.</string>
+    <string name="firewall_card_universal_rules" translatable="true">%1$s قاعدهٔ سراسری</string>
+    <string name="logs_card_network_count" translatable="true">%1$s اتصال</string>
+    <string name="hsf_downtime" translatable="true">(غیر فعال از %1$s)</string>
+    <string name="settings_theme_dialog_themes_1" translatable="true">تنظیم شده توسط System</string>
+    <string name="settings_notification_desc2" translatable="true">DNS / DNS + دیوارهٔ آتش</string>
+    <string name="settings_notification_dialog_option_1" translatable="true">"
+\nمکث / توقف (پیش‌فرض):
+\nدو دکمه را نشان می دهد تا به سرعت مکث کرده و Rethink را متوقف کنید."</string>
+    <string name="settings_locale_desc" translatable="true">زبان مورد نظرتان را انتخاب کنید</string>
+    <string name="firewall_card_status_active" translatable="true">%1$s برنامه</string>
+    <string name="hsf_start_btn_state" translatable="true">آغاز</string>
+    <string name="hsf_stop_btn_state" translatable="true">توقف</string>
 </resources>
