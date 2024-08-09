@@ -2068,6 +2068,12 @@ class BraveVPNService :
                 LOG_TAG_VPN,
                 "---------------------------RESTART-INIT----------------------------"
             )
+            // In vpn lockdown mode, unlink the adapter to close the previous file descriptor (fd)
+            // and use a new fd after creation. This should only be done in lockdown mode,
+            // as leaks are not possible.
+            if (VpnController.isVpnLockdown()) {
+               vpnAdapter?.unlink()
+            }
             // attempt seamless hand-off as described in VpnService.Builder.establish() docs
             val tunFd = establishVpn(networks)
             if (tunFd == null) {
