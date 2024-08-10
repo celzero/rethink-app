@@ -423,7 +423,7 @@ class SummaryStatisticsAdapter(
 
         private fun startAppInfoActivity(appConnection: AppConnection) {
             val intent = Intent(context, AppInfoActivity::class.java)
-            intent.putExtra(AppInfoActivity.UID_INTENT_NAME, appConnection.uid)
+            intent.putExtra(AppInfoActivity.INTENT_UID, appConnection.uid)
             context.startActivity(intent)
         }
 

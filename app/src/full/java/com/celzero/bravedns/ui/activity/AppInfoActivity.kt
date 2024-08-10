@@ -84,13 +84,14 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private var isRethinkApp: Boolean = false
 
     companion object {
-        const val UID_INTENT_NAME = "UID"
+        const val INTENT_UID = "UID"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        uid = intent.getIntExtra(UID_INTENT_NAME, INVALID_UID)
+        uid = intent.getIntExtra(INTENT_UID, INVALID_UID)
+        Logger.d(Logger.LOG_TAG_UI, "AppInfoActivity, intent uid: $uid")
         ipRulesViewModel.setUid(uid)
         domainRulesViewModel.setUid(uid)
         networkLogsViewModel.setUid(uid)
@@ -382,13 +383,13 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     private fun openAppWiseDomainLogsActivity() {
         val intent = Intent(this, AppWiseDomainLogsActivity::class.java)
-        intent.putExtra(UID_INTENT_NAME, uid)
+        intent.putExtra(INTENT_UID, uid)
         startActivity(intent)
     }
 
     private fun openAppWiseIpLogsActivity() {
         val intent = Intent(this, AppWiseIpLogsActivity::class.java)
-        intent.putExtra(UID_INTENT_NAME, uid)
+        intent.putExtra(INTENT_UID, uid)
         startActivity(intent)
     }
 

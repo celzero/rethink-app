@@ -20,13 +20,11 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -43,8 +41,7 @@ import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.ui.activity.AppInfoActivity
-import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.UID_INTENT_NAME
-import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.INTENT_UID
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -394,7 +391,7 @@ class FirewallAppListAdapter(
 
         private fun openAppDetailActivity(uid: Int) {
             val intent = Intent(context, AppInfoActivity::class.java)
-            intent.putExtra(UID_INTENT_NAME, uid)
+            intent.putExtra(INTENT_UID, uid)
             context.startActivity(intent)
         }
 

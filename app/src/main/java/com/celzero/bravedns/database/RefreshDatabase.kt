@@ -583,6 +583,7 @@ internal constructor(
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE
         )
+        intent.putExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, app.uid)
 
         val pendingIntent =
             getActivityPendingIntent(

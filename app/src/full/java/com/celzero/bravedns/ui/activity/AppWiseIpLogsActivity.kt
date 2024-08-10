@@ -69,7 +69,7 @@ class AppWiseIpLogsActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        uid = intent.getIntExtra(AppInfoActivity.UID_INTENT_NAME, INVALID_UID)
+        uid = intent.getIntExtra(AppInfoActivity.INTENT_UID, INVALID_UID)
         if (uid == INVALID_UID) {
             finish()
         }
