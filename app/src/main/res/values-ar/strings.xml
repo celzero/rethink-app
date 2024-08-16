@@ -920,4 +920,5 @@
     <string name="lbl_notification" translatable="true">الاخطارات</string>
     <string name="status_protected_with_wg" translatable="true">محمي باستخدام wireguard</string>
     <string name="search_proxy_add_apps" translatable="true">ابحث عن التطبيقات بواسطة الاسم</string>
+    <string name="memory_notification_text">(روثينك) يعاني من نقص الذاكرة وقد تكون إجراءات النظام محدودة.</string>
 </resources>
