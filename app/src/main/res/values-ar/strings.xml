@@ -917,7 +917,7 @@
     <string name="lbl_day" translatable="true">يوم</string>
     <string name="lbl_allowed_ips" translatable="true">عناوين IP المسموح بها</string>
     <string name="public_key_copy_toast_msg" translatable="true">تم نسخ المفتاح العام.</string>
-    <string name="lbl_notification" translatable="true">اشعار</string>
+    <string name="lbl_notification" translatable="true">الاخطارات</string>
     <string name="status_protected_with_wg" translatable="true">محمي باستخدام wireguard</string>
     <string name="search_proxy_add_apps" translatable="true">ابحث عن التطبيقات بواسطة الاسم</string>
 </resources>
