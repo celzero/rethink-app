@@ -809,7 +809,7 @@
     <string name="lbl_configure" translatable="true">Configurer</string>
     <string name="lbl_logs" translatable="true">journaux</string>
     <string name="bypass_dns_firewall" translatable="true">contourner dns &amp; firewall</string>
-    <string name="bsct_block_domain" translatable="true">Bloquer, faire confiance à <u> ce domaine</u> pour <u>cette applicaation</u></string>
+    <string name="bsct_block_domain" translatable="true">Bloquer, faire confiance à <u> ce domaine</u> pour <u>cette application</u></string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Impossible de configurer les proxies lorsque le VPN fonctionne en mode DNS uniquement.</string>
     <string name="settings_general_customize" translatable="true">personnaliser</string>
     <string name="settings_default_dns_heading" translatable="true">Choisissez le DNS de secours</string>
