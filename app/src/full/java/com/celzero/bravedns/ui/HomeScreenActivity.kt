@@ -37,7 +37,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -56,7 +55,6 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
@@ -100,11 +98,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
-    // private var biometricPromptRetryCount = 1
-    private var onResumeCalledAlready = false
-
     companion object {
-        private const val ON_RESUME_CALLED_PREFERENCE_KEY = "onResumeCalled"
+        private const val BIOMETRIC_TIMEOUT_MINUTES = 15L
     }
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
@@ -117,17 +112,18 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
 
-        // stackoverflow.com/questions/44221195/multiple-onstop-onresume-calls-in-android-activity
-        // Restore value of members from saved state
-        onResumeCalledAlready =
-            savedInstanceState?.getBoolean(ON_RESUME_CALLED_PREFERENCE_KEY) ?: false
+        val isAppRunningOnTv = isAppRunningOnTv()
 
         // do not launch on board activity when app is running on TV
-        if (persistentState.firstTimeLaunch && !isAppRunningOnTv()) {
+        if (persistentState.firstTimeLaunch && !isAppRunningOnTv) {
             launchOnboardActivity()
             return
         }
         updateNewVersion()
+
+        if (persistentState.biometricAuth && !isAppRunningOnTv) {
+            biometricPrompt()
+        }
 
         setupNavigationItemSelectedListener()
 
@@ -137,18 +133,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         initUpdateCheck()
 
         observeAppState()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        outState.putBoolean(ON_RESUME_CALLED_PREFERENCE_KEY, onResumeCalledAlready)
-        super.onSaveInstanceState(outState, outPersistentState)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (persistentState.biometricAuth && !isAppRunningOnTv() && !onResumeCalledAlready) {
-            biometricPrompt()
-        }
     }
 
     // check if app running on TV
@@ -164,10 +148,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun biometricPrompt() {
         // if the biometric authentication is already done in the last 15 minutes, then skip
         // fixme - #324 - move the 15 minutes to a configurable value
-        if (
-            SystemClock.elapsedRealtime() - persistentState.biometricAuthTime <
-                TimeUnit.MINUTES.toMillis(15)
-        ) {
+        val timeSinceLastAuth = SystemClock.elapsedRealtime() - persistentState.biometricAuthTime
+        if (timeSinceLastAuth < TimeUnit.MINUTES.toMillis(BIOMETRIC_TIMEOUT_MINUTES)) {
             return
         }
 
