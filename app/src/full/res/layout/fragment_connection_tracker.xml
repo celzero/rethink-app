@@ -22,7 +22,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-
             <RelativeLayout
                 android:id="@+id/connection_url_ll"
                 android:layout_width="match_parent"
@@ -99,7 +98,7 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/recycler_connection"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -110,7 +109,15 @@
         android:layout_marginBottom="2dp"
         android:clickable="true"
         android:focusable="true"
-        android:orientation="vertical" />
+        android:orientation="vertical"
+        android:nestedScrollingEnabled="true"
+        app:fastScrollAutoHide="true"
+        app:fastScrollAutoHideDelay="1500"
+        app:fastScrollEnableThumbInactiveColor="true"
+        app:fastScrollThumbColor="?attr/chipColorBgNormal"
+        app:fastScrollThumbEnabled="true"
+        app:fastScrollThumbInactiveColor="?attr/chipColorBgNormal"
+        app:fastScrollTrackColor="?attr/background" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/connection_list_scroll_header"

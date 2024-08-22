@@ -217,7 +217,7 @@
 
     </RelativeLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/ffa_app_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -228,10 +228,19 @@
         android:layout_marginBottom="2dp"
         android:clickable="true"
         android:focusable="true"
+        app:fastScrollPopupTextColor="?attr/primaryLightColorText"
+        app:fastScrollPopupBgColor="?attr/background"
         app:fastScrollEnabled="false"
         app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
         app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_line_drawable"
         app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
-        app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_line_drawable" />
+        app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_line_drawable"
+        app:fastScrollAutoHide="true"
+        app:fastScrollAutoHideDelay="1500"
+        app:fastScrollEnableThumbInactiveColor="true"
+        app:fastScrollThumbColor="?attr/chipColorBgNormal"
+        app:fastScrollThumbEnabled="true"
+        app:fastScrollThumbInactiveColor="?attr/chipColorBgNormal"
+        app:fastScrollTrackColor="?attr/background" />
 
 </RelativeLayout>

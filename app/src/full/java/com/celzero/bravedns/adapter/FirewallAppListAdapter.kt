@@ -45,6 +45,7 @@ import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.INTENT_UID
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView.SectionedAdapter
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,7 +54,7 @@ import kotlinx.coroutines.withContext
 class FirewallAppListAdapter(
     private val context: Context,
     private val lifecycleOwner: LifecycleOwner
-) : PagingDataAdapter<AppInfo, FirewallAppListAdapter.AppListViewHolder>(DIFF_CALLBACK) {
+) : PagingDataAdapter<AppInfo, FirewallAppListAdapter.AppListViewHolder>(DIFF_CALLBACK), SectionedAdapter {
 
     private val packageManager: PackageManager = context.packageManager
     // private val systemAppColor: Int by lazy { UIUtils.fetchColor(context, R.attr.textColorAccentBad) }
@@ -463,5 +464,10 @@ class FirewallAppListAdapter(
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.IO) { f() }
+    }
+
+    override fun getSectionName(position: Int): String {
+        val appInfo = getItem(position) ?: return ""
+        return appInfo.appName.substring(0, 1)
     }
 }

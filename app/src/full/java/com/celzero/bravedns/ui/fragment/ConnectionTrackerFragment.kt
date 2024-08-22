@@ -31,7 +31,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
 import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
+import com.celzero.bravedns.databinding.FragmentConnectionTrackerBinding
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
@@ -49,8 +49,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /** Captures network logs and stores in ConnectionTracker, a room database. */
 class ConnectionTrackerFragment :
-    Fragment(R.layout.activity_connection_tracker), SearchView.OnQueryTextListener {
-    private val b by viewBinding(ActivityConnectionTrackerBinding::bind)
+    Fragment(R.layout.fragment_connection_tracker), SearchView.OnQueryTextListener {
+    private val b by viewBinding(FragmentConnectionTrackerBinding::bind)
 
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val viewModel: ConnectionTrackerViewModel by viewModel()
