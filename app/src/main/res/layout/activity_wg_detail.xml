@@ -104,6 +104,15 @@
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/status_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:paddingTop="5dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/config_title_layout" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/public_key_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -112,7 +121,7 @@
                         android:text="@string/lbl_public_key"
                         android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/config_title_layout" />
+                        app:layout_constraintTop_toBottomOf="@id/status_text" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/public_key_text"
