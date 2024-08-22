@@ -21,16 +21,20 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import backend.Backend
+import backend.RouterStats
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgConfigAdapter
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.adapter.WgPeersAdapter
+import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ActivityWgDetailBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
@@ -183,7 +187,54 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             return@uiCtx
         }*/
 
+        io { updateStatusUi(config.getId()) }
         prefillConfig(config)
+    }
+
+
+    private suspend fun updateStatusUi(id: Int) {
+        val config = WireguardManager.getConfigFilesById(id)
+        val cid = ProxyManager.ID_WG_BASE + id
+        if (config?.isActive == true) {
+            var status: String
+            val statusId = VpnController.getProxyStatusById(cid)
+            val stats = VpnController.getProxyStats(cid)
+            uiCtx {
+                if (statusId != null) {
+                    var resId = UIUtils.getProxyStatusStringRes(statusId)
+                    // change the color based on the status
+                    if (statusId == Backend.TOK) {
+                        // if the lastOK is 0, then the handshake is not yet completed
+                        // so show the status as waiting
+                        if (stats?.lastOK == 0L) {
+                            resId = R.string.status_waiting
+                        }
+                    }
+                    status = getString(resId).replaceFirstChar(Char::titlecase)
+
+                    if ((statusId == Backend.TZZ || statusId == Backend.TNT) && stats != null) {
+                        // for idle state, if lastOk is less than 30 sec, then show as connected
+                        if (
+                            stats.lastOK != 0L &&
+                            System.currentTimeMillis() - stats.lastOK <
+                            30 * DateUtils.SECOND_IN_MILLIS
+                        ) {
+                            status =
+                                getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
+                        }
+                    }
+
+                } else {
+                    status = getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
+                }
+                b.statusText.text = status
+            }
+        } else {
+            uiCtx {
+                b.statusText.text =
+                    getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
+            }
+        }
     }
 
     private fun showInvalidConfigDialog() {
@@ -230,6 +281,9 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 }
             b.dnsServersText.text = dns
         } else {
+            b.publicKeyLabel.visibility = View.VISIBLE
+            b.publicKeyText.visibility = View.VISIBLE
+            b.publicKeyText.text = wgInterface?.getKeyPair()?.getPublicKey()?.base64()
             b.dnsServersLabel.visibility = View.GONE
             b.dnsServersText.visibility = View.GONE
         }
