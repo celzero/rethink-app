@@ -207,7 +207,7 @@
     <string name="settings_theme_dialog_themes_3">مظهر داكن</string>
     <string name="dc_check_update_desc">تحقق من وجود تحديثات لقائمة الحظر مرة واحدة كل <i> ثلاثة </i> أيام</string>
     <string name="about_email">راسلنا بالبريد الإلكتروني</string>
-    <string name="app_info_error">تعذر تشغيل معلومات التطبيق.</string>
+    <string name="app_info_error">يتعذر تشغيل معلومات التطبيق.</string>
     <string name="error_loading_log_file">خطأ في تحميل ملف السجل</string>
     <string name="cd_dns_proxy_mode_internal">داخلي</string>
     <string name="dns_btm_record_type">نوع الاستعلام: %1$s</string>
@@ -531,7 +531,7 @@
 \n"</string>
     <string name="about_web">الروابط</string>
     <string name="about_dialog_neutral_button">اقترح الميزات</string>
-    <string name="vpn_profile_error">تعذر تشغيل ملف تعريف VPN.</string>
+    <string name="vpn_profile_error">يتعذر تشغيل ملف تعريف VPN.</string>
     <string name="univ_accessibility_dialog_negative">رفض</string>
     <string name="fapps_filter_categories_heading">الاقسام</string>
     <string name="firewall_rule_global_lockdown">إغلاق</string>
@@ -910,4 +910,15 @@
     <string name="cd_dialog_edit_title" translatable="true">تعديل قاعدة النطاق</string>
     <string name="cd_toast_edit" translatable="true">تم التعديل</string>
     <string name="lbl_public_key" translatable="true">المفتاح العمومي</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">محمي!، متصل ب DNS + الجدار الناري + البروكسي</string>
+    <string name="lbl_stopped" translatable="true">متوقف</string>
+    <string name="lbl_private_key" translatable="true">المفتاح الخاص</string>
+    <string name="lbl_generated" translatable="true">(تم انشاؤه)</string>
+    <string name="lbl_day" translatable="true">يوم</string>
+    <string name="lbl_allowed_ips" translatable="true">عناوين IP المسموح بها</string>
+    <string name="public_key_copy_toast_msg" translatable="true">تم نسخ المفتاح العام.</string>
+    <string name="lbl_notification" translatable="true">الاخطارات</string>
+    <string name="status_protected_with_wg" translatable="true">محمي باستخدام wireguard</string>
+    <string name="search_proxy_add_apps" translatable="true">ابحث عن التطبيقات بواسطة الاسم</string>
+    <string name="memory_notification_text">(روثينك) يعاني من نقص الذاكرة وقد تكون إجراءات النظام محدودة.</string>
 </resources>
