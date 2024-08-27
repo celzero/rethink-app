@@ -1016,7 +1016,7 @@
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Terlindungi! Terhubung dengan DNS + Firewall + Proksi.</string>
     <string name="dc_proxy_dns_desc" translatable="true">Jangan memproksi DNS melalui WireGuard, SOCKS5, dan proksi HTTP yang-selalu-aktif.</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s dinonaktifkan karena proksi aktif</string>
-    <string name="lbl_idle" translatable="true">Menganggur</string>
+    <string name="lbl_idle" translatable="true">Mengganggur</string>
     <string name="lbl_split" translatable="true">Memisah</string>
     <string name="lbl_on_device" translatable="true">pada-perangkat</string>
     <string name="settings_connectivity_checks" translatable="true">Melakukan pengecekan koneksi</string>
