@@ -193,7 +193,7 @@
                 android:layout_centerVertical="true"
                 android:clickable="true"
                 android:focusable="true"
-                android:padding="5dp"
+                android:padding="15dp"
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp" />
 
