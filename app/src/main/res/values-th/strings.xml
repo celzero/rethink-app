@@ -1,11 +1,1002 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="title_about" translatable="true">…”“‘­­–——\t
-\n …”“‘­­–——\t
-\n …”“‘­­–——\t
-\n …”“‘­­–——\t
-\n …”“‘­­–——</string>
+    <string name="title_about" translatable="true">เกี่ยวกับ</string>
     <string name="title_settings" translatable="true">ตั้งค่า</string>
     <string name="title_statistics" translatable="true">สถานะ</string>
-    <string name="pause_title_desc" translatable="true">หยุดชั่วคราว</string>
+    <string name="pause_title_desc" translatable="true">งีบหลับสักพัก…</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">แอปที่เลือกจะถูกกำหนดเส้นทางผ่าน WireGuard VPN นี้เท่านั้น โดยไม่คำนึงว่า VPN นั้นจะเปิดใช้งานหรือปิดใช้งานอยู่</string>
+    <string name="lbl_idle" translatable="true">ว่างงาน</string>
+    <string name="lbl_private" translatable="true">ส่วนตัว</string>
+    <string name="lbl_secure" translatable="true">ปลอดภัย</string>
+    <string name="lbl_anonymous" translatable="true">ไม่ระบุชื่อ</string>
+    <string name="lbl_split" translatable="true">แยก</string>
+    <string name="lbl_on_device" translatable="true">บนอุปกรณ์</string>
+    <string name="slide_1_title" translatable="true">ฟรีและโอเพ่นซอร์ส</string>
+    <string name="block" translatable="true">ปิดกั้น</string>
+    <string name="status_protected_with_http_private_dns" translatable="true">ได้รับการปกป้องด้วยพร็อกซี HTTP และ DNS ส่วนตัว</string>
+    <string name="bsct_conn_block_desc" translatable="true">ถูกบล็อค %1$s โดย %2$s</string>
+    <string name="bsct_conn_block_desc_device" translatable="true">บล็อค %1$s บนอุปกรณ์</string>
+    <string name="bsct_conn_desc_allowed" translatable="true">อนุญาตใน %1$s %2$s</string>
+    <string name="bsct_conn_desc_blocked" translatable="true">ถูกบล็อคที่ %1$s %2$s</string>
+    <string name="private_dns_dialog_positive" translatable="true">ไปที่การตั้งค่า</string>
+    <string name="firewall_act_network_monitor_tab" translatable="true">เครือข่าย</string>
+    <string name="dns_crypt_url_remove_success" translatable="true">ลบตัวแก้ไข DNSCrypt แล้ว</string>
+    <string name="download_update_dialog_title" translatable="true">อัปเดตใหม่!</string>
+    <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink ได้รับการตั้งค่าให้ส่งต่อคำขอ DNS ไปยัง Orbot เปลี่ยนแปลงตามต้องการ</string>
+    <string name="settings_app_notification_a13_heading" translatable="true">การแจ้งเตือนแอป</string>
+    <string name="settings_notification_dialog_option_3" translatable="true">"
+\nไม่มี:
+\nไม่แสดงปุ่มใดๆ
+\n"</string>
+    <string name="logs_card_network_count" translatable="true">การเชื่อมต่อ %1$s</string>
+    <string name="hsf_start_btn_state" translatable="true">เริ่ม</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s การค้นหา</string>
+    <string name="about_bug_no_log_dialog_title" translatable="true">รายงานจุดบกพร่อง</string>
+    <string name="about_connect" translatable="true">ติดต่อ</string>
+    <string name="about_mail_subject" translatable="true">[คิดใหม่]:</string>
+    <string name="dns_crypt_relay_error_toast" translatable="true">ไม่ได้เลือกตัวแก้ไข</string>
+    <string name="dns_proxy_app" translatable="true">แอป</string>
+    <string name="fapps_unmetered_unblock_dialog_title" translatable="true">อนุญาตให้ใช้แบบไม่มีมิเตอร์</string>
+    <string name="other_dns_list_tab2" translatable="true">การเข้ารหัส DNS</string>
+    <string name="firewall_rule_global_lockdown_desc" translatable="true">This connection was blocked because universal lockdown is set.<br/><br/> To change go to <i>Universal</i> tab.</string>
+    <string name="category_name_installed" translatable="true">แอปที่ติดตั้ง</string>
+    <string name="ci_dialog_title" translatable="true">เพิ่มกฎ IP / พอร์ต</string>
+    <string name="ci_trust_initial" translatable="true">T</string>
+    <string name="brbs_backup_dialog_failure_positive" translatable="true">ลองสำรองข้อมูลอีกครั้ง</string>
+    <string name="brbs_restore_dialog_failure_title" translatable="true">การคืนค่าล้มเหลว</string>
+    <string name="bad_config_error" translatable="true">%1$s in %2$s</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">รวมแอปที่เหลือทั้งหมดที่ไม่ถูกกำหนดเส้นทางโดยพร็อกซีอื่น</string>
+    <string name="crypt_adguard_desc" translatable="true">ปกป้องอุปกรณ์ของคุณจากมัลแวร์และอื่นๆ อีกมากมาย</string>
+    <string name="lbl_stopped" translatable="true">หยุดแล้ว</string>
+    <string name="lbl_cache" translatable="true">แคช</string>
+    <string name="lbl_status" translatable="true">สถานะ</string>
+    <string name="lbl_remove" translatable="true">ลบ</string>
+    <string name="lbl_last" translatable="true">ล่าสุด</string>
+    <string name="lbl_starting" translatable="true">การเริ่มต้น</string>
+    <string name="lbl_overall" translatable="true">โดยรวม</string>
+    <string name="lbl_peer" translatable="true">เพื่อน</string>
+    <string name="status_protected_with_tor" translatable="true">ได้รับการคุ้มครองด้วยทอร์</string>
+    <string name="status_dns_error" translatable="true">ข้อผิดพลาด DNS</string>
+    <string name="status_dns_server_down" translatable="true">เซิร์ฟเวอร์ DNS ล่ม</string>
+    <string name="status_no_internet" translatable="true">ไม่มีอินเตอร์เน็ต</string>
+    <string name="status_protected_with_socks5_private_dns" translatable="true">ได้รับการปกป้องด้วย socks5 และ dns ส่วนตัว</string>
+    <string name="status_app_error" translatable="true">ข้อผิดพลาดของแอป</string>
+    <string name="apps_info_title" translatable="true">แอปพลิเคชั่น</string>
+    <string name="app_mode_wireguard" translatable="true">VPN</string>
+    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="public_key_copy_toast_msg" translatable="true">คัดลอกคีย์สาธารณะแล้ว</string>
+    <string name="app_mode_choose" translatable="true">เลือกโหมด</string>
+    <string name="relative_time_today" translatable="true">วันนี้</string>
+    <string name="settings_allow_lan_desc" translatable="true">ไม่รวม LAN, loopback, multicast, เส้นทางลิงก์ท้องถิ่นจากอุโมงค์ VPN ของ Rethink</string>
+    <string name="orbot" translatable="true">ผูกพัน</string>
+    <string name="orbot_socks5_desc" translatable="true">ส่งต่อการเชื่อมต่อ TCP ทั้งหมดไปยัง Orbot</string>
+    <string name="orbot_http_desc" translatable="true">สร้างอุโมงค์ HTTP CONNECT ให้กับ Orbot</string>
+    <string name="orbot_status_arg_3" translatable="true">DNS และ TCP</string>
+    <string name="orbot_bs_status_trying_connect" translatable="true">การตั้งค่า Orbot…</string>
+    <string name="orbot_stop_dialog_neutral" translatable="true">เปลี่ยน DNS</string>
+    <string name="orbot_install_dialog_title" translatable="true">ติดตั้ง Orbot?</string>
+    <string name="orbot_stop_dialog_negative" translatable="true">หยุดออร์บอท</string>
+    <string name="settings_orbot_notification_action" translatable="true">เปิดออร์บอท</string>
+    <string name="settings_orbot_disabled_error" translatable="true">ปิดพร็อกซี HTTP(S) และ/หรือ SOCKS5 เพื่อดำเนินการตั้งค่า Tor-as-a-proxy ต่อไป</string>
+    <string name="settings_https_disabled_error" translatable="true">เชื่อมต่อกับ %1$s แล้ว ปิดเพื่อดำเนินการต่อ</string>
+    <string name="about_bravedns_toreport_text" translatable="true">ความช่วยเหลือและข้อเสนอแนะ</string>
+    <string name="about_join_telegram" translatable="true">Telegram</string>
+    <string name="dc_dns_leaks_desc" translatable="true">เมื่อเปิดใช้งาน Rethink จะจับแพ็กเก็ตทั้งหมดบนพอร์ต 53 และส่งต่อไปยังจุดสิ้นสุด DNS ที่ผู้ใช้ตั้งค่า</string>
+    <string name="dc_check_update_heading" translatable="true">แจ้งเตือนการอัพเดตรายการบล็อค</string>
+    <string name="cd_custom_doh_url_name_default" translatable="true">DoH</string>
+    <string name="cd_custom_doh_dialog_title" translatable="true">ตัวแก้ปัญหา</string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s blocklist(s)</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_proxy_name" translatable="true">ชื่อพร็อกซี</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">A user-set universal firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> (Mobile) network.<br/><br/> To change go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_isolate_desc" translatable="true">A user-set firewall rule blocked this <i>app</i> connecting to other than <i>bypassed IPs</i>.<br/><br/> To change go to <i>All Apps</i> tab.</string>
+    <string name="new_app_notification_action_deny" translatable="true">บล็อคต่อไป</string>
+    <string name="ci_blocked_initial" translatable="true">B</string>
+    <string name="ci_no_rule_initial" translatable="true">N</string>
+    <string name="ada_noapp_dialog_title" translatable="true">ไม่มีแอพดังกล่าว</string>
+    <string name="ada_app_status_isolate" translatable="true">ถูกแยกออก อนุญาตให้มีเฉพาะ IP ที่เชื่อถือได้เท่านั้น</string>
+    <string name="ada_app_status_whitelist" translatable="true">จะข้ามกฎไฟร์วอลล์สากล</string>
+    <string name="ada_app_status_exclude" translatable="true">ได้รับการยกเว้นจาก DNS และไฟร์วอลล์</string>
+    <string name="ada_app_status_bypass_dns_firewall" translatable="true">จะข้ามกฎ DNS และไฟร์วอลล์สากล</string>
+    <string name="ada_app_metered" translatable="true">มิเตอร์</string>
+    <string name="rt_download_desc" translatable="true">ดาวน์โหลดรายการบล็อค (ประมาณ 60MB) เพื่อใช้ฟีเจอร์นี้</string>
+    <string name="rt_list_simple_btn_txt" translatable="true">เรียบง่าย</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">IP ที่ติดต่อมากที่สุด</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">โดเมนที่ถูกบล็อคมากที่สุด</string>
+    <string name="status_protected_with_tor_private_dns" translatable="true">ได้รับการปกป้องด้วย Tor และ DNS ส่วนตัว</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">เชื่อมต่อกับ RethinkDNS และไฟร์วอลล์</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">ได้รับการคุ้มครอง</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">ไม่สามารถเปิดการตั้งค่าการเข้าถึงได้ โปรดลองอีกครั้งในภายหลัง!</string>
+    <string name="conn_track_clear_logs_title" translatable="true">ลบบันทึกเครือข่ายทั้งหมดหรือไม่?</string>
+    <string name="dns_query_clear_logs_title" translatable="true">ลบบันทึก DNS ทั้งหมดหรือไม่?</string>
+    <string name="dns_query_clear_logs_message" translatable="true">การดำเนินการนี้จะลบบันทึก DNS บนอุปกรณ์ การดำเนินการนี้ไม่สามารถย้อนกลับได้ คุณต้องการดำเนินการต่อหรือไม่?</string>
+    <string name="bsct_app_info" translatable="true">ข้อมูลแอป</string>
+    <string name="bsct_block_ip" translatable="true">บล็อค เชื่อถือ <u>IP</u> นี้สำหรับ <u>แอป</u> นี้</string>
+    <string name="bsct_block_domain" translatable="true">บล็อกและเชื่อถือโดเมนสำหรับแอปนี้</string>
+    <string name="bsct_block" translatable="true">บล็อค ข้าม แยกออก <u>แอพนี้</u></string>
+    <string name="always_on_dialog_heading" translatable="true">ปิดใช้งาน VPN ที่เปิดตลอดเวลา</string>
+    <string name="always_on_dialog_positive_btn" translatable="true">ไปที่การตั้งค่า</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">ลบตัวแก้ไข DNSCrypt หรือไม่?</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">ลบ DNSCrypt Relay หรือไม่?</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">ลบ DNSCrypt Relay แล้ว</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">ลบการถ่ายทอด DNSCrypt จากการกำหนดค่าที่บันทึกไว้</string>
+    <string name="dns_proxy_remove_dialog_message" translatable="true">ลบ DNS Proxy จากการกำหนดค่าที่บันทึกไว้</string>
+    <string name="dns_proxy_remove_success" translatable="true">ลบพร็อกซี DNS แล้ว</string>
+    <string name="blocklist_update_check_failure" translatable="true">มีบางอย่างผิดพลาด โปรดลองอีกครั้งในภายหลัง!</string>
+    <string name="local_blocklist_redownload_desc" translatable="true">รายการบล็อคบนอุปกรณ์มีเวอร์ชันล่าสุดแล้ว v%1$s</string>
+    <string name="configure_dns_connected_dns_proxy_status" translatable="true">พร็อกซี DNS</string>
+    <string name="configure_dns_connection_name" translatable="true">เชื่อมต่อกับ %1$s แล้ว</string>
+    <string name="search_custom_domains" translatable="true"><font size="12">ค้นหาชื่อโดเมน</font></string>
+    <string name="search_proxy_add_apps" translatable="true">ค้นหาแอปตามชื่อ</string>
+    <string name="info_dialog_url_copy_toast_msg" translatable="true">คัดลอก URL แล้ว</string>
+    <string name="orbot_socks5" translatable="true">พร็อกซี TCP เท่านั้น</string>
+    <string name="orbot_none" translatable="true">ไม่มี (ค่าเริ่มต้น)</string>
+    <string name="settings_orbot_heading" translatable="true">ตั้งค่า Orbot</string>
+    <string name="settings_orbot_desc" translatable="true">Orbot ในโหมดที่ไม่ใช่ VPN พร้อมด้วย HTTPS/SOCKS5</string>
+    <string name="settings_orbot_install_desc" translatable="true">แตะที่นี่เพื่อติดตั้ง Orbot</string>
+    <string name="settings_socks5_disabled_error" translatable="true">เชื่อมต่อกับ %1$s แล้ว ปิดเพื่อดำเนินการต่อ</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">การแจ้งเตือนอย่างต่อเนื่อง</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">ทำให้การแจ้งเตือนคงอยู่อย่างต่อเนื่อง</string>
+    <string name="settings_theme_desc" translatable="true">ธีมมืด/สว่าง</string>
+    <string name="settings_go_log_desc" translatable="true">เพื่อวัตถุประสงค์ในการแก้ไขข้อบกพร่อง</string>
+    <string name="settings_rinr_heading" translatable="true">ลูปแบ็ก (ทดลอง)</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">กำหนดเส้นทางการรับส่งข้อมูลของ Rethink เอง เช่น การดาวน์โหลดรายการบล็อก การตรวจสอบการเชื่อมต่อ การเชื่อมต่อ DNS กลับเข้าสู่อุโมงค์</string>
+    <string name="settings_socks5_dialog_hint_port" translatable="true">Port</string>
+    <string name="settings_notification_desc1" translatable="true">หยุดชั่วคราว / หยุด (ค่าเริ่มต้น)</string>
+    <string name="settings_locale_heading" translatable="true">เปลี่ยนภาษา</string>
+    <string name="settings_notification_dialog_option_1" translatable="true">"
+\nหยุดชั่วคราว / หยุด (ค่าเริ่มต้น):
+\nแสดงปุ่มสองปุ่ม เพื่อหยุดชั่วคราวและหยุดการคิดใหม่อย่างรวดเร็ว"</string>
+    <string name="settings_selected_theme" translatable="true">ธีมปัจจุบัน: %1$s</string>
+    <string name="settings_protocol_translation_dns_inactive" translatable="true">สลับไปที่โหมด DNS/DNS+ไฟร์วอลล์เพื่อเปิดใช้งานการตั้งค่านี้</string>
+    <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
+    <string name="settings_pcap_dialog_option_2" translatable="true">ส่งออกไปยัง Logcat</string>
+    <string name="settings_pcap_dialog_option_3" translatable="true">ส่งออกไปยังโฟลเดอร์ดาวน์โหลด</string>
+    <string name="firewall_status_allow" translatable="true">อนุญาต</string>
+    <string name="dc_proxy_dns_desc" translatable="true">อย่าใช้พร็อกซี DNS ผ่าน Always-on WireGuard, SOCKS5, พร็อกซี HTTP</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> อาจส่งผลให้สูญเสียการเชื่อมต่อ เปลี่ยนการตั้งค่าเพื่อให้ Rethink ใช้ข้อมูลและทรัพยากรอื่นๆ เมื่ออยู่ในพื้นหลัง</string>
+    <string name="dc_block_heading" translatable="true">กฎ</string>
+    <string name="dc_other_dns_heading" translatable="true">พิมพ์</string>
+    <string name="dc_custom_dns_radio" translatable="true">DNS อื่น ๆ</string>
+    <string name="dc_dns_website_desc" translatable="true">ดึงไอคอนเว็บไซต์จาก <i>nextdns.io</i> และ <i>duckduckgo.com</i> ใช้พื้นที่ดิสก์สูงสุด 350 MB</string>
+    <string name="about_mozilla" translatable="true">Rethink ได้รับการสนับสนุนโดย Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
+    <string name="about_settings_vpn_profile" translatable="true">โปรไฟล์ VPN</string>
+    <string name="about_twitter" translatable="true">ติดตามเราบน Twitter</string>
+    <string name="cd_dns_crypt_title" translatable="true">ตัวแก้ปัญหา</string>
+    <string name="cd_custom_dns_proxy_name_default" translatable="true">พร็อกซี</string>
+    <string name="cd_custom_doh_url_name" translatable="true">DoH %1$s</string>
+    <string name="cd_custom_dns_proxy_name" translatable="true">พร็อกซี %1$s</string>
+    <string name="cd_dns_proxy_error_text_1" translatable="true">ที่อยู่ IP ไม่ถูกต้อง</string>
+    <string name="cd_doh_dialog_resolver_name" translatable="true">ชื่อตัวแก้ปัญหา</string>
+    <string name="cd_doh_dialog_resolver_url" translatable="true">URL ตัวแก้ปัญหา</string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true">อย่าตรวจสอบใบรับรอง TLS ของเซิร์ฟเวอร์ (เปิดใช้งานเฉพาะเมื่อคุณรู้ว่าคุณกำลังทำอะไรอยู่)</string>
+    <string name="cd_dns_alg_heading" translatable="true">การกรอง DNS ขั้นสูง (ทดลอง)</string>
+    <string name="ctbs_dialog_negative_btn" translatable="true">ย้อนกลับ</string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_chip_no_answer" translatable="true">ไม่มีคำตอบ</string>
+    <string name="dns_log_dialog_positive" translatable="true">ลบบันทึก</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">แก้ไขโดยไม่ระบุตัวตน %1$s โดย %2$s ผ่านทาง %3$s</string>
+    <string name="hs_download_negative_default" translatable="true">เตือนฉันภายหลัง</string>
+    <string name="univ_firewall_rule_1" translatable="true">บล็อกแอปทั้งหมดเมื่ออุปกรณ์ถูกล็อค</string>
+    <string name="univ_firewall_rule_2" translatable="true">บล็อคแอปใด ๆ ที่ไม่ได้ใช้งาน</string>
+    <string name="univ_firewall_rule_3" translatable="true">บล็อคเมื่อแอปต้นทางไม่เป็นที่รู้จัก</string>
+    <string name="univ_firewall_rule_5" translatable="true">บล็อคเมื่อ DNS ถูกข้าม</string>
+    <string name="univ_firewall_rule_7" translatable="true">บล็อค IPv4 ใน IPv6 (ทดลอง)</string>
+    <string name="univ_firewall_rule_9" translatable="true">บล็อคบนเครือข่ายแบบมิเตอร์ (มือถือ)</string>
+    <string name="univ_firewall_rule_10" translatable="true">บล็อกทั้งหมดยกเว้นแอปและ IP ที่ถูกข้ามไป</string>
+    <string name="univ_firewall_rule_6" translatable="true">บล็อกแอปที่เพิ่งติดตั้งใหม่ตามค่าเริ่มต้น</string>
+    <string name="univ_view_blocked_ip_desc" translatable="true">แก้ไขกฎของโดเมน, IP / พอร์ตที่ถูกบล็อคหรือเชื่อถือ</string>
+    <string name="univ_ip_delete_individual_toast" translatable="true">ลบ %1$s แล้ว</string>
+    <string name="univ_ip_delete_dialog_positive" translatable="true">ลบทั้งหมด</string>
+    <string name="univ_delete_firewall_dialog_message" translatable="true">การลบกฎเหล่านี้จะทำให้แอปพลิเคชันใดๆ ก็สามารถเชื่อมต่อกับ IP ที่ถูกบล็อคในปัจจุบันได้</string>
+    <string name="univ_accessibility_dialog_positive" translatable="true">ยินยอม</string>
+    <string name="dns_connected_rethink_plus" translatable="true">เชื่อมต่อแล้ว %1$s รายการบล็อคที่ใช้งานอยู่</string>
+    <string name="dns_connected_no_count" translatable="true">เชื่อมต่อ</string>
+    <string name="dns_connected" translatable="true">เชื่อมต่อ</string>
+    <string name="dns_proxy_dialog_message_no_app" translatable="true">ที่อยู่ IP: %1$s
+\n
+\nหมายเลขพอร์ต: %2$s</string>
+    <string name="dns_info_positive" translatable="true">Ok</string>
+    <string name="dns_proxy_dialog_header_dns" translatable="true">เพิ่มพร็อกซี DNS</string>
+    <string name="fapps_firewall_filter_bypass_universal" translatable="true">ข้ามไป</string>
+    <string name="fapps_info_unmetered_msg" translatable="true">อนุญาต/บล็อคเครือข่ายแบบไม่จำกัดปริมาณ (WiFi)</string>
+    <string name="fapps_info_metered_msg" translatable="true">อนุญาต/บล็อคการใช้งานเครือข่ายแบบคิดค่าบริการตามปริมาณการใช้งาน (มือถือ)</string>
+    <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">ข้ามกฎ DNS และไฟร์วอลล์</string>
+    <string name="fapps_unmetered_block_dialog_message" translatable="true">บล็อกการเชื่อมต่อบนเครือข่ายแบบไม่จำกัดปริมาณ (WiFi) สำหรับแอปที่อยู่ในรายการหรือไม่?</string>
+    <string name="fapps_exclude_block_dialog_title" translatable="true">ไม่รวมแอป</string>
+    <string name="fapps_metered_block_dialog_title" translatable="true">บล็อคบนมิเตอร์</string>
+    <string name="fapps_bypass_block_dialog_title" translatable="true">ข้ามแอปพลิเคชั่น</string>
+    <string name="fapps_exclude_block_dialog_message" translatable="true">ไม่รวมแอปที่แสดงรายการไว้ใน DNS และไฟร์วอลล์หรือไม่?</string>
+    <string name="rules_load_failure_desc" translatable="true">ไม่พบกฎไฟร์วอลล์</string>
+    <string name="rules_load_failure_reload" translatable="true">โหลดซ้ำ</string>
+    <string name="network_log_app_name_unnamed" translatable="true">ไม่ระบุชื่อ (%1$s)</string>
+    <string name="dns_crypt_connection_failure" translatable="true">เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์ DNSCrypt</string>
+    <string name="dns_proxy_toast_parameter" translatable="true">พร็อกซี DNS</string>
+    <string name="socks5_proxy_toast_parameter" translatable="true">พร็อกซี SOCKS5</string>
+    <string name="dns_proxy_connection_failure" translatable="true">เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์พร็อกซี DNS</string>
+    <string name="dns_proxy_connection_failure_lockdown" translatable="true">การไม่รวม %1$s ไว้กับ %2$s ในโหมดล็อคดาวน์อาจทำให้เกิดปัญหาการเชื่อมต่ออินเทอร์เน็ตได้</string>
+    <string name="update_complete_action_snack" translatable="true">RESTART</string>
+    <string name="settings_local_blocklist_dialog_positive" translatable="true">Download</string>
+    <string name="other_dns_list_tab1" translatable="true">DoH</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s ถูกปิดใช้งานเนื่องจากพร็อกซีเปิดใช้งานอยู่</string>
+    <string name="hs_btm_sheet_lock_down" translatable="true">ไม่สามารถเปลี่ยนโหมดได้เมื่อ VPN ถูก<i>ล็อค</i> แตะเพื่อ<u>แก้ไขการตั้งค่า VPN</u></string>
+    <string name="firewall_rule_no_rule" translatable="true">ไม่มีกฎ</string>
+    <string name="pause_desc" translatable="true">หมายเหตุ: แอปที่ถูกบล็อก %1$s จะยังคงถูกไฟร์วอลล์ต่อไป</string>
+    <string name="firewall_rule_block_unmetered" translatable="true">ไม่จำกัดปริมาณ (WiFi)</string>
+    <string name="firewall_rule_block_metered" translatable="true">มิเตอร์ (มือถือ)</string>
+    <string name="firewall_rule_univ_block_metered" translatable="true">มิเตอร์ (สากล)</string>
+    <string name="firewall_rule_isolate" translatable="true">แยกตัว</string>
+    <string name="firewall_rule_bypass_dns_firewall" translatable="true">แอปที่ถูกข้ามไป</string>
+    <string name="firewall_rule_block_app_new_install" translatable="true">แอปใหม่</string>
+    <string name="firewall_rule_block_app_exception" translatable="true">ข้อผิดพลาด</string>
+    <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">แอปที่ถูกข้ามไป</string>
+    <string name="firewall_rule_new_app_desc" translatable="true">แอป นี้สร้างการเชื่อมต่อเป็นครั้งแรก <br/><br/> หากต้องการเปลี่ยน ให้ไปที่แท็บ<i>สากล</i></string>
+    <string name="firewall_rule_dns_blocked" translatable="true">DNS ถูกบล็อค</string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true">This connection was allowed because the <i>destination IP</i> is set as Trusted IP.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
+    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">This connection was allowed because the &lt;i&gt;destination IP&lt;/i&gt; is set to bypass all universal firewall rules.&lt;br/&gt;&lt;br/&gt; To change go to &lt;i&gt;IP Rules&lt;i&gt; in &lt;i&gt;Universal&lt;/i&gt; tab.</string>
+    <string name="firewall_rule_device_lock_desc" translatable="true">This connection was firewalled because <i>device was locked</i> at the time.<br/><br/> To change this behaviour go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_foreground_desc" translatable="true">This connection was firewalled because the source app was <i>not in the foreground</i>.<br/><br/> To change this behaviour go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_block_udp_ntp_desc" translatable="true">A user-set firewall rule blocked this <i>UDP</i> connection.<br/><br/> To change go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">A user-set firewall rule blocked the <i>domain</i>.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">This connection was allowed because the <i>domain</i> is set as Trusted domain.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">This connection was allowed because the <i>domain</i> is set as trusted in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">This connection was forwarded to user-preferred Proxy.<br/><br/> To change go to <i>Proxy</i> from <i>Configure</i> screen.</string>
+    <string name="new_app_bulk_notification_title" translatable="true">ความสนใจ</string>
+    <string name="new_app_notification_action_toast_allow" translatable="true">การเชื่อมต่อเครือข่ายได้รับอนุญาตสำหรับแอป</string>
+    <string name="new_app_bulk_notification_content" translatable="true">Rethink บล็อกแอปใหม่ %1$s แตะเพื่อดูหรือแก้ไข</string>
+    <string name="new_app_notification_content" translatable="true">Rethink บล็อคแอปที่ติดตั้งล่าสุด %1$s</string>
+    <string name="new_app_notification_action_toast_deny" translatable="true">ปฏิเสธการเชื่อมต่อเครือข่ายสำหรับแอป</string>
+    <string name="notif_dialog_pause_dialog_title" translatable="true">แอปหยุดชั่วคราว!</string>
+    <string name="notif_dialog_pause_dialog_negative" translatable="true">ทิ้ง</string>
+    <string name="notif_dialog_pause_dialog_neutral" translatable="true">แสดง</string>
+    <string name="notif_channel_vpn_notification" translatable="true">VPN ที่ใช้งานอยู่</string>
+    <string name="notif_channel_vpn_failure" translatable="true">VPN ที่ไม่ได้ใช้งาน</string>
+    <string name="notif_channel_proxy_failure" translatable="true">การแจ้งเตือนพร็อกซี</string>
+    <string name="notif_channel_desc_proxy_failure" translatable="true">การแจ้งเตือนเกี่ยวกับข้อผิดพลาดและความผิดปกติเกี่ยวกับพร็อกซี</string>
+    <string name="notif_channel_desc_vpn_notification" translatable="true">แจ้งให้ทราบเมื่อ Rethink กำลังใช้งานและทำงานอยู่เบื้องหลัง</string>
+    <string name="notif_channel_download" translatable="true">ดาวน์โหลดการแจ้งเตือน</string>
+    <string name="notif_channel_desc_vpn_failure" translatable="true">แจ้งให้ทราบเมื่อ Rethink ถูกหยุดโดย Android หรือโดยแอป VPN อื่น</string>
+    <string name="notif_channed_desc_download" translatable="true">แจ้งเตือนความคืบหน้าการดาวน์โหลดสำหรับรายการบล็อกบนอุปกรณ์</string>
+    <string name="category_name_sys_apps" translatable="true">แอประบบ</string>
+    <string name="category_name_sys_components" translatable="true">ส่วนประกอบของระบบ</string>
+    <string name="cd_toast_edit" translatable="true">แก้ไขแล้ว</string>
+    <string name="cd_dialog_title" translatable="true">เพิ่มกฎโดเมน</string>
+    <string name="cd_blocked_initial" translatable="true">B</string>
+    <string name="cd_toast_deleted" translatable="true">โดเมนถูกลบออกจากรายการที่กำหนดเอง</string>
+    <string name="cd_remove_dialog_title" translatable="true">ลบโดเมน?</string>
+    <string name="cd_remove_dialog_message" translatable="true">ลบโดเมนจากการกำหนดค่าที่บันทึกไว้</string>
+    <string name="cd_deleted_toast" translatable="true">ลบกฎโดเมนทั้งหมด</string>
+    <string name="cd_no_rules_text" translatable="true">ไม่มีกฎของโดเมน</string>
+    <string name="cd_dialog_edit_title" translatable="true">แก้ไขกฎโดเมน</string>
+    <string name="ci_dialog_edittext_hint" translatable="true">ที่อยู่ IP, ซับเน็ตหรือพอร์ต</string>
+    <string name="ci_dialog_error_invalid_ip" translatable="true">ที่อยู่ IP, ซับเน็ตหรือพอร์ตไม่ถูกต้อง</string>
+    <string name="ci_bypass_universal_txt" translatable="true">บายพาสสากล</string>
+    <string name="ci_trust_txt" translatable="true">เชื่อถือได้</string>
+    <string name="ci_dialog_desc" translatable="true">อนุญาต (บายพาส) หรือบล็อกที่อยู่ IP, ซับเน็ต IP (ช่วง), พอร์ต ตัวอย่าง: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
+    <string name="ci_no_rule_txt" translatable="true">ไม่มีกฎ</string>
+    <string name="ci_no_rule" translatable="true">ไม่มีกฎ</string>
+    <string name="ada_app_status_allow" translatable="true">ได้รับอนุญาต</string>
+    <string name="ada_app_status_unknown" translatable="true">ไม่ทราบ</string>
+    <string name="ada_firewall_title" translatable="true">กฎไฟร์วอลล์สำหรับแอพนี้</string>
+    <string name="ada_app_status_block_wifi" translatable="true">ถูกบล็อคบนเครือข่ายแบบไม่มีการวัดปริมาณ (wifi)</string>
+    <string name="ada_app_status_block_md" translatable="true">ถูกบล็อคจากเครือข่ายแบบมิเตอร์ (มือถือ)</string>
+    <string name="ada_app_dns_settings" translatable="true">การตั้งค่า DNS</string>
+    <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">ล้างบันทึก</string>
+    <string name="bsdl_block_desc" translatable="true">Block, trust <u>this domain</u></string>
+    <string name="bsdl_blocked_desc" translatable="true">ถูกบล็อค %1$s โดย %2$s</string>
+    <string name="bypass_dns_firewall_tooltip">%1$s ทำงานกับ DNS ของ Rethink เท่านั้น</string>
+    <string name="bsac_title_desc" translatable="true">กฎมีผลใช้กับแอปนี้เท่านั้น</string>
+    <string name="notif_download_content_title" translatable="true">ดาวน์โหลดรายการบล็อคบนอุปกรณ์</string>
+    <string name="notif_download_content_text" translatable="true">กำลังดาวน์โหลดอยู่…</string>
+    <string name="notif_download_success_content" translatable="true">ดาวน์โหลดสำเร็จแล้ว</string>
+    <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">การควบคุมโดยผู้ปกครอง</string>
+    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen" translatable="true">บล็อกแอนตี้แวร์ สปายแวร์ และสแกร์แวร์</string>
+    <string name="rt_edit_dialog_positive" translatable="true">แก้ไข</string>
+    <string name="rt_re_download" translatable="true">ดาวน์โหลดรายการบล็อคอีกครั้ง</string>
+    <string name="lbl_advanced" translatable="true">ขั้นสูง</string>
+    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen" translatable="true">บล็อกเนื้อหาสำหรับผู้ใหญ่และเนื้อหาละเมิดลิขสิทธิ์ การพนันและการหาคู่ออนไลน์ และโซเชียลมีเดีย</string>
+    <string name="radio_sky_btn" translatable="true">⛅ ท้องฟ้า</string>
+    <string name="radio_max_btn" translatable="true">🪂 แม็กซ์</string>
+    <string name="dc_local_block_enabled" translatable="true">เปิดใช้งานแล้ว</string>
+    <string name="lbbs_search" translatable="true">ค้นหาโดเมนในรายการบล็อค</string>
+    <string name="dc_refresh_toast" translatable="true">รีเฟรชเสร็จสิ้น</string>
+    <string name="lbbs_enabled" translatable="true">เปิดใช้งานแล้ว</string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true">ไม่ทราบคุณสมบัติ</string>
+    <string name="lbbs_redownload" translatable="true">ดาวน์โหลดรายการบล็อคอีกครั้ง</string>
+    <string name="lbbs_download" translatable="true">อัปเดตรายการบล็อค</string>
+    <string name="lbbs_heading" translatable="true">กำหนดค่ารายการบล็อกมากกว่า 195 รายการ</string>
+    <string name="brbs_backup_restore_desc" translatable="true">ไม่ทำงานข้ามเวอร์ชันแอป</string>
+    <string name="bad_config_reason_unknown_section" translatable="true">หมวดที่ไม่ทราบ</string>
+    <string name="bad_config_explanation_pka" translatable="true">: ต้องเป็นค่าบวกและไม่เกิน 65535</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">: ต้องเป็นหมายเลขพอร์ต UDP ที่ถูกต้อง</string>
+    <string name="parse_error_generic" translatable="true">สตริง</string>
+    <string name="unknown_error" translatable="true">ข้อผิดพลาดที่ไม่ทราบ</string>
+    <string name="new_warp_config_desc" translatable="true">ดึงข้อมูลการกำหนดค่า WARP จากเซิร์ฟเวอร์</string>
+    <string name="one_wg_apps_added" translatable="true">การกำหนดเส้นทางแอปทั้งหมด</string>
+    <string name="generic_error" translatable="true">ข้อผิดพลาดที่ไม่รู้จัก “%s”</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">เปิดตลอดเวลา</string>
+    <string name="one_wg_error_toast" translatable="true">หากต้องการสลับไปที่ขั้นสูง ให้หยุด WireGuard ในโหมดเรียบง่าย</string>
+    <string name="add_peer" translatable="true">เพิ่มเพื่อน</string>
+    <string name="config_delete_dialog_desc" translatable="true">คุณแน่ใจหรือไม่ว่าต้องการลบการกำหนดค่า VPN ของ WireGuard นี้ ?</string>
+    <string name="exclude_all_app_wg_dialog_desc" translatable="true">ไม่รวมแอปทั้งหมดจาก WireGuard VPN นี้หรือไม่?</string>
+    <string name="wireguard_enabled_failure" translatable="true">หยุดพร็อกซีที่ใช้งานอยู่อื่น ๆ เพื่อเปิดใช้งาน WireGuard</string>
+    <string name="wireguard_disable_failure" translatable="true">ไม่สามารถปิด \"WireGuard ที่เปิดตลอดเวลา\" ได้</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">รวมแอป %1$s</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">ไม่รวมแอป %1$s</string>
+    <string name="wireguard_connection_error" translatable="true">WireGuard VPN ไม่สามารถเชื่อมต่อได้</string>
+    <string name="lbl_remaining_apps" translatable="true">แอปที่เหลืออยู่</string>
+    <string name="wireguard_disable_title" translatable="true">หยุด WireGuard</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">บล็อกการเข้าถึงเว็บไซต์สำหรับผู้ใหญ่ ลามกอนาจาร และเนื้อหาที่ไม่เหมาะสมทั้งหมด นอกจากนี้ยังบล็อกโดเมนพร็อกซีและ VPN ที่ใช้ในการข้ามตัวกรอง เว็บไซต์ที่มีเนื้อหาผสม (เช่น Reddit) จะถูกบล็อกด้วย Google, Bing และ Youtube จะถูกตั้งค่าเป็นโหมดปลอดภัย</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="crypt_relay_sweden" translatable="true">รีเลย์ DNS ที่ไม่เปิดเผยตัวตนซึ่งโฮสต์ในสวีเดน จัดทำโดย https://cryptostrom.is/</string>
+    <string name="crypt_relay_netherlands" translatable="true">รีเลย์ DNS ที่ไม่ระบุตัวตนที่โฮสต์ในเนเธอร์แลนด์</string>
+    <string name="settings_default_dns_desc" translatable="true">ในกรณีที่หายากที่ไม่สามารถระบุ DNS ที่ผู้ใช้ต้องการได้ จะมีการใช้ DNS สำรองแทน</string>
+    <string name="settings_pcap_heading" translatable="true">Packet capture</string>
+    <string name="firewall_status_block_metered" translatable="true">บล็อคบนเครือข่ายแบบมิเตอร์ (มือถือ)</string>
+    <string name="hs_biometeric_desc" translatable="true">ใช้การตรวจสอบข้อมูลชีวภาพเพื่อปลดล็อก Rethink</string>
+    <string name="apps_card_ips_count" translatable="true">กฎ IP และพอร์ต %1$s</string>
+    <string name="about_github" translatable="true">มีส่วนร่วมบน GitHub</string>
+    <string name="about_app_update_check" translatable="true">ตรวจสอบการอัปเดตแอป</string>
+    <string name="univ_accessibility_dialog_negative" translatable="true">ปฏิเสธ</string>
+    <string name="dns_info_neutral" translatable="true">สำเนา</string>
+    <string name="dns_proxy_dialog_message" translatable="true">ชื่อแอป: %1$s
+\n
+\nที่อยู่ IP: %2$s
+\n
+\nหมายเลขพอร์ต: %3$s</string>
+    <string name="fapps_filter_filter_heading" translatable="true">พิมพ์</string>
+    <string name="fapps_filter_parent_installed" translatable="true">ติดตั้งแล้ว</string>
+    <string name="fapps_filter_categories_heading" translatable="true">หมวดหมู่</string>
+    <string name="fapps_info_isolate_msg" translatable="true">บล็อคทั้งหมด ยกเว้น IP ที่เชื่อถือได้</string>
+    <string name="fapps_info_dialog_positive_btn" translatable="true">ตกลง</string>
+    <string name="fapps_info_exclude_msg" translatable="true">ไม่รวมทั้ง DNS + ไฟร์วอลล์</string>
+    <string name="orbot_toast_parameter" translatable="true">Tor-เป็น-พร็อกซี</string>
+    <string name="firewall_rule_block_univ_ip" translatable="true">IP / พอร์ต (สากล)</string>
+    <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNS พร็อกซี</string>
+    <string name="firewall_rule_block_http" translatable="true">HTTP ที่ไม่ปลอดภัย</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">โดเมน (มหาวิทยาลัย)</string>
+    <string name="firewall_rule_domain_trusted_univ" translatable="true">โดเมนที่เชื่อถือได้ (Univ)</string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>Unmetered</i> network.<br/><br/> To change go to <i>All Apps</i> tab.</string>
+    <string name="bypass_universal" translatable="true">บายพาสสากล</string>
+    <string name="isolate" translatable="true">แยกตัว</string>
+    <string name="untracked" translatable="true">ไม่ได้ติดตาม</string>
+    <string name="bypass_dns_firewall" translatable="true">ข้าม DNS และไฟร์วอลล์</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">คำเตือน: Rethink ถูกปิดใช้งานแล้ว</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">แตะเพื่อเปลี่ยนการตั้งค่าการป้องกัน</string>
+    <string name="firewall_mode_notification_title" translatable="true">ได้รับการป้องกัน! เชื่อมต่อกับไฟร์วอลล์แล้ว</string>
+    <string name="pause_mode_notification_title" translatable="true">หยุดชั่วคราว! แอปที่ถูกบล็อคจะยังคงถูกไฟร์วอลล์ต่อไป</string>
+    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">ซึ่งรอคอย</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">ล้มเหลว</string>
+    <string name="status_protected_with_wg" translatable="true">ป้องกันด้วย Wireguard</string>
+    <string name="status_protected_with_proxy_private_dns" translatable="true">ได้รับการปกป้องด้วยพร็อกซีและ DNS ส่วนตัว</string>
+    <string name="status_protected_with_http" translatable="true">ได้รับการปกป้องด้วยพร็อกซี HTTP</string>
+    <string name="status_protected_with_proxy" translatable="true">ได้รับการปกป้องด้วยพร็อกซี</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">ได้รับการปกป้องด้วย wireguard และ dns ส่วนตัว</string>
+    <string name="dns_explanation_dns_connected" translatable="true">เชื่อมต่อกับ RethinkDNS</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">เชื่อมต่อกับไฟร์วอลล์</string>
+    <string name="notification_action_resume_vpn" translatable="true">ประวัติย่อ</string>
+    <string name="notification_action_pause_vpn" translatable="true">หยุดชั่วคราว</string>
+    <string name="notification_action_stop_vpn" translatable="true">หยุด</string>
+    <string name="notification_action_dns_mode" translatable="true">DNS</string>
+    <string name="notification_action_dns_firewall_mode" translatable="true">DNS + ไฟร์วอลล์</string>
+    <string name="dns_mode_info_title" translatable="true">DNS</string>
+    <string name="firewall_rules" translatable="true">กฎของเครือข่าย</string>
+    <string name="firewall_mode_info_title" translatable="true">ไฟร์วอลล์</string>
+    <string name="firewall_mode_info_explanation_new" translatable="true">ตรวจสอบกิจกรรมเครือข่ายและไฟร์วอลล์ของแอปหรือที่อยู่ IP ใดๆ</string>
+    <string name="hybrid_mode_info_title" translatable="true">DNS + ไฟร์วอลล์</string>
+    <string name="alert_permission_accessibility" translatable="true">การอนุญาต-การเข้าถึง</string>
+    <string name="download_update_dialog_message_ok_title" translatable="true">อัพเดทล่าสุด!</string>
+    <string name="download_update_dialog_failure_title" translatable="true">มีบางอย่างผิดปกติ!</string>
+    <string name="download_update_dialog_failure_message" translatable="true">เซิร์ฟเวอร์ของเราอาจหยุดทำงานหรือไม่สามารถเชื่อมต่อได้ โปรดลองอีกครั้งในภายหลัง</string>
+    <string name="search_firewall_all_apps" translatable="true"><font size="12">ค้นหาแอพตาม uid, ชื่อ</font></string>
+    <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">ค้นหารายการบล็อค</font></string>
+    <string name="app_mode_dns_low_battery" translatable="true">DNS (ประหยัดแบตเตอรี่)</string>
+    <string name="app_mode_firewall" translatable="true">ไฟร์วอลล์</string>
+    <string name="info_dialog_rethink_toast_msg" translatable="true">คัดลอกเป็น URL RDNS+ DNS-over-HTTPS</string>
+    <string name="settings_enable_logs_desc" translatable="true">จัดเก็บบันทึก DNS และไฟร์วอลล์ไว้ในอุปกรณ์ภายในเครื่อง</string>
+    <string name="settings_enable_logs" translatable="true">เปิดใช้งานการบันทึกข้อมูลบนอุปกรณ์</string>
+    <string name="settings_connectivity_checks" translatable="true">ดำเนินการตรวจสอบการเชื่อมต่อ</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">การตรวจสอบการเชื่อมต่อจะถูกส่งไปเพื่อตรวจสอบความสามารถในการเข้าถึง</string>
+    <string name="settings_https_desc" translatable="true">ส่งต่อการเชื่อมต่อไปยังจุดสิ้นสุด HTTP(S) CONNECT</string>
+    <string name="settings_socks5_dialog_hint_username" translatable="true">ชื่อผู้ใช้ (ไม่บังคับ)</string>
+    <string name="settings_ip_dialog_title" translatable="true">เลือกเวอร์ชัน IP</string>
+    <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (ค่าเริ่มต้น)</string>
+    <string name="settings_ip_text_ipv6" translatable="true">IPv6</string>
+    <string name="settings_ip_text_ipv46" translatable="true">ออโต้</string>
+    <string name="settings_notification_desc3" translatable="true">ไม่มี</string>
+    <string name="settings_notification_dialog_title" translatable="true">เลือกการดำเนินการแจ้งเตือน</string>
+    <string name="settings_default_dns_heading" translatable="true">เลือก DNS สำรอง</string>
+    <string name="firewall_rule_block_http_desc" translatable="true">This connection was blocked because it likely used <i>insecure HTTP</i>.<br/><br/> To change go to <i>Universal</i> tab.</string>
+    <string name="ci_block" translatable="true">ปิดกั้น</string>
+    <string name="ci_trust_rule" translatable="true">เชื่อมั่น</string>
+    <string name="ada_ip_connection_count_zero" translatable="true">0 ที่อยู่ IP</string>
+    <string name="ci_delete" translatable="true">ลบ</string>
+    <string name="ada_noapp_dialog_positive" translatable="true">ตกลง</string>
+    <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">ความปลอดภัย</string>
+    <string name="rt_chip_update_available" translatable="true">อัปเดตพร้อมใช้งานแล้ว</string>
+    <string name="lbbs_update_check" translatable="true">ตรวจสอบการอัปเดต</string>
+    <string name="brbs_backup_title" translatable="true">การสำรองข้อมูล</string>
+    <string name="brbs_backup_dialog_title" translatable="true">การสำรองข้อมูล</string>
+    <string name="brbs_restore_dialog_message" translatable="true">กู้คืนการตั้งค่าแอป เครือข่าย และบันทึก DNS จากไฟล์สำรองข้อมูล การดำเนินการนี้จะเริ่มแอปใหม่</string>
+    <string name="brbs_backup_dialog_failure_title" translatable="true">การสำรองข้อมูลล้มเหลว</string>
+    <string name="brbs_restore_dialog_failure_message" translatable="true">ไม่สามารถคืนค่าได้ ลองใหม่อีกครั้ง?</string>
+    <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">รายการบล็อค %1$s</string>
+    <string name="key_length_explanation_binary" translatable="true">:คีย์ WireGuard ต้องมี 32 ไบต์</string>
+    <string name="bad_config_explanation_positive_number" translatable="true">: ต้องเป็นบวก</string>
+    <string name="bad_config_context" translatable="true">%1$s\'s %2$s</string>
+    <string name="bad_extension_error" translatable="true">ไฟล์จะต้องเป็น .conf หรือ .zip</string>
+    <string name="new_warp_error_toast" translatable="true">ไม่สามารถดึงการกำหนดค่า WARP ได้</string>
+    <string name="lbl_maybe_blocked" translatable="true">บางทีอาจถูกบล็อค</string>
+    <string name="lbl_action_required" translatable="true">จำเป็นต้องดำเนินการ</string>
+    <string name="lbl_rules" translatable="true">กฎ</string>
+    <string name="lbl_configure" translatable="true">การกำหนดค่า</string>
+    <string name="lbl_logs" translatable="true">บันทึก</string>
+    <string name="lbl_network" translatable="true">เครือข่าย</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">ไม่ได้รับการคุ้มครอง</string>
+    <string name="download_update_dialog_message_ok" translatable="true">คุณใช้เวอร์ชั่นล่าสุดแล้ว</string>
+    <string name="settings_ip_network_heading" translatable="true">เลือกเวอร์ชัน IP</string>
+    <string name="settings_proxy_header" translatable="true">พร็อกซี</string>
+    <string name="settings_autostart_bootup_desc" translatable="true">เมื่อเปิดเครื่องอุปกรณ์ ให้เริ่ม Rethink หากกำลังทำงานอยู่ก่อนที่จะปิดเครื่อง</string>
+    <string name="settings_check_update_desc" translatable="true">ตรวจสอบการอัปเดตแอปโดยอัตโนมัติสัปดาห์ละครั้ง</string>
+    <string name="settings_custom_downloader_heading" translatable="true">ใช้ตัวดาวน์โหลดในแอป</string>
+    <string name="settings_custom_downloader_desc" translatable="true">หากปิดใช้งาน ตัวจัดการการดาวน์โหลด <i>ในตัวของ Android </i>จะถูกใช้</string>
+    <string name="settings_ip_dialog_ipv46" translatable="true">อัตโนมัติ (ทดลอง)</string>
+    <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
+    <string name="firewall_card_text_active" translatable="true">%1$s ถูกบล็อค
+\n%2$s ถูกข้าม
+\n%3$s ถูกแยก
+\n%4$s ถูกแยก</string>
+    <string name="log_file_not_available" translatable="true">ไม่พบรายงานความผิดพลาด</string>
+    <string name="ctbs_app_info_not_available_toast" translatable="true">ไม่พบหน้าการตั้งค่าแอป</string>
+    <string name="dns_btm_sheet_chip" translatable="true">+%1$s IP อื่นๆ</string>
+    <string name="dns_proxy_ip_address" translatable="true">ที่อยู่ IP</string>
+    <string name="fapps_firewall_filter_isolate" translatable="true">โดดเดี่ยว</string>
+    <string name="fapps_info_dialog_message" translatable="true">บล็อกแอปไม่ให้เชื่อมต่ออินเทอร์เน็ต การจำกัดการเข้าถึงอินเทอร์เน็ตช่วยป้องกันการใช้ข้อมูลที่ไม่จำเป็น รวมทั้งช่วยประหยัดแบตเตอรี่</string>
+    <string name="fapps_info_bypass_msg" translatable="true">ข้ามกฎไฟร์วอลล์สากล</string>
+    <string name="fapps_unmetered_block_dialog_title" translatable="true">บล็อคแบบไม่มีมิเตอร์</string>
+    <string name="cd_no_rule_initial" translatable="true">N</string>
+    <string name="ada_app_status_block" translatable="true">ถูกบล็อค</string>
+    <string name="notif_download_cancel_content" translatable="true">การดาวน์โหลดถูกยกเลิก</string>
+    <string name="lbl_create" translatable="true">สร้าง</string>
+    <string name="lbl_qr_code" translatable="true">QR Code</string>
+    <string name="lbl_import" translatable="true">การนำเข้า</string>
+    <string name="lbl_wireguard" translatable="true">ไวร์การ์ด</string>
+    <string name="lbl_public_key" translatable="true">คีย์สาธารณะ</string>
+    <string name="lbl_addresses" translatable="true">ที่อยู่</string>
+    <string name="lbl_dns_servers" translatable="true">DNS Servers</string>
+    <string name="lbl_applications" translatable="true">แอปพลิเคชั่น</string>
+    <string name="lbl_ip_rules" translatable="true">กฎระเบียบทรัพย์สินทางปัญญา</string>
+    <string name="lbl_domain_rules" translatable="true">กฎของโดเมน</string>
+    <string name="lbl_delete" translatable="true">ลบ</string>
+    <string name="lbl_proceed" translatable="true">ดำเนินการ</string>
+    <string name="lbl_private_key" translatable="true">คีย์ส่วนตัว</string>
+    <string name="lbl_generated" translatable="true">(สร้างขึ้น)</string>
+    <string name="lbl_random" translatable="true">(สุ่ม)</string>
+    <string name="lbl_listen_port" translatable="true">ฟังพอร์ต</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_auto" translatable="true">(อัตโนมัติ)</string>
+    <string name="lbl_include" translatable="true">รวม</string>
+    <string name="lbl_select_all" translatable="true">เลือกทั้งหมด</string>
+    <string name="lbl_active" translatable="true">คล่องแคล่ว</string>
+    <string name="lbl_inactive" translatable="true">ไม่ทำงาน</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="lbl_fast" translatable="true">เร็ว</string>
+    <string name="lbl_slow" translatable="true">ช้า</string>
+    <string name="lbl_very" translatable="true">มาก</string>
+    <string name="lbl_add" translatable="true">แอป</string>
+    <string name="lbl_app_wise" translatable="true">ต่อ แอป</string>
+    <string name="lbl_sec" translatable="true">วินาที</string>
+    <string name="lbl_min" translatable="true">นาที</string>
+    <string name="lbl_hour" translatable="true">ชม</string>
+    <string name="lbl_day" translatable="true">วัน</string>
+    <string name="lbl_preshared_key" translatable="true">คีย์ที่แชร์ไว้ล่วงหน้า</string>
+    <string name="lbl_insecure" translatable="true">(ไม่ปลอดภัย)</string>
+    <string name="lbl_save" translatable="true">บันทึก</string>
+    <string name="slide_2_title" translatable="true">ยินดีต้อนรับ</string>
+    <string name="hybrid_mode_notification_title" translatable="true">ได้รับการป้องกัน! เชื่อมต่อกับ DNS + ไฟร์วอลล์แล้ว</string>
+    <string name="status_protected_with_private_dns" translatable="true">ได้รับการปกป้องด้วย DNS ส่วนตัว</string>
+    <string name="configure_dns_connected_doh_status" translatable="true">DNS ผ่าน HTTPS</string>
+    <string name="app_mode_dns_firewall" translatable="true">DNS และไฟร์วอลล์ (ค่าเริ่มต้น)</string>
+    <string name="orbot_http" translatable="true">พร็อกซี HTTP</string>
+    <string name="orbot_both" translatable="true">พร็อกซี TCP + HTTP</string>
+    <string name="orbot_both_desc" translatable="true">ทั้งหมดข้างต้น</string>
+    <string name="orbot_install_dialog_message" translatable="true">Orbot นำคุณลักษณะและฟังก์ชันของ Tor มาสู่ Android</string>
+    <string name="orbot_install_dialog_positive" translatable="true">ติดตั้ง</string>
+    <string name="orbot_install_dialog_neutral" translatable="true">เว็บไซต์</string>
+    <string name="settings_go_log_heading" translatable="true">ระดับบันทึก</string>
+    <string name="settings_http_proxy_desc" translatable="true">กำลังส่งต่อไปยัง %1$s</string>
+    <string name="firewall_card_text_inactive" translatable="true">เปิดใช้งานโหมดไฟร์วอลล์</string>
+    <string name="hsf_stop_btn_state" translatable="true">หยุด</string>
+    <string name="logs_disclaimer" translatable="true">แสดง 20,000 ตัวอักษรแรก</string>
+    <string name="cd_dns_crypt_relay_heading" translatable="true">รีเลย์</string>
+    <string name="fapps_metered_unblock_dialog_message" translatable="true">อนุญาตการเชื่อมต่อบนเครือข่ายแบบคิดค่าบริการตามปริมาณ (มือถือ) สำหรับแอปที่<i>อยู่ในรายการ</i>หรือไม่?</string>
+    <string name="univ_accessibility_crash_dialog_positive" translatable="true">ไปที่การตั้งค่า</string>
+    <string name="firewall_rule_exempt_orbot_setup" translatable="true">การตั้งค่า Orbot</string>
+    <string name="parse_error_reason" translatable="true">ไม่สามารถแยกวิเคราะห์ %1$s “%2$s” ได้</string>
+    <string name="wireguard_no_config_msg" translatable="true">ไม่มี WireGuard VPN เพิ่ม VPN เพื่อเริ่มต้นใช้งาน</string>
+    <string name="add_remove_apps" translatable="true">เพิ่ม / ลบ (%1$s แอป)</string>
+    <string name="cloudflare_dns_desc" translatable="true">ไม่บล็อกคำขอ DNS ใดๆ ใช้จุดสิ้นสุด DNS 1.1.1.1 ของ Cloudflare</string>
+    <string name="settings_title_desc" translatable="true">DNS และไฟร์วอลล์ที่ปรับแต่งได้สูง</string>
+    <string name="about_title_desc" translatable="true">ตรวจจับและบล็อกภัยคุกคามความปลอดภัยเครือข่าย</string>
+    <string name="txt_home" translatable="true">บ้าน</string>
+    <string name="accessibility_service_description" translatable="true">Rethink ใช้บริการการเข้าถึงเพื่อตรวจจับและไฟร์วอลล์แอปพลิเคชันพื้นหลัง Rethink ไม่รวบรวมหรือขายข้อมูลใดๆ</string>
+    <string name="next" translatable="true">ต่อไป</string>
+    <string name="skip" translatable="true">ข้าม</string>
+    <string name="lbl_blocked" translatable="true">ถูกบล็อค</string>
+    <string name="lbl_disabled" translatable="true">พิการ</string>
+    <string name="lbl_domain" translatable="true">โดเมน</string>
+    <string name="finish" translatable="true">เสร็จ</string>
+    <string name="lbl_cancel" translatable="true">ยกเลิก</string>
+    <string name="lbl_apply" translatable="true">นำมาใช้</string>
+    <string name="lbl_dismiss" translatable="true">อนุญาตให้ออกไป</string>
+    <string name="lbl_all" translatable="true">ทั้งหมด</string>
+    <string name="lbl_allowed" translatable="true">อนุญาต</string>
+    <string name="lbl_wildcard" translatable="true">ไวด์การ์ด</string>
+    <string name="exclude" translatable="true">ไม่รวม</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">เลือกโหมด.</string>
+    <string name="brave_dns_connect_mode_change_dns" translatable="true">เลือกโหมด.</string>
+    <string name="default_dns_name" translatable="true">RDNS เริ่มต้น</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">ลบ DNS Proxy?</string>
+    <string name="refresh_complete" translatable="true"><!-- ใช้ dc_refresh_toast --> การซิงค์รายการแอปใหม่เสร็จสมบูรณ์</string>
+    <string name="search_dns_logs" translatable="true"><font size="12">ค้นหาชื่อโดเมนหรือ IP</font></string>
+    <string name="settings_dns_proxy_dialog_app" translatable="true">แอป</string>
+    <string name="settings_socks_forwarding_desc_no_app" translatable="true">ส่งต่อไปยัง %1$s:%2$s</string>
+    <string name="settings_theme_dialog_themes_1" translatable="true">ตั้งค่าโดยระบบ</string>
+    <string name="hsf_proxy_chip_removed_toast" translatable="true">พร็อกซีถูกลบออก</string>
+    <string name="dc_local_block_heading" translatable="true">รายการบล็อคบนอุปกรณ์</string>
+    <string name="about_mail_to" translatable="true">hello@celzero.com</string>
+    <string name="error_loading_log_file" translatable="true">เกิดข้อผิดพลาดในการโหลดไฟล์บันทึก</string>
+    <string name="cd_dns_crypt_dialog_stamp" translatable="true">แสตมป์</string>
+    <string name="hs_download_positive_default" translatable="true">ok</string>
+    <string name="hs_download_positive_play_store" translatable="true">อัพเดตเสร็จสมบูรณ์</string>
+    <string name="univ_firewall_rule_4" translatable="true">บล็อค UDP ยกเว้น DNS และ NTP</string>
+    <string name="univ_ip_delete_toast_success" translatable="true">ลบกฎ IP ทั้งหมด</string>
+    <string name="fapps_filter_clear_btn" translatable="true">ชัดเจน</string>
+    <string name="fapps_metered_unblock_dialog_title" translatable="true">อนุญาตให้ใช้มิเตอร์</string>
+    <string name="fapps_isolate_block_dialog_message" translatable="true">แยกแอปที่<i>อยู่ใน</i>รายการหรือไม่?</string>
+    <string name="fapps_metered_block_dialog_message" translatable="true">บล็อกการเชื่อมต่อบนเครือข่ายแบบคิดค่าบริการตามปริมาณ (มือถือ) สำหรับแอปที่ <i>อยู่ในรายการ</i> หรือไม่?</string>
+    <string name="other_dns_list_tab3" translatable="true">พร็อกซี DNS</string>
+    <string name="firewall_rule_block_app" translatable="true">แอปถูกบล็อค</string>
+    <string name="firewall_rule_device_lock" translatable="true">อุปกรณ์ถูกล็อค</string>
+    <string name="firewall_rule_foreground" translatable="true">แอปไม่ได้ใช้งาน</string>
+    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true">This connection was allowed because <i>one-click Tor-as-a-proxy</i> setup via Orbot was in progress.</string>
+    <string name="notif_channel_firewall_alerts" translatable="true">การแจ้งเตือนไฟร์วอลล์</string>
+    <string name="ada_firewall_status" translatable="true">แอปนี้ <b><i>%1$s</i></b>.</string>
+    <string name="ada_ip_connection_count" translatable="true">เชื่อมต่อกับที่อยู่ IP %1$s</string>
+    <string name="ada_app_unmetered" translatable="true">ไร้มิเตอร์</string>
+    <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">ความเป็นส่วนตัว</string>
+    <string name="rt_download" translatable="true">ดาวน์โหลดรายการบล็อค</string>
+    <string name="rt_filter_desc_subgroups" translatable="true">กำลังแสดง <u>%1$s</u> รายการบล็อกในกลุ่ม: %2$s และกลุ่มย่อย: %3$s</string>
+    <string name="brbs_backup_dialog_message" translatable="true">สำรองข้อมูลการตั้งค่าแอป เครือข่าย และบันทึก DNS ลงในไฟล์ การดำเนินการนี้จะเริ่ม VPN ใหม่</string>
+    <string name="brbs_backup_dialog_positive" translatable="true">การสำรองข้อมูล</string>
+    <string name="lbbs_configure" translatable="true">การกำหนดค่า</string>
+    <string name="lbbs_copy" translatable="true">คัดลอกเป็น RDNS+ URL</string>
+    <string name="brbs_restore_complete_toast" translatable="true">การคืนค่าเสร็จสมบูรณ์ กำลังรีสตาร์ทแอป…</string>
+    <string name="brbs_backup_complete_toast" translatable="true">การสำรองข้อมูลเสร็จสิ้น</string>
+    <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
+    <string name="dc_entries" translatable="true">%1$s รายการ »</string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true">ข้ามกฎไฟร์วอลล์สากลสำหรับแอปที่<i>อยู่ในรายการ</i>หรือไม่?</string>
+    <string name="cd_toast_added" translatable="true">เพิ่มโดเมนสำเร็จแล้ว</string>
+    <string name="key_length_error" translatable="true">ความยาวคีย์ไม่ถูกต้อง</string>
+    <string name="config_add_success_toast" translatable="true">เสร็จแล้ว</string>
+    <string name="include_all_app_wg_dialog_title" translatable="true">รวมแอปทั้งหมด</string>
+    <string name="lbl_notification" translatable="true">การแจ้งเตือน</string>
+    <string name="memory_notification_text">Rethink กำลังประสบปัญหาหน่วยความจำต่ำ การดำเนินการของระบบอาจมีจำกัด</string>
+    <string name="slide_1_desc" translatable="true">Rethink เป็นซอฟต์แวร์โอเพ่นซอร์สที่ได้รับการสนับสนุนโดยโปรแกรม Mozilla Builders MVP</string>
+    <string name="allow" translatable="true">อนุญาต</string>
+    <string name="dns_mode_notification_title" translatable="true">ได้รับการป้องกัน! เชื่อมต่อกับ DNS ที่รวดเร็วและปลอดภัย</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">ได้รับการป้องกัน! เชื่อมต่อกับ DNS + ไฟร์วอลล์ + พร็อกซีแล้ว</string>
+    <string name="failed_using_default" translatable="true">ล้มเหลว: การใช้ DNS สำรอง</string>
+    <string name="universal_firewall_explanation" translatable="true">ใช้กฎไฟร์วอลล์กับแอปพลิเคชันทั้งหมดตามเหตุการณ์ของอุปกรณ์ เช่น ไฟร์วอลล์เมื่ออุปกรณ์ถูกล็อกหรือเมื่อไม่ได้ใช้งานแอปพลิเคชันใดแอปหนึ่ง</string>
+    <string name="dns_firewall_mode_info_explanation_new" translatable="true">ทั้งหมดข้างต้น + หลีกเลี่ยงการเซ็นเซอร์อินเตอร์เน็ต</string>
+    <string name="custom_url_error_invalid_url" translatable="true">URL ไม่ถูกต้อง</string>
+    <string name="conn_track_clear_logs_message" translatable="true">การดำเนินการนี้จะลบเฉพาะบันทึกเครือข่ายเท่านั้น แต่จะไม่ลบกฎไฟร์วอลล์ การดำเนินการนี้ไม่สามารถย้อนกลับได้ คุณต้องการดำเนินการต่อหรือไม่</string>
+    <string name="always_on_dialog_stop_heading" translatable="true">VPN ที่เปิดตลอดเวลา</string>
+    <string name="always_on_dialog" translatable="true">อุปกรณ์นี้เปิดใช้งาน \"Always-On VPN\" แล้ว หากต้องการเริ่ม Rethink โปรดไปที่แอปการตั้งค่าและปิดใช้งาน \"Always-on VPN\"</string>
+    <string name="always_on_dialog_stop_message" translatable="true">VPN แบบเปิดตลอดเวลาเปิดใช้งานสำหรับ Rethink แล้ว คุณแน่ใจหรือไม่? ว่าต้องการหยุด Rethink</string>
+    <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink กำลังรัน VPN ในโหมด <i>Lockdown</i> หากหยุดการทำงาน จะส่งผลให้สูญเสียการเชื่อมต่ออินเทอร์เน็ตบนโปรไฟล์ผู้ใช้รายนี้ คุณต้องการดำเนินการต่อหรือไม่ ?</string>
+    <string name="always_on_dialog_positive" translatable="true">หยุด</string>
+    <string name="always_on_dialog_neutral" translatable="true">การตั้งค่า</string>
+    <string name="private_dns_dialog_heading" translatable="true">ปิดการใช้งาน DNS ส่วนตัว</string>
+    <string name="dns_act_configure_tab" translatable="true">การกำหนดค่า</string>
+    <string name="univ_firewall_dialog_title" translatable="true">ลบกฎ IP หรือไม่?</string>
+    <string name="univ_firewall_dialog_message" translatable="true">การลบกฎนี้จะทำให้แอปใดๆ ก็ตามสามารถเชื่อมต่อกับ IP นี้ได้ คุณต้องการดำเนินการต่อหรือไม่ ?</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">ลบจุดสิ้นสุด DoH หรือไม่?</string>
+    <string name="doh_custom_url_remove_dialog_message" translatable="true">ลบจุดสิ้นสุด DNS ผ่าน Https จากการกำหนดค่าที่บันทึกไว้</string>
+    <string name="doh_custom_url_remove_success" translatable="true">ลบจุดสิ้นสุดแล้ว</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">ลบจุดสิ้นสุด DoT หรือไม่?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">ลบจุดสิ้นสุด DNS บน TLS จากการกำหนดค่าที่บันทึกไว้</string>
+    <string name="local_blocklist_download" translatable="true">ดาวน์โหลดรายการบล็อค</string>
+    <string name="local_blocklist_download_desc" translatable="true">ดาวน์โหลดรายการบล็อค (ประมาณ 60MB) เพื่อใช้ฟีเจอร์นี้?</string>
+    <string name="local_blocklist_redownload" translatable="true">อัพเดทล่าสุด!</string>
+    <string name="blocklist_update_check_not_required" translatable="true">รายการบล็อคเป็นเวอร์ชั่นล่าสุดแล้ว</string>
+    <string name="show_logs_disabled_network_message" translatable="true">การบันทึกการเชื่อมต่อถูกปิดใช้งาน หากต้องการเปิดใช้งานอีกครั้ง ให้ไปที่ <i>การตั้งค่า</i> และเปิด <i>เปิดใช้งานการบันทึกบนอุปกรณ์</i></string>
+    <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
+    <string name="configure_dns_crypt" translatable="true">DNSCrypt: ตัวแก้ไข %1$s</string>
+    <string name="http_proxy_dialog_heading" translatable="true">ตั้งค่าพร็อกซีเชื่อมต่อ HTTP(S)</string>
+    <string name="http_proxy_dialog_desc" translatable="true">ตั้งค่า URL ของฟอร์ม &lt;โปรโตคอล&gt;://&lt;ชื่อผู้ใช้&gt;:&lt;รหัสผ่าน&gt;@&lt;โดเมนหรือไอพี&gt;:&lt;พอร์ต&gt;&lt;เส้นทาง&gt; ตัวอย่าง: http://proxy.example.com:8080/</string>
+    <string name="download_update_dialog_trylater_title" translatable="true">ไม่สามารถอัปเดตได้ในขณะนี้</string>
+    <string name="download_update_dialog_trylater_message" translatable="true">ไม่สามารถดำเนินการอัปเดตได้ในขณะนี้ โปรดลองอีกครั้งในภายหลัง</string>
+    <string name="search_firewall_network_log" translatable="true"><font size="12">ค้นหาแอป, IP, โดเมน</font></string>
+    <string name="search_universal_ips" translatable="true"><font size="12">ค้นหา IP</font></string>
+    <string name="app_mode_dns" translatable="true">DNS</string>
+    <string name="info_dialog_copy_toast_msg" translatable="true">คัดลอกที่อยู่ IP แล้ว</string>
+    <string name="connection_http3" translatable="true">HTTP3</string>
+    <string name="relative_time_yesterday" translatable="true">เมื่อวาน</string>
+    <string name="settings_ptrans_heading" translatable="true">บังคับให้มีการออกจาก IPv4</string>
+    <string name="settings_allow_lan_heading" translatable="true">อย่ากำหนดเส้นทาง IP ส่วนตัว (ทดลอง)</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">แอปพลิเคชั่นส่งต่อพรอกซี Loopback</string>
+    <string name="settings_allow_bypass_heading" translatable="true">เปิดใช้งานการมองเห็นเครือข่าย</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">ตัวเลือกบางอย่างจะถูกปิดใช้งานเมื่อ VPN อยู่ในโหมดล็อคดาวน์ <u>ดูการตั้งค่า VPN</u></string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">ไม่สามารถตั้งค่าพร็อกซีได้เมื่อ VPN กำลังทำงานในโหมด DNS เท่านั้น</string>
+    <string name="settings_socks5_desc" translatable="true">ส่งต่อการเชื่อมต่อไปยังจุดสิ้นสุด SOCKS5</string>
+    <string name="settings_https_heading" translatable="true">ตั้งค่าพร็อกซี HTTP(S) CONNECT</string>
+    <string name="orbot_none_desc" translatable="true">ไม่มีอย่างที่กล่าวมาข้างต้น</string>
+    <string name="orbot_bs_status_1" translatable="true">กำลังส่งต่อการเชื่อมต่อ %1$s ไปยัง Orbot</string>
+    <string name="orbot_bs_status_2" translatable="true">มีการตั้งค่า HTTP Proxy แล้ว</string>
+    <string name="orbot_bs_status_3" translatable="true">การส่งต่อ %1$s ไปยัง Orbot ก็มีการตั้งค่า HTTP Proxy เช่นกัน</string>
+    <string name="orbot_bs_status_4" translatable="true">การตั้งค่า Tor-as-a-Proxy (Orbot) ด้วยการคลิกเพียงครั้งเดียว</string>
+    <string name="orbot_status_arg_2" translatable="true">TCP</string>
+    <string name="orbot_app_issue" translatable="true">ไม่สามารถเปิด Orbot ได้ มันถูกติดตั้งแล้วหรือไม่?</string>
+    <string name="orbot_stop_dialog_title" translatable="true">ต้องมีการแทรกแซงด้วยตนเอง</string>
+    <string name="orbot_title" translatable="true">Orbot และพร็อกซี</string>
+    <string name="orbot_no_app_toast" translatable="true">เพิ่มแอปอย่างน้อยหนึ่งแอปเพื่อเปิดใช้งาน Orbot</string>
+    <string name="settings_orbot_header" translatable="true">Orbot\t❯</string>
+    <string name="settings_orbot_notification_content" translatable="true">ความล้มเหลวในการเริ่ม Tor-as-a-Proxy เปิดแอป Orbot เพื่อเริ่มใช้งานด้วยตนเอง</string>
+    <string name="settings_general_header" translatable="true">ทั่วไป</string>
+    <string name="settings_general_customize" translatable="true">ปรับแต่ง</string>
+    <string name="settings_network_all_networks_desc" translatable="true">เมื่อเปิดใช้งาน Rethink จะใช้เครือข่ายทั้งหมดที่มีเพื่อเชื่อมต่ออินเทอร์เน็ต หากไม่เป็นเช่นนั้น จะใช้เครือข่ายใดก็ตามที่ Android ถือว่า <i>ใช้งานอยู่</i></string>
+    <string name="settings_check_update_heading" translatable="true">ตรวจสอบการอัปเดตแอป</string>
+    <string name="settings_import_export_desc" translatable="true">สำรองหรือกู้คืนข้อมูลแอปและการตั้งค่าด้วยตนเอง</string>
+    <string name="settings_app_notification_a13_desc" translatable="true">เปิดใช้งานการอนุญาตการแจ้งเตือนสำหรับแอป</string>
+    <string name="settings_autostart_bootup_heading" translatable="true">เริ่มการทำงานอัตโนมัติเมื่อเปิดเครื่อง (ทดลอง)</string>
+    <string name="settings_network_all_networks" translatable="true">ใช้เครือข่ายที่มีอยู่ทั้งหมด (ทดลอง)</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">การกำหนดเส้นทางการรับส่งข้อมูลของ Rethink ผ่านอุโมงค์ เว้นแต่คุณจะรู้ว่ากำลังทำอะไรอยู่ ให้ปิดมัน</string>
+    <string name="settings_rinr_dialog_title" translatable="true">ลูปแบ็ก (ทดลอง)</string>
+    <string name="settings_theme_heading" translatable="true">รูปร่าง</string>
+    <string name="settings_http_proxy_error_text1" translatable="true">ช่วงพอร์ตควรอยู่ระหว่าง 1024–65535</string>
+    <string name="settings_http_proxy_error_text2" translatable="true">พอร์ตไม่ถูกต้อง</string>
+    <string name="settings_http_proxy_error_text3" translatable="true">ชื่อโฮสต์ว่างเปล่า</string>
+    <string name="settings_http_proxy_dialog_title" translatable="true">URL เซิร์ฟเวอร์ที่กำหนดเอง</string>
+    <string name="settings_http_proxy_error_text4" translatable="true">การเชื่อมต่อโฮสต์ล้มเหลว ลองอีกครั้ง</string>
+    <string name="settings_dns_proxy_dialog_hostname" translatable="true">ชื่อโฮสต์</string>
+    <string name="settings_dns_proxy_dialog_port_number" translatable="true">หมายเลขพอร์ต</string>
+    <string name="settings_http_proxy_toast_success" translatable="true">ตั้งค่าพร็อกซี HTTP แล้ว</string>
+    <string name="settings_dns_proxy_dialog_username" translatable="true">ชื่อผู้ใช้</string>
+    <string name="settings_dns_proxy_dialog_password" translatable="true">รหัสผ่าน</string>
+    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">ชุด</string>
+    <string name="settings_app_list_default_app" translatable="true">ไม่มี</string>
+    <string name="settings_socks_forwarding_desc" translatable="true">ส่งต่อไปยัง %1$s:%2$s, %3$s</string>
+    <string name="settings_socks_forwarding_default_desc" translatable="true">ส่งต่อการเชื่อมต่อไปยังจุดสิ้นสุด SOCKS5</string>
+    <string name="settings_socks5_dialog_hint_ip" translatable="true">ที่อยู่ IP</string>
+    <string name="settings_socks5_dialog_hint_password" translatable="true">รหัสผ่าน (ไม่จำเป็น)</string>
+    <string name="settings_theme_dialog_title" translatable="true">รูปร่าง</string>
+    <string name="settings_theme_dialog_themes_2" translatable="true">แสงสว่าง</string>
+    <string name="settings_theme_dialog_themes_3" translatable="true">มืด</string>
+    <string name="settings_theme_dialog_themes_4" translatable="true">สีดำที่แท้จริง</string>
+    <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (ทดลอง)</string>
+    <string name="settings_notification_heading" translatable="true">เลือกการดำเนินการแจ้งเตือน</string>
+    <string name="settings_notification_desc" translatable="true">ปุ่มการดำเนินการที่จะแสดงพร้อมกับการแจ้งเตือน Rethink: %1$s</string>
+    <string name="settings_notification_desc2" translatable="true">DNS / DNS + ไฟร์วอลล์</string>
+    <string name="settings_notification_dialog_option_2" translatable="true">"
+\nDNS / DNS + ไฟร์วอลล์:
+\nแสดงปุ่มสองปุ่มเพื่อสลับระหว่างโหมด DNS ประหยัดแบตเตอรี่และโหมด DNS + ไฟร์วอลล์ปกติอย่างรวดเร็ว"</string>
+    <string name="settings_locale_desc" translatable="true">เลือกภาษาที่คุณต้องการ</string>
+    <string name="settings_locale_dialog_title" translatable="true">เลือกภาษาที่คุณต้องการ</string>
+    <string name="settings_biometeric_heading" translatable="true">เปิดใช้งานการล็อคแอป</string>
+    <string name="settings_locale_dialog_neutral" translatable="true">ช่วยแปลแอพนี้</string>
+    <string name="settings_biometric_desc" translatable="true">รักษาความปลอดภัยแอปนี้โดยใช้การล็อคหน้าจอของคุณ</string>
+    <string name="pcap_failure_toast" translatable="true">เกิดข้อผิดพลาดในการสร้างไฟล์ pcap โปรดลองอีกครั้ง!</string>
+    <string name="apps_icon_content_desc" translatable="true">ไอคอนแอปพลิเคชั่น</string>
+    <string name="firewall_status_excluded" translatable="true">ได้รับการยกเว้นจาก DNS และไฟร์วอลล์</string>
+    <string name="firewall_status_isolate" translatable="true">โดดเดี่ยว</string>
+    <string name="firewall_status_whitelisted" translatable="true">ข้ามกฎไฟร์วอลล์สากล</string>
+    <string name="firewall_status_bypass_dns_firewall" translatable="true">ข้ามกฎ DNS และไฟร์วอลล์</string>
+    <string name="firewall_status_unknown" translatable="true">ไม่ทราบ</string>
+    <string name="ct_bs_app_info_error" translatable="true">ไม่พบข้อมูลแอป</string>
+    <string name="hs_biometeric_feature_not_supported" translatable="true">การตรวจสอบข้อมูลชีวภาพไม่ได้รับการสนับสนุนหรือปิดใช้งานบนอุปกรณ์นี้</string>
+    <string name="hs_biometeric_title" translatable="true">ปลดล็อคความคิดใหม่</string>
+    <string name="hs_biometeric_failed" translatable="true">การตรวจสอบข้อมูลชีวภาพล้มเหลว</string>
+    <string name="hs_biometeric_error" translatable="true">ข้อผิดพลาดในการยืนยันตัวตนด้วยข้อมูลชีวภาพ</string>
+    <string name="firewall_card_status_active" translatable="true">แอป %1$s</string>
+    <string name="dns_card_latency_active" translatable="true">%1$sms</string>
+    <string name="dns_card_latency_inactive" translatable="true">เปิดใช้งานโหมด DNS</string>
+    <string name="firewall_card_universal_rules" translatable="true">กฎสากล %1$s</string>
+    <string name="rules_card_domain_count" translatable="true">กฎโดเมน %1$s</string>
+    <string name="hsf_downtime" translatable="true">(ไม่ได้ใช้งานตั้งแต่ %1$s)</string>
+    <string name="logs_card_duration" translatable="true">ตั้งแต่ %1$s</string>
+    <string name="hsf_vpn_prepare_failure" translatable="true">ขาดการอนุญาต VPN หรือแอปอื่นอยู่ในโหมดเปิดใช้งาน VPN ตลอดเวลา</string>
+    <string name="hsf_notification_permission_failure" translatable="true">เปิดใช้งานการอนุญาตการแจ้งเตือนจากหน้าจอการตั้งค่า</string>
+    <string name="hsf_start_dialog_message" translatable="true">คุณอยู่ห่างจากระบบปฏิบัติการ Android ที่ปลอดภัยเพียงขั้นตอนเดียว: ดูกิจกรรมเครือข่าย บล็อกเว็บไซต์ IP และแอปที่ทำงานผิดปกติได้ทันที</string>
+    <string name="hsf_start_dialog_positive" translatable="true">เริ่ม</string>
+    <string name="hsf_whats_new_chip_text" translatable="true">มีอะไรใหม่</string>
+    <string name="hsf_proxy_chip_text" translatable="true">พร็อกซีใช้งานอยู่</string>
+    <string name="hsf_blocklist_chip_text_no_data" translatable="true">เปิดใช้งาน RDNS+</string>
+    <string name="hsf_exclude_error" translatable="true">ไม่สามารถแยกออกได้ในโหมดล็อคดาวน์ VPN</string>
+    <string name="hsf_proxy_chip_remove_text" translatable="true">กำลังหยุด…</string>
+    <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">ปิดการใช้งานการจับแพ็กเก็ต</string>
+    <string name="hsf_whats_new_remove_text" translatable="true">ปิดการขาย…</string>
+    <string name="hsf_pause_vpn_failure" translatable="true">หยุดชั่วคราวไม่ได้: คิดใหม่ไม่ได้ใช้งาน</string>
+    <string name="lbl_background_data" translatable="true">การจำกัดข้อมูลพื้นหลัง</string>
+    <string name="lbl_battery_optimization" translatable="true">การเพิ่มประสิทธิภาพแบตเตอรี่</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">ปิดการใช้งาน %1$s</string>
+    <string name="dc_local_block_desc_1" translatable="true">เลือกจากรายการบล็อกมากกว่า 195 รายการ คลิกที่นี่เพื่อดาวน์โหลดหรือกำหนดค่ารายการบล็อก</string>
+    <string name="dc_dns_website_heading" translatable="true">แสดงไอคอนเว็บไซต์ในบันทึก DNS (ทดลอง)</string>
+    <string name="dc_dns_leaks_heading" translatable="true">ป้องกันการรั่วไหลของ DNS</string>
+    <string name="dc_check_update_desc" translatable="true">ตรวจสอบการอัปเดตรายการบล็อกทุก ๆ <i>สาม</i> วัน</string>
+    <string name="dc_proxy_dns_heading" translatable="true">ไม่เคยใช้พร็อกซี DNS</string>
+    <string name="about_bravedns_explantion" translatable="true">Rethink เป็นวิธีที่ง่ายที่สุดในการตรวจสอบกิจกรรมแอป หลีกเลี่ยงการเซ็นเซอร์อินเทอร์เน็ตและแอปไฟร์วอลล์บนอุปกรณ์ Android ของคุณ</string>
+    <string name="about_bug_report" translatable="true">รายงานจุดบกพร่อง</string>
+    <string name="about_bug_report_dialog_positive_btn" translatable="true">ส่งอีเมล์</string>
+    <string name="about_bug_report_desc" translatable="true">บันทึกความผิดพลาดของอีเมล์</string>
+    <string name="about_bug_no_log_dialog_positive_btn" translatable="true">ส่งอีเมล์</string>
+    <string name="about_web" translatable="true">ลิงค์</string>
+    <string name="about_website" translatable="true">เยี่ยมชม rethinkdns.com</string>
+    <string name="about_faq" translatable="true">ดูคำถามที่พบบ่อย</string>
+    <string name="about_docs" translatable="true">อ่านเอกสาร</string>
+    <string name="about_privacy_policy" translatable="true">อ่านนโยบายความเป็นส่วนตัว</string>
+    <string name="about_sponsor_link_text" translatable="true">สปอนเซอร์</string>
+    <string name="about_app" translatable="true">แอป</string>
+    <string name="about_email" translatable="true">ส่งอีเมล์ถึงเรา</string>
+    <string name="about_settings" translatable="true">ระบบ</string>
+    <string name="about_settings_app_info" translatable="true">ข้อมูลแอป</string>
+    <string name="about_app_contributors" translatable="true">ผู้เขียน</string>
+    <string name="about_app_translate" translatable="true">แปล</string>
+    <string name="about_settings_notification" translatable="true">การตั้งค่าการแจ้งเตือน</string>
+    <string name="about_dialog_positive_button" translatable="true">ไปกันเถอะ</string>
+    <string name="about_mail_to_string" translatable="true">mailto:</string>
+    <string name="about_mail_bugreport_text" translatable="true">ส่งอีเมลนี้ไปที่ : hello@celzero.com</string>
+    <string name="about_mail_bugreport_share_title" translatable="true">เลือกผู้ให้บริการอีเมล์</string>
+    <string name="about_dialog_neutral_button" translatable="true">แนะนำคุณสมบัติ</string>
+    <string name="app_info_error" translatable="true">ไม่สามารถเปิดข้อมูลแอปได้</string>
+    <string name="vpn_profile_error" translatable="true">ไม่สามารถเปิดโปรไฟล์ VPN ได้</string>
+    <string name="collecting_logs_progress_text" translatable="true">กำลังจับภาพ…</string>
+    <string name="contributors_dialog_title" translatable="true">ผู้เขียน</string>
+    <string name="notification_screen_error" translatable="true">ไม่สามารถเปิดหน้าจอการแจ้งเตือนแอปได้</string>
+    <string name="intent_launch_error" translatable="true">นับไม่เปิดตัว %1$s</string>
+    <string name="no_browser_error" translatable="true">ไม่สามารถเปิดหน้าเว็บจากเบราว์เซอร์ได้</string>
+    <string name="cd_custom_dns_proxy_title" translatable="true">พร็อกซี DNS ที่กำหนดเอง</string>
+    <string name="cd_custom_dns_proxy_default_app" translatable="true">ไม่มี</string>
+    <string name="cd_dns_proxy_mode_internal" translatable="true">ภายใน</string>
+    <string name="cd_dns_proxy_mode_external" translatable="true">ภายนอก</string>
+    <string name="cd_dns_proxy_error_text_2" translatable="true">ช่วงพอร์ตควรอยู่ระหว่าง 1024–65535</string>
+    <string name="cd_dns_proxy_error_text_3" translatable="true">พอร์ตไม่ถูกต้อง</string>
+    <string name="cd_dns_crypt_dialog_title" translatable="true">เพิ่มตัวแก้ไข DNSCrypt หรือรีเลย์</string>
+    <string name="cd_dns_crypt_name_default" translatable="true">DNSCrypt</string>
+    <string name="cd_dns_crypt_name" translatable="true">DNSCrypt %1$s</string>
+    <string name="cd_dns_crypt_dialog_name" translatable="true">ชื่อ</string>
+    <string name="cd_dns_crypt_dialog_desc" translatable="true">คำอธิบาย (ไม่บังคับ)</string>
+    <string name="cd_dns_crypt_error_text_1" translatable="true">แสตมป์ไม่สามารถว่างเปล่าได้</string>
+    <string name="cd_dns_alg_desc" translatable="true">กำหนด IP ที่ไม่ซ้ำกันต่อคำขอ DNS</string>
+    <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s แอปอื่นๆ</string>
+    <string name="ctbs_block_other_apps" translatable="true">กฎที่ใช้กับ %1$s จะใช้ได้กับแอปอื่นๆ อีก %2$s ด้วย</string>
+    <string name="dns_btm_resolved_doh" translatable="true">แก้ไข %1$s โดย %2$s</string>
+    <string name="dns_btm_resolved_doh_no_server" translatable="true">แก้ไขแล้ว %1$s</string>
+    <string name="dns_btm_latency_ms" translatable="true">%1$sms</string>
+    <string name="dns_btm_record_type" translatable="true">ประเภทการสอบถาม: %1$s</string>
+    <string name="hs_download_positive_website" translatable="true">เยี่ยมชมเว็บไซต์</string>
+    <string name="univ_view_blocked_ip" translatable="true">กฎ IP และพอร์ต</string>
+    <string name="univ_delete_firewall_dialog_title" translatable="true">ลบกฎ IP ทั้งหมดหรือไม่?</string>
+    <string name="univ_firewall_heading" translatable="true">กฎไฟร์วอลล์สากล</string>
+    <string name="app_ip_domain_rules" translatable="true">กฎ IP / โดเมนต่อแอป</string>
+    <string name="app_ip_domain_rules_desc" translatable="true">แก้ไขกฎ IP / โดเมนของแต่ละแอป</string>
+    <string name="dns_query_latency" translatable="true">%1$sms</string>
+    <string name="dns_proxy_port" translatable="true">หมายเลขพอร์ต</string>
+    <string name="fapps_filter_parent_system" translatable="true">ระบบ</string>
+    <string name="fapps_unmetered_unblock_dialog_message">อนุญาตให้เชื่อมต่อบนเครือข่ายแบบไม่จำกัดปริมาณ (WiFi) สำหรับแอปที่ <i>อยู่ในรายการ</i> หรือไม่?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">ข้ามแอปพลิเคชั่น</string>
+    <string name="fapps_unblock_dialog_title" translatable="true">อนุญาตแอป</string>
+    <string name="fapps_unblock_dialog_message" translatable="true">อนุญาตการเชื่อมต่อสำหรับแอปที่<i>อยู่ในรายการ</i>หรือไม่?</string>
+    <string name="fapps_isolate_block_dialog_title" translatable="true">แยกแอป</string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true">กำลังแสดงแอป <u>%1$s</u> %2$s รายการในหมวดหมู่: %3$s</string>
+    <string name="rules_load_failure_heading" translatable="true">บันทึก</string>
+    <string name="network_log_app_name_unknown" translatable="true">ไม่ทราบ</string>
+    <string name="system_dns_connection_failure" translatable="true">ไม่สามารถระบุเซิร์ฟเวอร์ DNS ปัจจุบันได้</string>
+    <string name="copy_clipboard_label" translatable="true">URL</string>
+    <string name="update_complete_snack_message" translatable="true">ดาวน์โหลดเวอร์ชันใหม่แล้ว</string>
+    <string name="settings_local_blocklist_version" translatable="true">เวอร์ชัน: v%1$s</string>
+    <string name="accessibility_notification_content" translatable="true">บริการ Rethink Accessibility หยุดทำงานหรือขัดข้อง ไม่สามารถบล็อกแอปที่ทำงานอยู่เบื้องหลังได้อีกต่อไป แตะเพื่อเปิดใช้งานอีกครั้ง</string>
+    <string name="accessibility_failure_toast" translatable="true">บริการ Rethink Accessibility หยุดทำงานหรือขัดข้อง ไม่สามารถบล็อกแอปที่ทำงานอยู่เบื้องหลังได้อีกต่อไป</string>
+    <string name="coming_soon_toast" translatable="true">เร็วๆ นี้</string>
+    <string name="pause_text" translatable="true">หยุดชั่วคราว</string>
+    <string name="firewall_rule_block_ip" translatable="true">IP / พอร์ต (แอป)</string>
+    <string name="firewall_rule_bypass_universal_ip" translatable="true">ข้าม IP</string>
+    <string name="firewall_rule_unknown" translatable="true">แหล่งที่มาไม่ทราบ</string>
+    <string name="firewall_rule_block_udp_ntp" translatable="true">UDP ถูกบล็อค</string>
+    <string name="firewall_rule_trusted_ip" translatable="true">IP ที่เชื่อถือได้</string>
+    <string name="firewall_rule_block_dns_bypass" translatable="true">ข้าม DNS</string>
+    <string name="firewall_rule_global_lockdown" translatable="true">การปิดพื้นที่</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">โดเมนที่เชื่อถือได้ (แอป)</string>
+    <string name="firewall_rule_proxied" translatable="true">พร็อกซี</string>
+    <string name="firewall_rule_no_rule_desc" translatable="true">ไม่มีกฎไฟร์วอลล์ที่ตรงกับการเชื่อมต่อนี้</string>
+    <string name="firewall_rule_block_app_desc" translatable="true">กฎไฟร์วอลล์ที่ผู้ใช้ตั้งไว้บล็อกแอปนี้&lt;i&gt;.&lt;br/&gt;&lt;br/&gt; หากต้องการเปลี่ยน ให้ไปที่แท็บ&lt;i&gt;แอปทั้งหมด&lt;/i&gt;</string>
+    <string name="firewall_rule_block_ip_univ_desc" translatable="true">A user-set firewall rule blocked the <i>destination IP / Port</i>.<br/><br/> To change go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_block_ip_desc" translatable="true">A user-set firewall rule blocked the <i>destination IP</i>.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">This connection was allowed because the <i>source app</i> is set to <i>bypass dns and firewall</i> rules.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">This connection was blocked because the <i>domain</i> is blocked by user-preferred DNS.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">This DNS connection was proxied and forwarded to user-preferred DNS endpoint.<br/><br/> To change disable <i>Prevent DNS leaks</i> from DNS <i>Configure</i> screen.</string>
+    <string name="notif_dialog_pause_dialog_positive" translatable="true">ประวัติย่อ</string>
+    <string name="notif_channel_desc_firewall_alerts" translatable="true">การแจ้งเตือนเกี่ยวกับข้อผิดพลาดและสิ่งผิดปกติของไฟร์วอลล์</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">This connection was allowed because the <i>source app</i> is set to <i>bypass universal</i> firewall rules.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
+    <string name="category_name_others" translatable="true">อื่น</string>
+    <string name="build__flavor_play_store" translatable="true">เล่น</string>
+    <string name="category_name_non_app_sys" translatable="true">การบริการระบบ</string>
+    <string name="build__flavor_website" translatable="true">เว็บไซต์</string>
+    <string name="build__flavor_fdroid" translatable="true">เอฟดรอยด์</string>
+    <string name="cd_dialog_desc" translatable="true">URL หรือชื่อโดเมนพร้อมไวด์การ์ดเสริม: *.test.com, test.com/test</string>
+    <string name="cd_dialog_edittext_hint" translatable="true">ใส่ %1$s</string>
+    <string name="cd_no_rule_txt" translatable="true">ไม่มีกฎ</string>
+    <string name="ci_dialog_added_success" translatable="true">เพิ่ม IP เข้าในรายการแล้ว</string>
+    <string name="cd_dialog_error_invalid_wildcard" translatable="true">URL หรือโดเมนไวล์ดการ์ดไม่ถูกต้อง</string>
+    <string name="ci_no_rules_text" translatable="true">ไม่มีกฎ IP หรือพอร์ต</string>
+    <string name="ci_bypass_universal_initial" translatable="true">BU</string>
+    <string name="ci_bypass_universal" translatable="true">บายพาสสากล</string>
+    <string name="ada_noapp_dialog_message" translatable="true">ข้อมูลแอปหายไป บางทีแอปนี้อาจถูกถอนการติดตั้งไปแล้ว?</string>
+    <string name="ada_network_log_title" translatable="true">บันทึกเครือข่ายสำหรับแอปนี้</string>
+    <string name="ada_app_firewall" translatable="true">ไฟร์วอลล์</string>
+    <string name="ada_app_bypass_univ" translatable="true">บายพาสสากล</string>
+    <string name="ada_app_bypass_dns_firewall" translatable="true">ข้าม DNS และไฟร์วอลล์</string>
+    <string name="ada_ip_no_connection" translatable="true">ไม่มีบันทึกเครือข่ายสำหรับแอพนี้</string>
+    <string name="ada_app_exclude" translatable="true">ไม่รวม</string>
+    <string name="ada_app_isolate" translatable="true">แยกตัว</string>
+    <string name="notif_download_failure_content" translatable="true">การดาวน์โหลดล้มเหลว โปรดลองอีกครั้ง</string>
+    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen" translatable="true">บล็อกมัลแวร์ แรนซัมแวร์ คริปโตแวร์ ฟิชเชอร์ และภัยคุกคามอื่นๆ</string>
+    <string name="rt_dialog_title" translatable="true">บันทึกการเปลี่ยนแปลง</string>
+    <string name="rt_dialog_message" translatable="true">คุณต้องการใช้รายการบล็อกที่กำหนดค่าใหม่หรือไม่?</string>
+    <string name="rt_dialog_neutral" translatable="true">ดำเนินการต่อ</string>
+    <string name="rt_download_start" translatable="true">กำลังดาวน์โหลดรายการบล็อค…</string>
+    <string name="rt_chip_check_update" translatable="true">ตรวจสอบการอัปเดต</string>
+    <string name="rethink_sky_desc" translatable="true">สถานที่มากกว่า 280 แห่ง เวลาการทำงานยาวนานขึ้น ตัวแก้ไขสตับทำงานบน cloudflare.com</string>
+    <string name="brbs_restore_dialog_positive" translatable="true">คืนค่า</string>
+    <string name="dc_setting_dns_cache_heading" translatable="true">บูสเตอร์ DNS</string>
+    <string name="brbs_title" translatable="true">การสำรองข้อมูลและกู้คืน</string>
+    <string name="brbs_restore_title" translatable="true">คืนค่า</string>
+    <string name="brbs_restore_desc" translatable="true">กู้คืนจากไฟล์สำรองข้อมูล</string>
+    <string name="brbs_restore_dialog_title" translatable="true">กู้คืนข้อมูลสำรอง</string>
+    <string name="brbs_restore_dialog_failure_positive" translatable="true">ลองคืนค่าอีกครั้ง</string>
+    <string name="brbs_restore_no_uri_toast" translatable="true">การคืนค่าล้มเหลว ลองอีกครั้ง</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">แอปที่ได้รับอนุญาตส่วนใหญ่</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">แอปที่ถูกบล็อคมากที่สุด</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">โดเมนที่ติดต่อมากที่สุด</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">ประเทศที่ติดต่อมากที่สุด</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">ไอพีที่ถูกบล็อคมากที่สุด</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">ประเทศที่ถูกบล็อคมากที่สุด</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">เริ่มคิดใหม่เพื่อดำเนินการต่อ</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">คีย์ไม่ถูกต้อง</string>
+    <string name="ssv_see_more" translatable="true">แสดงทั้งหมด</string>
+    <string name="bad_config_reason_invalid_number" translatable="true">หมายเลขไม่ถูกต้อง</string>
+    <string name="bad_config_reason_missing_attribute" translatable="true">ขาดคุณสมบัติ</string>
+    <string name="bad_config_reason_missing_section" translatable="true">ส่วนที่ขาดหายไป</string>
+    <string name="bad_config_reason_syntax_error" translatable="true">ข้อผิดพลาดทางไวยากรณ์</string>
+    <string name="key_length_explanation_base64" translatable="true">:คีย์ WireGuard base64 ต้องมี 44 อักขระ (32 ไบต์)</string>
+    <string name="key_length_explanation_hex" translatable="true">:รหัสเลขฐานสิบหกของ WireGuard ต้องมี 64 อักขระ (32 ไบต์)</string>
+    <string name="key_contents_error" translatable="true">ตัวอักษรที่ไม่ดีในคีย์</string>
+    <string name="parse_error_inet_address" translatable="true">ที่อยู่ IP</string>
+    <string name="parse_error_inet_endpoint" translatable="true">จุดสิ้นสุด</string>
+    <string name="invalid_file_error" translatable="true">ไฟล์ไม่ถูกต้อง</string>
+    <string name="import_error" translatable="true">ไม่สามารถนำเข้าอุโมงค์ได้: %s</string>
+    <string name="illegal_filename_error" translatable="true">ชื่อไฟล์ผิดกฎหมาย “%s”</string>
+    <string name="setup_wireguard" translatable="true">ตั้งค่า WireGuard</string>
+    <string name="wireguard_description" translatable="true">WireGuard เป็นตัวแทน</string>
+    <string name="new_warp_invalid_config_toast" translatable="true">การกำหนดค่า WARP ไม่ถูกต้อง</string>
+    <string name="parse_error_inet_network" translatable="true">เครือข่ายไอพี</string>
+    <string name="parse_error_integer" translatable="true">ตัวเลข</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">การปิดพื้นที่</string>
+    <string name="one_wg_dialog_desc" translatable="true">การเชื่อมต่อทั้งหมดจากแอปทั้งหมด รวมถึง DNS จะถูกส่งต่อไปยัง WireGuard VPN ที่ใช้งานอยู่เพียงตัวเดียว หากมี WireGuard VPN ที่ใช้งานอยู่ตัวอื่นก็จะหยุดทำงาน</string>
+    <string name="include_all_app_wg_dialog_desc" translatable="true">ใช้ WireGuard VPN นี้สำหรับแอปทั้งหมดหรือไม่?</string>
+    <string name="wireguard_disable_message" translatable="true">หยุด WireGuard VPN ที่ใช้งานอยู่ทั้งหมดหรือไม่?</string>
+    <string name="remaining_apps_dialog_title" translatable="true">รวมแอพที่เหลือ</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">บล็อกมัลแวร์และเนื้อหาสำหรับผู้ใหญ่ ใช้จุดสิ้นสุด DNS 1.1.1.3 ของ Cloudflare</string>
+    <string name="google_dns_desc" translatable="true">ไม่บล็อกคำขอ DNS ใดๆ ใช้จุดสิ้นสุด DNS ของ Google</string>
+    <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS พร้อมการค้นหาปลอดภัยและการบล็อกเนื้อหาสำหรับผู้ใหญ่</string>
+    <string name="crypt_relay_us" translatable="true">รีเลย์ DNS ที่ไม่เปิดเผยตัวตนซึ่งโฮสต์ในสหรัฐอเมริกา - ลอสแองเจลิส รัฐแคลิฟอร์เนีย จัดทำโดย https://cryptostrom.is/</string>
+    <string name="crypt_relay_singapore" translatable="true">แอปที่ถูกข้ามไป</string>
+    <string name="settings_socks5_heading" translatable="true">ตั้งค่าพร็อกซี SOCKS5</string>
+    <string name="hsf_vpn_dialog_header" translatable="true">ความสนใจ!</string>
+    <string name="hsf_blocklist_updating_text" translatable="true">กำลังเปิดใช้งาน…</string>
+    <string name="hsf_chip_appearance" translatable="true">ธีม: %1$s</string>
+    <string name="config_delete_dialog_title" translatable="true">ลบ</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">ส่วนหนึ่งของ %1$s</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) ไม่มี–dnssec/ไม่มี–log/ไม่มี–ตัวกรอง/ecs 9.9.9.12 – 149.112.112.12</string>
+    <string name="crypt_relay_france" translatable="true">รีเลย์ DNS ที่ไม่เปิดเผยตัวตนซึ่งโฮสต์อยู่ในปารีส ประเทศฝรั่งเศส จัดทำโดย https://cryptostrom.is/</string>
+    <string name="hsf_start_dialog_header" translatable="true">เริ่มต้น %1$s</string>
+    <string name="hsf_packet_capture_chip_text" translatable="true">การจับแพ็กเก็ตเปิดใช้งานอยู่</string>
+    <string name="about_whats_new" translatable="true">มีอะไรใหม่ใน %1$s</string>
+    <string name="network_dns" translatable="true">ระบบ DNS</string>
+    <string name="cd_dialog_error_invalid_domain" translatable="true">URL หรือชื่อโดเมนไม่ถูกต้อง</string>
+    <string name="lbl_unselected" translatable="true">ไม่ได้เลือก</string>
+    <string name="dns_mode_info_explanation_new" translatable="true">ตรวจสอบ บล็อก และเข้ารหัสคำขอ DNS</string>
+    <string name="firewall_rule_block_domain" translatable="true">โดเมน (แอพ)</string>
+    <string name="lbl_persistent_keepalive" translatable="true">การรักษาข้อมูลอย่างต่อเนื่อง</string>
+    <string name="lbl_allowed_ips" translatable="true">IP ที่ได้รับอนุญาต</string>
+    <string name="lbl_optional" translatable="true">(ไม่จำเป็น)</string>
+    <string name="slide_2_desc" translatable="true">Rethink เป็นวิธีที่ง่ายที่สุดในการตรวจสอบกิจกรรมเครือข่าย หลีกเลี่ยงการเซ็นเซอร์อินเทอร์เน็ตและแอปไฟร์วอลล์บนอุปกรณ์ Android ของคุณ</string>
+    <string name="rethink_max_desc" translatable="true">มากกว่า 50 ตำแหน่ง เป็นส่วนตัวมากขึ้น ตัวแก้ไขแบบวนซ้ำทำงานบน fly.io</string>
+    <string name="bsrf_sub_group_heading" translatable="true">กลุ่มย่อย</string>
+    <string name="bsrf_clear_filter" translatable="true">ชัดเจน</string>
+    <string name="exclude_apps_from_proxy">ข้ามแอปจากพร็อกซีทั้งหมด</string>
+    <string name="exclude_apps_from_proxy_failure_toast">แอปนี้ข้ามพร็อกซี</string>
+    <string name="rt_filter_parent_selected" translatable="true">เลือกแล้ว</string>
+    <string name="rt_filter_hint" translatable="true">กำลังแสดงรายการบล็อค<u>ทั้งหมด</u></string>
+    <string name="no_configs_error" translatable="true">ไม่พบการกำหนดค่า</string>
+    <string name="dc_setting_dns_cache_desc" translatable="true">การรวมคำขอ การตอบสนองแคช การจัดการข้อผิดพลาดที่ยืดหยุ่น</string>
+    <string name="status_protected_with_socks5" translatable="true">ป้องกันด้วยพร็อกซีถุงเท้า</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">เปิดใช้งาน DNS ส่วนตัวแล้ว</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: บล็อกแอปไม่ให้เชื่อมต่อกับอินเทอร์เน็ต
+\n<u>#2</u>: บล็อกแอปใดๆ ไม่ให้เชื่อมต่อกับ IP เฉพาะ
+\n<u>#3</u>: บล็อกการเชื่อมต่อทั้งหมดเมื่ออุปกรณ์ถูกล็อก (ไฟร์วอลล์สากล)
+\n<u>#4</u>: บล็อกแอปใดๆ ที่ไม่ได้ใช้งาน (ไฟร์วอลล์สากล)
+\n<u>#5</u>: บล็อกการเชื่อมต่อเมื่อไม่รู้จักแอปต้นทาง (ไฟร์วอลล์สากล)
+\n<u>#6</u>: บล็อกการรับส่งข้อมูล UDP ทั้งหมด ยกเว้น DNS (ไฟร์วอลล์สากล)
+\n<u>#7</u>: บล็อกการเชื่อมต่อเมื่อข้าม DNS (ไฟร์วอลล์สากล)</string>
+    <string name="private_dns_dialog_desc" translatable="true">การตั้งค่า DNS ของ Rethink จะถูกแทนที่ด้วย DNS ส่วนตัวของ Android
+\n
+\nหากต้องการใช้ DNS ของ Rethink ให้ไปที่การตั้งค่า Android แล้วปิด \"DNS ส่วนตัว\"</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink ใช้บริการการเข้าถึงเพื่อติดตามว่าแอปใดใช้งานอยู่ (เบื้องหน้า) และแอปใดไม่ได้ใช้งาน (เบื้องหลัง)
+\n
+\nRethink ไม่รวบรวมข้อมูลหรือสอดส่องคุณในทางใดทางหนึ่ง</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">บริการการเข้าถึง Rethink หยุดทำงานหรือขัดข้อง <i><b>ไปที่การตั้งค่าและบังคับหยุด</b></i> Rethink และเริ่มใหม่อีกครั้งเพื่อใช้ฟีเจอร์ <i>บล็อกแอปใดๆ ที่ไม่ได้ใช้งาน</i>
+\n
+\nRethink ใช้บริการการเข้าถึงเพื่อติดตามว่าแอปใดใช้งานอยู่ (เบื้องหน้า) เทียบกับแอปที่ไม่ได้ใช้งาน (เบื้องหลัง)</string>
+    <string name="firewall_act_universal_tab" translatable="true">สากล</string>
+    <string name="dns_crypt_url_remove_dialog_message" translatable="true">ลบตัวแก้ไข DNSCrypt จากการกำหนดค่าที่บันทึกไว้</string>
+    <string name="download_update_dialog_message" translatable="true">สามารถดาวน์โหลดแอปพลิเคชันเวอร์ชันใหม่ได้จากเว็บไซต์ คุณต้องการดำเนินการต่อหรือไม่?</string>
+    <string name="download_update_dialog_message_success" translatable="true">ดาวน์โหลดรายการบล็อคสำเร็จแล้ว</string>
+    <string name="whats_new_version_update" translatable="true">&lt;b&gt;Don\'t Panic 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. ใหม่: จับข้อผิดพลาดของกลไกเครือข่ายในรายงานจุดบกพร่องของผู้ใช้&lt;br/&gt; 2. ใหม่: ใช้ System DNS สำหรับชื่อโดเมนที่ไม่ได้รับการมอบหมายก็ต่อเมื่อ Prevent DNS leaks เปิดอยู่&lt;br/&gt; 3. การปรับปรุง: การเชื่อมต่อ WireGuard แบบ Dual-stack (IPv4 + IPv6)&lt;br/&gt; 4. การปรับปรุง: หลีกเลี่ยงการบล็อกองค์ประกอบ UI เมื่อกลไกเครือข่ายไม่มีการตอบสนอง&lt;br/&gt; 5. แก้ไข: หมดเวลาการเชื่อมต่อเมื่อเปิดการกรอง DNS ขั้นสูง&lt;br/&gt; 6. แก้ไข: จุดสิ้นสุดของเพียร์ WireGuard ที่มีชื่อโดเมนค้างเมื่อมีการเปลี่ยนแปลงเครือข่าย&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;ช่วยแปลแอปนี้&lt;/a&gt;</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">เมื่อปิดใช้งาน จะไม่รวมแอปส่งต่อพร็อกซี (SOCKS5, HTTP, DNS) จากอุโมงค์ VPN ของ Rethink</string>
+    <string name="settings_ip_network_desc" translatable="true">เลือกระหว่างเวอร์ชันโปรโตคอลอินเทอร์เน็ต</string>
+    <string name="settings_ptrans_desc" translatable="true">แปลทราฟฟิก IPv6 ขาออกให้เป็น IPv4 บนอุปกรณ์ เปิดใช้งานหากคุณเชื่อมต่อกับเครือข่าย IPv4 เท่านั้น</string>
+    <string name="show_logs_disabled_dns_message" translatable="true">การบันทึกคำขอ DNS ถูกปิดใช้งาน หากต้องการเปิดใช้งานอีกครั้ง ให้ไปที่ <i>การตั้งค่า</i> และเปิด <i>เปิดใช้งานการบันทึกบนอุปกรณ์</i></string>
+    <string name="settings_allow_bypass_desc" translatable="true">อนุญาตให้แอปร้องขอการเข้าถึงเครือข่ายที่มีอยู่ทั้งหมด แอปเหล่านี้อาจข้ามอุโมงค์ VPN ของ Rethink ได้ตามต้องการ แอปการประชุมทางเสียง/วิดีโอบางแอป เช่น Zoom และ Meet อาจต้องใช้สิ่งนี้เพื่อให้ทำงานได้อย่างถูกต้อง</string>
+    <string name="orbot_stop_dialog_message" translatable="true">Rethink หยุดการส่งต่อการเชื่อมต่อไปยัง Orbot แล้ว แต่ Orbot อาจยังคงทำงานอยู่เบื้องหลัง</string>
+    <string name="settings_socks5_vpn_disabled_error" translatable="true">เริ่มคิดใหม่เพื่อดำเนินการต่อ</string>
+    <string name="orbot_explanation" translatable="true">Orbot เป็นแอปพร็อกซีฟรีที่ช่วยให้แอปอื่นใช้อินเทอร์เน็ตได้ &lt;u&gt;ปลอดภัยยิ่งขึ้น&lt;/u&gt;
+\nOrbot ใช้ &lt;u&gt;Tor&lt;/u&gt; เพื่อเข้ารหัสการรับส่งข้อมูลทางอินเทอร์เน็ตของคุณ ซึ่งช่วยให้คุณ &lt;u&gt;หลีกเลี่ยงการเซ็นเซอร์&lt;/u&gt; และป้องกันการเฝ้าติดตามเครือข่าย&lt;/u&gt; ในรูปแบบต่างๆ ที่คุกคามเสรีภาพและความเป็นส่วนตัวของบุคคล
+\n&lt;u&gt;TCP Proxy&lt;/u&gt;: Rethink ส่งต่อเฉพาะการเชื่อมต่อ TCP ของแอป &lt;i&gt;ที่รวมอยู่&lt;/i&gt; ไปยัง Orbot
+\n&lt;u&gt;HTTP Proxy&lt;/u&gt;: Rethink &lt;i&gt;สร้าง&lt;/i&gt;อุโมงค์ HTTP CONNECT ไปยัง Orbot และส่งต่อเฉพาะการเชื่อมต่อ TCP ของแอป &lt;i&gt;ที่รวมอยู่&lt;/i&gt;</string>
+    <string name="settings_import_export_heading" translatable="true">การสำรองข้อมูลและกู้คืน</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">เปิดใช้งานการตั้งค่า <!--settings_network_all_networks--> %1$s ด้วย คุณต้องการดำเนินการต่อหรือไม่?</string>
+    <string name="settings_dns_proxy_dialog_header" translatable="true">ตั้งค่าพร็อกซี SOCKS5</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">Off (default)</string>
+    <string name="firewall_status_block_unmetered" translatable="true">ถูกบล็อคบนเครือข่ายแบบไม่มีการวัดปริมาณ (wifi)</string>
+    <string name="firewall_status_blocked" translatable="true">ถูกบล็อค</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">Rethink ต้องได้รับอนุญาตในการตั้งค่า VPN ในพื้นที่เพื่อเข้ารหัสคำขอ DNS ของอุปกรณ์ ดำเนินการตรวจสอบเครือข่าย และบังคับใช้กฎไฟร์วอลล์
+\n
+\nRethink จะไม่รวบรวมข้อมูลหรือสอดส่องคุณในทางใดทางหนึ่ง</string>
+    <string name="dc_custom_block_heading" translatable="true">กฎของโดเมน</string>
+    <string name="about_bravedns_whoarewe" translatable="true">Rethink คือโครงการโอเพ่นซอร์สฟรีที่นำโดยอดีตวิศวกรจาก Amazon, IBM และ Scientific Games</string>
+    <string name="about_bug_no_log_dialog_message" translatable="true">ไม่สามารถดึงข้อมูลบันทึกข้อผิดพลาดได้ คุณต้องการรายงานข้อผิดพลาดด้วยตนเองหรือไม่?</string>
+    <string name="rt_filter_desc" translatable="true">กำลังแสดง <u>%1$s</u> รายการบล็อค</string>
+    <string name="about_mail_bugreport_subject" translatable="true">[คิดใหม่]: รายงานจุดบกพร่อง</string>
+    <string name="private_dns_error" translatable="true">ไม่สามารถเปิดหน้าจอ DNS ส่วนตัวได้</string>
+    <string name="cd_dns_crypt_resolver_heading" translatable="true">แก้ปัญหา</string>
+    <string name="cd_dns_crypt_relay_name" translatable="true">รีเลย์ DNS %1$s</string>
+    <string name="cd_dns_crypt_dialog_heading" translatable="true">เพิ่มตัวแก้ไข DNSCrypt หรือรีเลย์</string>
+    <string name="cd_dnscrypt_relay_heading" translatable="true">รีเลย์</string>
+    <string name="cd_doh_dialog_heading" translatable="true">เพิ่ม DNS ผ่าน HTTPS</string>
+    <string name="univ_firewall_rule_8" translatable="true">บล็อกการรับส่งข้อมูลพอร์ต 80 (HTTP ที่ไม่ปลอดภัย)</string>
+    <string name="brbs_backup_desc" translatable="true">การตั้งค่าแอปสำรองข้อมูล เครือข่าย และบันทึก DNS</string>
+    <string name="brbs_backup_dialog_failure_message" translatable="true">ไม่สามารถสำรองข้อมูลได้ ลองอีกครั้งหรือไม่?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">ข้ามกฎ DNS และไฟร์วอลล์สากลสำหรับแอปที่แสดงรายการไว้หรือไม่?</string>
+    <string name="fapps_firewall_filter_hint" translatable="true">กำลังแสดงแอปทั้งหมด</string>
+    <string name="settings_local_blocklist_in_use" translatable="true">%1$s รายการบล็อคที่ใช้งานอยู่</string>
+    <string name="fapps_firewall_filter_desc" translatable="true">กำลังแสดงแอป <u>%1$s</u> %2$s</string>
+    <string name="fapps_firewall_filter_excluded" translatable="true">ไม่รวม</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">ค่าไม่ถูกต้อง</string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true">A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> network.<br/><br/> To change go to <i>All Apps</i> tab.</string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">This connection was blocked because the <i>source app</i> bypassed user-preferred DNS.<br/><br/> To change this behaviour go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_unknown_desc" translatable="true">This connection was firewalled because the <i>source app</i> could not be determined.<br/><br/> To change this behaviour go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">This connection was blocked because the <i>domain</i> is set as blocked in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.</string>
+    <string name="notif_dialog_pause_dialog_message" translatable="true">แอปพลิเคชันอยู่ในสถานะหยุดชั่วคราว ให้ดำเนินการต่อเพื่อดำเนินการต่อ</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">การเชื่อมต่อและแอปทั้งหมดที่ไม่ได้ถูกกำหนดเส้นทางโดย WireGuard VPN อื่น ๆ จะถูกกำหนดเส้นทางโดย VPN นี้</string>
+    <string name="routing_remaining_apps" translatable="true">การกำหนดเส้นทางแอปที่เหลือ</string>
+    <string name="exclude_all_app_wg_dialog_title" translatable="true">ไม่รวมแอปทั้งหมด</string>
+    <string name="wireguard_disclaimer" translatable="true">DNS จะถูกส่งต่อไปยัง %1$s, ICMP (ตัวอย่าง: ping) จะถูกส่งไปยังเครือข่ายพื้นฐาน</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">บล็อกเนื้อหาที่เป็นอันตราย ใช้จุดสิ้นสุด DNS 1.1.1.2 ของ Cloudflare</string>
+    <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">ล้างบันทึกทั้งหมดที่เกี่ยวข้องกับแอปพลิเคชันนี้</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">ตัวกรองครอบครัวจะบล็อกการเข้าถึงเว็บไซต์สำหรับผู้ใหญ่ ลามกอนาจาร และเนื้อหาที่ไม่เหมาะสมทั้งหมด นอกจากนี้ยังบล็อกโดเมนพร็อกซีและ VPN ที่อาจใช้เพื่อข้ามตัวกรองของเราได้ เว็บไซต์ที่มีเนื้อหาผสม (เช่น Reddit) ก็ถูกบล็อกเช่นกัน Google, Bing และ Youtube ถูกตั้งค่าเป็นโหมดปลอดภัย</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">ตัวกรองสำหรับผู้ใหญ่จะบล็อกการเข้าถึงเว็บไซต์สำหรับผู้ใหญ่ ลามกอนาจาร และเนื้อหาที่ไม่เหมาะสมทั้งหมด ไม่บล็อกพร็อกซีหรือ VPN หรือเว็บไซต์ที่มีเนื้อหาผสมกัน อนุญาตให้ใช้เว็บไซต์เช่น Reddit ส่วน Google และ Bing จะตั้งค่าเป็นโหมดปลอดภัย</string>
+    <string name="quad9_dns_desc" translatable="true">Quad9 กำหนดเส้นทางการสอบถาม DNS ของคุณผ่านเครือข่ายเซิร์ฟเวอร์ที่ปลอดภัยทั่วโลก</string>
+    <string name="contributors_list" translatable="true">"โครงการ &lt;i&gt;Rethink Open Source&lt;/i&gt; ดำรงอยู่ได้เพราะอาสาสมัครเหล่านี้ที่อุทิศเวลาอันมีค่ามากมายให้กับการพัฒนา&lt;br/&gt; &lt;br/&gt;🛡️ แอป Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt; &lt;a  href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 เครื่องมือเครือข่าย &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Lanius-collaris&gt;Lanius-collaris&lt;/a&gt;&lt;br/&gt;  &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 แก้ไข &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly &gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a  href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a  href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ ผู้ดูแลระบบชุมชน &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;Andersen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a  href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt; 📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ การแปล &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 ไอคอน &lt;br/&gt; &lt;a  href=https://github.com/celzero/rethink-app/issues/346&gt;ไอคอน&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 สร้างเซิร์ฟเวอร์ &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;"</string>
 </resources>
