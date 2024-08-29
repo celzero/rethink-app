@@ -921,4 +921,7 @@
     <string name="status_protected_with_wg" translatable="true">محمي باستخدام wireguard</string>
     <string name="search_proxy_add_apps" translatable="true">ابحث عن التطبيقات بواسطة الاسم</string>
     <string name="memory_notification_text">(روثينك) يعاني من نقص الذاكرة وقد تكون إجراءات النظام محدودة.</string>
+    <string name="crypt_relay_sweden" translatable="true">Anonymized DNS relay hosted in Sweden provided by https://cryptostrom.is/.</string>
+    <string name="crypt_relay_us" translatable="true">Anonymized DNS relay hosted in the US - Los Angeles, CA provided by https://cryptostrom.is/.</string>
+    <string name="crypt_relay_netherlands" translatable="true">Anonymized DNS relay hosted in Netherlands</string>
 </resources>
