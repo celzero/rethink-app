@@ -795,7 +795,7 @@
     <string name="lbl_blocked" translatable="true">Diblokir</string>
     <string name="firewall_rule_block_domain" translatable="true">Domain (Aplikasi)</string>
     <string name="lbl_disabled" translatable="true">Dinonaktifkan</string>
-    <string name="lbl_domain" translatable="true">Domain</string>
+    <string name="lbl_domain" translatable="true">Domain Laman</string>
     <string name="firewall_rule_block_domain_desc" translatable="true">Aturan firewall yang diterapkan \"Pengguna\" memblokir <i>Domain</i>.<br/><br/> Untuk mengubahnya, pergi ke tampilan <i>Firewall khusus aplikasi</i>.</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Domain Tepercaya (Aplikasi)</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true">Sambungan ini diizinkan karena <i>domain</i> ditetapkan sebagai domain tepercaya.<br/><br/> Untuk mengubahnya, buka tampilan <i>Firewall khusus aplikasi</i>.</string>
@@ -1019,7 +1019,7 @@
     <string name="lbl_idle" translatable="true">Menganggur</string>
     <string name="lbl_split" translatable="true">Pisah</string>
     <string name="lbl_on_device" translatable="true">pada perangkat</string>
-    <string name="settings_connectivity_checks" translatable="true">Melakukan pengecekan konektivitas</string>
+    <string name="settings_connectivity_checks" translatable="true">Melakukan pemeriksaan konektivitas</string>
     <string name="settings_connectivity_checks_desc" translatable="true">Pemeriksaan konektivitas dikirim untuk memastikan jangkauan.</string>
     <string name="dc_proxy_dns_heading" translatable="true">Jangan pernah melakukan proksi DNS</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Nonaktifkan %1$s</string>
