@@ -301,7 +301,7 @@
 \nRethink משתמש בשירות נגישות כדי לעקוב אחר אילו אפליקציות נמצאות בשימוש (בחזית) לעומת אלו שאינן בשימוש (ברקע).</string>
     <string name="lbl_split" translatable="true">פיצול</string>
     <string name="lbl_peer" translatable="true">עמית</string>
-    <string name="dns_act_configure_tab" translatable="true">הגדר</string>
+    <string name="dns_act_configure_tab" translatable="true">הגדרה</string>
     <string name="doh_custom_url_remove_dialog_title" translatable="true">מחק נקודת קצה שלDoH?</string>
     <string name="lbl_notification" translatable="true">התראה</string>
     <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink מריץ VPN במצב <i>סגר</i>. יצירתו תגרום לאובדן החיבור לרשת בפרופיל המשתמש הזה. האם אתה רוצה להמשיך בכל מקרה?</string>
@@ -491,7 +491,7 @@
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
     <string name="hs_biometeric_failed" translatable="true">אימות ביומטרי נכשל</string>
     <string name="firewall_status_excluded" translatable="true">לא נכלל ב-dns ובחומת האש</string>
-    <string name="firewall_status_isolate" translatable="true">מְבוּדָד</string>
+    <string name="firewall_status_isolate" translatable="true">מבודדות</string>
     <string name="firewall_status_whitelisted" translatable="true">עוקף כללי חומת אש אוניברסליים</string>
     <string name="hs_biometeric_feature_not_supported" translatable="true">אימות ביומטרי אינו נתמך או מושבת במכשיר זה</string>
     <string name="logs_card_dns_count" translatable="true">%1$s שאילתות</string>
@@ -569,7 +569,7 @@
     <string name="cd_custom_dns_proxy_name_default" translatable="true">מתווך</string>
     <string name="cd_custom_dns_proxy_name" translatable="true">פרוקסי %1$s</string>
     <string name="log_file_not_available" translatable="true">לא נמצא דוח קריסה</string>
-    <string name="logs_disclaimer" translatable="true">מציג 20 אלף תווים ראשונים</string>
+    <string name="logs_disclaimer" translatable="true">מציג 20,000 תווים ראשונים</string>
     <string name="cd_custom_doh_dialog_title" translatable="true">כתובת אתר מותאמת אישית של שרת</string>
     <string name="cd_custom_doh_url_name" translatable="true">DoH %1$s</string>
     <string name="notification_screen_error" translatable="true">לא ניתן היה להפעיל את מסך ההתראות של האפליקציה.</string>
@@ -599,7 +599,7 @@
     <string name="cd_dns_proxy_error_text_3" translatable="true">פתחה לא תקפה</string>
     <string name="cd_dns_crypt_dialog_title" translatable="true">הוסף פותר או ממסר DNSCrypt</string>
     <string name="cd_dns_crypt_name_default" translatable="true">DNSCrypt</string>
-    <string name="cd_dns_crypt_relay_name" translatable="true">DNSRelay %1$s</string>
+    <string name="cd_dns_crypt_relay_name" translatable="true">הפניית DNS %1$s</string>
     <string name="cd_doh_dialog_resolver_name" translatable="true">שם פותר</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">אל תאמת אישורי TLS של שרת (אפשר רק אם אתה יודע מה אתה עושה)</string>
     <string name="cd_dns_alg_heading" translatable="true">סינון DNS מתקדם (ניסיוני)</string>
@@ -614,7 +614,7 @@
     <string name="hs_download_positive_website" translatable="true">ביקור באתר</string>
     <string name="univ_firewall_rule_6" translatable="true">חסום אפליקציות שהותקנו לאחרונה כברירת מחדל</string>
     <string name="univ_firewall_rule_7" translatable="true">חסימת IPv4 ב-IPv6 (ניסיוני)</string>
-    <string name="univ_firewall_rule_10" translatable="true">חסום הכל חוץ מישומים וכתובות עם מעקף</string>
+    <string name="univ_firewall_rule_10" translatable="true">חסום הכל חוץ מיישומים וכתובות עם מעקף</string>
     <string name="univ_accessibility_crash_dialog_positive" translatable="true">לך להגדרות</string>
     <string name="cd_dns_crypt_name" translatable="true">DNSCrypt %1$s</string>
     <string name="univ_firewall_rule_1" translatable="true">חסום את כל האפליקציות כשהמכשיר נעול</string>
@@ -629,7 +629,7 @@
     <string name="fapps_unmetered_unblock_dialog_message">אפשר חיבורים ברשת לא מדודה (WiFi) עבור אפליקציות <i>רשומות</i>\?</string>
     <string name="fapps_firewall_filter_bypass_universal" translatable="true">עוקף</string>
     <string name="fapps_firewall_filter_excluded" translatable="true">מוצא מן הכלל</string>
-    <string name="fapps_firewall_filter_isolate" translatable="true">מְבוּדָד</string>
+    <string name="fapps_firewall_filter_isolate" translatable="true">מבודדות</string>
     <string name="dns_crypt_relay_error_toast" translatable="true">לא נבחר פותר</string>
     <string name="fapps_info_dialog_positive_btn" translatable="true">אישור</string>
     <string name="fapps_bypass_block_dialog_title" translatable="true">עקוף ישומים</string>
@@ -670,4 +670,33 @@
     <string name="univ_firewall_heading" translatable="true">כללי חומת אש אוניברסליים</string>
     <string name="fapps_unmetered_block_dialog_message" translatable="true">לחסום חיבורים ברשת לא מדודה (WiFi) עבור אפליקציות <i>רשומות</i>\?</string>
     <string name="fapps_metered_unblock_dialog_message" translatable="true">האם לאפשר חיבורים ברשת מדודה (סלולרית) עבור אפליקציות <i>רשומות</i>\?</string>
+    <string name="rt_filter_desc_subgroups" translatable="true">מציג את רשימות החסימה: <u>%1$s</u> בקבוצה:%2$s ובתת הקבוצה: %3$s</string>
+    <string name="parse_error_generic" translatable="true">מחרוזת</string>
+    <string name="rt_filter_desc" translatable="true">מציג את רשימות החסימה: <u>%1$s</u></string>
+    <string name="ada_app_status_isolate" translatable="true">מבודד; רק כתובות IP מהימנות מורשות</string>
+    <string name="ada_app_status_exclude" translatable="true">מוחרגת מה-DNS וחומת האש</string>
+    <string name="notif_download_cancel_content" translatable="true">הורדה בוטלה.</string>
+    <string name="settings_local_blocklist_version" translatable="true">גרסה: V%1$s</string>
+    <string name="collecting_logs_progress_text" translatable="true">תופס…</string>
+    <string name="settings_local_blocklist_dialog_positive" translatable="true">הורדה</string>
+    <string name="firewall_rule_bypass_dns_firewall" translatable="true">אפליקציה עוקפת</string>
+    <string name="firewall_rule_bypass_universal_ip" translatable="true">עוקף IP</string>
+    <string name="firewall_rule_block_dns_bypass" translatable="true">עוקף DNS</string>
+    <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">אפליקציה עוקפת</string>
+    <string name="ci_delete" translatable="true">מחק</string>
+    <string name="ada_noapp_dialog_positive" translatable="true">אישור</string>
+    <string name="ada_app_status_allow" translatable="true">מאושר</string>
+    <string name="ada_app_status_block" translatable="true">חסום</string>
+    <string name="ada_app_firewall" translatable="true">חומת אש</string>
+    <string name="notif_download_success_content" translatable="true">הורדה הושלמה בהצלחה.</string>
+    <string name="rt_filter_hint" translatable="true">מציג את <u>כל</u> רשימות החסימה</string>
+    <string name="parse_error_integer" translatable="true">מספר</string>
+    <string name="parse_error_inet_endpoint" translatable="true">נקודת סיום</string>
+    <string name="config_delete_dialog_title" translatable="true">מחק</string>
+    <string name="ctbs_app_info_not_available_toast" translatable="true">דף ההגדרות של האפליקציה לא נמצא</string>
+    <string name="dns_info_neutral" translatable="true">העתק</string>
+    <string name="fapps_firewall_filter_hint" translatable="true">מציג את כל האפליקציות</string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true">אפליקציות מוצגות: <u>%1$s</u>%2$s בקטגוריות: %3$s</string>
+    <string name="fapps_firewall_filter_desc" translatable="true">אפילקציות מוצגות: <u>%1$s</u>%2$s</string>
+    <string name="update_complete_action_snack" translatable="true">הפעל מחדש</string>
 </resources>
