@@ -29,7 +29,7 @@
             android:layout_centerVertical="true"
             android:alpha="0.7"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/report_bug_icon" />
+            android:src="@drawable/ic_android_icon" />
 
     </RelativeLayout>
 
