@@ -19,7 +19,9 @@ package com.celzero.bravedns.service
 import Logger.LOG_BATCH_LOGGER
 import android.content.Context
 import android.util.Log
+import backend.Backend
 import backend.DNSSummary
+import com.celzero.bravedns.RethinkDnsApplication
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.data.ConnectionSummary
@@ -161,12 +163,10 @@ internal constructor(
 
     fun updateIpSummary(summary: ConnectionSummary) {
         if (!persistentState.logsEnabled) return
-        val d = Logger.LoggerType.fromId(persistentState.goLoggerLevel.toInt())
-        val debug = d.isLessThan(Logger.LoggerType.INFO) // debug, verbose, very verbose
 
         serializer("updateIpSmm", looper) {
             val s =
-                if (debug && summary.targetIp?.isNotEmpty() == true) {
+                if (summary.targetIp?.isNotEmpty() == true) {
                     ipdb.makeSummaryWithTarget(summary)
                 } else {
                     summary
@@ -184,7 +184,7 @@ internal constructor(
 
         serializer("updateRethinkSmm", looper) {
             val s =
-                if (DEBUG && summary.targetIp?.isNotEmpty() == true) {
+                if (summary.targetIp?.isNotEmpty() == true) {
                     ipdb.makeSummaryWithTarget(summary)
                 } else {
                     summary
