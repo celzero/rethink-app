@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.database
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.room.Entity
 
 @Entity(tableName = "ProxyApplicationMapping", primaryKeys = ["uid", "packageName", "proxyId"])
@@ -54,5 +56,15 @@ class ProxyApplicationMapping {
         this.proxyName = proxyName
         this.isActive = isActive
         this.proxyId = proxyId
+    }
+
+    fun hasInternetPermission(packageManager: PackageManager): Boolean {
+        if (packageName.startsWith("no_package_")) return true
+
+        // INTERNET permission if defined, can not be denied so this is safe to use
+        return packageManager.checkPermission(
+            Manifest.permission.INTERNET,
+            packageName
+        ) == PackageManager.PERMISSION_GRANTED
     }
 }

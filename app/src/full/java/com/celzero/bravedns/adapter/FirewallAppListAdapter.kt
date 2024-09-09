@@ -112,15 +112,17 @@ class FirewallAppListAdapter(
                     } else {
                         b.firewallAppLabelTv.setTextColor(userAppColor)
                     } */
-                    // set the alpha based on internet permission
-                    if (appInfo.hasInternetPermission(packageManager)) {
-                        b.firewallAppLabelTv.alpha = 1f
-                    } else {
-                        b.firewallAppLabelTv.alpha = 0.4f
-                    }
                     b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
                     displayIcon(
                         getIcon(context, appInfo.packageName, appInfo.appName), b.firewallAppIconIv)
+                    // set the alpha based on internet permission
+                    if (appInfo.hasInternetPermission(packageManager)) {
+                        b.firewallAppLabelTv.alpha = 1f
+                        b.firewallAppIconIv.alpha = 1f
+                    } else {
+                        b.firewallAppLabelTv.alpha = 0.4f
+                        b.firewallAppIconIv.alpha = 0.4f
+                    }
                     if (appInfo.packageName == context.packageName) {
                         b.firewallAppToggleWifi.visibility = View.GONE
                         b.firewallAppToggleMobileData.visibility = View.GONE
