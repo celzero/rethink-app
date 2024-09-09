@@ -150,6 +150,10 @@ object WireguardManager : KoinComponent {
         return mappings.any { it.isActive }
     }
 
+    fun isAdvancedWgActive(): Boolean {
+        return mappings.any { it.isActive && !it.oneWireGuard }
+    }
+
     fun getEnabledConfigs(): List<Config> {
         val m = mappings.filter { it.isActive }
         val l = mutableListOf<Config>()
@@ -461,32 +465,22 @@ object WireguardManager : KoinComponent {
             }
         }
         // check if any catch-all config is enabled
-        if (configId == "" || !configId.contains(ProxyManager.ID_WG_BASE) || config == null) {
-            Logger.d(LOG_TAG_PROXY, "app config mapping not found for uid: $uid")
-            // there maybe catch-all config enabled, so return the active catch-all config
-            val catchAllConfig = mappings.find { it.isActive && it.isCatchAll }
-            return if (catchAllConfig == null) {
-                Logger.d(LOG_TAG_PROXY, "catch all config not found for uid: $uid")
+        Logger.d(LOG_TAG_PROXY, "app config mapping not found for uid: $uid")
+        // there maybe catch-all config enabled, so return the active catch-all config
+        val catchAllConfig = mappings.find { it.isActive && it.isCatchAll }
+        return if (catchAllConfig == null) {
+            Logger.d(LOG_TAG_PROXY, "catch all config not found for uid: $uid")
+            null
+        } else {
+            val optimalId = fetchOptimalCatchAllConfig(uid, ip)
+            if (optimalId == null) {
+                Logger.d(LOG_TAG_PROXY, "no catch all config found for uid: $uid")
                 null
             } else {
-                val optimalId = fetchOptimalCatchAllConfig(uid, ip)
-                if (optimalId == null) {
-                    Logger.d(LOG_TAG_PROXY, "no catch all config found for uid: $uid")
-                    null
-                } else {
-                    Logger.i(LOG_TAG_PROXY, "catch all config found for uid: $uid, $optimalId")
-                    mappings.find { it.id == optimalId }
-                }
+                Logger.i(LOG_TAG_PROXY, "catch all config found for uid: $uid, $optimalId")
+                mappings.find { it.id == optimalId }
             }
         }
-
-        // no catch-all wg matches the uid & ip combination, return config (assigned config)
-        if (config.isActive || config.isLockdown) {
-            Logger.d(LOG_TAG_PROXY, "app config mapping found for uid: $uid, $configId")
-            return config
-        }
-
-        return null
     }
 
     private fun convertStringIdToId(id: String): Int {
