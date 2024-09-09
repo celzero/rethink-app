@@ -464,20 +464,21 @@ object WireguardManager : KoinComponent {
                 // pass-through and check if any catch-all config is enabled
             }
         }
+
         // check if any catch-all config is enabled
         Logger.d(LOG_TAG_PROXY, "app config mapping not found for uid: $uid")
-        // there maybe catch-all config enabled, so return the active catch-all config
         val catchAllConfig = mappings.find { it.isActive && it.isCatchAll }
         return if (catchAllConfig == null) {
             Logger.d(LOG_TAG_PROXY, "catch all config not found for uid: $uid")
             null
         } else {
+            // if catch-all config is enabled, check for the validity of the connection
             val optimalId = fetchOptimalCatchAllConfig(uid, ip)
             if (optimalId == null) {
                 Logger.d(LOG_TAG_PROXY, "no catch all config found for uid: $uid")
                 null
             } else {
-                Logger.i(LOG_TAG_PROXY, "catch all config found for uid: $uid, $optimalId")
+                Logger.d(LOG_TAG_PROXY, "catch all config found for uid: $uid, $optimalId")
                 mappings.find { it.id == optimalId }
             }
         }
