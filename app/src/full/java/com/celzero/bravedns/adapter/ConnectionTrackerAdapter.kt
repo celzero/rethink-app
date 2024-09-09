@@ -185,8 +185,13 @@ class ConnectionTrackerAdapter(private val context: Context) :
         }
 
         private fun displayProtocolDetails(port: Int, proto: Int) {
-            // Instead of showing the port name and protocol, now the ports are resolved with
-            // known ports(reserved port and protocol identifiers).
+            // If the protocol is not TCP or UDP, then display the protocol name.
+            if (Protocol.UDP.protocolType != proto && Protocol.TCP.protocolType != proto) {
+                b.connLatencyTxt.text = Protocol.getProtocolName(proto).name
+                return
+            }
+
+            // Instead of displaying the port number, display the service name if it is known.
             // https://github.com/celzero/rethink-app/issues/42 - #3 - transport + protocol.
             val resolvedPort = KnownPorts.resolvePort(port)
             // case: for UDP/443 label it as HTTP3 instead of HTTPS
