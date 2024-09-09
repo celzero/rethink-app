@@ -86,6 +86,19 @@
                         android:text="@string/about_bravedns_whoarewe"
                         android:textSize="@dimen/large_font_text_view" />
 
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/sponsor_info_usage"
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:gravity="center_vertical"
+                        android:lineSpacingExtra="5dp"
+                        android:paddingTop="10dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:textSize="@dimen/large_font_text_view" />
+
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
 
@@ -212,7 +225,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/rectangle_border_background"
                     android:clickable="true"
-                    android:drawableStart="@drawable/report_bug_icon"
+                    android:drawableStart="@drawable/ic_android_icon"
                     android:drawablePadding="-15dp"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
