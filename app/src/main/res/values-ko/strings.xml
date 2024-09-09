@@ -539,4 +539,19 @@
     <string name="dc_proxy_dns_desc" translatable="true">항상 WireGuard, SOCKS5, HTTP 프록시에서 DNS를 프록시하지 마십시오.</string>
     <string name="battery_optimization_dialog_heading" translatable="true">비활성화 %1$s</string>
     <string name="lbl_battery_optimization" translatable="true">배터리 최적화</string>
+    <string name="cd_dns_crypt_error_text_1" translatable="true">스탬프는 비워둘 수 없습니다.</string>
+    <string name="cd_dns_crypt_dialog_desc" translatable="true">설명 (선택 사항)</string>
+    <string name="cd_dnscrypt_relay_heading" translatable="true">중계서버</string>
+    <string name="cd_dns_crypt_dialog_stamp" translatable="true">우표</string>
+    <string name="cd_dns_crypt_name" translatable="true">DNSCrypt %1$s</string>
+    <string name="cd_dns_crypt_dialog_heading" translatable="true">DNSCrypt 리졸버 또는 릴레이 추가</string>
+    <string name="cd_dns_crypt_resolver_heading" translatable="true">리졸버</string>
+    <string name="cd_dns_crypt_relay_heading" translatable="true">중계서버</string>
+    <string name="cd_dns_crypt_dialog_name" translatable="true">이름</string>
+    <string name="cd_doh_dialog_resolver_name" translatable="true">리졸버 이름</string>
+    <string name="cd_doh_dialog_resolver_url" translatable="true">리졸버 URL</string>
+    <string name="cd_dns_crypt_relay_name" translatable="true">DNS릴레이 %1$s</string>
+    <string name="cd_dns_crypt_name_default" translatable="true">DNSCrypt</string>
+    <string name="cd_doh_dialog_heading" translatable="true">HTTPS를 통한 DNS 추가</string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true">서버 TLS 인증서 검증을 하지 마십시오 (무엇을 하고 있는지 알고 있는 경우에만 활성화하십시오)</string>
 </resources>
