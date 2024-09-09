@@ -242,8 +242,8 @@
     <string name="finish">Concluir</string>
     <string name="slide_2_title">Bem-vindo</string>
     <string name="slide_2_desc">Rethink é a melhor maneira de monitorar as atividades da rede, ignorar a censura da internet e implementar um firewall para os aplicativos em seu dispositivo Android.</string>
-    <string name="slide_1_title">Gratuito e de software livre</string>
-    <string name="slide_1_desc">Rethink é um software livre apoiado pelo programa MVP do Mozilla Builders.</string>
+    <string name="slide_1_title">Gratuito e de código aberto</string>
+    <string name="slide_1_desc">Rethink é um de código aberto apoiado pelo programa MVP do Mozilla Builders.</string>
     <string name="allow">permitir</string>
     <string name="bypass_universal">Ignorar todos</string>
     <string name="exclude">excluir</string>
