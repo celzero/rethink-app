@@ -47,6 +47,7 @@ import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
 import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
@@ -448,6 +449,21 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         b.lockdownCheck.setOnClickListener { updateLockdown(b.lockdownCheck.isChecked) }
 
         b.catchAllCheck.setOnClickListener { updateCatchAll(b.catchAllCheck.isChecked) }
+
+        b.logsBtn.setOnClickListener {
+            startActivity(
+                NetworkLogsActivity.Tabs.NETWORK_LOGS.screen,
+                ProxyManager.ID_WG_BASE + configId
+            )
+        }
+    }
+
+    private fun startActivity(screenToLoad: Int, searchParam: String?) {
+        val intent = Intent(this, NetworkLogsActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
+        intent.putExtra(Constants.SEARCH_QUERY, searchParam ?: "")
+        startActivity(intent)
     }
 
     private fun updateLockdown(enabled: Boolean) {
