@@ -57,6 +57,9 @@ android {
         minSdkVersion 23
         targetSdkVersion 34
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
     }
 
     signingConfigs {
@@ -101,17 +104,21 @@ android {
     buildFeatures {
         viewBinding true
         buildConfig true
+        compose true
     }
 
     compileOptions {
         coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     packagingOptions {
         jniLibs {
             keepDebugSymbols += ['**/*.so']
+        }
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
 
@@ -153,6 +160,12 @@ android {
     }
     lint {
         abortOnError false
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.5.13'
     }
 
     tasks.configureEach { task ->
@@ -295,6 +308,21 @@ dependencies {
     // not in fdroid or website
     playImplementation 'com.google.firebase:firebase-crashlytics:19.0.0'
     playImplementation 'com.google.firebase:firebase-crashlytics-ndk:19.0.0'
+
+    // jetpack compose
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.5'
+    implementation 'androidx.activity:activity-compose:1.9.2'
+    implementation platform('androidx.compose:compose-bom:2024.09.00')
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.ui:ui-graphics'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation 'androidx.compose.material3:material3'
+
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+    debugImplementation 'androidx.compose.ui:ui-test-manifest'
+
+    androidTestImplementation platform('androidx.compose:compose-bom:2024.09.00')
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
 }
 
 // github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903
