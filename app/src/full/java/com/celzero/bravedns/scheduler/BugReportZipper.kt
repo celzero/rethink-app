@@ -222,7 +222,7 @@ object BugReportZipper {
         file.appendText(prefsDetails.toString())
         val separator = "--------------------------------------------\n"
         file.appendText(separator)
-        val build = VpnController.goBuildVersion()
+        val build = VpnController.goBuildVersion(true)
         file.appendText(build)
         file.appendText(separator)
     }

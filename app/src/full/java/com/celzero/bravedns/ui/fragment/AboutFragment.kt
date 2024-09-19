@@ -42,6 +42,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogViewLogsBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
@@ -51,6 +52,7 @@ import com.celzero.bravedns.scheduler.BugReportZipper.getZipFileName
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
@@ -81,6 +83,7 @@ import java.util.zip.ZipInputStream
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
 
+    private val persistentState by inject<PersistentState>()
     private var lastAppExitInfoDialogInvokeTime = INIT_TIME_MS
     private val workScheduler by inject<WorkScheduler>()
 
@@ -90,10 +93,13 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun initView() {
-
         if (isFdroidFlavour()) {
             b.aboutAppUpdate.visibility = View.GONE
         }
+
+        updateVersionInfo()
+
+        b.sponsorInfoUsage.text = getSponsorInfo()
 
         b.aboutSponsor.setOnClickListener(this)
         b.aboutWebsite.setOnClickListener(this)
@@ -120,16 +126,25 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppContributors.setOnClickListener(this)
         b.aboutAppTranslate.setOnClickListener(this)
         b.aboutStats.setOnClickListener(this)
+    }
 
+    private fun updateVersionInfo() {
         try {
-            val version = getVersionName() ?: ""
+            val version = getVersionName()
             // take first 7 characters of the version name, as the version has build number
             // appended to it, which is not required for the user to see.
-            val slicedVersion = version.slice(0..6) ?: ""
+            val slicedVersion = version.slice(0..6)
             b.aboutWhatsNew.text = getString(R.string.about_whats_new, slicedVersion)
             // show the complete version name along with the source of installation
             b.aboutAppVersion.text =
                 getString(R.string.about_version_install_source, version, getDownloadSource())
+            // show the go version if the log level is less than INFO, ie, DEBUG or VERBOSE
+            if (Logger.LoggerType.fromId(persistentState.goLoggerLevel.toInt())
+                    .isLessThan(Logger.LoggerType.INFO)
+            ) {
+                val build = VpnController.goBuildVersion(false)
+                b.aboutAppVersion.text = b.aboutAppVersion.text.toString() + "\n" + build
+            }
         } catch (e: PackageManager.NameNotFoundException) {
             Logger.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
         }
@@ -142,6 +157,19 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 requireContext().packageName
             )
         return pInfo?.versionName ?: ""
+    }
+
+    private fun getSponsorInfo(): String {
+        val installTime = requireContext().packageManager.getPackageInfo(
+            requireContext().packageName,
+            0
+        ).firstInstallTime
+        val timeDiff = System.currentTimeMillis() - installTime
+        val days = (timeDiff / (1000 * 60 * 60 * 24)).toDouble()
+        val month = days / 30
+        val amount = month * (0.60 + 0.20)
+        val msg = "You’ve been using Rethink for ${days.toInt()} days, which translates to a usage cost of ${"%.2f".format(amount)}$."
+        return msg
     }
 
     private fun getDownloadSource(): String {
