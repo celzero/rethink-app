@@ -32,9 +32,12 @@ import androidx.recyclerview.widget.RecyclerView
 import backend.Backend
 import backend.RouterStats
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.OneWgConfigAdapter.DnsStatusListener
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.ListItemWgGeneralInterfaceBinding
+import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
@@ -45,6 +48,7 @@ import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -52,7 +56,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class WgConfigAdapter(private val context: Context) :
+class WgConfigAdapter(private val context: Context, private val listener: DnsStatusListener, private val persistentState: PersistentState) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
 
     private var lifecycleOwner: LifecycleOwner? = null
@@ -76,6 +80,15 @@ class WgConfigAdapter(private val context: Context) :
                     return oldConnection == newConnection
                 }
             }
+    }
+
+    private enum class ProxyStatus(val id: Long) {
+        TOK(Backend.TOK),
+        TUP(Backend.TUP),
+        TZZ(Backend.TZZ),
+        TNT(Backend.TNT),
+        TKO(Backend.TKO),
+        END(Backend.END)
     }
 
     override fun onBindViewHolder(holder: WgInterfaceViewHolder, position: Int) {
@@ -203,6 +216,11 @@ class WgConfigAdapter(private val context: Context) :
             val pair = VpnController.getSupportedIpVersion(id)
             val c = WireguardManager.getConfigById(config.id)
             val stats = VpnController.getProxyStats(id)
+            val dnsStatusId = if (persistentState.splitDns) {
+                VpnController.getDnsStatus(id)
+            } else {
+                null
+            }
             val isSplitTunnel =
                 if (c?.getPeers()?.isNotEmpty() == true) {
                     VpnController.isSplitTunnelProxy(id, pair)
@@ -222,7 +240,7 @@ class WgConfigAdapter(private val context: Context) :
                 return
             }
             uiCtx {
-                updateStatusUi(config, statusId, stats)
+                updateStatusUi(config, statusId, dnsStatusId, stats)
                 updateUi(config, appsCount)
                 updateProtocolChip(pair)
                 updateSplitTunnelChip(isSplitTunnel)
@@ -269,17 +287,15 @@ class WgConfigAdapter(private val context: Context) :
             }
         }
 
-        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, stats: RouterStats?) {
+        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, dnsStatusId: Long?, stats: RouterStats?) {
             if (config.isActive) {
                 b.interfaceSwitch.isChecked = true
                 b.interfaceDetailCard.strokeWidth = 2
                 b.interfaceStatus.visibility = View.VISIBLE
                 b.interfaceConfigStatus.visibility = View.VISIBLE
-                var status: String
                 b.interfaceActiveLayout.visibility = View.VISIBLE
                 val time = getUpTime(stats)
                 val rxtx = getRxTx(stats)
-                val handShakeTime = getHandshakeTime(stats)
                 if (time.isNotEmpty()) {
                     val t = context.getString(R.string.logs_card_duration, time)
                     b.interfaceActiveUptime.text =
@@ -292,65 +308,26 @@ class WgConfigAdapter(private val context: Context) :
                     b.interfaceActiveUptime.text = context.getString(R.string.lbl_active)
                 }
                 b.interfaceActiveRxTx.text = rxtx
-                if (statusId != null) {
-                    var resId = UIUtils.getProxyStatusStringRes(statusId)
-                    // change the color based on the status
-                    if (statusId == Backend.TOK) {
-                        // if the lastOK is 0, then the handshake is not yet completed
-                        // so show the status as waiting
-                        if (stats?.lastOK == 0L) {
-                            b.interfaceDetailCard.strokeColor =
-                                UIUtils.fetchColor(context, R.attr.chipTextNeutral)
-                            resId = R.string.status_waiting
-                        } else {
-                            b.interfaceDetailCard.strokeColor =
-                                UIUtils.fetchColor(context, R.attr.accentGood)
-                        }
-                    } else if (
-                        statusId == Backend.TUP ||
-                            statusId == Backend.TZZ ||
-                            statusId == Backend.TNT
-                    ) {
+
+                if (dnsStatusId != null) {
+                    // check for dns failure cases and update the UI
+                    if (isDnsError(dnsStatusId)) {
                         b.interfaceDetailCard.strokeColor =
-                            UIUtils.fetchColor(context, R.attr.chipTextNeutral)
+                            fetchColor(context, R.attr.chipTextNegative)
+                        b.interfaceStatus.text =
+                            context.getString(R.string.status_failing)
+                                .replaceFirstChar(Char::titlecase)
                     } else {
-                        b.interfaceDetailCard.strokeColor =
-                            UIUtils.fetchColor(context, R.attr.chipTextNegative)
-                    }
-                    status =
-                        if (stats?.lastOK == 0L) {
-                            context.getString(resId).replaceFirstChar(Char::titlecase)
-                        } else {
-                            context.getString(
-                                R.string.about_version_install_source,
-                                context.getString(resId).replaceFirstChar(Char::titlecase),
-                                handShakeTime
-                            )
-                        }
-                    if ((statusId == Backend.TZZ || statusId == Backend.TNT) && stats != null) {
-                        // for idle state, if lastOk is less than 30 sec, then show as connected
-                        if (
-                            stats.lastOK != 0L &&
-                                System.currentTimeMillis() - stats.lastOK <
-                                    30 * DateUtils.SECOND_IN_MILLIS
-                        ) {
-                            status =
-                                context
-                                    .getString(R.string.dns_connected)
-                                    .replaceFirstChar(Char::titlecase)
-                        }
+                        // if dns status is not failing, then update the proxy status
+                        updateProxyStatusUi(statusId, stats)
                     }
                 } else {
-                    b.interfaceDetailCard.strokeColor =
-                        UIUtils.fetchColor(context, R.attr.accentBad)
-                    status =
-                        context.getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
-                    b.interfaceActiveLayout.visibility = View.GONE
+                    // in one wg mode, if dns status should be available, this is a fallback case
+                    updateProxyStatusUi(statusId, stats)
                 }
-                b.interfaceStatus.text = status
             } else {
                 b.interfaceActiveLayout.visibility = View.GONE
-                b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.background)
+                b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.background)
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceSwitch.isChecked = false
                 b.interfaceConfigStatus.visibility = View.GONE
@@ -359,6 +336,61 @@ class WgConfigAdapter(private val context: Context) :
                 b.interfaceStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
+        }
+
+        private fun getStrokeColorForStatus(status: ProxyStatus?, stats: RouterStats?): Int {
+            return when (status) {
+                ProxyStatus.TOK -> if (stats?.lastOK == 0L) R.attr.chipTextNeutral else R.attr.accentGood
+                ProxyStatus.TUP, ProxyStatus.TZZ, ProxyStatus.TNT -> R.attr.chipTextNeutral
+                else -> R.attr.chipTextNegative
+            }
+        }
+
+        private fun getStatusText(
+            status: ProxyStatus?,
+            handshakeTime: String? = null,
+            stats: RouterStats?
+        ): String {
+            if (status == null) return context.getString(R.string.status_waiting)
+                .replaceFirstChar(Char::titlecase)
+
+            val baseText = context.getString(UIUtils.getProxyStatusStringRes(status.id))
+                .replaceFirstChar(Char::titlecase)
+
+            return if (stats?.lastOK != 0L && handshakeTime != null) {
+                context.getString(R.string.about_version_install_source, baseText, handshakeTime)
+            } else {
+                baseText
+            }
+        }
+
+        private fun getIdleStatusText(status: ProxyStatus?, stats: RouterStats?): String {
+            if (status != ProxyStatus.TZZ && status != ProxyStatus.TNT) return ""
+            if (stats == null || stats.lastOK == 0L) return ""
+            if (System.currentTimeMillis() - stats.lastOK >= 30 * DateUtils.SECOND_IN_MILLIS) return ""
+
+            return context.getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
+        }
+
+        private fun updateProxyStatusUi(statusId: Long?, stats: RouterStats?) {
+            val status = ProxyStatus.entries.find { it.id == statusId } // Convert to enum
+
+            val handshakeTime = getHandshakeTime(stats).toString()
+
+            val strokeColor = getStrokeColorForStatus(status, stats)
+            b.interfaceDetailCard.strokeColor = fetchColor(context, strokeColor)
+
+            val statusText = getIdleStatusText(status, stats)
+                .ifEmpty { getStatusText(status, handshakeTime, stats) }
+
+            b.interfaceStatus.text = statusText
+        }
+
+        private fun isDnsError(statusId: Long?): Boolean {
+            if (statusId == null) return true
+
+            val s = Transaction.Status.fromId(statusId)
+            return s == Transaction.Status.BAD_QUERY || s == Transaction.Status.BAD_RESPONSE || s == Transaction.Status.NO_RESPONSE || s == Transaction.Status.SEND_FAIL || s == Transaction.Status.CLIENT_ERROR || s == Transaction.Status.INTERNAL_ERROR || s == Transaction.Status.TRANSPORT_ERROR
         }
 
         private fun getRxTx(stats: RouterStats?): String {
@@ -453,6 +485,7 @@ class WgConfigAdapter(private val context: Context) :
             }
 
             WireguardManager.disableConfig(cfg)
+            uiCtx { listener.onDnsStatusChanged() }
         }
 
         private suspend fun enableWgIfPossible(cfg: WgConfigFilesImmutable) {
@@ -518,6 +551,7 @@ class WgConfigAdapter(private val context: Context) :
             }
 
             WireguardManager.enableConfig(cfg)
+            uiCtx { listener.onDnsStatusChanged() }
         }
 
         private fun launchConfigDetail(id: Int) {
