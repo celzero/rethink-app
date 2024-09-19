@@ -495,7 +495,9 @@ object WireguardManager : KoinComponent {
             }
         }
         Logger.d(LOG_TAG_PROXY, "optimalCatchAllConfig: fetching new wgId for uid: $uid")
-        val catchAllList = mappings.filter { it.isActive && it.isCatchAll }
+        val catchAllList = mappings.filter {
+            val id = ProxyManager.ID_WG_BASE + it.id
+            it.isActive && it.isCatchAll && VpnController.canRouteIp(id, ip, false) }
         catchAllList.forEach {
             if (isProxyConnectionValid(it.id, ip)) {
                 // note the uid and wgid in a cache, so that we can use it for further requests
@@ -507,7 +509,7 @@ object WireguardManager : KoinComponent {
         // none of the catch-all has valid connection, send ping to all catch-all configs
         pingCatchAllConfigs(catchAllList)
         // return any catch-all config
-        return catchAllList.random().id
+        return catchAllList.randomOrNull()?.id
     }
 
     private fun pingCatchAllConfigs(catchAllConfigs: List<WgConfigFilesImmutable>) {
@@ -934,8 +936,10 @@ object WireguardManager : KoinComponent {
         return mappings.find { it.oneWireGuard && it.isActive }?.id
     }
 
-    suspend fun getOptimalCatchAllConfigId(): Int? {
-        val configs = mappings.filter { it.isCatchAll && it.isActive }
+    suspend fun getOptimalCatchAllConfigId(ip: String?): Int? {
+        val configs = mappings.filter {
+            val id = ProxyManager.ID_WG_BASE + it.id
+            it.isCatchAll && it.isActive && ((ip == null) || VpnController.canRouteIp(id, ip, false)) }
         configs.forEach {
             if (isValidLastOk(it.id)) {
                 Logger.d(LOG_TAG_PROXY, "found optimal catch all config: ${it.id}")
@@ -944,7 +948,7 @@ object WireguardManager : KoinComponent {
         }
         Logger.d(LOG_TAG_PROXY, "no optimal catch all config found, returning any catchall")
         // if no catch-all config is active, return any catch-all config
-        return configs.random()?.id
+        return configs.randomOrNull()?.id
     }
 
     private fun io(f: suspend () -> Unit) {
