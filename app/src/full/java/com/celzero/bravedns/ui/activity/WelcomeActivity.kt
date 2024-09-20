@@ -24,8 +24,10 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -146,7 +148,7 @@ class WelcomeActivity : ComponentActivity() {
                                 launchHomeScreen()
                             }) {
                                 Text(
-                                    text = "Skip",
+                                    text = "SKIP",
                                     style = MaterialTheme.typography.titleMedium,
                                 )
                             }
@@ -159,11 +161,14 @@ class WelcomeActivity : ComponentActivity() {
                             ) {
                                 repeat(pagerState.pageCount) { iteration ->
                                     val color =
-                                        if (pagerState.currentPage == iteration) Color.LightGray else Color.DarkGray
+                                        if (pagerState.currentPage == iteration) MaterialTheme.colorScheme.primary else Color.Transparent
+                                    val borderColor =
+                                        if (pagerState.currentPage == iteration) Color.Transparent else MaterialTheme.colorScheme.onBackground
                                     Box(
                                         modifier = Modifier
                                             .padding(2.dp)
                                             .clip(CircleShape)
+                                            .border(BorderStroke(1.dp, borderColor), CircleShape)
                                             .background(color)
                                             .size(8.dp)
                                     )
@@ -184,7 +189,7 @@ class WelcomeActivity : ComponentActivity() {
                                 }
                             }) {
                                 Text(
-                                    text = "Next", style = MaterialTheme.typography.titleMedium
+                                    text = "NEXT", style = MaterialTheme.typography.titleMedium
                                 )
                             }
                         }
