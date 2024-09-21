@@ -988,15 +988,23 @@ object WireguardManager : KoinComponent {
 
     suspend fun getOptimalCatchAllConfigId(): Int? {
         val configs = mappings.filter { it.isCatchAll && it.isActive }
-        configs.forEach {
-            if (isValidLastOk(it.id)) {
-                Logger.d(LOG_TAG_PROXY, "found optimal catch all config: ${it.id}")
-                return it.id
+        // get the config which doesn't have split tunnel. If none, return any catch-all config
+        // TODO: instead get the dns ip from go-lib and check if it can be routed
+        configs.forEach { config ->
+            if (isValidLastOk(config.id) && !isSplitTunnelProxy(config.id)) {
+                Logger.d(LOG_TAG_PROXY, "optimal catch all config found: ${config.id}")
+                return config.id
             }
         }
         Logger.d(LOG_TAG_PROXY, "no optimal catch all config found, returning any catchall")
-        // if no catch-all config is active, return any catch-all config
-        return configs.random()?.id
+        // return any catch-all config
+        return configs.randomOrNull()?.id
+    }
+
+    private suspend fun isSplitTunnelProxy(configId: Int): Boolean {
+        val id = ProxyManager.ID_WG_BASE + configId
+        val pair = VpnController.getSupportedIpVersion(id)
+        return VpnController.isSplitTunnelProxy(id, pair)
     }
 
     private fun io(f: suspend () -> Unit) {
