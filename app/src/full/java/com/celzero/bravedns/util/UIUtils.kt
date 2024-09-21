@@ -640,8 +640,10 @@ object UIUtils {
         val fwd = stat?.fwd()?.toString()
         val icmp = stat?.icmp()?.toString()
         val nic = stat?.nic()?.toString()
+        val rdnsInfo = stat?.rdnsinfo()?.toString()
+        val nicInfo = stat?.nicinfo()?.toString()
 
-        var stats = nic + fwd + ip + icmp + tcp + udp
+        var stats = nic + nicInfo + fwd + ip + icmp + tcp + udp + rdnsInfo
         stats = stats.replace("{", "\n")
         stats = stats.replace("}", "\n\n")
         stats = stats.replace(",", "\n")
