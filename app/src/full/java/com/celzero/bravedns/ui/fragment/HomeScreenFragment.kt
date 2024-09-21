@@ -19,6 +19,7 @@ import Logger
 import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.ActivityNotFoundException
@@ -38,11 +39,14 @@ import android.os.SystemClock
 import android.provider.Settings
 import android.text.format.DateUtils
 import android.util.TypedValue
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -194,22 +198,55 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         b.fhsSponsor.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
-            startActivity(intent)
+            promptForAppSponsorship()
         }
 
         b.fhsSponsorBottom.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
-            startActivity(intent)
+            promptForAppSponsorship()
         }
 
         b.fhsTitleRethink.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
-            startActivity(intent)
+            promptForAppSponsorship()
         }
 
         // comment out the below code to disable the alerts card (v0.5.5b)
         // b.fhsCardAlertsLl.setOnClickListener { startActivity(ScreenType.ALERTS) }
+    }
+
+    private fun promptForAppSponsorship() {
+        val installTime = requireContext().packageManager.getPackageInfo(
+            requireContext().packageName,
+            0
+        ).firstInstallTime
+        val timeDiff = System.currentTimeMillis() - installTime
+        // convert it to month
+        val days = (timeDiff / (1000 * 60 * 60 * 24)).toDouble()
+        val month = days / 30
+        // multiply the month with 0.60$ + 0.20$ for every month
+        val amount = month * (0.60 + 0.20)
+        Logger.d(LOG_TAG_UI, "Sponsor: $installTime, days/month: $days/$month, amount: $amount")
+        val alertBuilder = MaterialAlertDialogBuilder(requireContext())
+        val inflater = LayoutInflater.from(requireContext())
+        val dialogView = inflater.inflate(R.layout.dialog_sponsor_info, null)
+        alertBuilder.setView(dialogView)
+        alertBuilder.setCancelable(true)
+
+        val amountTxt = dialogView.findViewById<AppCompatTextView>(R.id.dialog_sponsor_info_amount)
+        val usageTxt = dialogView.findViewById<AppCompatTextView>(R.id.dialog_sponsor_info_usage)
+        val sponsorBtn = dialogView.findViewById<AppCompatTextView>(R.id.dialog_sponsor_info_sponsor)
+
+        val dialog = alertBuilder.create()
+
+        val msg = getString(R.string.sponser_dialog_usage_msg, days.toInt().toString(), "%.2f".format(amount))
+        amountTxt.text = getString(R.string.two_argument_no_space, getString(R.string.symbol_dollar), "%.2f".format(amount))
+        usageTxt.text = msg
+
+        sponsorBtn.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
+            startActivity(intent)
+        }
+
+        dialog.show()
     }
 
     private fun handlePause() {
@@ -554,6 +591,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     "${ProxyManager.ID_WG_BASE}${id}"
                 }
             } else {
+                if (persistentState.splitDns && WireguardManager.isAdvancedWgActive()) {
+                    dns += ", " + resources.getString(R.string.lbl_wireguard)
+                }
+
                 preferredId
             }
 
