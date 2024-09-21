@@ -174,8 +174,6 @@ class WgMainActivity :
         observeConfig()
         observeDnsName()
         setupClickListeners()
-
-
     }
 
     private fun setAdapter() {
@@ -215,7 +213,7 @@ class WgMainActivity :
         val layoutManager = LinearLayoutManager(this)
         b.wgGeneralInterfaceList.layoutManager = layoutManager
 
-        wgConfigAdapter = WgConfigAdapter(this)
+        wgConfigAdapter = WgConfigAdapter(this, this, persistentState)
         wgConfigViewModel.interfaces.observe(this) { wgConfigAdapter?.submitData(lifecycle, it) }
         b.wgGeneralInterfaceList.adapter = wgConfigAdapter
     }
@@ -224,7 +222,7 @@ class WgMainActivity :
         val layoutManager = LinearLayoutManager(this)
         b.oneWgInterfaceList.layoutManager = layoutManager
 
-        oneWgConfigAdapter = OneWgConfigAdapter(this, this)
+        oneWgConfigAdapter = OneWgConfigAdapter(this, this, persistentState)
         wgConfigViewModel.interfaces.observe(this) { oneWgConfigAdapter?.submitData(lifecycle, it) }
         b.oneWgInterfaceList.adapter = oneWgConfigAdapter
     }
@@ -285,18 +283,25 @@ class WgMainActivity :
     }
 
     private fun observeDnsName() {
+        val activeConfigs = WireguardManager.getEnabledConfigs()
         if (WireguardManager.oneWireGuardEnabled()) {
-            val activeConfigs = WireguardManager.getEnabledConfigs()
-            val isAnyConfigActive = activeConfigs.isNotEmpty()
-            if (isAnyConfigActive) {
-                val dnsName = activeConfigs.firstOrNull()?.getName() ?: return
-                b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsName)
-            }
+            val dnsName = activeConfigs.firstOrNull()?.getName() ?: return
+            b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsName)
             // remove the observer if any config is active
             appConfig.getConnectedDnsObservable().removeObservers(this)
         } else {
-            appConfig.getConnectedDnsObservable().observe(this) {
-                b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, it)
+            appConfig.getConnectedDnsObservable().observe(this) { dns ->
+                var dnsNames: String = dns.ifEmpty { "" }
+                if (persistentState.splitDns) {
+                    if (activeConfigs.isNotEmpty()) {
+                        dnsNames += ", "
+                    }
+                    dnsNames += activeConfigs.joinToString(", ") { it.getName() }
+                    b.wgWireguardDisclaimer.text =
+                        getString(R.string.wireguard_disclaimer, dnsNames)
+                } else {
+                    b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsNames)
+                }
             }
         }
     }
