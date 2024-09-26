@@ -150,6 +150,10 @@ class FirewallAppListAdapter(
         }
 
         private fun maybeDisplayProxyStatus(appInfo: AppInfo) {
+            if (appInfo.isProxyExcluded) {
+                return
+            }
+
             // show key icon in drawable right of b.firewallAppDataUsage
             val proxy = ProxyManager.getProxyIdForApp(appInfo.uid)
             if (proxy.isEmpty() || proxy == ID_NONE) {
