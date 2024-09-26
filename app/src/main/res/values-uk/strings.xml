@@ -534,4 +534,13 @@
     <string name="settings_import_export_heading" translatable="true">Резервне копіювання та відновлення</string>
     <string name="orbot_no_app_toast" translatable="true">Додайте принаймні один застосунок, щоб увімкнути Orbot</string>
     <string name="settings_theme_desc" translatable="true">Темна/світла тема</string>
+    <string name="crypt_relay_netherlands" translatable="true">Анонімна ретрансляція DNS (Система доменних імен), розміщена в Нідерландах</string>
+    <string name="crypt_adguard_family_desc" translatable="true">«ADguard DNS» з безпечним пошуком і блокуванням вмісту для дорослих.</string>
+    <string name="crypt_adguard_desc" translatable="true">Захищає ваш пристрій від шкідливого програмного забезпечення та більше.</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 [Перевіряє посилання трафіку у базі даних загроз IBM X-Force] (будь-який) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Видалити кінцеву точку DoT?</string>
+    <string name="crypt_relay_us" translatable="true">"Анонімна ретрансляція DNS (Система доменних імен), розміщена в США,  Лос-Анджелес, Каліфорнія, надається https://cryptostrom.is/."</string>
+    <string name="crypt_relay_france" translatable="true">Анонімна ретрансляція DNS (Система доменних імен) розміщена в Парижі, Франція, надається https://cryptostrom.is/.</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 [Перевіряє посилання трафіку у базі даних загроз IBM X-Force] (будь-який) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="crypt_relay_sweden" translatable="true">Анонімна ретрансляція DNS (Система доменних імен) розміщена в Швеції, надається https://cryptostrom.is/.</string>
 </resources>
