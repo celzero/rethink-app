@@ -363,7 +363,7 @@
     <string name="lbl_peer" translatable="true">피어</string>
     <string name="bsct_conn_desc_blocked" translatable="true">%1$s%2$s에서 차단됨</string>
     <string name="bsct_conn_desc_allowed" translatable="true">%1$s%2$s에 허용됨</string>
-    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">보호되었습니댜! DNS + 방화벽 + 프록시에 연결되었습니다.</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">보호되었습니다! DNS + 방화벽 + 프록시에 연결되었습니다.</string>
     <string name="lbl_unselected" translatable="true">선택되지 않음</string>
     <string name="lbl_idle" translatable="true">유휴 상태</string>
     <string name="lbl_split" translatable="true">분할</string>
@@ -554,4 +554,15 @@
     <string name="cd_dns_crypt_name_default" translatable="true">DNSCrypt</string>
     <string name="cd_doh_dialog_heading" translatable="true">HTTPS를 통한 DNS 추가</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">서버 TLS 인증서 검증을 하지 마십시오 (무엇을 하고 있는지 알고 있는 경우에만 활성화하십시오)</string>
+    <string name="cd_dns_alg_heading" translatable="true">고급 DNS 필터링 (실험적)</string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_chip" translatable="true">+%1$s 다른 IP들</string>
+    <string name="dns_log_dialog_positive" translatable="true">로그 삭제</string>
+    <string name="cd_dns_alg_desc" translatable="true">DNS 요청당 고유 IP 할당</string>
+    <string name="ctbs_dialog_negative_btn" translatable="true">뒤로가기</string>
+    <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s 기타 앱</string>
+    <string name="ctbs_block_other_apps" translatable="true">%1$s에 적용된 규칙은 %2$s의 다른 앱에도 적용됩니다</string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s 차단 목록</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_chip_no_answer" translatable="true">응답 없음</string>
+    <string name="ctbs_app_info_not_available_toast" translatable="true">앱 설정 페이지를 찾을 수 없음</string>
 </resources>
