@@ -85,7 +85,7 @@
     <string name="always_on_dialog_heading">Wyłączenie zawsze włączonej sieci VPN</string>
     <string name="always_on_dialog_stop_heading">Zawsze włączona sieć VPN</string>
     <string name="private_dns_dialog_heading">Wyłącz prywatny DNS</string>
-    <string name="private_dns_dialog_desc">Ustawienia DNS Rethink są nadrzędne w stosunku do prywatnych DNS Androida.
+    <string name="private_dns_dialog_desc">Ustawienia DNS Rethink są nadpisywane przez prywatny DNS Androida.
 \n
 \nAby użyć DNS Rethink przejdź do Ustawień Androida i wyłącz \"Prywatny DNS\".</string>
     <string name="doh_custom_url_remove_success">Punkt końcowy usunięty.</string>

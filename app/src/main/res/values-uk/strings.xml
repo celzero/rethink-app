@@ -79,7 +79,7 @@
     <string name="settings_theme_heading" translatable="true">Зовнішній вигляд</string>
     <string name="settings_dns_proxy_dialog_app" translatable="true">Застосунок</string>
     <string name="settings_dns_proxy_dialog_app_desc" translatable="true">Вибраний застосунок буде виключено з VPN, щоб вона могла встановлювати проксі-з’єднання від вашого імені.</string>
-    <string name="settings_app_list_default_app" translatable="true">Ніхто</string>
+    <string name="settings_app_list_default_app" translatable="true">Жоден</string>
     <string name="settings_theme_dialog_title" translatable="true">Зовнішній вигляд</string>
     <string name="firewall_card_status_active" translatable="true">%1$s застосунків</string>
     <string name="hsf_vpn_prepare_failure" translatable="true">Немає дозволу VPN, або інший застосунок працює в режимі постійно увімкненого VPN.</string>
@@ -118,7 +118,7 @@
     <string name="pause_desc" translatable="true">Примітка: %1$s заблоковані застосунки продовжуватимуть блокуватися брандмауером.</string>
     <string name="firewall_rule_block_app" translatable="true">Застосунок заблоковано</string>
     <string name="firewall_rule_foreground" translatable="true">Застосунок не використовується</string>
-    <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">Обхідний застосунок</string>
+    <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">Обхід фаєрвол</string>
     <string name="firewall_rule_new_app_desc" translatable="true">Цей застосунок встановив з\'єднання <i>вперше</i>.<br/><br/> Для зміни перейдіть на вкладку <i>Універсальні</i>.</string>
     <string name="firewall_rule_block_app_unmetered_desc" translatable="true">Встановлене користувачем правило брандмауера заблокувало цей <i>застосунок</i> при спробі підключення до <i>Необмеженої</i> мережі.<br/><br/> Щоб змінити, перейдіть на вкладку <i>Всі Застосунки</i>.</string>
     <string name="firewall_rule_block_app_mobile_desc" translatable="true">Встановлене користувачем правило брандмауера заблокувало цей <i>застосунок</i> при спробі підключення до <i>Обмеженої</i>мережі.<br/><br/> Щоб змінити, перейдіть на вкладку <i>Всі Застосунки</i>.</string>
@@ -169,7 +169,7 @@
     <string name="about_app" translatable="true">застосунок</string>
     <string name="about_settings_app_info" translatable="true">Інформація про застосунок</string>
     <string name="about_app_translate" translatable="true">Перекласти</string>
-    <string name="cd_custom_dns_proxy_default_app" translatable="true">Ніхто</string>
+    <string name="cd_custom_dns_proxy_default_app" translatable="true">Відсутнє</string>
     <string name="dns_proxy_app" translatable="true">Застосунок</string>
     <string name="fapps_firewall_filter_isolate" translatable="true">Ізольовані</string>
     <string name="fapps_info_unmetered_msg" translatable="true">Дозволити / Заблокувати в безлімітній мережі (Wi-Fi).</string>
@@ -194,7 +194,7 @@
     <string name="firewall_rule_trusted_ip_desc" translatable="true">Це з\'єднання було дозволено, оскільки <i>IP-адресу призначення</i> встановлено як Довірену IP-адресу.<br/><br/> Для зміни перейдіть на сторінку <i>Брандмауер для конкретного застосунку</i>.</string>
     <string name="firewall_rule_block_dns_bypass_desc" translatable="true">Це з\'єднання було заблоковано через те, що <i>джерело застосунку</i> обійшло бажаний користувачем DNS.<br/><br/> Щоб змінити цю поведінку, перейдіть на сторінку <i>Універсальний</i>.</string>
     <string name="new_app_bulk_notification_title" translatable="true">Увага</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">Це з\'єднання було дозволено, тому що для <i>джерела застосунку</i> налаштовано <i>обхід універсальних</i>правил брандмауера.<br/><br/> Для зміни перейдіть на сторінку <i>Брандмауер для конкретного застосунку</i>.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">Це з\'єднання було дозволено, тому що для <i>застосунку</i> налаштовано <i>універсальний обхід </i>правил брандмауера.<br/><br/> Для зміни перейдіть на сторінку <i>Брандмауера для потрібного застосунку</i>.</string>
     <string name="category_name_non_app_sys" translatable="true">Системні служби</string>
     <string name="category_name_installed" translatable="true">Встановлені застосунки</string>
     <string name="ada_app_status_isolate" translatable="true">ізольовано; допускаються лише довірені IP-адреси</string>
@@ -223,7 +223,7 @@
 \n <u>№6</u>: блокує весь трафік UDP, крім DNS (універсальний брандмауер).
 \n <u>№7</u>: блокувати підключення, коли DNS обходиться (універсальний брандмауер).</string>
     <string name="settings_allow_bypass_desc" translatable="true">Дозволити застосункам, що запитують, доступ до всіх доступних мереж. Ці застосунки можуть обходити VPN тунель Rethink за вимогою. Деякі застосунки для аудіо чи відео конференцій, такі як Zoom та Meet, можуть потребувати цього для належної роботи.</string>
-    <string name="settings_https_desc" translatable="true">Цей налаштування є лише рекомендацією, і можливо, застосунки проігнорують його. Застосунки, які використовують проксі HTTP(S), обходять правила брандмауера та DNS.</string>
+    <string name="settings_https_desc" translatable="true">Пересилати з\'єднання за протоколом HTTP(s).</string>
     <string name="whats_new_version_update" translatable="true">&lt;b&gt;РА Фішер!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Нова функція&lt;/i&gt;: повністю новий екран статистики.&lt;br/&gt; 2. &lt;i&gt;Нова функція&lt;/i&gt; : захистіть цей застосунок за допомогою блокування екрана.&lt;br/&gt; 3. &lt;i&gt;Нова функція&lt;/i&gt;: виберіть потрібну мову в налаштуваннях застосунку.&lt;br/&gt; 4. &lt;i&gt;Нова функція&lt;/i&gt;: RDNS+ &lt; i&gt;Простий&lt;/i&gt; перегляд показує лише добре підібрані списки.&lt;br/&gt; 5. Перейменувати: режим &lt;i&gt;блокування застосунку&lt;/i&gt; тепер є режимом &lt;i&gt;ізоляції&lt;/i&gt;.&lt;br/&gt; 6 . Перейменування: &lt;i&gt;Обхід правил застосунку&lt;/i&gt; тепер називається &lt;i&gt;Довіра&lt;/i&gt; IP.&lt;br/&gt; 7. Виправлено збій, коли Rethink інстальовано в робочому профілі.&lt;br/&gt; 8. Зараз видалення спеціальних правил застосунку, коли застосунок видалено.&lt;br/&gt; 9. Інші незначні зміни інтерфейсу користувача та виправлення помилок.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/ translate&gt;Допоможіть перекласти цей застосунок&lt;/a&gt;</string>
     <string name="orbot_explanation" translatable="true">Orbot – це безплатний застосунок-проксі, яка дає змогу іншим застосункам <u>безпечніше</u> використовувати Інтернет.
 \nOrbot використовує <u>Tor</u> для шифрування вашого Інтернет-трафіку, що допомагає вам <u>обійти цензуру</u> та захиститися від форм <u>мережевого спостереження</u>, які загрожують особистій свободі та конфіденційності.
@@ -411,7 +411,7 @@
     <string name="settings_default_dns_desc" translatable="true">У рідкісних випадках, коли бажаний користувачем DNS неможливо встановити, використовується резервний DNS.</string>
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
     <string name="local_blocklist_redownload_desc" translatable="true">Блоклисти на пристрої вже мають останню версію v%1$s.</string>
-    <string name="configure_dns_crypt" translatable="true">DNSCrypt: %1$s resolvers</string>
+    <string name="configure_dns_crypt" translatable="true">DNSCrypt: %1$s резольвери (розв\'язуют доменні імена в IP-адреси)</string>
     <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">найбільш заблоковані домени</string>
     <string name="configure_dns_connected_doh_status" translatable="true">DNS через HTTPS</string>
     <string name="ssv_see_more" translatable="true">Показати усе</string>
@@ -534,4 +534,217 @@
     <string name="settings_import_export_heading" translatable="true">Резервне копіювання та відновлення</string>
     <string name="orbot_no_app_toast" translatable="true">Додайте принаймні один застосунок, щоб увімкнути Orbot</string>
     <string name="settings_theme_desc" translatable="true">Темна/світла тема</string>
+    <string name="crypt_relay_netherlands" translatable="true">Анонімна ретрансляція DNS (Система доменних імен), розміщена в Нідерландах</string>
+    <string name="crypt_adguard_family_desc" translatable="true">«ADguard DNS» з безпечним пошуком і блокуванням вмісту для дорослих.</string>
+    <string name="crypt_adguard_desc" translatable="true">Захищає ваш пристрій від шкідливого програмного забезпечення та більше.</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 [Перевіряє посилання трафіку у базі даних загроз IBM X-Force] (будь-який) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Видалити кінцеву точку DoT?</string>
+    <string name="crypt_relay_us" translatable="true">"Анонімна ретрансляція DNS (Система доменних імен), розміщена в США,  Лос-Анджелес, Каліфорнія, надається https://cryptostrom.is/."</string>
+    <string name="crypt_relay_france" translatable="true">Анонімна ретрансляція DNS (Система доменних імен) розміщена в Парижі, Франція, надається https://cryptostrom.is/.</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 [Перевіряє посилання трафіку у базі даних загроз IBM X-Force] (будь-який) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="crypt_relay_sweden" translatable="true">Анонімна ретрансляція DNS (Система доменних імен) розміщена в Швеції, надається https://cryptostrom.is/.</string>
+    <string name="lbl_split" translatable="true">Роздільне тунел-ня</string>
+    <string name="settings_socks5_dialog_hint_ip" translatable="true">IP-адреса</string>
+    <string name="dc_check_update_desc" translatable="true">Перевіряти оновленя блок листа раз на <i>три</i> дні</string>
+    <string name="dc_proxy_dns_desc" translatable="true">Не проксірувати DNS через Always-on, WireGuard, Socks5, HTTP-проксі.</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Нікли не проксувати DNS</string>
+    <string name="dns_log_dialog_positive" translatable="true">Видалення logs-журналу</string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_chip" translatable="true">+%1$s Інші IPs</string>
+    <string name="firewall_rule_bypass_universal_ip" translatable="true">Обхід IP</string>
+    <string name="add_remove_apps" translatable="true">Додати/Видалити (%1$s застосунок)</string>
+    <string name="exclude_all_app_wg_dialog_title" translatable="true">Відключити усі додатки</string>
+    <string name="include_all_app_wg_dialog_desc" translatable="true">Використовувати цей WireGuard VPN для усіх додатків?</string>
+    <string name="config_add_success_toast" translatable="true">Добре</string>
+    <string name="config_delete_dialog_title" translatable="true">Видалити</string>
+    <string name="bad_config_error" translatable="true">%1$s в %2$s</string>
+    <string name="wireguard_enabled_failure" translatable="true">Зупиніть інші активні проксі-сервери, щоб увімкнути WireGuard</string>
+    <string name="google_dns_desc" translatable="true">Не блокує запити системи доменних імен [DNS]. На основі DNS Google .</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">Блокує шкідливий вміст. Використовує систему доменних імен [DNS] Cloudflare.</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">частково %1$s</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">Дозволено %1$s додатків</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">Відключено %1$s додатків</string>
+    <string name="settings_http_proxy_desc" translatable="true">Переадресування на %1$s</string>
+    <string name="settings_theme_dialog_themes_2" translatable="true">Світла</string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true">Не перевіряти сертифікати TLS [безпеки транспортного рівня] сервера (вмикати, лише якщо ви точно знаєте, що робите)</string>
+    <string name="cd_dnscrypt_relay_heading" translatable="true">Ретранслятор</string>
+    <string name="invalid_file_error" translatable="true">пошкоджений файл</string>
+    <string name="parse_error_generic" translatable="true">рядок</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Вибрані застосунки спрямовуватимуться лише через цю WireGuard VPN, незалежно від того, активна чи вимкнена VPN.</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">Завжди ввімкнено</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Блокує доступ до всіх дорослих, порнографічних та відвертих сайтів. Він також блокує проксі-сервери та VPN-домени, які використовуються для обходу фільтрів. Також блокуються сайти зі змішаним контентом (наприклад, Reddit). Google, Bing та Youtube налоштуйте на безпечний режим.</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">Сімейний фільтр блокує доступ до усіх дорослих, порнографічних та відвертих сайтів. Він також блокує проксі-сервери та VPN-домени, які можуть бути використані для обходу наших фільтрів. Сайти змішаного контенту (наприклад, Reddit) також блокуються. Google, Bing та Youtube налаштуйте на безпечний режим.</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">Блокує шкідливе програмне забезпечення та вміст для дорослих. Використовує систему доменних імен [DNS] Cloudflare.</string>
+    <string name="exclude_all_app_wg_dialog_desc" translatable="true">Відключити усі додатки від цього WireGuard VPN?</string>
+    <string name="config_delete_dialog_desc" translatable="true">Ви впевнені, що хочете видалити цю конфігурацію WireGuard VPN?</string>
+    <string name="one_wg_error_toast" translatable="true">Щоб перемкнутися на розширений режим, зупиніть WireGuard у простому режимі</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">Усі з\'єднання та програми, не маршрутизовані іншими VPN-серверами WireGuard, будуть маршрутизовані цим.</string>
+    <string name="one_wg_dialog_desc" translatable="true">Усі з’єднання з усіх додатків, включаючи DNS, спрямовуватимуться до однієї активної WireGuard VPN. Інші активні WireGuard VPNs, якщо такі є, буде зупинено.</string>
+    <string name="parse_error_reason" translatable="true">Неможливо проаналізувати %1$s “%2$s”</string>
+    <string name="lbl_peer" translatable="true">Інтер. вузел</string>
+    <string name="settings_dns_proxy_dialog_header" translatable="true">Встановленя SOCKS5 проксі</string>
+    <string name="settings_theme_dialog_themes_1" translatable="true">З Системи</string>
+    <string name="settings_notification_dialog_option_3" translatable="true">"
+\nНічого.
+\nНе відображає кнопки.
+\n"</string>
+    <string name="settings_protocol_translation_dns_inactive" translatable="true">Перемикач режимів DNS/Фаєрвол+DNS, оберіть налаштування</string>
+    <string name="dns_btm_sheet_chip_no_answer" translatable="true">Немає відповіді</string>
+    <string name="about_mail_to_string" translatable="true">Посилання mailTO:</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Застосунки переадресації проксі-серверів зі зворотним зв\'язком</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Коли цей параметр вимкнено, супроводження застосунків до проксі-серверів (SОСКS5, НТТР, DNS) виключається з VPN-тунелів Rethink\'s.</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">Також вмикає<!--settings_network_all_networks--> %1$s налаштування. Ви бажаєте продовжити?</string>
+    <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (стандарт)</string>
+    <string name="settings_socks5_dialog_hint_port" translatable="true">Порт</string>
+    <string name="settings_selected_theme" translatable="true">Поточна тема: %1$s</string>
+    <string name="about_bug_no_log_dialog_positive_btn" translatable="true">Надіслати email</string>
+    <string name="about_settings_vpn_profile" translatable="true">Профіль VPN</string>
+    <string name="about_settings_notification" translatable="true">Налаштування сповіщень</string>
+    <string name="about_mail_bugreport_text" translatable="true">Надіслати листа: hello@celzero.com</string>
+    <string name="about_dialog_neutral_button" translatable="true">Запропонувати функції</string>
+    <string name="vpn_profile_error" translatable="true">Не вдалося запустити профіль VPN.</string>
+    <string name="logs_disclaimer" translatable="true">Показувати перші 20 000 символів</string>
+    <string name="cd_custom_doh_url_name" translatable="true">DNS-Над-HTTPs%1$s</string>
+    <string name="cd_custom_doh_url_name_default" translatable="true">[DoH] Система назв доменів (DNS)-Над- Безпечним протоколом передачі гіпертексту (HTTPs)</string>
+    <string name="cd_custom_dns_proxy_name_default" translatable="true">Проксі</string>
+    <string name="cd_custom_dns_proxy_name" translatable="true">Проксі %1$s</string>
+    <string name="cd_dns_proxy_error_text_1" translatable="true">Некоректна IP адреса</string>
+    <string name="ctbs_dialog_negative_btn" translatable="true">Назад</string>
+    <string name="hs_download_positive_default" translatable="true">Добре</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">дозволено <u>анонімно</u> %1$s по %2$s через %3$s</string>
+    <string name="ci_dialog_desc" translatable="true">Дозволити ОБІЙТИ або ЗАБЛОКУВАТИ: IP-адресу, IP-підмережу (діапазон), порт. Приклади: 10.10.10.10, 10.1.1.*, 10.2.2/24, ff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
+    <string name="ada_app_bypass_dns_firewall" translatable="true">Обходить DNS &amp; Firewall</string>
+    <string name="http_proxy_dialog_desc" translatable="true">Налаштуйте URL-адресу форми, &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Приклад: http://proxy.example.com:8080/</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Це з\'єднання було дозволено, оскільки<i>застосунок</i>налаштовано на <i>обхід правил dns і фаєрвола</i>.<br/><br/> Щоб змінити, перейдіть на екран визначеного застосунку у<i>фаєрволі</i> .</string>
+    <string name="settings_pcap_heading" translatable="true">Перех-ня пакетів</string>
+    <string name="firewall_card_text_active" translatable="true">%1$s заблоковані
+\n%2$s обходять 
+\n%3$s виключені
+\n%4$s ізольовані</string>
+    <string name="contributors_dialog_title" translatable="true">Автори</string>
+    <string name="cd_dns_proxy_mode_internal" translatable="true">Внутрішній</string>
+    <string name="cd_dns_proxy_mode_external" translatable="true">Зовнішній</string>
+    <string name="cd_dns_crypt_name" translatable="true">DNSCrypt %1$s</string>
+    <string name="cd_dns_crypt_error_text_1" translatable="true">Штамп не може бути порожнім</string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s блок-лист(и)</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_resolved_doh" translatable="true">дозволено %1$s по %2$s</string>
+    <string name="dns_btm_resolved_doh_no_server" translatable="true">дозволено %1$s</string>
+    <string name="hs_download_positive_play_store" translatable="true">Оновлення відбулося</string>
+    <string name="univ_accessibility_crash_dialog_positive" translatable="true">Перейти до налаштувань</string>
+    <string name="univ_accessibility_dialog_positive" translatable="true">Дозвіл</string>
+    <string name="univ_accessibility_dialog_negative" translatable="true">Відхилити</string>
+    <string name="dns_connected_rethink_plus" translatable="true">Підключено. %1$s блок-лист застосовується</string>
+    <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Застосунки які обходять</string>
+    <string name="ada_app_status_bypass_dns_firewall" translatable="true">ігнорують універсальні правила DNS та брандмауера</string>
+    <string name="univ_firewall_rule_9" translatable="true">Блокувати у мобільній (тарифікованій) мережі</string>
+    <string name="bypass_dns_firewall_tooltip">%1$s працює лише з DNS Rethink</string>
+    <string name="wireguard_connection_error" translatable="true">WireGuard VPN не вдається підключити</string>
+    <string name="cd_custom_dns_proxy_title" translatable="true">Користувкий DNS-проксі</string>
+    <string name="settings_http_proxy_error_text3" translatable="true">Ім\'я хосту порожнє</string>
+    <string name="settings_http_proxy_error_text4" translatable="true">Помилка з\'єднання з host-вузлом. Спробуйте ще раз.</string>
+    <string name="about_settings" translatable="true">система</string>
+    <string name="about_dialog_positive_button" translatable="true">Почнемо</string>
+    <string name="cd_dns_crypt_resolver_heading" translatable="true">Резолвер</string>
+    <string name="cd_dns_proxy_error_text_2" translatable="true">Діапазон портів повинен бути від 1024-65535</string>
+    <string name="cd_dns_crypt_relay_heading" translatable="true">Ретранслятор</string>
+    <string name="cd_dns_crypt_relay_name" translatable="true">DNSРетранслятор %1$s</string>
+    <string name="wireguard_disclaimer" translatable="true">DNS-трафік перенаправляється на %1$s, ICMP-трафік (наприклад: ping) відправляється через базову мережу.</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Видаліть DNS через TLS із збереженої конфігурації.</string>
+    <string name="info_dialog_rethink_toast_msg" translatable="true">Скопійовано URL як RDNS+ DNS-over-HTTPS</string>
+    <string name="settings_http_proxy_dialog_title" translatable="true">Налаштування URL-адреси сервера</string>
+    <string name="settings_http_proxy_error_text1" translatable="true">Діапазон портів має бути від 1024 до 65535</string>
+    <string name="settings_http_proxy_error_text2" translatable="true">Недійсний порт</string>
+    <string name="settings_http_proxy_toast_success" translatable="true">HTTP-проксі встановлено</string>
+    <string name="settings_dns_proxy_dialog_hostname" translatable="true">Назва host-вузла</string>
+    <string name="settings_dns_proxy_dialog_port_number" translatable="true">Номер порту</string>
+    <string name="settings_dns_proxy_dialog_username" translatable="true">Ім\'я користувача</string>
+    <string name="settings_dns_proxy_dialog_password" translatable="true">Пароль</string>
+    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">встановити</string>
+    <string name="settings_socks5_dialog_hint_password" translatable="true">Пароль (оционально)</string>
+    <string name="settings_socks_forwarding_desc" translatable="true">Пересилання на %1$s:%2$s, %3$s</string>
+    <string name="settings_socks_forwarding_default_desc" translatable="true">Пересилати з’єднання на SOCKS5.</string>
+    <string name="settings_socks5_dialog_hint_username" translatable="true">Ім\'я (оционально)</string>
+    <string name="settings_theme_dialog_themes_3" translatable="true">Темна</string>
+    <string name="settings_theme_dialog_themes_4" translatable="true">Чорна</string>
+    <string name="settings_ip_dialog_title" translatable="true">Оберіть версію IP</string>
+    <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (пробний)</string>
+    <string name="settings_ip_dialog_ipv46" translatable="true">Авто (пробний)</string>
+    <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
+    <string name="settings_ip_text_ipv6" translatable="true">IPv6</string>
+    <string name="settings_ip_text_ipv46" translatable="true">Авто</string>
+    <string name="settings_notification_desc" translatable="true">Поруч зі сповіщеннями Rethink відображати варіанти дій:%1$s</string>
+    <string name="settings_notification_desc1" translatable="true">Пауза/Зупинити (стандарт)</string>
+    <string name="settings_notification_desc2" translatable="true">DNS / Фаєрвол + DNS</string>
+    <string name="settings_notification_desc3" translatable="true">Нічого</string>
+    <string name="settings_notification_dialog_title" translatable="true">Оберіть дію сповіщення</string>
+    <string name="settings_notification_dialog_option_1" translatable="true">"
+\nПауза/Зупинити (стандарт):
+\nПоказує дві кнопки для швидкої паузи та зупинки Rethink."</string>
+    <string name="settings_notification_dialog_option_2" translatable="true">"
+\nDNS / Фаєрвол + DNS:
+\nПоказує дві кнопки для швидкого перемикання між режимом DNS із заощадженням батареї та звичайним режимом фаєрвол + DNS."</string>
+    <string name="firewall_status_whitelisted" translatable="true">обходять універсальні правила фаєрвола</string>
+    <string name="firewall_status_bypass_dns_firewall" translatable="true">обходять правила DNS та фаєрвола</string>
+    <string name="settings_pcap_dialog_title" translatable="true">PCAP (бібл-ка перех-ня пакетів)</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">вимкнено (стандарт)</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s запитів</string>
+    <string name="logs_card_network_count" translatable="true">%1$s підключень</string>
+    <string name="dc_check_update_heading" translatable="true">Запитувати про оновлення блок листа</string>
+    <string name="about_bug_no_log_dialog_message" translatable="true">Не вдалося отримати журнал збоїв. Бажаєте повідомити про помилку вручну?</string>
+    <string name="about_twitter" translatable="true">Слідкуйте у Твіттері</string>
+    <string name="about_mail_subject" translatable="true">[Rethink]:</string>
+    <string name="about_mozilla" translatable="true">Rethink підтримується Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
+    <string name="about_mail_to" translatable="true">hello@celzero.com</string>
+    <string name="about_mail_bugreport_share_title" translatable="true">Оберіть провайдера e-mail</string>
+    <string name="intent_launch_error" translatable="true">Не вдалося запустити %1$s</string>
+    <string name="log_file_not_available" translatable="true">Звіт про збій не знайдено</string>
+    <string name="cd_dns_proxy_error_text_3" translatable="true">Недійсний порт</string>
+    <string name="cd_dns_crypt_name_default" translatable="true">DNSCrypt - протокол шифрования DNS-трафика</string>
+    <string name="cd_dns_crypt_dialog_title" translatable="true">Додайте DNSCrypt Резолвер або Ретранслятор</string>
+    <string name="cd_dns_crypt_dialog_heading" translatable="true">Додати DNSCrypt Резолвер або Ретранслятор</string>
+    <string name="cd_dns_crypt_dialog_name" translatable="true">Ім\'я</string>
+    <string name="cd_dns_crypt_dialog_stamp" translatable="true">Штамп</string>
+    <string name="cd_dns_crypt_dialog_desc" translatable="true">Опис (опціонально)</string>
+    <string name="cd_doh_dialog_heading" translatable="true">Додати DNS над HTTPs</string>
+    <string name="cd_doh_dialog_resolver_url" translatable="true">URL Резолвера</string>
+    <string name="cd_doh_dialog_resolver_name" translatable="true">Назва Резолвера</string>
+    <string name="cd_dns_alg_heading" translatable="true">Розширена фільтрація DNS (експериментально)</string>
+    <string name="cd_dns_alg_desc" translatable="true">Призначати унікальну IP-адресу на кожний запиту DNS</string>
+    <string name="hs_download_negative_default" translatable="true">Нагадати пізніше</string>
+    <string name="univ_firewall_rule_7" translatable="true">Блокувати IPv4 в IPv6 (експериментально)</string>
+    <string name="univ_ip_delete_individual_toast" translatable="true">%1$s видалено.</string>
+    <string name="univ_ip_delete_dialog_positive" translatable="true">Видалити все</string>
+    <string name="univ_ip_delete_toast_success" translatable="true">Видалено усі правила IP.</string>
+    <string name="univ_delete_firewall_dialog_title" translatable="true">Видалити усі правила IP?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Обійти універсальні правила DNS та фаєрвола для<i>перелічених</i>застосунків?</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s вимкнено, оскільки проксі-сервери активні</string>
+    <string name="firewall_rule_bypass_dns_firewall" translatable="true">Обхід DNS&amp;Firewall</string>
+    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">Це з\'єднання було дозволено, оскільки &lt;i&gt;визначена IP-адреса&lt;/i&gt; налаштована на обхід всіх універсальних правил брандмауера.&lt;br/&gt;&lt;br/&gt; Щоб змінити, перейдіть до &lt;i&gt;Правила ID&lt;i&gt; та на вкладку &lt;i&gt;Універсальні&lt;/i&gt;).</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Цей застосунок обходить проксі</string>
+    <string name="exclude_apps_from_proxy">Застосунок обходить усі проксі-сервери</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Щоб продовжити, вімкніть Rethink</string>
+    <string name="bad_extension_error" translatable="true">Файл повинен бути .conf або .zip</string>
+    <string name="no_configs_error" translatable="true">Конфігурацій не знайдені</string>
+    <string name="illegal_filename_error" translatable="true">Неправильна назва файлу “%s”</string>
+    <string name="import_error" translatable="true">Не вдалося імпортувати тунель: %s</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">Закриття</string>
+    <string name="one_wg_apps_added" translatable="true">Маршрутизація усіх застосунків</string>
+    <string name="new_warp_invalid_config_toast" translatable="true">Конфігурація WARP є некоректною</string>
+    <string name="new_warp_error_toast" translatable="true">Не вдалося отримати конфігурацію WARP</string>
+    <string name="new_warp_config_desc" translatable="true">Отримати конфігурацію WARP із сервера</string>
+    <string name="wireguard_description" translatable="true">WireGuard у якості проксі.</string>
+    <string name="setup_wireguard" translatable="true">Налаштувати WireGuard</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">Фільтр для дорослих блокує доступ до всіх дорослих, порнографічних та відвертих сайтів. Він не блокує проксі-сервери або VPN-домени, а також сайти змішаного контенту. Дозволені такі сайти, як Reddit. Google та Bing налоштуйте на безпечний режим.</string>
+    <string name="routing_remaining_apps" translatable="true">Маршрутизація решти додатків</string>
+    <string name="settings_notification_heading" translatable="true">Оберіть дію сповіщень</string>
+    <string name="app_ip_domain_rules" translatable="true">На кожен застосунок особистий IP / правила Домену</string>
+    <string name="app_ip_domain_rules_desc" translatable="true">Змінювати IP кожного застосунку / правила Домену</string>
+    <string name="firewall_rule_block_dns_bypass" translatable="true">Обхід DNS</string>
+    <string name="collecting_logs_progress_text" translatable="true">Дайте подумати…</string>
+    <string name="private_dns_error" translatable="true">Не вдалося запустити приватний екран DNS.</string>
+    <string name="error_loading_log_file" translatable="true">Помилка завантаження log журналу</string>
+    <string name="quad9_dns_desc" translatable="true">Quad9 маршрутизує [Перевіряє посилання трафіку у базі даних загроз IBM X-Force] ваші DNS-запити [Системи доменних імен] через захищену мережу серверів по всьому світу.</string>
+    <string name="cloudflare_dns_desc" translatable="true">Не блокує запити DNS. Використовує систему доменних імен [DNS] Cloudflare.</string>
+    <string name="wireguard_disable_failure" translatable="true">Функцію \"Завжди включений WireGuard\" не можна вимкнути</string>
+    <string name="include_all_app_wg_dialog_title" translatable="true">Включити усі додатки</string>
 </resources>
