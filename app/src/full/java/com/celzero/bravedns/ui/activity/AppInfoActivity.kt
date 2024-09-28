@@ -408,8 +408,9 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                     b.aadMostContactedDomainRl.visibility = View.GONE
                 } else {
                     b.aadMostContactedDomainRl.visibility = View.VISIBLE
-
                 }
+            } else {
+                b.aadMostContactedDomainRl.visibility = View.VISIBLE
             }
         }
     }
@@ -430,6 +431,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 } else {
                     b.aadMostContactedDomainRl.visibility = View.VISIBLE
                 }
+            } else {
+                b.aadMostContactedDomainRl.visibility = View.VISIBLE
             }
         }
     }
@@ -450,6 +453,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 } else {
                     b.aadMostContactedIpsRl.visibility = View.VISIBLE
                 }
+            } else {
+                b.aadMostContactedIpsRl.visibility = View.VISIBLE
             }
         }
     }
@@ -471,6 +476,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 } else {
                     b.aadMostContactedIpsRl.visibility = View.VISIBLE
                 }
+            } else {
+                b.aadMostContactedIpsRl.visibility = View.VISIBLE
             }
         }
     }

@@ -137,7 +137,13 @@ class DomainConnectionsActivity : AppCompatActivity(R.layout.activity_domain_con
                 if (recyclerAdapter.itemCount < 1) {
                     b.dcRecycler.visibility = View.GONE
                     b.dcRecycler.visibility = View.VISIBLE
+                } else {
+                    b.dcRecycler.visibility = View.VISIBLE
+                    b.dcRecycler.visibility = View.GONE
                 }
+            } else {
+                b.dcRecycler.visibility = View.VISIBLE
+                b.dcRecycler.visibility = View.GONE
             }
         }
         b.dcRecycler.adapter = recyclerAdapter

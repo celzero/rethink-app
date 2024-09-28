@@ -193,6 +193,9 @@ class AppWiseIpLogsActivity :
                     hideNoRulesUi()
                     showRulesUi()
                 }
+            } else {
+                hideNoRulesUi()
+                showRulesUi()
             }
         }
     }
@@ -217,6 +220,9 @@ class AppWiseIpLogsActivity :
                     hideNoRulesUi()
                     showRulesUi()
                 }
+            } else {
+                hideNoRulesUi()
+                showRulesUi()
             }
         }
     }
