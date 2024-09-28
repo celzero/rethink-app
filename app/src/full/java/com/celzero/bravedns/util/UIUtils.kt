@@ -107,6 +107,15 @@ object UIUtils {
         }
     }
 
+    enum class ProxyStatus(val id: Long) {
+        TOK(Backend.TOK),
+        TUP(Backend.TUP),
+        TZZ(Backend.TZZ),
+        TNT(Backend.TNT),
+        TKO(Backend.TKO),
+        END(Backend.END)
+    }
+
     fun formatToRelativeTime(context: Context, timestamp: Long): String {
         val now = System.currentTimeMillis()
         return if (DateUtils.isToday(timestamp)) {

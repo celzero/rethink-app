@@ -31,10 +31,8 @@ import backend.Backend
 import backend.RouterStats
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.WgConfigAdapter
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.adapter.WgPeersAdapter
-import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ActivityWgDetailBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
@@ -45,11 +43,13 @@ import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
 import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config
@@ -192,49 +192,85 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         prefillConfig(config)
     }
 
-
     private suspend fun updateStatusUi(id: Int) {
         val config = WireguardManager.getConfigFilesById(id)
         val cid = ProxyManager.ID_WG_BASE + id
         if (config?.isActive == true) {
-            var status: String
             val statusId = VpnController.getProxyStatusById(cid)
             val stats = VpnController.getProxyStats(cid)
+            val ps = UIUtils.ProxyStatus.entries.find { it.id == statusId }
             uiCtx {
                 if (statusId != null) {
-                    var resId = UIUtils.getProxyStatusStringRes(statusId)
-                    // change the color based on the status
-                    if (statusId == Backend.TOK) {
-                        // if the lastOK is 0, then the handshake is not yet completed
-                        // so show the status as waiting
-                        if (stats?.lastOK == 0L) {
-                            resId = R.string.status_waiting
-                        }
-                    }
-                    status = getString(resId).replaceFirstChar(Char::titlecase)
 
-                    if ((statusId == Backend.TZZ || statusId == Backend.TNT) && stats != null) {
-                        // for idle state, if lastOk is less than 30 sec, then show as connected
-                        if (
-                            stats.lastOK != 0L &&
-                            System.currentTimeMillis() - stats.lastOK <
-                            30 * DateUtils.SECOND_IN_MILLIS
-                        ) {
-                            status =
-                                getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
-                        }
-                    }
-
+                    val handshakeTime = getHandshakeTime(stats).toString()
+                    val statusText = getIdleStatusText(ps, stats)
+                        .ifEmpty { getStatusText(ps, handshakeTime, stats) }
+                    b.statusText.text = statusText
                 } else {
-                    status = getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
+                    b.statusText.text =
+                        getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
                 }
-                b.statusText.text = status
+                val strokeColor = getStrokeColorForStatus(ps, stats)
+                b.interfaceDetailCard.strokeWidth = 2
+                b.interfaceDetailCard.strokeColor = fetchColor(this, strokeColor)
             }
         } else {
             uiCtx {
+                b.interfaceDetailCard.strokeWidth = 0
                 b.statusText.text =
                     getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
+        }
+    }
+
+    private fun getStatusText(
+        status: UIUtils.ProxyStatus?,
+        handshakeTime: String? = null,
+        stats: RouterStats?
+    ): String {
+        if (status == null) return getString(R.string.status_waiting)
+            .replaceFirstChar(Char::titlecase)
+
+        val baseText = getString(UIUtils.getProxyStatusStringRes(status.id))
+            .replaceFirstChar(Char::titlecase)
+
+        return if (stats?.lastOK != 0L && handshakeTime != null) {
+            getString(R.string.about_version_install_source, baseText, handshakeTime)
+        } else {
+            baseText
+        }
+    }
+
+    private fun getIdleStatusText(status: UIUtils.ProxyStatus?, stats: RouterStats?): String {
+        if (status != UIUtils.ProxyStatus.TZZ && status != UIUtils.ProxyStatus.TNT) return ""
+        if (stats == null || stats.lastOK == 0L) return ""
+        if (System.currentTimeMillis() - stats.lastOK >= 30 * DateUtils.SECOND_IN_MILLIS) return ""
+
+        return getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
+    }
+
+    private fun getHandshakeTime(stats: RouterStats?): CharSequence {
+        if (stats == null) {
+            return ""
+        }
+        if (stats.lastOK == 0L) {
+            return ""
+        }
+        val now = System.currentTimeMillis()
+        // returns a string describing 'time' as a time relative to 'now'
+        return DateUtils.getRelativeTimeSpanString(
+            stats.lastOK,
+            now,
+            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        )
+    }
+
+    private fun getStrokeColorForStatus(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
+        return when (status) {
+            UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) R.attr.chipTextNeutral else R.attr.accentGood
+            UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
+            else -> R.attr.chipTextNegative
         }
     }
 
@@ -451,18 +487,15 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         b.catchAllCheck.setOnClickListener { updateCatchAll(b.catchAllCheck.isChecked) }
 
         b.logsBtn.setOnClickListener {
-            startActivity(
-                NetworkLogsActivity.Tabs.NETWORK_LOGS.screen,
-                ProxyManager.ID_WG_BASE + configId
-            )
+            startActivity(ProxyManager.ID_WG_BASE + configId)
         }
     }
 
-    private fun startActivity(screenToLoad: Int, searchParam: String?) {
+    private fun startActivity(searchParam: String?) {
         val intent = Intent(this, NetworkLogsActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-        intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
-        intent.putExtra(Constants.SEARCH_QUERY, searchParam ?: "")
+        val query = RULES_SEARCH_ID_WIREGUARD + searchParam
+        intent.putExtra(Constants.SEARCH_QUERY, query)
         startActivity(intent)
     }
 

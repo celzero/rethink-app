@@ -37,7 +37,6 @@ import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.ListItemWgGeneralInterfaceBinding
 import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
@@ -56,7 +55,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class WgConfigAdapter(private val context: Context, private val listener: DnsStatusListener, private val persistentState: PersistentState) :
+class WgConfigAdapter(private val context: Context, private val listener: DnsStatusListener, private val splitDns: Boolean) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
 
     private var lifecycleOwner: LifecycleOwner? = null
@@ -80,15 +79,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                     return oldConnection == newConnection
                 }
             }
-    }
-
-    private enum class ProxyStatus(val id: Long) {
-        TOK(Backend.TOK),
-        TUP(Backend.TUP),
-        TZZ(Backend.TZZ),
-        TNT(Backend.TNT),
-        TKO(Backend.TKO),
-        END(Backend.END)
     }
 
     override fun onBindViewHolder(holder: WgInterfaceViewHolder, position: Int) {
@@ -216,7 +206,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             val pair = VpnController.getSupportedIpVersion(id)
             val c = WireguardManager.getConfigById(config.id)
             val stats = VpnController.getProxyStats(id)
-            val dnsStatusId = if (persistentState.splitDns) {
+            val dnsStatusId = if (splitDns) {
                 VpnController.getDnsStatus(id)
             } else {
                 null
@@ -338,16 +328,16 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
         }
 
-        private fun getStrokeColorForStatus(status: ProxyStatus?, stats: RouterStats?): Int {
+        private fun getStrokeColorForStatus(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
             return when (status) {
-                ProxyStatus.TOK -> if (stats?.lastOK == 0L) R.attr.chipTextNeutral else R.attr.accentGood
-                ProxyStatus.TUP, ProxyStatus.TZZ, ProxyStatus.TNT -> R.attr.chipTextNeutral
+                UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) R.attr.chipTextNeutral else R.attr.accentGood
+                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
                 else -> R.attr.chipTextNegative
             }
         }
 
         private fun getStatusText(
-            status: ProxyStatus?,
+            status: UIUtils.ProxyStatus?,
             handshakeTime: String? = null,
             stats: RouterStats?
         ): String {
@@ -364,8 +354,8 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
         }
 
-        private fun getIdleStatusText(status: ProxyStatus?, stats: RouterStats?): String {
-            if (status != ProxyStatus.TZZ && status != ProxyStatus.TNT) return ""
+        private fun getIdleStatusText(status: UIUtils.ProxyStatus?, stats: RouterStats?): String {
+            if (status != UIUtils.ProxyStatus.TZZ && status != UIUtils.ProxyStatus.TNT) return ""
             if (stats == null || stats.lastOK == 0L) return ""
             if (System.currentTimeMillis() - stats.lastOK >= 30 * DateUtils.SECOND_IN_MILLIS) return ""
 
@@ -373,7 +363,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         }
 
         private fun updateProxyStatusUi(statusId: Long?, stats: RouterStats?) {
-            val status = ProxyStatus.entries.find { it.id == statusId } // Convert to enum
+            val status = UIUtils.ProxyStatus.entries.find { it.id == statusId } // Convert to enum
 
             val handshakeTime = getHandshakeTime(stats).toString()
 
