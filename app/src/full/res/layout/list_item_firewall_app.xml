@@ -67,6 +67,7 @@
                             android:id="@+id/firewall_app_toggle_other"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textStyle="italic"
                             android:layout_marginStart="5dp"
                             android:layout_marginEnd="5dp"
                             android:textSize="@dimen/default_font_text_view" />
