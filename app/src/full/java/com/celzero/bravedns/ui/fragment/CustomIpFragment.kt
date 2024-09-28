@@ -30,6 +30,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.CustomIpAdapter
 import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
 import com.celzero.bravedns.databinding.FragmentCustomIpBinding
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
@@ -141,10 +142,29 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
         if (rules == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
             b.cipAddFab.visibility = View.VISIBLE
             setupAdapterForApp()
+            io {
+                val appName = FirewallManager.getAppNameByUid(uid)
+                if (!appName.isNullOrEmpty()) {
+                    uiCtx { updateAppNameInSearchHint(appName) }
+                }
+            }
         } else {
             b.cipAddFab.visibility = View.GONE
             setupAdapterForAllApps()
         }
+    }
+
+    private fun updateAppNameInSearchHint(appName: String) {
+        val appNameTruncated = appName.substring(0, appName.length.coerceAtMost(10))
+        val hint = getString(
+            R.string.two_argument_colon,
+            appNameTruncated,
+            getString(R.string.search_universal_ips)
+        )
+        b.cipSearchView.queryHint = hint
+        b.cipSearchView.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text).textSize =
+            14f
+        return
     }
 
     private fun setupAdapterForApp() {

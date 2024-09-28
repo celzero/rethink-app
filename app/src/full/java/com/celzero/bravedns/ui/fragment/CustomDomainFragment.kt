@@ -29,11 +29,13 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.CustomDomainAdapter
+import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.DialogAddCustomDomainBinding
 import com.celzero.bravedns.databinding.FragmentCustomDomainBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
 import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
@@ -108,6 +110,25 @@ class CustomDomainFragment :
         viewModel.customDomains.observe(this as LifecycleOwner) {
             adapter.submitData(this.lifecycle, it)
         }
+        io {
+            val appName = FirewallManager.getAppNameByUid(uid)
+            if (appName != null) {
+                uiCtx { updateAppNameInSearchHint(appName) }
+            }
+        }
+    }
+
+    private fun updateAppNameInSearchHint(appName: String) {
+        val appNameTruncated = appName.substring(0, appName.length.coerceAtMost(10))
+        val hint = getString(
+            R.string.two_argument_colon,
+            appNameTruncated,
+            getString(R.string.search_custom_domains)
+        )
+        b.cdaSearchView.queryHint = hint
+        b.cdaSearchView.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text).textSize =
+            14f
+        return
     }
 
     private fun setupAllRules(rule: CustomRulesActivity.RULES) {
