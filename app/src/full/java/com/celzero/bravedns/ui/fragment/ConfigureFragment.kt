@@ -23,6 +23,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.FragmentConfigureBinding
 import com.celzero.bravedns.ui.activity.AppListActivity
+import com.celzero.bravedns.ui.activity.AdvancedSettingActivity
 import com.celzero.bravedns.ui.activity.DnsDetailActivity
 import com.celzero.bravedns.ui.activity.FirewallActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
@@ -41,18 +42,23 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
         PROXY,
         VPN,
         OTHERS,
-        LOGS
+        LOGS,
+        ADVANCED
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        setupClickListeners()
     }
 
     private fun initView() {
         b.fsNetworkTv.text = getString(R.string.lbl_network).replaceFirstChar(Char::titlecase)
         b.fsLogsTv.text = getString(R.string.lbl_logs).replaceFirstChar(Char::titlecase)
+        b.fsDevOptTv.text = getString(R.string.lbl_advanced).replaceFirstChar(Char::titlecase)
+    }
 
+    private fun setupClickListeners() {
         b.fsAppsCard.setOnClickListener {
             // open apps configuration
             startActivity(ScreenType.APPS)
@@ -87,6 +93,11 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
             // open logs configuration
             startActivity(ScreenType.LOGS)
         }
+
+        b.fsDevOptCard.setOnClickListener {
+            // open developer options configuration
+            startActivity(ScreenType.ADVANCED)
+        }
     }
 
     private fun startActivity(type: ScreenType) {
@@ -99,8 +110,8 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
                 ScreenType.VPN -> Intent(requireContext(), TunnelSettingsActivity::class.java)
                 ScreenType.OTHERS -> Intent(requireContext(), MiscSettingsActivity::class.java)
                 ScreenType.LOGS -> Intent(requireContext(), NetworkLogsActivity::class.java)
+                ScreenType.ADVANCED -> Intent(requireContext(), AdvancedSettingActivity::class.java)
             }
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
     }
 }
