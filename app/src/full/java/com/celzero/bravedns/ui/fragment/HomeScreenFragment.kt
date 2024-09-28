@@ -449,10 +449,17 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     val status = VpnController.getProxyStatusById(proxyId)
                     if (status != null) {
                         // consider starting and up as active
-                        if (status == Backend.TKO) {
-                            failing++
+                        if (status == Backend.TOK) {
+                            val stats = VpnController.getProxyStats(proxyId)
+                            val lastOk = stats?.lastOK ?: 0
+                            val isUp = System.currentTimeMillis() - lastOk < 30 * DateUtils.SECOND_IN_MILLIS
+                            if (isUp) {
+                                active++
+                            } else {
+                                failing++
+                            }
                         } else {
-                            active++
+                            failing++
                         }
                     } else {
                         failing++
