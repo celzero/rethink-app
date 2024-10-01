@@ -887,7 +887,7 @@
     <string name="univ_firewall_heading" translatable="true">Universelle Firewall-Regeln</string>
     <string name="lbl_allowed_ips" translatable="true">Zulässige IPs</string>
     <string name="bad_config_reason_invalid_number" translatable="true">Ungültige Nummer</string>
-    <string name="add_remove_apps" translatable="true">Anwendungen hinzufügen / entfernen (%1$s Apps)</string>
+    <string name="add_remove_apps" translatable="true">Hinzufügen / Entfernen (%1$s Apps)</string>
     <string name="bad_extension_error" translatable="true">Datei muss .conf oder .zip sein</string>
     <string name="parse_error_integer" translatable="true">Nummer</string>
     <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">DNS &amp; Firewall-Regeln umgehen.</string>
