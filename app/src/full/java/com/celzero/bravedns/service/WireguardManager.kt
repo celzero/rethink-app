@@ -546,9 +546,7 @@ object WireguardManager : KoinComponent {
             }
         }
         Logger.d(LOG_TAG_PROXY, "optimalCatchAllConfig: fetching new wgId for uid: $uid")
-        val catchAllList = mappings.filter {
-            val id = ProxyManager.ID_WG_BASE + it.id
-            it.isActive && it.isCatchAll && VpnController.canRouteIp(id, ip, false) }
+        val catchAllList = mappings.filter { it.isActive && it.isCatchAll }
         catchAllList.forEach {
             if (isValidWgConnForIp(it.id, ip)) {
                 // note the uid and wgid in a cache, so that we can use it for further requests
