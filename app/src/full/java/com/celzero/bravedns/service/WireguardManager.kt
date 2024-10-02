@@ -484,6 +484,26 @@ object WireguardManager : KoinComponent {
         }
     }
 
+    suspend fun getConfigIdForApp(uid: Int): WgConfigFilesImmutable? {
+        val configId = ProxyManager.getProxyIdForApp(uid)
+
+        val id = if (configId.isNotEmpty()) convertStringIdToId(configId) else INVALID_CONF_ID
+        val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
+        if (config != null && (config.isActive || config.isLockdown)) {
+            Logger.d(LOG_TAG_PROXY, "app config mapping found for uid: $uid, $configId")
+            return config
+        }
+
+        val catchAllConfig = getOptimalCatchAllConfigId()
+        return if (catchAllConfig == null) {
+            Logger.d(LOG_TAG_PROXY, "catch all config not found for uid: $uid")
+            null
+        } else {
+            Logger.d(LOG_TAG_PROXY, "catch all config found for uid: $uid, $catchAllConfig")
+            mappings.find { it.id == catchAllConfig }
+        }
+    }
+
     private fun convertStringIdToId(id: String): Int {
         return try {
             val configId = id.substring(ProxyManager.ID_WG_BASE.length)
@@ -1005,6 +1025,12 @@ object WireguardManager : KoinComponent {
         val id = ProxyManager.ID_WG_BASE + configId
         val pair = VpnController.getSupportedIpVersion(id)
         return VpnController.isSplitTunnelProxy(id, pair)
+    }
+
+    fun invalidateCatchAllCache() {
+        if (catchAllAppConfigCache.value.isNotEmpty()) {
+            catchAllAppConfigCache.value = emptyMap()
+        }
     }
 
     private fun io(f: suspend () -> Unit) {
