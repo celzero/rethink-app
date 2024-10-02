@@ -106,14 +106,6 @@ class BlocklistDownloadHelper {
             }
         }
 
-        fun deleteFromCanonicalPath(context: Context) {
-            val canonicalPath =
-                File(
-                    blocklistCanonicalPath(context, Constants.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME)
-                )
-            deleteRecursive(canonicalPath)
-        }
-
         fun getExternalFilePath(context: Context, timestamp: String): String {
             return context.getExternalFilesDir(null).toString() +
                 Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH +
