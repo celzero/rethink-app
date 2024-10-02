@@ -113,6 +113,7 @@
     <string name="symbol_download" translatable="false">%1$s 🔻</string>
     <string name="single_argument" translatable="false">%1$s</string>
     <string name="single_argument_parenthesis" translatable="false">(%1$s)</string>
+    <string name="two_argument_no_space" translatable="false">%1$s%2$s</string>
     <string name="two_argument_space" translatable="false">%1$s %2$s</string>
     <string name="two_argument_colon" translatable="false">%1$s: %2$s</string>
     <string name="two_argument" translatable="false">%1$s / %2$s</string>
@@ -134,6 +135,7 @@
     <string name="symbol_lightening" translatable="false">⚡</string>
     <string name="symbol_ps" translatable="false">%1$s/S</string>
     <string name="symbol_mb" translatable="false">MB</string>
+    <string name="symbol_dollar" translatable="false">$</string>
 
     <string name="numeric_one" translatable="false">1</string>
     <string name="numeric_twenty_four" translatable="false">24</string>
@@ -637,6 +639,12 @@
 
     <string name="pcap_failure_toast" translatable="true">Error creating pcap file, Try again!</string>
 
+    <string name="settings_biometric_dialog_heading" translatable="true">Biometric Authentication</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">None</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">Immediately</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">After 5 minute</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">After 15 minutes</string>
+
     <!-- AppDetailActivity -->
     <string name="apps_icon_content_desc" translatable="true">Application Icon</string>
 
@@ -719,6 +727,8 @@
     <string name="battery_optimization_dialog_heading" translatable="true">Disable %1$s</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> may result in connectivity loss. Change setting to let Rethink use data and other resources when in background.</string>
 
+    <string name="sponser_dialog_usage_msg" translatable="true">You’ve been using Rethink for <b>%1$s days</b>, which translates to a usage cost of <b>$%2$s</b>. Would you consider sponsoring to sustain its development?</string>
+
     <!-- DNS configure screen -->
 
     <string name="dc_block_heading" translatable="true">rules</string>
@@ -745,6 +755,11 @@
 
     <string name="dc_proxy_dns_heading" translatable="true">Never proxy DNS</string>
     <string name="dc_proxy_dns_desc" translatable="true">Do not proxy DNS over Always-on WireGuard, SOCKS5, HTTP proxies.</string>
+
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Use System DNS for undelegated domains</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Use System DNS for undelgated domains like .lan, .internal, etc.</string>
+
+    <string name="dc_filtering_heading" translatable="true">filtering</string>
 
     <!-- About fragment -->
     <string name="about_bravedns_explantion" translatable="true">Rethink is the easiest way to monitor app activity, circumvent Internet censorship, and firewall apps on your Android device. </string>
@@ -834,7 +849,6 @@
                                               <a href="https://github.com/dmcardle">dmcardle</a><br/>
                                               <a href="https://github.com/fortuna">fortuna</a><br/>
                                               <a href="https://github.com/ignoramous">ignoramous</a><br/>
-                                              <a href="https://github.com/Lanius-collaris">Lanius-collaris</a><br/>
                                               <a href="https://github.com/PeterDaveHello">PeterDaveHello</a><br/>
                                               <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a><br/>
                                               <a href="https://github.com/SeanBurford">SeanBurford</a><br/>
@@ -914,6 +928,12 @@
 
     <string name="cd_dns_alg_heading" translatable="true">Advanced DNS filtering (experimental)</string>
     <string name="cd_dns_alg_desc" translatable="true">Assign unique IP per DNS request</string>
+
+    <string name="cd_split_dns_heading" translatable="true">Split DNS (experimental)</string>
+    <string name="cd_split_dns_desc" translatable="true">Use fixed DNS servers for specific apps</string>
+
+    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Treat DNS rules as firewall rules (experimental)</string>
+    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">DNS blocking will be bypassed during resolution; the decision will be made at connection time.</string>
 
     <!-- Connection Tracker fragment string -->
 
@@ -1146,6 +1166,7 @@
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Trusted Domain (Univ)</string>
     <string name="firewall_rule_proxied" translatable="true">Proxied</string>
     <string name="firewall_rule_private_dns" translatable="true">Private DNS</string>
+    <string name="firewall_rule_bypass_proxy" translatable="true">Bypass Proxy</string>
 
     <string name="firewall_rule_no_rule_desc" translatable="true">No firewall rules matched this connection.</string>
     <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[A user-set firewall rule blocked this <i>app</i>.<br/><br/> To change go to <i>All Apps</i> tab.]]></string>
@@ -1176,6 +1197,7 @@
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[This connection was allowed because the <i>domain</i> is set as trusted in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.]]></string>
     <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[This connection was forwarded to user-preferred Proxy.<br/><br/> To change go to <i>Proxy</i> from <i>Configure</i> screen.]]></string>
     <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[This connection is looking for a <i>Private DNS</i> server that doesn\'t exist.]]></string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[This connection was allowed because the <i>source app</i> is set to <i>bypass proxy</i> rules.<br/><br/> To change go to <i>App-specific Firewall</i> screen.]]></string>
 
     <!-- New app install Notification -->
     <string name="new_app_bulk_notification_title" translatable="true">Attention</string>
@@ -1561,6 +1583,52 @@
     <!-- console logs -->
     <string name="console_log_title" translatable="true">App Log</string>
     <string name="console_log_desc" translatable="true">Logs may contain sensitive information.</string>
+
+    <!-- advanced settings -->
+    <string name="do_not_randomize_listen_port_title" translatable="true">Do not randomize listen port</string>
+    <string name="do_not_randomize_listen_port_desc" translatable="true">Do not randomize the WireGuard listen port on Advanced mode.</string>
+
+    <string name="endpoint_independent_mapping_title" translatable="true">Endpoint independent mapping</string>
+    <string name="endpoint_independent_mapping_desc" translatable="true">Allow incoming packets to be forwarded to the same endpoint, regardless of the source IP address.</string>
+
+    <string name="anti_censorship_title" translatable="true">Anti-censorship</string>
+    <string name="anti_censorship_desc" translatable="true">Use anti-censorship techniques to bypass network restrictions.</string>
+
+    <string name="tcp_keep_alive_title" translatable="true">TCP keep alive</string>
+    <string name="tcp_keep_alive_desc" translatable="true">Send keep alive packets to prevent the connection from being closed.</string>
+
+    <!-- anti-censorship -->
+    <string name="ac_title" translatable="true">anti-censorship</string>
+    <string name="ac_desc" translatable="true">Anti-Censorship mode is a feature that helps you bypass censorship and access the internet freely. It is recommended to use this feature only if you are in a country where the internet is censored.</string>
+
+    <string name="ac_never_split" translatable="true">Never split</string>
+    <string name="ac_never_split_desc" translatable="true">Do not split packets when sending them to the server.</string>
+
+    <string name="ac_split_auto" translatable="true">Split auto</string>
+    <string name="ac_split_auto_desc" translatable="true">Automatically split packets when sending them to the server.</string>
+
+    <string name="ac_split_tcp" translatable="true">Split TCP</string>
+    <string name="ac_split_tcp_desc" translatable="true">Split TCP packets when sending them to the server.</string>
+
+    <string name="ac_split_tls" translatable="true">Split TLS</string>
+    <string name="ac_split_tls_desc" translatable="true">Split TLS packets when sending them to the server.</string>
+
+    <string name="ac_desync" translatable="true">Desync (experimental)</string>
+    <string name="ac_desync_desc" translatable="true">Desynchronize packets when sending them to the server.</string>
+
+    <string name="ac_retry_options_title" translatable="true">retry options</string>
+    <string name="ac_retry_options_desc" translatable="true">Retry options will help you bypass censorship and access the internet freely. It is recommended to use this feature only if you are in a country where the internet is censored.</string>
+
+    <string name="ac_retry_options_never" translatable="true">Never</string>
+    <string name="ac_retry_options_never_desc" translatable="true">Never retry sending packets.</string>
+
+    <string name="ac_retry_options_with_split" translatable="true">Retry with Split</string>
+    <string name="ac_retry_options_with_split_desc" translatable="true">Retry sending packets with split.</string>
+
+    <string name="ac_retry_options_after_split" translatable="true">Retry after Split</string>
+    <string name="ac_retry_options_after_split_desc" translatable="true">Retry sending packets after split.</string>
+
+    <string name="ac_toast_retry_disabled" translatable="true">Retry strategy is disabled for never split mode</string>
 
     <!-- alert, commenting out for now in v055b -->
 
