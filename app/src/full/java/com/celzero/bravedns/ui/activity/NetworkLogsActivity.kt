@@ -46,6 +46,8 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
     // to handle search navigation from universal firewall, to show only the search results
     // of the selected universal rule, show only network logs tab
     private var isUnivNavigated = false
+    // to handle the wireguard connections
+    private var isWireGuardLogs = false
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
@@ -55,6 +57,10 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
         DNS_LOGS(1),
         RETHINK_LOGS(2)
     }
+    
+    companion object {
+        const val RULES_SEARCH_ID_WIREGUARD = "W:"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
@@ -63,6 +69,8 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
         searchParam = intent.getStringExtra(Constants.SEARCH_QUERY) ?: ""
         if (searchParam.contains(RULES_SEARCH_ID)) {
             isUnivNavigated = true
+        } else if(searchParam.contains(RULES_SEARCH_ID_WIREGUARD)) {
+            isWireGuardLogs = true
         }
         init()
     }
@@ -106,7 +114,7 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
     }
 
     private fun getCount(): Int {
-        if (isUnivNavigated) {
+        if (isUnivNavigated || isWireGuardLogs) {
             return 1
         }
 
@@ -122,7 +130,7 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
     }
 
     private fun getFragment(position: Int): Fragment {
-        if (isUnivNavigated) {
+        if (isUnivNavigated || isWireGuardLogs) {
             return ConnectionTrackerFragment.newInstance(searchParam)
         }
         return when (position) {

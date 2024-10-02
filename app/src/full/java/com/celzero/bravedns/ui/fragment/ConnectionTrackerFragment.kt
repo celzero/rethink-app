@@ -34,6 +34,7 @@ import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.FragmentConnectionTrackerBinding
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
@@ -79,10 +80,18 @@ class ConnectionTrackerFragment :
         initView()
         if (arguments != null) {
             val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
-            if (query.contains(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)) {
+            val containsUniv = query.contains(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)
+            val containsWireGuard = query.contains(NetworkLogsActivity.RULES_SEARCH_ID_WIREGUARD)
+            if (containsUniv) {
                 val rule = query.split(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)[1]
                 filterCategories.add(rule)
                 filterType = TopLevelFilter.BLOCKED
+                viewModel.setFilter(filterQuery, filterCategories, filterType)
+                hideSearchLayout()
+            } else if (containsWireGuard) {
+                val rule = query.split(NetworkLogsActivity.RULES_SEARCH_ID_WIREGUARD)[1]
+                filterQuery = rule
+                filterType = TopLevelFilter.ALL
                 viewModel.setFilter(filterQuery, filterCategories, filterType)
                 hideSearchLayout()
             } else {
@@ -102,21 +111,7 @@ class ConnectionTrackerFragment :
         b.connectionListLogsDisabledTv.visibility = View.GONE
         b.connectionCardViewTop.visibility = View.VISIBLE
 
-        b.recyclerConnection.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(requireContext())
-        b.recyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
-        recyclerAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.connectionTrackerList.observe(viewLifecycleOwner) { it ->
-                    recyclerAdapter.submitData(lifecycle, it)
-                }
-            }
-        }
-        b.recyclerConnection.adapter = recyclerAdapter
-
-        setupRecyclerScrollListener()
+        setupRecyclerView()
 
         b.connectionSearch.setOnQueryTextListener(this)
         b.connectionSearch.setOnClickListener {
@@ -132,6 +127,40 @@ class ConnectionTrackerFragment :
 
         remakeParentFilterChipsUi()
         remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
+    }
+
+    private fun setupRecyclerView() {
+        b.recyclerConnection.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(requireContext())
+        b.recyclerConnection.layoutManager = layoutManager
+        val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
+        recyclerAdapter.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.connectionTrackerList.observe(viewLifecycleOwner) { pagingData ->
+                    recyclerAdapter.submitData(lifecycle, pagingData)
+                }
+            }
+        }
+        recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    b.connectionListLogsDisabledTv.text = getString(R.string.ada_ip_no_connection)
+                    b.connectionListLogsDisabledTv.visibility = View.VISIBLE
+                    b.connectionCardViewTop.visibility = View.GONE
+                } else {
+                    b.connectionListLogsDisabledTv.visibility = View.GONE
+                    b.connectionCardViewTop.visibility = View.VISIBLE
+                }
+            } else {
+                b.connectionListLogsDisabledTv.visibility = View.GONE
+                b.connectionCardViewTop.visibility = View.VISIBLE
+            }
+        }
+        b.recyclerConnection.adapter = recyclerAdapter
+
+        setupRecyclerScrollListener()
     }
 
     private fun hideSearchLayout() {
