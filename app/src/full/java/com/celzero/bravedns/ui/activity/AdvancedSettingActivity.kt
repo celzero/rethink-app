@@ -99,6 +99,12 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         } else {
             b.dvTcpKeepAliveRl.visibility = View.GONE
         }
+        if (DEBUG) {
+            b.settingsActivitySlowdownRl.visibility = View.VISIBLE
+            b.settingsActivitySlowdownSwitch.isChecked = persistentState.slowdownMode
+        } else {
+            b.settingsActivitySlowdownRl.visibility = View.GONE
+        }
         displayPcapUi()
     }
 
@@ -154,6 +160,14 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         }
 
         b.dvTcpKeepAliveRl.setOnClickListener { b.dvTcpKeepAliveSwitch.isChecked = !b.dvTcpKeepAliveSwitch.isChecked }
+
+        b.settingsActivitySlowdownRl.setOnClickListener {
+            b.settingsActivitySlowdownSwitch.isChecked = !b.settingsActivitySlowdownSwitch.isChecked
+        }
+
+        b.settingsActivitySlowdownSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.slowdownMode = isChecked
+        }
     }
 
     private fun displayPcapUi() {
