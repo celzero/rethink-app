@@ -29,6 +29,7 @@ import com.celzero.bravedns.databinding.ActivityDomainConnectionsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
 import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import org.koin.android.ext.android.inject
@@ -72,9 +73,8 @@ class DomainConnectionsActivity : AppCompatActivity(R.layout.activity_domain_con
             val flag = intent.getStringExtra(INTENT_FLAG) ?: ""
             viewModel.setFlag(flag)
             b.dcFlag.visibility = View.VISIBLE
-            b.dcFlag.text = flag
+            b.dcFlag.text = getString(R.string.two_argument_space, flag, getCountryNameFromFlag(flag))
             b.dcTitle.visibility = View.GONE
-            Logger.d(LOG_TAG_UI, "Flag: $flag, Type: $type")
         }
         val tc = intent.getIntExtra(INTENT_TIME_CATEGORY, 0)
         val timeCategory =
