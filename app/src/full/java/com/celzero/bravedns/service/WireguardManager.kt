@@ -558,7 +558,7 @@ object WireguardManager : KoinComponent {
         // none of the catch-all has valid connection, send ping to all catch-all configs
         pingCatchAllConfigs(catchAllList)
         // return any catch-all config
-        return catchAllList.random().id
+        return catchAllList.randomOrNull()?.id
     }
 
     private suspend fun isValidWgConnForIp(wgId: Int, ip: String, default: Boolean = false): Boolean {
