@@ -55,7 +55,7 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
     private fun initView() {
         b.fsNetworkTv.text = getString(R.string.lbl_network).replaceFirstChar(Char::titlecase)
         b.fsLogsTv.text = getString(R.string.lbl_logs).replaceFirstChar(Char::titlecase)
-        b.fsDevOptTv.text = getString(R.string.lbl_advanced).replaceFirstChar(Char::titlecase)
+        b.fsAdvancedTv.text = getString(R.string.lbl_advanced).replaceFirstChar(Char::titlecase)
     }
 
     private fun setupClickListeners() {
@@ -94,7 +94,7 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
             startActivity(ScreenType.LOGS)
         }
 
-        b.fsDevOptCard.setOnClickListener {
+        b.fsAdvancedCard.setOnClickListener {
             // open developer options configuration
             startActivity(ScreenType.ADVANCED)
         }

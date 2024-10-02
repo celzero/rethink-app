@@ -25,7 +25,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -213,7 +212,7 @@ class WgMainActivity :
         val layoutManager = LinearLayoutManager(this)
         b.wgGeneralInterfaceList.layoutManager = layoutManager
 
-        wgConfigAdapter = WgConfigAdapter(this, this, persistentState)
+        wgConfigAdapter = WgConfigAdapter(this, this, persistentState.splitDns)
         wgConfigViewModel.interfaces.observe(this) { wgConfigAdapter?.submitData(lifecycle, it) }
         b.wgGeneralInterfaceList.adapter = wgConfigAdapter
     }
@@ -222,7 +221,7 @@ class WgMainActivity :
         val layoutManager = LinearLayoutManager(this)
         b.oneWgInterfaceList.layoutManager = layoutManager
 
-        oneWgConfigAdapter = OneWgConfigAdapter(this, this, persistentState)
+        oneWgConfigAdapter = OneWgConfigAdapter(this, this)
         wgConfigViewModel.interfaces.observe(this) { oneWgConfigAdapter?.submitData(lifecycle, it) }
         b.oneWgInterfaceList.adapter = oneWgConfigAdapter
     }

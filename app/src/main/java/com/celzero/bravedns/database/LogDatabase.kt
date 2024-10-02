@@ -17,7 +17,6 @@ package com.celzero.bravedns.database
 
 import Logger
 import android.content.Context
-import android.content.pm.PackageInfo
 import android.database.Cursor
 import android.database.sqlite.SQLiteException
 import androidx.room.Database
@@ -27,12 +26,11 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.work.impl.Migration_1_2
 import com.celzero.bravedns.util.Utilities
 
 @Database(
     entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class],
-    version = 9,
+    version = 10,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -71,6 +69,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_6_7)
                 .addMigrations(MIGRATION_7_8)
                 .addMigrations(Migration_8_9)
+                .addMigrations(Migration_9_10)
                 .fallbackToDestructiveMigration() // recreate the database if no migration is found
                 .build()
         }
@@ -277,9 +276,15 @@ abstract class LogDatabase : RoomDatabase() {
             }
 
         private val Migration_8_9: Migration = object : Migration(8, 9) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("CREATE INDEX IF NOT EXISTS index_ConnectionTracker_connId ON ConnectionTracker(connId)")
-                database.execSQL("CREATE INDEX IF NOT EXISTS index_RethinkLog_connId ON RethinkLog(connId)")
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_ConnectionTracker_connId ON ConnectionTracker(connId)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_RethinkLog_connId ON RethinkLog(connId)")
+            }
+        }
+
+        private val Migration_9_10: Migration = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_ConnectionTracker_proxyDetails ON ConnectionTracker(proxyDetails)")
             }
         }
     }

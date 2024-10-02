@@ -85,7 +85,7 @@ object EnhancedBugReport {
         }
     }
 
-    private fun getFileToWrite(context: Context): File? {
+    fun getFileToWrite(context: Context): File? {
         val file = getTombstoneFile(context)
         Log.d(LOG_TAG_BUG_REPORT, "file to write logs: ${file?.name}")
         return file

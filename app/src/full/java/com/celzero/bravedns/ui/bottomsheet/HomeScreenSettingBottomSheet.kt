@@ -42,6 +42,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import kotlin.math.abs
 
 class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetHomeScreenBinding? = null
@@ -89,7 +90,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         Logger.d(LOG_TAG_VPN, "Home screen bottom sheet selectedIndex: $selectedIndex")
 
         if (DEBUG) {
-            val timeSinceLastAuth = SystemClock.elapsedRealtime() - persistentState.biometricAuthTime
+            val timeSinceLastAuth = abs(SystemClock.elapsedRealtime() - persistentState.biometricAuthTime)
             b.bsHomeScreenAppLockTime.visibility = View.VISIBLE
             b.bsHomeScreenAppLockTime.text = java.util.concurrent.TimeUnit.MILLISECONDS.toMinutes(timeSinceLastAuth).toString() + " minutes"
             Logger.d(LOG_TAG_VPN, "last auth time: ${persistentState.biometricAuthTime}")

@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.viewmodel
 
+import Logger
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -100,7 +101,9 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
     }
 
     val appIpLogs = ipFilter.switchMap { input -> fetchIpLogs(uid, input) }
-    val appDomainLogs = domainFilter.switchMap { input -> fetchAppDomainLogs(uid, input) }
+    val appDomainLogs = domainFilter.switchMap {
+        input -> fetchAppDomainLogs(uid, input)
+    }
 
     val rinrIpLogs = ipFilter.switchMap { input -> fetchRinrIpLogs(input) }
     val rinrDomainLogs = domainFilter.switchMap { input -> fetchRinrDomainLogs(input) }
