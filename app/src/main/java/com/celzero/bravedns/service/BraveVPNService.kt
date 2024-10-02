@@ -3292,8 +3292,7 @@ class BraveVPNService :
                 ProxyManager.ID_WG_BASE + id
             } else if (WireguardManager.catchAllEnabled()) {
                 // if the enabled wireguard is catchall-wireguard, then return wireguard id
-                val endpoint = appConfig.getSelectedDnsProxyDetails()
-                val id = WireguardManager.getOptimalCatchAllConfigId(endpoint?.proxyIP) ?: return Backend.Base
+                val id = WireguardManager.getOptimalCatchAllConfigId() ?: return Backend.Base
                 ProxyManager.ID_WG_BASE + id
             } else {
                 // if the enabled wireguard is not one-wireguard, then return base
@@ -3301,8 +3300,7 @@ class BraveVPNService :
             }
         } else if (WireguardManager.catchAllEnabled()) { // check even if wireguard is not enabled
             // if the enabled wireguard is catchall-wireguard, then return wireguard id
-            val endpoint = appConfig.getSelectedDnsProxyDetails()
-            val id = WireguardManager.getOptimalCatchAllConfigId(endpoint?.proxyIP) ?: return Backend.Base
+            val id = WireguardManager.getOptimalCatchAllConfigId() ?: return Backend.Base
             // in this case, no need to check if the proxy is available
             ProxyManager.ID_WG_BASE + id
         } else {
