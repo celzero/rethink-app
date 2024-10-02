@@ -172,7 +172,7 @@ configurations {
 
 dependencies {
     def room_version = "2.6.1"
-    def paging_version = "3.3.0"
+    def paging_version = "3.3.2"
 
     implementation 'com.google.guava:guava:32.1.1-android'
 
@@ -191,7 +191,7 @@ dependencies {
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
     // LiveData
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.2'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.6'
 
     implementation 'com.google.code.gson:gson:2.10.1'
 
@@ -201,12 +201,12 @@ dependencies {
     implementation "androidx.room:room-paging:$room_version"
 
     fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2'
-    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.2'
+    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6'
+    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.6'
 
     // Pagers Views
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    fullImplementation 'androidx.fragment:fragment-ktx:1.8.0'
+    fullImplementation 'androidx.fragment:fragment-ktx:1.8.3'
     implementation 'com.google.android.material:material:1.12.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.1.0'
 
@@ -246,15 +246,14 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:0751d67f29@aar'
-    websiteImplementation 'com.github.celzero:firestack:0751d67f29@aar'
-    fdroidImplementation 'com.github.celzero:firestack:0751d67f29@aar'
+    download 'com.github.celzero:firestack:a6ae729b45@aar'
+    websiteImplementation 'com.github.celzero:firestack:a6ae729b45@aar'
+    fdroidImplementation 'com.github.celzero:firestack:a6ae729b45@aar'
     // debug symbols
-    playImplementation 'com.github.celzero:firestack:0751d67f29:debug@aar'
-    // 0097800c71
+    playImplementation 'com.github.celzero:firestack:a6ae729b45:debug@aar'
 
     // Work manager
-    implementation('androidx.work:work-runtime-ktx:2.9.0') {
+    implementation('androidx.work:work-runtime-ktx:2.9.1') {
         modules {
             module("com.google.guava:listenablefuture") {
                 replacedBy("com.google.guava:guava", "listenablefuture is part of guava")
@@ -274,8 +273,8 @@ dependencies {
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
 
-    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
-    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
+    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.8.0'
+    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.8.0'
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
@@ -284,8 +283,8 @@ dependencies {
 
     // for encrypting wireguard configuration files
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
-    implementation("androidx.security:security-app-authenticator:1.0.0-alpha03")
-    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-alpha03")
+    implementation("androidx.security:security-app-authenticator:1.0.0-beta01")
+    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-beta01")
 
     // barcode scanner for wireguard
     fullImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
