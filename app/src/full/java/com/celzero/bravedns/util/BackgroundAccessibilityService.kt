@@ -16,29 +16,284 @@
 package com.celzero.bravedns.util
 
 import Logger
+import Logger.LOG_TAG_APP_OPS
 import Logger.LOG_TAG_FIREWALL
+import android.Manifest
 import android.accessibilityservice.AccessibilityService
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.PixelFormat
+import android.hardware.camera2.CameraManager
+import android.media.AudioManager
+import android.media.AudioRecordingConfiguration
+import android.os.Build
 import android.text.TextUtils
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.MicCamAccessIndicatorBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.util.Utilities.isAtleastN
+import com.celzero.bravedns.util.Utilities.isAtleastP
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 
+// cam and mic access is still not working as expected, need to test it
+// commented out the ui code for now, will enable it once the feature is working
+// for cam and mic access ref: github.com/NitishGadangi/Privacy-Indicator-App/blob/master/app/src/main/java/com/nitish/privacyindicator
+// see: developer.android.com/guide/topics/media/camera#kotlin
+// see: developer.android.com/guide/topics/media/audio-capture
 class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
 
     private val persistentState by inject<PersistentState>()
+    private lateinit var windowManager: WindowManager
+    private lateinit var b: MicCamAccessIndicatorBinding
+    private lateinit var lp: WindowManager.LayoutParams
+
+    private var cameraManager: CameraManager? = null
+    private var audioManager: AudioManager? = null
+    private var micCallback: AudioManager.AudioRecordingCallback? = null
+    private var cameraCallback: CameraManager.AvailabilityCallback? = null
+
+    private var cameraOn = false
+    private var micOn = false
+    private var notifManager: NotificationManagerCompat? = null
+    private var notifBuilder: NotificationCompat.Builder? = null
+    private var possibleUid: Int? = null
+    private var possibleAppName: String? = null
+    private val notificationID = 7897
+
+    companion object {
+        private const val NOTIF_CHANNEL_ID = "MIC_CAM_ACCESS"
+    }
+
+    override fun onServiceConnected() {
+        if (isAtleastN() && persistentState.micCamAccess) {
+            overlay()
+            callBacks()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun callBacks() {
+        if (!persistentState.micCamAccess)  return
+
+        try {
+            if (cameraManager == null) cameraManager =
+                getSystemService(CAMERA_SERVICE) as CameraManager
+            cameraManager!!.registerAvailabilityCallback(getCameraCallback(), null)
+
+            if (audioManager == null) audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+            audioManager!!.registerAudioRecordingCallback(getMicCallback(), null)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_FIREWALL, "Error in registering callbacks: ${e.message}")
+        }
+    }
+
+    private fun getCameraCallback(): CameraManager.AvailabilityCallback {
+        cameraCallback =
+            object : CameraManager.AvailabilityCallback() {
+                override fun onCameraAvailable(cameraId: String) {
+                    super.onCameraAvailable(cameraId)
+                    cameraOn = false
+                    hideCam()
+                    dismissNotification()
+                }
+
+                override fun onCameraUnavailable(cameraId: String) {
+                    super.onCameraUnavailable(cameraId)
+                    cameraOn = true
+                    showCam()
+                    showNotification()
+                }
+            }
+        return cameraCallback as CameraManager.AvailabilityCallback
+    }
+
+    private fun getMicCallback(): AudioManager.AudioRecordingCallback {
+        micCallback =
+            @RequiresApi(Build.VERSION_CODES.N)
+            object : AudioManager.AudioRecordingCallback() {
+                override fun onRecordingConfigChanged(configs: List<AudioRecordingConfiguration>) {
+                    if (configs.isNotEmpty()) {
+                        micOn = true
+                        showMic()
+                        showNotification()
+                    } else {
+                        micOn = false
+                        hideMic()
+                        dismissNotification()
+                    }
+                }
+            }
+        return micCallback as AudioManager.AudioRecordingCallback
+    }
+
+    private fun overlay() {
+        windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+        lp = WindowManager.LayoutParams()
+        lp.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
+        lp.format = PixelFormat.TRANSLUCENT
+        lp.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+        lp.gravity = layoutGravity
+        b = MicCamAccessIndicatorBinding.inflate(LayoutInflater.from(this))
+        windowManager.addView(b.root, lp)
+    }
+
+    private fun showMic() {
+        Logger.e(LOG_TAG_APP_OPS, "Mic is being used: ${persistentState.micCamAccess}")
+        if (persistentState.micCamAccess) {
+            updateIndicatorProperties()
+            b.ivMic.visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideMic() {
+        b.ivMic.visibility = View.GONE
+    }
+
+    private fun showCam() {
+        Logger.e(LOG_TAG_APP_OPS, "Camera is being used: ${persistentState.micCamAccess}")
+        if (persistentState.micCamAccess) {
+            updateIndicatorProperties()
+            b.ivCam.visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideCam() {
+        b.ivCam.visibility = View.GONE
+    }
+
+
+    private val layoutGravity: Int
+        get() = Gravity.TOP or Gravity.END
+
+    private fun updateIndicatorProperties() {
+        updateLayoutGravity()
+    }
+
+    private fun updateLayoutGravity() {
+        lp.gravity = layoutGravity
+        windowManager.updateViewLayout(b.root, lp)
+    }
+
+    private fun setupNotification() {
+        createNotificationChannel()
+        notifBuilder =
+            NotificationCompat.Builder(applicationContext, NOTIF_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification_icon)
+                .setContentTitle(notificationTitle)
+                .setContentText(notificationDescription)
+                .setContentIntent(getPendingIntent())
+                .setOngoing(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+        notifManager = NotificationManagerCompat.from(applicationContext)
+    }
+
+    private val notificationTitle: String
+        get() {
+            if (cameraOn && micOn) return "Your Camera and Mic is ON"
+            if (cameraOn && !micOn) return "Your Camera is ON"
+            return if (!cameraOn && micOn) "Your MIC is ON" else "Your Camera or Mic is ON"
+        }
+
+    private val notificationDescription: String
+        get() {
+            if (cameraOn && micOn)
+                return "A third-party app($possibleAppName) is using your Camera and Microphone"
+            if (cameraOn && !micOn) return "A third-party app($possibleAppName) is using your Camera"
+            return if (!cameraOn && micOn) "A third-party app($possibleAppName) is using your Microphone"
+            else "A third-party app($possibleAppName) is using your Camera or Microphone"
+        }
+
+    private fun showNotification() {
+        setupNotification()
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED) {
+            // notification permission request and handling are done in the HomeScreenFragment
+            // so no need to handle it here
+            return
+        }
+        if (notifManager != null)
+            notifManager!!.notify(notificationID, notifBuilder!!.build())
+    }
+
+    private fun dismissNotification() {
+        if (cameraOn || micOn) {
+            showNotification()
+        } else {
+            if (notifManager != null) notifManager!!.cancel(notificationID)
+        }
+    }
+
+    private fun getPendingIntent(): PendingIntent {
+        val intent = Intent(applicationContext, HomeScreenActivity::class.java)
+        return PendingIntent.getActivity(
+            applicationContext, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
+
+    private fun createNotificationChannel() {
+        val notificationChannel = "Notifications for Camera and Mic access"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val importance = NotificationManager.IMPORTANCE_LOW
+            val channel =
+                NotificationChannel(NOTIF_CHANNEL_ID, notificationChannel, importance)
+            val description = "Notification for Camera and Mic access"
+            channel.description = description
+            channel.lightColor = Color.RED
+            val notificationManager =
+                applicationContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
 
     override fun onInterrupt() {
         Logger.w(LOG_TAG_FIREWALL, "BackgroundAccessibilityService Interrupted")
     }
 
-    override fun onRebind(intent: Intent?) {
-        super.onRebind(intent)
+    private fun unRegisterCameraCallBack() {
+        try {
+            if (cameraManager != null && cameraCallback != null) {
+                cameraManager!!.unregisterAvailabilityCallback(cameraCallback!!)
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_FIREWALL, "Error in unregistering camera callback: ${e.message}")
+        }
+    }
+
+    private fun unRegisterMicCallback() {
+        try {
+            if (isAtleastN()) {
+                if (audioManager != null && micCallback != null) {
+                    audioManager!!.unregisterAudioRecordingCallback(micCallback!!)
+                }
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_FIREWALL, "Error in unregistering mic callback: ${e.message}")
+        }
+    }
+
+    override fun onDestroy() {
+        unRegisterCameraCallBack()
+        unRegisterMicCallback()
+        super.onDestroy()
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
@@ -112,14 +367,14 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
         // no need ot handle the events when the vpn is not running
         if (!VpnController.isOn()) return
 
-        if (!persistentState.getBlockAppWhenBackground()) return
+        if (!persistentState.getBlockAppWhenBackground() && !persistentState.micCamAccess) return
 
         val latestTrackedPackage = getEventPackageName(event)
 
         if (latestTrackedPackage.isNullOrEmpty()) return
 
         val hasContentChanged =
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            if (isAtleastP()) {
                 event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED ||
                     event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
             } else {
@@ -127,13 +382,16 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
             }
         Logger.d(
             LOG_TAG_FIREWALL,
-            "onAccessibilityEvent: ${event.packageName}, ${event.eventType}, $hasContentChanged"
-        )
+            "onAccessibilityEvent: ${event.packageName}, ${event.eventType}, $hasContentChanged")
 
         if (!hasContentChanged) return
 
         // If the package received is Rethink, do nothing.
         if (event.packageName == this.packageName) return
+
+        possibleUid = getEventUid(latestTrackedPackage) ?: return
+
+        possibleAppName = Utilities.getPackageInfoForUid(this, possibleUid!!)?.firstOrNull()
 
         // https://stackoverflow.com/a/27642535
         // top window is launcher? try revoke queued up permissions
@@ -142,7 +400,7 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
         if (isPackageLauncher(latestTrackedPackage)) {
             FirewallManager.untrackForegroundApps()
         } else {
-            val uid = getEventUid(latestTrackedPackage) ?: return
+            val uid = possibleUid ?: return
             FirewallManager.trackForegroundApp(uid)
         }
     }
@@ -183,9 +441,7 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
                     .resolveActivity(
                         intent,
                         PackageManager.ResolveInfoFlags.of(
-                            PackageManager.MATCH_DEFAULT_ONLY.toLong()
-                        )
-                    )
+                            PackageManager.MATCH_DEFAULT_ONLY.toLong()))
                     ?.activityInfo
                     ?.packageName
             } else {

@@ -16,12 +16,15 @@
 package com.celzero.bravedns.ui.fragment
 
 import Logger
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.CompoundButton
+import android.widget.RadioButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -40,17 +43,19 @@ import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.activity.DnsListActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.bottomsheet.LocalBlocklistsBottomSheet
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
 
-class DnsSettingsFragment :
-    Fragment(R.layout.fragment_dns_configure),
+class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     LocalBlocklistsBottomSheet.OnBottomSheetDialogFragmentDismiss {
     private val b by viewBinding(FragmentDnsConfigureBinding::bind)
 
@@ -93,18 +98,21 @@ class DnsSettingsFragment :
         b.dcFaviconSwitch.isChecked = persistentState.fetchFavIcon
         // prevent dns leaks
         b.dcPreventDnsLeaksSwitch.isChecked = persistentState.preventDnsLeaks
+        // enable per-app domain rules (dns alg)
+        b.dcAlgSwitch.isChecked = persistentState.enableDnsAlg
         // periodically check for blocklist update
         b.dcCheckUpdateSwitch.isChecked = persistentState.periodicallyCheckBlocklistUpdate
         // use custom download manager
         b.dcDownloaderSwitch.isChecked = persistentState.useCustomDownloadManager
-        // enable per-app domain rules (dns alg)
-        b.dcAlgSwitch.isChecked = persistentState.enableDnsAlg
         // enable dns caching in tunnel
         b.dcEnableCacheSwitch.isChecked = persistentState.enableDnsCache
         // proxy dns
         b.dcProxyDnsSwitch.isChecked = !persistentState.proxyDns
-
+        // use system dns for undelegated domains
+        b.dcUndelegatedDomainsSwitch.isChecked = persistentState.useSystemDnsForUndelegatedDomains
         b.connectedStatusTitle.text = getConnectedDnsType()
+        b.dvBypassDnsBlockSwitch.isChecked = persistentState.bypassBlockInDns
+        updateSpiltDnsUi()
     }
 
     private fun updateLocalBlocklistUi() {
@@ -131,11 +139,6 @@ class DnsSettingsFragment :
     }
 
     private fun initObservers() {
-        observeBraveMode()
-        observeAppState()
-    }
-
-    private fun observeAppState() {
         VpnController.connectionStatus.observe(viewLifecycleOwner) {
             if (it == BraveVPNService.State.PAUSED) {
                 val intent = Intent(requireContext(), PauseActivity::class.java)
@@ -145,6 +148,17 @@ class DnsSettingsFragment :
 
         appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
             updateConnectedStatus(it)
+            updateSelectedDns()
+        }
+    }
+
+    private fun updateSpiltDnsUi() {
+        if (persistentState.enableDnsAlg) {
+            b.dcSplitDnsRl.visibility = View.VISIBLE
+            b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
+        } else {
+            b.dcSplitDnsRl.visibility = View.GONE
+            b.dcSplitDnsSwitch.isChecked = false
         }
     }
 
@@ -153,44 +167,47 @@ class DnsSettingsFragment :
             b.connectedStatusTitleUrl.text =
                 resources.getString(R.string.configure_dns_connected_dns_proxy_status)
             b.connectedStatusTitle.text = resources.getString(R.string.lbl_wireguard)
-            disableAllDns()
-            b.wireguardRb.isEnabled = true
             return
+        }
+
+        var dns = connectedDns
+        if (persistentState.splitDns && WireguardManager.isAdvancedWgActive()) {
+            dns += ", " + resources.getString(R.string.lbl_wireguard)
         }
 
         when (appConfig.getDnsType()) {
             AppConfig.DnsType.DOH -> {
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_doh_status)
-                b.connectedStatusTitle.text = connectedDns
+                b.connectedStatusTitle.text = dns
             }
             AppConfig.DnsType.DOT -> {
                 b.connectedStatusTitleUrl.text = resources.getString(R.string.lbl_dot)
-                b.connectedStatusTitle.text = connectedDns
+                b.connectedStatusTitle.text = dns
             }
             AppConfig.DnsType.DNSCRYPT -> {
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_dns_crypt_status)
-                b.connectedStatusTitle.text = connectedDns
+                b.connectedStatusTitle.text = dns
             }
             AppConfig.DnsType.DNS_PROXY -> {
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-                b.connectedStatusTitle.text = connectedDns
+                b.connectedStatusTitle.text = dns
             }
             AppConfig.DnsType.RETHINK_REMOTE -> {
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_doh_status)
-                b.connectedStatusTitle.text = connectedDns
+                b.connectedStatusTitle.text = dns
             }
             AppConfig.DnsType.SYSTEM_DNS -> {
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-                b.connectedStatusTitle.text = connectedDns
+                b.connectedStatusTitle.text = dns
             }
             AppConfig.DnsType.ODOH -> {
                 b.connectedStatusTitleUrl.text = resources.getString(R.string.lbl_odoh)
-                b.connectedStatusTitle.text = connectedDns
+                b.connectedStatusTitle.text = dns
             }
         }
     }
@@ -207,25 +224,30 @@ class DnsSettingsFragment :
         if (WireguardManager.oneWireGuardEnabled()) {
             b.wireguardRb.visibility = View.VISIBLE
             b.wireguardRb.isChecked = true
+            b.wireguardRb.setChecked(true)
             b.wireguardRb.isEnabled = true
             disableAllDns()
             return
-        } else {
-            b.wireguardRb.visibility = View.GONE
         }
 
+        b.wireguardRb.visibility = View.GONE
         if (isSystemDns()) {
             b.networkDnsRb.isChecked = true
-            return
-        }
-
-        if (isRethinkDns()) {
+            b.rethinkPlusDnsRb.isChecked = false
+            b.customDnsRb.isChecked = false
+            b.networkDnsRb.setChecked(true)
+        } else if (isRethinkDns()) {
             b.rethinkPlusDnsRb.isChecked = true
-            return
+            b.customDnsRb.isChecked = false
+            b.networkDnsRb.isChecked = false
+            b.rethinkPlusDnsRb.setChecked(true)
+        } else {
+            // connected to custom dns, update the dns details
+            b.customDnsRb.isChecked = true
+            b.rethinkPlusDnsRb.isChecked = false
+            b.networkDnsRb.isChecked = false
+            b.customDnsRb.setChecked(true)
         }
-
-        // connected to custom dns, update the dns details
-        b.customDnsRb.isChecked = true
     }
 
     private fun disableAllDns() {
@@ -266,10 +288,6 @@ class DnsSettingsFragment :
         }
     }
 
-    private fun observeBraveMode() {
-        appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) { updateSelectedDns() }
-    }
-
     private fun initClickListeners() {
 
         b.dcLocalBlocklistRl.setOnClickListener { openLocalBlocklist() }
@@ -279,13 +297,6 @@ class DnsSettingsFragment :
         b.dcCheckUpdateRl.setOnClickListener {
             b.dcCheckUpdateSwitch.isChecked = !b.dcCheckUpdateSwitch.isChecked
         }
-
-        b.dcAlgSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
-            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcAlgSwitch)
-            persistentState.enableDnsAlg = enabled
-        }
-
-        b.dcAlgRl.setOnClickListener { b.dcAlgSwitch.isChecked = !b.dcAlgSwitch.isChecked }
 
         b.dcCheckUpdateSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
             persistentState.periodicallyCheckBlocklistUpdate = enabled
@@ -300,6 +311,14 @@ class DnsSettingsFragment :
                     .cancelAllWorkByTag(BLOCKLIST_UPDATE_CHECK_JOB_TAG)
             }
         }
+
+        b.dcAlgSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcAlgSwitch)
+            persistentState.enableDnsAlg = enabled
+            updateSpiltDnsUi()
+        }
+
+        b.dcAlgRl.setOnClickListener { b.dcAlgSwitch.isChecked = !b.dcAlgSwitch.isChecked }
 
         b.dcFaviconRl.setOnClickListener {
             b.dcFaviconSwitch.isChecked = !b.dcFaviconSwitch.isChecked
@@ -320,17 +339,27 @@ class DnsSettingsFragment :
             persistentState.preventDnsLeaks = enabled
         }
 
+        b.rethinkPlusDnsRb.setOnCheckedChangeListener(null)
         b.rethinkPlusDnsRb.setOnClickListener {
             // rethink dns plus
             invokeRethinkActivity(ConfigureRethinkBasicActivity.FragmentLoader.DB_LIST)
         }
 
+        b.customDnsRb.setOnCheckedChangeListener(null)
         b.customDnsRb.setOnClickListener {
             // custom dns
             showCustomDns()
         }
 
+        b.networkDnsRb.setOnCheckedChangeListener(null)
         b.networkDnsRb.setOnClickListener {
+            if (isSystemDns()) {
+                io {
+                    val sysDns = VpnController.getSystemDns()
+                    uiCtx { showSystemDnsDialog(sysDns) }
+                }
+                return@setOnClickListener
+            }
             // network dns proxy
             setNetworkDns()
         }
@@ -374,6 +403,61 @@ class DnsSettingsFragment :
                 }
             }
         }
+
+        b.dvBypassDnsBlockSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.bypassBlockInDns = isChecked
+        }
+
+        b.dvBypassDnsBlockRl.setOnClickListener {
+            b.dvBypassDnsBlockSwitch.isChecked = !b.dvBypassDnsBlockSwitch.isChecked
+        }
+
+        b.dcSplitDnsSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.splitDns = isChecked
+        }
+
+        b.dcSplitDnsRl.setOnClickListener {
+            b.dcSplitDnsSwitch.isChecked = !b.dcSplitDnsSwitch.isChecked
+        }
+
+        b.networkDnsInfo.setOnClickListener {
+            io {
+                val sysDns = VpnController.getSystemDns()
+                uiCtx { showSystemDnsDialog(sysDns) }
+            }
+        }
+
+        b.dcUndelegatedDomainsRl.setOnClickListener {
+            b.dcUndelegatedDomainsSwitch.isChecked = !b.dcUndelegatedDomainsSwitch.isChecked
+        }
+
+        b.dcUndelegatedDomainsSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.useSystemDnsForUndelegatedDomains = isChecked
+        }
+    }
+
+    private fun showSystemDnsDialog(dns: String) {
+        val builder = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.network_dns)
+            .setMessage(dns)
+            .setCancelable(true)
+            .setPositiveButton(R.string.ada_noapp_dialog_positive) { di, _ ->
+                di.dismiss()
+            }
+            .setNeutralButton(requireContext().getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
+                UIUtils.clipboardCopy(
+                    requireContext(),
+                    dns,
+                    requireContext().getString(R.string.copy_clipboard_label)
+                )
+                Utilities.showToastUiCentered(
+                    requireContext(),
+                    requireContext().getString(R.string.info_dialog_url_copy_toast_msg),
+                    Toast.LENGTH_SHORT
+                )
+            }
+        val dialog = builder.create()
+        dialog.show()
     }
 
     private fun initAnimation() {
@@ -426,6 +510,10 @@ class DnsSettingsFragment :
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 
     override fun onBtmSheetDismiss() {

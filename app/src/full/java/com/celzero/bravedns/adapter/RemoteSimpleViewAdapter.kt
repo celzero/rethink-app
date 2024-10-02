@@ -55,8 +55,7 @@ class RemoteSimpleViewAdapter(val context: Context) :
                     oldConnection: RemoteBlocklistPacksMap,
                     newConnection: RemoteBlocklistPacksMap
                 ): Boolean {
-                    return (oldConnection.pack == newConnection.pack &&
-                        oldConnection.level == newConnection.level)
+                    return oldConnection == newConnection
                 }
             }
     }

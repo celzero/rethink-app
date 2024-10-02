@@ -33,7 +33,7 @@ object ViewModelModule {
         viewModel { AppCustomIpViewModel(get()) }
         viewModel { RethinkRemoteFileTagViewModel(get()) }
         viewModel { RethinkLocalFileTagViewModel(get()) }
-        viewModel { AppConnectionsViewModel(get()) }
+        viewModel { AppConnectionsViewModel(get(), get()) }
         viewModel { SummaryStatisticsViewModel(get(), get(), get()) }
         viewModel { DetailedStatisticsViewModel(get(), get(), get()) }
         viewModel { LocalBlocklistPacksMapViewModel(get()) }
@@ -44,6 +44,8 @@ object ViewModelModule {
         viewModel { ODoHEndpointViewModel(get()) }
         viewModel { RethinkLogViewModel(get()) }
         viewModel { AlertsViewModel(get(), get()) }
+        viewModel { ConsoleLogViewModel(get()) }
+        viewModel { DomainConnectionsViewModel(get()) }
     }
 
     val modules = listOf(viewModelModule)

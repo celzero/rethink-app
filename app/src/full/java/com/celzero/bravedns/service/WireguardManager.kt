@@ -31,6 +31,7 @@ import com.celzero.bravedns.wireguard.BadConfigException
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgInterface
+import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -78,6 +79,12 @@ object WireguardManager : KoinComponent {
     const val WARP_ID = 1
     const val WARP_FILE_NAME = "wg1.conf"
 
+    // let the error code be a string, so that it can be concatenated with the error message
+    const val ERR_CODE_VPN_NOT_ACTIVE = "1"
+    const val ERR_CODE_VPN_NOT_FULL = "2"
+    const val ERR_CODE_OTHER_WG_ACTIVE = "3"
+    const val ERR_CODE_WG_INVALID = "4"
+
     // invalid config id
     const val INVALID_CONF_ID = -1
 
@@ -101,7 +108,6 @@ object WireguardManager : KoinComponent {
                 EncryptedFileManager.readWireguardConfig(applicationContext, path)
             if (config == null) {
                 Logger.e(LOG_TAG_PROXY, "error loading wg config: $path, deleting...")
-                db.deleteConfig(it.id)
                 return@forEach
             }
             if (configs.none { i -> i.getId() == it.id }) {
@@ -142,6 +148,10 @@ object WireguardManager : KoinComponent {
 
     fun isAnyWgActive(): Boolean {
         return mappings.any { it.isActive }
+    }
+
+    fun isAdvancedWgActive(): Boolean {
+        return mappings.any { it.isActive && !it.oneWireGuard }
     }
 
     fun getEnabledConfigs(): List<Config> {
@@ -229,21 +239,29 @@ object WireguardManager : KoinComponent {
         return
     }
 
-    fun canEnableConfig(map: WgConfigFilesImmutable): Boolean {
-        val canEnable = appConfig.canEnableProxy() && appConfig.canEnableWireguardProxy()
-        if (!canEnable) {
-            return false
-        }
-        // if one wireguard is enabled, don't allow to enable another
-        if (oneWireGuardEnabled()) {
-            return false
-        }
-        val config = configs.find { it.getId() == map.id }
+    fun canEnableProxy(): Boolean {
+        return appConfig.canEnableProxy()
+    }
+
+    fun isValidConfig(id: Int): Boolean {
+        val config = configs.find { it.getId() == id }
         if (config == null) {
-            Logger.e(LOG_TAG_PROXY, "canEnableConfig: wg not found, id: ${map.id}, ${configs.size}")
+            Logger.e(LOG_TAG_PROXY, "canEnableConfig: wg not found, id: ${id}, ${configs.size}")
             return false
         }
         return true
+    }
+
+    fun isAnyOtherOneWgEnabled(id: Int): Boolean {
+        return mappings.any { it.oneWireGuard && it.isActive && it.id != id }
+    }
+
+    fun canEnableWg(): Boolean {
+        val canEnableProxy = appConfig.canEnableProxy()
+        val canEnableWireGuardProxy = appConfig.canEnableWireguardProxy()
+        val canEnable = canEnableProxy && canEnableWireGuardProxy
+        Logger.i(LOG_TAG_PROXY, "canEnableConfig? $canEnableProxy && $canEnableWireGuardProxy")
+        return canEnable
     }
 
     fun canDisableConfig(map: WgConfigFilesImmutable): Boolean {
@@ -427,30 +445,63 @@ object WireguardManager : KoinComponent {
 
         // if the app is added to config, return the config if it is active or lockdown
         if (config != null && (config.isActive || config.isLockdown)) {
-            return config
-        }
-        // check if any catch-all config is enabled
-        if (configId == "" || !configId.contains(ProxyManager.ID_WG_BASE) || config == null) {
-            Logger.d(LOG_TAG_PROXY, "app config mapping not found for uid: $uid")
-            // there maybe catch-all config enabled, so return the active catch-all config
-            val catchAllConfig = mappings.find { it.isActive && it.isCatchAll }
-            return if (catchAllConfig == null) {
-                Logger.d(LOG_TAG_PROXY, "catch all config not found for uid: $uid")
-                null
+            val isValidConfig = if (config.isLockdown) {
+                // if lockdown is enabled, canRoute checks peer configuration and if it returns
+                // "false", then the connection will be sent to base and not dropped
+                // if lockdown is disabled, then canRoute returns default (true) which
+                // will have the effect of blocking all connections
+                // ie, if lockdown is enabled, split-tunneling happens as expected but if
+                // lockdown is disabled, it has the effect of blocking all connections
+                isValidWgConnForIp(id, ip, true)
             } else {
-                val optimalId = fetchOptimalCatchAllConfig(uid, ip)
-                if (optimalId == null) {
-                    Logger.d(LOG_TAG_PROXY, "no catch all config found for uid: $uid")
-                    null
-                } else {
-                    Logger.d(LOG_TAG_PROXY, "catch all config found for uid: $uid, $optimalId")
-                    mappings.find { it.id == optimalId }
-                }
+                isValidWgConnForIp(id, ip, false)
+            }
+            if (isValidConfig) {
+                Logger.d(LOG_TAG_PROXY, "app config mapping found for uid: $uid, $configId")
+                return config
+            } else {
+                Logger.d(LOG_TAG_PROXY, "app config mapping found for uid: $uid, $configId, but not valid")
+                // pass-through and check if any catch-all config is enabled
             }
         }
 
-        // if the app is not added to any config, and no catch-all config is enabled
-        return null
+        // check if any catch-all config is enabled
+        Logger.d(LOG_TAG_PROXY, "app config mapping not found for uid: $uid")
+        val catchAllConfig = mappings.find { it.isActive && it.isCatchAll }
+        return if (catchAllConfig == null) {
+            Logger.d(LOG_TAG_PROXY, "catch all config not found for uid: $uid")
+            null
+        } else {
+            // if catch-all config is enabled, check for the validity of the connection
+            val optimalId = fetchOptimalCatchAllConfig(uid, ip)
+            if (optimalId == null) {
+                Logger.d(LOG_TAG_PROXY, "no catch all config found for uid: $uid")
+                null
+            } else {
+                Logger.d(LOG_TAG_PROXY, "catch all config found for uid: $uid, $optimalId")
+                mappings.find { it.id == optimalId }
+            }
+        }
+    }
+
+    suspend fun getConfigIdForApp(uid: Int): WgConfigFilesImmutable? {
+        val configId = ProxyManager.getProxyIdForApp(uid)
+
+        val id = if (configId.isNotEmpty()) convertStringIdToId(configId) else INVALID_CONF_ID
+        val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
+        if (config != null && (config.isActive || config.isLockdown)) {
+            Logger.d(LOG_TAG_PROXY, "app config mapping found for uid: $uid, $configId")
+            return config
+        }
+
+        val catchAllConfig = getOptimalCatchAllConfigId()
+        return if (catchAllConfig == null) {
+            Logger.d(LOG_TAG_PROXY, "catch all config not found for uid: $uid")
+            null
+        } else {
+            Logger.d(LOG_TAG_PROXY, "catch all config found for uid: $uid, $catchAllConfig")
+            mappings.find { it.id == catchAllConfig }
+        }
     }
 
     private fun convertStringIdToId(id: String): Int {
@@ -486,7 +537,7 @@ object WireguardManager : KoinComponent {
         if (available) {
             val wgId = catchAllAppConfigCache.value[uid]
             if (wgId != null) {
-                if (isProxyConnectionValid(wgId, ip)) {
+                if (isValidWgConnForIp(wgId, ip)) {
                     Logger.d(LOG_TAG_PROXY, "optimalCatchAllConfig: returning cached wgId: $wgId")
                     return wgId // return the already mapped wgId which is active
                 }
@@ -499,7 +550,7 @@ object WireguardManager : KoinComponent {
             val id = ProxyManager.ID_WG_BASE + it.id
             it.isActive && it.isCatchAll && VpnController.canRouteIp(id, ip, false) }
         catchAllList.forEach {
-            if (isProxyConnectionValid(it.id, ip)) {
+            if (isValidWgConnForIp(it.id, ip)) {
                 // note the uid and wgid in a cache, so that we can use it for further requests
                 catchAllAppConfigCache.value += uid to it.id
                 Logger.d(LOG_TAG_PROXY, "optimalCatchAllConfig: returning new wgId: ${it.id}")
@@ -512,6 +563,13 @@ object WireguardManager : KoinComponent {
         return catchAllList.randomOrNull()?.id
     }
 
+    private suspend fun isValidWgConnForIp(wgId: Int, ip: String, default: Boolean = false): Boolean {
+        val isSupported = isSupportedIpVersion(wgId, ip)
+        val isValid = isProxyConnectionValid(wgId, ip, default)
+        Logger.d(LOG_TAG_PROXY, "isValidWgConnForIp: $wgId? isSupported: $isSupported, isValid: $isValid")
+        return isSupported && isValid
+    }
+
     private fun pingCatchAllConfigs(catchAllConfigs: List<WgConfigFilesImmutable>) {
         io {
             // ping the catch-all config
@@ -522,13 +580,27 @@ object WireguardManager : KoinComponent {
         }
     }
 
-    private suspend fun isProxyConnectionValid(wgId: Int, ip: String, default: Boolean = false): Boolean {
+    private suspend fun isProxyConnectionValid(wgId: Int, ip: String, default: Boolean): Boolean {
         // check if the handshake is less than 3 minutes (VALID_LAST_OK_SEC)
         // and if the ip can be routed
         val id = ProxyManager.ID_WG_BASE + wgId
         val canRoute = VpnController.canRouteIp(id, ip, default)
         Logger.d(LOG_TAG_PROXY, "isProxyConnectionValid: $wgId? can route?$canRoute")
         return isValidLastOk(wgId) && canRoute
+    }
+
+    private suspend fun isSupportedIpVersion(wgId: Int, ip: String): Boolean {
+        val ipVersion = IPAddressString(ip).toAddress().ipVersion
+        val id = ProxyManager.ID_WG_BASE + wgId
+        val supportedVersion = VpnController.getSupportedIpVersion(id)
+        Logger.d(LOG_TAG_PROXY, "isSupportedIpVersion: $wgId? ipVersion: $ipVersion, supportedVersion: $supportedVersion")
+        if (ipVersion.isIPv4 && supportedVersion.first) {
+            return true
+        }
+        if (ipVersion.isIPv6 && supportedVersion.second) {
+            return true
+        }
+        return false
     }
 
     private suspend fun isValidLastOk(wgId: Int): Boolean {
@@ -936,19 +1008,31 @@ object WireguardManager : KoinComponent {
         return mappings.find { it.oneWireGuard && it.isActive }?.id
     }
 
-    suspend fun getOptimalCatchAllConfigId(ip: String?): Int? {
-        val configs = mappings.filter {
-            val id = ProxyManager.ID_WG_BASE + it.id
-            it.isCatchAll && it.isActive && ((ip == null) || VpnController.canRouteIp(id, ip, false)) }
-        configs.forEach {
-            if (isValidLastOk(it.id)) {
-                Logger.d(LOG_TAG_PROXY, "found optimal catch all config: ${it.id}")
-                return it.id
+    suspend fun getOptimalCatchAllConfigId(): Int? {
+        val configs = mappings.filter { it.isCatchAll && it.isActive }
+        // get the config which doesn't have split tunnel. If none, return any catch-all config
+        // TODO: instead get the dns ip from go-lib and check if it can be routed
+        configs.forEach { config ->
+            if (isValidLastOk(config.id) && !isSplitTunnelProxy(config.id)) {
+                Logger.d(LOG_TAG_PROXY, "optimal catch all config found: ${config.id}")
+                return config.id
             }
         }
         Logger.d(LOG_TAG_PROXY, "no optimal catch all config found, returning any catchall")
-        // if no catch-all config is active, return any catch-all config
+        // return any catch-all config
         return configs.randomOrNull()?.id
+    }
+
+    private suspend fun isSplitTunnelProxy(configId: Int): Boolean {
+        val id = ProxyManager.ID_WG_BASE + configId
+        val pair = VpnController.getSupportedIpVersion(id)
+        return VpnController.isSplitTunnelProxy(id, pair)
+    }
+
+    fun invalidateCatchAllCache() {
+        if (catchAllAppConfigCache.value.isNotEmpty()) {
+            catchAllAppConfigCache.value = emptyMap()
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

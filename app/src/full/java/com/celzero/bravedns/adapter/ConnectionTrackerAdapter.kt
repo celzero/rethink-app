@@ -45,6 +45,7 @@ import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -69,12 +70,13 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 override fun areContentsTheSame(
                     oldConnection: ConnectionTracker,
                     newConnection: ConnectionTracker
-                ) = oldConnection.id == newConnection.id
+                ) = oldConnection == newConnection
             }
 
         private const val MAX_BYTES = 500000 // 500 KB
         private const val MAX_TIME_TCP = 135 // seconds
         private const val MAX_TIME_UDP = 135 // seconds
+        private const val NO_USER_ID = 0
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionTrackerViewHolder {
@@ -146,47 +148,43 @@ class ConnectionTrackerAdapter(private val context: Context) :
         private fun displayAppDetails(ct: ConnectionTracker) {
             io {
                 uiCtx {
-                    // append the usrId with app name if the usrId is not 0
-                    // fixme: move the 0 to a constant
-                    if (ct.usrId != 0) {
-                        b.connectionAppName.text =
-                            context.getString(
-                                R.string.about_version_install_source,
-                                ct.appName,
-                                ct.usrId.toString()
-                            )
-                    } else {
-                        b.connectionAppName.text = ct.appName
-                    }
-
                     val apps = FirewallManager.getPackageNamesByUid(ct.uid)
-
-                    if (apps.isEmpty()) {
-                        loadAppIcon(Utilities.getDefaultIcon(context))
-                        return@uiCtx
-                    }
-
                     val count = apps.count()
-                    val appName =
-                        if (count > 1) {
-                            context.getString(
-                                R.string.ctbs_app_other_apps,
-                                ct.appName,
-                                (count).minus(1).toString()
-                            )
-                        } else {
-                            ct.appName
-                        }
+
+                    val appName = when {
+                        ct.usrId != NO_USER_ID -> context.getString(
+                            R.string.about_version_install_source,
+                            ct.appName,
+                            ct.usrId.toString()
+                        )
+
+                        count > 1 -> context.getString(
+                            R.string.ctbs_app_other_apps,
+                            ct.appName,
+                            "${count - 1}"
+                        )
+
+                        else -> ct.appName
+                    }
 
                     b.connectionAppName.text = appName
-                    loadAppIcon(getIcon(context, apps[0], /*No app name */ ""))
+                    if (apps.isEmpty()) {
+                        loadAppIcon(getDefaultIcon(context))
+                    } else {
+                        loadAppIcon(getIcon(context, apps[0]))
+                    }
                 }
             }
         }
 
         private fun displayProtocolDetails(port: Int, proto: Int) {
-            // Instead of showing the port name and protocol, now the ports are resolved with
-            // known ports(reserved port and protocol identifiers).
+            // If the protocol is not TCP or UDP, then display the protocol name.
+            if (Protocol.UDP.protocolType != proto && Protocol.TCP.protocolType != proto) {
+                b.connLatencyTxt.text = Protocol.getProtocolName(proto).name
+                return
+            }
+
+            // Instead of displaying the port number, display the service name if it is known.
             // https://github.com/celzero/rethink-app/issues/42 - #3 - transport + protocol.
             val resolvedPort = KnownPorts.resolvePort(port)
             // case: for UDP/443 label it as HTTP3 instead of HTTPS

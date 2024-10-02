@@ -55,7 +55,7 @@ import java.io.File
         DoTEndpoint::class,
         ODoHEndpoint::class
     ],
-    version = 23,
+    version = 24,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -99,6 +99,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_20_21)
                 .addMigrations(MIGRATION_21_22)
                 .addMigrations(MIGRATION_22_23)
+                .addMigrations(MIGRATION_23_24)
                 .build()
 
         private val roomCallback: Callback =
@@ -968,6 +969,15 @@ abstract class AppDatabase : RoomDatabase() {
                         "ALTER TABLE AppInfo ADD COLUMN isProxyExcluded INTEGER NOT NULL DEFAULT 0"
                     )
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_22_23: added isProxyExcluded column")
+                }
+            }
+
+        private val MIGRATION_23_24: Migration =
+            object : Migration(23, 24) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        "UPDATE DoTEndpoint set desc = 'Adguard DNS over TLS. Blocks ads, tracking, and phishing.' where name = 'Adguard' and id = 2"
+                    )
                 }
             }
 

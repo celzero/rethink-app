@@ -159,7 +159,7 @@ object RethinkBlocklistManager : KoinComponent {
                             packsBlocklistMapping.put(PacksMappingKey(s, 0), l.value)
                             return@forEachIndexed
                         }
-                        val level = l.level?.elementAt(index) ?: 2
+                        val level = l.level?.getOrNull(index) ?: 2
                         packsBlocklistMapping.put(PacksMappingKey(s, level), l.value)
                     }
                 }
@@ -182,7 +182,7 @@ object RethinkBlocklistManager : KoinComponent {
                         key.pack,
                         key.level,
                         packsBlocklistMapping.get(key).toList(),
-                        dbFileTagLocal.first { it.pack?.contains(key.pack) == true }.group
+                        dbFileTagLocal.firstOrNull { it.pack?.contains(key.pack) == true }?.group ?: ""
                     )
                 }
             )
@@ -239,7 +239,7 @@ object RethinkBlocklistManager : KoinComponent {
                             return@forEachIndexed
                         }
                         // if the level is empty, then set the level to 2 (assume highest) #756
-                        val level = r.level?.elementAt(index) ?: 2
+                        val level = r.level?.getOrNull(index) ?: 2
                         packsBlocklistMapping.put(PacksMappingKey(s, level), r.value)
                     }
                 }
@@ -266,7 +266,7 @@ object RethinkBlocklistManager : KoinComponent {
                         key.pack,
                         key.level,
                         packsBlocklistMapping.get(key).toList(),
-                        dbFileTagRemote.first { it.pack?.contains(key.pack) == true }.group
+                        dbFileTagRemote.firstOrNull { it.pack?.contains(key.pack) == true }?.group ?: ""
                     )
                 }
             )

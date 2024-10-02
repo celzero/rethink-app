@@ -10,6 +10,9 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
         tools:ignore="ScopedStorage" />
+    <uses-permission
+            android:name="android.permission.SYSTEM_ALERT_WINDOW"
+            android:minSdkVersion="34" />
 
     <application
         android:name=".RethinkDnsApplication"
@@ -113,6 +116,8 @@
         <activity
             android:name=".ui.activity.AppWiseDomainLogsActivity"
             android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.ConsoleLogActivity"
+            android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.NotificationHandlerDialog"
             android:excludeFromRecents="true"
@@ -125,6 +130,15 @@
             tools:replace="screenOrientation" />
         <activity
             android:name=".ui.activity.AlertsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.AntiCensorshipActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.AdvancedSettingActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.DomainConnectionsActivity"
             android:finishOnTaskLaunch="true" />
 
         <receiver

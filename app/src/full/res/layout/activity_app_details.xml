@@ -38,7 +38,7 @@
                 android:layout_toEndOf="@id/aad_app_detail_icon"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/aad_app_detail_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -46,18 +46,32 @@
                     android:textColor="?primaryTextColor"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/aad_pkg_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:alpha="0.7"
+                    android:textColor="?primaryTextColor"
+                    android:textSize="@dimen/default_font_text_view" />
+
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/aad_firewall_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
+                    android:alpha="0.7"
                     android:textColor="?primaryTextColor"
                     android:textSize="@dimen/default_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/aad_data_usage_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginEnd="10dp"
+                    android:layout_toStartOf="@id/aad_proxy_details"
+                    android:alpha="0.7"
                     android:padding="5dp"
                     android:textColor="?primaryTextColor"
                     android:textSize="@dimen/default_font_text_view" />
@@ -78,7 +92,7 @@
                     android:layout_marginEnd="5dp"
                     android:minWidth="24dp"
                     android:minHeight="24dp"
-                    android:src="@drawable/brave_mode_info" />
+                    android:src="@drawable/ic_info_white" />
 
 
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -101,7 +115,7 @@
                 android:layout_marginEnd="5dp"
                 android:orientation="vertical"
                 android:paddingTop="5dp"
-                android:paddingBottom="5dp">
+                android:paddingBottom="15dp">
 
                 <RelativeLayout
                     android:id="@+id/aad_aap_firewall_new_card"
@@ -135,28 +149,12 @@
                         android:gravity="center"
                         android:weightSum="1">
 
-                        <TextView
-                            android:id="@+id/aad_app_settings_block1"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="center"
-                            android:layout_weight="0.33"
-                            android:drawablePadding="5dp"
-                            android:fontFamily="sans-serif-medium"
-                            android:gravity="center"
-                            android:padding="5dp"
-                            android:text="@string/ada_app_firewall"
-                            android:textColor="?primaryTextColor"
-                            android:textSize="@dimen/default_font_text_view"
-                            android:visibility="gone"
-                            app:drawableTopCompat="@drawable/ic_firewall_allow_grey" />
-
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/aad_app_settings_block_wifi"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
-                            android:layout_weight="0.33"
+                            android:layout_weight="0.333"
                             android:drawablePadding="5dp"
                             android:fontFamily="sans-serif-medium"
                             android:gravity="center"
@@ -166,12 +164,12 @@
                             android:textSize="@dimen/default_font_text_view"
                             app:drawableTopCompat="@drawable/ic_firewall_wifi_on_grey" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/aad_app_settings_block_md"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
-                            android:layout_weight="0.33"
+                            android:layout_weight="0.333"
                             android:drawablePadding="5dp"
                             android:fontFamily="sans-serif-medium"
                             android:gravity="center"
@@ -181,12 +179,12 @@
                             android:textSize="@dimen/default_font_text_view"
                             app:drawableTopCompat="@drawable/ic_firewall_data_on_grey" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/aad_app_settings_isolate"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
-                            android:layout_weight="0.33"
+                            android:layout_weight="0.333"
                             android:drawablePadding="5dp"
                             android:fontFamily="sans-serif-medium"
                             android:gravity="center"
@@ -206,12 +204,12 @@
                         android:gravity="center"
                         android:weightSum="1">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/aad_app_settings_bypass_dns_firewall"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
-                            android:layout_weight="0.33"
+                            android:layout_weight="0.333"
                             android:drawablePadding="5dp"
                             android:fontFamily="sans-serif-medium"
                             android:gravity="center"
@@ -221,12 +219,12 @@
                             android:textSize="@dimen/default_font_text_view"
                             app:drawableTopCompat="@drawable/ic_firewall_bypass_off" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/aad_app_settings_bypass_univ"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
-                            android:layout_weight="0.33"
+                            android:layout_weight="0.333"
                             android:drawablePadding="5dp"
                             android:fontFamily="sans-serif-medium"
                             android:gravity="center"
@@ -236,12 +234,12 @@
                             android:textSize="@dimen/default_font_text_view"
                             app:drawableTopCompat="@drawable/ic_firewall_bypass_off" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/aad_app_settings_exclude"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
-                            android:layout_weight="0.33"
+                            android:layout_weight="0.333"
                             android:drawablePadding="5dp"
                             android:fontFamily="sans-serif-medium"
                             android:gravity="center"
@@ -351,13 +349,21 @@
                 android:layout_toEndOf="@id/exclude_proxy_icon"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/exclude_proxy_txt"
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/exclude_apps_from_proxy"
                     android:textSize="@dimen/large_font_text_view" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/aad_proxy_details"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.7"
+                    android:textSize="@dimen/default_font_text_view" />
+
             </LinearLayout>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -396,7 +402,7 @@
                     android:paddingBottom="10dp">
 
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/aad_ip_block_header"
                         style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="match_parent"
@@ -409,7 +415,7 @@
                         android:textSize="@dimen/heading_font_text_view"
                         android:textStyle="bold" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -441,7 +447,7 @@
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/aad_domain_block_header"
                         style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="match_parent"
@@ -454,7 +460,7 @@
                         android:textSize="@dimen/heading_font_text_view"
                         android:textStyle="bold" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"

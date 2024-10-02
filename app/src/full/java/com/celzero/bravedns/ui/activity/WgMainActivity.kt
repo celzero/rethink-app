@@ -24,7 +24,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.addCallback
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -152,6 +152,19 @@ class WgMainActivity :
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         init()
+        onBackPressedDispatcher.addCallback(
+            this /* lifecycle owner */,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (b.createFab.visibility == View.VISIBLE) {
+                        collapseFab()
+                    } else {
+                        finish()
+                    }
+                    return
+                }
+            }
+        )
     }
 
     private fun init() {
@@ -160,14 +173,6 @@ class WgMainActivity :
         observeConfig()
         observeDnsName()
         setupClickListeners()
-
-        onBackPressedDispatcher.addCallback(this /* lifecycle owner */) {
-            if (b.createFab.visibility == View.VISIBLE) {
-                collapseFab()
-            } else {
-                finish()
-            }
-        }
     }
 
     private fun setAdapter() {
@@ -207,7 +212,7 @@ class WgMainActivity :
         val layoutManager = LinearLayoutManager(this)
         b.wgGeneralInterfaceList.layoutManager = layoutManager
 
-        wgConfigAdapter = WgConfigAdapter(this)
+        wgConfigAdapter = WgConfigAdapter(this, this, persistentState.splitDns)
         wgConfigViewModel.interfaces.observe(this) { wgConfigAdapter?.submitData(lifecycle, it) }
         b.wgGeneralInterfaceList.adapter = wgConfigAdapter
     }
@@ -277,18 +282,25 @@ class WgMainActivity :
     }
 
     private fun observeDnsName() {
+        val activeConfigs = WireguardManager.getEnabledConfigs()
         if (WireguardManager.oneWireGuardEnabled()) {
-            val activeConfigs = WireguardManager.getEnabledConfigs()
-            val isAnyConfigActive = activeConfigs.isNotEmpty()
-            if (isAnyConfigActive) {
-                val dnsName = activeConfigs.firstOrNull()?.getName() ?: return
-                b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsName)
-            }
+            val dnsName = activeConfigs.firstOrNull()?.getName() ?: return
+            b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsName)
             // remove the observer if any config is active
             appConfig.getConnectedDnsObservable().removeObservers(this)
         } else {
-            appConfig.getConnectedDnsObservable().observe(this) {
-                b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, it)
+            appConfig.getConnectedDnsObservable().observe(this) { dns ->
+                var dnsNames: String = dns.ifEmpty { "" }
+                if (persistentState.splitDns) {
+                    if (activeConfigs.isNotEmpty()) {
+                        dnsNames += ", "
+                    }
+                    dnsNames += activeConfigs.joinToString(", ") { it.getName() }
+                    b.wgWireguardDisclaimer.text =
+                        getString(R.string.wireguard_disclaimer, dnsNames)
+                } else {
+                    b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsNames)
+                }
             }
         }
     }

@@ -107,6 +107,15 @@ object UIUtils {
         }
     }
 
+    enum class ProxyStatus(val id: Long) {
+        TOK(Backend.TOK),
+        TUP(Backend.TUP),
+        TZZ(Backend.TZZ),
+        TNT(Backend.TNT),
+        TKO(Backend.TKO),
+        END(Backend.END)
+    }
+
     fun formatToRelativeTime(context: Context, timestamp: Long): String {
         val now = System.currentTimeMillis()
         return if (DateUtils.isToday(timestamp)) {
@@ -631,5 +640,23 @@ object UIUtils {
         }
 
         return result.toString().trim()
+    }
+
+    fun formatNetStat(stat: backend.NetStat?): String {
+        val ip = stat?.ip()?.toString()
+        val udp = stat?.udp()?.toString()
+        val tcp = stat?.tcp()?.toString()
+        val fwd = stat?.fwd()?.toString()
+        val icmp = stat?.icmp()?.toString()
+        val nic = stat?.nic()?.toString()
+        val rdnsInfo = stat?.rdnsinfo()?.toString()
+        val nicInfo = stat?.nicinfo()?.toString()
+
+        var stats = nic + nicInfo + fwd + ip + icmp + tcp + udp + rdnsInfo
+        stats = stats.replace("{", "\n")
+        stats = stats.replace("}", "\n\n")
+        stats = stats.replace(",", "\n")
+
+        return stats
     }
 }

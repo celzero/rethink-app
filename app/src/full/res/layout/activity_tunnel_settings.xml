@@ -137,9 +137,10 @@
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
                         android:layout_marginEnd="5dp"
+                        android:alpha="0.5"
                         android:layout_marginBottom="5dp"
                         android:padding="10dp"
-                        android:src="@drawable/ic_firewall_exclude_off" />
+                        android:src="@drawable/ic_loop_back_app" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -307,7 +308,7 @@
                         android:layout_marginBottom="5dp"
                         android:alpha="0.5"
                         android:padding="10dp"
-                        android:src="@drawable/rethink_within_rethink" />
+                        android:src="@drawable/ic_loopback" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -543,6 +544,7 @@
                         android:src="@drawable/ic_connectivity_checks" />
 
                     <LinearLayout
+                        android:id="@+id/settings_activity_connectivity_checks_ll"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
@@ -576,6 +578,23 @@
                         android:padding="10dp" />
 
                 </RelativeLayout>
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/settings_activity_ping_ips_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rt_edit_dialog_positive"
+                    android:background="@drawable/home_screen_button_stop_bg"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="15dp"
+                    android:paddingTop="7dp"
+                    android:paddingBottom="7dp"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:textColor="?attr/primaryTextColor"
+                    />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

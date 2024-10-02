@@ -29,13 +29,14 @@ import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.os.SystemClock
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -54,7 +55,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
-import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
 import com.celzero.bravedns.service.AppUpdater
@@ -62,6 +63,7 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
 import com.celzero.bravedns.util.Constants
@@ -76,19 +78,21 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import java.util.Calendar
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import java.util.Calendar
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
+import kotlin.math.abs
+
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
 
     private val persistentState by inject<PersistentState>()
-    private val appConfig by inject<AppConfig>()
+    private val appInfoDb by inject<AppInfoRepository>()
     private val appUpdateManager by inject<AppUpdater>()
     private val rdb by inject<RefreshDatabase>()
 
@@ -97,12 +101,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
-    // private var biometricPromptRetryCount = 1
-    private var onResumeCalledAlready = false
-
-    companion object {
-        private const val ON_RESUME_CALLED_PREFERENCE_KEY = "onResumeCalled"
-    }
+    private var isActivityStarted = false
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
     private fun Context.isDarkThemeOn(): Boolean {
@@ -114,15 +113,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
 
-        // stackoverflow.com/questions/44221195/multiple-onstop-onresume-calls-in-android-activity
-        // Restore value of members from saved state
-        onResumeCalledAlready =
-            savedInstanceState?.getBoolean(ON_RESUME_CALLED_PREFERENCE_KEY) ?: false
-
         // do not launch on board activity when app is running on TV
         if (persistentState.firstTimeLaunch && !isAppRunningOnTv()) {
             launchOnboardActivity()
-            rdnsRemote()
             return
         }
         updateNewVersion()
@@ -135,18 +128,37 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         initUpdateCheck()
 
         observeAppState()
+        isActivityStarted = false
     }
 
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        outState.putBoolean(ON_RESUME_CALLED_PREFERENCE_KEY, onResumeCalledAlready)
-        super.onSaveInstanceState(outState, outPersistentState)
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
+    override fun onPause() {
+        super.onPause()
     }
 
     override fun onResume() {
         super.onResume()
-        if (persistentState.biometricAuth && !isAppRunningOnTv() && !onResumeCalledAlready) {
-            biometricPrompt()
+        Logger.v(LOG_TAG_UI, "isActivityStarted: $isActivityStarted, intent: $intent, action: ${intent?.action}")
+        if (!isActivityStarted) {
+            isActivityStarted = true
+            Logger.vv(LOG_TAG_UI, "HomeScreenActivity is resumed")
+            if (intent != null) { // intent is not null means the activity is started from intent
+                Logger.vv(LOG_TAG_UI, "HomeScreenActivity is started from intent")
+                Logger.vv(LOG_TAG_UI, "isBiometricEnabled: ${isBiometricEnabled()}, isAppRunningOnTv: ${isAppRunningOnTv()}")
+                if (isBiometricEnabled() && !isAppRunningOnTv()) {
+                    biometricPrompt()
+                }
+            }
         }
+    }
+
+    private fun isBiometricEnabled(): Boolean {
+        val type = MiscSettingsActivity.BioMetricType.fromValue(persistentState.biometricAuthType)
+        // use the biometricAuth flag for backward compatibility with older versions
+        return persistentState.biometricAuth || type.enabled()
     }
 
     // check if app running on TV
@@ -161,11 +173,18 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun biometricPrompt() {
         // if the biometric authentication is already done in the last 15 minutes, then skip
-        // fixme - #324 - move the 15 minutes to a configurable value
-        if (
-            SystemClock.elapsedRealtime() - persistentState.biometricAuthTime <
-                TimeUnit.MINUTES.toMillis(15)
-        ) {
+        val minutes = MiscSettingsActivity.BioMetricType.fromValue(persistentState.biometricAuthType).mins
+
+        val timeoutMinutes = if (minutes == -1L) { // this is for backward compatibility with older versions
+           MiscSettingsActivity.BioMetricType.FIFTEEN_MIN.mins
+        } else {
+            minutes
+        }
+
+        Logger.d(LOG_TAG_UI, "Biometric timeout: $timeoutMinutes, biometricAuthTime: ${persistentState.biometricAuthTime}")
+        val timeSinceLastAuth = abs(SystemClock.elapsedRealtime() - persistentState.biometricAuthTime)
+        if (timeSinceLastAuth < TimeUnit.MINUTES.toMillis(timeoutMinutes)) {
+            Logger.i(LOG_TAG_UI, "Biometric auth skipped, time since last auth: $timeSinceLastAuth")
             return
         }
 
@@ -228,7 +247,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         super.onAuthenticationSucceeded(result)
                         // biometricPromptRetryCount = 1
                         persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
-                        Logger.i(LOG_TAG_UI, "Biometric success @ ${System.currentTimeMillis()}")
+                        Logger.i(LOG_TAG_UI, "Biometric success @ ${SystemClock.elapsedRealtime()}")
                     }
 
                     override fun onAuthenticationFailed() {
@@ -381,6 +400,12 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun removeThisMethod() {
+        // set allowBypass to false for all versions, overriding the user's preference.
+        // the default was true for Play Store and website versions, and false for F-Droid.
+        // when allowBypass is true, some OEMs bypass the VPN service, causing connections
+        // to fail due to the "Block connections without VPN" option.
+        persistentState.allowBypass = false
+
         // change the persistent state for defaultDnsUrl, if its google.com (only for v055d)
         // fixme: remove this post v054.
         // this is to fix the default dns url, as the default dns url is changed from
@@ -393,17 +418,11 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
         // to SystemClock.elapsedRealtime
         persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
-    }
-
-    private fun rdnsRemote() {
-        // enforce the dns to sky for play store build, and max for website and f-droid build
-        // on first time launch
-        io {
-            if (isPlayStoreFlavour()) {
-                appConfig.switchRethinkDnsToSky()
-            } else {
-                appConfig.switchRethinkDnsToMax()
-            }
+        // set the rethink app in firewall mode as allowed by default
+        io { appInfoDb.resetRethinkAppFirewallMode() }
+        // if biometric auth is enabled, then set the biometric auth type to 3 (15 minutes)
+        if (persistentState.biometricAuth) {
+            persistentState.biometricAuthType = MiscSettingsActivity.BioMetricType.FIFTEEN_MIN.action
         }
     }
 
@@ -603,17 +622,22 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
 
     private fun showUpdateCompleteSnackbar() {
-        val snack =
-            Snackbar.make(
-                b.container,
-                getString(R.string.update_complete_snack_message),
-                Snackbar.LENGTH_INDEFINITE
-            )
-        snack.setAction(getString(R.string.update_complete_action_snack)) {
-            appUpdateManager.completeUpdate()
+        try {
+            val container: View = findViewById(R.id.container)
+            val snack =
+                Snackbar.make(
+                    container,
+                    getString(R.string.update_complete_snack_message),
+                    Snackbar.LENGTH_INDEFINITE
+                )
+            snack.setAction(getString(R.string.update_complete_action_snack)) {
+                appUpdateManager.completeUpdate()
+            }
+            snack.setActionTextColor(ContextCompat.getColor(this, R.color.primaryLightColorText))
+            snack.show()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "Error showing update complete snackbar: ${e.message}", e)
         }
-        snack.setActionTextColor(ContextCompat.getColor(this, R.color.primaryLightColorText))
-        snack.show()
     }
 
     private fun showDownloadDialog(
@@ -686,6 +710,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         } catch (e: IllegalArgumentException) {
             Logger.w(LOG_TAG_DOWNLOAD, "Unregister receiver exception")
         }
+        Logger.d(LOG_TAG_UI, "HomeScreenActivity is stopped")
     }
 
     private fun setupNavigationItemSelectedListener() {

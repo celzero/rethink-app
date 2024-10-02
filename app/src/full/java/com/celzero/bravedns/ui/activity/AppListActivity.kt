@@ -19,9 +19,12 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.graphics.Rect
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.CompoundButton
@@ -33,6 +36,7 @@ import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -41,7 +45,6 @@ import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityAppListBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.bottomsheet.FirewallAppFilterBottomSheet
-import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
@@ -77,7 +80,7 @@ class AppListActivity :
         private const val ANIMATION_END_DEGREE = 360.0f
 
         private const val REFRESH_TIMEOUT: Long = 4000
-        private const val QUERY_TEXT_TIMEOUT: Long = 600
+        private const val QUERY_TEXT_TIMEOUT: Long = 1000
     }
 
     // enum class for bulk ui update
@@ -116,14 +119,18 @@ class AppListActivity :
         ALL(0),
         ALLOWED(1),
         BLOCKED(2),
-        BYPASS(3),
-        EXCLUDED(4),
-        LOCKDOWN(5);
+        BLOCKED_WIFI(3),
+        BLOCKED_MOBILE_DATA(4),
+        BYPASS(5),
+        EXCLUDED(6),
+        LOCKDOWN(7);
 
         fun getFilter(): Set<Int> {
             return when (this) {
                 ALL -> setOf(0, 1, 2, 3, 4, 5, 7)
                 ALLOWED -> setOf(5)
+                BLOCKED_WIFI -> setOf(5)
+                BLOCKED_MOBILE_DATA -> setOf(5)
                 BLOCKED -> setOf(5)
                 BYPASS -> setOf(2, 7)
                 EXCLUDED -> setOf(3)
@@ -135,7 +142,9 @@ class AppListActivity :
             return when (this) {
                 ALL -> setOf(0, 1, 2, 3)
                 ALLOWED -> setOf(3)
-                BLOCKED -> setOf(0, 1, 2)
+                BLOCKED_WIFI -> setOf(1)
+                BLOCKED_MOBILE_DATA -> setOf(2)
+                BLOCKED -> setOf(0)
                 BYPASS -> setOf(0, 1, 2, 3)
                 EXCLUDED -> setOf(0, 1, 2, 3)
                 LOCKDOWN -> setOf(0, 1, 2, 3)
@@ -146,6 +155,8 @@ class AppListActivity :
             return when (this) {
                 ALL -> context.getString(R.string.lbl_all)
                 ALLOWED -> context.getString(R.string.lbl_allowed)
+                BLOCKED_WIFI -> context.getString(R.string.two_argument_colon, context.getString(R.string.lbl_blocked), context.getString(R.string.firewall_rule_block_unmetered))
+                BLOCKED_MOBILE_DATA -> context.getString(R.string.two_argument_colon, context.getString(R.string.lbl_blocked), context.getString(R.string.firewall_rule_block_metered))
                 BLOCKED -> context.getString(R.string.lbl_blocked)
                 BYPASS -> context.getString(R.string.fapps_firewall_filter_bypass_universal)
                 EXCLUDED -> context.getString(R.string.fapps_firewall_filter_excluded)
@@ -158,6 +169,8 @@ class AppListActivity :
                 return when (id) {
                     ALL.id -> ALL
                     ALLOWED.id -> ALLOWED
+                    BLOCKED_WIFI.id -> BLOCKED_WIFI
+                    BLOCKED_MOBILE_DATA.id -> BLOCKED_MOBILE_DATA
                     BLOCKED.id -> BLOCKED
                     BYPASS.id -> BYPASS
                     EXCLUDED.id -> EXCLUDED
@@ -191,6 +204,7 @@ class AppListActivity :
     override fun onResume() {
         super.onResume()
         setFirewallFilter(filters.value?.firewallFilter)
+        b.ffaAppList.requestFocus()
     }
 
     private fun initObserver() {
@@ -200,11 +214,8 @@ class AppListActivity :
 
             if (it == null) return@observe
 
-            ui {
-                appInfoViewModel.setFilter(it)
-                b.ffaAppList.smoothScrollToPosition(0)
-                updateFilterText(it)
-            }
+            appInfoViewModel.setFilter(it)
+            updateFilterText(it)
         }
     }
 
@@ -217,9 +228,7 @@ class AppListActivity :
                     getString(
                         R.string.fapps_firewall_filter_desc,
                         firewallLabel.lowercase(),
-                        filterLabel
-                    )
-                )
+                        filterLabel))
         } else {
             b.firewallAppLabelTv.text =
                 UIUtils.updateHtmlEncodedText(
@@ -227,20 +236,21 @@ class AppListActivity :
                         R.string.fapps_firewall_filter_desc_category,
                         firewallLabel.lowercase(),
                         filterLabel,
-                        filter.categoryFilters
-                    )
-                )
+                        filter.categoryFilters))
         }
         b.firewallAppLabelTv.isSelected = true
     }
 
     override fun onPause() {
         filters.postValue(Filters())
+        b.ffaSearch.clearFocus()
+        b.ffaAppList.requestFocus()
         super.onPause()
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
         addQueryToFilters(query)
+        b.ffaSearch.clearFocus()
         return true
     }
 
@@ -278,10 +288,7 @@ class AppListActivity :
                     b.ffaRefreshList.isEnabled = true
                     b.ffaRefreshList.clearAnimation()
                     Utilities.showToastUiCentered(
-                        this,
-                        getString(R.string.refresh_complete),
-                        Toast.LENGTH_SHORT
-                    )
+                        this, getString(R.string.refresh_complete), Toast.LENGTH_SHORT)
                 }
             }
         }
@@ -290,30 +297,27 @@ class AppListActivity :
             showBulkRulesUpdateDialog(
                 getBulkActionDialogTitle(BlockType.UNMETER),
                 getBulkActionDialogMessage(BlockType.UNMETER),
-                BlockType.UNMETER
-            )
+                BlockType.UNMETER)
         }
 
         b.ffaToggleAllMobileData.setOnClickListener {
             showBulkRulesUpdateDialog(
                 getBulkActionDialogTitle(BlockType.METER),
                 getBulkActionDialogMessage(BlockType.METER),
-                BlockType.METER
-            )
+                BlockType.METER)
         }
 
         b.ffaToggleAllLockdown.setOnClickListener {
             showBulkRulesUpdateDialog(
                 getBulkActionDialogTitle(BlockType.LOCKDOWN),
                 getBulkActionDialogMessage(BlockType.LOCKDOWN),
-                BlockType.LOCKDOWN
-            )
+                BlockType.LOCKDOWN)
         }
 
         TooltipCompat.setTooltipText(
             b.ffaToggleAllBypassDnsFirewall,
-            getString(R.string.bypass_dns_firewall_tooltip, getString(R.string.bypass_dns_firewall))
-        )
+            getString(
+                R.string.bypass_dns_firewall_tooltip, getString(R.string.bypass_dns_firewall)))
 
         b.ffaToggleAllBypassDnsFirewall.setOnClickListener {
             // show tooltip once the user clicks on the button
@@ -326,24 +330,21 @@ class AppListActivity :
             showBulkRulesUpdateDialog(
                 getBulkActionDialogTitle(BlockType.BYPASS_DNS_FIREWALL),
                 getBulkActionDialogMessage(BlockType.BYPASS_DNS_FIREWALL),
-                BlockType.BYPASS_DNS_FIREWALL
-            )
+                BlockType.BYPASS_DNS_FIREWALL)
         }
 
         b.ffaToggleAllBypass.setOnClickListener {
             showBulkRulesUpdateDialog(
                 getBulkActionDialogTitle(BlockType.BYPASS),
                 getBulkActionDialogMessage(BlockType.BYPASS),
-                BlockType.BYPASS
-            )
+                BlockType.BYPASS)
         }
 
         b.ffaToggleAllExclude.setOnClickListener {
             showBulkRulesUpdateDialog(
                 getBulkActionDialogTitle(BlockType.EXCLUDE),
                 getBulkActionDialogMessage(BlockType.EXCLUDE),
-                BlockType.EXCLUDE
-            )
+                BlockType.EXCLUDE)
         }
 
         b.ffaAppInfoIcon.setOnClickListener { showInfoDialog() }
@@ -505,28 +506,42 @@ class AppListActivity :
             makeFirewallChip(FirewallFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
         val blocked =
             makeFirewallChip(FirewallFilter.BLOCKED.id, getString(R.string.lbl_blocked), false)
+        val blockedWifiTxt = getString(
+            R.string.two_argument_colon,
+            getString(R.string.lbl_blocked),
+            getString(R.string.firewall_rule_block_unmetered)
+        )
+        val blockedWifi =
+            makeFirewallChip(FirewallFilter.BLOCKED_WIFI.id, blockedWifiTxt, false)
+        val blockedMobileDataTxt = getString(
+            R.string.two_argument_colon,
+            getString(R.string.lbl_blocked),
+            getString(R.string.firewall_rule_block_metered)
+        )
+        val blockedMobileData =
+            makeFirewallChip(FirewallFilter.BLOCKED_MOBILE_DATA.id, blockedMobileDataTxt, false)
+
         val bypassUniversal =
             makeFirewallChip(
                 FirewallFilter.BYPASS.id,
                 getString(R.string.fapps_firewall_filter_bypass_universal),
-                false
-            )
+                false)
         val excluded =
             makeFirewallChip(
                 FirewallFilter.EXCLUDED.id,
                 getString(R.string.fapps_firewall_filter_excluded),
-                false
-            )
+                false)
         val lockdown =
             makeFirewallChip(
                 FirewallFilter.LOCKDOWN.id,
                 getString(R.string.fapps_firewall_filter_isolate),
-                false
-            )
+                false)
 
         b.ffaFirewallChipGroup.addView(none)
         b.ffaFirewallChipGroup.addView(allowed)
         b.ffaFirewallChipGroup.addView(blocked)
+        b.ffaFirewallChipGroup.addView(blockedWifi)
+        b.ffaFirewallChipGroup.addView(blockedMobileData)
         b.ffaFirewallChipGroup.addView(bypassUniversal)
         b.ffaFirewallChipGroup.addView(excluded)
         b.ffaFirewallChipGroup.addView(lockdown)
@@ -567,9 +582,7 @@ class AppListActivity :
     private fun colorUpChipIcon(chip: Chip) {
         val colorFilter =
             PorterDuffColorFilter(
-                ContextCompat.getColor(this, R.color.primaryText),
-                PorterDuff.Mode.SRC_IN
-            )
+                ContextCompat.getColor(this, R.color.primaryText), PorterDuff.Mode.SRC_IN)
         chip.checkedIcon?.colorFilter = colorFilter
         chip.chipIcon?.colorFilter = colorFilter
     }
@@ -583,8 +596,7 @@ class AppListActivity :
                 b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
                 b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_off)
                 b.ffaToggleAllBypassDnsFirewall.setImageResource(
-                    R.drawable.ic_bypass_dns_firewall_off
-                )
+                    R.drawable.ic_bypass_dns_firewall_off)
             }
             BlockType.METER -> {
                 b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on_grey)
@@ -592,8 +604,7 @@ class AppListActivity :
                 b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
                 b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_off)
                 b.ffaToggleAllBypassDnsFirewall.setImageResource(
-                    R.drawable.ic_bypass_dns_firewall_off
-                )
+                    R.drawable.ic_bypass_dns_firewall_off)
             }
             BlockType.LOCKDOWN -> {
                 b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on_grey)
@@ -601,8 +612,7 @@ class AppListActivity :
                 b.ffaToggleAllExclude.setImageResource(R.drawable.ic_firewall_exclude_off)
                 b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
                 b.ffaToggleAllBypassDnsFirewall.setImageResource(
-                    R.drawable.ic_bypass_dns_firewall_off
-                )
+                    R.drawable.ic_bypass_dns_firewall_off)
             }
             BlockType.BYPASS -> {
                 b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on_grey)
@@ -610,8 +620,7 @@ class AppListActivity :
                 b.ffaToggleAllExclude.setImageResource(R.drawable.ic_firewall_exclude_off)
                 b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_off)
                 b.ffaToggleAllBypassDnsFirewall.setImageResource(
-                    R.drawable.ic_bypass_dns_firewall_off
-                )
+                    R.drawable.ic_bypass_dns_firewall_off)
             }
             BlockType.BYPASS_DNS_FIREWALL -> {
                 b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on_grey)
@@ -626,8 +635,7 @@ class AppListActivity :
                 b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
                 b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_off)
                 b.ffaToggleAllBypassDnsFirewall.setImageResource(
-                    R.drawable.ic_bypass_dns_firewall_off
-                )
+                    R.drawable.ic_bypass_dns_firewall_off)
             }
         }
     }
@@ -719,14 +727,58 @@ class AppListActivity :
         b.ffaSearch.setOnQueryTextListener(this)
         addAnimation()
         remakeFirewallChipsUi()
+        handleKeyboardEvent()
+    }
+
+    private fun handleKeyboardEvent() {
+        // ref: stackoverflow.com/a/36259261
+        val rootView = findViewById<View>(android.R.id.content)
+
+        rootView.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
+            private var alreadyOpen = false
+            private val defaultKeyboardHeightDP = 100
+            private val EstimatedKeyboardDP = defaultKeyboardHeightDP + 48
+            private val rect = Rect()
+
+            override fun onGlobalLayout() {
+                val estimatedKeyboardHeight = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    EstimatedKeyboardDP.toFloat(),
+                    rootView.resources.displayMetrics
+                ).toInt()
+                rootView.getWindowVisibleDisplayFrame(rect)
+                val heightDiff = rootView.rootView.height - (rect.bottom - rect.top)
+                val isShown = heightDiff >= estimatedKeyboardHeight
+
+                if (isShown == alreadyOpen) {
+                    return // nothing to do
+                }
+
+                alreadyOpen = isShown
+
+                if (!isShown) {
+                    if (b.ffaSearch.hasFocus()) {
+                        // clear focus from search view when keyboard is closed
+                        b.ffaSearch.clearFocus()
+                    }
+                }
+            }
+        })
     }
 
     private fun initListAdapter() {
-        b.ffaAppList.setHasFixedSize(true)
-        layoutManager = CustomLinearLayoutManager(this)
-        b.ffaAppList.layoutManager = layoutManager
         val recyclerAdapter = FirewallAppListAdapter(this, this)
-        appInfoViewModel.appInfo.observe(this) { recyclerAdapter.submitData(this.lifecycle, it) }
+        b.ffaAppList.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(this)
+        b.ffaAppList.layoutManager = layoutManager
+        recyclerAdapter.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+
+        appInfoViewModel.appInfo.observe(this) {
+            b.ffaAppList.post { recyclerAdapter.submitData(lifecycle, it) }
+        }
+
         b.ffaAppList.adapter = recyclerAdapter
     }
 
@@ -743,8 +795,7 @@ class AppListActivity :
                 Animation.RELATIVE_TO_SELF,
                 ANIMATION_PIVOT_VALUE,
                 Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE
-            )
+                ANIMATION_PIVOT_VALUE)
         animation.repeatCount = ANIMATION_REPEAT_COUNT
         animation.duration = ANIMATION_DURATION
     }
@@ -755,9 +806,5 @@ class AppListActivity :
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
-    }
-
-    private fun ui(f: () -> Unit) {
-        lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 }

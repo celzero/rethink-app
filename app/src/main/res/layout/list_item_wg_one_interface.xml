@@ -47,12 +47,19 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginStart="3dp"
-                        android:layout_marginEnd="3dp"
                         android:ellipsize="end"
-                        android:maxLength="15"
+                        android:maxLength="16"
                         android:padding="5dp"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        android:textColor="?attr/secondaryTextColor" />
+                        android:textAppearance="?attr/textAppearanceHeadline6" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/interface_id_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="3dp"
+                        android:alpha="0.7"
+                        android:maxLength="5" />
 
                     <com.google.android.material.chip.ChipGroup
                         android:id="@+id/protocol_info_chip_group"
@@ -172,7 +179,9 @@
                 android:layout_centerVertical="true"
                 android:clickable="true"
                 android:focusable="true"
-                android:padding="10dp"
+                android:layoutDirection="rtl"
+                android:layout_marginEnd="10dp"
+                android:padding="20dp"
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp" />
         </RelativeLayout>

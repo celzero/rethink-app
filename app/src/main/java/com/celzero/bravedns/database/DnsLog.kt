@@ -57,6 +57,7 @@ class DnsLog {
     var resolverId: String = ""
     var msg: String = ""
     var upstreamBlock: Boolean = false
+    var region: String = ""
 
     override fun equals(other: Any?): Boolean {
         if (other !is DnsLog) return false

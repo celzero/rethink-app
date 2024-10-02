@@ -21,7 +21,6 @@ import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.content.res.Resources
 import android.os.ParcelFileDescriptor
-import android.os.SystemClock
 import android.widget.Toast
 import backend.Backend
 import com.celzero.bravedns.R
@@ -30,13 +29,16 @@ import com.celzero.bravedns.data.AppConfig.Companion.FALLBACK_DNS
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint
+import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.TcpProxyHelper
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
@@ -50,6 +52,7 @@ import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.blocklistDir
 import com.celzero.bravedns.util.Utilities.blocklistFile
+import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.wireguard.Config
@@ -57,12 +60,11 @@ import intra.Intra
 import intra.Tunnel
 import java.net.URI
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import settings.Settings
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -120,6 +122,11 @@ class GoVpnAdapter : KoinComponent {
         setRDNS()
         addTransport()
         setDnsAlg()
+        notifyLoopback()
+        setDialStrategy()
+        setTransparency()
+        setCrashFd()
+        undelegatedDomains()
         Logger.v(LOG_TAG_VPN, "GoVpnAdapter initResolverProxiesPcap done")
     }
 
@@ -134,6 +141,17 @@ class GoVpnAdapter : KoinComponent {
         Logger.v(LOG_TAG_VPN, "GoVpnAdapter setPcapMode done")
     }
 
+    private suspend fun setCrashFd() {
+        Logger.v(LOG_TAG_VPN, "GoVpnAdapter setCrashFd")
+        val crashFd = EnhancedBugReport.getFileToWrite(context)
+        if (crashFd != null) {
+            val set = Intra.setCrashFd(crashFd.absolutePath)
+            Logger.i(LOG_TAG_VPN, "set crash fd: $crashFd, set? $set")
+        } else {
+            Logger.w(LOG_TAG_VPN, "crash fd is null, cannot set")
+        }
+    }
+
     private suspend fun setRoute(tunnelOptions: TunnelOptions) {
         Logger.v(LOG_TAG_VPN, "GoVpnAdapter setRoute")
         try {
@@ -145,7 +163,7 @@ class GoVpnAdapter : KoinComponent {
 
             // on route change, set the tun mode again for ptMode
             tunnel.setTunMode(
-                tunnelOptions.tunDnsMode.mode,
+                tunnelOptions.tunDnsMode.mode.toInt(),
                 tunnelOptions.tunFirewallMode.mode,
                 tunnelOptions.ptMode.id
             )
@@ -374,6 +392,19 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
+    suspend fun unlink() {
+        if (!tunnel.isConnected) {
+            Logger.i(LOG_TAG_VPN, "Tunnel NOT connected, skip unlink")
+            return
+        }
+        try {
+            tunnel.unlink()
+            Logger.i(LOG_TAG_VPN, "tunnel unlinked")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "err dispose: ${e.message}", e)
+        }
+    }
+
     private suspend fun getRdnsStamp(url: String): String {
         val s = url.split(RETHINKDNS_DOMAIN)[1]
         val stamp =
@@ -406,7 +437,7 @@ class GoVpnAdapter : KoinComponent {
 
     private fun setTunnelMode(tunnelOptions: TunnelOptions) {
         tunnel.setTunMode(
-            tunnelOptions.tunDnsMode.mode,
+            tunnelOptions.tunDnsMode.mode.toInt(),
             tunnelOptions.tunFirewallMode.mode,
             tunnelOptions.ptMode.id
         )
@@ -419,7 +450,7 @@ class GoVpnAdapter : KoinComponent {
         }
         try {
             tunnel.setTunMode(
-                tunnelOptions.tunDnsMode.mode,
+                tunnelOptions.tunDnsMode.mode.toInt(),
                 tunnelOptions.tunFirewallMode.mode,
                 tunnelOptions.ptMode.id
             )
@@ -737,7 +768,7 @@ class GoVpnAdapter : KoinComponent {
             }
             Logger.i(LOG_TAG_VPN, "remove wireguard proxy with id: $id")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "error removing wireguard proxy: ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "err removing wireguard proxy: ${e.message}", e)
         }
     }
 
@@ -755,12 +786,17 @@ class GoVpnAdapter : KoinComponent {
 
             val wgConfig = WireguardManager.getConfigById(proxyId)
             val isOneWg = WireguardManager.getOneWireGuardProxyId() == proxyId
-            val wgUserSpaceString = wgConfig?.toWgUserspaceString(isOneWg)
+            val skipListenPort = !isOneWg && persistentState.randomizeListenPort
+            val wgUserSpaceString = wgConfig?.toWgUserspaceString(skipListenPort)
             getProxies()?.addProxy(id, wgUserSpaceString)
-            if (isOneWg) setWireGuardDns(id)
+            //if (isOneWg) setWireGuardDns(id)
+            setWireGuardDns(id)
+            // initiate a ping request to the wg proxy
+            initiateWgPing(id)
             Logger.i(LOG_TAG_VPN, "add wireguard proxy with $id; dns? $isOneWg")
+            Logger.vv(LOG_TAG_VPN, "wg config: $wgUserSpaceString")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "error adding wireguard proxy: ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "err adding wireguard proxy: ${e.message}", e)
             // do not auto remove failed wg proxy, let the user decide via UI
             // WireguardManager.disableConfig(id)
             showWireguardFailureToast(
@@ -789,7 +825,7 @@ class GoVpnAdapter : KoinComponent {
             val res = getProxies()?.refreshProxies()
             Logger.i(LOG_TAG_VPN, "refresh proxies: $res")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "error refreshing proxies: ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "err refreshing proxies: ${e.message}", e)
         }
     }
 
@@ -802,16 +838,27 @@ class GoVpnAdapter : KoinComponent {
             val res = getProxies()?.getProxy(id)?.refresh()
             Logger.i(LOG_TAG_VPN, "refresh proxy($id): $res")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "error refreshing proxy($id): ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "err refreshing proxy($id): ${e.message}", e)
         }
     }
 
-    suspend fun getProxyStats(id: String): backend.Stats? {
+    suspend fun getProxyStats(id: String): backend.RouterStats? {
         return try {
             val stats = getProxies()?.getProxy(id)?.router()?.stat()
             stats
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "error getting proxy stats($id): ${e.message}")
+            Logger.e(LOG_TAG_VPN, "err getting proxy stats($id): ${e.message}")
+            null
+        }
+    }
+
+    fun getNetStat(): backend.NetStat? {
+        return try {
+            val stat = tunnel.stat()
+            Logger.i(LOG_TAG_VPN, "net stat: $stat")
+            stat
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "err getting net stat: ${e.message}")
             null
         }
     }
@@ -891,7 +938,8 @@ class GoVpnAdapter : KoinComponent {
     suspend fun closeTun() {
         try {
             if (tunnel.isConnected) {
-                Logger.i(LOG_TAG_VPN, "Tunnel disconnect")
+                // this is not the only place where tunnel is disconnected
+                // netstack can also close the tunnel on errors
                 tunnel.disconnect()
             } else {
                 Logger.i(LOG_TAG_VPN, "Tunnel already disconnected")
@@ -965,6 +1013,27 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
+    suspend fun getSystemDns(): String {
+        return try {
+            val sysDns = getResolver()?.get(Backend.System)?.addr ?: ""
+            Logger.i(LOG_TAG_VPN, "get system dns: $sysDns")
+            sysDns
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "err get system dns: ${e.message}", e)
+            ""
+        }
+    }
+
+    suspend fun notifyLoopback() {
+        val t = persistentState.routeRethinkInRethink || VpnController.isVpnLockdown()
+        try {
+            Intra.loopback(t)
+            Logger.i(LOG_TAG_VPN, "notify loopback? $t")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "err notify loopback? $t, ${e.message}", e)
+        }
+    }
+
     suspend fun setSystemDns(systemDns: List<String>) {
         if (!tunnel.isConnected) {
             Logger.i(LOG_TAG_VPN, "Tunnel NOT connected, skip setting system-dns")
@@ -994,7 +1063,7 @@ class GoVpnAdapter : KoinComponent {
         proto: Long
     ): Boolean {
         if (!tunnel.isConnected) {
-            Logger.e(LOG_TAG_VPN, "updateLink: tunFd is null, returning")
+            Logger.e(LOG_TAG_VPN, "updateLink: tunnel disconnected, returning")
             return false
         }
         Logger.i(LOG_TAG_VPN, "updateLink with fd(${tunFd.fd}) mtu: ${opts.mtu}")
@@ -1122,10 +1191,11 @@ class GoVpnAdapter : KoinComponent {
         }
 
         fun setLogLevel(level: Int) {
-            // 0 - very verbose, 1 - verbose, 2 - debug, 3 - info, 4 - warn, 5 - error, 6 - stacktrace, 7 - none
-            // TODO: setting for console log level?, set as STACKTRACE for now
-            Intra.logLevel(level, Logger.LoggerType.STACKTRACE.id)
-            Logger.i(LOG_TAG_VPN, "set log level: $level, stacktrace")
+            // 0 - very verbose, 1 - verbose, 2 - debug, 3 - info, 4 - warn, 5 - error, 6 - stacktrace, 7 - user, 8 - none
+            // from UI, if none is selected, set the log level to 7 (user), usr will send only
+            // user notifications
+            Intra.logLevel(level, level)
+            Logger.i(LOG_TAG_VPN, "set go-log level: ${Logger.LoggerType.fromId(level)}")
         }
     }
 
@@ -1177,7 +1247,6 @@ class GoVpnAdapter : KoinComponent {
                 Logger.w(LOG_TAG_VPN, "Tunnel NOT connected, skip get proxies")
                 return null
             }
-            val t = System.currentTimeMillis()
             val px = tunnel.proxies
             return px
         } catch (e: Exception) {
@@ -1186,14 +1255,14 @@ class GoVpnAdapter : KoinComponent {
         return null
     }
 
-    suspend fun canRouteIp(wgId: String, ip: String, default: Boolean): Boolean {
+    suspend fun canRouteIp(proxyId: String, ip: String, default: Boolean): Boolean {
         return try {
-            val router = getProxies()?.getProxy(wgId)?.router() ?: return default
+            val router = getProxies()?.getProxy(proxyId)?.router() ?: return default
             val res = router.contains(ip)
-            Logger.i(LOG_TAG_VPN, "canRouteIp($wgId, $ip), res? $res")
+            Logger.d(LOG_TAG_VPN, "canRouteIp($proxyId, $ip), res? $res")
             res
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_VPN, "err canRouteIp($wgId, $ip): ${e.message}")
+            Logger.w(LOG_TAG_VPN, "err canRouteIp($proxyId, $ip): ${e.message}")
             default
         }
     }
@@ -1203,7 +1272,7 @@ class GoVpnAdapter : KoinComponent {
             val router = getProxies()?.getProxy(proxyId)?.router() ?: return Pair(false, false)
             val has4 = router.iP4()
             val has6 = router.iP6()
-            Logger.i(LOG_TAG_VPN, "supported ip version($proxyId): has4? $has4, has6? $has6")
+            Logger.d(LOG_TAG_VPN, "supported ip version($proxyId): has4? $has4, has6? $has6")
             return Pair(has4, has6)
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "err supported ip version($proxyId): ${e.message}")
@@ -1228,7 +1297,7 @@ class GoVpnAdapter : KoinComponent {
                     false
                 }
 
-            Logger.i(
+            Logger.d(
                 LOG_TAG_VPN,
                 "split tunnel proxy($proxyId): ipv4? ${pair.first}, ipv6? ${pair.second}, res? $res"
             )
@@ -1239,12 +1308,12 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun initiateWgPing(wgId: String) {
+    suspend fun initiateWgPing(proxyId: String) {
         try {
-            val res = getProxies()?.getProxy(wgId)?.ping()
-            Logger.i(LOG_TAG_VPN, "initiateWgPing($wgId): $res")
+            val res = getProxies()?.getProxy(proxyId)?.ping()
+            Logger.i(LOG_TAG_VPN, "initiateWgPing($proxyId): $res")
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_VPN, "err initiateWgPing($wgId): ${e.message}")
+            Logger.w(LOG_TAG_VPN, "err initiateWgPing($proxyId): ${e.message}")
         }
     }
 
@@ -1268,14 +1337,69 @@ class GoVpnAdapter : KoinComponent {
         Logger.i(LOG_TAG_VPN, "low memory, called Intra.lowMem()")
     }
 
-    suspend fun goBuildVersion(): String {
+    fun goBuildVersion(full: Boolean = false): String {
         return try {
-            val version = Intra.build()
+            val version = Intra.build(full)
             Logger.i(LOG_TAG_VPN, "go build version: $version")
             version
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "err go build version: ${e.message}", e)
             ""
+        }
+    }
+
+    suspend fun setDialStrategy(mode: Int = persistentState.dialStrategy, retry: Int = persistentState.retryStrategy, tcpKeepAlive: Boolean = persistentState.tcpKeepAlive) {
+        if (!tunnel.isConnected) {
+            Logger.i(LOG_TAG_VPN, "Tunnel NOT connected, skip set dial strategy")
+            return
+        }
+        try {
+            Settings.setDialerOpts(mode, retry, tcpKeepAlive)
+            Logger.i(LOG_TAG_VPN, "set dial strategy: $mode, retry: $retry, tcpKeepAlive: $tcpKeepAlive")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "err set dial strategy: ${e.message}", e)
+        }
+    }
+
+    suspend fun setTransparency(eim: Boolean = persistentState.endpointIndependence) {
+        if (!tunnel.isConnected) {
+            Logger.i(LOG_TAG_VPN, "Tunnel NOT connected, skip transparency")
+            return
+        }
+        if (!isAtleastS()) {
+            Intra.transparency(false, false)
+            Logger.i(LOG_TAG_VPN, "Android version is less than S, set transparency: false")
+            return
+        }
+        // set both endpoint independent mapping and endpoint independent filtering
+        // as a single value, as for the user is concerned, it is a single setting
+        Intra.transparency(eim, eim)
+        Logger.i(LOG_TAG_VPN, "set transparency: $eim")
+    }
+
+    suspend fun undelegatedDomains(useSystemDns: Boolean = persistentState.useSystemDnsForUndelegatedDomains) {
+        if (!tunnel.isConnected) {
+            Logger.i(LOG_TAG_VPN, "Tunnel NOT connected, skip undelegated domains")
+            return
+        }
+        try {
+            Intra.undelegatedDomains(useSystemDns)
+            Logger.i(LOG_TAG_VPN, "undelegated domains: $useSystemDns")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "err undelegated domains: ${e.message}", e)
+        }
+    }
+
+    suspend fun setSlowdownMode(slowdown: Boolean = persistentState.slowdownMode) {
+        if (!tunnel.isConnected) {
+            Logger.i(LOG_TAG_VPN, "Tunnel NOT connected, skip slowdown mode")
+            return
+        }
+        try {
+            Intra.slowdown(slowdown)
+            Logger.i(LOG_TAG_VPN, "set slowdown mode: $slowdown")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "err slowdown mode: ${e.message}", e)
         }
     }
 

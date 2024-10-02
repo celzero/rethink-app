@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <RelativeLayout
+        android:id="@+id/console_log_header_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/console_log_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:padding="10dp"
+            android:text="@string/console_log_title"
+            android:layout_toStartOf="@id/console_stat_info"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="16sp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/console_stat_info"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@id/console_log_start_stop"
+            android:src="@drawable/ic_info" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/console_log_start_stop"
+            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_centerVertical="true"
+            android:text="@string/hsf_start_btn_state"
+            android:layout_toStartOf="@id/console_log_save"
+            android:textColor="?attr/secondaryTextColor" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/console_log_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/console_log_share"
+            android:src="@drawable/ic_save" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/console_log_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="15dp"
+            android:src="@drawable/ic_share" />
+
+    </RelativeLayout>
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/console_log_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:indicatorColor="?attr/secondaryTextColor"
+        android:layout_below="@id/console_log_header_container"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/console_log_info_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:textSize="@dimen/small_font_text_view"
+        android:fontFamily="serif-monospace"
+        android:layout_below="@id/console_log_progress_bar"
+        android:text="@string/console_log_desc" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_share_log"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"
+        android:textColor="?attr/primaryTextColor"
+        app:backgroundTint="?attr/buttonBackground"
+        android:text="@string/about_bug_report_desc" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/console_log_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="2dp"
+        android:layout_below="@id/console_log_info_text"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="2dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:fastScrollEnabled="false"
+        app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
+        app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_line_drawable"
+        app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
+        app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_line_drawable" />
+
+</RelativeLayout>

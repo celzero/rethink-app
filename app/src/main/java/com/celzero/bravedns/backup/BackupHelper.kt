@@ -98,7 +98,7 @@ class BackupHelper {
 
         fun stopVpn(context: Context) {
             Logger.i(Logger.LOG_TAG_BACKUP_RESTORE, "calling vpn stop from backup helper")
-            VpnController.stop(context)
+            VpnController.stop("bkup", context)
         }
 
         fun startVpn(context: Context) {
