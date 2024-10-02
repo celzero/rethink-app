@@ -26,6 +26,12 @@ class ConnectionTracer(ctx: Context) {
         private const val SEPARATOR = "|"
     }
 
+    enum class CallerSrc {
+        PREFLOW,
+        INFLOW,
+        FLOW
+    }
+
     private val cm: ConnectivityManager
     private val uidCache: Cache<String, Int>
 
@@ -47,7 +53,8 @@ class ConnectionTracer(ctx: Context) {
         sourceIp: String,
         sourcePort: Int,
         destIp: String,
-        destPort: Int
+        destPort: Int,
+        caller: CallerSrc
     ): Int {
         var uid = Constants.INVALID_UID
         // android.googlesource.com/platform/development/+/da84168fb/ndk/platforms/android-21/include/linux/in.h
@@ -98,7 +105,7 @@ class ConnectionTracer(ctx: Context) {
             Logger.e(LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
         }
 
-        if (retryRequired(uid, protocol, destIp, key)){
+        if (retryRequired(uid, protocol, destIp, key, caller)){
             // change the destination IP to unspecified IP and try again for unconnected UDP
             val dip =
                 if (IPAddressString(destIp).isIPv6) {
@@ -107,7 +114,7 @@ class ConnectionTracer(ctx: Context) {
                     Constants.UNSPECIFIED_IP_IPV4
                 }
             val dport = 0
-            val res = getUidQ(protocol, sourceIp, sourcePort, dip, dport)
+            val res = getUidQ(protocol, sourceIp, sourcePort, dip, dport, caller)
             Logger.d(
                 LOG_TAG_VPN,
                 "retrying with: $protocol, $sourceIp, $sourcePort, $dip, $dport old($destIp, $destPort), res: $res"
@@ -121,7 +128,7 @@ class ConnectionTracer(ctx: Context) {
     }
 
     // handle unconnected UDP requests
-    private fun retryRequired(uid: Int, protocol: Int, destIp: String, key: String): Boolean {
+    private fun retryRequired(uid: Int, protocol: Int, destIp: String, key: String, caller: CallerSrc): Boolean {
         if (uid != Constants.INVALID_UID) { // already got the uid, no need to retry
             return false
         }
@@ -130,7 +137,7 @@ class ConnectionTracer(ctx: Context) {
             return false
         }
         // no need to retry for protocols other than UDP
-        if (protocol != Protocol.UDP.protocolType) {
+        if (protocol != Protocol.UDP.protocolType && caller != CallerSrc.INFLOW) {
             return false
         }
 

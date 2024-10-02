@@ -24,6 +24,7 @@ import android.os.SystemClock
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import backend.Backend
 import backend.RDNS
 import backend.RouterStats
 import com.celzero.bravedns.R
@@ -101,7 +102,7 @@ object VpnController : KoinComponent {
         states?.cancel()
         vpnStartElapsedTime = SystemClock.elapsedRealtime()
         try {
-            externalScope?.coroutineContext?.get(Job)?.cancel("VPNController - onVpnDestroyed")
+            // externalScope?.coroutineContext?.get(Job)?.cancel("VPNController - onVpnDestroyed")
             externalScope?.cancel("VPNController - onVpnDestroyed")
         } catch (ignored: IllegalStateException) {} catch (
             ignored: CancellationException) {} catch (ignored: Exception) {}
@@ -327,8 +328,8 @@ object VpnController : KoinComponent {
         return braveVpnService?.getRDNS(type)
     }
 
-    suspend fun goBuildVersion(): String {
-        return braveVpnService?.goBuildVersion() ?: ""
+    fun goBuildVersion(full: Boolean): String {
+        return braveVpnService?.goBuildVersion(full) ?: ""
     }
 
     fun protectSocket(socket: Socket) {
