@@ -124,7 +124,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         b.lbbsVersion.text =
             getString(
                 R.string.settings_local_blocklist_version,
-                Utilities.convertLongToTime(
+                convertLongToTime(
                     persistentState.localBlocklistTimestamp,
                     Constants.TIME_FORMAT_2
                 )

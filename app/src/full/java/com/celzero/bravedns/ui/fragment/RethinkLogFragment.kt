@@ -89,7 +89,7 @@ class RethinkLogFragment :
         val recyclerAdapter = RethinkLogAdapter(requireContext())
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.rlogList.observe(viewLifecycleOwner) { it ->
+                viewModel.rlogList.observe(viewLifecycleOwner) {
                     recyclerAdapter.submitData(lifecycle, it)
                 }
             }

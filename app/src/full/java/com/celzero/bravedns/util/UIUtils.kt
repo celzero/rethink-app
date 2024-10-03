@@ -310,7 +310,7 @@ object UIUtils {
 
         if (isDgaDomain(dnsLog.queryStr)) return
 
-        Logger.d(Logger.LOG_TAG_UI, "Glide - fetchFavIcon():${dnsLog.queryStr}")
+        Logger.d(LOG_TAG_UI, "Glide - fetchFavIcon():${dnsLog.queryStr}")
 
         // fetch fav icon in background using glide
         FavIconDownloader(context, dnsLog.queryStr).run()

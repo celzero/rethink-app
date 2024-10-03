@@ -24,7 +24,6 @@ import android.os.SystemClock
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import backend.Backend
 import backend.RDNS
 import backend.RouterStats
 import com.celzero.bravedns.R
@@ -36,7 +35,6 @@ import java.net.Socket
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
@@ -150,7 +148,7 @@ object VpnController : KoinComponent {
     fun stop(reason: String, context: Context) {
         Logger.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
         connectionState = null
-        onConnectionStateChanged(connectionState)
+        onConnectionStateChanged(null)
         braveVpnService?.signalStopService(reason, userInitiated = true)
     }
 

@@ -84,10 +84,10 @@ class CustomDomain {
     }
 
     companion object {
-        private const val currentVersion: Long = 1L
+        private const val CURRENT_VERSION: Long = 1L
 
         fun getCurrentVersion(): Long {
-            return currentVersion
+            return CURRENT_VERSION
         }
     }
 

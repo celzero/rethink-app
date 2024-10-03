@@ -44,8 +44,6 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
 import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.ui.activity.AppInfoActivity
-import com.celzero.bravedns.ui.activity.AppWiseDomainLogsActivity
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.fetchColor

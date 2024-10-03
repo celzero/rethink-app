@@ -49,7 +49,7 @@ interface ProxyEndpointDAO {
     fun getConnectedProxyLiveData(): LiveData<ProxyEndpoint?>
 
     @Query("select * from ProxyEndpoint where proxyMode = 0") // 0 for Custom SOCKS5
-    fun getCustomSocks5Endpoint(): ProxyEndpoint
+    fun getCustomSocks5Endpoint(): ProxyEndpoint?
 
     @Query("select * from ProxyEndpoint where isSelected = 1 and proxyMode = 0")
     fun getConnectedSocks5Proxy(): ProxyEndpoint?

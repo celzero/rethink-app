@@ -161,7 +161,7 @@ internal constructor(
                 val androidUidConfig = AndroidUidConfig.fromFileSystemUid(uid)
                 Logger.i(
                     LOG_TAG_FIREWALL,
-                    "android-uid for ${uid} is uid: ${androidUidConfig.uid}, n: ${androidUidConfig.name}"
+                    "android-uid for $uid is uid: ${androidUidConfig.uid}, n: ${androidUidConfig.name}"
                 )
 
                 if (androidUidConfig.uid == INVALID_UID) {

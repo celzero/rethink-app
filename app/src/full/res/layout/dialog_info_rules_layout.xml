@@ -14,7 +14,7 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/info_rules_dialog_cancel_img"
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -27,7 +27,7 @@
             android:layout_gravity="center"
             android:orientation="horizontal">
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/info_rules_dialog_rules_icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"

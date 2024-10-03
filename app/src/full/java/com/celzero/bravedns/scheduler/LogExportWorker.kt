@@ -37,7 +37,7 @@ class LogExportWorker(context: Context, workerParams: WorkerParameters) :
     private val consoleLogDao by inject<ConsoleLogDAO>()
 
     companion object {
-        private const val query = "SELECT * FROM ConsoleLog order by id"
+        private const val QUERY = "SELECT * FROM ConsoleLog order by id"
     }
 
     override suspend fun doWork(): Result {
@@ -54,7 +54,7 @@ class LogExportWorker(context: Context, workerParams: WorkerParameters) :
     private fun exportLogsToCsvStream(filePath: String): Boolean {
         var cursor: Cursor? = null
         try {
-            val query = SimpleSQLiteQuery(query)
+            val query = SimpleSQLiteQuery(QUERY)
             cursor = consoleLogDao.getLogsCursor(query)
 
             val file = File(filePath)
@@ -64,7 +64,7 @@ class LogExportWorker(context: Context, workerParams: WorkerParameters) :
             }
 
             val stringBuilder = StringBuilder()
-            cursor?.let {
+            cursor.let {
                 if (it.moveToFirst()) {
                     do {
                         val timestamp = it.getLong(it.getColumnIndexOrThrow("timestamp"))

@@ -27,7 +27,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import backend.Backend
 import backend.RouterStats
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -434,9 +433,9 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         b.applicationsBtn.isEnabled = true
         mappingViewModel.getAppCountById(id).observe(this) {
             if (it == 0) {
-                b.applicationsBtn.setTextColor(UIUtils.fetchColor(this, R.attr.accentBad))
+                b.applicationsBtn.setTextColor(fetchColor(this, R.attr.accentBad))
             } else {
-                b.applicationsBtn.setTextColor(UIUtils.fetchColor(this, R.attr.accentGood))
+                b.applicationsBtn.setTextColor(fetchColor(this, R.attr.accentGood))
             }
             b.applicationsBtn.text = getString(R.string.add_remove_apps, it.toString())
         }

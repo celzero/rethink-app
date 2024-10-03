@@ -29,7 +29,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import backend.Backend
 import backend.RouterStats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.OneWgConfigAdapter.DnsStatusListener
@@ -140,7 +139,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 b.interfaceConfigStatus.visibility = View.GONE
                 b.interfaceAppsCount.visibility = View.GONE
                 b.interfaceActiveLayout.visibility = View.GONE
-                b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.background)
+                b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.background)
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceSwitch.isChecked = false
                 b.protocolInfoChipGroup.visibility = View.GONE
@@ -243,15 +242,14 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 b.interfaceConfigStatus.visibility = View.VISIBLE
                 b.interfaceAppsCount.text = context.getString(R.string.routing_remaining_apps)
                 b.interfaceAppsCount.setTextColor(
-                    UIUtils.fetchColor(context, R.attr.primaryLightColorText)
+                    fetchColor(context, R.attr.primaryLightColorText)
                 )
                 b.interfaceConfigStatus.text = context.getString(R.string.catch_all_wg_dialog_title)
                 return // no need to update the apps count
             } else if (config.isLockdown) {
                 if (!config.isActive) {
                     b.interfaceDetailCard.strokeWidth = 2
-                    b.interfaceDetailCard.strokeColor =
-                        UIUtils.fetchColor(context, R.attr.accentBad)
+                    b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.accentBad)
                 }
                 b.interfaceConfigStatus.visibility = View.VISIBLE
                 b.interfaceConfigStatus.text =
@@ -269,11 +267,9 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             b.interfaceAppsCount.text =
                 context.getString(R.string.firewall_card_status_active, appsCount.toString())
             if (appsCount == 0) {
-                b.interfaceAppsCount.setTextColor(UIUtils.fetchColor(context, R.attr.accentBad))
+                b.interfaceAppsCount.setTextColor(fetchColor(context, R.attr.accentBad))
             } else {
-                b.interfaceAppsCount.setTextColor(
-                    UIUtils.fetchColor(context, R.attr.primaryLightColorText)
-                )
+                b.interfaceAppsCount.setTextColor(fetchColor(context, R.attr.primaryLightColorText))
             }
         }
 

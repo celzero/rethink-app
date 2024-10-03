@@ -161,10 +161,10 @@ class BraveVPNService :
     // used mostly for service to adapter creation and updates
     private var serializer: CoroutineDispatcher = Daemons.make("vpnser")
 
-    private var flowDispatcher = Daemons.ioDispatcher<Mark>("flow", Mark(),  vpnScope)
-    private var inflowDispatcher = Daemons.ioDispatcher<Mark>("inflow", Mark(), vpnScope)
-    private var preflowDispatcher = Daemons.ioDispatcher<PreMark>("preflow", PreMark(), vpnScope)
-    private var dnsQueryDispatcher = Daemons.ioDispatcher<DNSOpts>("onQuery", DNSOpts(), vpnScope)
+    private var flowDispatcher = Daemons.ioDispatcher("flow", Mark(),  vpnScope)
+    private var inflowDispatcher = Daemons.ioDispatcher("inflow", Mark(), vpnScope)
+    private var preflowDispatcher = Daemons.ioDispatcher("preflow", PreMark(), vpnScope)
+    private var dnsQueryDispatcher = Daemons.ioDispatcher("onQuery", DNSOpts(), vpnScope)
 
     // channel to perform wg handshakes
     private val wgHandshakeChannel = Channel<ProxyOperationData>(Channel.CONFLATED)
@@ -349,7 +349,7 @@ class BraveVPNService :
             // in case of zero, bind only for wg connections, wireguard tries to bind to
             // network with zero addresses
             if (
-                (destIp.isZero && who.startsWith(ProxyManager.ID_WG_BASE)) ||
+                (destIp.isZero && who.startsWith(ID_WG_BASE)) ||
                 destIp.isZero ||
                 destIp.isLoopback
             ) {
@@ -418,7 +418,7 @@ class BraveVPNService :
     }
 
     private suspend fun getUid(
-        _uid: Int,
+        recdUid: Int,
         protocol: Int,
         srcIp: String,
         srcPort: Int,
@@ -431,7 +431,7 @@ class BraveVPNService :
             ioAsync("getUidQ") { connTracer.getUidQ(protocol, srcIp, srcPort, dstIp, dstPort, caller) }
                 .await()
         } else {
-            _uid // uid must have been retrieved from procfs by the caller
+            recdUid // uid must have been retrieved from procfs by the caller
         }
     }
 
@@ -1254,7 +1254,7 @@ class BraveVPNService :
     }
 
     private fun makeDnscryptRelayObserver(): Observer<PersistentState.DnsCryptRelayDetails> {
-        return Observer<PersistentState.DnsCryptRelayDetails> { t ->
+        return Observer { t ->
             io("dnscryptRelay") {
                 if (t.added) {
                     vpnAdapter?.addDnscryptRelay(t.relay)
@@ -1266,7 +1266,7 @@ class BraveVPNService :
     }
 
     private fun makeAppInfoObserver(): Observer<Collection<AppInfo>> {
-        return Observer<Collection<AppInfo>> { t ->
+        return Observer { t ->
             try {
                 var latestExcludedApps: Set<String>
                 // adding synchronized block, found a case of concurrent modification
@@ -1300,7 +1300,7 @@ class BraveVPNService :
     }
 
     private fun makeOrbotStartStatusObserver(): Observer<Boolean> {
-        return Observer<Boolean> { settingUpOrbot.set(it) }
+        return Observer { settingUpOrbot.set(it) }
     }
 
     private fun updateNotificationBuilder(): Notification {
@@ -3102,7 +3102,7 @@ class BraveVPNService :
         return vpnScope.async(CoroutineName(s) + Dispatchers.IO) { f() }
     }
 
-    override fun onQuery(fqdn: String?, qtype: Long): backend.DNSOpts = go2kt(dnsQueryDispatcher) {
+    override fun onQuery(fqdn: String?, qtype: Long): DNSOpts = go2kt(dnsQueryDispatcher) {
         // queryType: see ResourceRecordTypes.kt
         logd("onQuery: rcvd query: $fqdn, qtype: $qtype")
         if (fqdn == null) {
@@ -3133,7 +3133,7 @@ class BraveVPNService :
     }
 
     // function to decide which transport id to return on Dns only mode
-    private suspend fun getTransportIdForDnsMode(fqdn: String): backend.DNSOpts {
+    private suspend fun getTransportIdForDnsMode(fqdn: String): DNSOpts {
         // useFixedTransport is false in Dns only mode
         val tid = determineDnsTransportId(false)
 
@@ -3149,7 +3149,7 @@ class BraveVPNService :
 
     // function to decide which transport id to return on DnsFirewall mode
     // two types of src, from onQuery and from preFlow (onQuery: true, preFlow: false)
-    private suspend fun getTransportIdForDnsFirewallMode(fqdn: String, src: Boolean = false): backend.DNSOpts {
+    private suspend fun getTransportIdForDnsFirewallMode(fqdn: String, src: Boolean = false): DNSOpts {
         val useFixedTransport = shouldUseFixedTransport(src)
 
         val tid = determineDnsTransportId(useFixedTransport)
@@ -3195,7 +3195,7 @@ class BraveVPNService :
     private fun determineDnsTransportId(useFixedTransport: Boolean): String {
         val oneWgId = WireguardManager.getOneWireGuardProxyId()
         val tid =  if (oneWgId != null) {
-            ProxyManager.ID_WG_BASE + oneWgId
+            ID_WG_BASE + oneWgId
         } else if (appConfig.isSystemDns() || (isAppPaused() && VpnController.isVpnLockdown())) {
             // in vpn-lockdown mode+appPause , use system dns if the app is paused to mimic
             // as if the apps are excluded from vpn
@@ -3217,8 +3217,8 @@ class BraveVPNService :
     private suspend fun makeNsOpts(
         tid: String,
         bypassLocalBlocklists: Boolean = false
-    ): backend.DNSOpts {
-        val opts = backend.DNSOpts()
+    ): DNSOpts {
+        val opts = DNSOpts()
         opts.ipcsv = "" // as of now, no suggested ips
         opts.tidcsv = tid
         opts.pid = proxyIdForOnQuery()
@@ -3289,11 +3289,11 @@ class BraveVPNService :
             // only for one-wireguard, the dns queries are proxied
             if (WireguardManager.oneWireGuardEnabled()) {
                 val id = WireguardManager.getOneWireGuardProxyId() ?: return Backend.Base
-                ProxyManager.ID_WG_BASE + id
+                ID_WG_BASE + id
             } else if (WireguardManager.catchAllEnabled()) {
                 // if the enabled wireguard is catchall-wireguard, then return wireguard id
                 val id = WireguardManager.getOptimalCatchAllConfigId() ?: return Backend.Base
-                ProxyManager.ID_WG_BASE + id
+                ID_WG_BASE + id
             } else {
                 // if the enabled wireguard is not one-wireguard, then return base
                 Backend.Base
@@ -3302,7 +3302,7 @@ class BraveVPNService :
             // if the enabled wireguard is catchall-wireguard, then return wireguard id
             val id = WireguardManager.getOptimalCatchAllConfigId() ?: return Backend.Base
             // in this case, no need to check if the proxy is available
-            ProxyManager.ID_WG_BASE + id
+            ID_WG_BASE + id
         } else {
             Backend.Base
         }
@@ -3348,7 +3348,7 @@ class BraveVPNService :
     }
 
     override fun onProxyAdded(id: String) {
-        if (!id.contains(ProxyManager.ID_WG_BASE)) {
+        if (!id.contains(ID_WG_BASE)) {
             // only wireguard proxies are considered for overlay network
             return
         }
@@ -3363,7 +3363,7 @@ class BraveVPNService :
     }
 
     override fun onProxyRemoved(id: String) {
-        if (!id.contains(ProxyManager.ID_WG_BASE)) {
+        if (!id.contains(ID_WG_BASE)) {
             // only wireguard proxies are considered for overlay network
             return
         }
@@ -3827,7 +3827,7 @@ class BraveVPNService :
     private suspend fun determineProxyDetails(
         connTracker: ConnTrackerMetaData,
         doubleLoopback: Boolean
-    ): intra.Mark {
+    ): Mark {
         val baseOrExit =
             if (doubleLoopback) {
                 Backend.Base
@@ -3850,7 +3850,7 @@ class BraveVPNService :
         // check for one-wireguard, if enabled, return wireguard proxy for all connections
         val oneWgId = WireguardManager.getOneWireGuardProxyId()
         if (oneWgId != null && oneWgId != WireguardManager.INVALID_CONF_ID) {
-            val proxyId = "${ProxyManager.ID_WG_BASE}${oneWgId}"
+            val proxyId = "${ID_WG_BASE}${oneWgId}"
             // regardless of whether this proxyId exists in go, use it to avoid leaks
             val ipSupported = isIpSupportedByWireGuardId(proxyId, connTracker.destIP)
             val canRoute = canRouteIp(proxyId, connTracker.destIP, true)
@@ -3874,7 +3874,7 @@ class BraveVPNService :
                 connTracker.destIP
             ) // also accounts for catch-all
         if (wgConfig != null && wgConfig.id != WireguardManager.INVALID_CONF_ID) {
-            val proxyId = "${ProxyManager.ID_WG_BASE}${wgConfig.id}"
+            val proxyId = "${ID_WG_BASE}${wgConfig.id}"
             // TODO: WgMgr takes care of giving the correct proxyId, check for canRouteIp to
             // trigger the handshake if needed
             val canRoute = canRouteIp(proxyId, connTracker.destIP, true)
@@ -4049,7 +4049,7 @@ class BraveVPNService :
     }
 
     private suspend fun handleProxyHandshake(id: String) {
-        if (!id.startsWith(ProxyManager.ID_WG_BASE)) {
+        if (!id.startsWith(ID_WG_BASE)) {
             // only wireguard proxies are considered for handshakes
             return
         }
@@ -4134,7 +4134,7 @@ class BraveVPNService :
         connId: String,
         uid: Int,
         isRethink: Boolean = false
-    ): intra.Mark {
+    ): Mark {
         // persist ConnTrackerMetaData
         if (cm != null) {
             cm.proxyDetails = proxyId
@@ -4150,7 +4150,7 @@ class BraveVPNService :
             logd("flow/inflow: connTracker: $cm")
         }
 
-        val mark = intra.Mark()
+        val mark = Mark()
         mark.pid = proxyId
         mark.cid = connId
         // if rethink, then set uid as rethink, so that go process can handle it accordingly

@@ -337,7 +337,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
         private fun loadAppIcon(drawable: Drawable?) {
             Glide.with(context)
                 .load(drawable)
-                .error(Utilities.getDefaultIcon(context))
+                .error(getDefaultIcon(context))
                 .into(b.connectionAppIcon)
         }
     }

@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -31,7 +30,6 @@ import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
-import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

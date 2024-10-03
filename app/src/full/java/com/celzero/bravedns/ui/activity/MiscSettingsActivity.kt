@@ -29,7 +29,6 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.LocaleList
 import android.provider.Settings
 import android.view.View
@@ -41,27 +40,22 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.biometric.BiometricManager
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.backup.BackupHelper
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.bottomsheet.BackupRestoreBottomSheet
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.NotificationActionType
-import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
-import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -69,11 +63,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
-import java.io.File
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 

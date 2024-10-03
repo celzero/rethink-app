@@ -19,10 +19,7 @@ package com.celzero.bravedns.service
 import Logger.LOG_BATCH_LOGGER
 import android.content.Context
 import android.util.Log
-import backend.Backend
 import backend.DNSSummary
-import com.celzero.bravedns.RethinkDnsApplication
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.database.ConnectionTracker
@@ -156,7 +153,7 @@ internal constructor(
         if (!persistentState.logsEnabled) return
 
         serializer("writeRethinkLog", looper) {
-            val rlog = ipdb.makeRethinkLogs(info) ?: return@serializer
+            val rlog = ipdb.makeRethinkLogs(info)
             rrBatcher?.add(rlog)
         }
     }

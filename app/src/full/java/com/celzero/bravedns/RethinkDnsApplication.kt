@@ -3,7 +3,6 @@ package com.celzero.bravedns
 import Logger
 import Logger.LOG_TAG_SCHEDULER
 import android.app.Application
-import android.content.ComponentCallbacks2
 import android.content.pm.ApplicationInfo
 import android.os.StrictMode
 import com.celzero.bravedns.scheduler.ScheduleManager

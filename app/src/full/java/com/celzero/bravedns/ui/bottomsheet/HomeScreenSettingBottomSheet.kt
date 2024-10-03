@@ -18,7 +18,6 @@ package com.celzero.bravedns.ui.bottomsheet
 import Logger
 import Logger.LOG_TAG_VPN
 import android.content.res.Configuration
-import android.icu.util.TimeUnit
 import android.os.Bundle
 import android.os.SystemClock
 import android.text.format.DateUtils
@@ -35,8 +34,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
-import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
-import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers

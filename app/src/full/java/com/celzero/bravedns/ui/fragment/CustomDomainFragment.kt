@@ -29,7 +29,6 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.CustomDomainAdapter
-import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.DialogAddCustomDomainBinding
 import com.celzero.bravedns.databinding.FragmentCustomDomainBinding
 import com.celzero.bravedns.service.DomainRulesManager

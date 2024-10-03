@@ -38,7 +38,6 @@ import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
@@ -464,7 +463,7 @@ class GoVpnAdapter : KoinComponent {
         Logger.d(LOG_TAG_VPN, "set brave dns to tunnel (local/remote)")
 
         // enable local blocklist if enabled
-        if (persistentState.blocklistEnabled && !Utilities.isPlayStoreFlavour()) {
+        if (persistentState.blocklistEnabled && !isPlayStoreFlavour()) {
             setRDNSLocal()
         } else {
             // remove local blocklist, if any
@@ -1125,7 +1124,7 @@ class GoVpnAdapter : KoinComponent {
     }
 
     private suspend fun resetLocalBlocklistStampFromTunnel() {
-        if (Utilities.isPlayStoreFlavour()) return
+        if (isPlayStoreFlavour()) return
 
         try {
             val rl = getRDNS(RethinkBlocklistManager.RethinkBlocklistType.LOCAL)

@@ -17,7 +17,6 @@ package com.celzero.bravedns.adapter
 
 import Logger
 import Logger.LOG_TAG_DNS
-import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable

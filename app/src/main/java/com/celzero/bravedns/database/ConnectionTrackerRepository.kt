@@ -16,7 +16,6 @@
 package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.data.DataUsage
 import com.celzero.bravedns.service.PersistentState

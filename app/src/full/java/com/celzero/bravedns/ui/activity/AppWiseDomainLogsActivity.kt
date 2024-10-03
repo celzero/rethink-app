@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import Logger
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Configuration

@@ -60,13 +60,12 @@ class Peer private constructor(builder: Builder) {
 
     override fun equals(obj: Any?): Boolean {
         if (obj !is Peer) return false
-        val other = obj
-        return allowedIps == other.allowedIps &&
-            endpoint == other.endpoint &&
-            unresolvedEndpoint == other.unresolvedEndpoint &&
-            persistentKeepalive == other.persistentKeepalive &&
-            preSharedKey == other.preSharedKey &&
-            publicKey == other.publicKey
+        return allowedIps == obj.allowedIps &&
+                endpoint == obj.endpoint &&
+                unresolvedEndpoint == obj.unresolvedEndpoint &&
+                persistentKeepalive == obj.persistentKeepalive &&
+                preSharedKey == obj.preSharedKey &&
+                publicKey == obj.publicKey
     }
 
     /**

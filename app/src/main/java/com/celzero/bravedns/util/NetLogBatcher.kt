@@ -16,25 +16,18 @@
 
 package com.celzero.bravedns.util
 
-import Logger
 import Logger.LOG_BATCH_LOGGER
 import android.util.Log
 import co.touchlab.stately.concurrency.AtomicBoolean
-import kotlinx.coroutines.CloseableCoroutineDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.withContext
 
 // channel buffer receives batched entries of batchsize or once every waitms from a batching
@@ -116,11 +109,11 @@ class NetLogBatcher<T, V>(
 
     private suspend fun txswap() {
         val b = batches
-        batches = mutableListOf<T>() // swap buffers
+        batches = mutableListOf() // swap buffers
         buffersCh.send(b)
 
         val u = updates
-        updates = mutableListOf<V>() // swap buffers
+        updates = mutableListOf() // swap buffers
         updatesCh.send(u)
 
         logd( "txswap (${lsn}) b: ${b.size}, u: ${u.size}")

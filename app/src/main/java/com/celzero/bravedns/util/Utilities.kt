@@ -628,11 +628,7 @@ object Utilities {
         val remoteFile =
             blocklistFile(remoteDir.absolutePath, Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
                 ?: return false
-        if (remoteFile.exists()) {
-            return true
-        }
-
-        return false
+        return remoteFile.exists()
     }
 
     fun blocklistDir(ctx: Context?, which: String, timestamp: Long): File? {

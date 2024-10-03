@@ -19,7 +19,6 @@ import Logger
 import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.ActivityNotFoundException
@@ -45,7 +44,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri

@@ -147,7 +147,7 @@ internal constructor(
 
             Logger.i(
                 LOG_TAG_APP_DB,
-                "reload: fm: ${fm}; ip: ${ipm}; dom: ${dm}; px: ${pxm}; wg: ${wgm}; t: ${tcpm}"
+                "reload: fm: ${fm}; ip: ${ipm}; dom: ${dm}; px: ${pxm}; wg: ${wgm}; t: $tcpm"
             )
 
             val trackedApps = FirewallManager.getAllApps()
@@ -343,7 +343,7 @@ internal constructor(
         }
         val ai = maybeFetchAppInfo(uid)
         val pkg = ai?.packageName ?: ""
-        Logger.i(LOG_TAG_APP_DB, "insert app; uid: $uid, pkg: ${pkg}")
+        Logger.i(LOG_TAG_APP_DB, "insert app; uid: $uid, pkg: $pkg")
         if (ai != null) {
             // uid may be different from the one in ai, if the app is installed in a different user
             insertApp(ai)
@@ -665,7 +665,7 @@ internal constructor(
         val intent = Intent(ctx, HomeScreenActivity::class.java)
         val nm = ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         val pendingIntent =
-            Utilities.getActivityPendingIntent(
+            getActivityPendingIntent(
                 ctx,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT,

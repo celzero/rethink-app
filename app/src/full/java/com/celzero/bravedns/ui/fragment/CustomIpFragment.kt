@@ -248,7 +248,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
             val input = dBind.daciIpEditText.text.toString()
             val ipString = Utilities.removeLeadingAndTrailingDots(input)
             var ip: IPAddress? = null
-            var port: Int = 0
+            var port = 0
 
             // chances of creating NetworkOnMainThread exception, handling with io operation
             ioCtx {

@@ -23,14 +23,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.PagingSource
-import androidx.paging.PagingState
 import androidx.paging.cachedIn
 import androidx.paging.liveData
 import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.database.ConsoleLogDAO
 import com.celzero.bravedns.util.Constants
-import kotlinx.coroutines.flow.Flow
 
 class ConsoleLogViewModel(private val dao: ConsoleLogDAO) : ViewModel() {
     private var filter: MutableLiveData<String> = MutableLiveData()

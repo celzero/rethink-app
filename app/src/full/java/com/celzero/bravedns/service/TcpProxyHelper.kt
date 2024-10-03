@@ -202,7 +202,7 @@ object TcpProxyHelper : KoinComponent {
             Logger.w(LOG_TAG_PROXY, "getTcpProxyPaymentStatus: tcpProxy not found")
             return PaymentStatus.NOT_PAID
         }
-        return PaymentStatus.values().find { it.value == tcpProxy.paymentStatus }
+        return PaymentStatus.entries.find { it.value == tcpProxy.paymentStatus }
             ?: PaymentStatus.NOT_PAID
     }
 

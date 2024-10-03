@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger
 object Daemons {
 
     fun make(tag: String) = Executors.newSingleThreadExecutor(Factory(tag)).asCoroutineDispatcher()
-    fun <T> ioDispatcher(tag: String, default: T, s: CoroutineScope) = CoFactory<T>(tag, default, s, make(tag))
+    fun <T> ioDispatcher(tag: String, default: T, s: CoroutineScope) = CoFactory(tag, default, s, make(tag))
 }
 
 class CoFactory<T>(

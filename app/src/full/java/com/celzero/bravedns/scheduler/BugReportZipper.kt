@@ -27,7 +27,6 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities
 import com.google.common.io.Files
-import intra.Intra
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException

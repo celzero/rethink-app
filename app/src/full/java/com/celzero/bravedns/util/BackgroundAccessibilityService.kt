@@ -210,16 +210,16 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
     private val notificationTitle: String
         get() {
             if (cameraOn && micOn) return "Your Camera and Mic is ON"
-            if (cameraOn && !micOn) return "Your Camera is ON"
-            return if (!cameraOn && micOn) "Your MIC is ON" else "Your Camera or Mic is ON"
+            if (cameraOn) return "Your Camera is ON"
+            return if (micOn) "Your MIC is ON" else "Your Camera or Mic is ON"
         }
 
     private val notificationDescription: String
         get() {
             if (cameraOn && micOn)
                 return "A third-party app($possibleAppName) is using your Camera and Microphone"
-            if (cameraOn && !micOn) return "A third-party app($possibleAppName) is using your Camera"
-            return if (!cameraOn && micOn) "A third-party app($possibleAppName) is using your Microphone"
+            if (cameraOn) return "A third-party app($possibleAppName) is using your Camera"
+            return if (micOn) "A third-party app($possibleAppName) is using your Microphone"
             else "A third-party app($possibleAppName) is using your Camera or Microphone"
         }
 

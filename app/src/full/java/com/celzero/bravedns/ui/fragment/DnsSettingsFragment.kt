@@ -19,12 +19,10 @@ import Logger
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.view.MotionEvent
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.CompoundButton
-import android.widget.RadioButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
