@@ -263,44 +263,64 @@ object UIUtils {
 
     fun fetchToggleBtnColors(context: Context, attr: Int): Int {
         val attributeFetch =
-            if (attr == R.color.firewallNoRuleToggleBtnTxt) {
-                R.attr.firewallNoRuleToggleBtnTxt
-            } else if (attr == R.color.firewallNoRuleToggleBtnBg) {
-                R.attr.firewallNoRuleToggleBtnBg
-            } else if (attr == R.color.firewallBlockToggleBtnTxt) {
-                R.attr.firewallBlockToggleBtnTxt
-            } else if (attr == R.color.firewallBlockToggleBtnBg) {
-                R.attr.firewallBlockToggleBtnBg
-            } else if (attr == R.color.firewallWhiteListToggleBtnTxt) {
-                R.attr.firewallWhiteListToggleBtnTxt
-            } else if (attr == R.color.firewallWhiteListToggleBtnBg) {
-                R.attr.firewallWhiteListToggleBtnBg
-            } else if (attr == R.color.firewallExcludeToggleBtnBg) {
-                R.attr.firewallExcludeToggleBtnBg
-            } else if (attr == R.color.firewallExcludeToggleBtnTxt) {
-                R.attr.firewallExcludeToggleBtnTxt
-            } else if (attr == R.color.defaultToggleBtnBg) {
-                R.attr.defaultToggleBtnBg
-            } else if (attr == R.color.defaultToggleBtnTxt) {
-                R.attr.defaultToggleBtnTxt
-            } else if (attr == R.color.accentGood) {
-                R.attr.accentGood
-            } else if (attr == R.color.accentBad) {
-                R.attr.accentBad
-            } else if (attr == R.color.chipBgNeutral) {
-                R.attr.chipBgColorNeutral
-            } else if (attr == R.color.chipBgNegative) {
-                R.attr.chipBgColorNegative
-            } else if (attr == R.color.chipBgPositive) {
-                R.attr.chipBgColorPositive
-            } else if (attr == R.color.chipTextNeutral) {
-                R.attr.chipTextNeutral
-            } else if (attr == R.color.chipTextNegative) {
-                R.attr.chipTextNegative
-            } else if (attr == R.color.chipTextPositive) {
-                R.attr.chipTextPositive
-            } else {
-                R.attr.chipBgColorPositive
+            when (attr) {
+                R.color.firewallNoRuleToggleBtnTxt -> {
+                    R.attr.firewallNoRuleToggleBtnTxt
+                }
+                R.color.firewallNoRuleToggleBtnBg -> {
+                    R.attr.firewallNoRuleToggleBtnBg
+                }
+                R.color.firewallBlockToggleBtnTxt -> {
+                    R.attr.firewallBlockToggleBtnTxt
+                }
+                R.color.firewallBlockToggleBtnBg -> {
+                    R.attr.firewallBlockToggleBtnBg
+                }
+                R.color.firewallWhiteListToggleBtnTxt -> {
+                    R.attr.firewallWhiteListToggleBtnTxt
+                }
+                R.color.firewallWhiteListToggleBtnBg -> {
+                    R.attr.firewallWhiteListToggleBtnBg
+                }
+                R.color.firewallExcludeToggleBtnBg -> {
+                    R.attr.firewallExcludeToggleBtnBg
+                }
+                R.color.firewallExcludeToggleBtnTxt -> {
+                    R.attr.firewallExcludeToggleBtnTxt
+                }
+                R.color.defaultToggleBtnBg -> {
+                    R.attr.defaultToggleBtnBg
+                }
+                R.color.defaultToggleBtnTxt -> {
+                    R.attr.defaultToggleBtnTxt
+                }
+                R.color.accentGood -> {
+                    R.attr.accentGood
+                }
+                R.color.accentBad -> {
+                    R.attr.accentBad
+                }
+                R.color.chipBgNeutral -> {
+                    R.attr.chipBgColorNeutral
+                }
+                R.color.chipBgNegative -> {
+                    R.attr.chipBgColorNegative
+                }
+                R.color.chipBgPositive -> {
+                    R.attr.chipBgColorPositive
+                }
+                R.color.chipTextNeutral -> {
+                    R.attr.chipTextNeutral
+                }
+                R.color.chipTextNegative -> {
+                    R.attr.chipTextNegative
+                }
+                R.color.chipTextPositive -> {
+                    R.attr.chipTextPositive
+                }
+                else -> {
+                    R.attr.chipBgColorPositive
+                }
             }
         return fetchColor(context, attributeFetch)
     }

@@ -80,7 +80,7 @@ class NetLogBatcher<T, V>(
 
     // stackoverflow.com/a/68905423
     suspend fun close() = withContext(NonCancellable) {
-                if (closed.compareAndSet(false, true)) {
+                if (closed.compareAndSet(expected = false, new = true)) {
                     signal.close()
                     buffersCh.close()
                     updatesCh.close()

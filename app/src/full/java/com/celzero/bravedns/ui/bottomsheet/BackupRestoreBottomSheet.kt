@@ -160,18 +160,19 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
                 LOG_TAG_BACKUP_RESTORE,
                 "WorkManager state: ${workInfo.state} for ${BackupAgent.TAG}"
             )
-            if (workInfo.state == WorkInfo.State.SUCCEEDED) {
-                showBackupSuccessUi()
-                workManager.pruneWork()
-            } else if (
-                workInfo.state == WorkInfo.State.CANCELLED ||
-                    workInfo.state == WorkInfo.State.FAILED
-            ) {
-                showBackupFailureDialog()
-                workManager.pruneWork()
-                workManager.cancelAllWorkByTag(BackupAgent.TAG)
-            } else {
-                // no-op
+            when (workInfo.state) {
+                WorkInfo.State.SUCCEEDED -> {
+                    showBackupSuccessUi()
+                    workManager.pruneWork()
+                }
+                WorkInfo.State.CANCELLED, WorkInfo.State.FAILED -> {
+                    showBackupFailureDialog()
+                    workManager.pruneWork()
+                    workManager.cancelAllWorkByTag(BackupAgent.TAG)
+                }
+                else -> {
+                    // no-op
+                }
             }
         }
     }

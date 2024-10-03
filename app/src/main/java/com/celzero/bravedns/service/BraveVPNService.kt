@@ -2361,7 +2361,7 @@ class BraveVPNService :
         var new = _new
         // when old and new are null, no changes
         if (old == null && new == null) {
-            return NetworkChanges(false, false, false)
+            return NetworkChanges(routesChanged = false, netChanged = false, mtuChanged = false)
         }
         // no old routes to compare with, return true
         if (old == null) return NetworkChanges()

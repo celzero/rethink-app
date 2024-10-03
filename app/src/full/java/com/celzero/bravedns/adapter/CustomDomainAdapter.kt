@@ -107,13 +107,19 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val customDomain: CustomDomain = getItem(position) ?: return
-        if (holder is CustomDomainViewHolderWithHeader) {
-            holder.update(customDomain)
-        } else if (holder is CustomDomainViewHolderWithoutHeader) {
-            holder.update(customDomain)
-        } else {
-            Logger.w(LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
-            return
+        when (holder) {
+            is CustomDomainViewHolderWithHeader -> {
+                holder.update(customDomain)
+            }
+
+            is CustomDomainViewHolderWithoutHeader -> {
+                holder.update(customDomain)
+            }
+
+            else -> {
+                Logger.w(LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
+                return
+            }
         }
     }
 

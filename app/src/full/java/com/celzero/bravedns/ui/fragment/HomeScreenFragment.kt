@@ -542,30 +542,35 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun observeDnsStates() {
         persistentState.median.observe(viewLifecycleOwner) {
             // show status as very fast, fast, slow, and very slow based on the latency
-            if (it in 0L..19L) {
-                val string =
-                    getString(
-                        R.string.ci_desc,
-                        getString(R.string.lbl_very),
-                        getString(R.string.lbl_fast)
-                    )
-                        .replaceFirstChar(Char::titlecase)
-                b.fhsCardDnsLatency.text = string
-            } else if (it in 20L..50L) {
-                b.fhsCardDnsLatency.text =
-                    getString(R.string.lbl_fast).replaceFirstChar(Char::titlecase)
-            } else if (it in 50L..100L) {
-                b.fhsCardDnsLatency.text =
-                    getString(R.string.lbl_slow).replaceFirstChar(Char::titlecase)
-            } else {
-                val string =
-                    getString(
-                        R.string.ci_desc,
-                        getString(R.string.lbl_very),
-                        getString(R.string.lbl_slow)
-                    )
-                        .replaceFirstChar(Char::titlecase)
-                b.fhsCardDnsLatency.text = string
+            when (it) {
+                in 0L..19L -> {
+                    val string =
+                        getString(
+                            R.string.ci_desc,
+                            getString(R.string.lbl_very),
+                            getString(R.string.lbl_fast)
+                        )
+                            .replaceFirstChar(Char::titlecase)
+                    b.fhsCardDnsLatency.text = string
+                }
+                in 20L..50L -> {
+                    b.fhsCardDnsLatency.text =
+                        getString(R.string.lbl_fast).replaceFirstChar(Char::titlecase)
+                }
+                in 50L..100L -> {
+                    b.fhsCardDnsLatency.text =
+                        getString(R.string.lbl_slow).replaceFirstChar(Char::titlecase)
+                }
+                else -> {
+                    val string =
+                        getString(
+                            R.string.ci_desc,
+                            getString(R.string.lbl_very),
+                            getString(R.string.lbl_slow)
+                        )
+                            .replaceFirstChar(Char::titlecase)
+                    b.fhsCardDnsLatency.text = string
+                }
             }
 
             b.fhsCardDnsLatency.isSelected = true
@@ -1545,20 +1550,28 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun fetchTextColor(attr: Int): Int {
         val attributeFetch =
-            if (attr == R.color.accentGood) {
-                R.attr.accentGood
-            } else if (attr == R.color.accentBad) {
-                R.attr.accentBad
-            } else if (attr == R.color.primaryLightColorText) {
-                R.attr.primaryLightColorText
-            } else if (attr == R.color.secondaryText) {
-                R.attr.invertedPrimaryTextColor
-            } else if (attr == R.color.primaryText) {
-                R.attr.primaryTextColor
-            } else if (attr == R.color.primaryTextLight) {
-                R.attr.primaryTextColor
-            } else {
-                R.attr.accentGood
+            when (attr) {
+                R.color.accentGood -> {
+                    R.attr.accentGood
+                }
+                R.color.accentBad -> {
+                    R.attr.accentBad
+                }
+                R.color.primaryLightColorText -> {
+                    R.attr.primaryLightColorText
+                }
+                R.color.secondaryText -> {
+                    R.attr.invertedPrimaryTextColor
+                }
+                R.color.primaryText -> {
+                    R.attr.primaryTextColor
+                }
+                R.color.primaryTextLight -> {
+                    R.attr.primaryTextColor
+                }
+                else -> {
+                    R.attr.accentGood
+                }
             }
         val typedValue = TypedValue()
         val a: TypedArray =

@@ -486,12 +486,16 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
                 }
                 AppConfig.ProxyProvider.CUSTOM -> {
                     val type = AppConfig.ProxyType.of(proxyType)
-                    if (type == AppConfig.ProxyType.SOCKS5) {
-                        R.string.lbl_socks5
-                    } else if (type == AppConfig.ProxyType.HTTP) {
-                        R.string.lbl_http
-                    } else {
-                        R.string.lbl_http_socks5
+                    when (type) {
+                        AppConfig.ProxyType.SOCKS5 -> {
+                            R.string.lbl_socks5
+                        }
+                        AppConfig.ProxyType.HTTP -> {
+                            R.string.lbl_http
+                        }
+                        else -> {
+                            R.string.lbl_http_socks5
+                        }
                     }
                 }
                 else -> {

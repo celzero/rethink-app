@@ -365,11 +365,13 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                 val v: Any? = e.value
                 val key: String = e.key
 
-                if (v is Boolean) prefsEditor.putBoolean(key, (v as Boolean?)!!)
-                else if (v is Float) prefsEditor.putFloat(key, (v as Float?)!!)
-                else if (v is Int) prefsEditor.putInt(key, (v as Int?)!!)
-                else if (v is Long) prefsEditor.putLong(key, (v as Long?)!!)
-                else if (v is String) prefsEditor.putString(key, v as String?)
+                when (v) {
+                    is Boolean -> prefsEditor.putBoolean(key, (v as Boolean?)!!)
+                    is Float -> prefsEditor.putFloat(key, (v as Float?)!!)
+                    is Int -> prefsEditor.putInt(key, (v as Int?)!!)
+                    is Long -> prefsEditor.putLong(key, (v as Long?)!!)
+                    is String -> prefsEditor.putString(key, v as String?)
+                }
             }
             prefsEditor.apply()
             Logger.i(
