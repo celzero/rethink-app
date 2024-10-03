@@ -25,6 +25,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DomainConnectionsAdapter
 import com.celzero.bravedns.databinding.ActivityDomainConnectionsBinding
+import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
@@ -32,6 +33,7 @@ import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.nio.charset.StandardCharsets
 
 class DomainConnectionsActivity : AppCompatActivity(R.layout.activity_domain_connections){
     private val b by viewBinding(ActivityDomainConnectionsBinding::bind)
@@ -64,15 +66,11 @@ class DomainConnectionsActivity : AppCompatActivity(R.layout.activity_domain_con
         if (type == InputType.DOMAIN) {
             val domain = intent.getStringExtra(INTENT_DOMAIN) ?: ""
             viewModel.setDomain(domain)
-            b.dcTitle.visibility = View.VISIBLE
             b.dcTitle.text = domain
-            b.dcFlag.visibility = View.GONE
         } else {
             val flag = intent.getStringExtra(INTENT_FLAG) ?: ""
             viewModel.setFlag(flag)
-            b.dcFlag.visibility = View.VISIBLE
-            b.dcFlag.text = getString(R.string.two_argument_space, flag, getCountryNameFromFlag(flag))
-            b.dcTitle.visibility = View.GONE
+            b.dcTitle.text = getString(R.string.two_argument_space, flag, getCountryNameFromFlag(flag))
         }
         val tc = intent.getIntExtra(INTENT_TIME_CATEGORY, 0)
         val timeCategory =
@@ -134,14 +132,14 @@ class DomainConnectionsActivity : AppCompatActivity(R.layout.activity_domain_con
             if (it.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
                     b.dcRecycler.visibility = View.GONE
-                    b.dcRecycler.visibility = View.VISIBLE
+                    b.dcNoDataRl.visibility = View.VISIBLE
                 } else {
                     b.dcRecycler.visibility = View.VISIBLE
-                    b.dcRecycler.visibility = View.GONE
+                    b.dcNoDataRl.visibility = View.GONE
                 }
             } else {
                 b.dcRecycler.visibility = View.VISIBLE
-                b.dcRecycler.visibility = View.GONE
+                b.dcNoDataRl.visibility = View.GONE
             }
         }
         b.dcRecycler.adapter = recyclerAdapter
