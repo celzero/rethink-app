@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="?attr/background"
+    android:orientation="vertical"
     android:paddingBottom="20dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     app:layout_scrollFlags="scroll|enterAlways">
@@ -36,7 +36,8 @@
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:drawablePadding="10dp"
             android:paddingStart="10dp"
             android:paddingTop="10dp"
@@ -47,297 +48,307 @@
             android:textSize="@dimen/default_font_text_view"
             android:visibility="visible" />
 
-        <RadioGroup
-            android:id="@+id/ac_radio_group"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="5dp"
-            android:gravity="center">
+            android:clipToPadding="true"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true">
 
-            <RelativeLayout
-                android:id="@+id/ac_never_split_rl"
+            <RadioGroup
+                android:id="@+id/ac_radio_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="1dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
+                android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="5dp"
+                android:gravity="center">
 
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/ac_radio_never_split"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:checked="false"
-                    android:padding="5dp"
-                    android:text="" />
-
-                <LinearLayout
+                <RelativeLayout
+                    android:id="@+id/ac_never_split_rl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/ac_radio_never_split"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="1dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
 
-                    <TextView
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/ac_radio_never_split"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:drawablePadding="10dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:checked="false"
                         android:padding="5dp"
-                        android:text="@string/ac_never_split"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/large_font_text_view"
-                        app:drawableEndCompat="@drawable/dot_accent" />
+                        android:text="" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingStart="5dp"
-                        android:paddingTop="5dp"
-                        android:paddingEnd="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="@string/ac_never_split_desc"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-                </LinearLayout>
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/ac_radio_never_split"
+                        android:orientation="vertical">
 
-            </RelativeLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:drawablePadding="10dp"
+                            android:padding="5dp"
+                            android:text="@string/ac_never_split"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/large_font_text_view"
+                            app:drawableEndCompat="@drawable/dot_accent" />
 
-            <RelativeLayout
-                android:id="@+id/ac_split_auto_rl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="1dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="5dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/ac_never_split_desc"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
 
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/ac_radio_split_auto"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:checked="false"
-                    android:padding="5dp"
-                    android:text="" />
+                </RelativeLayout>
 
-                <LinearLayout
+                <RelativeLayout
+                    android:id="@+id/ac_split_auto_rl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/ac_radio_split_auto"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="1dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
 
-                    <TextView
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/ac_radio_split_auto"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:drawablePadding="10dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:checked="false"
                         android:padding="5dp"
-                        android:text="@string/ac_split_auto"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/large_font_text_view"
-                        app:drawableEndCompat="@drawable/dot_accent" />
+                        android:text="" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingStart="5dp"
-                        android:paddingTop="5dp"
-                        android:paddingEnd="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="@string/ac_split_auto_desc"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-                </LinearLayout>
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/ac_radio_split_auto"
+                        android:orientation="vertical">
 
-            </RelativeLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:drawablePadding="10dp"
+                            android:padding="5dp"
+                            android:text="@string/ac_split_auto"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/large_font_text_view"
+                            app:drawableEndCompat="@drawable/dot_accent" />
 
-            <RelativeLayout
-                android:id="@+id/ac_split_tcp_rl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="1dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="5dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/ac_split_auto_desc"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
 
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/ac_radio_split_tcp"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:checked="false"
-                    android:padding="5dp"
-                    android:text="" />
+                </RelativeLayout>
 
-                <LinearLayout
+                <RelativeLayout
+                    android:id="@+id/ac_split_tcp_rl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/ac_radio_split_tcp"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="1dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
 
-                    <TextView
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/ac_radio_split_tcp"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:drawablePadding="10dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:checked="false"
                         android:padding="5dp"
-                        android:text="@string/ac_split_tcp"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/large_font_text_view"
-                        app:drawableEndCompat="@drawable/dot_yellow" />
+                        android:text="" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingStart="5dp"
-                        android:paddingTop="5dp"
-                        android:paddingEnd="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="@string/ac_split_tcp_desc"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-                </LinearLayout>
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/ac_radio_split_tcp"
+                        android:orientation="vertical">
 
-            </RelativeLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:drawablePadding="10dp"
+                            android:padding="5dp"
+                            android:text="@string/ac_split_tcp"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/large_font_text_view"
+                            app:drawableEndCompat="@drawable/dot_yellow" />
 
-            <RelativeLayout
-                android:id="@+id/ac_split_tls_rl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="1dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="5dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/ac_split_tcp_desc"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
 
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/ac_radio_split_tls"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:checked="false"
-                    android:padding="5dp"
-                    android:text="" />
+                </RelativeLayout>
 
-                <LinearLayout
+                <RelativeLayout
+                    android:id="@+id/ac_split_tls_rl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/ac_radio_split_tls"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="1dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
 
-                    <TextView
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/ac_radio_split_tls"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:drawablePadding="10dp"
-                        android:paddingStart="5dp"
-                        android:paddingTop="5dp"
-                        android:paddingEnd="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="@string/ac_split_tls"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/large_font_text_view"
-                        app:drawableEndCompat="@drawable/dot_green" />
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:checked="false"
+                        android:padding="5dp"
+                        android:text="" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingStart="5dp"
-                        android:paddingTop="5dp"
-                        android:paddingEnd="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="@string/ac_split_tls_desc"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-                </LinearLayout>
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/ac_radio_split_tls"
+                        android:orientation="vertical">
 
-            </RelativeLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:drawablePadding="10dp"
+                            android:paddingStart="5dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/ac_split_tls"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/large_font_text_view"
+                            app:drawableEndCompat="@drawable/dot_green" />
 
-            <RelativeLayout
-                android:id="@+id/ac_desync_rl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="1dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="5dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/ac_split_tls_desc"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
 
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/ac_radio_desync"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:checked="false"
-                    android:padding="5dp"
-                    android:text="" />
+                </RelativeLayout>
 
-                <LinearLayout
+                <RelativeLayout
+                    android:id="@+id/ac_desync_rl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/ac_radio_desync"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="1dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
 
-                    <TextView
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/ac_radio_desync"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:drawablePadding="10dp"
-                        android:paddingStart="5dp"
-                        android:paddingTop="5dp"
-                        android:paddingEnd="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="@string/ac_desync"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/large_font_text_view"
-                        app:drawableEndCompat="@drawable/dot_red" />
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:checked="false"
+                        android:padding="5dp"
+                        android:text="" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingStart="5dp"
-                        android:paddingTop="5dp"
-                        android:paddingEnd="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="@string/ac_desync_desc"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-                </LinearLayout>
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/ac_radio_desync"
+                        android:orientation="vertical">
 
-            </RelativeLayout>
-        </RadioGroup>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:drawablePadding="10dp"
+                            android:paddingStart="5dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/ac_desync"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/large_font_text_view"
+                            app:drawableEndCompat="@drawable/dot_red" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="5dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/ac_desync_desc"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
+
+                </RelativeLayout>
+            </RadioGroup>
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/ac_retry_title_text"
@@ -345,7 +356,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="55dp"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="15dp"
             android:fontFamily="sans-serif-smallcaps"
             android:lineSpacingExtra="5dp"
             android:padding="5dp"
@@ -359,7 +370,8 @@
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:drawablePadding="10dp"
             android:paddingStart="10dp"
             android:paddingTop="10dp"
@@ -370,191 +382,201 @@
             android:textSize="@dimen/default_font_text_view"
             android:visibility="visible" />
 
-        <RadioGroup
-            android:id="@+id/ac_retry_radio_group"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="5dp"
-            android:gravity="center">
+            android:clipToPadding="true"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true">
 
-            <RelativeLayout
-                android:id="@+id/ac_retry_never_rl"
+            <RadioGroup
+                android:id="@+id/ac_retry_radio_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
+                android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="5dp"
+                android:gravity="center">
 
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/ac_radio_never_retry"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:checked="false"
-                    android:padding="5dp"
-                    android:text="" />
-
-                <LinearLayout
+                <RelativeLayout
+                    android:id="@+id/ac_retry_never_rl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/ac_radio_never_retry"
-                    android:orientation="vertical">
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
 
-                    <TextView
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/ac_radio_never_retry"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:drawablePadding="10dp"
-                        android:paddingStart="5dp"
-                        android:paddingTop="5dp"
-                        android:paddingEnd="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="@string/ac_retry_options_never"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/large_font_text_view" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="5dp"
-                        android:paddingTop="5dp"
-                        android:paddingEnd="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="@string/ac_retry_options_never_desc"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-                </LinearLayout>
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/ac_retry_with_split_rl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="1dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
-
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/ac_radio_retry_with_split"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:checked="false"
-                    android:padding="5dp"
-                    android:text="" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/ac_radio_retry_with_split"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:drawablePadding="10dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:checked="false"
                         android:padding="5dp"
-                        android:text="@string/ac_retry_options_with_split"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/large_font_text_view" />
+                        android:text="" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingStart="5dp"
-                        android:paddingTop="5dp"
-                        android:paddingEnd="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="@string/ac_retry_options_with_split_desc"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-                </LinearLayout>
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/ac_radio_never_retry"
+                        android:orientation="vertical">
 
-            </RelativeLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:drawablePadding="10dp"
+                            android:paddingStart="5dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/ac_retry_options_never"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/large_font_text_view" />
 
-            <RelativeLayout
-                android:id="@+id/ac_retry_after_split_rl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="5dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/ac_retry_options_never_desc"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
 
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/ac_radio_retry_after_split"
-                    style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:checked="false"
-                    android:padding="5dp"
-                    android:text="" />
+                </RelativeLayout>
 
-                <LinearLayout
+                <RelativeLayout
+                    android:id="@+id/ac_retry_with_split_rl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/ac_radio_retry_after_split"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="1dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
 
-                    <TextView
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/ac_radio_retry_with_split"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:drawablePadding="10dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:checked="false"
                         android:padding="5dp"
-                        android:text="@string/ac_retry_options_after_split"
-                        android:textColor="?attr/primaryTextColor"
-                        android:textSize="@dimen/large_font_text_view" />
+                        android:text="" />
 
-                    <TextView
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/ac_radio_retry_with_split"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:drawablePadding="10dp"
+                            android:padding="5dp"
+                            android:text="@string/ac_retry_options_with_split"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="5dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/ac_retry_options_with_split_desc"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/ac_retry_after_split_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/ac_radio_retry_after_split"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="5dp"
-                        android:paddingTop="5dp"
-                        android:paddingEnd="5dp"
-                        android:paddingBottom="5dp"
-                        android:text="@string/ac_retry_options_after_split_desc"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-                </LinearLayout>
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:checked="false"
+                        android:padding="5dp"
+                        android:text="" />
 
-            </RelativeLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/ac_radio_retry_after_split"
+                        android:orientation="vertical">
 
-        </RadioGroup>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:drawablePadding="10dp"
+                            android:padding="5dp"
+                            android:text="@string/ac_retry_options_after_split"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="5dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/ac_retry_options_after_split_desc"
+                            android:textColor="?attr/primaryLightColorText"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </RadioGroup>
+        </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="15dp"
             android:layout_marginEnd="20dp"
+            android:layout_marginBottom="30dp"
             android:alpha="0.9"
             android:gravity="center"
-            android:layout_marginBottom="40dp"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
