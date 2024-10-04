@@ -664,14 +664,6 @@
                 android:contentDescription="@string/about_mozilla"
                 app:srcCompat="@drawable/foss_logo" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/osom_img"
-                android:layout_width="160dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:contentDescription="@string/about_mozilla"
-                android:src="@drawable/osom_logos_horizontal" />
-
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatTextView

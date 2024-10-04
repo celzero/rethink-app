@@ -145,7 +145,7 @@
     <string name="slide_2_desc" translatable="true">Rethink is the easiest way to monitor network activity, bypass Internet censorship, and firewall apps on your Android device.</string>
 
     <string name="slide_1_title" translatable="true">Free and Open Source</string>
-    <string name="slide_1_desc" translatable="true">Rethink is an open source software backed by Mozilla Builders MVP program.</string>
+    <string name="slide_1_desc" translatable="true">Rethink is an open source software backed by Mozilla Builders MVP program, FOSS United Foundation.</string>
 
     <string name="rdns_plus" translatable="false">RDNS Plus</string>
 
@@ -788,7 +788,7 @@
     <string name="about_settings_notification" translatable="true">Notification Settings</string>
     <string name="about_whats_new" translatable="true">What\'s new in %1$s</string>
     <string name="about_twitter" translatable="true">Follow us on Twitter</string>
-    <string name="about_mozilla" translatable="true">Rethink is supported by Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
+    <string name="about_mozilla" translatable="true">Rethink is supported by Mozilla Builders, FOSS United Foundation.</string>
     <string name="about_app_update_check" translatable="true">Check for app updates</string>
     <string name="about_app_contributors" translatable="true">Authors</string>
     <string name="about_app_translate" translatable="true">Translate</string>
@@ -807,7 +807,6 @@
     <string name="about_website_link" translatable="false">https://www.rethinkdns.com/</string>
     <string name="about_mozilla_alumni_link" translatable="false">https://builders.mozilla.community/old/alumni.html</string>
     <string name="about_foss_link" translatable="false">https://fossunited.org/grants</string>
-    <string name="about_osom_link" translatable="false">https://www.osomprivacy.com</string>
     <string name="about_translate_link" translatable="false">https://svc.rethinkdns.com/r/translate</string>
     <string name="about_privacy_policy_link" translatable="false">https://www.rethinkdns.com/privacy</string>
     <string name="about_mastodom_handle" translatable="false">https://mastodon.social/@rdns</string>

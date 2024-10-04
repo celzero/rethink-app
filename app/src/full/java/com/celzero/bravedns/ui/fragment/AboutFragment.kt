@@ -114,7 +114,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutFaq.setOnClickListener(this)
         b.mozillaImg.setOnClickListener(this)
         b.fossImg.setOnClickListener(this)
-        b.osomImg.setOnClickListener(this)
         b.aboutAppUpdate.setOnClickListener(this)
         b.aboutWhatsNew.setOnClickListener(this)
         b.aboutAppInfo.setOnClickListener(this)
@@ -134,15 +133,19 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             // appended to it, which is not required for the user to see.
             val slicedVersion = version.slice(0..6)
             b.aboutWhatsNew.text = getString(R.string.about_whats_new, slicedVersion)
-            // show the complete version name along with the source of installation
-            b.aboutAppVersion.text =
-                getString(R.string.about_version_install_source, version, getDownloadSource())
+
+            // complete version name along with the source of installation
+            val v = getString(R.string.about_version_install_source, version, getDownloadSource())
+
             // show the go version if the log level is less than INFO, ie, DEBUG or VERBOSE
             if (Logger.LoggerType.fromId(persistentState.goLoggerLevel.toInt())
                     .isLessThan(Logger.LoggerType.INFO)
             ) {
                 val build = VpnController.goBuildVersion(false)
-                b.aboutAppVersion.text = b.aboutAppVersion.text.toString() + "\n" + build
+                b.aboutAppVersion.text = "$v\n$build"
+            } else {
+                b.aboutAppVersion.text = v
+
             }
         } catch (e: PackageManager.NameNotFoundException) {
             Logger.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
@@ -217,9 +220,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.fossImg -> {
                 openActionViewIntent(getString(R.string.about_foss_link).toUri())
-            }
-            b.osomImg -> {
-                openActionViewIntent(getString(R.string.about_osom_link).toUri())
             }
             b.aboutAppUpdate -> {
                 (requireContext() as HomeScreenActivity).checkForUpdate(
