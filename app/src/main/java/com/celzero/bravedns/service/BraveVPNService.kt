@@ -3579,7 +3579,8 @@ class BraveVPNService :
         val dstPort = second.port ?: 0
 
         val ips = realIps.split(",")
-        val fip = ips.firstOrNull()?.trim()
+        // take the first non-unspecified ip as the real destination ip
+        val fip = ips.firstOrNull { !isUnspecifiedIp(it.trim()) }?.trim()
         // use realIps; as of now, netstack uses the first ip
         // TODO: apply firewall rules on all real ips
         val realDestIp =
