@@ -33,6 +33,7 @@ enum class Protocol(val protocolType: Int) {
     GRE(47),
     ESP(50),
     AH(51),
+    ICMPV6(58),
     MTP(92),
     BEETPH(94),
     ENCAP(98),
