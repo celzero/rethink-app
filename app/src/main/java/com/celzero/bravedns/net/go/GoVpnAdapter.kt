@@ -24,6 +24,7 @@ import android.os.ParcelFileDescriptor
 import android.widget.Toast
 import backend.Backend
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.Companion.FALLBACK_DNS
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
@@ -853,6 +854,10 @@ class GoVpnAdapter : KoinComponent {
 
     fun getNetStat(): backend.NetStat? {
         return try {
+            if (DEBUG) {
+                // print the stack trace for debugging purposes
+                Intra.printStack()
+            }
             val stat = tunnel.stat()
             Logger.i(LOG_TAG_VPN, "net stat: $stat")
             stat
