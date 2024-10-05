@@ -214,7 +214,31 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
                 consoleLogRepository.consoleLogStartTimestamp = 0L
             }
         }
+
         b.consoleStatInfo.setOnClickListener { showStatsDialog() }
+
+        b.consoleLogDelete.setOnClickListener {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(getString(R.string.console_log_delete_title))
+                .setMessage(getString(R.string.console_log_delete_desc))
+                .setPositiveButton(getString(R.string.lbl_delete)) { _, _ ->
+                    io {
+                        consoleLogRepository.deleteAllLogs()
+                        uiCtx {
+                            showToastUiCentered(
+                                this,
+                                getString(R.string.console_log_delete_toast),
+                                Toast.LENGTH_SHORT
+                            )
+                            finish()
+                        }
+                    }
+                }
+                .setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        }
     }
 
     private fun showStartDialog() {

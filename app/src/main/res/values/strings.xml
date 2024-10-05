@@ -106,7 +106,6 @@
     <string name="lbl_test" translatable="true">test</string>
     <string name="lbl_protos" translatable="true">protos</string>
 
-
     <string name="memory_notification_text">Rethink is experiencing low memory. System actions may be limited.</string>
 
     <string name="symbol_upload" translatable="false">%1$s 🔺</string>
@@ -1582,6 +1581,10 @@
     <!-- console logs -->
     <string name="console_log_title" translatable="true">App Log</string>
     <string name="console_log_desc" translatable="true">Logs may contain sensitive information.</string>
+    <string name="console_log_delete_title" translatable="true">Delete logs?</string>
+    <string name="console_log_delete_desc" translatable="true">Delete all logs from this app?</string>
+    <string name="console_log_delete_toast" translatable="true">Logs deleted</string>
+
 
     <!-- advanced settings -->
     <string name="do_not_randomize_listen_port_title" translatable="true">Do not randomize listen port</string>

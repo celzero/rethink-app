@@ -50,4 +50,7 @@ interface ConsoleLogDAO {
 
     @Query("SELECT * FROM ConsoleLog ORDER BY timestamp DESC LIMIT :limit OFFSET :offset")
     suspend fun getLogs(offset: Int, limit: Int): List<ConsoleLog>
+
+    @Query("DELETE FROM ConsoleLog")
+    suspend fun deleteAllLogs()
 }

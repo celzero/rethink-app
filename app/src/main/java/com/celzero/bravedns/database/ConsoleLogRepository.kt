@@ -34,4 +34,8 @@ class ConsoleLogRepository(private val consoleLogDAO: ConsoleLogDAO) {
     suspend fun getLogCount(): Int {
         return consoleLogDAO.getLogCount()
     }
+
+    suspend fun deleteAllLogs() {
+        consoleLogDAO.deleteAllLogs()
+    }
 }
