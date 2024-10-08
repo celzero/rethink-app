@@ -77,7 +77,7 @@
     <string name="lbl_stopped" translatable="true">Спрян</string>
     <string name="lbl_private" translatable="true">поверително</string>
     <string name="lbl_secure" translatable="true">защитен</string>
-    <string name="lbl_overall" translatable="true">Като цяло</string>
+    <string name="lbl_overall" translatable="true">Global</string>
     <string name="lbl_anonymous" translatable="true">анонимен</string>
     <string name="failed_using_default" translatable="true">Неуспешно: използване на резервен DNS</string>
     <string name="alert_firewall_accessibility_exception" translatable="true">Неуспешно отваряне на настройките за достъпност. Опитайте отново по-късно!</string>
