@@ -147,4 +147,6 @@
     <string name="dns_firewall_mode_info_explanation_new" translatable="true">Vše výše + obejít cenzuru internetu.</string>
     <string name="alert_permission_accessibility" translatable="true">Povolení - Přístupnost</string>
     <string name="alert_firewall_accessibility_exception" translatable="true">Nastavení expozic Přístupů. Vyzkoušejte znovu!</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="brave_dns_connect_mode_change_dns" translatable="true">Zvolte režim</string>
 </resources>
