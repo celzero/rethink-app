@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_settings" translatable="true">Setări</string>
+    <string name="title_statistics" translatable="true">Statistici</string>
+    <string name="pause_title_desc" translatable="true">o pauză mică…</string>
+    <string name="about_title_desc" translatable="true">Detectează și blochează riscurile de securitate în rețea</string>
+    <string name="txt_home" translatable="true">Acasă</string>
+    <string name="accessibility_service_description" translatable="true">Rethink utilizează serviciile de accesibilitate pentru a detecta și proteja aplicațiile care rulează în fundal. Rethink nu colectează și nu vinde nici o informație.</string>
+    <string name="next" translatable="true">Urmatorul</string>
+    <string name="skip" translatable="true">Sari peste</string>
+    <string name="finish" translatable="true">Terminat</string>
+    <string name="lbl_cancel" translatable="true">Anulează</string>
+    <string name="lbl_blocked" translatable="true">Blocat</string>
+    <string name="lbl_domain_rules" translatable="true">Reguli pe domeniu</string>
+    <string name="lbl_delete" translatable="true">Șterge</string>
+    <string name="lbl_proceed" translatable="true">Continuă</string>
+    <string name="lbl_private_key" translatable="true">Cheie privată</string>
+    <string name="lbl_generated" translatable="true">(generată)</string>
+    <string name="lbl_random" translatable="true">(aleatoriu)</string>
+    <string name="lbl_listen_port" translatable="true">Port ascultare</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_auto" translatable="true">(automat)</string>
+    <string name="lbl_include" translatable="true">Include</string>
+    <string name="lbl_select_all" translatable="true">Selectează tot</string>
+    <string name="lbl_active" translatable="true">Activ</string>
+    <string name="lbl_inactive" translatable="true">Inactiv</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_slow" translatable="true">Încet</string>
+    <string name="lbl_very" translatable="true">Foarte</string>
+    <string name="lbl_add" translatable="true">Adaugă</string>
+    <string name="lbl_app_wise" translatable="true">per aplicație</string>
+    <string name="lbl_sec" translatable="true">sec.</string>
+    <string name="lbl_min" translatable="true">min.</string>
+    <string name="lbl_hour" translatable="true">oră</string>
+    <string name="lbl_day" translatable="true">zi</string>
+    <string name="lbl_preshared_key" translatable="true">cheie pre-partajată</string>
+    <string name="lbl_insecure" translatable="true">(riscant)</string>
+    <string name="lbl_optional" translatable="true">(facultativ)</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Menținut neîntrerupt</string>
+    <string name="lbl_allowed_ips" translatable="true">IP-uri permise</string>
+    <string name="lbl_save" translatable="true">Salvează</string>
+    <string name="lbl_cache" translatable="true">Cache</string>
+    <string name="lbl_status" translatable="true">Stare</string>
+    <string name="lbl_remove" translatable="true">Elimină</string>
+    <string name="lbl_last" translatable="true">Ultima</string>
+    <string name="lbl_starting" translatable="true">Începe</string>
+    <string name="lbl_overall" translatable="true">Global</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Include toate aplicațiile care au rămas nedirecționate printr-un proxy</string>
+    <string name="remaining_apps_dialog_title" translatable="true">Include restul aplicatiilor</string>
+    <string name="crypt_adguard_desc" translatable="true">Protejează-ți dispozitivul de aplicații dăunătoare și nu numai atât.</string>
+    <string name="quad9_dns_desc" translatable="true">Quad9 rulează cererile DNS printr-o rețea securizată de servere pe întregul glob pământesc.</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">Filtrul Familie blochează accesul la toate site-urile pornografice, pentru adulți sau cu conținut explicit. Blochează si conexiunile prin proxy sau VPN folosite pentru a ocoli filtrele. Site-urile cu continut mixt (precum Reddit) sunt, de asemenea, blocate. Google, Bing si YouTube sunt setate pe SafeMode.</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">Blochează conținutul dăunător. Folosește endpoint-ul DNS 1.1.1.2 de la Cloudfare.</string>
+    <string name="google_dns_desc" translatable="true">Nu blochează nici o cerere DNS. Utilizează endpoint-ul DNS de la Google.</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">Blochează malware-ul si conținutul pentru adulți. Folosește endpoint-ul DNS 1.1.1.3 de la Cloudfare.</string>
+    <string name="cloudflare_dns_desc" translatable="true">Nu blochează nici o cerere DNS. Folosește endpoint-ul DNS 1.1.1.1 de la Cloudfare.</string>
+    <string name="crypt_relay_singapore" translatable="true">Releu DNS anonim găzduit în Singapore.</string>
+    <string name="crypt_relay_us" translatable="true">Releu DNS anonim găzduit în Los Angeles (California, SUA) furnizat de https://cryptostrom.is/.</string>
+    <string name="crypt_relay_sweden" translatable="true">Releu DNS anonim găzduit în Suedia furnizat de https://cryptostrom.is/.</string>
+    <string name="crypt_relay_france" translatable="true">Releu DNS anonim găzduit în Paris (Franța) furnizat de https://cryptostrom.is/.</string>
+    <string name="crypt_relay_netherlands" translatable="true">Releu DNS anonim găzduit în Olanda</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
+    <string name="lbl_apply" translatable="true">Aplică</string>
+    <string name="lbl_dismiss" translatable="true">Renuntă</string>
+    <string name="lbl_all" translatable="true">Toate</string>
+    <string name="lbl_allowed" translatable="true">Permis</string>
+    <string name="lbl_maybe_blocked" translatable="true">Posibil blocat</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="lbl_fast" translatable="true">Rapid</string>
+    <string name="crypt_adguard_family_desc" translatable="true">DNS AdGuard cu căutare securizată și blocare conținut pentru adulți.</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Blochează accesul la toate site-urile pornografice, pentru adulți sau cu conținut explicit. De asemenea, blochează toate conexiunile prin proxy sau VPN folosite pentru a ocoli filtrele. Site-urile cu conținut mixt (precum Reddit) sunt, de asemenea, blocate. Google, Bing și YouTube sunt setate pe Safe Mode.</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">Filtrul Adult blochează accesul la toate site-urile pornografice, pentru adulți sau cu conținut explicit. Nu blochează conexiunile prin proxy sau VPN și nici site-urile cu conținut mixt. Site-urile precum Reddit sunt permise. Google și Bing sunt setate pe SafeMode.</string>
+    <string name="lbl_secure" translatable="true">securizat</string>
+    <string name="lbl_anonymous" translatable="true">anonim</string>
+    <string name="untracked" translatable="true">neurmărit</string>
+    <string name="bypass_dns_firewall" translatable="true">ocolește dns și paravanul de protecție</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Atentie: Rethink a fost dezactivat</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Apasă aici pentru a schimba setările protecției</string>
+    <string name="dns_mode_notification_title" translatable="true">Protejat! Conectat la un DNS rapid și securizat.</string>
+    <string name="firewall_mode_notification_title" translatable="true">Protejat! Conectat la un Paravan de protecție.</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Protejat! Conectat la DNS+Paravan de protecție+Proxy.</string>
+    <string name="hybrid_mode_notification_title" translatable="true">Protejat! Conectat la DNS+Paravan de protecție.</string>
+    <string name="lbl_remaining_apps" translatable="true">Aplicații rămase</string>
+    <string name="wireguard_disable_message" translatable="true">Opresc toate VPN-urile AdGuard active?</string>
+    <string name="wireguard_disable_title" translatable="true">Oprește WireGuard</string>
+    <string name="settings_title_desc" translatable="true">Un DNS extrem de configurabil + Paravan de protecție</string>
+    <string name="lbl_disabled" translatable="true">Dezactivat</string>
+    <string name="lbl_domain" translatable="true">Domeniu</string>
+    <string name="lbl_wildcard" translatable="true">Permis special</string>
+    <string name="lbl_action_required" translatable="true">Acțiune necesară</string>
+    <string name="lbl_rules" translatable="true">reguli</string>
+    <string name="lbl_configure" translatable="true">Configurează</string>
+    <string name="lbl_logs" translatable="true">jurnale</string>
+    <string name="lbl_network" translatable="true">rețea</string>
+    <string name="lbl_create" translatable="true">Creează</string>
+    <string name="lbl_qr_code" translatable="true">Cod QR</string>
+    <string name="lbl_import" translatable="true">Importați</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_public_key" translatable="true">Cheia publică</string>
+    <string name="lbl_addresses" translatable="true">Adrese</string>
+    <string name="lbl_dns_servers" translatable="true">Servere DNS</string>
+    <string name="lbl_applications" translatable="true">Aplicații</string>
+    <string name="lbl_ip_rules" translatable="true">Reguli IP</string>
+    <string name="lbl_stopped" translatable="true">Oprit</string>
+    <string name="lbl_private" translatable="true">privat</string>
+    <string name="lbl_idle" translatable="true">Inactiv</string>
+    <string name="lbl_peer" translatable="true">Pereche</string>
+    <string name="lbl_split" translatable="true">Împarte</string>
+    <string name="lbl_on_device" translatable="true">în dispozitiv</string>
+    <string name="lbl_unselected" translatable="true">Neselectat</string>
+    <string name="lbl_notification" translatable="true">notificare</string>
+    <string name="memory_notification_text">Rethink rulează cu memorie insuficientă. Acțiunile sistemului pot fi limitate.</string>
+    <string name="slide_2_title" translatable="true">Bun venit</string>
+    <string name="slide_2_desc" translatable="true">Rething e cel mai bun mijloc pentru monitorizarea activității din rețea, ocolirea cenzurii pe internet și protejarea aplicațiilor în dispozitivul tău Android.</string>
+    <string name="slide_1_title" translatable="true">Gratuit și cod-sursă deschis (open source)</string>
+    <string name="slide_1_desc" translatable="true">Rethink e un software open-source, susținut prin programul Mozilla Builders MVP.</string>
+    <string name="allow" translatable="true">permite</string>
+    <string name="block" translatable="true">blocare</string>
+    <string name="bypass_universal" translatable="true">ocolire universală</string>
+    <string name="exclude" translatable="true">exclude</string>
+    <string name="isolate" translatable="true">izolează</string>
+    <string name="pause_mode_notification_title" translatable="true">În pauză! Aplicațiile blocate sunt, în continuare, protejate.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">în așteptare</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">protejat</string>
+    <string name="wireguard_disclaimer" translatable="true">DNS este retrimis la %1$s, ICMP (ex: ping) este trimis la rețeaua de bază.</string>
+    <string name="wireguard_no_config_msg" translatable="true">Nu există VPN AdGuard. Adaugă unul pentru a începe.</string>
+    <string name="wireguard_connection_error" translatable="true">VPN-ul WireGuard nu a reușit să se conecteze</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="title_about" translatable="true">Despre</string>
+    <string name="status_no_internet" translatable="true">fără internet</string>
+    <string name="notification_action_dns_mode" translatable="true">DNS</string>
+    <string name="dns_mode_info_title" translatable="true">DNS</string>
+    <string name="firewall_mode_info_title" translatable="true">Paravan de protecție</string>
+    <string name="apps_info_title" translatable="true">Aplicații</string>
+    <string name="custom_url_error_invalid_url" translatable="true">URL invalid</string>
+    <string name="bsct_app_info" translatable="true">Informații despre aplicație</string>
+    <string name="always_on_dialog_positive_btn" translatable="true">Mergi la Setări</string>
+    <string name="always_on_dialog_neutral" translatable="true">Setări</string>
+    <string name="private_dns_dialog_positive" translatable="true">Mergeți la setări</string>
+    <string name="dns_act_configure_tab" translatable="true">Configurează</string>
+    <string name="configure_dns_connected_doh_status" translatable="true">DNS peste HTTPS</string>
+    <string name="configure_dns_connection_name" translatable="true">Conectat la %s1$s</string>
+    <string name="download_update_dialog_title" translatable="true">Actualizare nouă!</string>
+    <string name="download_update_dialog_failure_title" translatable="true">Ceva n-a mers bine!</string>
+    <string name="app_mode_dns" translatable="true">DNS</string>
+    <string name="app_mode_firewall" translatable="true">Paravan de protecție</string>
+    <string name="relative_time_today" translatable="true">Astăzi</string>
+    <string name="relative_time_yesterday" translatable="true">Ieri</string>
+    <string name="settings_proxy_header" translatable="true">proxy</string>
+    <string name="orbot" translatable="true">Orbot</string>
+    <string name="orbot_http" translatable="true">HTTP Proxy</string>
+    <string name="orbot_status_arg_2" translatable="true">TCP</string>
+    <string name="orbot_install_dialog_title" translatable="true">Instalați Orbot?</string>
+    <string name="orbot_install_dialog_neutral" translatable="true">site</string>
+    <string name="settings_general_customize" translatable="true">configurați</string>
+    <string name="settings_check_update_heading" translatable="true">Caută actualizări ale aplicației</string>
+    <string name="settings_theme_heading" translatable="true">Aspect</string>
+    <string name="settings_go_log_heading" translatable="true">Nivele de jurnalizare</string>
+    <string name="settings_dns_proxy_dialog_hostname" translatable="true">Nume gazdă</string>
+    <string name="settings_app_list_default_app" translatable="true">Nimic</string>
+    <string name="settings_socks5_dialog_hint_ip" translatable="true">Adresă IP</string>
+    <string name="settings_socks5_dialog_hint_port" translatable="true">Port</string>
+    <string name="settings_socks5_dialog_hint_username" translatable="true">Nume utilizator (opțional)</string>
+    <string name="settings_socks5_dialog_hint_password" translatable="true">Parola (opțional)</string>
+    <string name="settings_theme_dialog_title" translatable="true">Aspect</string>
+    <string name="settings_theme_dialog_themes_2" translatable="true">Luminos</string>
+    <string name="settings_theme_dialog_themes_3" translatable="true">Întunecat</string>
+    <string name="settings_ip_text_ipv46" translatable="true">Automat</string>
+    <string name="settings_notification_desc3" translatable="true">Nimic</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">Dezactivat (implicit)</string>
+    <string name="firewall_status_allow" translatable="true">permis</string>
+    <string name="firewall_status_blocked" translatable="true">blocat</string>
+    <string name="hs_biometeric_feature_not_supported" translatable="true">Autentificarea biometrică pe acest dispozitiv este dezactivată sau nu e acceptată</string>
+    <string name="always_on_dialog_positive" translatable="true">Stop</string>
+    <string name="firewall_act_network_monitor_tab" translatable="true">Rețea</string>
+    <string name="orbot_install_dialog_positive" translatable="true">Instalează</string>
+    <string name="settings_dns_proxy_dialog_username" translatable="true">Nume de utilizator</string>
+    <string name="settings_general_header" translatable="true">general</string>
+    <string name="firewall_status_unknown" translatable="true">necunoscut</string>
+    <string name="settings_import_export_heading" translatable="true">Copie de rezervă și restaurare</string>
+    <string name="settings_dns_proxy_dialog_password" translatable="true">Parolă</string>
+    <string name="settings_locale_heading" translatable="true">Schimbați limba</string>
+    <string name="hsf_start_btn_state" translatable="true">începe</string>
+    <string name="hsf_stop_btn_state" translatable="true">stop</string>
+</resources>
