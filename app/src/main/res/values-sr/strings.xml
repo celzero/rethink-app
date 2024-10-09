@@ -1,2 +1,969 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="local_blocklist_redownload_desc" translatable="true">Блоклиста на уређају је већ на последњој верзији v%1$s.</string>
+    <string name="show_logs_disabled_network_message" translatable="true">Записивање конекција је онемогућено. За поновно омогућавање, идите у <i>подешавања</i> и укључите <i>Омогући записивање на уређају.</i></string>
+    <string name="show_logs_disabled_dns_message" translatable="true">Записивање DNS захтева је онемогућено. За поновно омогућавање, идите у <i>подешавања</i> и укључите <i>Омогући записивање на уређају.</i></string>
+    <string name="download_update_dialog_message" translatable="true">Нова верзија апликације је доступна за преузимање са веб сајта. Да ли желите да наставите?</string>
+    <string name="download_update_dialog_message_ok" translatable="true">Већ сте на последњој верзији.</string>
+    <string name="search_firewall_network_log" translatable="true"><font size="12">Претражи апликације, IP-јеве, домене</font></string>
+    <string name="search_universal_ips" translatable="true"><font size="12">Претражи IP-јеве</font></string>
+    <string name="title_about" translatable="true">О програму</string>
+    <string name="title_settings" translatable="true">Подешавања</string>
+    <string name="title_statistics" translatable="true">Статистика</string>
+    <string name="pause_title_desc" translatable="true">одмарам…</string>
+    <string name="about_title_desc" translatable="true">Откриј и блокирај безбедносне претње у мрежи</string>
+    <string name="txt_home" translatable="true">Почетна</string>
+    <string name="accessibility_service_description" translatable="true">Rethink користи сервисе приступачности да открије и блокира апликације у позадини. Rethink не сакупља нити продаје никакве информације.</string>
+    <string name="next" translatable="true">Следеће</string>
+    <string name="skip" translatable="true">Прескочи</string>
+    <string name="finish" translatable="true">Заврши</string>
+    <string name="lbl_apply" translatable="true">Примени</string>
+    <string name="lbl_dismiss" translatable="true">Одбаци</string>
+    <string name="lbl_all" translatable="true">Све</string>
+    <string name="lbl_allowed" translatable="true">Дозвољено</string>
+    <string name="lbl_maybe_blocked" translatable="true">Можда блокирано</string>
+    <string name="lbl_blocked" translatable="true">Блокирано</string>
+    <string name="lbl_disabled" translatable="true">Онемогућено</string>
+    <string name="lbl_wildcard" translatable="true">Специјални карактер</string>
+    <string name="lbl_action_required" translatable="true">Захтева се радња</string>
+    <string name="lbl_rules" translatable="true">правила</string>
+    <string name="lbl_network" translatable="true">мрежа</string>
+    <string name="lbl_create" translatable="true">Направи</string>
+    <string name="lbl_qr_code" translatable="true">QR код</string>
+    <string name="lbl_import" translatable="true">Увези</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_public_key" translatable="true">Јавни кључ</string>
+    <string name="lbl_addresses" translatable="true">Адресе</string>
+    <string name="lbl_applications" translatable="true">Апликације</string>
+    <string name="lbl_domain_rules" translatable="true">Правила домена</string>
+    <string name="lbl_delete" translatable="true">Обриши</string>
+    <string name="settings_title_desc" translatable="true">Високо прилагодљив DNS и заштитни зид</string>
+    <string name="lbl_dns_servers" translatable="true">DNS сервери</string>
+    <string name="lbl_ip_rules" translatable="true">IP правила</string>
+    <string name="lbl_generated" translatable="true">(генерисано)</string>
+    <string name="lbl_listen_port" translatable="true">Надгледај порт</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_auto" translatable="true">(аутоматско)</string>
+    <string name="lbl_include" translatable="true">Уврсти</string>
+    <string name="lbl_select_all" translatable="true">изабери све</string>
+    <string name="lbl_inactive" translatable="true">Неактивно</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS и SOCKS5</string>
+    <string name="lbl_fast" translatable="true">брз</string>
+    <string name="lbl_slow" translatable="true">спор</string>
+    <string name="lbl_very" translatable="true">веома</string>
+    <string name="lbl_add" translatable="true">додај</string>
+    <string name="lbl_app_wise" translatable="true">по апликацији</string>
+    <string name="lbl_sec" translatable="true">сек</string>
+    <string name="lbl_hour" translatable="true">сати</string>
+    <string name="lbl_preshared_key" translatable="true">Подељен кључ</string>
+    <string name="lbl_optional" translatable="true">(опционо)</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Стално одржавање</string>
+    <string name="lbl_save" translatable="true">сачувај</string>
+    <string name="lbl_cache" translatable="true">Кеш</string>
+    <string name="lbl_status" translatable="true">Статус</string>
+    <string name="lbl_remove" translatable="true">Уклони</string>
+    <string name="lbl_last" translatable="true">Последње</string>
+    <string name="lbl_starting" translatable="true">Покреће се</string>
+    <string name="lbl_allowed_ips" translatable="true">Дозвољене IP</string>
+    <string name="lbl_private" translatable="true">приватно</string>
+    <string name="lbl_secure" translatable="true">безбедно</string>
+    <string name="lbl_split" translatable="true">Подели</string>
+    <string name="lbl_on_device" translatable="true">на-уређају</string>
+    <string name="lbl_unselected" translatable="true">Неизабрано</string>
+    <string name="lbl_notification" translatable="true">обавештење</string>
+    <string name="memory_notification_text">Rethink-у недостаје меморије. Системске радње могу бити ограничене.</string>
+    <string name="slide_2_title" translatable="true">Добродошли</string>
+    <string name="slide_1_title" translatable="true">Бесплатан и отвореног кода</string>
+    <string name="slide_1_desc" translatable="true">Rethink је софтвер отвореног кода подржан од стране Mozilla Builders MVP програма.</string>
+    <string name="allow" translatable="true">дозволи</string>
+    <string name="block" translatable="true">блокирај</string>
+    <string name="bypass_universal" translatable="true">заобиђи универзално</string>
+    <string name="exclude" translatable="true">изузми</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="bypass_dns_firewall" translatable="true">заобиђи днс и заштитни зид</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Додирните да промените подешавања заштите</string>
+    <string name="firewall_mode_notification_title" translatable="true">Заштићени! Повезани са заштитним зидом.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">чекање</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">неуспех</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">заштићен</string>
+    <string name="status_app_error" translatable="true">грешка апликације</string>
+    <string name="status_protected_with_socks5" translatable="true">заштићен са socks проксијем</string>
+    <string name="status_protected_with_proxy" translatable="true">заштићен са проксијем</string>
+    <string name="status_protected_with_wg" translatable="true">заштићен са wireguard-ом</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">није заштићен</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Повезан са RethinkDNS-ом</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">Повезан са заштитним зидом</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Повезан са RethinkDNS-ом и заштитним зидом</string>
+    <string name="notification_action_resume_vpn" translatable="true">НАСТАВИ</string>
+    <string name="hybrid_mode_notification_title" translatable="true">Заштићени! Повезани са DNS + заштитни зид.</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Заштићени! Повезани са DNS + заштитни зид + прокси.</string>
+    <string name="failed_using_default" translatable="true">Неуспех: користи се резервни DNS</string>
+    <string name="status_dns_server_down" translatable="true">dns сервер није оперативан</string>
+    <string name="status_protected_with_tor" translatable="true">заштићен са tor-ом</string>
+    <string name="status_protected_with_private_dns" translatable="true">заштићен са приватним dns-ом</string>
+    <string name="status_protected_with_proxy_private_dns" translatable="true">заштићен са проксијем и приватним dns-ом</string>
+    <string name="status_protected_with_socks5_private_dns" translatable="true">заштићен са socks5 и приватним dns-ом</string>
+    <string name="status_protected_with_http_private_dns" translatable="true">заштићен са http проксијем и приватним dns-ом</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">омогућен је приватни dns</string>
+    <string name="firewall_mode_info_title" translatable="true">Заштитни зид</string>
+    <string name="apps_info_title" translatable="true">Апликације</string>
+    <string name="alert_permission_accessibility" translatable="true">Дозвола - Приступачност</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">Неуспело отварање подешавање приступачности. Покушајте поново касније!</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">Изаберите мод.</string>
+    <string name="brave_dns_connect_mode_change_dns" translatable="true">Изаберите мод.</string>
+    <string name="default_dns_name" translatable="true">RDNS подразумевано</string>
+    <string name="conn_track_clear_logs_title" translatable="true">Обрисати све мрежне записе?</string>
+    <string name="conn_track_clear_logs_message" translatable="true">Ово брише само мрежне записе али не и правила заштитног зида. Ова радња је неопозива. Да ли желите да наставите?</string>
+    <string name="bsct_app_info" translatable="true">Информације о апликацији</string>
+    <string name="bsct_block_domain" translatable="true">Блокирај, веруј <u>доменима</u> за <u>ову апликацију</u></string>
+    <string name="bsct_block" translatable="true">Блокирај, заобиђи, изузми, изолуј <u>ову апликацију</u></string>
+    <string name="bsct_conn_block_desc_device" translatable="true">блокирано %1$s на уређају</string>
+    <string name="bsct_conn_desc_allowed" translatable="true">дозвољено на %1$s%2$s</string>
+    <string name="bsct_conn_desc_blocked" translatable="true">блокирано на %1$s%2$s</string>
+    <string name="always_on_dialog" translatable="true">\"Увек активан VPN\" је омогућен на овом уређају. Да би сте покренули Rethink, молим вас идите у подешавања и онемогућите \"Увек активан VPN\".</string>
+    <string name="always_on_dialog_heading" translatable="true">Онемогући Увек активан VPN</string>
+    <string name="always_on_dialog_positive_btn" translatable="true">Иди на подешавања</string>
+    <string name="always_on_dialog_stop_heading" translatable="true">Увек активан VPN</string>
+    <string name="always_on_dialog_stop_message" translatable="true">Увек активан VPN је омогућен за Rethink. Да ли заиста желите да зауставите Rethink?</string>
+    <string name="always_on_dialog_positive" translatable="true">Заустави</string>
+    <string name="always_on_dialog_neutral" translatable="true">Подешавања</string>
+    <string name="notification_action_dns_firewall_mode" translatable="true">DNS + заштитни зид</string>
+    <string name="firewall_mode_info_explanation_new" translatable="true">Надгледај активност мреже и блокирај апликацију или IP адресу.</string>
+    <string name="hybrid_mode_info_title" translatable="true">DNS + заштитни зид</string>
+    <string name="dns_mode_info_explanation_new" translatable="true">Надгледај, блокирај и енкриптуј DNS захтеве.</string>
+    <string name="custom_url_error_invalid_url" translatable="true">Неисправан URL</string>
+    <string name="dns_query_clear_logs_title" translatable="true">Обрисати све DNS записе?</string>
+    <string name="dns_query_clear_logs_message" translatable="true">Ово брише DNS записе на уређаје. Ова радња је неопозива. Да ли желите да наставите?</string>
+    <string name="bsct_block_ip" translatable="true">Блокирај, веруј <u>овој IP</u> за <u>ову апликацију</u></string>
+    <string name="private_dns_dialog_positive" translatable="true">Иди на подешавања</string>
+    <string name="firewall_act_network_monitor_tab" translatable="true">Мрежа</string>
+    <string name="dns_act_configure_tab" translatable="true">Подеси</string>
+    <string name="univ_firewall_dialog_title" translatable="true">Обриши IP правило?</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">Обрисати DoH крајњу тачку?</string>
+    <string name="doh_custom_url_remove_dialog_message" translatable="true">Обрисати DNS путем Https крању тачку из сачуване конфигурације.</string>
+    <string name="doh_custom_url_remove_success" translatable="true">Крајња тачка је обрисана.</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Обрисати DoT крајњу тачку?</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Обрисати DNSCrypt разрешивач?</string>
+    <string name="dns_crypt_url_remove_dialog_message" translatable="true">Обрисати DNSCrypt разрешивач из сачуване конфигурације.</string>
+    <string name="dns_crypt_url_remove_success" translatable="true">DNSCrypt разрешивач је обрисан.</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Обрисати DSNCrypt релеј?</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt релеј је обрисан.</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">Обрисати DNS прокси?</string>
+    <string name="dns_proxy_remove_dialog_message" translatable="true">Обрисати DNS прокси из сачуване конфигурације.</string>
+    <string name="local_blocklist_download" translatable="true">Преузми блоклисту</string>
+    <string name="local_blocklist_download_desc" translatable="true">Преузети блоклисту (око 60MB) да би сте користили ову функционалност?</string>
+    <string name="local_blocklist_redownload" translatable="true">Ажурна је!</string>
+    <string name="blocklist_update_check_failure" translatable="true">Нешто је пошло по злу. Покушајте поново касније!</string>
+    <string name="blocklist_update_check_not_required" translatable="true">Блоклисте су већ на последњој верзији.</string>
+    <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast --> Синхронизација списка апликација је завршена.</string>
+    <string name="configure_dns_connected_doh_status" translatable="true">DNS путем HTTPS-а</string>
+    <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
+    <string name="configure_dns_connected_dns_proxy_status" translatable="true">DNS прокси</string>
+    <string name="configure_dns_connection_name" translatable="true">Повезан на %1$s</string>
+    <string name="configure_dns_crypt" translatable="true">DNSCrypt: %1$s разрешивачи</string>
+    <string name="http_proxy_dialog_desc" translatable="true">URL формулара подешавања, &lt;протокол&gt;://&lt;корисничко-име&gt;:&lt;лозинка&gt;@&lt;домен-или-ip&gt;:&lt;порт&gt;&lt;путања&gt;. Пример: http://proksi.primer.com:8080/</string>
+    <string name="download_update_dialog_title" translatable="true">Ново издање!</string>
+    <string name="download_update_dialog_message_ok_title" translatable="true">Ажурна је!</string>
+    <string name="private_dns_dialog_desc" translatable="true">Rethink-ова DNS подешавања су преписана Андроидовим приватним DNS-ом.\n\nДа би сте користили Rethink-ов DNS идите на Андроид подешавања и искључите \"Приватни DNS\".</string>
+    <string name="http_proxy_dialog_heading" translatable="true">Подеси HTTP(S) CONNECT прокси</string>
+    <string name="download_update_dialog_message_success" translatable="true">Успешно преузимање блоклисте.</string>
+    <string name="download_update_dialog_failure_title" translatable="true">Нешто је пошло по злу!</string>
+    <string name="download_update_dialog_failure_message" translatable="true">Или наши сервери нису доступни или конекција није могла бити успостављена. Молим вас покушајте поново после неког времена.</string>
+    <string name="download_update_dialog_trylater_title" translatable="true">Надоградња није могућа у овом тренутку</string>
+    <string name="download_update_dialog_trylater_message" translatable="true">Надоградња се тренутно не може извршити, молим вас покушајте поново касније.</string>
+    <string name="search_firewall_all_apps" translatable="true"><font size="12">Претражи апликације по uid, имену</font></string>
+    <string name="search_dns_logs" translatable="true"><font size="12">Претражи имена домена или IP-јеве</font></string>
+    <string name="search_custom_domains" translatable="true"><font size="12">Претражи имена домена</font></string>
+    <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Претражи блоклисте</font></string>
+    <string name="search_proxy_add_apps" translatable="true">Претражи апликације по називу</string>
+    <string name="app_mode_dns_low_battery" translatable="true">DNS (чувар батерије)</string>
+    <string name="app_mode_firewall" translatable="true">Заштитни зид</string>
+    <string name="app_mode_dns_firewall" translatable="true">DNS и заштитни зид (подразумевано)</string>
+    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="info_dialog_copy_toast_msg" translatable="true">IP адреса је ископирана.</string>
+    <string name="info_dialog_url_copy_toast_msg" translatable="true">URL је ископиран</string>
+    <string name="public_key_copy_toast_msg" translatable="true">Јавни кључ је ископиран.</string>
+    <string name="info_dialog_rethink_toast_msg" translatable="true">Ископиран као RDNS+ DNS-путем-HTTPS URL</string>
+    <string name="settings_enable_logs" translatable="true">Омогући записивање на уређају</string>
+    <string name="connection_http3" translatable="true">HTTP3</string>
+    <string name="relative_time_today" translatable="true">Данас</string>
+    <string name="relative_time_yesterday" translatable="true">Јуче</string>
+    <string name="settings_ip_network_heading" translatable="true">Изабери IP верзију</string>
+    <string name="settings_ip_network_desc" translatable="true">Изабери између верзија интернет протокола.</string>
+    <string name="settings_connectivity_checks" translatable="true">Изврши провере повезивости</string>
+    <string name="settings_allow_lan_heading" translatable="true">Не рутирај приватне IP (експериментално)</string>
+    <string name="settings_ptrans_heading" translatable="true">Приморај IPv4 излазак</string>
+    <string name="settings_ptrans_desc" translatable="true">Преведи одлазни IPv6 саобраћај у IPv4 на уређају. Омогући ако сте повезани на само IPv4 мрежу.</string>
+    <string name="settings_allow_bypass_heading" translatable="true">Омогући видљивост мреже</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">Одређене опције су онемогућене када је VPN у закључаном моду. <u>Види VPN подешавања</u>.</string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Није могуће подешавање проксија када се VPN извршава у DNS само моду.</string>
+    <string name="settings_proxy_header" translatable="true">прокси</string>
+    <string name="settings_socks5_heading" translatable="true">Подеси SOCKS5 прокси</string>
+    <string name="settings_socks5_desc" translatable="true">Прослеђуј конекције ка SOCKS5 крајњој тачки.</string>
+    <string name="settings_https_heading" translatable="true">Подеси HTTP(S) CONNECT прокси</string>
+    <string name="orbot_socks5" translatable="true">TCP-само прокси</string>
+    <string name="orbot_http" translatable="true">HTTP прокси</string>
+    <string name="orbot_both" translatable="true">TCP + HTTP прокси</string>
+    <string name="orbot_none" translatable="true">Ништа (подразумевано)</string>
+    <string name="orbot_none_desc" translatable="true">Ништа од наведеног.</string>
+    <string name="orbot_bs_status_2" translatable="true">HTTP прокси је подешен.</string>
+    <string name="orbot_status_arg_2" translatable="true">TCP</string>
+    <string name="orbot_status_arg_3" translatable="true">DNS и TCP</string>
+    <string name="orbot_stop_dialog_title" translatable="true">Неопходна је ручна интервенција</string>
+    <string name="orbot_stop_dialog_neutral" translatable="true">Промени DNS</string>
+    <string name="orbot_install_dialog_positive" translatable="true">Инсталирај</string>
+    <string name="orbot_install_dialog_neutral" translatable="true">веб сајт</string>
+    <string name="orbot" translatable="true">Orbot</string>
+    <string name="orbot_socks5_desc" translatable="true">Прослеђује све TCP конекције Orbot-у.</string>
+    <string name="orbot_http_desc" translatable="true">Успоставља HTTP CONNECT тунел ка Orbot-у.</string>
+    <string name="orbot_bs_status_1" translatable="true">Прослеђивање %1$s конекције Orbot-у.</string>
+    <string name="orbot_bs_status_3" translatable="true">Прослеђивање %1$s Orbot-у, HTTP прокси је такође подешен.</string>
+    <string name="orbot_bs_status_4" translatable="true">Један-клик Tor-као-прокси (Orbot) подешавање.</string>
+    <string name="orbot_bs_status_trying_connect" translatable="true">Подешавање Orbot-а…</string>
+    <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink је подешен да прослеђује DNS упите Orbot-у. Промените ако је потребно.</string>
+    <string name="orbot_stop_dialog_negative" translatable="true">Заустави Orbot</string>
+    <string name="orbot_title" translatable="true">Orbot и проксији</string>
+    <string name="orbot_install_dialog_title" translatable="true">Инсталирати Orbot?</string>
+    <string name="settings_socks5_vpn_disabled_error" translatable="true">Покрените Rethink да би сте наставили.</string>
+    <string name="settings_general_header" translatable="true">опште</string>
+    <string name="settings_general_customize" translatable="true">прилагоди</string>
+    <string name="settings_autostart_bootup_heading" translatable="true">Аутоматски покрени при покретању телефона (експериментално)</string>
+    <string name="settings_network_all_networks" translatable="true">Користи све доступне мреже (експериментално)</string>
+    <string name="settings_check_update_heading" translatable="true">Провери надоградње апликације</string>
+    <string name="settings_check_update_desc" translatable="true">Аутоматски проверавај за надоградње апликације једном недељно.</string>
+    <string name="settings_custom_downloader_heading" translatable="true">Користи преузимач у апликацији</string>
+    <string name="settings_custom_downloader_desc" translatable="true">Уколико је онемогућено, користи се Андроидов уграђени <i>менаџер преузимања</i></string>
+    <string name="settings_app_notification_a13_heading" translatable="true">Обавештења апликације</string>
+    <string name="settings_app_notification_a13_desc" translatable="true">Омогући дозволе за обавештења апликације</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">Стално обавештење</string>
+    <string name="settings_theme_heading" translatable="true">Изглед</string>
+    <string name="settings_theme_desc" translatable="true">Тамна/светла тема</string>
+    <string name="settings_go_log_heading" translatable="true">Ниво записа</string>
+    <string name="settings_go_log_desc" translatable="true">За исправљање грешака</string>
+    <string name="settings_rinr_heading" translatable="true">Повратна петља (експериментално)</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">Рутирај Rethink-ов саобраћај кроз тунел. Осим ако знаш шта радиш, искључи ово.</string>
+    <string name="settings_rinr_dialog_title" translatable="true">Повратна петља (експериментално)</string>
+    <string name="orbot_no_app_toast" translatable="true">Додај најмање једну апликацију да би сте омогућили Orbot</string>
+    <string name="settings_orbot_heading" translatable="true">Подеси Orbot</string>
+    <string name="settings_orbot_desc" translatable="true">Orbot у не-vpn моду са HTTPS/SOCKS5.</string>
+    <string name="settings_orbot_install_desc" translatable="true">Додирните овде да инсталирате Orbot</string>
+    <string name="settings_orbot_disabled_error" translatable="true">Искључи HTTP(S) и/или SOCKS5 прокси да би наставили са Tor-као-прокси подешавањем.</string>
+    <string name="settings_orbot_notification_action" translatable="true">Отвори Orbot</string>
+    <string name="settings_import_export_heading" translatable="true">Резервна копија и враћање</string>
+    <string name="settings_import_export_desc" translatable="true">Ручно направи копију или врати податке апликације и подешавања.</string>
+    <string name="settings_http_proxy_desc" translatable="true">Прослеђује се на %1$s</string>
+    <string name="settings_http_proxy_dialog_title" translatable="true">URL прилагођеног сервера</string>
+    <string name="settings_http_proxy_error_text1" translatable="true">Опсег порта би требао бити између 1024-65535</string>
+    <string name="settings_http_proxy_error_text2" translatable="true">Неисправан порт</string>
+    <string name="settings_http_proxy_error_text3" translatable="true">Име домаћина је празно</string>
+    <string name="settings_http_proxy_error_text4" translatable="true">Неуспело повезивање са домаћином. Покушајте поново.</string>
+    <string name="settings_http_proxy_toast_success" translatable="true">HTTP прокси је подешен</string>
+    <string name="settings_dns_proxy_dialog_header" translatable="true">Подеси SOCKS5 прокси</string>
+    <string name="settings_dns_proxy_dialog_app" translatable="true">Апликација</string>
+    <string name="settings_dns_proxy_dialog_hostname" translatable="true">Име домаћина</string>
+    <string name="settings_dns_proxy_dialog_username" translatable="true">Корисничко име</string>
+    <string name="settings_dns_proxy_dialog_password" translatable="true">Лозинка</string>
+    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">подеси</string>
+    <string name="settings_app_list_default_app" translatable="true">Ништа</string>
+    <string name="settings_socks_forwarding_desc" translatable="true">Прослеђује се на %1$s:%2$s, %3$s</string>
+    <string name="settings_socks_forwarding_default_desc" translatable="true">Конекције се прослеђују на SOCKS5 крајњу тачку.</string>
+    <string name="settings_socks5_dialog_hint_ip" translatable="true">IP адреса</string>
+    <string name="settings_socks5_dialog_hint_port" translatable="true">Порт</string>
+    <string name="settings_socks5_dialog_hint_username" translatable="true">Корисничко име (опционо)</string>
+    <string name="settings_socks5_dialog_hint_password" translatable="true">Лозинка (опционо)</string>
+    <string name="settings_theme_dialog_title" translatable="true">Изглед</string>
+    <string name="settings_theme_dialog_themes_1" translatable="true">Подешено према систему</string>
+    <string name="settings_theme_dialog_themes_4" translatable="true">Права црна</string>
+    <string name="settings_ip_dialog_title" translatable="true">Изабери IP верзију</string>
+    <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (подразумевано)</string>
+    <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (експериментално)</string>
+    <string name="settings_ip_dialog_ipv46" translatable="true">Аутоматски (експериментално)</string>
+    <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
+    <string name="settings_ip_text_ipv6" translatable="true">IPv6</string>
+    <string name="settings_ip_text_ipv46" translatable="true">Аутоматски</string>
+    <string name="settings_notification_heading" translatable="true">Изабери радњу обавештења</string>
+    <string name="settings_notification_desc" translatable="true">Које дугмиће радњиприказати са Rethink обавештењем: %1$s</string>
+    <string name="settings_notification_desc1" translatable="true">Паузирај / Заустави (подразумевано)</string>
+    <string name="settings_notification_desc2" translatable="true">DNS / DNS + заштитни зид</string>
+    <string name="settings_notification_desc3" translatable="true">Ништа</string>
+    <string name="settings_notification_dialog_option_1" translatable="true">\nПаузирај / Заустави (подразумевано):\nПриказује два дугмета, за брзо паузирање и заустављање Rethink-а.</string>
+    <string name="settings_notification_dialog_option_3" translatable="true">\nНишта:\nНе приказује дугмиће.\n</string>
+    <string name="settings_locale_heading" translatable="true">Промени језик</string>
+    <string name="settings_locale_desc" translatable="true">Изаберите ваш жељени језик</string>
+    <string name="settings_locale_dialog_title" translatable="true">Изаберите ваш жељени језик</string>
+    <string name="settings_locale_dialog_neutral" translatable="true">Помозите у превођењу апликације</string>
+    <string name="settings_biometeric_heading" translatable="true">Омогући закључавање апликације</string>
+    <string name="settings_biometric_desc" translatable="true">Обезбеди апликацију коришћењем закључавања екрана</string>
+    <string name="settings_selected_theme" translatable="true">Тренутна тема: %1$s</string>
+    <string name="settings_protocol_translation_dns_inactive" translatable="true">Пређи на DNS/DNS+заштитни зид мод да би сте омогућили ово подешавање</string>
+    <string name="settings_default_dns_desc" translatable="true">У ретким случајевима када жељени DNS није доступан, користи се резервни DNS.</string>
+    <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">Искључено (подразумевано)</string>
+    <string name="pcap_failure_toast" translatable="true">Грешка при прављењу pcap датотеке. Покушајте поново!</string>
+    <string name="apps_icon_content_desc" translatable="true">Икона апликације</string>
+    <string name="firewall_status_allow" translatable="true">дозвољено</string>
+    <string name="firewall_status_isolate" translatable="true">изоловано</string>
+    <string name="firewall_status_whitelisted" translatable="true">заобилази универзална правила заштитног зида</string>
+    <string name="firewall_status_bypass_dns_firewall" translatable="true">заобилази dns и правила заштитног зида</string>
+    <string name="firewall_status_blocked" translatable="true">блокирано</string>
+    <string name="firewall_status_unknown" translatable="true">непознато</string>
+    <string name="ct_bs_app_info_error" translatable="true">Информација о апликацији није пронађена</string>
+    <string name="hs_biometeric_title" translatable="true">Откључај Rethink</string>
+    <string name="hs_biometeric_desc" translatable="true">Користи биометријску потврду да би сте откључали Rethink</string>
+    <string name="settings_pcap_dialog_option_2" translatable="true">Испис у Logcat</string>
+    <string name="settings_pcap_dialog_option_3" translatable="true">Испис у фасциклу преузимања</string>
+    <string name="hs_biometeric_error" translatable="true">Грешка биометријске потврде</string>
+    <string name="firewall_card_text_inactive" translatable="true">Омогући мод заштитног зида.</string>
+    <string name="dns_card_latency_active" translatable="true">%1$sms</string>
+    <string name="dns_card_latency_inactive" translatable="true">Омогући DNS мод.</string>
+    <string name="firewall_card_universal_rules" translatable="true">%1$s универзалних правила</string>
+    <string name="rules_card_domain_count" translatable="true">%1$s правила домена</string>
+    <string name="apps_card_ips_count" translatable="true">%1$s IP и порт правила</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s упита</string>
+    <string name="hsf_start_btn_state" translatable="true">покрени</string>
+    <string name="hsf_downtime" translatable="true">(неактивно од %1$s)</string>
+    <string name="logs_card_duration" translatable="true">од %1$s</string>
+    <string name="hsf_vpn_dialog_header" translatable="true">Пажња!</string>
+    <string name="hsf_vpn_prepare_failure" translatable="true">Или недостају VPN дозволе, или је друга апликација у увек укљученом VPN моду.</string>
+    <string name="hsf_notification_permission_failure" translatable="true">Омогућите дозволе за обавештења у екрану подешавања</string>
+    <string name="hsf_start_dialog_header" translatable="true">Покрени %1$s</string>
+    <string name="hsf_start_dialog_message" translatable="true">Ви сте један корак далеко од безбедног и сигурног Андроида: Моментално видите мрежну активност, блокирајте веб сајтове, IP-јеве, и апликације које се лоше понашају.</string>
+    <string name="hsf_whats_new_chip_text" translatable="true">Шта је ново</string>
+    <string name="hsf_proxy_chip_text" translatable="true">Прокси је активан</string>
+    <string name="hsf_packet_capture_chip_text" translatable="true">Активно је хватање пакета</string>
+    <string name="hsf_blocklist_chip_text_no_data" translatable="true">Омогући RDNS+</string>
+    <string name="hsf_exclude_error" translatable="true">Изузимање није могуће у VPN закључаном моду</string>
+    <string name="hsf_proxy_chip_removed_toast" translatable="true">Прокси је уклоњен</string>
+    <string name="hsf_proxy_chip_remove_text" translatable="true">Заустављање…</string>
+    <string name="hsf_whats_new_remove_text" translatable="true">Затварање…</string>
+    <string name="hsf_chip_appearance" translatable="true">Тема: %1$s</string>
+    <string name="hsf_pause_vpn_failure" translatable="true">Није могуће паузирање: Rethink није активан</string>
+    <string name="lbl_background_data" translatable="true">Ограничавање података у позадини</string>
+    <string name="lbl_battery_optimization" translatable="true">Оптимизација батерије</string>
+    <string name="dc_block_heading" translatable="true">правила</string>
+    <string name="dc_other_dns_heading" translatable="true">врста</string>
+    <string name="dc_custom_dns_radio" translatable="true">Други DNS</string>
+    <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
+    <string name="dc_entries" translatable="true">%1$s уноси »</string>
+    <string name="dc_local_block_heading" translatable="true">Блок листе на уређају</string>
+    <string name="dc_local_block_desc_1" translatable="true">Изаберите међу 195+ блок листи. Кликните овде да преузмете или подесите блок листе.</string>
+    <string name="dc_custom_block_heading" translatable="true">Правила домена</string>
+    <string name="dc_dns_website_heading" translatable="true">Прикажи икону веб сајта у DNS записима (експериментално)</string>
+    <string name="dc_dns_website_desc" translatable="true">Покупи икону веб сајта са <i>nextdns.io</i> и <i>duckduckgo.com</i>. Заузима до 350 mb простора складишта</string>
+    <string name="dc_dns_leaks_heading" translatable="true">Спречи DNS цурења</string>
+    <string name="dc_dns_leaks_desc" translatable="true">Када је омогућено, Rethink хвата све пакете на порту 53 и прослеђује их ка кориснички подешеној DNS крајњој тачки</string>
+    <string name="dc_check_update_heading" translatable="true">Питај при освежењу блок листе</string>
+    <string name="dc_check_update_desc" translatable="true">Проверавај освежење блок листе на свака <i>три</i> дана</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Никада не проксуј DNS</string>
+    <string name="dc_proxy_dns_desc" translatable="true">Не проксуј DNS преко увек укљученог WireGuard-а, SOCKS5, HTTP проксија.</string>
+    <string name="about_bravedns_whoarewe" translatable="true">Rethink је бесплатан пројекат отвореног кода, под вођством инжењера из Амазона, IBM-а, и Scientific Games-а.</string>
+    <string name="about_bravedns_toreport_text" translatable="true">помоћ и повратне информације</string>
+    <string name="about_bug_report_desc" translatable="true">пошаљи записе о проблемима апликације</string>
+    <string name="about_join_telegram" translatable="true">Телеграм</string>
+    <string name="about_bug_report" translatable="true">Извештај о грешки</string>
+    <string name="about_bug_report_dialog_positive_btn" translatable="true">Пошаљи е-поруку</string>
+    <string name="about_bug_no_log_dialog_title" translatable="true">Извештај о грешки</string>
+    <string name="about_bug_no_log_dialog_message" translatable="true">Није успело сакупљање записа о грешки. Да ли желите да ручно пријавите ваш проблем?</string>
+    <string name="about_web" translatable="true">везе</string>
+    <string name="about_website" translatable="true">Посети rethinkdns.com</string>
+    <string name="about_github" translatable="true">Допринеси на GitHub-у</string>
+    <string name="about_faq" translatable="true">Погледај ЧПП</string>
+    <string name="about_docs" translatable="true">Прочитај документацију</string>
+    <string name="about_privacy_policy" translatable="true">Прочитај полису приватности</string>
+    <string name="about_sponsor_link_text" translatable="true">Спонзориши</string>
+    <string name="about_app" translatable="true">апликација</string>
+    <string name="about_email" translatable="true">Пошаљи нам е-поруку</string>
+    <string name="about_settings" translatable="true">системске</string>
+    <string name="about_settings_app_info" translatable="true">Информације о апликацији</string>
+    <string name="about_settings_vpn_profile" translatable="true">VPN профил</string>
+    <string name="about_settings_notification" translatable="true">Подешавања обавештења</string>
+    <string name="about_whats_new" translatable="true">Шта је ново у %1$s</string>
+    <string name="about_twitter" translatable="true">Пратите нас на Твитеру</string>
+    <string name="about_mozilla" translatable="true">Rethink је подржан од стране Мозила Билдерс, FOSS United фондације, OSOM Products Inc.</string>
+    <string name="about_app_update_check" translatable="true">Провери за надоградњом апликације</string>
+    <string name="about_app_contributors" translatable="true">Аутори</string>
+    <string name="about_app_translate" translatable="true">Преведи</string>
+    <string name="about_dialog_positive_button" translatable="true">Идемо</string>
+    <string name="about_mail_to" translatable="true">hello@celzero.com</string>
+    <string name="about_mail_to_string" translatable="true">mailto:</string>
+    <string name="about_mail_subject" translatable="true">[Rethink]:</string>
+    <string name="about_mail_bugreport_subject" translatable="true">[Rethink]: Извештај о грешки</string>
+    <string name="about_mail_bugreport_text" translatable="true">Пошаљи ову е-поруку на : hello@celzero.com</string>
+    <string name="about_mail_bugreport_share_title" translatable="true">Изабери провајдера е-поште</string>
+    <string name="about_dialog_neutral_button" translatable="true">Предложи функционалности</string>
+    <string name="vpn_profile_error" translatable="true">Није било могуће покренути VPN профил.</string>
+    <string name="private_dns_error" translatable="true">Није било могуће покренути приватни dns екран.</string>
+    <string name="intent_launch_error" translatable="true">Није било могуће покренути %1$s</string>
+    <string name="no_browser_error" translatable="true">Није било могуће отворити веб страницу у прегледачу.</string>
+    <string name="log_file_not_available" translatable="true">Није пронађен извештај о грешки</string>
+    <string name="logs_disclaimer" translatable="true">Приказано првих 20,000 карактера</string>
+    <string name="contributors_dialog_title" translatable="true">Аутори</string>
+    <string name="cd_custom_doh_dialog_title" translatable="true">URL прилагођеног сервера</string>
+    <string name="cd_custom_dns_proxy_title" translatable="true">Прилагођени DNS прокси</string>
+    <string name="cd_custom_dns_proxy_name_default" translatable="true">Прокси</string>
+    <string name="cd_custom_dns_proxy_name" translatable="true">Прокси %1$s</string>
+    <string name="cd_custom_dns_proxy_default_app" translatable="true">Ништа</string>
+    <string name="cd_dns_proxy_mode_internal" translatable="true">Интерно</string>
+    <string name="cd_dns_proxy_mode_external" translatable="true">Екстерно</string>
+    <string name="cd_dns_proxy_error_text_1" translatable="true">Неисправна IP адреса</string>
+    <string name="cd_dns_proxy_error_text_2" translatable="true">Опсег порта би требао бити између 1024-65535</string>
+    <string name="cd_dns_proxy_error_text_3" translatable="true">Неисправан порт</string>
+    <string name="cd_dns_crypt_dialog_title" translatable="true">Додај DNSCrypt разрешивач или релеј</string>
+    <string name="cd_dns_crypt_name_default" translatable="true">DNSCrypt</string>
+    <string name="cd_dns_crypt_name" translatable="true">DNSCrypt %1$s</string>
+    <string name="cd_dns_crypt_dialog_heading" translatable="true">Додај DNSCrypt разрешивач или релеј</string>
+    <string name="cd_dns_crypt_dialog_name" translatable="true">Назив</string>
+    <string name="cd_dns_crypt_dialog_stamp" translatable="true">Печат</string>
+    <string name="cd_dns_crypt_dialog_desc" translatable="true">Опис (опционо)</string>
+    <string name="cd_dns_crypt_error_text_1" translatable="true">Печат не може бити празан</string>
+    <string name="cd_doh_dialog_heading" translatable="true">Додај DNS путем HTTPS-а</string>
+    <string name="cd_doh_dialog_resolver_name" translatable="true">Назив разрешивача</string>
+    <string name="cd_doh_dialog_resolver_url" translatable="true">URL разрешивача</string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true">Не потврђуј TLS сертификате сервера (омогући само ако знаш шта радиш)</string>
+    <string name="cd_dns_alg_heading" translatable="true">Напредно DNS филтрирање (експериментално)</string>
+    <string name="cd_dns_alg_desc" translatable="true">Додели јединствену IP по DNS захтеву</string>
+    <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s остале апликације</string>
+    <string name="ctbs_block_other_apps" translatable="true">Правила примењена за %1$s ће такође бити применљива за %2$s осталих апликација</string>
+    <string name="dns_log_dialog_positive" translatable="true">Обриши записе</string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s блок листи</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_chip" translatable="true">+%1$s остали IP-јеви</string>
+    <string name="dns_btm_sheet_chip_no_answer" translatable="true">Нема одговора</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">разрешено <u>анонимно</u>%1$s по %2$s путем %3$s</string>
+    <string name="dns_btm_resolved_doh" translatable="true">разрешено %1$s по %2$s</string>
+    <string name="dns_btm_resolved_doh_no_server" translatable="true">разрешено %1$s</string>
+    <string name="dns_btm_latency_ms" translatable="true">%1$sms</string>
+    <string name="dns_btm_record_type" translatable="true">Врста упита: %1$s</string>
+    <string name="hs_download_positive_default" translatable="true">у реду</string>
+    <string name="hs_download_positive_play_store" translatable="true">Заврши надоградњу</string>
+    <string name="hs_download_negative_default" translatable="true">Подсети ме касније</string>
+    <string name="univ_firewall_rule_1" translatable="true">Блокирај све апликације када је уређај закључан</string>
+    <string name="univ_firewall_rule_2" translatable="true">Блокирај све апликације које нису у употреби</string>
+    <string name="univ_firewall_rule_4" translatable="true">Блокирај UDP осим DNS и NTP</string>
+    <string name="univ_firewall_rule_5" translatable="true">Блокирај када је DNS заобиђен</string>
+    <string name="univ_firewall_rule_7" translatable="true">Блокирај IPv4 у IPv6 (експериментално)</string>
+    <string name="univ_firewall_rule_8" translatable="true">Блокирај порт 80 (небезбедан HTTP) саобраћај</string>
+    <string name="univ_firewall_rule_9" translatable="true">Блокирај на ограниченим (мобилним) мрежама</string>
+    <string name="univ_view_blocked_ip" translatable="true">IP и порт правила</string>
+    <string name="univ_view_blocked_ip_desc" translatable="true">Измени блокиране или домене од поверења, IP / порт правила.</string>
+    <string name="univ_ip_delete_individual_toast" translatable="true">%1$s обрисано.</string>
+    <string name="univ_ip_delete_toast_success" translatable="true">Обрисана су сва IP правила.</string>
+    <string name="univ_delete_firewall_dialog_message" translatable="true">Брисањем ових правила дозволићете свим апликацијама да се повежу на тренутно блокиране IP-јеве.</string>
+    <string name="univ_accessibility_crash_dialog_positive" translatable="true">Иди на подешавања</string>
+    <string name="univ_accessibility_dialog_positive" translatable="true">Дозволи</string>
+    <string name="univ_accessibility_dialog_negative" translatable="true">Спречи</string>
+    <string name="univ_firewall_heading" translatable="true">Унивезална правила заштитног зида</string>
+    <string name="app_ip_domain_rules_desc" translatable="true">Измени IP / доменска правила по апликацији.</string>
+    <string name="dns_connected" translatable="true">Повезано</string>
+    <string name="dns_info_positive" translatable="true">У реду</string>
+    <string name="dns_info_neutral" translatable="true">Ископирај</string>
+    <string name="dns_crypt_relay_error_toast" translatable="true">Није изабран разрешивач</string>
+    <string name="dns_proxy_dialog_message_no_app" translatable="true">IP адреса: %1$s\n\nБрој порта: %2$s</string>
+    <string name="dns_query_latency" translatable="true">%1$sms</string>
+    <string name="dns_proxy_dialog_header_dns" translatable="true">Додај DNS прокси</string>
+    <string name="dns_proxy_app" translatable="true">Апликација</string>
+    <string name="dns_proxy_ip_address" translatable="true">IP адреса</string>
+    <string name="dns_proxy_port" translatable="true">Број порта</string>
+    <string name="fapps_filter_filter_heading" translatable="true">Врста</string>
+    <string name="fapps_filter_categories_heading" translatable="true">Категорије</string>
+    <string name="fapps_filter_parent_installed" translatable="true">Инсталирано</string>
+    <string name="fapps_filter_parent_system" translatable="true">Системске</string>
+    <string name="fapps_firewall_filter_bypass_universal" translatable="true">Заобиђене</string>
+    <string name="fapps_firewall_filter_excluded" translatable="true">Изузете</string>
+    <string name="fapps_firewall_filter_isolate" translatable="true">Изоловане</string>
+    <string name="fapps_info_unmetered_msg" translatable="true">Дозволи / блокирај на неограниченој (WiFi) мрежи.</string>
+    <string name="fapps_info_metered_msg" translatable="true">Дозволи / блокирај на ограниченој (мобилној) мрежи.</string>
+    <string name="fapps_info_bypass_msg" translatable="true">Заобиђи универзална правила заштитног зида.</string>
+    <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Заобиђи DNS и правила заштитног зида.</string>
+    <string name="fapps_info_exclude_msg" translatable="true">Изузми из DNS + заштитног зида.</string>
+    <string name="fapps_info_isolate_msg" translatable="true">Бокирај све осим IP-јеве од поверења.</string>
+    <string name="fapps_info_dialog_positive_btn" translatable="true">Важи</string>
+    <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Дозволи на неограниченим</string>
+    <string name="fapps_unmetered_unblock_dialog_message">Дозволити конекције на неограниченим (WiFi) мрежама за апликације на <i>списку</i>\?</string>
+    <string name="fapps_metered_block_dialog_title" translatable="true">Блокирај на ограниченим</string>
+    <string name="fapps_metered_unblock_dialog_title" translatable="true">Дозволи на ограниченим</string>
+    <string name="fapps_bypass_block_dialog_title" translatable="true">Заобиђи апликације</string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true">Заобиђи унивезална правила заштитног зида за апликације на <i>списку</i>\?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Заобиђи апликације</string>
+    <string name="fapps_unblock_dialog_title" translatable="true">Дозволи апликације</string>
+    <string name="fapps_unblock_dialog_message" translatable="true">Дозволити конекције за апликације на <i>списку</i>\?</string>
+    <string name="fapps_exclude_block_dialog_title" translatable="true">Изузми апликације</string>
+    <string name="fapps_isolate_block_dialog_title" translatable="true">Изолуј апликације</string>
+    <string name="fapps_isolate_block_dialog_message" translatable="true">Изолуј апликације на <i>списку</i>\?</string>
+    <string name="fapps_firewall_filter_hint" translatable="true">Приказане су све апликације</string>
+    <string name="fapps_firewall_filter_desc" translatable="true">Приакзано <u>%1$s</u>%2$s апликација</string>
+    <string name="rules_load_failure_heading" translatable="true">Белешка</string>
+    <string name="dns_proxy_connection_failure_lockdown" translatable="true">Изузимање %1$s за %2$s у закључаном моду може произвести проблеме у повезивању са интернетом.</string>
+    <string name="dns_proxy_toast_parameter" translatable="true">DNS прокси</string>
+    <string name="socks5_proxy_toast_parameter" translatable="true">SOCKS5 прокси</string>
+    <string name="system_dns_connection_failure" translatable="true">Не може се утврдити тренутни DNS сервер</string>
+    <string name="copy_clipboard_label" translatable="true">URL</string>
+    <string name="update_complete_snack_message" translatable="true">Преузета је нова верзија.</string>
+    <string name="update_complete_action_snack" translatable="true">ПОКРЕНИ ПОНОВО</string>
+    <string name="settings_local_blocklist_in_use" translatable="true">%1$s блок листи је у употреби</string>
+    <string name="settings_local_blocklist_dialog_positive" translatable="true">Преузми</string>
+    <string name="settings_local_blocklist_version" translatable="true">Верзија: v%1$s</string>
+    <string name="accessibility_notification_content" translatable="true">Rethink-ов сервис за приступачност је заустављен или има проблем. Више не блокира апликације у позадини. Додирните да поново омогућите.</string>
+    <string name="accessibility_failure_toast" translatable="true">Rethink-ов сервис за приступачност је заустављен или има проблем. Више не блокира апликације у позадини.</string>
+    <string name="coming_soon_toast" translatable="true">доступно ускоро</string>
+    <string name="orbot_toast_parameter" translatable="true">Tor-као-прокси</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s је онемогућен јер се проксији активни</string>
+    <string name="pause_text" translatable="true">паузирано</string>
+    <string name="pause_desc" translatable="true">Напомена: %1$s блокираних апликација ће наставити да буде под заштитним зидом.</string>
+    <string name="other_dns_list_tab1" translatable="true">DoH</string>
+    <string name="other_dns_list_tab2" translatable="true">Dnscrypt</string>
+    <string name="firewall_rule_no_rule" translatable="true">Нема правила</string>
+    <string name="firewall_rule_block_app" translatable="true">Апликација је блокирана</string>
+    <string name="firewall_rule_block_metered" translatable="true">Ограничена (мобилна)</string>
+    <string name="firewall_rule_univ_block_metered" translatable="true">Ограничена (универзална)</string>
+    <string name="firewall_rule_bypass_dns_firewall" translatable="true">Заобиђена апликација</string>
+    <string name="firewall_rule_block_app_new_install" translatable="true">Нова апликација</string>
+    <string name="firewall_rule_block_ip" translatable="true">IP / порт (апликација)</string>
+    <string name="firewall_rule_block_univ_ip" translatable="true">IP / порт (универзално)</string>
+    <string name="firewall_rule_trusted_ip" translatable="true">IP од поверења</string>
+    <string name="firewall_rule_bypass_universal_ip" translatable="true">Заобиђена IP</string>
+    <string name="firewall_rule_device_lock" translatable="true">Уређај је закључан</string>
+    <string name="firewall_rule_foreground" translatable="true">Апликације које се не користе</string>
+    <string name="firewall_rule_block_udp_ntp" translatable="true">UDP је блокиран</string>
+    <string name="firewall_rule_block_dns_bypass" translatable="true">DNS је заобиђен</string>
+    <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">Заобиђена апликација</string>
+    <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNS проксован</string>
+    <string name="firewall_rule_block_http" translatable="true">Небезбедан HTTP</string>
+    <string name="firewall_rule_global_lockdown" translatable="true">Закључано</string>
+    <string name="firewall_rule_exempt_orbot_setup" translatable="true">Orbot подешавање</string>
+    <string name="firewall_rule_block_domain" translatable="true">Домен (апликација)</string>
+    <string name="firewall_rule_dns_blocked" translatable="true">DNS је блокиран</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">Домен (универзално)</string>
+    <string name="firewall_rule_domain_trusted_univ" translatable="true">Домен од поверења(универ)</string>
+    <string name="firewall_rule_proxied" translatable="true">Проксован</string>
+    <string name="firewall_rule_new_app_desc" translatable="true">Ова плаикација је успоставила конекцију <i>први</i> пут.<br/><br/> За промену идите на картицу <i>Универзално</i>.</string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true">Кориснички подешено правило је блокирало ову <i>апликацију</i> при покушају повезивања на <i>ограничену</i>мрежу.<br/><br/> За промену идите на картицу <i>Све апликације</i>.</string>
+    <string name="firewall_rule_isolate_desc" translatable="true">Кориснички подешено правило је блокирало ову <i>апликацију</i> при повезивању на другу од <i>заобиђене IP-јеве</i>.<br/><br/> За промену идите на картицу <i>Све апликације</i>.</string>
+    <string name="firewall_rule_block_ip_univ_desc" translatable="true">Кориснички подешено правило је блокирало <i>одредишни IP / порт</i>.<br/><br/> За промену идите на картицу <i>универзално</i>.</string>
+    <string name="firewall_rule_block_ip_desc" translatable="true">Кориснички подешено правило је блокирало <i>одредишну IP</i>.<br/><br/> За промену идите на екран <i>заштитни зид по апликацији</i>.</string>
+    <string name="firewall_rule_device_lock_desc" translatable="true">Ова конекција је ограничена заштитним зидом јер је <i>уређај био закључан</i> у том тренутку.<br/><br/> За промену овог понашања иди на картицу <i>универзално</i>.</string>
+    <string name="firewall_rule_foreground_desc" translatable="true">Ова конекција је ограничена заштитним зидом јер изворна апликација <i>није била у првом плану</i>.<br/><br/> За промену овог понашања иди на картицу <i>универзално</i>.</string>
+    <string name="firewall_rule_block_udp_ntp_desc" translatable="true">Кориснички дефинисано правило је блокирало ову <i>UDP</i> конекцију.<br/><br/> За промену иди на картицу <i>универзално</i>.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">Ова конекција је дозвољена јер је <i>изворна апликација</i> подешена да <i>заобиђе универзална</i> правила заштитног зида.<br/><br/> За промену иди на екран <i>заштитни зид по апликацији</i>.</string>
+    <string name="firewall_rule_block_http_desc" translatable="true">Ова конекција је блокирана јер је вероватно користила <i>небезбедни HTTP</i>.<br/><br/> За промену иди на картицу <i>универзално</i>.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Кориснички подешено правило заштитног зида је блокирало <i>домен</i>.<br/><br/> За промену иди на екран <i>заштитни зид по апликацији</i>.</string>
+    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true">Ова конекција је дозвољена јер <i>један-клик Tor-као-прокси</i> подешавање путем Orbot-а је била у току.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Ова конекција је дозвољена јер је <i>домен</i> подешен као домен од поверења.<br/><br/> За промену иди на екран <i>заштитни зид по апликацији</i>.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">Ова конекција је блокирана јер је <i>домен</i> блокиран од стране кориснички пожељног DNS-а.<br/><br/> За промену овог понашања иди на картицу <i>подеси DNS</i>.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Ова конекција је блокирана јер је <i>домен</i> подешен као блокиран у Универзалним правилима домена.<br/><br/> За промену овог правила иди на картицу <i>подеси DNS</i>.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Ова конекција је дозвољена јер је <i>домен</i> подешен као од поверења у Универзалним правилима домена.<br/><br/> За промену овог понашања иди на картицу <i>подеси DNS</i>.</string>
+    <string name="new_app_bulk_notification_title" translatable="true">Пажња</string>
+    <string name="new_app_bulk_notification_content" translatable="true">Rethink је блокирао %1$s нових апликација. Додирни за преглед или измену.</string>
+    <string name="new_app_notification_content" translatable="true">Rethink је блокирао недавно инсталирану апликацију %1$s.</string>
+    <string name="new_app_notification_action_deny" translatable="true">Настави блокирање</string>
+    <string name="new_app_notification_action_toast_allow" translatable="true">Мрежна конекција је дозвољена за ову апликацију</string>
+    <string name="notif_dialog_pause_dialog_message" translatable="true">Апликација је у паузираном стању, активирај за наставак</string>
+    <string name="notif_dialog_pause_dialog_positive" translatable="true">Активирај</string>
+    <string name="notif_dialog_pause_dialog_negative" translatable="true">Одбаци</string>
+    <string name="notif_channel_vpn_failure" translatable="true">Неактивни VPN</string>
+    <string name="notif_channel_firewall_alerts" translatable="true">Упозорења заштитног зида</string>
+    <string name="notif_channel_proxy_failure" translatable="true">Упозорења проксија</string>
+    <string name="notif_channel_desc_vpn_notification" translatable="true">Обавести када је Rethink активан и покренут у позадини</string>
+    <string name="notif_channel_desc_firewall_alerts" translatable="true">Упозори при грешкама и аномалијама заштитног зида</string>
+    <string name="notif_channed_desc_download" translatable="true">Упозори при напретку преузимања за блок листе на уређају</string>
+    <string name="category_name_sys_apps" translatable="true">Апликације система</string>
+    <string name="category_name_non_app_sys" translatable="true">Сервиси система</string>
+    <string name="category_name_installed" translatable="true">Инсталиране апликације</string>
+    <string name="build__flavor_website" translatable="true">веб сајт</string>
+    <string name="build__flavor_play_store" translatable="true">репродукуј</string>
+    <string name="build__flavor_fdroid" translatable="true">fdroid</string>
+    <string name="cd_toast_deleted" translatable="true">Домен је укоњен из прилагођеног списка</string>
+    <string name="cd_toast_added" translatable="true">Домен је успешно додат</string>
+    <string name="cd_remove_dialog_title" translatable="true">Обрисати домен?</string>
+    <string name="cd_remove_dialog_message" translatable="true">Обриши домен из сачуване конфигурације.</string>
+    <string name="cd_dialog_edit_title" translatable="true">Измени правило домена</string>
+    <string name="cd_toast_edit" translatable="true">Измењено</string>
+    <string name="cd_dialog_desc" translatable="true">URL или назив домена са опционим специјалним знаком: *.test.com, test.com/test</string>
+    <string name="cd_dialog_edittext_hint" translatable="true">Унеси %1$s</string>
+    <string name="cd_dialog_error_invalid_domain" translatable="true">Неисправан URL или назив домена</string>
+    <string name="cd_dialog_error_invalid_wildcard" translatable="true">Неисправан специјални карактер или домен</string>
+    <string name="cd_no_rule_txt" translatable="true">Нема правила</string>
+    <string name="ci_dialog_title" translatable="true">Додај IP / порт правило</string>
+    <string name="ci_dialog_edittext_hint" translatable="true">IP адреса, подмрежа или порт</string>
+    <string name="ci_dialog_error_invalid_ip" translatable="true">Неисправна IP адреса, подмрежа или порт.</string>
+    <string name="ci_dialog_added_success" translatable="true">IP додата на списак</string>
+    <string name="ci_bypass_universal_initial" translatable="true">УО</string>
+    <string name="ci_bypass_universal_txt" translatable="true">Универзална обилазница</string>
+    <string name="ci_trust_initial" translatable="true">П</string>
+    <string name="ci_bypass_universal" translatable="true">Универзална обилазница</string>
+    <string name="ci_delete" translatable="true">обриши</string>
+    <string name="ada_noapp_dialog_title" translatable="true">Нема такве апликације</string>
+    <string name="ada_noapp_dialog_message" translatable="true">Недостаје информација о апликацији. Можда је ова апликација деинсталирана?</string>
+    <string name="ada_noapp_dialog_positive" translatable="true">Важи</string>
+    <string name="ada_firewall_status" translatable="true">Ова апликација <b><i>%1$s</i></b>.</string>
+    <string name="ada_ip_connection_count" translatable="true">Повезан на %1$s IP адреса</string>
+    <string name="ada_ip_connection_count_zero" translatable="true">0 IP адреса</string>
+    <string name="ada_ip_no_connection" translatable="true">Нема мрежних записа за ову апликацију.</string>
+    <string name="ada_app_status_allow" translatable="true">је дозвољено</string>
+    <string name="ada_app_status_block" translatable="true">је блокирано</string>
+    <string name="ada_app_status_block_wifi" translatable="true">је блокирано на неограниченим (wifi) мрежама</string>
+    <string name="ada_app_status_block_md" translatable="true">је блокирано на ограниченим (мобилним) мрежама</string>
+    <string name="ada_app_status_whitelist" translatable="true">ће заобићи универзална правила заштитног зида</string>
+    <string name="ada_app_status_isolate" translatable="true">је изолована; само IP-јеви од поверења су дозвољене</string>
+    <string name="ada_app_status_bypass_dns_firewall" translatable="true">ће заобићи универзална dns и правила заштитног зида</string>
+    <string name="ci_trust_rule" translatable="true">Поверење</string>
+    <string name="ada_app_firewall" translatable="true">Заштитни зид</string>
+    <string name="ada_app_metered" translatable="true">Ограничена</string>
+    <string name="ada_app_bypass_univ" translatable="true">Универзална обилазница</string>
+    <string name="ada_app_bypass_dns_firewall" translatable="true">Заобиђи DNS и заштитни зид</string>
+    <string name="ada_app_exclude" translatable="true">Изузми</string>
+    <string name="ada_app_isolate" translatable="true">Изолуј</string>
+    <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">Очисти записе</string>
+    <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Очисти све записе повезане са овом апликацијом.</string>
+    <string name="bypass_dns_firewall_tooltip">%1$s ради једино са Rethink-овим DNS-om</string>
+    <string name="exclude_apps_from_proxy">Заобиђи апликацију од свих проксија</string>
+    <string name="bsac_title_desc" translatable="true">Правила се примањују само на ову апликацију.</string>
+    <string name="bsdl_block_desc" translatable="true">Блокирај, веруј <u>овом домену</u></string>
+    <string name="bsdl_blocked_desc" translatable="true">блокирано %1$s од %2$s</string>
+    <string name="network_dns" translatable="true">Системски DNS</string>
+    <string name="notif_download_content_title" translatable="true">Преузми блок листу на уређај</string>
+    <string name="notif_download_failure_content" translatable="true">Преузимање није успело. Покушајте поново.</string>
+    <string name="notif_download_cancel_content" translatable="true">Преузимање прекинуто.</string>
+    <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Родитељска контрола</string>
+    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen" translatable="true">Блокирај пиратски и садржај за одрасле, клађење, завођење и друштвене мреже.</string>
+    <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Безбедност</string>
+    <string name="rt_dialog_title" translatable="true">Сачувај измене</string>
+    <string name="rt_dialog_message" translatable="true">Да ли желите да примените ново конфигурисану блок листу?</string>
+    <string name="rt_edit_dialog_positive" translatable="true">Измени</string>
+    <string name="rt_download_start" translatable="true">Преузимање блок листе…</string>
+    <string name="rt_download" translatable="true">Преузми блок листе</string>
+    <string name="rt_chip_update_available" translatable="true">Надоградња је доступна</string>
+    <string name="rt_re_download" translatable="true">Поново преузми блок листе</string>
+    <string name="rt_filter_parent_selected" translatable="true">Изабрано</string>
+    <string name="rt_download_desc" translatable="true">Преузми блок листе (око 60MB) да би сте користили ову функционалност.</string>
+    <string name="radio_sky_btn" translatable="true">⛅ Небо</string>
+    <string name="radio_max_btn" translatable="true">🪂 Макс</string>
+    <string name="rt_filter_hint" translatable="true">Приказане <u>све</u> блок листе</string>
+    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen" translatable="true">Блокирај attentionware, spyware, scareware.</string>
+    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen" translatable="true">Блокирај malware, ransomware, cryptoware, phishers, и остале претње.</string>
+    <string name="bsrf_sub_group_heading" translatable="true">Подгрупа</string>
+    <string name="dc_local_block_enabled" translatable="true">Омогућено</string>
+    <string name="dc_setting_dns_cache_heading" translatable="true">DNS појачивач</string>
+    <string name="dc_refresh_toast" translatable="true">Освежавање завршено</string>
+    <string name="lbbs_enabled" translatable="true">Омогућено</string>
+    <string name="lbbs_copy" translatable="true">Копирај као RDNS+ URL</string>
+    <string name="lbbs_search" translatable="true">Претражи домене у блок листама</string>
+    <string name="lbbs_update_check" translatable="true">Провери надоградњу</string>
+    <string name="lbbs_redownload" translatable="true">Поново преузми блок листе</string>
+    <string name="brbs_title" translatable="true">Резервна копија и враћање</string>
+    <string name="brbs_backup_title" translatable="true">Направи резервну копију</string>
+    <string name="brbs_backup_desc" translatable="true">Направи копију подешавања, мреже и dns записа</string>
+    <string name="brbs_restore_title" translatable="true">Поврати</string>
+    <string name="brbs_restore_desc" translatable="true">Поврати из дататеке резервне копије</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Не функционише са различитим верзијама апликације</string>
+    <string name="brbs_backup_dialog_message" translatable="true">Прави копију подешавања апликације, мреже, и dns записа у датотеку. Ово ће поново покренути VPN.</string>
+    <string name="brbs_restore_dialog_message" translatable="true">Поврати подешавања апликације, мреже, и dns записе из датотеке копије. Ово ће поново покренути апликацију.</string>
+    <string name="brbs_restore_dialog_positive" translatable="true">Поврати</string>
+    <string name="brbs_backup_dialog_failure_title" translatable="true">Прављење копије није успело</string>
+    <string name="brbs_backup_dialog_failure_positive" translatable="true">Поново покушај копију</string>
+    <string name="brbs_restore_dialog_failure_title" translatable="true">Враћање није успело</string>
+    <string name="brbs_restore_dialog_failure_message" translatable="true">Није могло вратити. Покушати поново?</string>
+    <string name="brbs_backup_complete_toast" translatable="true">Прављење копије је завршено</string>
+    <string name="brbs_restore_no_uri_toast" translatable="true">Враћање није успело; покушај поново</string>
+    <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s блок листи</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">нејвише дозвољених апликација</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">највише блокираних апликација</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">највише контактираних домена</string>
+    <string name="rethink_sky_desc" translatable="true">280+ локација; висока поузданост; разрешивач се извршава на cloudflare.com</string>
+    <string name="dc_setting_dns_cache_desc" translatable="true">Спаја захтеве, кешира одговоре, отпорно решавање грешака</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">највише контактираних ip-јева</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">највише блокираних земаља</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Покрени Rethink за наставак</string>
+    <string name="ssv_see_more" translatable="true">Прикажи све</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">Неисправан кључ</string>
+    <string name="bad_config_reason_invalid_number" translatable="true">Неисправан број</string>
+    <string name="bad_config_reason_missing_section" translatable="true">Недостаје секција</string>
+    <string name="bad_config_reason_unknown_section" translatable="true">Непозната секција</string>
+    <string name="key_length_explanation_base64" translatable="true">: WireGuard base64 кључеви морају да садрже 44 карактера (32 бајта)</string>
+    <string name="key_length_explanation_binary" translatable="true">: WireGuard кључеви морају бити 32 бајта</string>
+    <string name="key_length_explanation_hex" translatable="true">: WireGuard хекс кључеви морају да садрже 64 карактера (32 бајта)</string>
+    <string name="key_contents_error" translatable="true">Погрешни карактери у кључу</string>
+    <string name="key_length_error" translatable="true">Неисправна дужина кључа</string>
+    <string name="parse_error_inet_address" translatable="true">IP адреса</string>
+    <string name="parse_error_inet_endpoint" translatable="true">Крајња тачка</string>
+    <string name="parse_error_inet_network" translatable="true">IP мрежа</string>
+    <string name="parse_error_integer" translatable="true">број</string>
+    <string name="bad_config_explanation_pka" translatable="true">: Мора бити позитиван и не већи од 65535</string>
+    <string name="bad_config_explanation_positive_number" translatable="true">: Мора бити позитиван</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">: Мора бити исправан број UDP порта</string>
+    <string name="bad_config_error" translatable="true">%1$s у %2$s</string>
+    <string name="generic_error" translatable="true">Непозната “%s” грешка</string>
+    <string name="parse_error_reason" translatable="true">Није могуће парсирати %1$s “%2$s”</string>
+    <string name="invalid_file_error" translatable="true">неисправна датотека</string>
+    <string name="import_error" translatable="true">Није могуће увести тунел: %s</string>
+    <string name="illegal_filename_error" translatable="true">Неисправан назив датотеке “%s”</string>
+    <string name="no_configs_error" translatable="true">Није пронађена конфигурација</string>
+    <string name="bad_extension_error" translatable="true">Датотека мора бити .conf или .zip</string>
+    <string name="wireguard_description" translatable="true">WireGuard као прокси.</string>
+    <string name="new_warp_config_desc" translatable="true">Добави WARP конфигурацију са сервера</string>
+    <string name="new_warp_invalid_config_toast" translatable="true">Неисправна WARP конфигурација</string>
+    <string name="one_wg_apps_added" translatable="true">Рутирање свих апликација</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">Закључавање</string>
+    <string name="bad_config_context" translatable="true">%1$s-ов %2$s</string>
+    <string name="one_wg_dialog_desc" translatable="true">Све конекције из ове апликације, укључујучи DNS, биће рутиране на један, активан WireGuard VPN. Остали активни WireGuard VPN-ови, ако постоје, биће заустављени.</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">Увек укључен</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">Све конекције и апликације које нису рутиране путем других WireGuard VPN-ова биће рутиране овим.</string>
+    <string name="add_remove_apps" translatable="true">Додај / уклони (%1$s апликација)</string>
+    <string name="routing_remaining_apps" translatable="true">Рутирање осталих апликација</string>
+    <string name="config_delete_dialog_desc" translatable="true">Да ли заиста желите да обришете ову WireGuard VPN конфигурацију?</string>
+    <string name="add_peer" translatable="true">Додај peer-а</string>
+    <string name="include_all_app_wg_dialog_desc" translatable="true">Користи ова WireGuard VPN за све апликације?</string>
+    <string name="wireguard_disable_failure" translatable="true">\"Увек укључен WireGuard\" не може бити искључен</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">део од %1$s</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">Обухвати %1$s апликација</string>
+    <string name="wireguard_no_config_msg" translatable="true">Нема WireGuard VPN-ова. Додај неки да би почео.</string>
+    <string name="wireguard_disclaimer" translatable="true">DNS се прослеђује на %1$s, ICMP (нпр: ping) се шаље на основну мрежу.</string>
+    <string name="wireguard_disable_title" translatable="true">Заустави WireGuard</string>
+    <string name="wireguard_disable_message" translatable="true">Заустави све активне WireGuard VPN-ове?</string>
+    <string name="lbl_remaining_apps" translatable="true">Преостале апликације</string>
+    <string name="remaining_apps_dialog_title" translatable="true">Обухвати преостале апликације</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Обухвати све преостале апликације које се не рутирају путем других проксија</string>
+    <string name="cloudflare_dns_desc" translatable="true">Не блокирај ниједан DNS захтев. Користи Cloudflare-ову 1.1.1.1 DNS крајњу тачку.</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">Блокирај малвер и садржај за одрасле. Користи Cloudflare-ову 1.1.1.3 DNS крајњу тачку.</string>
+    <string name="google_dns_desc" translatable="true">Не блокира ниједан DNS захтев. Користи Google-ову DNS крајњу тачку.</string>
+    <string name="quad9_dns_desc" translatable="true">Quad9 рутира ваше DNS упите кроз безбедну мрежу сервера на целој планети.</string>
+    <string name="crypt_adguard_desc" translatable="true">Штити ваш уређај од малвера и више.</string>
+    <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS са безбедном претрагом и блокирањем садржаја за одрасле.</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="crypt_relay_netherlands" translatable="true">Анонимизиран DNS релеј који се налази у Холандији</string>
+    <string name="crypt_relay_france" translatable="true">Анонимизиран DNS релеј који се налази у Паризу у Француској омогућен од стране https://cryptostrom.is/.</string>
+    <string name="crypt_relay_sweden" translatable="true">Анонимизирани DNS релеј који се налази у Шведској омогућен од стране https://cryptostrom.is/.</string>
+    <string name="crypt_relay_us" translatable="true">Анонимизиран DNS релеј који с налази у САД - Лос Анђелес, омогућен од стране https://cryptostrom.is/.</string>
+    <string name="crypt_relay_singapore" translatable="true">Анонимизиран DNS релеј који се налази у Сингапуру.</string>
+    <string name="lbl_cancel" translatable="true">Поништи</string>
+    <string name="lbl_domain" translatable="true">Домен</string>
+    <string name="lbl_configure" translatable="true">Подеси</string>
+    <string name="lbl_logs" translatable="true">записи</string>
+    <string name="lbl_proceed" translatable="true">Настави</string>
+    <string name="lbl_private_key" translatable="true">Приватни кључ</string>
+    <string name="lbl_random" translatable="true">(насумично)</string>
+    <string name="lbl_active" translatable="true">Активно</string>
+    <string name="lbl_min" translatable="true">мин</string>
+    <string name="lbl_day" translatable="true">дан</string>
+    <string name="lbl_insecure" translatable="true">(небезбедно)</string>
+    <string name="lbl_stopped" translatable="true">Заустављен</string>
+    <string name="lbl_overall" translatable="true">Опште</string>
+    <string name="lbl_idle" translatable="true">Мирује</string>
+    <string name="lbl_anonymous" translatable="true">анонимно</string>
+    <string name="slide_2_desc" translatable="true">Rethink је најлакши начин да надгледате активност мреже, заобиђете цензуру интернета, и блокирате апликације на вашем андроид уређају.</string>
+    <string name="untracked" translatable="true">непраћен</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Упозорење: Rethink је деактивиран</string>
+    <string name="isolate" translatable="true">изолуј</string>
+    <string name="dns_mode_notification_title" translatable="true">Заштићени! Повезани са брзим и безбедним DNS-ом.</string>
+    <string name="pause_mode_notification_title" translatable="true">Паузирано! Блокиране апликације ће наставити да буду надгледане.</string>
+    <string name="status_no_internet" translatable="true">нема интернета</string>
+    <string name="status_dns_error" translatable="true">грешка dns-а</string>
+    <string name="status_protected_with_tor_private_dns" translatable="true">заштићен са tor-ом и приватним dns-ом</string>
+    <string name="status_protected_with_http" translatable="true">заштићен са http проксијем</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">заштичен са wireguard-ом и приватним dns-ом</string>
+    <string name="notification_action_pause_vpn" translatable="true">ПАУЗИРАЈ</string>
+    <string name="universal_firewall_explanation" translatable="true">Примени правила заштитног зида на све апликације на основу догађаја на уређају, на пример, блокирај када је уређај закључан или када одређена апликација није у употреби.</string>
+    <string name="notification_action_stop_vpn" translatable="true">ЗАУСТАВИ</string>
+    <string name="notification_action_dns_mode" translatable="true">DNS</string>
+    <string name="dns_mode_info_title" translatable="true">DNS</string>
+    <string name="firewall_rules" translatable="true">Правила мреже</string>
+    <string name="dns_firewall_mode_info_explanation_new" translatable="true">Све изнад + заобиђи цензуру интернета.</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink користи сервисе приступачности да прати које апликације су у употреби за разлику од оних које нису у употреби.\n\nRethink не сакупља никакве информације нити вас шпијунира на било који начин.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Rethink сервиси приступачности су престали да функционишу.<i><b>Иди у подешавања и насилно заустави</b></i> Rethink и покрени га поново да би користио <i>Блокирај било коју апликацију која није у употреби</i> функционалност.\n\nRethink користи сервисе приступачности да би пратио које апликације су у употреби за разлику од оних које нису у употреби.</string>
+    <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink је покренуо VPN у <i>Lockdown</i> моду. Његово заустављање ће резултовати губитком интернет конекције на овом корисничком профилу. Да ли желите да наставите?</string>
+    <string name="private_dns_dialog_heading" translatable="true">Искључи приватни DNS</string>
+    <string name="firewall_act_universal_tab" translatable="true">универзално</string>
+    <string name="univ_firewall_dialog_message" translatable="true">Брисањем овог правила дозволићете свим апликацијама повезивање на ову IP. Да ли желите да наставите?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Обрисати DNS путем TLS крајње тачке из сачуване конфигурације.</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Обрисати DNSCrypt релеј из сачуване конфигурације.</string>
+    <string name="dns_proxy_remove_success" translatable="true">DNS прокси је обрисан.</string>
+    <string name="bsct_conn_block_desc" translatable="true">блокирано %1$s од %2$s</string>
+    <string name="app_mode_dns" translatable="true">DNS</string>
+    <string name="app_mode_wireguard" translatable="true">VPN</string>
+    <string name="settings_enable_logs_desc" translatable="true">Чувај записе DNS-а и заштитног зида на уређају.</string>
+    <string name="app_mode_choose" translatable="true">Изабери мод</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">Провере повезивости се шаљу за утврђивање доступности.</string>
+    <string name="settings_allow_lan_desc" translatable="true">Изузми LAN, loopback, multicast, link-local руте из Rethink-овог VPN тунела.</string>
+    <string name="settings_allow_bypass_desc" translatable="true">Дозволи захтеваним апликацијама приступ свим доступним мрежама. Ове апликације могу да заобиђу Rethink-ов VPN тунел на захтев. Неке аудио/видео конференцијсле апликације попут Zoom-а и Meet-а можда захтевају ово за исправно функционисање.</string>
+    <string name="settings_https_desc" translatable="true">Прослеђуј конекције ка HTTP(S) CONNECT крајњој тачки.</string>
+    <string name="orbot_both_desc" translatable="true">Све наведено.</string>
+    <string name="settings_socks5_disabled_error" translatable="true">Повезан са %1$s. Искључите га да би сте наставили.</string>
+    <string name="settings_https_disabled_error" translatable="true">Повезан са %1$s. Искључите га да би сте наставили.</string>
+    <string name="settings_autostart_bootup_desc" translatable="true">При покретању уређаја, покрени Rethink ако је био покренут пре гашења.</string>
+    <string name="settings_network_all_networks_desc" translatable="true">Када је омогућено, Rethink користи све доступне мреже да се повеже на интернет. У супротном, користи ону означену као <i>активну</i> од стране Андроида.</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Учини обавештење сталним</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Рутирај Rethink-ов саобраћај, попут преузимања блоклисти, провере повезивости, DNS конекција, назад у тунел.</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">Такоше омогућава <!--settings_network_all_networks-->%1$s подешавање. Да ли желите да наставите?</string>
+    <string name="settings_dns_proxy_dialog_port_number" translatable="true">Број порта</string>
+    <string name="settings_socks_forwarding_desc_no_app" translatable="true">Прослеђује се на %1$s:%2$s</string>
+    <string name="settings_theme_dialog_themes_2" translatable="true">Светла</string>
+    <string name="settings_theme_dialog_themes_3" translatable="true">Тамна</string>
+    <string name="settings_notification_dialog_title" translatable="true">Изабери радњу обавештења</string>
+    <string name="settings_notification_dialog_option_2" translatable="true">\nDNS / DNS + заштитни зид:\nПриказује два дугмета за брзо пребацивање на DNS који штеди батерију и стандардни мод DNS + заштитни зид.</string>
+    <string name="settings_default_dns_heading" translatable="true">Изабери резервни DNS</string>
+    <string name="settings_pcap_heading" translatable="true">Хватање пакета</string>
+    <string name="firewall_status_excluded" translatable="true">изузето из dns-а и заштитног зида</string>
+    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">Ова конекција је дозвољена јер је &lt;i&gt;одредишна IP&lt;/i&gt; подешена да заобиђе сва универзална правила заштитног зида.&lt;br/&gt;&lt;br/&gt; За промену иди на &lt;i&gt;IP правила&lt;i&gt; на картици &lt;i&gt;универзално&lt;/i&gt;.</string>
+    <string name="firewall_status_block_unmetered" translatable="true">блокирано на неограниченим (wifi) мрежама</string>
+    <string name="firewall_status_block_metered" translatable="true">блокирано на ограниченим (мобилним) мрежама</string>
+    <string name="hs_biometeric_feature_not_supported" translatable="true">Биометријска потврда није подржана или је онемогућена на овом уређају</string>
+    <string name="firewall_card_text_active" translatable="true">%1$s блокирано\n%2$s заобиђено\n%3$s изузето\n%4$s изоловано</string>
+    <string name="hs_biometeric_failed" translatable="true">Неуспела биометријска потврда</string>
+    <string name="firewall_card_status_active" translatable="true">%1$s апликација</string>
+    <string name="logs_card_network_count" translatable="true">%1$s конекција</string>
+    <string name="hsf_stop_btn_state" translatable="true">заустави</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">Rethink-у су потребне дозволе да подеси локални VPN за енкрипцију DNS захтева уређаја, имплементацију монитора мреже, и приморавање правила заштитног зида.\n\nRethink не сакупља никакве информације нити вас шпијунира ни на који начин.</string>
+    <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Хватање података је онемогућено</string>
+    <string name="hsf_start_dialog_positive" translatable="true">Покрени</string>
+    <string name="hsf_blocklist_updating_text" translatable="true">Омогућавање…</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">Онемогући %1$s</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> може резултирати у губитку конекције. Промените подешавање да би сте дозволили Rethink-у да користи податке и друге ресурсе када је у позадини.</string>
+    <string name="about_bravedns_explantion" translatable="true">Rethink је најлакши начин за надгледање активности апликације, заобилажења цензуре интернетам, и блокирање интернета апликацијама на вашем Андроид уређају.</string>
+    <string name="about_bug_no_log_dialog_positive_btn" translatable="true">Пошаљи е-поруку</string>
+    <string name="about_connect" translatable="true">контактирај</string>
+    <string name="app_info_error" translatable="true">Није било могуће покренути информације о апликацији.</string>
+    <string name="cd_dnscrypt_relay_heading" translatable="true">Релеји</string>
+    <string name="notification_screen_error" translatable="true">Није било могуће покренути екран са обавештењем апликације.</string>
+    <string name="error_loading_log_file" translatable="true">Грешка при учитавању датотеке записа</string>
+    <string name="collecting_logs_progress_text" translatable="true">Хватање…</string>
+    <string name="cd_dns_crypt_title" translatable="true">разрешивачи</string>
+    <string name="cd_custom_doh_url_name" translatable="true">DoH %1$s</string>
+    <string name="cd_custom_doh_url_name_default" translatable="true">DoH</string>
+    <string name="cd_dns_crypt_relay_name" translatable="true">DNSRelay %1$s</string>
+    <string name="cd_dns_crypt_resolver_heading" translatable="true">Разрешивач</string>
+    <string name="cd_dns_crypt_relay_heading" translatable="true">Релеј</string>
+    <string name="ctbs_app_info_not_available_toast" translatable="true">Није пронађена страница подешавања апликације</string>
+    <string name="ctbs_dialog_negative_btn" translatable="true">Врати се</string>
+    <string name="hs_download_positive_website" translatable="true">Посети веб сајт</string>
+    <string name="univ_firewall_rule_3" translatable="true">Блокирај када је изворна апликација непозната</string>
+    <string name="univ_firewall_rule_6" translatable="true">Подразумевано блокирај ново инсталиране апликације</string>
+    <string name="univ_firewall_rule_10" translatable="true">Блокирај све осим заобиђене апликације и IP-јеве</string>
+    <string name="univ_ip_delete_dialog_positive" translatable="true">Обриши све</string>
+    <string name="univ_delete_firewall_dialog_title" translatable="true">Обрисати сва IP правила?</string>
+    <string name="app_ip_domain_rules" translatable="true">IP / доменска правила по апликацији</string>
+    <string name="dns_connected_rethink_plus" translatable="true">Повезано. %1$s блок листи је у употреби</string>
+    <string name="dns_connected_no_count" translatable="true">Повезано</string>
+    <string name="dns_proxy_dialog_message" translatable="true">Назив апликације: %1$s\n\nIP адреса: %2$s\n\nБрој порта: %3$s</string>
+    <string name="dns_proxy_name" translatable="true">Назив проксија</string>
+    <string name="fapps_filter_clear_btn" translatable="true">Очисти</string>
+    <string name="fapps_info_dialog_message" translatable="true">Блокирај апликације од приступа интернету. Ограничавање приступа интернету помаже у спречавању нежељене потрошње података, као и потрошњи батерије.</string>
+    <string name="fapps_unmetered_block_dialog_title" translatable="true">Блокирај на неограниченим</string>
+    <string name="fapps_unmetered_block_dialog_message" translatable="true">Блокирати конекције на неограниченим (WiFi) мрежама за апликације на<i>списку</i>\?</string>
+    <string name="fapps_metered_block_dialog_message" translatable="true">Блокирати конекције на ограниченим (мобилним) мрежама за апликације на<i>списку</i>\?</string>
+    <string name="fapps_metered_unblock_dialog_message" translatable="true">Дозволити конекције на ограниченим (мобилним) мрежама за апликације на<i>списку</i>\?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Заобиђи универзална DNS и правила заштитног зида за апликације на <i>списку</i>\?</string>
+    <string name="network_log_app_name_unnamed" translatable="true">Неименовано (%1$s)</string>
+    <string name="fapps_exclude_block_dialog_message" translatable="true">Изузети апликације на <i>списку</i> из DNS и заштитног зида?</string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true">Приказано <u>%1$s</u>%2$s апликација у категоријама: %3$s</string>
+    <string name="rules_load_failure_desc" translatable="true">Нису пронађена правила заштитног зида</string>
+    <string name="rules_load_failure_reload" translatable="true">учитај поново</string>
+    <string name="network_log_app_name_unknown" translatable="true">Непознато</string>
+    <string name="dns_proxy_connection_failure" translatable="true">Грешка при повезивању са DNS прокси сервером.</string>
+    <string name="dns_crypt_connection_failure" translatable="true">Грешка при повезивању са DNSCrypt сервером.</string>
+    <string name="firewall_rule_unknown_desc" translatable="true">Ова конекција је ограничена заштитним зидом јер <i>изворна апликација</i> није могла бити утврђена.<br/><br/> За промену овог понашања иди на картицу <i>универзално</i>.</string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">Ова конекција је блокирана јер је <i>изворна апликација</i> заобишла пожељни DNS корисника.<br/><br/> За промену овог понашања иди на картицу <i>универзално</i>.</string>
+    <string name="other_dns_list_tab3" translatable="true">Dns прокси</string>
+    <string name="firewall_rule_block_unmetered" translatable="true">Неограничана (WiFi)</string>
+    <string name="firewall_rule_isolate" translatable="true">Изолуј</string>
+    <string name="firewall_rule_block_app_exception" translatable="true">Грешка</string>
+    <string name="firewall_rule_unknown" translatable="true">Извор није познат</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Домен од поверења (апликација)</string>
+    <string name="firewall_rule_no_rule_desc" translatable="true">Ниједно правило заштитног зида се не поклапа са овом конекцијом.</string>
+    <string name="firewall_rule_block_app_desc" translatable="true">Кориснички подешено правило је блокирало ову <i>апликацију</i>.<br/><br/> За промену идите на картицу <i>Све апликације</i>.</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Блокира апликацију од повезивања на интернет.\n <u>#2</u>: Блокира све апликације од повезивања на одређену IP.\n <u>#3</u>: Блокира све конекције када је уређај закључан (Универзални заштитни зид).\n <u>#4</u>: Блокира било коју апликацију која није у употреби (Универзални заштитни зид).\n <u>#5</u>: Блокира конекције када је непозната изворна апликација (Универзални заштитни зид).\n <u>#6</u>: Блокира сав UDP саобраћај осим DNS-а (Универзални заштитни зид).\n <u>#7</u>: Блокира конекције када је DNS заобиђен (Универзални заштитни зид).</string>
+    <string name="hs_btm_sheet_lock_down" translatable="true">Није могућа промена модова када је VPN <i>lockdown</i>. Додирните да <u>измените VPN подешавања</u>.</string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">Кориснички подешено правило је блокирало ову <i>апликацију</i> при покушају повезивања на <i>неограничену</i>мрежу.<br/><br/> За промену идите на картицу <i>Све апликације</i>.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">Кориснички подешено правило је блокирало ову <i>апликацију</i> при покушају повезивања на <i>неограничену</i> (мобилну) мрежу.<br/><br/> За промену идите на картицу <i>универзална</i>.</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">Ова DNS конекција је проксована и прослеђена на пожељну DNS крајњу тачку корисника.<br/><br/> За промену онемогући <i>спречи DNS цурења</i> на екрану DNS <i>подешавања</i>.</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Конекција је дозвољена јер је <i>изворна апликација</i> подешена да <i>заобиђе dns и правила заштитног зида</i>.<br/><br/> За промену идите на екран <i>заштитни зид по апликацији</i>.</string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true">Конекција је дозвољена јер је <i>одредишна IP</i> подешена као IP од поверења.<br/><br/> За промену иди на екран <i>заштитни зид по апликацији</i>.</string>
+    <string name="whats_new_version_update" translatable="true">&lt;b&gt;Не паничите 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Ново: Хватање грешака мрежног енџина у корисничким извештајима о грешки.&lt;br/&gt; 2. Ново: користи системски DNS за неделегиране називе домена уколико је укључен Спречи DNS цурења.&lt;br/&gt; 3. Унапређење: Двострука (IPv4 + IPv6) WireGuard повезивост.&lt;br/&gt; 4. Унапређење: Избегавај блокирање UI елемената када је мрежни енџин нереспонзиван.&lt;br/&gt; 5. Исправка: истицање времена повезивања са укљученим Напредним DNS филтрирањем.&lt;br/&gt; 6. Исправка: WireGuard peer крајње тачке са називима домена висе при променама мреже.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Помозите у превођењу ове апликације&lt;/a&gt;</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Пошаљи прокси прослеђујуће апликације на повратну петљу</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Када је онемогућено, изузима прокси (SOCKS5, HTTP, DNS) прослеђујуће апликације из Rethink-овог VPN тунела.</string>
+    <string name="orbot_stop_dialog_message" translatable="true">Rethink је престао да прослеђује конекције Orbot-у, али Orbot је можда покренут у позадини.</string>
+    <string name="orbot_app_issue" translatable="true">Нисмо могли покренути Orbot. Да ли је инсталиран?</string>
+    <string name="orbot_explanation" translatable="true">Orbot је бесплатна прокси апликација која оснажава остале апликације да користе интернет <u>безбедније</u>.\nOrbot користи <u>Tor</u> да енкриптује ваш интернет саобраћај што Вам помаже да <u>заобиђете цензуру</u> и одбраните се против облика <u>надгледања мреже</u> која прете личним слободама и приватношћу.\n<u>TCP прокси</u>: Rethink прослеђује само TCP конекције <i>обухваћених</i> апликација Orbot-у.\n<u>HTTP прокси</u>: Rethink <i>успоставља</i> HTTP CONNECT тунел ка Orbot-у и прослеђује само TCP конекције <i>обухваћених</i> апликација.</string>
+    <string name="orbot_install_dialog_message" translatable="true">Orbot доноси могућности и функционалности Tor-а Андроиду.</string>
+    <string name="settings_orbot_header" translatable="true">Orbot\t❯</string>
+    <string name="settings_orbot_notification_content" translatable="true">Несупело покретање Tor-као-прокси. Отворите Orbot апликацију да би сте је ручно покренули.</string>
+    <string name="contributors_list" translatable="true">&lt;i&gt;Rethink пројекат отвореног кода&lt;/i&gt; дугује своје постојање овим волонтерима који посвећују небројене сате његовом развоју.&lt;br/&gt; &lt;br/&gt;🛡️ Андроид апликација &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Мрежни енџин &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Lanius-collaris&gt;Lanius-collaris&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Разрешивач &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Модови заједнице &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;Andersen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Гео-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Преводи &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Иконе &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Иконе&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Сервери изградње &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="rethink_max_desc" translatable="true">50+ локација; већа приватност; рекурзивни разрешивач се извршава на fly.io</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
+    <string name="firewall_rule_global_lockdown_desc" translatable="true">Ова конекција је блокирана јер је подешено универзално закључавање.<br/><br/> За промену иди на картицу <i>универзално</i>.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">Ова конекција је прослеђена кориснички пожељном проксију.<br/><br/> За промену иди на <i>Прокси</i> у екрану <i>Подеси</i>.</string>
+    <string name="new_app_notification_action_toast_deny" translatable="true">Мрежна конекција је одбијена за ову апликацију</string>
+    <string name="notif_dialog_pause_dialog_title" translatable="true">Апликација је паузирана!</string>
+    <string name="notif_channel_vpn_notification" translatable="true">Активни VPN</string>
+    <string name="notif_dialog_pause_dialog_neutral" translatable="true">Прикажи</string>
+    <string name="notif_channel_desc_vpn_failure" translatable="true">Обавести када је Rethink заустављен од стране Андроида или друге VPN апликације</string>
+    <string name="notif_channel_download" translatable="true">Упозорења преузимања</string>
+    <string name="notif_channel_desc_proxy_failure" translatable="true">Упозори при грешкама и аномалијама проксија</string>
+    <string name="category_name_sys_components" translatable="true">Компоненте система</string>
+    <string name="category_name_others" translatable="true">Остале</string>
+    <string name="cd_no_rules_text" translatable="true">Нема правила домена.</string>
+    <string name="cd_deleted_toast" translatable="true">Обриши сва правила домена</string>
+    <string name="cd_dialog_title" translatable="true">Додај правило домена</string>
+    <string name="cd_blocked_initial" translatable="true">Б</string>
+    <string name="cd_no_rule_initial" translatable="true">Н</string>
+    <string name="ci_dialog_desc" translatable="true">Дозволи (заобилазак) или блокирај IP адресу, IP подмрежу (опсег), порт. Пример: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
+    <string name="ci_no_rules_text" translatable="true">Нема IP или порт правила.</string>
+    <string name="ci_no_rule_initial" translatable="true">Н</string>
+    <string name="ci_no_rule_txt" translatable="true">Нема правила</string>
+    <string name="ci_trust_txt" translatable="true">Од поверења</string>
+    <string name="ci_blocked_initial" translatable="true">Б</string>
+    <string name="ci_no_rule" translatable="true">Нема правила</string>
+    <string name="ci_block" translatable="true">Блокирај</string>
+    <string name="ada_app_status_exclude" translatable="true">је изузето из dns-а и заштитног зида</string>
+    <string name="ada_app_status_unknown" translatable="true">је непознато</string>
+    <string name="ada_firewall_title" translatable="true">правила заштитног зида за ову апликацију</string>
+    <string name="ada_network_log_title" translatable="true">мрежни записи за ову апликацију</string>
+    <string name="ada_app_unmetered" translatable="true">Неограничена</string>
+    <string name="ada_app_dns_settings" translatable="true">DNS подешавања</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Ова апликација заобилази проксије</string>
+    <string name="notif_download_content_text" translatable="true">Преузимање у току…</string>
+    <string name="notif_download_success_content" translatable="true">Преузимање завршено.</string>
+    <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Приватност</string>
+    <string name="rt_dialog_neutral" translatable="true">Настави</string>
+    <string name="rt_chip_check_update" translatable="true">Провери надоградње</string>
+    <string name="rt_list_simple_btn_txt" translatable="true">једноставна</string>
+    <string name="lbl_advanced" translatable="true">напредна</string>
+    <string name="rt_filter_desc" translatable="true">Приказано <u>%1$s</u> блок листи</string>
+    <string name="rt_filter_desc_subgroups" translatable="true">Приказано <u>%1$s</u> блок листи у групи: %2$s и подгрупама: %3$s</string>
+    <string name="bsrf_clear_filter" translatable="true">Очисти</string>
+    <string name="lbbs_configure" translatable="true">Подеси</string>
+    <string name="lbbs_download" translatable="true">Освежи блок листе</string>
+    <string name="lbbs_heading" translatable="true">Подеси 195+ блок листи</string>
+    <string name="brbs_backup_dialog_title" translatable="true">Направи копију</string>
+    <string name="brbs_backup_dialog_positive" translatable="true">Направи копију</string>
+    <string name="brbs_restore_dialog_title" translatable="true">Поврати копију</string>
+    <string name="brbs_backup_dialog_failure_message" translatable="true">Ниј могуће направити копију. Покушати поново?</string>
+    <string name="brbs_restore_complete_toast" translatable="true">Враћање завршено, поновно покретање апликације…</string>
+    <string name="brbs_restore_dialog_failure_positive" translatable="true">Поново покушај враћање</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">највипе контактираних земаља</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">највише блокираних ip-јева</string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true">Непознати атрибут</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">највише блокираних домена</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">Неисправна вредност</string>
+    <string name="bad_config_reason_missing_attribute" translatable="true">Недостаје атрибут</string>
+    <string name="bad_config_reason_syntax_error" translatable="true">Грешка у синтакси</string>
+    <string name="parse_error_generic" translatable="true">стринг</string>
+    <string name="unknown_error" translatable="true">Непозната грешка</string>
+    <string name="setup_wireguard" translatable="true">Подеси WireGuard</string>
+    <string name="new_warp_error_toast" translatable="true">Није могуће добавити WARP конфигурацију</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Изабране апликације ће једино бити рутиране кроз овај WireGuard VPN, без обзира да ли је VPN активан или онемогућен.</string>
+    <string name="one_wg_error_toast" translatable="true">Да пређете на Напредни, зауставите WireGuard у једоставном моду</string>
+    <string name="config_add_success_toast" translatable="true">Завршено</string>
+    <string name="wireguard_enabled_failure" translatable="true">Заустави остале активне проксије да би омогућио WireGuard</string>
+    <string name="config_delete_dialog_title" translatable="true">Обриши</string>
+    <string name="include_all_app_wg_dialog_title" translatable="true">Обухвати све апликације</string>
+    <string name="exclude_all_app_wg_dialog_title" translatable="true">Изузми све апликације</string>
+    <string name="exclude_all_app_wg_dialog_desc" translatable="true">Изузми све апликације из овог WireGuard VPN-а?</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">Изузми %1$s апликација</string>
+    <string name="wireguard_connection_error" translatable="true">WireGuard VPN неуспева да се повеже</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">Блокира злонамерни садржај. Користи Cloudflare-ову 1.1.1.2 DNS крајњу тачку.</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">Филтер за одрасле блокира приступ свим сајтовима са садржајем за одрасле. Не блокира прокси или VPN-ове, нити сајтове са мешовитим садржајем. Сајтови попут Редита су дозвољени. Гугл и Бинг су подешени на безбедни мод.</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Блокира приступ свим сајтовима са садржајем за одрасле. Такође блокира прокси и VPN домене који се могу користити за заобилажење филтера. Сајтови мешовитог садржаја (попут Редита) су такође блокирани. Гугл, Бинг и Јутјуб су подешени на безбедни мод.</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">Породични филтер блокира приступ свим сајтовима са садржајем за одрасле. Такође блокира све прокси и VPN домене који се могу користити за заобилажење наших филтера. Сајтови мешовитог садржаја (попут Редита) су такође блокирани. Гугл, Бинг и Јутјуб су подешени на безбедни мод.</string>
+</resources>
