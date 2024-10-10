@@ -745,7 +745,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     if (Utilities.isLanIpv4(ip)) {
                         Utilities.isValidLocalPort(port)
                     } else {
-                        Utilities.isValidPort(port)
+                        isValidPort(port)
                     }
                 if (!isValid) {
                     errorTxt.text = getString(R.string.settings_http_proxy_error_text1)

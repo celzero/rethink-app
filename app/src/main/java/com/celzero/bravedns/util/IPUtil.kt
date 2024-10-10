@@ -81,11 +81,7 @@ class IPUtil {
             // get the first segment from ipv6 address
             val segment = ipv6.getSegment(0)
             // Decimal value for the 64(hexa) is 100
-            if (segment.segmentValue == 100) {
-                return true
-            }
-
-            return false
+            return segment.segmentValue == 100
         }
 
         fun getIpAddress(ip: String): IPAddress? {

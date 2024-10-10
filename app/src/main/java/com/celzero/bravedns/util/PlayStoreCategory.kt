@@ -52,7 +52,7 @@ enum class PlayStoreCategory(val rawValue: Int) {
     GAMES("GAMES".hashCode());
 
     companion object {
-        private val map = values().associateBy(PlayStoreCategory::rawValue)
+        private val map = entries.associateBy(PlayStoreCategory::rawValue)
         const val GENERAL_GAMES_CATEGORY_NAME = "GAMES"
 
         fun fromCategoryName(name: String): PlayStoreCategory {

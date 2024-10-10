@@ -134,6 +134,13 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         displayRecordTypeChip()
         setupClickListeners()
         updateRulesUi(log!!.queryStr)
+
+        if (log!!.region.isNotEmpty()) {
+            b.dnsRegion.visibility = View.VISIBLE
+            b.dnsRegion.text = log!!.region
+        } else {
+            b.dnsRegion.visibility = View.GONE
+        }
     }
 
     private fun getResponseIp(): String {

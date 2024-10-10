@@ -134,7 +134,7 @@ object EncryptedFileManager {
                 dir.mkdirs()
             }
             val fileToWrite = File(dir, fileName)
-            write(ctx, cfg, fileToWrite)
+            return write(ctx, cfg, fileToWrite)
         } catch (e: Exception) {
             Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
         }

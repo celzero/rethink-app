@@ -33,6 +33,7 @@ import com.celzero.bravedns.adapter.DnsQueryAdapter
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
 import com.celzero.bravedns.util.Utilities
@@ -80,6 +81,10 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         initView()
         if (arguments != null) {
             val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
+            if (query.contains(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)) {
+                // do nothing, as the search is for the firewall rules and not for the dns
+                return
+            }
             b.queryListSearch.setQuery(query, true)
         }
     }

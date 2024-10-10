@@ -20,6 +20,8 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
+import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.InternetProtocol
@@ -59,6 +61,12 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val NOTIFICATION_PERMISSION = "notification_permission_request"
         const val EXCLUDE_APPS_IN_PROXY = "exclude_apps_in_proxy"
         const val BIOMETRIC_AUTH = "biometric_authentication"
+        const val ANTI_CENSORSHIP_TYPE = "dial_strategy"
+        const val RETRY_STRATEGY = "retry_strategy"
+        const val ENDPOINT_INDEPENDENCE = "endpoint_independence"
+        const val TCP_KEEP_ALIVE = "tcp_keep_alive"
+        const val USE_SYSTEM_DNS_FOR_UNDELEGATED_DOMAINS = "use_system_dns_for_undelegated_domains"
+        const val SLOWDOWN_MODE = "slowdown_mode"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -121,9 +129,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         stringPref("http_proxy_ipaddress").withDefault<String>("http://127.0.0.1:8118")
 
     // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
-    // default: false for fdroid flavour
-    var allowBypass by
-        booleanPref("allow_bypass").withDefault<Boolean>(!Utilities.isFdroidFlavour())
+    // default: false
+    var allowBypass by booleanPref("allow_bypass").withDefault<Boolean>(false)
 
     // user set among AppConfig.DnsType enum; RETHINK_REMOTE is default which is Rethink-DoH
     var dnsType by
@@ -190,9 +197,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     private var _blockNewlyInstalledApp by booleanPref("block_new_app").withDefault<Boolean>(false)
 
     // user setting to use custom download manager or android's default download manager
-    // default: false, i.e., use android's default download manager
+    // default: true, i.e., use in-build download manager, as we see lot of failures with
+    // android's download manager because of the blocking nature of the app
     var useCustomDownloadManager by
-        booleanPref("use_custom_download_managet").withDefault<Boolean>(false)
+        booleanPref("use_custom_download_managet").withDefault<Boolean>(true)
 
     // custom download manager's last generated id
     var customDownloaderLastGeneratedId by
@@ -242,14 +250,17 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // make notification persistent (Android 13 and above), default false
     var persistentNotification by booleanPref("persistent_notification").withDefault<Boolean>(false)
 
-    // biometric authentication
+    // biometric authentication TODO: remove this
     var biometricAuth by booleanPref("biometric_authentication").withDefault<Boolean>(false)
+
+    // bio-metric authentication type
+    var biometricAuthType by intPref("biometric_authentication_type").withDefault<Int>(0)
 
     // enable dns alg
     var enableDnsAlg by booleanPref("dns_alg").withDefault<Boolean>(false)
 
     // default dns url
-    var defaultDnsUrl by stringPref("default_dns_query").withDefault<String>("")
+    var defaultDnsUrl by stringPref("default_dns_query").withDefault<String>(Constants.DEFAULT_DNS_LIST[1].url)
 
     // packet capture type
     var pcapMode by intPref("pcap_mode").withDefault<Int>(PcapMode.NONE.id)
@@ -281,6 +292,43 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // exclude apps which are configured in proxy (socks5, http, dns proxy)
     var excludeAppsInProxy by booleanPref("exclude_apps_in_proxy").withDefault<Boolean>(true)
+
+    var pingv4Ips by stringPref("ping_ipv4_ips").withDefault<String>(Constants.ip4probes.joinToString(","))
+
+    var pingv6Ips by stringPref("ping_ipv6_ips").withDefault<String>(Constants.ip6probes.joinToString(","))
+
+    // TODO: do we need this? instead use in-memory variable
+    var consoleLogEnabled by booleanPref("console_log_enabled").withDefault<Boolean>(false)
+
+    // camera and mic access
+    var micCamAccess by booleanPref("mic_camera_access").withDefault<Boolean>(false)
+
+    // anti-censorship type (auto, split_tls, split_tcp, desync)
+    var dialStrategy by intPref("dial_strategy").withDefault<Int>(AntiCensorshipActivity.DialStrategies.SPLIT_AUTO.mode)
+
+    // retry strategy type (before split, after split, never)
+    var retryStrategy by intPref("retry_strategy").withDefault<Int>(AntiCensorshipActivity.RetryStrategies.RETRY_AFTER_SPLIT.mode)
+
+    // bypass blocking in dns level, decision is made in flow() (see BraveVPNService#flow)
+    var bypassBlockInDns by booleanPref("bypass_block_in_dns").withDefault<Boolean>(false)
+
+    // randomize listen port for advanced wireguard configuration, default false
+    // restart of tunnel when wireguard is enabled is required to randomize the port to work properly
+    // this is not a user facing option, but a developer option
+    var randomizeListenPort by booleanPref("randomize_listen_port").withDefault<Boolean>(true)
+
+    // endpoint independent mapping/filtering
+    var endpointIndependence by booleanPref("endpoint_independence").withDefault<Boolean>(false)
+
+    var tcpKeepAlive by booleanPref("tcp_keep_alive").withDefault<Boolean>(false)
+
+    // enable split dns
+    var splitDns by booleanPref("split_dns").withDefault<Boolean>(false)
+
+    // use system dns for undelegatedDomains
+    var useSystemDnsForUndelegatedDomains by booleanPref("use_system_dns_for_undelegated_domains").withDefault<Boolean>(false)
+
+    var slowdownMode by booleanPref("slowdown_mode").withDefault<Boolean>(false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
@@ -420,7 +468,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     }
 
     fun getProxyStatus(): MutableLiveData<Int> {
-        if (proxyStatus.value == null) updateProxyStatus()
+        if (proxyStatus.value == null || proxyStatus.value == -1) updateProxyStatus()
         return proxyStatus
     }
 

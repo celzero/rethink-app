@@ -312,6 +312,14 @@ object DomainRulesManager : KoinComponent {
         clearTrustedMap(uid)
     }
 
+    suspend fun deleteRules(list: List<CustomDomain>) {
+        list.forEach { cd ->
+            removeFromTrie(cd)
+            removeIfInTrustedMap(cd.uid, cd.domain)
+        }
+        db.deleteRules(list)
+    }
+
     suspend fun deleteAllRules() {
         db.deleteAllRules()
         trie.clear()
