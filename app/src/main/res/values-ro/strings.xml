@@ -88,7 +88,7 @@
     <string name="lbl_disabled" translatable="true">Dezactivat</string>
     <string name="lbl_domain" translatable="true">Domeniu</string>
     <string name="lbl_wildcard" translatable="true">Metacaracter</string>
-    <string name="lbl_action_required" translatable="true">Acțiune cerută</string>
+    <string name="lbl_action_required" translatable="true">Actiune ceruta</string>
     <string name="lbl_rules" translatable="true">reguli</string>
     <string name="lbl_configure" translatable="true">Configurează</string>
     <string name="lbl_logs" translatable="true">jurnale</string>
