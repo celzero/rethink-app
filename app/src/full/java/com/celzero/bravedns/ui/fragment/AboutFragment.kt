@@ -382,12 +382,14 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun emailBugReport() {
         try {
             // get the rethink.tombstone file
-            val tombstoneFile = EnhancedBugReport.getTombstoneZipFile(requireContext())
-            // Get the bug_report.zip file
+            val tombstoneFile:File? = EnhancedBugReport.getTombstoneZipFile(requireContext())
+
+            // get the bug_report.zip file
             val dir = requireContext().filesDir
             val file = File(getZipFileName(dir))
-            val uri = getFileUri(file)
+            val uri = getFileUri(file) ?: throw Exception("file uri is null")
 
+            // create an intent for sending email with or without multiple attachments
             val emailIntent = if (tombstoneFile != null) {
                 Intent(Intent.ACTION_SEND_MULTIPLE)
             } else {
@@ -399,14 +401,19 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 Intent.EXTRA_SUBJECT,
                 getString(R.string.about_mail_bugreport_subject)
             )
-            emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.about_mail_bugreport_text))
 
-            // attach extra as list or single file based on the availability
+            // attach extra files (either as a list or single file based on availability)
             if (tombstoneFile != null) {
-                val tombstoneUri = getFileUri(tombstoneFile)
+                val tombstoneUri =
+                    getFileUri(tombstoneFile) ?: throw Exception("tombstoneUri is null")
+                val uriList = arrayListOf<Uri>(uri, tombstoneUri)
                 // send multiple attachments
-                emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, arrayListOf(uri, tombstoneUri))
+                emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriList)
             } else {
+                // ensure EXTRA_TEXT is passed correctly as an ArrayList<CharSequence>
+                val bugReportText = getString(R.string.about_mail_bugreport_text)
+                val bugReportTextList = arrayListOf<CharSequence>(bugReportText)
+                emailIntent.putCharSequenceArrayListExtra(Intent.EXTRA_TEXT, bugReportTextList)
                 emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
             }
             Logger.i(LOG_TAG_UI, "email with attachment: $uri, ${tombstoneFile?.path}")
