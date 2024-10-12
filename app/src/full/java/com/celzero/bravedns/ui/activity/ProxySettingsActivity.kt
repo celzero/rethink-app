@@ -415,10 +415,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun displayHttpProxyUi() {
-        if (!isAtleastQ()) {
-            b.settingsActivityHttpProxyContainer.visibility = View.GONE
-            return
-        }
         val isCustomHttpProxyEnabled = appConfig.isCustomHttpProxyEnabled()
         b.settingsActivityHttpProxyContainer.visibility = View.VISIBLE
         b.settingsActivityHttpProxySwitch.isChecked = isCustomHttpProxyEnabled
