@@ -56,13 +56,24 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         }
     }
 
+    private fun getBypassProxyFilter(): Set<Int> {
+        val filter = firewallFilter.getFilter()
+        val bypassFilter = setOf(2, 7)
+        if (filter == bypassFilter) {
+            return setOf(1)
+        }
+        return setOf(0, 1)
+    }
+
     private fun allApps(searchString: String): LiveData<PagingData<AppInfo>> {
+        val includeProxyBypass = getBypassProxyFilter()
         return if (category.isEmpty()) {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     appInfoDAO.getAppInfos(
                         "%$searchString%",
                         firewallFilter.getFilter(),
-                        firewallFilter.getConnectionStatusFilter()
+                        firewallFilter.getConnectionStatusFilter(),
+                        includeProxyBypass
                     )
                 }
                 .liveData
@@ -73,7 +84,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         "%$searchString%",
                         category,
                         firewallFilter.getFilter(),
-                        firewallFilter.getConnectionStatusFilter()
+                        firewallFilter.getConnectionStatusFilter(),
+                        includeProxyBypass
                     )
                 }
                 .liveData
@@ -82,12 +94,14 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     }
 
     private fun installedApps(search: String): LiveData<PagingData<AppInfo>> {
+        val includeProxyBypass = getBypassProxyFilter()
         return if (category.isEmpty()) {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     appInfoDAO.getInstalledApps(
                         "%$search%",
                         firewallFilter.getFilter(),
-                        firewallFilter.getConnectionStatusFilter()
+                        firewallFilter.getConnectionStatusFilter(),
+                        includeProxyBypass
                     )
                 }
                 .liveData
@@ -98,7 +112,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         "%$search%",
                         category,
                         firewallFilter.getFilter(),
-                        firewallFilter.getConnectionStatusFilter()
+                        firewallFilter.getConnectionStatusFilter(),
+                        includeProxyBypass
                     )
                 }
                 .liveData
@@ -107,12 +122,14 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     }
 
     private fun systemApps(search: String): LiveData<PagingData<AppInfo>> {
+        val includeProxyBypass = getBypassProxyFilter()
         return if (category.isEmpty()) {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     appInfoDAO.getSystemApps(
                         "%$search%",
                         firewallFilter.getFilter(),
-                        firewallFilter.getConnectionStatusFilter()
+                        firewallFilter.getConnectionStatusFilter(),
+                        includeProxyBypass
                     )
                 }
                 .liveData
@@ -123,7 +140,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         "%$search%",
                         category,
                         firewallFilter.getFilter(),
-                        firewallFilter.getConnectionStatusFilter()
+                        firewallFilter.getConnectionStatusFilter(),
+                        includeProxyBypass
                     )
                 }
                 .liveData

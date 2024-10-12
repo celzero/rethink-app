@@ -27,7 +27,6 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities
 import com.google.common.io.Files
-import intra.Intra
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -222,14 +221,20 @@ object BugReportZipper {
         file.appendText(prefsDetails.toString())
         val separator = "--------------------------------------------\n"
         file.appendText(separator)
-        val build = VpnController.goBuildVersion()
+        val build = VpnController.goBuildVersion(true)
         file.appendText(build)
         file.appendText(separator)
     }
 
     private fun copy(input: InputStream, output: OutputStream) {
-        while (input.read() != -1) {
-            output.write(input.readBytes())
+        try {
+            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+            var bytesRead: Int
+            while (input.read(buffer).also { bytesRead = it } != -1) {
+                output.write(buffer, 0, bytesRead)
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BUG_REPORT, "Exception while copying the file", e)
         }
     }
 }

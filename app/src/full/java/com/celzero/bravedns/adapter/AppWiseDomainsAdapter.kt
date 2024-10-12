@@ -40,7 +40,8 @@ import kotlin.math.log2
 class AppWiseDomainsAdapter(
     val context: Context,
     val lifecycleOwner: LifecycleOwner,
-    val uid: Int
+    val uid: Int,
+    val isRethink: Boolean
 ) :
     PagingDataAdapter<AppConnection, AppWiseDomainsAdapter.ConnectionDetailsViewHolder>(
         DIFF_CALLBACK
@@ -67,9 +68,6 @@ class AppWiseDomainsAdapter(
     }
 
     private lateinit var adapter: AppWiseDomainsAdapter
-
-    // ui component to update/toggle the buttons
-    data class ToggleBtnUi(val txtColor: Int, val bgColor: Int)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -142,6 +140,10 @@ class AppWiseDomainsAdapter(
         private fun openBottomSheet(appConn: AppConnection) {
             if (context !is AppCompatActivity) {
                 Logger.w(LOG_TAG_UI, "Error opening the app conn bottom sheet")
+                return
+            }
+
+            if (isRethink) {
                 return
             }
 

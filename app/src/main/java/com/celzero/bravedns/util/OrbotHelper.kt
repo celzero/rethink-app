@@ -87,7 +87,7 @@ class OrbotHelper(
         private const val STATUS_STOPPING = "STOPPING"
         private const val STATUS_OFF = "OFF"
 
-        private const val orbot = "ORBOT"
+        private const val ORBOT = "ORBOT"
 
         const val ORBOT_NOTIFICATION_ACTION_TEXT = "OPEN_ORBOT_INTENT"
 
@@ -432,7 +432,7 @@ class OrbotHelper(
 
         return ProxyEndpoint(
             id,
-            orbot,
+            ORBOT,
             proxyMode.value,
             proxyType = "NONE",
             ORBOT_PACKAGE_NAME,
