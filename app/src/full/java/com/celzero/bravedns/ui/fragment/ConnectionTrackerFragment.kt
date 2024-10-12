@@ -62,6 +62,9 @@ class ConnectionTrackerFragment :
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
     private val persistentState by inject<PersistentState>()
 
+    private var fromWireGuardScreen: Boolean = false
+    private var fromUniversalFirewallScreen: Boolean = false
+
     companion object {
         const val PROTOCOL_FILTER_PREFIX = "P:"
         private const val QUERY_TEXT_TIMEOUT: Long = 600
@@ -80,15 +83,15 @@ class ConnectionTrackerFragment :
         initView()
         if (arguments != null) {
             val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
-            val containsUniv = query.contains(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)
-            val containsWireGuard = query.contains(NetworkLogsActivity.RULES_SEARCH_ID_WIREGUARD)
-            if (containsUniv) {
+            fromUniversalFirewallScreen = query.contains(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)
+            fromWireGuardScreen = query.contains(NetworkLogsActivity.RULES_SEARCH_ID_WIREGUARD)
+            if (fromUniversalFirewallScreen) {
                 val rule = query.split(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)[1]
                 filterCategories.add(rule)
                 filterType = TopLevelFilter.BLOCKED
                 viewModel.setFilter(filterQuery, filterCategories, filterType)
                 hideSearchLayout()
-            } else if (containsWireGuard) {
+            } else if (fromWireGuardScreen) {
                 val rule = query.split(NetworkLogsActivity.RULES_SEARCH_ID_WIREGUARD)[1]
                 filterQuery = rule
                 filterType = TopLevelFilter.ALL
@@ -146,9 +149,14 @@ class ConnectionTrackerFragment :
         recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
-                    b.connectionListLogsDisabledTv.text = getString(R.string.ada_ip_no_connection)
-                    b.connectionListLogsDisabledTv.visibility = View.VISIBLE
-                    b.connectionCardViewTop.visibility = View.GONE
+                    if (fromUniversalFirewallScreen || fromWireGuardScreen) {
+                        b.connectionListLogsDisabledTv.text = getString(R.string.ada_ip_no_connection)
+                        b.connectionListLogsDisabledTv.visibility = View.VISIBLE
+                        b.connectionCardViewTop.visibility = View.GONE
+                    } else {
+                        b.connectionListLogsDisabledTv.visibility = View.GONE
+                        b.connectionCardViewTop.visibility = View.VISIBLE
+                    }
                 } else {
                     b.connectionListLogsDisabledTv.visibility = View.GONE
                     b.connectionCardViewTop.visibility = View.VISIBLE

@@ -54,7 +54,7 @@ interface AppInfoDAO {
     @Query("select * from AppInfo order by appCategory, uid") fun getAllAppDetails(): List<AppInfo>
 
     @Query(
-        "select * from AppInfo where isSystemApp = 1 and (appName like :search or uid like :search or packageName like :search) and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) or isProxyExcluded in (:isProxyExcluded) order by lower(appName)"
+        "select * from AppInfo where isSystemApp = 1 and (appName like :search or uid like :search or packageName like :search) and (firewallStatus in (:firewall) or isProxyExcluded in (:isProxyExcluded)) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
     fun getSystemApps(
         search: String,
@@ -64,7 +64,7 @@ interface AppInfoDAO {
     ): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where isSystemApp = 1 and (appName like :search or uid like :search or packageName like :search) and appCategory in (:filter) and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) or isProxyExcluded in (:isProxyExcluded) order by lower(appName)"
+        "select * from AppInfo where isSystemApp = 1 and (appName like :search or uid like :search or packageName like :search) and appCategory in (:filter) and (firewallStatus in (:firewall)  or isProxyExcluded in (:isProxyExcluded)) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
     fun getSystemApps(
         search: String,
@@ -75,7 +75,7 @@ interface AppInfoDAO {
     ): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where isSystemApp = 0 and (appName like :search or uid like :search or packageName like :search) and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) or isProxyExcluded in (:isProxyExcluded) order by lower(appName)"
+        "select * from AppInfo where isSystemApp = 0 and (appName like :search or uid like :search or packageName like :search) and (firewallStatus in (:firewall) or isProxyExcluded in (:isProxyExcluded)) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
     fun getInstalledApps(
         search: String,
@@ -85,7 +85,7 @@ interface AppInfoDAO {
     ): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where isSystemApp = 0 and (appName like :search or uid like :search or packageName like :search) and appCategory in (:filter) and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) or isProxyExcluded in (:isProxyExcluded) order by lower(appName)"
+        "select * from AppInfo where isSystemApp = 0 and (appName like :search or uid like :search or packageName like :search) and appCategory in (:filter) and (firewallStatus in (:firewall) or isProxyExcluded in (:isProxyExcluded)) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
     fun getInstalledApps(
         search: String,
@@ -96,7 +96,7 @@ interface AppInfoDAO {
     ): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) or isProxyExcluded in (:isProxyExcluded) order by lower(appName)"
+        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and (firewallStatus in (:firewall) or isProxyExcluded in (:isProxyExcluded)) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
     fun getAppInfos(
         search: String,
@@ -106,7 +106,7 @@ interface AppInfoDAO {
     ): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and appCategory in (:filter)  and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) or isProxyExcluded in (:isProxyExcluded) order by lower(appName)"
+        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and appCategory in (:filter)  and (firewallStatus in (:firewall) or isProxyExcluded in (:isProxyExcluded)) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
     fun getAppInfos(
         search: String,
