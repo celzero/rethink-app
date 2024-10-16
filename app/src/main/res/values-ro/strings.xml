@@ -759,5 +759,36 @@
     <string name="category_name_others" translatable="true">Altele</string>
     <string name="category_name_non_app_sys" translatable="true">Servicii de sistem</string>
     <string name="category_name_installed" translatable="true">Aplicații instalate</string>
-    <string name="build__flavor_website" translatable="true">site</string>
+    <string name="build__flavor_website" translatable="true">website</string>
+    <string name="cd_dialog_error_invalid_domain" translatable="true">URL sau nume de domeniu nevalide</string>
+    <string name="cd_dialog_error_invalid_wildcard" translatable="true">Metacaracter, URL sau domeniu nevalide</string>
+    <string name="ci_dialog_desc" translatable="true">Permite (ocolește) sau blochează adrese IP, subrețea IP (interval), Port. Exemplu: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
+    <string name="build__flavor_play_store" translatable="true">play-store</string>
+    <string name="build__flavor_fdroid" translatable="true">fdroid</string>
+    <string name="cd_toast_deleted" translatable="true">Domeniu eliminat din lista personalizată</string>
+    <string name="cd_toast_added" translatable="true">Domeniu adăugat cu succes</string>
+    <string name="cd_remove_dialog_title" translatable="true">Ștergi domeniul?</string>
+    <string name="cd_remove_dialog_message" translatable="true">Șterge domeniul din configurația salvată.</string>
+    <string name="cd_deleted_toast" translatable="true">Șterge toate regulile de domeniu</string>
+    <string name="cd_no_rules_text" translatable="true">Nu există reguli de domeniu.</string>
+    <string name="cd_dialog_edit_title" translatable="true">Editare reguli de domeniu</string>
+    <string name="cd_toast_edit" translatable="true">Editat</string>
+    <string name="cd_dialog_title" translatable="true">Adaugă regulă de domeniu</string>
+    <string name="cd_dialog_desc" translatable="true">URL sau nume de domeniu cu un metacaracter optional: *.test.com, test.com/test</string>
+    <string name="cd_blocked_initial" translatable="true">B</string>
+    <string name="cd_no_rule_initial" translatable="true">N</string>
+    <string name="cd_no_rule_txt" translatable="true">Nu există reguli</string>
+    <string name="ci_dialog_title" translatable="true">Adaugă regulă de IP / Port</string>
+    <string name="ci_dialog_edittext_hint" translatable="true">Adrese IP, subrețea IP, port</string>
+    <string name="ci_dialog_error_invalid_ip" translatable="true">Adrese IP, subrețea IP, port nevalide.</string>
+    <string name="ci_dialog_added_success" translatable="true">IP adăugat în listă</string>
+    <string name="ci_no_rules_text" translatable="true">Nu există reguli de IP / Port.</string>
+    <string name="ci_bypass_universal_initial" translatable="true">BU</string>
+    <string name="ci_bypass_universal_txt" translatable="true">Ocolire Universală</string>
+    <string name="ci_trust_initial" translatable="true">T</string>
+    <string name="ci_trust_txt" translatable="true">De încredere</string>
+    <string name="ci_blocked_initial" translatable="true">B</string>
+    <string name="ci_no_rule_initial" translatable="true">N</string>
+    <string name="ci_no_rule_txt" translatable="true">Fără reguli</string>
+    <string name="ci_no_rule" translatable="true">Fără reguli</string>
 </resources>
