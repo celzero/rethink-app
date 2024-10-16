@@ -791,4 +791,6 @@
     <string name="ci_no_rule_initial" translatable="true">N</string>
     <string name="ci_no_rule_txt" translatable="true">Fără reguli</string>
     <string name="ci_no_rule" translatable="true">Fără reguli</string>
+    <string name="ci_block" translatable="true">Blocare</string>
+    <string name="ci_bypass_universal" translatable="true">ocolire universală</string>
 </resources>
