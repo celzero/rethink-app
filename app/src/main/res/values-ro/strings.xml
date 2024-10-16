@@ -753,5 +753,10 @@
     <string name="notif_channel_proxy_failure" translatable="true">Notificări Proxy</string>
     <string name="notif_channel_firewall_alerts" translatable="true">Notificări Firewall</string>
     <string name="notif_dialog_pause_dialog_negative" translatable="true">Renunță</string>
-    <string name="notif_dialog_pause_dialog_neutral" translatable="true">Spectacol</string>
+    <string name="notif_dialog_pause_dialog_neutral" translatable="true">Arată</string>
+    <string name="category_name_sys_components" translatable="true">Componente Sistem</string>
+    <string name="category_name_sys_apps" translatable="true">Aplicații de sistem</string>
+    <string name="category_name_others" translatable="true">Altele</string>
+    <string name="category_name_non_app_sys" translatable="true">Servicii de sistem</string>
+    <string name="category_name_installed" translatable="true">Aplicații instalate</string>
 </resources>
