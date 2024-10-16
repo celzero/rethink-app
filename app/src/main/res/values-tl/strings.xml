@@ -129,4 +129,13 @@
     <string name="show_logs_disabled_network_message" translatable="true">Ang pag-log ng koneksyon ay hindi pinagana. Upang muling paganahin, pumunta sa <i>Mga Setting</i> at i-on ang <i>Paganahin ang on-device na pag-log.</i></string>
     <string name="show_logs_disabled_dns_message" translatable="true">Ang pag-log ng kahilingan sa DNS ay hindi pinagana. Upang muling paganahin, pumunta sa <i>Mga Setting</i> at i-on ang <i>Paganahin ang on-device na pag-log.</i></string>
     <string name="settings_enable_logs" translatable="true">Paganahin ang on-device na pag-log</string>
+    <string name="lbl_maybe_blocked" translatable="true">Baka Naharang</string>
+    <string name="lbl_network" translatable="true">network</string>
+    <string name="lbl_create" translatable="true">Gumawa</string>
+    <string name="lbl_qr_code" translatable="true">QR Code</string>
+    <string name="lbl_import" translatable="true">I-import</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_public_key" translatable="true">Pampublikong Susi</string>
+    <string name="lbl_addresses" translatable="true">Mga address</string>
+    <string name="lbl_dns_servers" translatable="true">Mga server ng DNS</string>
 </resources>
