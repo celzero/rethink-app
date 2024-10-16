@@ -793,7 +793,7 @@
     <string name="ci_no_rule" translatable="true">Fără reguli</string>
     <string name="ci_block" translatable="true">Blocare</string>
     <string name="ci_bypass_universal" translatable="true">Ocolire Universală</string>
-    <string name="ci_trust_rule" translatable="true">Trust</string>
+    <string name="ci_trust_rule" translatable="true">De încredere</string>
     <string name="lbbs_heading" translatable="true">Configurează peste 195 liste de filtre</string>
     <string name="brbs_backup_restore_desc" translatable="true">Nu funcționează la toate versiunile aplicației</string>
     <string name="brbs_backup_dialog_message" translatable="true">Salvează setările de la aplicații, rețea și jurnale DNS intr-un fișier. Această acțiune va reporni VPN.</string>
@@ -964,4 +964,6 @@
     <string name="wireguard_apps_proxy_map_desc" translatable="true">parte a %1$s</string>
     <string name="wg_apps_dialog_title_include" translatable="true">Include %1$s aplicații</string>
     <string name="wg_apps_dialog_title_exclude" translatable="true">Exclude %1$s aplicații</string>
+    <string name="bsrf_clear_filter" translatable="true">Șterge</string>
+    <string name="dc_local_block_enabled" translatable="true">Activat</string>
 </resources>
