@@ -759,4 +759,5 @@
     <string name="category_name_others" translatable="true">Altele</string>
     <string name="category_name_non_app_sys" translatable="true">Servicii de sistem</string>
     <string name="category_name_installed" translatable="true">Aplicații instalate</string>
+    <string name="build__flavor_website" translatable="true">site</string>
 </resources>
