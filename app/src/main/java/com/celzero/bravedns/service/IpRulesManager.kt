@@ -320,6 +320,20 @@ object IpRulesManager : KoinComponent {
         resultsCache.invalidateAll()
     }
 
+    suspend fun deleteRules(list: List<CustomIp>) {
+        list.forEach {
+            val pair = it.getCustomIpAddress()
+            val ipaddr = pair.first
+            val port = pair.second
+            val k = normalize(ipaddr)
+            if (!k.isNullOrEmpty()) {
+                iptree.esc(k, treeVal(it.uid, port, it.status))
+            }
+        }
+        db.deleteRules(list)
+        resultsCache.invalidateAll()
+    }
+
     suspend fun deleteAllAppsRules() {
         db.deleteAllAppsRules()
         iptree.clear()

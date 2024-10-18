@@ -415,10 +415,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun displayHttpProxyUi() {
-        if (!isAtleastQ()) {
-            b.settingsActivityHttpProxyContainer.visibility = View.GONE
-            return
-        }
         val isCustomHttpProxyEnabled = appConfig.isCustomHttpProxyEnabled()
         b.settingsActivityHttpProxyContainer.visibility = View.VISIBLE
         b.settingsActivityHttpProxySwitch.isChecked = isCustomHttpProxyEnabled
@@ -745,7 +741,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     if (Utilities.isLanIpv4(ip)) {
                         Utilities.isValidLocalPort(port)
                     } else {
-                        Utilities.isValidPort(port)
+                        isValidPort(port)
                     }
                 if (!isValid) {
                     errorTxt.text = getString(R.string.settings_http_proxy_error_text1)
