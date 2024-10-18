@@ -2,16 +2,16 @@
 <resources>
     <string name="title_settings" translatable="true">Setări</string>
     <string name="title_statistics" translatable="true">Statistici</string>
-    <string name="pause_title_desc" translatable="true">o pauză mică…</string>
+    <string name="pause_title_desc" translatable="true">într-o mică pauză…</string>
     <string name="about_title_desc" translatable="true">Detectează și blochează riscurile de securitate în rețea</string>
     <string name="txt_home" translatable="true">Acasă</string>
-    <string name="accessibility_service_description" translatable="true">Rethink utilizează serviciile de accesibilitate pentru a detecta și proteja aplicațiile care rulează în fundal. Rethink nu colectează și nu vinde nici o informație.</string>
+    <string name="accessibility_service_description" translatable="true">Rethink utilizează serviciul de accesibilitate pentru a detecta și proteja aplicațiile care rulează în fundal. Rethink nu colectează și nu vinde nici o informație.</string>
     <string name="next" translatable="true">Următorul</string>
     <string name="skip" translatable="true">Sari peste</string>
     <string name="finish" translatable="true">Termină</string>
     <string name="lbl_cancel" translatable="true">Anulează</string>
-    <string name="lbl_blocked" translatable="true">Blocat</string>
-    <string name="lbl_domain_rules" translatable="true">Reguli pe Domeniu</string>
+    <string name="lbl_blocked" translatable="true">Blocate</string>
+    <string name="lbl_domain_rules" translatable="true">Reguli domeniu</string>
     <string name="lbl_delete" translatable="true">Șterge</string>
     <string name="lbl_proceed" translatable="true">Continuă</string>
     <string name="lbl_private_key" translatable="true">Cheie privată</string>
@@ -25,7 +25,7 @@
     <string name="lbl_active" translatable="true">Activ</string>
     <string name="lbl_inactive" translatable="true">Inactiv</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
-    <string name="lbl_slow" translatable="true">incet</string>
+    <string name="lbl_slow" translatable="true">încet</string>
     <string name="lbl_very" translatable="true">foarte</string>
     <string name="lbl_add" translatable="true">adaugă</string>
     <string name="lbl_app_wise" translatable="true">per aplicație</string>
@@ -43,13 +43,13 @@
     <string name="lbl_status" translatable="true">Stare</string>
     <string name="lbl_remove" translatable="true">Elimină</string>
     <string name="lbl_last" translatable="true">Ultima</string>
-    <string name="lbl_starting" translatable="true">Începe</string>
+    <string name="lbl_starting" translatable="true">Se începe</string>
     <string name="lbl_overall" translatable="true">Global</string>
     <string name="remaining_apps_dialog_desc" translatable="true">Include toate aplicațiile care au rămas nedirecționate printr-un proxy</string>
-    <string name="remaining_apps_dialog_title" translatable="true">Include restul aplicatiilor</string>
+    <string name="remaining_apps_dialog_title" translatable="true">Include restul aplicațiilor</string>
     <string name="crypt_adguard_desc" translatable="true">Protejează-ți dispozitivul de aplicații dăunătoare și nu numai atât.</string>
     <string name="quad9_dns_desc" translatable="true">Quad9 rulează cererile DNS printr-o rețea securizată de servere pe întregul glob pământesc.</string>
-    <string name="cleanbrowsing_family_dns_desc" translatable="true">Filtrul Familie blochează accesul la toate site-urile pornografice, pentru adulți sau cu conținut explicit. Blochează si conexiunile prin proxy sau VPN folosite pentru a ocoli filtrele. Site-urile cu continut mixt (precum Reddit) sunt, de asemenea, blocate. Google, Bing si YouTube sunt setate pe SafeMode.</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">Filtrul Family blochează accesul la toate website-urile pornografice, pentru adulți sau cu conținut explicit. Blochează si conexiunile prin proxy sau VPN folosite pentru a ocoli filtrele. Website-urile cu continut mixt (precum Reddit) sunt, de asemenea, blocate. Google, Bing si YouTube sunt setate pe SafeMode.</string>
     <string name="cloudflare_security_dns_desc" translatable="true">Blochează conținutul dăunător. Folosește endpoint-ul DNS 1.1.1.2 de la Cloudfare.</string>
     <string name="google_dns_desc" translatable="true">Nu blochează nici o cerere DNS. Utilizează endpoint-ul DNS de la Google.</string>
     <string name="cloudflare_family_dns_desc" translatable="true">Blochează malware-ul si conținutul pentru adulți. Folosește endpoint-ul DNS 1.1.1.3 de la Cloudfare.</string>
@@ -63,14 +63,14 @@
     <string name="lbl_apply" translatable="true">Aplică</string>
     <string name="lbl_dismiss" translatable="true">Renuntă</string>
     <string name="lbl_all" translatable="true">Toate</string>
-    <string name="lbl_allowed" translatable="true">Permis</string>
-    <string name="lbl_maybe_blocked" translatable="true">Posibil blocat</string>
+    <string name="lbl_allowed" translatable="true">Permise</string>
+    <string name="lbl_maybe_blocked" translatable="true">Posibil blocate</string>
     <string name="lbl_http" translatable="true">HTTP</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
     <string name="lbl_fast" translatable="true">rapid</string>
     <string name="crypt_adguard_family_desc" translatable="true">DNS AdGuard cu căutare securizată și blocare conținut pentru adulți.</string>
-    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Blochează accesul la toate site-urile pornografice, pentru adulți sau cu conținut explicit. De asemenea, blochează toate conexiunile prin proxy sau VPN folosite pentru a ocoli filtrele. Site-urile cu conținut mixt (precum Reddit) sunt, de asemenea, blocate. Google, Bing și YouTube sunt setate pe Safe Mode.</string>
-    <string name="cleanbrowsing_adult_dns_desc" translatable="true">Filtrul Adult blochează accesul la toate site-urile pornografice, pentru adulți sau cu conținut explicit. Nu blochează conexiunile prin proxy sau VPN și nici site-urile cu conținut mixt. Site-urile precum Reddit sunt permise. Google și Bing sunt setate pe SafeMode.</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Blochează accesul la toate website-urile pornografice, pentru adulți sau cu conținut explicit. Blochează toate conexiunile prin proxy sau VPN folosite pentru a ocoli filtrele. Website-urile cu conținut mixt (precum Reddit) sunt, de asemenea, blocate. Google, Bing și YouTube sunt setate pe Safe Mode.</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">Filtrul Adult blochează accesul la toate website-urile pornografice, pentru adulți sau cu conținut explicit. Nu blochează conexiunile prin proxy sau VPN și nici website-urile cu conținut mixt. Website-urile precum Reddit sunt permise. Google și Bing sunt setate pe SafeMode.</string>
     <string name="lbl_secure" translatable="true">securizat</string>
     <string name="lbl_anonymous" translatable="true">anonim</string>
     <string name="untracked" translatable="true">neurmărit</string>
@@ -84,7 +84,7 @@
     <string name="lbl_remaining_apps" translatable="true">Aplicații rămase</string>
     <string name="wireguard_disable_message" translatable="true">Opresc toate VPN-urile AdGuard active?</string>
     <string name="wireguard_disable_title" translatable="true">Oprește WireGuard</string>
-    <string name="settings_title_desc" translatable="true">Un DNS foarte configurabil + Firewall</string>
+    <string name="settings_title_desc" translatable="true">Un DNS foarte configurabil și Firewall</string>
     <string name="lbl_disabled" translatable="true">Dezactivat</string>
     <string name="lbl_domain" translatable="true">Domeniu</string>
     <string name="lbl_wildcard" translatable="true">Metacaracter</string>
@@ -95,7 +95,7 @@
     <string name="lbl_network" translatable="true">rețea</string>
     <string name="lbl_create" translatable="true">Creează</string>
     <string name="lbl_qr_code" translatable="true">Cod QR</string>
-    <string name="lbl_import" translatable="true">Importați</string>
+    <string name="lbl_import" translatable="true">Importare</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
     <string name="lbl_public_key" translatable="true">Cheia publică</string>
     <string name="lbl_addresses" translatable="true">Adrese</string>
@@ -106,7 +106,7 @@
     <string name="lbl_private" translatable="true">privat</string>
     <string name="lbl_idle" translatable="true">Inactiv</string>
     <string name="lbl_peer" translatable="true">Pereche</string>
-    <string name="lbl_split" translatable="true">Împarte</string>
+    <string name="lbl_split" translatable="true">Împărțit</string>
     <string name="lbl_on_device" translatable="true">pe dispozitiv</string>
     <string name="lbl_unselected" translatable="true">Neselectat</string>
     <string name="lbl_notification" translatable="true">notificare</string>
@@ -117,10 +117,10 @@
     <string name="slide_1_desc" translatable="true">Rethink e un software open-source, susținut prin programul Mozilla Builders MVP.</string>
     <string name="allow" translatable="true">permite</string>
     <string name="block" translatable="true">blochează</string>
-    <string name="bypass_universal" translatable="true">ocolire generală</string>
+    <string name="bypass_universal" translatable="true">ocolire universală</string>
     <string name="exclude" translatable="true">exclude</string>
     <string name="isolate" translatable="true">izolează</string>
-    <string name="pause_mode_notification_title" translatable="true">În pauză! Aplicațiile blocate sunt, în continuare, protejate.</string>
+    <string name="pause_mode_notification_title" translatable="true">În pauză! Aplicațiile blocate vor fi protejate în continuare.</string>
     <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">în așteptare</string>
     <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">protejat</string>
     <string name="wireguard_disclaimer" translatable="true">DNS este retrimis la %1$s, ICMP (ex: ping) este trimis la rețeaua de bază.</string>
@@ -132,12 +132,12 @@
     <string name="notification_action_dns_mode" translatable="true">DNS</string>
     <string name="dns_mode_info_title" translatable="true">DNS</string>
     <string name="firewall_mode_info_title" translatable="true">Firewall</string>
-    <string name="apps_info_title" translatable="true">Aplicații instalate</string>
+    <string name="apps_info_title" translatable="true">Aplicații</string>
     <string name="custom_url_error_invalid_url" translatable="true">URL invalid</string>
     <string name="bsct_app_info" translatable="true">Informații aplicație</string>
-    <string name="always_on_dialog_positive_btn" translatable="true">Mergeți la setări</string>
+    <string name="always_on_dialog_positive_btn" translatable="true">Mergi la Setări</string>
     <string name="always_on_dialog_neutral" translatable="true">Setări</string>
-    <string name="private_dns_dialog_positive" translatable="true">Mergeți la Setări</string>
+    <string name="private_dns_dialog_positive" translatable="true">Mergi la Setări</string>
     <string name="dns_act_configure_tab" translatable="true">Configurează</string>
     <string name="configure_dns_connected_doh_status" translatable="true">DNS peste HTTPS</string>
     <string name="configure_dns_connection_name" translatable="true">Conectat la %1$s</string>
@@ -151,14 +151,14 @@
     <string name="orbot" translatable="true">Orbot</string>
     <string name="orbot_http" translatable="true">Proxy HTTP</string>
     <string name="orbot_status_arg_2" translatable="true">TCP</string>
-    <string name="orbot_install_dialog_title" translatable="true">Instalați Orbot?</string>
+    <string name="orbot_install_dialog_title" translatable="true">Instalezi Orbot?</string>
     <string name="orbot_install_dialog_neutral" translatable="true">website</string>
-    <string name="settings_general_customize" translatable="true">personalizați</string>
+    <string name="settings_general_customize" translatable="true">personalizează</string>
     <string name="settings_check_update_heading" translatable="true">Caută actualizări ale aplicației</string>
     <string name="settings_theme_heading" translatable="true">Aspect</string>
     <string name="settings_go_log_heading" translatable="true">Nivele de jurnalizare</string>
     <string name="settings_dns_proxy_dialog_hostname" translatable="true">Nume gazdă</string>
-    <string name="settings_app_list_default_app" translatable="true">Nimic</string>
+    <string name="settings_app_list_default_app" translatable="true">Nici una</string>
     <string name="settings_socks5_dialog_hint_ip" translatable="true">Adresă IP</string>
     <string name="settings_socks5_dialog_hint_port" translatable="true">Port</string>
     <string name="settings_socks5_dialog_hint_username" translatable="true">Nume utilizator (opțional)</string>
@@ -167,26 +167,26 @@
     <string name="settings_theme_dialog_themes_2" translatable="true">Luminos</string>
     <string name="settings_theme_dialog_themes_3" translatable="true">Întunecat</string>
     <string name="settings_ip_text_ipv46" translatable="true">Automat</string>
-    <string name="settings_notification_desc3" translatable="true">Nimic</string>
-    <string name="settings_pcap_dialog_option_1" translatable="true">Dezactivat (implicit)</string>
-    <string name="firewall_status_allow" translatable="true">permis</string>
-    <string name="firewall_status_blocked" translatable="true">blocat</string>
+    <string name="settings_notification_desc3" translatable="true">Nici una</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">Dezactivat (prestabilit)</string>
+    <string name="firewall_status_allow" translatable="true">permise</string>
+    <string name="firewall_status_blocked" translatable="true">blocate</string>
     <string name="hs_biometeric_feature_not_supported" translatable="true">Autentificarea biometrică pe acest dispozitiv este dezactivată sau nu e acceptată</string>
     <string name="always_on_dialog_positive" translatable="true">Stop</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Rețea</string>
     <string name="orbot_install_dialog_positive" translatable="true">Instalează</string>
     <string name="settings_dns_proxy_dialog_username" translatable="true">Nume de utilizator</string>
     <string name="settings_general_header" translatable="true">general</string>
-    <string name="firewall_status_unknown" translatable="true">necunoscut</string>
+    <string name="firewall_status_unknown" translatable="true">necunoscute</string>
     <string name="settings_import_export_heading" translatable="true">Copie de rezervă și restaurare</string>
     <string name="settings_dns_proxy_dialog_password" translatable="true">Parolă</string>
-    <string name="settings_locale_heading" translatable="true">Schimbați limba</string>
-    <string name="hsf_start_btn_state" translatable="true">începe</string>
+    <string name="settings_locale_heading" translatable="true">Schimbă limba</string>
+    <string name="hsf_start_btn_state" translatable="true">start</string>
     <string name="hsf_stop_btn_state" translatable="true">stop</string>
-    <string name="failed_using_default" translatable="true">Nereușit: se utilizează un DNS alternativ</string>
+    <string name="failed_using_default" translatable="true">Nereușit: se utilizează DNS-ul alternativ</string>
     <string name="status_app_error" translatable="true">eroare în aplicație</string>
     <string name="status_dns_error" translatable="true">eroare la DNS</string>
-    <string name="status_dns_server_down" translatable="true">server DNS căzut</string>
+    <string name="status_dns_server_down" translatable="true">server DNS nefuncțional</string>
     <string name="status_protected_with_tor" translatable="true">protejat cu Tor</string>
     <string name="status_protected_with_private_dns" translatable="true">protejat cu DNS privat</string>
     <string name="status_protected_with_tor_private_dns" translatable="true">protejat cu Tor și DNS privat</string>
@@ -204,7 +204,7 @@
     <string name="dns_explanation_firewall_connected" translatable="true">Conectat la Firewall</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Conectat la RethinkDNS și Firewall</string>
     <string name="universal_firewall_explanation" translatable="true">Aplică regulile Firewall-ului la toate aplicațiile în funcție de evenimentele de pe dispozitiv; de exemplu, protejează când dispozitivul este blocat sau când o anumită aplicație nu rulează.</string>
-    <string name="notification_action_resume_vpn" translatable="true">CONTINUA</string>
+    <string name="notification_action_resume_vpn" translatable="true">CONTINUĂ</string>
     <string name="notification_action_pause_vpn" translatable="true">PAUZĂ</string>
     <string name="notification_action_stop_vpn" translatable="true">STOP</string>
     <string name="notification_action_dns_firewall_mode" translatable="true">DNS + Firewall</string>
@@ -214,94 +214,94 @@
     <string name="dns_mode_info_explanation_new" translatable="true">Monitorizează, blochează și criptează toate cererile DNS.</string>
     <string name="dns_firewall_mode_info_explanation_new" translatable="true">Toate de mai sus + ocolește cenzura pe internet.</string>
     <string name="alert_permission_accessibility" translatable="true">Permisiuni - Accesibilitate</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Serviciul de accesibilitate al Rethink s-a oprit sau s-a blocat . <i><b>Mergeți la Setări si Oprire Forțată</b></i> apoi reporniți Rethink <i>Blocați orice altă aplicație neutilizată</i>.\n\nRethink utilizează serviciul de accesibilitate pentru a diferenția aplicațiile care rulează la vedere față de cele care rulează în fundal.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Serviciul de accesibilitate al Rethink s-a oprit sau s-a blocat. <i><b>Mergeți la Setări și Oprire Forțată</b></i> apoi reporniți Rethink pentru <i>Blocare aplicații care rulează în fundal</i>.\n\nRethink utilizează serviciul de accesibilitate pentru a diferenția aplicațiile care rulează la vedere față de cele care rulează în fundal.</string>
     <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink utilizează serviciul de accesibilitate pentru a diferenția aplicațiile care rulează la vedere față de cele care rulează în fundal.\n\nRethink nu colectează nici o informație și nu vă spionează în nici un fel.</string>
-    <string name="alert_firewall_accessibility_exception" translatable="true">Nu s-a putut deschide Setări- Accesibilitate. Încercați din nou mai târziu!</string>
-    <string name="brave_dns_connect_mode_change_firewall" translatable="true">Alegeți modalitatea.</string>
-    <string name="brave_dns_connect_mode_change_dns" translatable="true">Alegeți modalitatea.</string>
-    <string name="default_dns_name" translatable="true">RDNS implicit</string>
-    <string name="conn_track_clear_logs_title" translatable="true">Ștergeți toate jurnalele de rețea?</string>
-    <string name="conn_track_clear_logs_message" translatable="true">Vor fi eliminate toate jurnalele de rețea, dar nu și regulile Firewall-ului. Acțiunea este ireversibilă. Doriți să continuați?</string>
-    <string name="dns_query_clear_logs_title" translatable="true">Ștergeți toate jurnalele DNS?</string>
-    <string name="dns_query_clear_logs_message" translatable="true">Vor fi eliminate toate jurnalele DNS de pe dispozitiv. Acțiunea este ireversibilă. Doriți sa continuați?</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">Nu s-a putut deschide Setări- Accesibilitate. Încearcă din nou mai târziu!</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">Alege modul.</string>
+    <string name="brave_dns_connect_mode_change_dns" translatable="true">Alege modul.</string>
+    <string name="default_dns_name" translatable="true">RDNS prestabilit</string>
+    <string name="conn_track_clear_logs_title" translatable="true">Ștergi toate jurnalele de rețea?</string>
+    <string name="conn_track_clear_logs_message" translatable="true">Vor fi eliminate toate jurnalele de rețea, dar nu și regulile Firewall-ului. Acțiunea este ireversibilă. Vrei să continui?</string>
+    <string name="dns_query_clear_logs_title" translatable="true">Ștergi toate jurnalele DNS?</string>
+    <string name="dns_query_clear_logs_message" translatable="true">Vor fi eliminate toate jurnalele DNS de pe dispozitiv. Acțiunea este ireversibilă. Vrei să continui?</string>
     <string name="bsct_block_ip" translatable="true">Blochează, autorizează <u>aceasta adresă IP</u> pentru <u>această aplicație</u></string>
     <string name="bsct_block_domain" translatable="true">Blochează, autorizează <u>domeniul</u> pentru <u>această aplicație</u></string>
     <string name="bsct_block" translatable="true">Blochează, ocolește, exclude, izolează, <u>această aplicație</u></string>
-    <string name="bsct_conn_block_desc" translatable="true">blocat %1$s de %2$s</string>
-    <string name="bsct_conn_block_desc_device" translatable="true">blocat %1$s pe dispozitiv</string>
-    <string name="bsct_conn_desc_allowed" translatable="true">acceptat în %1$s %2$s</string>
-    <string name="bsct_conn_desc_blocked" translatable="true">blocat în %1$s %2$s</string>
+    <string name="bsct_conn_block_desc" translatable="true">%1$s blocate de %2$s</string>
+    <string name="bsct_conn_block_desc_device" translatable="true">%1$s blocate pe dispozitiv</string>
+    <string name="bsct_conn_desc_allowed" translatable="true">permise în %1$s %2$s</string>
+    <string name="bsct_conn_desc_blocked" translatable="true">blocate în %1$s %2$s</string>
     <string name="always_on_dialog_heading" translatable="true">Dezactivează VPN Permanent</string>
-    <string name="always_on_dialog" translatable="true">\"VPN Permanent\" este activat pe acest dispozitiv. Pentru a porni Rethink, mergeți la setările aplicației și dezactivați \"VPN Permanent\".</string>
+    <string name="always_on_dialog" translatable="true">\"VPN Permanent\" este activat pe acest dispozitiv. Pentru a porni Rethink, mergi la setările aplicației și dezactivează \"VPN Permanent\".</string>
     <string name="always_on_dialog_stop_heading" translatable="true">VPN Permanent</string>
     <string name="firewall_act_universal_tab" translatable="true">universal</string>
-    <string name="download_update_dialog_trylater_message" translatable="true">Nu se poate actualiza acum, vă rog să încercați mai târziu.</string>
+    <string name="download_update_dialog_trylater_message" translatable="true">Nu se poate actualiza acum, încearcă din nou mai târziu.</string>
     <string name="search_firewall_network_log" translatable="true"><font size="12">Caută aplicații, IP-uri, domenii</font></string>
     <string name="search_firewall_all_apps" translatable="true"><font size="12">Caută aplicații după uid, nume</font></string>
     <string name="search_dns_logs" translatable="true"><font size="12">Caută nume de domenii sau IP-uri</font></string>
     <string name="search_universal_ips" translatable="true"><font size="12">Caută IP-uri</font></string>
     <string name="search_custom_domains" translatable="true"><font size="12">Caută nume de domeniu</font></string>
-    <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Caută liste blocate</font></string>
+    <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Caută liste de filtre</font></string>
     <string name="search_proxy_add_apps" translatable="true">Caută aplicații după nume</string>
     <string name="app_mode_dns_low_battery" translatable="true">DNS (economizor baterie)</string>
     <string name="app_mode_dns_firewall" translatable="true">DNS și Firewall (prestabilit)</string>
     <string name="app_mode_wireguard" translatable="true">VPN</string>
     <string name="settings_vpn_heading" translatable="true">vpn</string>
-    <string name="info_dialog_copy_toast_msg" translatable="true">Adresa IP coplată.</string>
+    <string name="info_dialog_copy_toast_msg" translatable="true">Adresă IP copiată.</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL copiat</string>
     <string name="public_key_copy_toast_msg" translatable="true">Cheie publică copiată.</string>
-    <string name="info_dialog_rethink_toast_msg" translatable="true">Copiat ca RDNS + DNS peste HTTPS URL</string>
+    <string name="info_dialog_rethink_toast_msg" translatable="true">Copiat ca URL RDNS + DNS-peste-HTTPS</string>
     <string name="settings_enable_logs_desc" translatable="true">Păstrează jurnalele DNS și Firewall local, pe dispozitiv.</string>
     <string name="settings_enable_logs" translatable="true">Activează jurnalele pe dispozitiv</string>
-    <string name="app_mode_choose" translatable="true">Alege modalitatea</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Blochează conectarea unei aplicații la internet.\n <u>#2</u>: Blochează conectarea tuturor aplicațiilor la un anumit IP.\n <u>#3</u>: Blochează toate conexiunile când dispozitivul este blocat (Universal Firewall).\n <u>#4</u>: Blochează toate aplicațiile neutilizate (Universal Firewall).\n <u>#5</u>: Blochează conexiunile aplicațiilor din sursă necunoscută (Universal Firewall).\n <u>#6</u>: Blochează tot traficul UDP cu excepția DNS (Universal Firewall).\n <u>#7</u>: Blochează conexiunile când DNS este ocolit (Universal Firewall).</string>
-    <string name="private_dns_dialog_desc" translatable="true">Setările DNS-ului Rethink sunt suprascrise de DNS-ul privat din Android.\n\nPentru a utiliza DNS-ul Rethink, mergeți la Setări și opriți \"DNS privat\".</string>
-    <string name="univ_firewall_dialog_message" translatable="true">Eliminarea acestei reguli va permite oricărei aplicații să se conecteze la acest IP. Doriți să continuați?</string>
-    <string name="doh_custom_url_remove_dialog_title" translatable="true">Eliminați endpoint-ul DoH?</string>
-    <string name="always_on_dialog_stop_message" translatable="true">VPN Permanent este activ. Sigur doriți să opriți Rethink?</string>
+    <string name="app_mode_choose" translatable="true">Alege modul</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Blochează conectarea unei aplicații la internet.\n <u>#2</u>: Blochează conectarea tuturor aplicațiilor la un anumit IP.\n <u>#3</u>: Blochează toate conexiunile când dispozitivul este blocat (Universal Firewall).\n <u>#4</u>: Blochează toate aplicațiile care rulează în fundal (Universal Firewall).\n <u>#5</u>: Blochează conexiunile aplicațiilor din sursă necunoscută (Universal Firewall).\n <u>#6</u>: Blochează tot traficul UDP cu excepția DNS (Universal Firewall).\n <u>#7</u>: Blochează conexiunile când DNS este ocolit (Universal Firewall).</string>
+    <string name="private_dns_dialog_desc" translatable="true">Setările DNS-ului Rethink sunt suprascrise de DNS-ul privat din Android.\n\nPentru a utiliza DNS-ul Rethink, mergi la Setări și oprește \"DNS privat\".</string>
+    <string name="univ_firewall_dialog_message" translatable="true">Eliminarea acestei reguli va permite oricărei aplicații să se conecteze la acest IP. Vrei să continui?</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">Elimini endpoint-ul DoH?</string>
+    <string name="always_on_dialog_stop_message" translatable="true">VPN Permanent este activ. Sigur vrei să oprești Rethink?</string>
     <string name="private_dns_dialog_heading" translatable="true">Oprește DNS privat</string>
-    <string name="univ_firewall_dialog_title" translatable="true">Eliminați regula IP?</string>
+    <string name="univ_firewall_dialog_title" translatable="true">Elimini regula IP?</string>
     <string name="doh_custom_url_remove_dialog_message" translatable="true">Elimină endpoint-ul DNS over HTTPS din configurația salvată.</string>
     <string name="doh_custom_url_remove_success" translatable="true">Endpoint eliminat.</string>
-    <string name="dot_custom_url_remove_dialog_title" translatable="true">Eliminați endpoint-ul DoT?</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Elimini endpoint-ul DoT?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Elimină endpoint-ul DNS-over-TLS din configurația salvată.</string>
-    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Eliminați DNSCrypt resolver?</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Elimini rezolvatorul DNSCrypt?</string>
     <string name="dns_crypt_url_remove_dialog_message" translatable="true">Elimină DNSCrypt resolver din configurația salvată.</string>
-    <string name="dns_crypt_url_remove_success" translatable="true">DNSCrypt resolver eliminat.</string>
-    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Eliminați DNSCrypt Relay?</string>
-    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Elimină DNSCrypt relay din configurația salvată.</string>
-    <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt Relay eliminat.</string>
-    <string name="dns_proxy_remove_dialog_message" translatable="true">Elimina DNS Proxy din configurația salvată.</string>
+    <string name="dns_crypt_url_remove_success" translatable="true">Rezolvator DNSCrypt eliminat.</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Elimini releul DNSCrypt?</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Elimină releul DNSCrypt din configurația salvată.</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">Releu DNSCrypt eliminat.</string>
+    <string name="dns_proxy_remove_dialog_message" translatable="true">Elimină proxy DNS din configurația salvată.</string>
     <string name="dns_proxy_remove_success" translatable="true">DNS Proxy eliminat.</string>
     <string name="local_blocklist_download" translatable="true">Descărcare liste de filtre</string>
     <string name="local_blocklist_redownload" translatable="true">Actualizat!</string>
     <string name="local_blocklist_redownload_desc" translatable="true">Listele de filtre de pe dispozitiv sunt actualizate la ultima versiune v%1$s.</string>
-    <string name="blocklist_update_check_failure" translatable="true">Ceva nu a mers bine. Încercați din nou mai târziu!</string>
+    <string name="blocklist_update_check_failure" translatable="true">Ceva nu a mers bine. Încearcă din nou mai târziu!</string>
     <string name="blocklist_update_check_not_required" translatable="true">Listele de filtre sunt actualizate la ultima versiune.</string>
-    <string name="show_logs_disabled_dns_message" translatable="true">Jurnalul cererilor DNS a fost dezactivat. Pentru reactivare, mergeți la <i>Setări</i> și selectați <i>Activați jurnalele pe dispozitiv</i></string>
+    <string name="show_logs_disabled_dns_message" translatable="true">Jurnalul cererilor DNS a fost dezactivat. Pentru reactivare, mergi la <i>Setări</i> și selectează <i>Activează jurnalele pe dispozitiv</i></string>
     <string name="configure_dns_connected_dns_proxy_status" translatable="true">DNS Proxy</string>
     <string name="configure_dns_crypt" translatable="true">Rezolvatori DNSCrypt: %1$s</string>
     <string name="http_proxy_dialog_heading" translatable="true">Alege HTTP(S) CONNECT Proxy</string>
     <string name="http_proxy_dialog_desc" translatable="true">Setează URL de forma &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Examplu: http://proxy.example.com:8080/</string>
-    <string name="download_update_dialog_message" translatable="true">O noua versiune a aplicației este disponibilă pentru descărcare de pe website. Incepeți descărcarea?</string>
+    <string name="download_update_dialog_message" translatable="true">O noua versiune a aplicației este disponibilă pentru descărcare de pe website. Începi descărcarea?</string>
     <string name="download_update_dialog_message_ok_title" translatable="true">Actualizat!</string>
-    <string name="download_update_dialog_message_ok" translatable="true">Aveți deja ultima versiune.</string>
+    <string name="download_update_dialog_message_ok" translatable="true">Ai deja ultima versiune.</string>
     <string name="download_update_dialog_message_success" translatable="true">Lista de filtre a fost descărcată cu succes.</string>
-    <string name="download_update_dialog_failure_message" translatable="true">Serverele noastre sunt nefuncționale sau conexiunea nu a fost realizată. Încercați din nou mai târziu.</string>
+    <string name="download_update_dialog_failure_message" translatable="true">Serverele noastre sunt nefuncționale sau conexiunea nu a fost realizată. Încearcă din nou mai târziu.</string>
     <string name="download_update_dialog_trylater_title" translatable="true">Nu se poate actualiza acum</string>
-    <string name="whats_new_version_update" translatable="true">&lt;b&gt;Nu intrați în panică 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Nou: Captează erorile de retea în rapoartele cu bug-uri la utilizator.&lt;br/&gt; 2. Nou: utilizează System DNS pentru numele de domenii nedelegate când Previne scurgerile DNS este activ.&lt;br/&gt; 3. Îmbunătățiri: Conectivitate WireGuard Dual-stack (IPv4 + IPv6).&lt;br/&gt; 4. Îmbunătățiri: Împiedică blocarea elementelor UI când rețeaua este blocată.&lt;br/&gt; 5. Fix: Expirarea conexiunilor cu Filtrare DNS avansată.&lt;br/&gt; 6. Fix: Endpoint-uri WireGuard pereche cu nume de domenii menținute după schimbările rețelei .&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Help translate this app&lt;/a&gt;</string>
+    <string name="whats_new_version_update" translatable="true">&lt;b&gt;Nu intra în panică 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Nou: Captează erorile de retea în rapoartele cu bug-uri la utilizator.&lt;br/&gt; 2. Nou: utilizează System DNS pentru numele de domenii nedelegate când Previne scurgerile DNS este activ.&lt;br/&gt; 3. Îmbunătățiri: Conectivitate WireGuard Dual-stack (IPv4 + IPv6).&lt;br/&gt; 4. Îmbunătățiri: Împiedică blocarea elementelor UI când rețeaua este blocată.&lt;br/&gt; 5. Fix: Expirarea conexiunilor cu Filtrare DNS avansată ACTIVĂ.&lt;br/&gt; 6. Fix: Endpoint-uri WireGuard pereche cu nume de domenii menținute după schimbările rețelei .&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Help translate this app&lt;/a&gt;</string>
     <string name="connection_http3" translatable="true">HTTP3</string>
-    <string name="settings_ip_network_heading" translatable="true">Alegeți versiunea IP</string>
-    <string name="settings_ip_network_desc" translatable="true">Alegeți o versiune de Internet Protocol.</string>
+    <string name="settings_ip_network_heading" translatable="true">Alege versiunea IP</string>
+    <string name="settings_ip_network_desc" translatable="true">Alege o versiune de Internet Protocol.</string>
     <string name="settings_ptrans_heading" translatable="true">Forțează ieșirea IPv4</string>
-    <string name="settings_ptrans_desc" translatable="true">Convertește în dispozitiv traficul de ieșire IPv6 la IPv4. Activați dacă sunteți conectat la o rețea exclusiv IPv4.</string>
+    <string name="settings_ptrans_desc" translatable="true">Convertește în dispozitiv traficul de ieșire IPv6 la IPv4. Activează dacă ești conectat la o rețea exclusiv IPv4.</string>
     <string name="settings_connectivity_checks" translatable="true">Execută verificări de conectivitate</string>
-    <string name="settings_connectivity_checks_desc" translatable="true">Sunt trimise verificări de conectivitate pentru a determina accesibilitatea.</string>
-    <string name="settings_allow_lan_heading" translatable="true">Nu direcționează IP-urile private(experimental)</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">Sunt trimise verificări de conectivitate pentru a determina disponibilitatea.</string>
+    <string name="settings_allow_lan_heading" translatable="true">Nu direcționa IP-urile private (experimental)</string>
     <string name="settings_allow_lan_desc" translatable="true">Exclude direcționările LAN, loopback, multicast și link-local din tunelul VPN al Rethink.</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Când este dezactivat, exclude aplicațiile proxy (SOCKS5, HTTP, DNS) din tunelul VPN al Rethink.</string>
     <string name="settings_allow_bypass_heading" translatable="true">Activează vizibilitatea rețelei</string>
-    <string name="settings_allow_bypass_desc" translatable="true">Permite aplicațiilor să acceseze toate rețelele disponibile. La nevoie, aceste aplicații ar putea ocoli tunelul VPN Rethink. Unele aplicații de audio/video conferință precum Zoom și Meet au nevoie de asta pentru a funcționa corespunzător.</string>
+    <string name="settings_allow_bypass_desc" translatable="true">Permite aplicațiilor să acceseze toate rețelele disponibile. La nevoie, aceste aplicații pot ocoli tunelul VPN Rethink. Unele aplicații de audio/video conferință precum Zoom și Meet au nevoie de asta pentru a funcționa corespunzător.</string>
     <string name="settings_lock_down_mode_desc" translatable="true">Anumite opțiuni sunt dezactivate când VPN e în modul lockdown. <u>Vezi setările VPN</u>.</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Nu pot fi setate proxy-uri când VPN rulează în modul DNS-only.</string>
     <string name="settings_socks5_heading" translatable="true">Setare Proxy SOCKS5</string>
@@ -313,67 +313,67 @@
     <string name="orbot_http_desc" translatable="true">Setează tunelul HTTP CONNECT la Orbot.</string>
     <string name="orbot_both" translatable="true">Proxy TCP + HTTP</string>
     <string name="orbot_both_desc" translatable="true">Toate de mai sus.</string>
-    <string name="orbot_none" translatable="true">Nici una (implicit)</string>
+    <string name="orbot_none" translatable="true">Nici una (prestabilit)</string>
     <string name="orbot_none_desc" translatable="true">Nici una de mai sus.</string>
     <string name="orbot_bs_status_1" translatable="true">Transmit conexiunile %1$s la Orbot.</string>
     <string name="orbot_bs_status_2" translatable="true">HTTP Proxy este setat.</string>
-    <string name="orbot_bs_status_3" translatable="true">Transmit %1$s la Orbot, Proxy HTTP setat.</string>
+    <string name="orbot_bs_status_3" translatable="true">%1$s se înaintează către Orbot, în plus Proxy HTTP setat.</string>
     <string name="orbot_status_arg_3" translatable="true">DNS si TCP</string>
     <string name="orbot_app_issue" translatable="true">Orbot nu poate fi deschis. Este instalat?</string>
     <string name="orbot_bs_status_trying_connect" translatable="true">Orbot se instalează…</string>
-    <string name="orbot_stop_dialog_title" translatable="true">Se cere intervenția manuală</string>
-    <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink este setat să transmită cererile DNS la Orbot. Modificați dacă e necesar.</string>
+    <string name="orbot_stop_dialog_title" translatable="true">E nevoie de intervenție manuală</string>
+    <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink este setat să transmită cererile DNS la Orbot. Modifică dacă e necesar.</string>
     <string name="local_blocklist_download_desc" translatable="true">Descarc listele de filtre (în jur de 60Mb) pentru a utiliza această opțiune?</string>
-    <string name="dns_proxy_remove_dialog_title" translatable="true">Eliminați DNS Proxy?</string>
-    <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink rulează VPN în modul <i>Lockdown</i>. Oprirea acestuia va duce la pierderea conexiunii internet pe acest profil de utilizator. Doriți să continuați??</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">Elimini proxy DNS?</string>
+    <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink rulează VPN în modul <i>Lockdown</i>. Oprirea acestuia va duce la pierderea conexiunii internet pe acest profil de utilizator. Vrei să continui?</string>
     <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast -->Lista aplicațiilor reactualizată.</string>
-    <string name="show_logs_disabled_network_message" translatable="true">Jurnalul pentru conexiuni a fost dezactivat. Pentru reactivare, mergeți la <i>Setări</i> și selectati<i>Activați jurnalele pe dispozitiv</i></string>
+    <string name="show_logs_disabled_network_message" translatable="true">Jurnalul pentru conexiuni a fost dezactivat. Pentru reactivare, mergi la <i>Setări</i> și selectează <i>Activează jurnalele pe dispozitiv</i></string>
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
-    <string name="orbot_bs_status_4" translatable="true">Setare Tor ca Proxy (Orbot) printr-un singur click.</string>
+    <string name="orbot_bs_status_4" translatable="true">Setare Tor-ca-Proxy (Orbot) dintr-un singur click.</string>
     <string name="orbot_stop_dialog_message" translatable="true">Rethink a oprit transmiterea conexiunilor prin Orbot, dar e posibil ca Orbot să ruleze încă în fundal.</string>
-    <string name="orbot_no_app_toast" translatable="true">Adăugați cel puțin o aplicație pentru activarea Orbot</string>
+    <string name="orbot_no_app_toast" translatable="true">Pentru activarea Orbot adăugă cel puțin o aplicație</string>
     <string name="settings_orbot_heading" translatable="true">Instalare Orbot</string>
     <string name="settings_orbot_header" translatable="true">Orbot\t❯</string>
     <string name="settings_orbot_desc" translatable="true">Orbot în modul non-VPN cu HTTPS/SOCKS5.</string>
-    <string name="settings_orbot_install_desc" translatable="true">Țap aici pentru a instala Orbot</string>
-    <string name="settings_socks5_disabled_error" translatable="true">Conectat la %1$s. Închideți pentru a continua.</string>
-    <string name="settings_socks5_vpn_disabled_error" translatable="true">Porniți Rethink pentru a continua.</string>
-    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">nereușit</string>
-    <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplicațiile proxy la loopback</string>
+    <string name="settings_orbot_install_desc" translatable="true">Tap aici pentru a instala Orbot</string>
+    <string name="settings_socks5_disabled_error" translatable="true">Conectat la %1$s. Închide pentru a continua.</string>
+    <string name="settings_socks5_vpn_disabled_error" translatable="true">Pornește Rethink pentru a continua.</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">nu reușește</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplicații proxy cu loopback</string>
     <string name="orbot_stop_dialog_negative" translatable="true">Oprește Orbot</string>
     <string name="orbot_stop_dialog_neutral" translatable="true">Schimbă DNS</string>
-    <string name="orbot_title" translatable="true">Orbot și Proxies</string>
+    <string name="orbot_title" translatable="true">Orbot și Proxy-uri</string>
     <string name="orbot_install_dialog_message" translatable="true">Orbot aduce pe Android caracteristici și funcții ale Tor.</string>
     <string name="settings_https_disabled_error" translatable="true">Conectat la %1$s. Oprește pentru a continua.</string>
-    <string name="settings_orbot_notification_content" translatable="true">Pornirea Tor-as-a-Proxy nu a reușit. Deschide aplicația Orbot pentru a-l porni manual.</string>
-    <string name="settings_orbot_disabled_error" translatable="true">Inchide proxy-ul HTTP(S) și/sau SOCKS5 pentru a continua instalarea Tor-as-a-proxy.</string>
+    <string name="settings_orbot_notification_content" translatable="true">Pornirea Tor-ca-Proxy nu a reușit. Deschide aplicația Orbot pentru a-l porni manual.</string>
+    <string name="settings_orbot_disabled_error" translatable="true">Inchide proxy-ul HTTP(S) și/sau SOCKS5 pentru a continua instalarea Tor-ca-proxy.</string>
     <string name="settings_orbot_notification_action" translatable="true">Deschide Orbot</string>
     <string name="settings_autostart_bootup_heading" translatable="true">Auto-start la pornirea dispozitivului (experimental)</string>
     <string name="settings_autostart_bootup_desc" translatable="true">La pornirea dispozitivului, startează Rethink dacă rula înainte de închidere.</string>
-    <string name="orbot_explanation" translatable="true">Orbot este o aplicație proxy gratuită care permite altor aplicații să folosească internetul mult mai <u>sigur</u>.\nOrbot folosește <u>Tor</u> pentru a cripta traficul tău de internet și astfel te ajută să <u>ocolești cenzura</u> și să eviți diferitele forme de <u>supraveghere în rețea</u> care pun în pericol libertatea persoanei și intimitatea.\n<u>TCP Proxy</u>: Rethink direcționează numai conexiunile TCP ale aplicațiilor <i>adăugate</i> la Orbot.\n<u>HTTP Proxy</u>: Rethink <i>instalează</i> tunelul HTTP CONNECT la Orbot și direcționează numai conexiunile TCP ale aplicațiilor <i>adăugate</i>.</string>
+    <string name="orbot_explanation" translatable="true">Orbot este o aplicație proxy gratuită care permite altor aplicații să folosească internetul mult mai <u>sigur</u>.\nOrbot folosește <u>Tor</u> pentru a cripta traficul tău de internet și astfel te ajută să <u>ocolești cenzura</u> și să eviți diferitele forme de <u>supraveghere în rețea</u> care pun în pericol libertatea și intimitatea personală\n<u>TCP Proxy</u>: Rethink direcționează numai conexiunile TCP ale aplicațiilor <i>adăugate</i> la Orbot.\n<u>HTTP Proxy</u>: Rethink <i>instalează</i> tunelul HTTP CONNECT la Orbot și direcționează numai conexiunile TCP ale aplicațiilor <i>adăugate</i>.</string>
     <string name="settings_network_all_networks" translatable="true">Folosește toate rețelele disponibile (experimental)</string>
     <string name="settings_network_all_networks_desc" translatable="true">Când este activat, Rethink folosește toate rețelele disponibile pentru conectarea la internet. Dacă nu, folosește orice rețea indicată ca <i>activă</i> de Android.</string>
     <string name="settings_check_update_desc" translatable="true">Verifică automat pentru actualizări săptămânal.</string>
     <string name="settings_custom_downloader_heading" translatable="true">Folosește downloader-ul aplicației</string>
-    <string name="settings_custom_downloader_desc" translatable="true">Dacă e dezactivat, este folosit <i>Download Manager</i> din Android</string>
+    <string name="settings_custom_downloader_desc" translatable="true">Dacă e dezactivat, se folosește <i>Download Manager</i> al Android</string>
     <string name="settings_import_export_desc" translatable="true">Efectuează manual copie de rezervă sau restaurare a setărilor și datelor din aplicații.</string>
     <string name="settings_app_notification_a13_heading" translatable="true">Notificare aplicație</string>
     <string name="settings_app_notification_a13_desc" translatable="true">Activează notificările pentru aplicație</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Notificare permanentă</string>
     <string name="settings_theme_dialog_themes_4" translatable="true">Negru</string>
     <string name="settings_ip_dialog_title" translatable="true">Alege versiunea IP</string>
-    <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (implicit)</string>
+    <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (prestabilit)</string>
     <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (experimental)</string>
     <string name="settings_ip_dialog_ipv46" translatable="true">Auto (experimental)</string>
     <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
     <string name="settings_ip_text_ipv6" translatable="true">IPv6</string>
     <string name="settings_notification_heading" translatable="true">Alege acțiunea la notificare</string>
-    <string name="settings_notification_desc1" translatable="true">Pauză / Stop (implicit)</string>
+    <string name="settings_notification_desc1" translatable="true">Pauză / Stop (prestabilit)</string>
     <string name="settings_notification_desc2" translatable="true">DNS / DNS + Firewall</string>
     <string name="settings_notification_dialog_title" translatable="true">Alege acțiunea la notificare</string>
-    <string name="settings_notification_dialog_option_1" translatable="true">\nPauză / Stop (implicit):\nArată 2 butoane, pentru a porni și opri Rethink rapid.</string>
+    <string name="settings_notification_dialog_option_1" translatable="true">\nPauză / Stop (prestabilit):\nArată 2 butoane, pentru a porni și opri Rethink rapid.</string>
     <string name="settings_notification_desc" translatable="true">Butoane pentru acțiuni de ales la notificarea Rethink: %1$s</string>
-    <string name="settings_notification_dialog_option_3" translatable="true">\nNici una:\nNu există butoane.\n</string>
+    <string name="settings_notification_dialog_option_3" translatable="true">\nNici una:\nNici un buton.\n</string>
     <string name="settings_notification_dialog_option_2" translatable="true">\nDNS / DNS + Firewall:\nArată 2 butoane pentru a schimba rapid între modul DNS cu economie de baterie și modul DNS + Firewall obișnuit.</string>
     <string name="settings_locale_desc" translatable="true">Alege limba preferată</string>
     <string name="settings_locale_dialog_title" translatable="true">Alege limba preferată</string>
@@ -390,16 +390,16 @@
     <string name="apps_icon_content_desc" translatable="true">Icon aplicație</string>
     <string name="firewall_status_excluded" translatable="true">excluse din dns și firewall</string>
     <string name="firewall_status_isolate" translatable="true">izolate</string>
-    <string name="firewall_status_whitelisted" translatable="true">ocolește regulile generale ale firewall-ului</string>
-    <string name="firewall_status_bypass_dns_firewall" translatable="true">ocolește regulile dns și firewall</string>
-    <string name="firewall_status_block_unmetered" translatable="true">blocat în rețelele necontorizate (wifi)</string>
+    <string name="firewall_status_whitelisted" translatable="true">ocolesc regulile generale ale firewall-ului</string>
+    <string name="firewall_status_bypass_dns_firewall" translatable="true">ocolesc regulile dns și firewall</string>
+    <string name="firewall_status_block_unmetered" translatable="true">blocate în rețelele necontorizate (wifi)</string>
     <string name="hs_biometeric_failed" translatable="true">Autentificare biometrică nereușită</string>
     <string name="hs_biometeric_error" translatable="true">Eroare la autentificarea biometrică</string>
     <string name="firewall_card_status_active" translatable="true">%1$s aplicații</string>
     <string name="firewall_card_text_active" translatable="true">%1$s blocate\n%2$s ocolite\n%3$s excluse\n%4$s izolate</string>
     <string name="firewall_card_text_inactive" translatable="true">Activează modul Firewall.</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">Ieșire la Logcat</string>
-    <string name="firewall_status_block_metered" translatable="true">blocat în rețelele contorizate (mobile)</string>
+    <string name="firewall_status_block_metered" translatable="true">blocate în rețelele contorizate (mobile)</string>
     <string name="ct_bs_app_info_error" translatable="true">Nu găsesc informații despre aplicație</string>
     <string name="hs_biometeric_title" translatable="true">Deblochează Rethink</string>
     <string name="hs_biometeric_desc" translatable="true">Folosește autentificarea biometrică pentru a debloca Rethink</string>
@@ -410,7 +410,7 @@
     <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimental)</string>
     <string name="settings_rinr_dialog_desc" translatable="true">Asta va activa și setarea <!--settings_network_all_networks--> %1$s. Vrei să continui?</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Faceți notificarea permanentă</string>
-    <string name="settings_rinr_desc_disabled" translatable="true">Direcționează traficul propriu al Rethink (descărcarea listele de filtre, verificările de conectivitate, conexiunile DNS) înapoi în tunel.</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Direcționează traficul propriu al Rethink (descărcarea listelor de filtre, verificările de conectivitate, conexiunile DNS) înapoi în tunel.</string>
     <string name="settings_http_proxy_desc" translatable="true">Trimitere la %1$s</string>
     <string name="settings_http_proxy_error_text1" translatable="true">Porturile trebuie să fie în intervalul 1024–65535</string>
     <string name="settings_http_proxy_error_text3" translatable="true">Numele gazdei nu e completat</string>
@@ -428,7 +428,7 @@
     <string name="settings_theme_dialog_themes_1" translatable="true">Setat de sistem</string>
     <string name="settings_biometric_desc" translatable="true">Securizează aplicația prin blocarea ecranului</string>
     <string name="dns_card_latency_active" translatable="true">%1$sms</string>
-    <string name="dns_card_latency_inactive" translatable="true">Avrig modul DNS.</string>
+    <string name="dns_card_latency_inactive" translatable="true">Activează modul DNS.</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s reguli generale</string>
     <string name="rules_card_domain_count" translatable="true">%1$s reguli pe domeniu</string>
     <string name="apps_card_ips_count" translatable="true">%1$s reguli pe IP &amp; Port</string>
@@ -436,16 +436,16 @@
     <string name="logs_card_dns_count" translatable="true">cereri %1$s</string>
     <string name="hsf_downtime" translatable="true">(inactiv de la %1$s)</string>
     <string name="logs_card_duration" translatable="true">de la %1$s</string>
-    <string name="hsf_vpn_prepare_failure" translatable="true">Permisiunea de creare a VPN n-a fost acordată sau o altă aplicație e în modul VPN permanent.</string>
+    <string name="hsf_vpn_prepare_failure" translatable="true">Permisiunea de creare a VPN nu a fost acordată sau există o altă aplicație în modul VPN permanent.</string>
     <string name="hsf_notification_permission_failure" translatable="true">Activează notificările din Setări</string>
     <string name="hsf_start_dialog_header" translatable="true">Start %1$s</string>
-    <string name="hsf_start_dialog_message" translatable="true">Ești la un singur pas de un Android protejat și securizat: observă instant activitatea în rețea, blochează siteuri web, IP-uri și aplicații dăunătoare.</string>
+    <string name="hsf_start_dialog_message" translatable="true">Ești la un singur pas de un Android protejat și securizat: observă instant activitatea în rețea, blochează websiteuri, IP-uri și aplicații dăunătoare.</string>
     <string name="hsf_start_dialog_positive" translatable="true">Start</string>
     <string name="hsf_whats_new_chip_text" translatable="true">Noutăți</string>
     <string name="hsf_proxy_chip_text" translatable="true">Proxy activ</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">Capturare pachete activă</string>
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">Activează RDNS+</string>
-    <string name="hsf_exclude_error" translatable="true">Excluderea nu e posibila în modul VPN lockdown</string>
+    <string name="hsf_exclude_error" translatable="true">Excluderea nu e posibilă în modul VPN lockdown</string>
     <string name="hsf_proxy_chip_remove_text" translatable="true">Se oprește…</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Capturarea pachetelor dezactivată</string>
     <string name="hsf_whats_new_remove_text" translatable="true">Se închide…</string>
@@ -453,7 +453,7 @@
     <string name="hsf_chip_appearance" translatable="true">Tema: %1$s</string>
     <string name="lbl_background_data" translatable="true">Datele în background vor fi restricționate</string>
     <string name="lbl_battery_optimization" translatable="true">Optimizare baterie</string>
-    <string name="battery_optimization_dialog_heading" translatable="true">Dezactivează %1$s</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">Dezactivare %1$s</string>
     <string name="dc_block_heading" translatable="true">reguli</string>
     <string name="dc_other_dns_heading" translatable="true">tip</string>
     <string name="dc_custom_dns_radio" translatable="true">Alte DNS</string>
@@ -462,17 +462,17 @@
     <string name="dc_local_block_heading" translatable="true">Liste filtre de pe dispozitiv</string>
     <string name="hsf_pause_vpn_failure" translatable="true">Rethink nu poate fi pus în pauză deoarece e inactiv</string>
     <string name="dc_custom_block_heading" translatable="true">Reguli domeniu</string>
-    <string name="dc_dns_website_heading" translatable="true">Arată icon-urile site-urilor în jurnalul DNS (experimental)</string>
+    <string name="dc_dns_website_heading" translatable="true">Arată icon-urile website-urilor în jurnalul DNS (experimental)</string>
     <string name="dc_dns_website_desc" translatable="true">Colectează icon-uri de website de la <i>nextdns.io</i> și <i>duckduckgo.com</i>. Consumă până la 350Mb spațiu memorie</string>
-    <string name="dc_check_update_desc" translatable="true">Verifică actualizarea listelor de filtre o dată la <i>three</i> zile</string>
+    <string name="dc_check_update_desc" translatable="true">Verifică actualizarea listelor de filtre o dată la <i>trei</i> zile</string>
     <string name="dc_proxy_dns_heading" translatable="true">Niciodată Proxy DNS</string>
-    <string name="dc_proxy_dns_desc" translatable="true">Fără Proxy DNS peste proxy-uri WireGuard Always-on, SOCKS5, HTTP.</string>
-    <string name="about_bravedns_whoarewe" translatable="true">Rethink este un proiect open-source gratuit, condus de foști ingineri software de la Amazon, IBM și Scientific Games.</string>
+    <string name="dc_proxy_dns_desc" translatable="true">Nu utiliza DNS peste proxy-uri permanente WireGuard, SOCKS5, HTTP.</string>
+    <string name="about_bravedns_whoarewe" translatable="true">Rethink este un proiect open-source gratuit, condus de ingineri software care au lucrat la Amazon, IBM și Scientific Games.</string>
     <string name="dc_dns_leaks_heading" translatable="true">Previne scurgerile DNS</string>
-    <string name="dc_check_update_heading" translatable="true">Întreabă despre actualizări liste filtre</string>
+    <string name="dc_check_update_heading" translatable="true">Atenționare actualizări liste filtre</string>
     <string name="about_bug_report_desc" translatable="true">jurnal de erori la email</string>
     <string name="about_join_telegram" translatable="true">Telegram</string>
-    <string name="about_bug_no_log_dialog_title" translatable="true">Raport bug-uri</string>
+    <string name="about_bug_no_log_dialog_title" translatable="true">Raport bug</string>
     <string name="about_bug_no_log_dialog_positive_btn" translatable="true">Trimite email</string>
     <string name="about_web" translatable="true">link-uri</string>
     <string name="about_website" translatable="true">Vizitează rethinkdns.com</string>
@@ -491,13 +491,13 @@
     <string name="about_app_update_check" translatable="true">Verifică pentru actualizări ale aplicației</string>
     <string name="about_app_translate" translatable="true">Traduceți</string>
     <string name="about_mail_to" translatable="true">hello@celzero.com</string>
-    <string name="about_mail_to_string" translatable="true">mailto:</string>
+    <string name="about_mail_to_string" translatable="true">e-mail la:</string>
     <string name="about_mail_subject" translatable="true">[Rethink]:</string>
-    <string name="about_mail_bugreport_subject" translatable="true">[Rethink]: Bug report</string>
+    <string name="about_mail_bugreport_subject" translatable="true">[Rethink]: raportare bug</string>
     <string name="about_mail_bugreport_share_title" translatable="true">Selectează provider-ul de email</string>
-    <string name="about_dialog_neutral_button" translatable="true">Sugerează caracteristici</string>
+    <string name="about_dialog_neutral_button" translatable="true">Sugerează funcționalități</string>
     <string name="app_info_error" translatable="true">Nu pot deschide Informații Aplicație.</string>
-    <string name="private_dns_error" translatable="true">Nu pot deschide ecranul Private DNS.</string>
+    <string name="private_dns_error" translatable="true">Nu pot deschide ecranul DNS Privat.</string>
     <string name="intent_launch_error" translatable="true">Nu pot deschide %1$s</string>
     <string name="no_browser_error" translatable="true">Nu pot deschide pagina web în browser.</string>
     <string name="log_file_not_available" translatable="true">Nu s-a găsit raportul de erori</string>
@@ -514,40 +514,40 @@
     <string name="hsf_vpn_dialog_header" translatable="true">Atenție!</string>
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink cere permisiunea de a stabili o VPN locală pentru criptarea cererile DNS ale dispozitivului, implementarea monitorizării rețelei și impunerea regulilor Firewall-ului.\n\nRethink nu colectează informații și nu vă spionează în nici un fel.</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Proxy eliminat</string>
-    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> poate duce la pierderea conexiunii. Schimbă setarea pentru a permite Rethink să folosească datele și alte resurse când rulează în background.</string>
-    <string name="dc_local_block_desc_1" translatable="true">Alege din peste 195 liste de filtre. Click aici pentru descărcarea sau configurarea listelor.</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> poate duce la pierderea conexiunii. Modifică setarea pentru a permite Rethink să folosească datele și alte resurse când rulează în background.</string>
+    <string name="dc_local_block_desc_1" translatable="true">Alege din peste 195 liste de filtre. Click aici pentru descărcarea sau configurarea lor.</string>
     <string name="dc_dns_leaks_desc" translatable="true">Când este activat, Rethink capturează toate pachetele la portul 53 și le înaintează la un endpoint setat de utilizator</string>
     <string name="about_bravedns_explantion" translatable="true">Rethink este cea mai ușoară cale pentru monitorizarea activității aplicațiilor, ocolirea cenzurii pe internet și protejarea aplicațiilor pe dispozitivul tău Android.</string>
-    <string name="about_bug_report" translatable="true">Raport bug-uri</string>
+    <string name="about_bug_report" translatable="true">Raportare bug</string>
     <string name="about_bravedns_toreport_text" translatable="true">ajutor și feedback</string>
     <string name="about_bug_report_dialog_positive_btn" translatable="true">Trimite email</string>
-    <string name="about_bug_no_log_dialog_message" translatable="true">Nu am reușit să colectez jurnalele de erori. Vrei să trimiti tu raportul de bug-uri?</string>
+    <string name="about_bug_no_log_dialog_message" translatable="true">Nu am reușit să colectez jurnalele de erori. Dorești să raportezi manual un bug?</string>
     <string name="about_faq" translatable="true">Vezi Întrebări Frecvente</string>
     <string name="about_connect" translatable="true">contact</string>
-    <string name="about_settings" translatable="true">system</string>
+    <string name="about_settings" translatable="true">sistem</string>
     <string name="about_app_contributors" translatable="true">Autori</string>
     <string name="about_dialog_positive_button" translatable="true">Să începem</string>
-    <string name="about_mail_bugreport_text" translatable="true">Trimite acest email la: hello@celzero.com</string>
+    <string name="about_mail_bugreport_text" translatable="true">Trimite acest e-mail la: hello@celzero.com</string>
     <string name="notification_screen_error" translatable="true">Nu pot deschide ecranul Notificări Aplicație.</string>
     <string name="contributors_list" translatable="true">&lt;i&gt;Proiectul Open Source Rethink&lt;/i&gt; își datorează existența voluntarilor care au dedicat nenumărate ore pentru dezvoltarea sa.&lt;br/&gt; &lt;br/&gt;🛡️ Aplicația Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Motor de rețea &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Lanius-collaris&gt;Lanius-collaris&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolvator &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Moderatorii comunității &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;Andersen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Traduceri &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Icon-uri &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Servere dezvoltare &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="cd_custom_dns_proxy_name_default" translatable="true">Proxy</string>
     <string name="cd_custom_dns_proxy_name" translatable="true">Proxy %1$s</string>
-    <string name="cd_custom_dns_proxy_default_app" translatable="true">Nimic</string>
+    <string name="cd_custom_dns_proxy_default_app" translatable="true">Nici una</string>
     <string name="cd_dns_proxy_mode_internal" translatable="true">Intern</string>
     <string name="cd_dns_proxy_mode_external" translatable="true">Extern</string>
     <string name="cd_dns_proxy_error_text_1" translatable="true">Adresă IP nevalidă</string>
     <string name="cd_dns_proxy_error_text_2" translatable="true">Portul trebuie să fie în intervalul 1024–65535</string>
-    <string name="cd_dns_proxy_error_text_3" translatable="true">Port nevalid</string>
+    <string name="cd_dns_proxy_error_text_3" translatable="true">Portul nu e valid</string>
     <string name="cd_dns_crypt_name_default" translatable="true">DNSCrypt</string>
     <string name="cd_dns_crypt_name" translatable="true">DNSCrypt %1$s</string>
-    <string name="cd_dns_crypt_relay_name" translatable="true">DNSRelay %1$s</string>
+    <string name="cd_dns_crypt_relay_name" translatable="true">Releu DNS %1$s</string>
     <string name="cd_dns_crypt_dialog_heading" translatable="true">Adaugă Rezolvatorul sau Releul DNSCrypt</string>
     <string name="cd_dns_crypt_dialog_title" translatable="true">Adaugă Rezolvatorul sau Releul DNSCrypt</string>
     <string name="cd_dns_crypt_resolver_heading" translatable="true">Rezolvator</string>
     <string name="cd_dns_crypt_relay_heading" translatable="true">Releu</string>
-    <string name="cd_dns_crypt_dialog_stamp" translatable="true">Stamp</string>
-    <string name="cd_dns_crypt_dialog_desc" translatable="true">Descriere (facultativ)</string>
-    <string name="cd_dns_crypt_error_text_1" translatable="true">Stamp nu poate fi gol</string>
+    <string name="cd_dns_crypt_dialog_stamp" translatable="true">DNS stamp</string>
+    <string name="cd_dns_crypt_dialog_desc" translatable="true">Descriere (optional)</string>
+    <string name="cd_dns_crypt_error_text_1" translatable="true">DNS stamp nu poate fi gol</string>
     <string name="cd_doh_dialog_heading" translatable="true">Adaugă DNS peste HTTPS</string>
     <string name="cd_doh_dialog_resolver_name" translatable="true">Nume Rezolvator</string>
     <string name="cd_doh_dialog_resolver_url" translatable="true">URL Rezolvator</string>
@@ -564,7 +564,7 @@
     <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="dns_btm_sheet_chip" translatable="true">+%1$s alte IP-uri</string>
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">Fără răspuns</string>
-    <string name="dns_btm_resolved_crypt" translatable="true">resolvat <u>anonim</u> %1$s de %2$s via %3$s</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">rezolvat <u>anonim</u> %1$s de %2$s via %3$s</string>
     <string name="dns_btm_resolved_doh" translatable="true">rezolvat %1$s de %2$s</string>
     <string name="dns_btm_resolved_doh_no_server" translatable="true">rezolvat %1$s</string>
     <string name="dns_btm_latency_ms" translatable="true">%1$sms</string>
@@ -579,24 +579,24 @@
     <string name="fapps_firewall_filter_bypass_universal" translatable="true">Ocolite</string>
     <string name="fapps_info_dialog_message" translatable="true">Blochează conectarea la internet a aplicațiilor. Limitarea accesului la internet previne consumul inutil de date și economisește bateria.</string>
     <string name="univ_firewall_rule_1" translatable="true">Blochează toate aplicațiile când dispozitivul este blocat</string>
-    <string name="univ_firewall_rule_2" translatable="true">Blochează toate aplicațiile nedeschise</string>
+    <string name="univ_firewall_rule_2" translatable="true">Blochează toate aplicațiile care rulează în fundal</string>
     <string name="univ_firewall_rule_3" translatable="true">Blochează aplicațiile din surse necunoscute</string>
     <string name="univ_firewall_rule_4" translatable="true">Blochează UDP cu excepția DNS și NTP</string>
     <string name="univ_firewall_rule_5" translatable="true">Blochează când DNS este ocolit</string>
-    <string name="univ_firewall_rule_6" translatable="true">Blochează implicit aplicațiile nou instalate</string>
+    <string name="univ_firewall_rule_6" translatable="true">Blochează aplicațiile nou instalate (prestabilit)</string>
     <string name="univ_firewall_rule_7" translatable="true">Blochează IPv4 în IPv6 (experimental)</string>
     <string name="univ_firewall_rule_8" translatable="true">Blochează traficul prin portul 80 (HTTP nesecurizat)</string>
     <string name="univ_firewall_rule_9" translatable="true">Blochează în rețelele contorizate (mobile)</string>
-    <string name="univ_firewall_rule_10" translatable="true">Blochează tot, cu excepția aplicațiilor și IP-urilor setate pentru ocolire</string>
+    <string name="univ_firewall_rule_10" translatable="true">Blochează tot, cu excepția aplicațiilor și IP-urilor cu ocolire</string>
     <string name="univ_view_blocked_ip" translatable="true">Reguli pentru IP-uri și porturi</string>
-    <string name="univ_view_blocked_ip_desc" translatable="true">Modifică regulile de blocare sau ignorare a domeniilor, IP-urilor și porturilor.</string>
+    <string name="univ_view_blocked_ip_desc" translatable="true">Modifică domeniile, IP-urile și porturile blocate sau de încredere.</string>
     <string name="univ_ip_delete_individual_toast" translatable="true">%1$s eliminat.</string>
     <string name="univ_ip_delete_dialog_positive" translatable="true">Elimină toate</string>
     <string name="univ_ip_delete_toast_success" translatable="true">Elimină toate regulile pentru IP.</string>
-    <string name="univ_delete_firewall_dialog_title" translatable="true">Elimin toate regulile pentru IP?</string>
+    <string name="univ_delete_firewall_dialog_title" translatable="true">Elimini toate regulile pentru IP?</string>
     <string name="univ_delete_firewall_dialog_message" translatable="true">După eliminarea acestor reguli, orice aplicație se poate conecta la IP-urile care acum sunt blocate.</string>
     <string name="univ_accessibility_crash_dialog_positive" translatable="true">Mergi la Setări</string>
-    <string name="univ_accessibility_dialog_positive" translatable="true">Permisiune</string>
+    <string name="univ_accessibility_dialog_positive" translatable="true">Permite</string>
     <string name="univ_accessibility_dialog_negative" translatable="true">Interzice</string>
     <string name="univ_firewall_heading" translatable="true">Reguli universale pentru firewall</string>
     <string name="app_ip_domain_rules" translatable="true">Reguli de IP/domeniu per aplicație</string>
@@ -623,8 +623,347 @@
     <string name="fapps_info_metered_msg" translatable="true">Permite/Blochează în rețelele contorizate (Mobile).</string>
     <string name="fapps_info_bypass_msg" translatable="true">Ocolește regulile universale ale Firewall-ului.</string>
     <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Ocolește regulile DNS și Firewall.</string>
-    <string name="fapps_info_exclude_msg" translatable="true">Exclude și din DNS și din Firewall</string>
+    <string name="fapps_info_exclude_msg" translatable="true">Exclude din ambele: DNS și Firewall.</string>
     <string name="fapps_filter_clear_btn" translatable="true">Șterge</string>
     <string name="fapps_info_isolate_msg" translatable="true">Blochează tot cu excepția IP-urilor de încredere.</string>
-    <string name="fapps_info_dialog_positive_btn" translatable="true">Ok</string>
+    <string name="fapps_info_dialog_positive_btn" translatable="true">Okay</string>
+    <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Permite în necontorizate</string>
+    <string name="fapps_unmetered_block_dialog_title" translatable="true">Blochează în necontorizate</string>
+    <string name="fapps_unmetered_unblock_dialog_message">Permiți conexiunile în rețele necontorizate (WiFi) pentru aplicațiile <i>din listă</i>\?</string>
+    <string name="fapps_unmetered_block_dialog_message" translatable="true">Blochezi conexiunile în rețele necontorizate (WiFi) pentru aplicațiile <i>din listă</i>\?</string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true">Arată aplicațiile <u>%1$s</u> %2$s în categoriile: %3$s</string>
+    <string name="rules_load_failure_heading" translatable="true">Notă</string>
+    <string name="network_log_app_name_unknown" translatable="true">Necunoscut</string>
+    <string name="dns_proxy_connection_failure_lockdown" translatable="true">Excluderea %1$s din %2$s în modul lockdown poate cauza probleme de conectare la internet.</string>
+    <string name="accessibility_notification_content" translatable="true">Serviciul de accesibilitate Rethink s-a oprit sau blocat. Ca urmare, aplicațiile în fundal nu mai sunt blocate. Tap pentru a reactiva.</string>
+    <string name="other_dns_list_tab2" translatable="true">Dnscrypt</string>
+    <string name="other_dns_list_tab3" translatable="true">Proxy Dns</string>
+    <string name="firewall_rule_block_app_exception" translatable="true">Eroare</string>
+    <string name="firewall_rule_block_ip_desc" translatable="true">O regulă firewall setată de utilizator blochează <i>IP-ul destinație</i>.<br/><br/> Pentru a schimba, mergi la tab-ul <i>Firewall per Aplicație</i>.</string>
+    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">Această conexiune a fost permisă pentru că &lt;i&gt;IP-ul destinație&lt;/i&gt; este setat să ocolească toate regulile firewall.&lt;br/&gt;&lt;br/&gt; Pentru a schimba, mergi la &lt;i&gt;Reguli IP&lt;i&gt; în tab-ul &lt;i&gt;Universal&lt;/i&gt;.</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Această conexiune a fost permisă pentru că the <i>aplicația solicitantă</i> este setată pe <i>ocolirea regulilor dns și firewall</i>.<br/><br/> Pentru a schimba, mergi la ecranul <i>Firewall per Aplicație</i>.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Această conexiune a fost permisă pentru că <i>domeniul</i> este setat de încredere de regulile Universale de domeniu.<br/><br/> Pentru modificare, mergi la tab-ul<i>Configurare DNS</i>.</string>
+    <string name="new_app_bulk_notification_title" translatable="true">Atenție</string>
+    <string name="new_app_notification_action_toast_deny" translatable="true">Conexiune de rețea refuzată pentru aplicație</string>
+    <string name="notif_channel_vpn_failure" translatable="true">VPN inactivă</string>
+    <string name="notif_channel_desc_firewall_alerts" translatable="true">Notificare la erori și anomalii ale Firewall-ului</string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true">Ocolești regulile universale de Firewall pentru aplicațiile <i>din listă</i>\?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Aplicații cu ocolire</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Ocolești regulile universale la DNS și Firewall pentru aplicațiile <i>din listă</i>\?</string>
+    <string name="fapps_unblock_dialog_title" translatable="true">Permite aplicații</string>
+    <string name="fapps_exclude_block_dialog_title" translatable="true">Exclude aplicații</string>
+    <string name="fapps_unblock_dialog_message" translatable="true">Permiți conexiunile pentru aplicațiile <i>din listă</i>\?</string>
+    <string name="fapps_exclude_block_dialog_message" translatable="true">Excluzi aplicațiile <i>din listă</i> de la Firewall și DNS?</string>
+    <string name="fapps_isolate_block_dialog_title" translatable="true">Izolare aplicatii</string>
+    <string name="fapps_isolate_block_dialog_message" translatable="true">Izolezi aplicațiile <i>din listă</i>\?</string>
+    <string name="fapps_firewall_filter_hint" translatable="true">Arată toate aplicațiile</string>
+    <string name="fapps_firewall_filter_desc" translatable="true">Arată aplicațiile <u>%1$s</u> %2$s</string>
+    <string name="fapps_metered_block_dialog_title" translatable="true">Blocare în contorizate</string>
+    <string name="fapps_metered_unblock_dialog_title" translatable="true">Permis în contorizate</string>
+    <string name="fapps_metered_unblock_dialog_message" translatable="true">Permiți conexiunile în rețelele contorizate (mobile) pentru aplicațiile <i>din listă</i>\?</string>
+    <string name="fapps_metered_block_dialog_message" translatable="true">Blochezi conexiunile în rețelele contorizate (mobile) pentru aplicațiile <i>din listă</i>\?</string>
+    <string name="fapps_bypass_block_dialog_title" translatable="true">Aplicații cu ocolire</string>
+    <string name="rules_load_failure_desc" translatable="true">Nu ai fost găsite reguli pentru Firewall</string>
+    <string name="rules_load_failure_reload" translatable="true">reîncărcare</string>
+    <string name="network_log_app_name_unnamed" translatable="true">Fără nume (%1$s)</string>
+    <string name="dns_crypt_connection_failure" translatable="true">Eroare de conectare la serverul DNSCrypt.</string>
+    <string name="dns_proxy_connection_failure" translatable="true">Eroare de conectare la serverul DNS Proxy.</string>
+    <string name="dns_proxy_toast_parameter" translatable="true">Proxy DNS</string>
+    <string name="socks5_proxy_toast_parameter" translatable="true">Proxy SOCKS5</string>
+    <string name="orbot_toast_parameter" translatable="true">Tor-ca-proxy</string>
+    <string name="system_dns_connection_failure" translatable="true">Imposibil de determinat serverul DNS curent</string>
+    <string name="copy_clipboard_label" translatable="true">URL</string>
+    <string name="update_complete_snack_message" translatable="true">Noua versiune descărcată.</string>
+    <string name="update_complete_action_snack" translatable="true">REPORNIRE</string>
+    <string name="settings_local_blocklist_in_use" translatable="true">Se utilizează lista de filtre %1$s</string>
+    <string name="settings_local_blocklist_dialog_positive" translatable="true">Descărcare</string>
+    <string name="settings_local_blocklist_version" translatable="true">Versiune: v%1$s</string>
+    <string name="accessibility_failure_toast" translatable="true">Serviciul de accesibilitate Rethink s-a oprit sau blocat. Ca urmare, aplicațiile în fundal nu mai sunt blocate.</string>
+    <string name="coming_soon_toast" translatable="true">în curând</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s este deactivat dacă proxy-urile sunt active</string>
+    <string name="pause_text" translatable="true">în pauză</string>
+    <string name="pause_desc" translatable="true">Notă: %1$s aplicații blocate vor fi protejate de firewall în continuare.</string>
+    <string name="other_dns_list_tab1" translatable="true">DoH</string>
+    <string name="hs_btm_sheet_lock_down" translatable="true">Nu se pot schimba modurile când VPN este în <i>lockdown</i>. Tap pentru <u>a schimba setările VPN</u>.</string>
+    <string name="firewall_rule_no_rule" translatable="true">Fără reguli</string>
+    <string name="firewall_rule_block_app" translatable="true">Aplicație blocată</string>
+    <string name="firewall_rule_block_unmetered" translatable="true">Necontorizat (WiFi)</string>
+    <string name="firewall_rule_block_metered" translatable="true">Contorizat (Mobile)</string>
+    <string name="firewall_rule_univ_block_metered" translatable="true">Contorizat (Universal)</string>
+    <string name="firewall_rule_isolate" translatable="true">Izolează</string>
+    <string name="firewall_rule_bypass_dns_firewall" translatable="true">Aplicații cu ocolire</string>
+    <string name="firewall_rule_block_app_new_install" translatable="true">Aplicație nouă</string>
+    <string name="firewall_rule_block_ip" translatable="true">IP / Port (Aplicație)</string>
+    <string name="firewall_rule_block_univ_ip" translatable="true">IP / Port (Universal)</string>
+    <string name="firewall_rule_trusted_ip" translatable="true">IP de încredere</string>
+    <string name="firewall_rule_bypass_universal_ip" translatable="true">IP ocolit</string>
+    <string name="firewall_rule_device_lock" translatable="true">Dispozitiv blocat</string>
+    <string name="firewall_rule_foreground" translatable="true">Aplicație nedeschisă</string>
+    <string name="firewall_rule_unknown" translatable="true">Sursă necunoscută</string>
+    <string name="firewall_rule_block_udp_ntp" translatable="true">UDP Blocat</string>
+    <string name="firewall_rule_block_dns_bypass" translatable="true">DNS ocolit</string>
+    <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">Aplicație cu ocolire</string>
+    <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNS prin Proxy</string>
+    <string name="firewall_rule_exempt_orbot_setup" translatable="true">Instalare Orbot</string>
+    <string name="firewall_rule_block_http" translatable="true">HTTP nesigur</string>
+    <string name="firewall_rule_global_lockdown" translatable="true">Blocare universală</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Domeniu de încredere (Aplicație)</string>
+    <string name="firewall_rule_block_domain" translatable="true">Domeniu (Aplicație)</string>
+    <string name="firewall_rule_dns_blocked" translatable="true">DNS blocat</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">Domeniu (Universal)</string>
+    <string name="firewall_rule_domain_trusted_univ" translatable="true">Domeniu de încredere (Universal)</string>
+    <string name="firewall_rule_proxied" translatable="true">Prin Proxy</string>
+    <string name="firewall_rule_no_rule_desc" translatable="true">Nici o regulă firewall pentru această conexiune.</string>
+    <string name="firewall_rule_new_app_desc" translatable="true">Această aplicație se conectează <i>întâia</i> oară.<br/><br/> Pentru a-i schimba setările, mergi la tab-ul <i>Universal</i>.</string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">O regulă firewall setată de utilizator blochează conectarea acestei <i>aplicații</i> în rețelele <i>necontorizate</i>.<br/><br/>Pentru a schimba, mergi la tab-ul <i>Toate</i> (aplicațiile).</string>
+    <string name="firewall_rule_block_app_desc" translatable="true">O regulă firewall setată de utilizator blochează această <i>aplicație</i>.<br/><br/>Pentru a schimba, mergi la tab-ul <i>Toate</i> (aplicațiile).</string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true">O regulă firewall setată de utilizator blochează conectarea acestei <i>aplicații</i> în rețelele <i>contorizate</i>.<br/><br/>Pentru a schimba, mergi la tab-ul <i>Toate</i> (aplicațiile).</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">O regulă firewall setată de utilizator blochează conectarea acestei <i>aplicații</i> în rețelele <i>contorizate</i> (mobile).<br/><br/>Pentru a schimba, mergi la tab-ul <i>Universal</i>.</string>
+    <string name="firewall_rule_isolate_desc" translatable="true">O regulă firewall setată de utilizator blochează conectarea acestei <i>aplicații</i> la alte IP-uri în afară celor <i>ocolite</i>.<br/><br/>Pentru a schimba, mergi la tab-ul <i>Toate</i> (aplicațiile).</string>
+    <string name="firewall_rule_block_ip_univ_desc" translatable="true">O regulă firewall setată de utilizator blochează <i>IP-ul/Portul destinație</i>.<br/><br/> Pentru a schimba, mergi la tab-ul <i>Universal</i>.</string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true">Această conexiune a fost permisă pentru că <i>IP-ul destinație</i> este setat ca IP de încredere.<br/><br/> Pentru a schimba, mergi la ecranul <i>Firewall per Aplicație</i>.</string>
+    <string name="firewall_rule_device_lock_desc" translatable="true">Această conexiune a fost blocată de firewall pentru că <i>dispozitivul era blocat</i> la acel moment.<br/><br/> Pentru a schimba regula, mergi la tab-ul <i>Universal</i>.</string>
+    <string name="firewall_rule_unknown_desc" translatable="true">Această conexiune a fost blocată de firewall pentru că <i>sursa aplicației</i> este necunoscută.<br/><br/> Pentru a schimba regula, mergi la tab-ul <i>Universal</i>.</string>
+    <string name="firewall_rule_block_udp_ntp_desc" translatable="true">O regulă setată de utlizator a blocat această conexiune <i>UDP</i>.<br/><br/> Pentru a schimba regula, mergi la tab-ul <i>Universal</i>.</string>
+    <string name="firewall_rule_foreground_desc" translatable="true">Această conexiune a fost blocată de firewall pentru că aplicația solicitantă rula <i>în fundal</i>.<br/><br/> Pentru a schimba regula, mergi la tab-ul <i>Universal</i>.</string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">Această conexiune a fost blocată pentru ca <i>aplicația solicitantă</i> a ocolit DNS-ul preferat de utilizator. <br/><br/> Pentru a schimba regula, mergi la tab-ul <i>Universal</i>.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">Această conexiune a fost permisă pentru că<i>aplicația solicitantă</i> este setată pe <i>ocolirea regulilor universale</i> ale firewall-ului.<br/><br/> Pentru a schimba regula, mergi la tab-ul <i>Firewall per Aplicație</i>.</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">Această conexiune DNS s-a realizat prin proxy, fiind înaintată la endpoint-ul DNS preferat de utilizator.<br/><br/> Pentru modificare, dezactivează <i>Previne scurgerile DNS</i> din ecranul DNS <i>Configurare</i>.</string>
+    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true">Această conexiune a fost permisă pentru că instalarea <i>Tor-ca proxy cu un singur click</i> este în curs de realizare.</string>
+    <string name="firewall_rule_block_http_desc" translatable="true">Această conexiune a fost blocată pentru că e posibil să utilizeze <i>HTTP nesigur</i>.<br/><br/> Pentru modificare, mergi la tab-ul <i>Universal</i>.</string>
+    <string name="firewall_rule_global_lockdown_desc" translatable="true">Această conexiune a fost blocată pentru că a fost setată Blocarea universală.<br/><br/> Pentru modificare, mergi la tab-ul <i>Universal</i>.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">O regulă de firewall setată de utilizator a blocat <i>domeniul</i>.<br/><br/> Pentru modificare, mergi la ecranul <i>Firewall per aplicație</i>.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Această conexiune a fost permisă pentru că <i>domeniul</i> este setat ca domeniu de încredere.<br/><br/> Pentru modificare, mergi la ecranul <i>Firewall per aplicațiel</i>.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">Această conexiune a fost blocată pentru că <i>domeniul</i> este blocat de DNS-ul preferat de utilizator.<br/><br/> Pentru modificare, mergi la tab-ul <i>Configurare DNS</i>.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Această conexiune a fost blocată pentru că <i>domeniul</i> este blocat de regulile Universale de domeniu.<br/><br/> Pentru modificare, mergi la tab-ul <i>Configurare DNS</i>.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">Această conexiune a fost înaintată la Proxy-ul preferat de utilizator.<br/><br/> Pentru modificare, mergi la <i>Proxy</i> în ecranul <i>Configurare</i>.</string>
+    <string name="new_app_bulk_notification_content" translatable="true">Rethink a blocat %1$s aplicații noi. Tap pentru a vizualiza și modifica.</string>
+    <string name="new_app_notification_content" translatable="true">Rethink a blocat aplicația instalată recent, %1$s.</string>
+    <string name="new_app_notification_action_deny" translatable="true">Continuă blocarea</string>
+    <string name="new_app_notification_action_toast_allow" translatable="true">Conexiune de rețea permisă pentru aplicație</string>
+    <string name="notif_dialog_pause_dialog_title" translatable="true">Aplicație în pauză!</string>
+    <string name="notif_dialog_pause_dialog_message" translatable="true">Aplicație în pauză, CONTINUĂ pentru repornire</string>
+    <string name="notif_dialog_pause_dialog_positive" translatable="true">Continuă</string>
+    <string name="notif_channel_vpn_notification" translatable="true">VPN activă</string>
+    <string name="notif_channel_desc_vpn_notification" translatable="true">Notificare când Rethink este activ și rulează în fundal</string>
+    <string name="notif_channel_desc_vpn_failure" translatable="true">Notificare când Rethink este oprit de Android sau de alte aplicații VPN</string>
+    <string name="notif_channed_desc_download" translatable="true">Notificare cu progresul descărcării pentru listele de filtre pe dispozitiv</string>
+    <string name="notif_channel_desc_proxy_failure" translatable="true">Notificare la erori și anomalii ale Proxy-ului</string>
+    <string name="notif_channel_download" translatable="true">Descarcă Notificări</string>
+    <string name="notif_channel_proxy_failure" translatable="true">Notificări Proxy</string>
+    <string name="notif_channel_firewall_alerts" translatable="true">Notificări Firewall</string>
+    <string name="notif_dialog_pause_dialog_negative" translatable="true">Renunță</string>
+    <string name="notif_dialog_pause_dialog_neutral" translatable="true">Arată</string>
+    <string name="category_name_sys_components" translatable="true">Componente Sistem</string>
+    <string name="category_name_sys_apps" translatable="true">Aplicații de sistem</string>
+    <string name="category_name_others" translatable="true">Altele</string>
+    <string name="category_name_non_app_sys" translatable="true">Servicii de sistem</string>
+    <string name="category_name_installed" translatable="true">Aplicații instalate</string>
+    <string name="build__flavor_website" translatable="true">website</string>
+    <string name="cd_dialog_error_invalid_domain" translatable="true">URL-ul sau numele de domeniu nu este valid</string>
+    <string name="cd_dialog_error_invalid_wildcard" translatable="true">Metacaracterul, URL-ul sau domeniul nu este valid</string>
+    <string name="ci_dialog_desc" translatable="true">Permite (ocolește) sau blochează adrese IP, subrețea IP (interval), Port. Exemplu: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
+    <string name="build__flavor_play_store" translatable="true">play-store</string>
+    <string name="build__flavor_fdroid" translatable="true">fdroid</string>
+    <string name="cd_toast_deleted" translatable="true">Domeniu eliminat din lista personalizată</string>
+    <string name="cd_toast_added" translatable="true">Domeniu adăugat cu succes</string>
+    <string name="cd_remove_dialog_title" translatable="true">Ștergi domeniul?</string>
+    <string name="cd_remove_dialog_message" translatable="true">Șterge domeniul din configurația salvată.</string>
+    <string name="cd_deleted_toast" translatable="true">Șterge toate regulile de domeniu</string>
+    <string name="cd_no_rules_text" translatable="true">Nu există reguli de domeniu.</string>
+    <string name="cd_dialog_edit_title" translatable="true">Editare regulă de domeniu</string>
+    <string name="cd_toast_edit" translatable="true">Editat</string>
+    <string name="cd_dialog_title" translatable="true">Adaugă regulă de domeniu</string>
+    <string name="cd_dialog_desc" translatable="true">URL sau nume de domeniu cu un metacaracter optional: *.test.com, test.com/test</string>
+    <string name="cd_blocked_initial" translatable="true">B</string>
+    <string name="cd_no_rule_initial" translatable="true">N</string>
+    <string name="cd_no_rule_txt" translatable="true">Nu există reguli</string>
+    <string name="ci_dialog_title" translatable="true">Adaugă regulă de IP / Port</string>
+    <string name="ci_dialog_edittext_hint" translatable="true">Adrese IP, subrețea IP, port</string>
+    <string name="ci_dialog_error_invalid_ip" translatable="true">Adresele IP, subrețelele IP sau porturile nu sunt valide.</string>
+    <string name="ci_dialog_added_success" translatable="true">IP adăugat în listă</string>
+    <string name="ci_no_rules_text" translatable="true">Nu există reguli de IP / Port.</string>
+    <string name="ci_bypass_universal_initial" translatable="true">BU</string>
+    <string name="ci_bypass_universal_txt" translatable="true">Ocolire Universală</string>
+    <string name="ci_trust_initial" translatable="true">T</string>
+    <string name="ci_trust_txt" translatable="true">De încredere</string>
+    <string name="ci_blocked_initial" translatable="true">B</string>
+    <string name="ci_no_rule_initial" translatable="true">N</string>
+    <string name="ci_no_rule_txt" translatable="true">Fără reguli</string>
+    <string name="ci_no_rule" translatable="true">Fără reguli</string>
+    <string name="ci_block" translatable="true">Blocare</string>
+    <string name="ci_bypass_universal" translatable="true">Ocolire Universală</string>
+    <string name="ci_trust_rule" translatable="true">Încredere</string>
+    <string name="lbbs_heading" translatable="true">Configurează peste 195 liste de filtre</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Nu funcționează la toate versiunile aplicației</string>
+    <string name="brbs_backup_dialog_message" translatable="true">Salvează setările de la aplicații, rețea și jurnale DNS intr-un fișier. Această acțiune va reporni VPN.</string>
+    <string name="parse_error_integer" translatable="true">număr</string>
+    <string name="one_wg_apps_added" translatable="true">Se direcționează toate aplicațiile</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Aplicațiile selectate vor fi direcționate numai prin această VPN WireGuard, indiferent dacă este activă sau dezactivată.</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">Permanent</string>
+    <string name="unknown_error" translatable="true">Eroare necunoscută</string>
+    <string name="invalid_file_error" translatable="true">fișierul nu e valid</string>
+    <string name="routing_remaining_apps" translatable="true">Se direcționează aplicațiile rămase</string>
+    <string name="rt_download_desc" translatable="true">Descarcă listele de filtre (aprox. 60Mb) pentru a utiliza această opțiune.</string>
+    <string name="rt_filter_parent_selected" translatable="true">Selectat</string>
+    <string name="radio_max_btn" translatable="true">🪂 Max</string>
+    <string name="rt_filter_desc" translatable="true">Se arată listele de filtre <u>%1$s</u></string>
+    <string name="bsrf_sub_group_heading" translatable="true">Subgrup</string>
+    <string name="cd_dialog_edittext_hint" translatable="true">Introdu %1$s</string>
+    <string name="ci_delete" translatable="true">elimină</string>
+    <string name="ada_noapp_dialog_title" translatable="true">Nu există această aplicație</string>
+    <string name="ada_noapp_dialog_message" translatable="true">Informații despre aplicație lipsă. Poate că aplicația a fost dezinstalată?</string>
+    <string name="ada_noapp_dialog_positive" translatable="true">Okay</string>
+    <string name="ada_firewall_status" translatable="true">Această aplicație <b><i>%1$s</i></b>.</string>
+    <string name="ada_ip_connection_count_zero" translatable="true">0 adrese IP</string>
+    <string name="ada_ip_no_connection" translatable="true">Nu există înregistrări în jurnal pentru această aplicație.</string>
+    <string name="ada_app_status_whitelist" translatable="true">va ocoli regulile universale de firewall</string>
+    <string name="ada_app_status_isolate" translatable="true">este izolată; numai IP-urile de încredere sunt permise</string>
+    <string name="ada_app_status_exclude" translatable="true">este exclusă de la dns și firewall</string>
+    <string name="ada_app_status_block_md" translatable="true">este blocată în rețelele contorizate (mobile)</string>
+    <string name="ada_app_status_block_wifi" translatable="true">este blocată în rețelele necontorizate (wifi)</string>
+    <string name="ada_app_status_block" translatable="true">este blocată</string>
+    <string name="ada_app_status_allow" translatable="true">este permisă</string>
+    <string name="ada_ip_connection_count" translatable="true">Conectată la adresele IP %1$s</string>
+    <string name="ada_app_status_bypass_dns_firewall" translatable="true">va ocoli regulile universale de dns și firewall</string>
+    <string name="ada_app_status_unknown" translatable="true">este necunoscută</string>
+    <string name="ada_firewall_title" translatable="true">reguli de firewall pentru această aplicație</string>
+    <string name="ada_network_log_title" translatable="true">jurnal de rețea pentru această aplicație</string>
+    <string name="ada_app_firewall" translatable="true">Firewall</string>
+    <string name="ada_app_metered" translatable="true">Contorizat</string>
+    <string name="ada_app_unmetered" translatable="true">Necontorizat</string>
+    <string name="ada_app_bypass_univ" translatable="true">Ocolire Universală</string>
+    <string name="ada_app_bypass_dns_firewall" translatable="true">Ocolire DNS și Firewall</string>
+    <string name="ada_app_exclude" translatable="true">Exclude</string>
+    <string name="ada_app_isolate" translatable="true">Izolează</string>
+    <string name="ada_app_dns_settings" translatable="true">Setări DNS</string>
+    <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">Șterge jurnalele</string>
+    <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Șterge toate jurnalele pentru această aplicație.</string>
+    <string name="bypass_dns_firewall_tooltip">%1$s funcționează doar cu DNS-ul Rethink</string>
+    <string name="exclude_apps_from_proxy">Exclude aplicația la toate proxy-urile</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Această aplicație ocolește proxy-urile</string>
+    <string name="bsac_title_desc" translatable="true">Regulile se aplică numai pentru această aplicație.</string>
+    <string name="bsdl_block_desc" translatable="true">Blochează, permite <u>acest domeniu</u></string>
+    <string name="bsdl_blocked_desc" translatable="true">%1$s blocată de %2$s</string>
+    <string name="network_dns" translatable="true">DNS sistem</string>
+    <string name="notif_download_content_title" translatable="true">Descărcare listă filtre pe dispozitiv</string>
+    <string name="notif_download_content_text" translatable="true">Descărcare în progres…</string>
+    <string name="notif_download_failure_content" translatable="true">Descărcare nereușită. Încearcă din nou.</string>
+    <string name="notif_download_cancel_content" translatable="true">Descărcare anulată.</string>
+    <string name="notif_download_success_content" translatable="true">Descărcare reușită.</string>
+    <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Control Parental</string>
+    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blochează conținutul pentru adulți și piratat, website-uri de jocuri de noroc și întâlniri online, social-media.</string>
+    <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Intimitate</string>
+    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blochează attentionware, spyware, scareware.</string>
+    <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Securitate</string>
+    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blochează malware, ransomware, cryptoware, phishing și alte amenințări.</string>
+    <string name="rt_dialog_title" translatable="true">Salvează modificările</string>
+    <string name="rt_dialog_message" translatable="true">Dorești să aplici noua configurație a listelor de filtre?</string>
+    <string name="rt_dialog_neutral" translatable="true">Continuă</string>
+    <string name="rt_edit_dialog_positive" translatable="true">Editare</string>
+    <string name="rt_download_start" translatable="true">Se descarcă liste de filtre…</string>
+    <string name="rt_download" translatable="true">Descărcare liste de filtre</string>
+    <string name="rt_chip_update_available" translatable="true">Actualizare disponibilă</string>
+    <string name="rt_chip_check_update" translatable="true">Verifică pentru actualizare</string>
+    <string name="rt_re_download" translatable="true">Re-descărcare liste de filtre</string>
+    <string name="rt_list_simple_btn_txt" translatable="true">simplu</string>
+    <string name="lbl_advanced" translatable="true">avansat</string>
+    <string name="lbbs_enabled" translatable="true">Activată</string>
+    <string name="lbbs_configure" translatable="true">Configurează</string>
+    <string name="lbbs_copy" translatable="true">Copiază ca URL RDNS+</string>
+    <string name="lbbs_search" translatable="true">Caută domenii în lista de filtre</string>
+    <string name="lbbs_update_check" translatable="true">Verifică actualizări</string>
+    <string name="lbbs_redownload" translatable="true">Redescarcă listele de filtre</string>
+    <string name="lbbs_download" translatable="true">Actualizează listele de filtre</string>
+    <string name="brbs_title" translatable="true">Copie de rezervă și restaurare</string>
+    <string name="brbs_backup_title" translatable="true">Copie de rezervă</string>
+    <string name="brbs_backup_desc" translatable="true">Copie de rezervă a setărilor pentru aplicații, rețea si jurnale DNS</string>
+    <string name="brbs_restore_title" translatable="true">Restaurare</string>
+    <string name="brbs_restore_desc" translatable="true">Restaurare după copie de rezervă</string>
+    <string name="brbs_backup_dialog_title" translatable="true">Preia copia de rezervă</string>
+    <string name="brbs_backup_dialog_positive" translatable="true">Copie de rezervă</string>
+    <string name="brbs_restore_dialog_title" translatable="true">Restaurare copie de rezervă</string>
+    <string name="brbs_restore_dialog_message" translatable="true">Restaurează setările pentru aplicații, rețea, și jurnalele DNS dintr-un fișier copie de rezervă. Această acțiune va reporni aplicația.</string>
+    <string name="brbs_restore_dialog_positive" translatable="true">Restaurare</string>
+    <string name="brbs_backup_dialog_failure_title" translatable="true">Restaurare eșuată</string>
+    <string name="brbs_backup_dialog_failure_positive" translatable="true">Încearcă din nou copie de rezervă</string>
+    <string name="brbs_backup_dialog_failure_message" translatable="true">Nu s-a putut realiza copia de rezervă. Mai încerci o dată?</string>
+    <string name="radio_sky_btn" translatable="true">⛅ Sky</string>
+    <string name="rt_filter_hint" translatable="true">Se arată <u>toate</u> listele de filtre</string>
+    <string name="rt_filter_desc_subgroups" translatable="true">Se arată listele de filtre <u>%1$s</u>în grupul: %2$s și subgrupul: %3$s</string>
+    <string name="rethink_sky_desc" translatable="true">280+ locații; uptime ridicat; resolver stub rulând pe cloudflare.com</string>
+    <string name="rethink_max_desc" translatable="true">50+ locații; mai multă intimitate; resolver recursiv rulând pe fly.io</string>
+    <string name="dc_setting_dns_cache_heading" translatable="true">Booster DNS</string>
+    <string name="dc_setting_dns_cache_desc" translatable="true">Grupează cererile, memorează răspunsurile, rezolvă cu promptitudine erorile</string>
+    <string name="dc_refresh_toast" translatable="true">Reîmprospătare completă</string>
+    <string name="brbs_restore_dialog_failure_title" translatable="true">Restaurare nereușită</string>
+    <string name="brbs_restore_dialog_failure_message" translatable="true">Nu s-a putut efectua restaurarea. Mai încerci o dată?</string>
+    <string name="brbs_restore_dialog_failure_positive" translatable="true">Încearcă restaurarea încă o dată</string>
+    <string name="brbs_restore_complete_toast" translatable="true">Restaurare completă, se repornește aplicația…</string>
+    <string name="brbs_backup_complete_toast" translatable="true">Copie de rezervă reușită</string>
+    <string name="brbs_restore_no_uri_toast" translatable="true">Restaurare nereușită, încearcă din nou</string>
+    <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s liste de filtre</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">cele mai contactate țări</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">cele mai contactate domenii</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">cele mai blocate aplicații</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">cele mai permise aplicații</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">cele mai blocate domenii</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">cele mai contactate IP-uri</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">cele mai blocate IP-uri</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">cele mai blocate țări</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Pornește Rethink pentru a începe</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">Valoarea nu e validă</string>
+    <string name="bad_config_reason_invalid_number" translatable="true">Numărul nu e valid</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">Cheia nu e validă</string>
+    <string name="ssv_see_more" translatable="true">Arată-le pe toate</string>
+    <string name="bad_config_reason_missing_attribute" translatable="true">Atribut lipsă</string>
+    <string name="bad_config_reason_missing_section" translatable="true">Secțiune lipsă</string>
+    <string name="bad_config_reason_syntax_error" translatable="true">Eroare de sintaxă</string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true">Atribut necunoscut</string>
+    <string name="bad_config_reason_unknown_section" translatable="true">Secțiune necunoscută</string>
+    <string name="key_length_explanation_binary" translatable="true">: cheile WireGuard trebuie să fie pe 32 bytes</string>
+    <string name="key_length_explanation_hex" translatable="true">: cheile hex WireGuard trebuie să conțină 64 caractere (32 bytes)</string>
+    <string name="key_length_explanation_base64" translatable="true">: cheile base64 WireGuard trebuie să conțină 44 caractere (32 bytes)</string>
+    <string name="key_contents_error" translatable="true">Caracter incorect în cheie</string>
+    <string name="key_length_error" translatable="true">lungimea cheii nu este cea corectă</string>
+    <string name="parse_error_inet_address" translatable="true">Adresa IP</string>
+    <string name="parse_error_inet_endpoint" translatable="true">Endpoint</string>
+    <string name="parse_error_inet_network" translatable="true">Rețea IP</string>
+    <string name="bad_config_explanation_pka" translatable="true">: Trebuie sâ fie pozitiv și nu mai mare de 65535</string>
+    <string name="bad_config_explanation_positive_number" translatable="true">: Trebuie să fie pozitiv</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">: Trebuie să fie un număr de port UDP valid</string>
+    <string name="bad_config_context" translatable="true">%2$s %1$s</string>
+    <string name="bad_config_error" translatable="true">%1$s în %2$s</string>
+    <string name="generic_error" translatable="true">Eroare “%s” necunoscută</string>
+    <string name="parse_error_generic" translatable="true">șir</string>
+    <string name="parse_error_reason" translatable="true">Nu se poate analiza %1$s “%2$s”</string>
+    <string name="import_error" translatable="true">Tunelul nu poate fi importat: %s</string>
+    <string name="illegal_filename_error" translatable="true">Nume fișier incorect “%s”</string>
+    <string name="no_configs_error" translatable="true">Nici o configurație găsită</string>
+    <string name="bad_extension_error" translatable="true">Fișierul trebuie să fie .conf sau .zip</string>
+    <string name="setup_wireguard" translatable="true">Instalare WireGuard</string>
+    <string name="wireguard_description" translatable="true">WireGuard ca proxy.</string>
+    <string name="new_warp_config_desc" translatable="true">Obține configurația WARP de la server</string>
+    <string name="new_warp_error_toast" translatable="true">Nu se poate obține configurația WARP</string>
+    <string name="new_warp_invalid_config_toast" translatable="true">Configurația WARP nu e validă</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">Blocare</string>
+    <string name="one_wg_dialog_desc" translatable="true">Toate conexiunile, de la toate aplicațiile, inclusiv DNS, vor fi direcționate la o singură VPN WireGuard activă. Dacă există alte VPN WireGuard active, vor fi oprite.</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">Toate conexiunile și aplicațiile nedirecționate prin alte VPN WireGuard vor fi direcționate prin aceasta.</string>
+    <string name="one_wg_error_toast" translatable="true">Pentru a comuta la Avansate, oprește WireGuard în modul Simplu</string>
+    <string name="add_remove_apps" translatable="true">Adaugă / Elimină (%1$s aplicații)</string>
+    <string name="add_peer" translatable="true">Adaugă Pereche</string>
+    <string name="config_delete_dialog_desc" translatable="true">Sigur dorești să elimini această configurație VPN WireGuard?</string>
+    <string name="config_delete_dialog_title" translatable="true">Eliminare</string>
+    <string name="include_all_app_wg_dialog_title" translatable="true">Include toate aplicațiile</string>
+    <string name="config_add_success_toast" translatable="true">Gata</string>
+    <string name="include_all_app_wg_dialog_desc" translatable="true">Utilizezi această VPN WireGuard pentru toate aplicațiile?</string>
+    <string name="exclude_all_app_wg_dialog_title" translatable="true">Exclude toate aplicațiile</string>
+    <string name="exclude_all_app_wg_dialog_desc" translatable="true">Excluzi toate aplicațiile de la această VPN WireGuard?</string>
+    <string name="wireguard_enabled_failure" translatable="true">Împiedică alte proxy-uri active să activeze WireGuard</string>
+    <string name="wireguard_disable_failure" translatable="true">\"WireGuard Permanent\" nu poate fi închis</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">parte a %1$s</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">Include %1$s aplicații</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">Exclude %1$s aplicații</string>
+    <string name="bsrf_clear_filter" translatable="true">Elimină</string>
+    <string name="dc_local_block_enabled" translatable="true">Activat</string>
 </resources>
