@@ -62,7 +62,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         if (filter == bypassFilter) {
             return setOf(1)
         }
-        return setOf(0, 1)
+        return setOf() // empty set (as query uses or condition)
     }
 
     private fun allApps(searchString: String): LiveData<PagingData<AppInfo>> {
