@@ -35,8 +35,9 @@ import kotlinx.coroutines.withContext
 class NetLogBatcher<T, V>(
     private val tag: String,
     private val looper: CoroutineDispatcher,
+    private val batchSize: Int,
     private val processor: suspend (List<T>) -> Unit,
-    private val updator: suspend (List<V>) -> Unit = { _ -> }
+    private val updator: suspend (List<V>) -> Unit = { _ -> },
 ) {
     companion object {
         private const val DEBUG = true
@@ -49,8 +50,6 @@ class NetLogBatcher<T, V>(
     private val nsig = CoroutineName(tag + "Signal")
     private val ncons = CoroutineName(tag + "Consumer") // writes batches to db
     private val closed = AtomicBoolean(false)
-    // dispatch buffer to consumer if greater than batch size
-    private val batchSize = 20
 
     // no of batch-sized buffers to hold in a channel
     private val qsize = 2

@@ -69,6 +69,11 @@ internal constructor(
     private var rrBatcher: NetLogBatcher<RethinkLog, ConnectionSummary>? = null
     private var consoleLogBatcher: NetLogBatcher<ConsoleLog, Nothing>? = null
 
+    // dispatch buffer to consumer if greater than batch size for dns, ip and rr logs
+    private val logBatchSize = 20
+    // dispatch buffer to consumer if greater than batch size, for console logs
+    private val consoleLogBatchSize = 100
+
     // a single thread to run sig and batch co-routines in;
     // to avoid use of mutex/semaphores over shared-state
     // looper is never closed / cancelled and is always active
@@ -85,11 +90,12 @@ internal constructor(
         serializer("restart", looper) {
 
             // create new batchers on every new scope as their lifecycle is tied to the scope
-            val b1 = NetLogBatcher<DnsLog, Nothing>("dns", looper, dnsdb::insertBatch)
+            val b1 = NetLogBatcher<DnsLog, Nothing>("dns", looper, logBatchSize, dnsdb::insertBatch)
             val b2 =
                 NetLogBatcher<ConnectionTracker, ConnectionSummary>(
                     "ip",
                     looper,
+                    logBatchSize,
                     ipdb::insertBatch,
                     ipdb::updateBatch
                 )
@@ -97,11 +103,12 @@ internal constructor(
                 NetLogBatcher<RethinkLog, ConnectionSummary>(
                     "rr",
                     looper,
+                    logBatchSize,
                     ipdb::insertRethinkBatch,
                     ipdb::updateRethinkBatch
                 )
             val b4 =
-                NetLogBatcher<ConsoleLog, Nothing>("console", consoleLogLooper, consoleLogDb::insertBatch)
+                NetLogBatcher<ConsoleLog, Nothing>("console", consoleLogLooper, consoleLogBatchSize, consoleLogDb::insertBatch)
 
             b1.begin(s)
             b2.begin(s)
