@@ -543,7 +543,7 @@
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
                         android:padding="10dp"
-                        android:src="@drawable/bs_dns_home_screen" />
+                        android:src="@drawable/ic_dns_rules_as_firewall" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -793,11 +793,9 @@
                         android:id="@+id/dc_prevent_dns_leaks_img"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
                         android:layout_marginEnd="5dp"
-                        android:layout_marginBottom="5dp"
                         android:padding="10dp"
                         android:src="@drawable/ic_prevent_dns_leaks" />
 
@@ -856,7 +854,7 @@
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
                         android:padding="10dp"
-                        android:src="@drawable/ic_prevent_dns_leaks" />
+                        android:src="@drawable/ic_undelegated_domain" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
