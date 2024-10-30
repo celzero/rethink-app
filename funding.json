@@ -8,7 +8,7 @@
     "phone": "",
     "description": "Anti-censorship and Anti-surveillance tools for Android",
     "webpageUrl": {
-      "url": "https://celzero.com/"
+      "url": "https://github.com/celzero/rethink-app"
     }
   },
   "projects": [
@@ -17,7 +17,7 @@
       "name": "Rethink DNS + Firewall",
       "description": "Network security app for Android",
       "webpageUrl": {
-        "url": "https://rethinkdns.com/app"
+        "url": "https://github.com/celzero/rethink-app"
       },
       "repositoryUrl": {
         "url": "https://github.com/celzero/rethink-app"
@@ -36,59 +36,6 @@
         "anti-censorship",
         "privacy",
         "firewall"
-      ]
-    },
-    {
-      "guid": "serverless-dns",
-      "name": "Serverless DNS",
-      "description": "Content-blocking DoT, DoH resolver that deploys to Fly.io, Cloudflare Workers, Deno Deploy, and Fastly",
-      "webpageUrl": {
-        "url": "https://rethinkdns.com/"
-      },
-      "repositoryUrl": {
-        "url": "https://github.com/serverless-dns/serverless-dns"
-      },
-      "licenses": [
-        "spdx:MPL-2.0"
-      ],
-      "tags": [
-        "network-security",
-        "doh",
-        "dns",
-        "dot",
-        "cloudflare",
-        "vpn",
-        "anti-censorship",
-        "blocklists",
-        "adblocker",
-        "wireguard",
-        "dnscrypt"
-      ]
-    },
-    {
-      "guid": "firestack",
-      "name": "Firestack",
-      "description": "Userspace network monitor and proxifier with support for WireGuard",
-      "webpageUrl": {
-        "url": "https://github.com/celzero/firestack"
-      },
-      "repositoryUrl": {
-        "url": "https://github.com/celzero/firestack"
-      },
-      "licenses": [
-        "spdx:MPL-2.0"
-      ],
-      "tags": [
-        "network-security",
-        "doh",
-        "odoh",
-        "dot",
-        "dnscrypt",
-        "proxifier",
-        "socks5",
-        "anti-censorship",
-        "firewall",
-        "wireguard"
       ]
     }
   ],
@@ -164,7 +111,7 @@
         "guid": "compliments",
         "status": "active",
         "name": "Compliments",
-        "description": "My mom says, good deeds never go to waste.",
+        "description": "My mom says, good deeds never go waste.",
         "amount": 0,
         "currency": "USD",
         "frequency": "one-time",
@@ -179,6 +126,7 @@
         "year": 2023,
         "income": 4000,
         "expenses": 12000,
+        "taxes": 0,
         "currency": "USD",
         "description": "Rough estimate of costs incurred by the developers in keeping the lights on."
       }
