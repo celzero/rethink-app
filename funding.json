@@ -181,7 +181,7 @@
         "expenses": 12000,
         "currency": "USD",
         "description": "Rough estimate of costs incurred by the developers in keeping the lights on.",
-      },
+      }
     ]
   }
 }
