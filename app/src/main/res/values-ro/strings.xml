@@ -25,7 +25,7 @@
     <string name="lbl_active" translatable="true">Activ</string>
     <string name="lbl_inactive" translatable="true">Inactiv</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
-    <string name="lbl_slow" translatable="true">încet</string>
+    <string name="lbl_slow" translatable="true">lent</string>
     <string name="lbl_very" translatable="true">foarte</string>
     <string name="lbl_add" translatable="true">adaugă</string>
     <string name="lbl_app_wise" translatable="true">per aplicație</string>
@@ -61,7 +61,7 @@
     <string name="crypt_relay_netherlands" translatable="true">Releu DNS anonim găzduit în Olanda</string>
     <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
     <string name="lbl_apply" translatable="true">Aplică</string>
-    <string name="lbl_dismiss" translatable="true">Renuntă</string>
+    <string name="lbl_dismiss" translatable="true">Renunță</string>
     <string name="lbl_all" translatable="true">Toate</string>
     <string name="lbl_allowed" translatable="true">Permise</string>
     <string name="lbl_maybe_blocked" translatable="true">Posibil blocate</string>
