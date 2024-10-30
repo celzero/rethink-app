@@ -1,0 +1,187 @@
+{
+  "version": "v1.0.0",
+  "entity": {
+    "type": "organisation",
+    "role": "owner",
+    "name": "Celzero Pvt Ltd",
+    "email": "hello@celzero.com",
+    "phone": "",
+    "description": "Anti-censorship and Anti-surveillance tools for Android",
+    "webpageUrl": {
+      "url": "https://celzero.com/"
+    }
+  },
+  "projects": [
+    {
+      "guid": "rethink",
+      "name": "Rethink DNS + Firewall",
+      "description": "Network security app for Android",
+      "webpageUrl": {
+        "url": "https://rethinkdns.com/app"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/celzero/rethink-app"
+      },
+      "licenses": [
+        "spdx:Apache-2.0"
+      ],
+      "tags": [
+        "network-security",
+        "vpn",
+        "doh",
+        "dns",
+        "odoh",
+        "android",
+        "wireguard",
+        "anti-censorship",
+        "privacy",
+        "firewall"
+      ]
+    },
+    {
+      "guid": "serverless-dns",
+      "name": "Serverless DNS",
+      "description": "Content-blocking DoT, DoH resolver that deploys to Fly.io, Cloudflare Workers, Deno Deploy, and Fastly",
+      "webpageUrl": {
+        "url": "https://rethinkdns.com/"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/serverless-dns/serverless-dns"
+      },
+      "licenses": [
+        "spdx:MPL-2.0"
+      ],
+      "tags": [
+        "network-security",
+        "doh",
+        "dns",
+        "dot",
+        "cloudflare",
+        "vpn",
+        "anti-censorship",
+        "blocklists",
+        "adblocker",
+        "wireguard",
+        "dnscrypt"
+      ]
+    },
+    {
+      "guid": "firestack",
+      "name": "Firestack",
+      "description": "Userspace network monitor and proxifier with support for WireGuard",
+      "webpageUrl": {
+        "url": "https://github.com/celzero/firestack"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/celzero/firestack"
+      },
+      "licenses": [
+        "spdx:MPL-2.0"
+      ],
+      "tags": [
+        "network-security",
+        "doh",
+        "odoh",
+        "dot",
+        "dnscrypt",
+        "proxifier",
+        "socks5",
+        "anti-censorship",
+        "firewall",
+        "wireguard"
+      ]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "github",
+        "type": "payment-provider",
+        "address": "https://github.com/sponsors/serverless-dns",
+        "description": "via GitHub Sponsors"
+      },
+      {
+        "guid": "stripe",
+        "type": "payment-provider",
+        "address": "https://svc.rethinkdns.com/r/sponsor",
+        "description": "via the Stripe payment gateway"
+      }
+    ],
+    "plans": [
+      {
+        "guid": "onetime-devs",
+        "status": "active",
+        "name": "Support the developers",
+        "description": "Helps pay the bills of developers working full-time on Serverless DNS & Rethink DNS + Firewall projects.",
+        "amount": 10000,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": [
+          "github",
+          "stripe"
+        ]
+      },
+      {
+        "guid": "onetime-project",
+        "status": "active",
+        "name": "Public DoH, DoT, ODoH Resolvers",
+        "description": "Covers Rethink's public ODoH, DoH, and DoT resolvers costs for a year.",
+        "amount": 5000,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": [
+          "github",
+          "stripe"
+        ]
+      },
+      {
+        "guid": "monthly-100",
+        "status": "active",
+        "name": "Development & Maintainence",
+        "description": "Partially covers developing and maintaining Rethink DNS + Firewall & Serverless DNS projects for a month.",
+        "amount": 100,
+        "currency": "USD",
+        "frequency": "monthly",
+        "channels": [
+          "github",
+          "stripe"
+        ]
+      },
+      {
+        "guid": "monthly",
+        "status": "active",
+        "name": "Monthly",
+        "description": "Monthly sponsorship",
+        "amount": 1,
+        "currency": "USD",
+        "frequency": "monthly",
+        "channels": [
+          "github",
+          "stripe"
+        ]
+      },
+      {
+        "guid": "compliments",
+        "status": "active",
+        "name": "Compliments",
+        "description": "My mom says, good deeds never go to waste.",
+        "amount": 0,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": [
+          "github",
+          "stripe"
+        ]
+      }
+    ],
+    "history": [
+      {
+        "year": 2023,
+        "income": 4000,
+        "expenses": 12000,
+        "currency": "USD",
+        "description": "Rough estimate of costs incurred by the developers in keeping the lights on.",
+      },
+    ]
+  }
+}
