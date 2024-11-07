@@ -104,7 +104,7 @@
     <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s
 \n
 \n%2$s</string>
-    <string name="orbot_stop_dialog_message" translatable="true">RethinkDNS הפסיק להעביר חיבורים ל-Orbot, אבל ייתכן ש-Orbot פועל ברקע.</string>
+    <string name="orbot_stop_dialog_message" translatable="true">Rethink הפסיק להעביר חיבורים ל-Orbot, אבל ייתכן ש-Orbot פועל ברקע.</string>
     <string name="orbot_stop_dialog_dns_message" translatable="true">RethinkDNS מוגדר להעביר שאילתות DNS ל-Orbot. שנה לפי הצורך.</string>
     <string name="orbot_stop_dialog_negative" translatable="true">עצור את Orbot</string>
     <string name="orbot_stop_dialog_neutral" translatable="true">שנה DNS</string>
@@ -343,7 +343,7 @@
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
     <string name="configure_dns_connected_dns_proxy_status" translatable="true">פרוקסי DNS</string>
     <string name="configure_dns_connection_name" translatable="true">מחובר ל-%1$s</string>
-    <string name="configure_dns_connected_doh_status" translatable="true">DNS מעל HTTPS</string>
+    <string name="configure_dns_connected_doh_status" translatable="true">DNS דרך HTTPS</string>
     <string name="dns_crypt_relay_remove_dialog_title" translatable="true">האם למחוק את DNSCrypt?</string>
     <string name="search_firewall_all_apps" translatable="true"><font size="12">חפש אפליקציות באמצעות מזהה מיוחד,שם</font></string>
     <string name="info_dialog_rethink_toast_msg" translatable="true">הועתק ככתובת DNS-over-HTTPS של RDNS+</string>
@@ -515,7 +515,7 @@
     <string name="dc_dns_leaks_heading" translatable="true">מנע דליפות DNS</string>
     <string name="dc_check_update_heading" translatable="true">התרע על עדכונים לרשימות החסימה</string>
     <string name="dc_proxy_dns_heading" translatable="true">אף פעם אל תעביר DNS דרך פרוקסי</string>
-    <string name="dc_proxy_dns_desc" translatable="true">אל תעביר DNS דרך פרוקסי של WireGuard שפעיל תמיד, SOCKS5, HTTP.</string>
+    <string name="dc_proxy_dns_desc" translatable="true">אל תעביר DNS דרך פרוקסי WireGuard פעיל תמיד, SOCKS5, HTTP.</string>
     <string name="about_bravedns_explantion" translatable="true">Rethink היא הדרך הקלה ביותר לנטר את פעילות האפליקציות, לעקוף צנזורה באינטרנט, ולהציב חומת אש לאפליקציות במכשיר האנדרואיד שלך.</string>
     <string name="about_bravedns_whoarewe" translatable="true">RethinkDNS הוא פרויקט חינמי וקוד פתוח, בהובלת מהנדסים לשעבר מאמזון, IBM ו-Scientific Games.</string>
     <string name="about_bug_report" translatable="true">דוח שגיאות</string>
@@ -699,4 +699,5 @@
     <string name="fapps_firewall_filter_desc_category" translatable="true">אפליקציות מוצגות: <u>%1$s</u>%2$s בקטגוריות: %3$s</string>
     <string name="fapps_firewall_filter_desc" translatable="true">אפילקציות מוצגות: <u>%1$s</u>%2$s</string>
     <string name="update_complete_action_snack" translatable="true">הפעל מחדש</string>
+    <string name="intent_launch_error" translatable="true">לא יכל להפעיל %1$s</string>
 </resources>
