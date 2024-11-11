@@ -110,7 +110,7 @@
     <string name="lbl_on_device" translatable="true">pe dispozitiv</string>
     <string name="lbl_unselected" translatable="true">Neselectat</string>
     <string name="lbl_notification" translatable="true">notificare</string>
-    <string name="memory_notification_text">Rethink rulează cu memorie insuficientă. Operațiunile sistemului ar putea fi limitate.</string>
+    <string name="memory_notification_text">Rethink nu dispune de suficientă memorie. Operațiunile sistemului ar putea fi limitate.</string>
     <string name="slide_2_title" translatable="true">Bun venit</string>
     <string name="slide_2_desc" translatable="true">Rethink e cea mai ușoară cale pentru monitorizarea activității din rețea, ocolirea cenzurii pe internet și protejarea aplicațiilor pe dispozitivul tău Android.</string>
     <string name="slide_1_title" translatable="true">Gratuit și Open-Source</string>

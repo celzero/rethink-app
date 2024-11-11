@@ -991,4 +991,7 @@
     <string name="lbl_idle" translatable="true">Bezczynność</string>
     <string name="lbl_notification" translatable="true">powiadomienie</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Pod ochroną! Połączono z DNS + Firewall + Proxy.</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Usuń punkt końcowy DNS przez TLS z zapisanej konfiguracji.</string>
+    <string name="memory_notification_text">Rethink ma mało pamięci. Akcje systemowe mogą być ograniczone.</string>
+    <string name="failed_using_default" translatable="true">Niepowodzenie: użycie zapasowego DNS</string>
 </resources>
