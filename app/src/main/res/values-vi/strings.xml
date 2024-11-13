@@ -619,4 +619,6 @@
     <string name="cloudflare_dns_desc" translatable="true">Không chặn bất kỳ yêu cầu DNS nào. Sử dụng điểm cuối DNS 1.1.1.1 của Cloudflare.</string>
     <string name="ci_dialog_edittext_hint" translatable="true">Địa chỉ IP, mạng con hoặc cổng</string>
     <string name="ci_trust_initial" translatable="true">T</string>
+    <string name="lbl_listen_port" translatable="true">Cổng lắng</string>
+    <string name="lbl_preshared_key" translatable="true">khoá chia sẻ trước</string>
 </resources>
