@@ -14,8 +14,6 @@ In other words, Rethink DNS + Firewall has three primary modes, VPN, DNS, and Fi
 ![3](https://github.com/celzero/rethink-app/assets/56958445/c74f3485-7197-4e5b-860f-c2b11c556cee)
 ![4](https://github.com/celzero/rethink-app/assets/56958445/a2032d44-f07c-45e9-801b-7abe0cac0ead)
 ![5](https://github.com/celzero/rethink-app/assets/56958445/b9973e69-d45e-4be9-bd42-b80fb2768ec5)
-![6](https://github.com/celzero/rethink-app/assets/56958445/27a45c02-7046-41b1-89bb-7fe3624ed717)
-![7](https://github.com/celzero/rethink-app/assets/56958445/7246da25-6541-405e-b2a4-444dbb5c60f4)
 
 ### VPN / Proxifier
 Rethink supports forwarding TCP and UDP connections over SOCKS5, HTTP CONNECT, and WireGuard tunnels. Split-tunneling further helps run multiple such tunnels at the same time and lets users route different apps over different tunnels. For example, one could route Firefox over SOCKS5 connecting to Tor, Netflix over WireGuard connecting through any popular VPN provider, and Telegram or WhatsApp over censorship-resistant HTTP CONNECT endpoints at the same time.
@@ -101,12 +99,9 @@ We aren't there yet, may never will be but these are some tenets for the project
 - Practice what you preach: Be obsessively private and secure.
 
 ## Backstory
-[<img src="http://fossunited.org/files/fossunited-badge.svg"
+[<img src="https://fossunited.org/files/fossunited-white.svg"
      alt="FOSS United"
      height="40">](https://fossunited.org/grants)&emsp;
-[<img src="https://uploads-ssl.webflow.com/621553456a1d6199c3872a37/625d74f87ccfb1bacb0422c9_osomprivacy-p-800.png"
-     alt="OSOM Products Inc"
-     height="40">](https://osomprivacy.com/)&emsp;
 [<img src="https://rethinkdns.com/ico/moz-builders-2000x550.png"
      alt="Mozilla Builders"
      height="40">](https://builders.mozilla.community/old/alumni.html)&emsp;
