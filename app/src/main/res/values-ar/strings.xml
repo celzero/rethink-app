@@ -924,4 +924,16 @@
     <string name="crypt_relay_netherlands" translatable="true">Anonymized DNS relay hosted in Netherlands</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">اجعل الإشعار مستمرًا</string>
     <string name="lbl_listen_port" translatable="true">منفذ المراقبة</string>
+    <string name="lbl_overall" translatable="true">المجموع</string>
+    <string name="http_proxy_dialog_desc" translatable="true">إعداد عنوان URL للنموذج, &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Example: http://proxy.example.com:8080/</string>
+    <string name="lbl_include" translatable="true">يتضمن</string>
+    <string name="lbl_hour" translatable="true">ساعه</string>
+    <string name="lbl_preshared_key" translatable="true">مفتاح مشترك مسبق</string>
+    <string name="lbl_persistent_keepalive" translatable="true">الحفاظ على الاتصال يعمل</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">محمي بواسطه wireguard و اتصال dns خاص</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">احذف نقطه النهايه لDot</string>
+    <string name="lbl_cache" translatable="true">الذاكره المؤقتة</string>
+    <string name="lbl_unselected" translatable="true">الغاء تحديد</string>
+    <string name="lbl_idle" translatable="true">خامل</string>
+    <string name="lbl_split" translatable="true">منقسم</string>
 </resources>
