@@ -38,11 +38,12 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
@@ -80,14 +81,17 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     private var showBypassToolTip: Boolean = true
 
+    private var isRethinkApp: Boolean = false
+
     companion object {
-        const val UID_INTENT_NAME = "UID"
+        const val INTENT_UID = "UID"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        uid = intent.getIntExtra(UID_INTENT_NAME, INVALID_UID)
+        uid = intent.getIntExtra(INTENT_UID, INVALID_UID)
+        Logger.d(Logger.LOG_TAG_UI, "AppInfoActivity, intent uid: $uid")
         ipRulesViewModel.setUid(uid)
         domainRulesViewModel.setUid(uid)
         networkLogsViewModel.setUid(uid)
@@ -121,8 +125,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 this.appInfo = appInfo
 
                 b.aadAppDetailName.text = appName(packages.count())
+                b.aadPkgName.text = appInfo.packageName
                 b.excludeProxySwitch.isChecked = appInfo.isProxyExcluded
-                updateDataUsage()
+                displayDataUsage()
+                displayProxyStatus()
                 displayIcon(
                     Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
                     b.aadAppDetailIcon
@@ -130,21 +136,39 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
                 // do not show the firewall status if the app is Rethink
                 if (appInfo.packageName == rethinkPkgName) {
+                    isRethinkApp = true
                     b.aadFirewallStatus.visibility = View.GONE
                     hideFirewallStatusUi()
                     hideDomainBlockUi()
                     hideIpBlockUi()
-                    return@uiCtx
+                    hideBypassProxyUi()
+                    setRethinkDomainLogsAdapter()
+                    setRethinkIpLogsAdapter()
+                } else {
+                    updateFirewallStatusUi(appStatus, connStatus)
+                    setDomainsAdapter()
+                    setIpAdapter()
                 }
-                updateFirewallStatusUi(appStatus, connStatus)
-                setDomainsAdapter()
-                setIpAdapter()
             }
         }
     }
 
+    private fun displayProxyStatus() {
+        val proxy = ProxyManager.getProxyIdForApp(appInfo.uid)
+        if (proxy.isEmpty() || proxy == ID_NONE) {
+            b.aadProxyDetails.visibility = View.GONE
+            return
+        }
+        b.aadProxyDetails.visibility = View.VISIBLE
+        b.aadProxyDetails.text = getString(R.string.wireguard_apps_proxy_map_desc, proxy)
+    }
+
     private fun hideFirewallStatusUi() {
         b.aadAppSettingsCard.visibility = View.GONE
+    }
+
+    private fun hideBypassProxyUi() {
+        b.excludeProxyRl.visibility = View.GONE
     }
 
     private fun hideDomainBlockUi() {
@@ -174,7 +198,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         startActivity(intent)
     }
 
-    private fun updateDataUsage() {
+    private fun displayDataUsage() {
         val u = Utilities.humanReadableByteCount(appInfo.uploadBytes, true)
         val uploadBytes = getString(R.string.symbol_upload, u)
         val d = Utilities.humanReadableByteCount(appInfo.downloadBytes, true)
@@ -359,20 +383,20 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     private fun openAppWiseDomainLogsActivity() {
         val intent = Intent(this, AppWiseDomainLogsActivity::class.java)
-        intent.putExtra(UID_INTENT_NAME, uid)
+        intent.putExtra(INTENT_UID, uid)
         startActivity(intent)
     }
 
     private fun openAppWiseIpLogsActivity() {
         val intent = Intent(this, AppWiseIpLogsActivity::class.java)
-        intent.putExtra(UID_INTENT_NAME, uid)
+        intent.putExtra(INTENT_UID, uid)
         startActivity(intent)
     }
 
     private fun setDomainsAdapter() {
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedDomainRv.layoutManager = layoutManager
-        val adapter = AppWiseDomainsAdapter(this, this, uid)
+        val adapter = AppWiseDomainsAdapter(this, this, uid, isRethinkApp)
         networkLogsViewModel.getDomainLogsLimited(uid).observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -384,8 +408,53 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                     b.aadMostContactedDomainRl.visibility = View.GONE
                 } else {
                     b.aadMostContactedDomainRl.visibility = View.VISIBLE
-
                 }
+            } else {
+                b.aadMostContactedDomainRl.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun setRethinkDomainLogsAdapter() {
+        val layoutManager = LinearLayoutManager(this)
+        b.aadMostContactedDomainRv.layoutManager = layoutManager
+        val adapter = AppWiseDomainsAdapter(this, this, uid, isRethinkApp)
+        networkLogsViewModel.getRethinkDomainLogsLimited().observe(this) {
+            adapter.submitData(this.lifecycle, it)
+        }
+        b.aadMostContactedDomainRv.adapter = adapter
+
+        adapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (adapter.itemCount < 1) {
+                    b.aadMostContactedDomainRl.visibility = View.GONE
+                } else {
+                    b.aadMostContactedDomainRl.visibility = View.VISIBLE
+                }
+            } else {
+                b.aadMostContactedDomainRl.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun setRethinkIpLogsAdapter() {
+        val layoutManager = LinearLayoutManager(this)
+        b.aadMostContactedIpsRv.layoutManager = layoutManager
+        val adapter = AppWiseIpsAdapter(this, this, uid, isRethinkApp)
+        networkLogsViewModel.getRethinkIpLogsLimited().observe(this) {
+            adapter.submitData(this.lifecycle, it)
+        }
+        b.aadMostContactedIpsRv.adapter = adapter
+
+        adapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (adapter.itemCount < 1) {
+                    b.aadMostContactedIpsRl.visibility = View.GONE
+                } else {
+                    b.aadMostContactedIpsRl.visibility = View.VISIBLE
+                }
+            } else {
+                b.aadMostContactedIpsRl.visibility = View.VISIBLE
             }
         }
     }
@@ -394,7 +463,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         b.aadMostContactedIpsRv.setHasFixedSize(true)
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedIpsRv.layoutManager = layoutManager
-        val adapter = AppWiseIpsAdapter(this, this, uid)
+        val adapter = AppWiseIpsAdapter(this, this, uid, isRethinkApp)
         networkLogsViewModel.getIpLogsLimited(uid).observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -407,6 +476,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 } else {
                     b.aadMostContactedIpsRl.visibility = View.VISIBLE
                 }
+            } else {
+                b.aadMostContactedIpsRl.visibility = View.VISIBLE
             }
         }
     }

@@ -11,13 +11,13 @@
         android:alpha="0.2"
         android:background="?attr/primaryLightColorText" />
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/custom_ip_app_name_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
+        android:layout_marginTop="10dp"
         android:padding="10dp">
 
         <ImageView
@@ -35,10 +35,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/custom_ip_app_icon_iv"
+            android:layout_toStartOf="@id/custom_ip_see_more_chip"
             android:padding="5dp"
             android:textColor="?attr/secondaryTextColor"
             android:textSize="@dimen/extra_large_font_text_view" />
-    </LinearLayout>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/custom_ip_see_more_chip"
+            style="@style/ThinnerChip.Action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:layout_gravity="end"
+            android:layout_marginEnd="10dp"
+            android:text="@string/ssv_see_more"
+            android:textColor="?attr/chipTextPositive"
+            android:textSize="@dimen/large_font_text_view"
+            android:visibility="visible"
+            app:chipBackgroundColor="?attr/chipBgColorPositive"
+            app:chipSurfaceColor="@null" />
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/custom_ip_container"
@@ -47,11 +65,21 @@
         android:layout_below="@id/custom_ip_app_name_container"
         android:padding="5dp">
 
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/custom_ip_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:visibility="gone" />
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/custom_ip_flag"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_alignParentStart="true"
+            android:layout_toEndOf="@id/custom_ip_checkbox"
             android:layout_centerVertical="true"
             android:alpha="0.75"
             android:gravity="center"

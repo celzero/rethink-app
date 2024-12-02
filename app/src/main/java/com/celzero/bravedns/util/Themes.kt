@@ -26,7 +26,7 @@ enum class Themes(val id: Int) {
 
     companion object {
         fun getThemeCount(): Int {
-            return values().count()
+            return entries.count()
         }
 
         fun getTheme(id: Int): Int {
