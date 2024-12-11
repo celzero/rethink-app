@@ -482,8 +482,7 @@
     <string name="settings_check_update_desc">Uygulama güncellemelerini haftada bir otomatik olarak kontrol edin.</string>
     <string name="settings_dns_proxy_dialog_header">SOCKS5 Vekili Ayarla</string>
     <string name="settings_theme_dialog_title">Görünüm</string>
-    <string name="settings_ip_dialog_ipv46">Otomatik (deneysel)
-\nbağlantı kontrolleri erişilebilirlik tespitine gönderildi.</string>
+    <string name="settings_ip_dialog_ipv46">Otomatik (deneysel)</string>
     <string name="firewall_status_isolate">izole edilmiş</string>
     <string name="lbl_proceed">Devam Et</string>
     <string name="about_website">rethinkdns.com adresini ziyaret edin</string>
@@ -594,7 +593,7 @@
     <string name="download_update_dialog_message">Uygulamanın yeni sürümü web sitesinden indirilebilir. Devam etmek istiyor musunuz\?</string>
     <string name="download_update_dialog_message_ok">Zaten en son sürümü kullanıyorsunuz.</string>
     <string name="info_dialog_url_copy_toast_msg">URL kopyalandı</string>
-    <string name="whats_new_version_update">&lt;b&gt;Azami çaba&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Daha özel bir Rethink çözümleyicisinin tanıtımı, &lt;i&gt;Max&lt;/i&gt;.&lt;br/&gt; 2. IPv6\'yı deneysel olarak işaretleyin; varsayılan olarak IPv4\'e geçin.&lt;br/&gt; 3. &lt;i&gt;Yeni özellik&lt;/i&gt;: Uygulama ayarlarını yedekleme ve geri yükleme.&lt;br/&gt; 4. &lt;i&gt;Yeni özellik&lt;/i&gt;: Uygulama kilitleme modu.&lt;br/&gt; 5. &lt;i&gt;Yeni özellik&lt;/i&gt;: Evrensel kilitleme modu.&lt;br/&gt; 6. &lt;i&gt;Yeni özellik&lt;/i&gt;: Bağlantı noktası numaralarına güvenlik duvarı kuralları uygulayın.&lt;br/&gt; 7. &lt;i&gt;Yeni özellik&lt;/i&gt;: Uygulama güvenlik duvarı kurallarını toplu olarak uygulayın.&lt;br/&gt; 8. Küçük kullanıcı arayüzü yenilemesi.&lt;br/&gt; 9. Diğer bellek ve çökme düzeltmeleri.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Bu uygulamanın çevrilmesine yardımcı olun.&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Azami çaba&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Yeni: Kullanıcı hata raporlarında ağ motoru hatalarını yakalayın.&lt;i&gt;Maksimum&lt;/i&gt;.&lt;br/&gt;2. Yeni: \"DNS sızıntılarını engelle\" seçeneği açık olduğunda, delegelenmemiş alan adları için Sistem DNS\'ini kullanma.&lt;br/&gt; 3. Geliştirme: İkili yığın (IPv4 + IPv6) WireGuard bağlantısı.&lt;br/&gt; 4. Geliştirme: Ağ motoru yanıt vermediğinde arayüz öğelerinin engellenmesini önleme.&lt;br/&gt; 5. Düzeltme: Gelişmiş DNS filtreleme açıkken bağlantı zaman aşımı sorunları.&lt;br/&gt; 6. Düzeltme: Domain adlarına sahip WireGuard peer uç noktaları, ağ değişikliklerinde donuyor.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Bu uygulamanın çevirisine yardımcı olun&lt;/a&gt;</string>
     <string name="settings_ip_network_desc">İnternet Protokolü sürümleri arasından seçim yapın.</string>
     <string name="orbot_http">HTTP Vekili</string>
     <string name="orbot_bs_status_2">HTTP Vekili ayarlandı.</string>
@@ -1021,4 +1020,24 @@
     <string name="wg_apps_dialog_title_include" translatable="true">%1$s uygulamaları dahil et</string>
     <string name="wg_apps_dialog_title_exclude" translatable="true">%1$s uygulamaları hariç tut</string>
     <string name="wireguard_disable_message" translatable="true">Bütün aktif WireGuard VPNleri durdurulsun mu?</string>
+    <string name="lbl_idle" translatable="true">Boşta</string>
+    <string name="lbl_split" translatable="true">Böl</string>
+    <string name="lbl_on_device" translatable="true">Cihazda</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Koruma sağlandı! DNS + Güvenlik Duvarı + Proxy\'e bağlı.</string>
+    <string name="settings_connectivity_checks" translatable="true">Bağlantı kontrollerini gerçekleştir</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Devre dışı bırakıldığında, Rethink\'in VPN tünelinden proxy (SOCKS5, HTTP, DNS) yönlendirme uygulamaları hariç tutulur.</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">%1$s\'i devre dışı bırak</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> bağlantı kaybına neden olabilir. Rethink\'in arka planda veri ve diğer kaynakları kullanabilmesi için ayarı değiştirin.</string>
+    <string name="dc_proxy_dns_heading" translatable="true">DNS\'i asla proxy üzerinden yönlendirme</string>
+    <string name="dc_proxy_dns_desc" translatable="true">Her Zaman Açık WireGuard, SOCKS5, HTTP proxy\'leri üzerinden DNS proxy\'si oluşturmayın.</string>
+    <string name="lbl_notification" translatable="true">bildirim</string>
+    <string name="memory_notification_text">Rethink düşük bellekle çalışıyor. Sistem eylemleri sınırlı olabilir.</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback proxy yönlendirme uygulamaları</string>
+    <string name="lbl_background_data" translatable="true">Arka plan verilerini kısıtlama</string>
+    <string name="lbl_battery_optimization" translatable="true">Pil optimizasyonu</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">Bağlantı kontrolleri, erişilebilirliği doğrulamak için gönderilir.</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s, proxy\'ler aktif olduğu için devre dışı bırakıldı.</string>
+    <string name="lbl_unselected" translatable="true">Seçilmemiş</string>
+    <string name="exclude_apps_from_proxy">Uygulamayı tüm proxy\'lerden hariç tut</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Bu uygulama proxy\'leri atlar (bypass)</string>
 </resources>
