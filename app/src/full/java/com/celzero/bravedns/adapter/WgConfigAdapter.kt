@@ -43,11 +43,13 @@ import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
+import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.wireguard.WgInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -130,8 +132,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             if (config.isLockdown) {
                 b.protocolInfoChipGroup.visibility = View.GONE
                 b.interfaceActiveLayout.visibility = View.GONE
-                b.interfaceStatus.text =
-                    context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
+                b.interfaceStatus.visibility = View.GONE
                 val id = ProxyManager.ID_WG_BASE + config.id
                 val appsCount = ProxyManager.getAppCountForProxy(id)
                 updateUi(config, appsCount)
@@ -233,7 +234,28 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 updateUi(config, appsCount)
                 updateProtocolChip(pair)
                 updateSplitTunnelChip(isSplitTunnel)
+                updateAmneziaChip(config)
             }
+        }
+
+        private fun updateAmneziaChip(config: WgConfigFiles) {
+            val c = WireguardManager.getConfigById(config.id) ?: return
+
+            c.getInterface()?.let {
+                if (isAmneziaConfig(it)) {
+                    b.chipAmnezia.visibility = View.VISIBLE
+                } else {
+                    b.chipAmnezia.visibility = View.GONE
+                }
+            }
+        }
+
+        private fun isAmneziaConfig(c: WgInterface): Boolean {
+            // TODO: should we add more checks here?
+            // consider the config values jc, jmin, jmax, h1, h2, h3, h4, s1, s2
+            return c.getJc().isPresent || c.getJmin().isPresent || c.getJmax().isPresent ||
+                    c.getH1().isPresent || c.getH2().isPresent || c.getH3().isPresent ||
+                    c.getH4().isPresent || c.getS1().isPresent || c.getS2().isPresent
         }
 
         private fun updateUi(config: WgConfigFiles, appsCount: Int) {
@@ -326,9 +348,9 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
         private fun getStrokeColorForStatus(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
             return when (status) {
-                UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) R.attr.chipTextNeutral else R.attr.accentGood
-                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
-                else -> R.attr.chipTextNegative
+                UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) return R.attr.chipTextNeutral else R.attr.accentGood
+                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ -> R.attr.chipTextNeutral
+                else -> R.attr.chipTextNegative // TNT, TKO, TEND
             }
         }
 
@@ -353,7 +375,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         private fun getIdleStatusText(status: UIUtils.ProxyStatus?, stats: RouterStats?): String {
             if (status != UIUtils.ProxyStatus.TZZ && status != UIUtils.ProxyStatus.TNT) return ""
             if (stats == null || stats.lastOK == 0L) return ""
-            if (System.currentTimeMillis() - stats.lastOK >= 30 * DateUtils.SECOND_IN_MILLIS) return ""
+            if (System.currentTimeMillis() - stats.lastOK >= WG_HANDSHAKE_TIMEOUT) return ""
 
             return context.getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
         }
@@ -412,7 +434,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             if (stats == null) {
                 return ""
             }
-            if (stats.lastOK == 0L) {
+            if (stats.lastOK <= 0L) {
                 return ""
             }
             val now = System.currentTimeMillis()
@@ -470,7 +492,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 }
             }
 
-            WireguardManager.disableConfig(cfg)
             uiCtx { listener.onDnsStatusChanged() }
         }
 

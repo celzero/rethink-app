@@ -42,6 +42,7 @@ import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
+import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
@@ -65,7 +66,6 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
     companion object {
         private const val ONE_SEC = 1500L
-
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
 
@@ -258,8 +258,8 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         private fun getStrokeColorForStatus(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int{
             return when (status) {
                 UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) R.attr.chipTextNeutral else R.attr.accentGood
-                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
-                else -> R.attr.chipTextNegative
+                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ -> R.attr.chipTextNeutral
+                else -> R.attr.chipTextNegative // TNT, TKO, TEND
             }
         }
 
@@ -278,7 +278,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         private fun getIdleStatusText(status: UIUtils.ProxyStatus?, stats: RouterStats?): String {
             if (status != UIUtils.ProxyStatus.TZZ && status != UIUtils.ProxyStatus.TNT) return ""
             if (stats == null || stats.lastOK == 0L) return ""
-            if (System.currentTimeMillis() - stats.lastOK >= 30 * DateUtils.SECOND_IN_MILLIS) return ""
+            if (System.currentTimeMillis() - stats.lastOK >= WG_HANDSHAKE_TIMEOUT) return ""
 
             return context.getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
         }
