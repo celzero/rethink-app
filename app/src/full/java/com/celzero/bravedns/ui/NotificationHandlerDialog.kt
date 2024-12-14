@@ -26,6 +26,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.activity.AppInfoActivity
+import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.INTENT_UID
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.util.Constants
@@ -34,8 +36,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class NotificationHandlerDialog : AppCompatActivity() {
     enum class TrampolineType {
         ACCESSIBILITY_SERVICE_FAILURE_DIALOG,
-        NEW_APP_INSTAL_DIALOG,
-        HOMESCREEN_ACTIVITY,
+        NEW_APP_INSTALL_DIALOG,
+        HOME_SCREEN_ACTIVITY,
         PAUSE_ACTIVITY,
         NONE
     }
@@ -55,12 +57,12 @@ class NotificationHandlerDialog : AppCompatActivity() {
     private fun handleNotificationIntent(intent: Intent) {
         // app not started launch home screen
         if (!VpnController.isOn()) {
-            trampoline(TrampolineType.NONE)
+            trampoline(TrampolineType.NONE, intent)
             return
         }
 
         if (VpnController.isAppPaused()) {
-            trampoline(TrampolineType.PAUSE_ACTIVITY)
+            trampoline(TrampolineType.PAUSE_ACTIVITY, intent)
             return
         }
 
@@ -68,28 +70,28 @@ class NotificationHandlerDialog : AppCompatActivity() {
             if (isAccessibilityIntent(intent)) {
                 TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG
             } else if (isNewAppInstalledIntent(intent)) {
-                TrampolineType.NEW_APP_INSTAL_DIALOG
+                TrampolineType.NEW_APP_INSTALL_DIALOG
             } else {
                 TrampolineType.NONE
             }
-        trampoline(t)
+        trampoline(t, intent)
     }
 
-    private fun trampoline(trampolineType: TrampolineType) {
+    private fun trampoline(trampolineType: TrampolineType, intent: Intent) {
         Logger.i(LOG_TAG_VPN, "act on notification, notification type: $trampolineType")
         when (trampolineType) {
             TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG -> {
                 handleAccessibilitySettings()
             }
-            TrampolineType.NEW_APP_INSTAL_DIALOG -> {
+            TrampolineType.NEW_APP_INSTALL_DIALOG -> {
                 // navigate to all apps screen
-                launchFirewallActivityAndFinish()
+                launchFirewallActivityAndFinish(intent)
             }
-            TrampolineType.HOMESCREEN_ACTIVITY -> {
+            TrampolineType.HOME_SCREEN_ACTIVITY -> {
                 launchHomeScreenAndFinish()
             }
             TrampolineType.PAUSE_ACTIVITY -> {
-                showAppPauseDialog(trampolineType)
+                showAppPauseDialog(trampolineType, intent)
             }
             TrampolineType.NONE -> {
                 launchHomeScreenAndFinish()
@@ -102,11 +104,19 @@ class NotificationHandlerDialog : AppCompatActivity() {
         finish()
     }
 
-    private fun launchFirewallActivityAndFinish() {
-        val intent = Intent(this, AppListActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-        startActivity(intent)
-        finish()
+    private fun launchFirewallActivityAndFinish(recvIntent: Intent) {
+        val uid = recvIntent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, Int.MIN_VALUE)
+        Logger.d(LOG_TAG_VPN, "notification intent - new app installed, uid: $uid")
+        if (uid > 0) {
+            val intent = Intent(this, AppInfoActivity::class.java)
+            intent.putExtra(INTENT_UID, uid)
+            startActivity(intent)
+            finish()
+        } else {
+            val intent = Intent(this, AppListActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun handleAccessibilitySettings() {
@@ -131,7 +141,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
         ContextCompat.startActivity(context, intent, null)
     }
 
-    private fun showAppPauseDialog(trampolineType: TrampolineType) {
+    private fun showAppPauseDialog(trampolineType: TrampolineType, intent: Intent) {
         val builder = MaterialAlertDialogBuilder(this)
 
         builder.setTitle(R.string.notif_dialog_pause_dialog_title)
@@ -141,7 +151,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
         builder.setPositiveButton(R.string.notif_dialog_pause_dialog_positive) { _, _ ->
             VpnController.resumeApp()
 
-            trampoline(trampolineType)
+            trampoline(trampolineType, intent)
         }
 
         builder.setNegativeButton(R.string.notif_dialog_pause_dialog_negative) { _, _ -> finish() }

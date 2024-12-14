@@ -35,11 +35,14 @@ class CustomDomain {
     override fun equals(other: Any?): Boolean {
         if (other !is CustomDomain) return false
         if (domain != other.domain) return false
+        if (status != other.status) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.domain.hashCode()
+        var result = this.domain.hashCode()
+        result += result * 31 + this.status
+        return result
     }
 
     constructor(values: ContentValues?) {
@@ -81,10 +84,10 @@ class CustomDomain {
     }
 
     companion object {
-        private const val currentVersion: Long = 1L
+        private const val CURRENT_VERSION: Long = 1L
 
         fun getCurrentVersion(): Long {
-            return currentVersion
+            return CURRENT_VERSION
         }
     }
 

@@ -17,7 +17,6 @@ package com.celzero.bravedns.database
 
 import Logger
 import android.content.Context
-import android.content.pm.PackageInfo
 import android.database.Cursor
 import android.database.sqlite.SQLiteException
 import androidx.room.Database
@@ -31,7 +30,7 @@ import com.celzero.bravedns.util.Utilities
 
 @Database(
     entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class],
-    version = 7,
+    version = 10,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -68,6 +67,9 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_4_5)
                 .addMigrations(MIGRATION_5_6)
                 .addMigrations(MIGRATION_6_7)
+                .addMigrations(MIGRATION_7_8)
+                .addMigrations(Migration_8_9)
+                .addMigrations(Migration_9_10)
                 .fallbackToDestructiveMigration() // recreate the database if no migration is found
                 .build()
         }
@@ -262,6 +264,29 @@ abstract class LogDatabase : RoomDatabase() {
                     )
                 }
             }
+
+        private val MIGRATION_7_8: Migration =
+            object : Migration(7, 8) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    // add a new column region to DNS log table with default as empty string
+                    db.execSQL(
+                        "ALTER TABLE DnsLogs ADD COLUMN region TEXT DEFAULT '' NOT NULL"
+                    )
+                }
+            }
+
+        private val Migration_8_9: Migration = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_ConnectionTracker_connId ON ConnectionTracker(connId)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_RethinkLog_connId ON RethinkLog(connId)")
+            }
+        }
+
+        private val Migration_9_10: Migration = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_ConnectionTracker_proxyDetails ON ConnectionTracker(proxyDetails)")
+            }
+        }
     }
 
     fun checkPoint() {

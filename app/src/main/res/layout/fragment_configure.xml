@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:background="?attr/background"
     android:fillViewport="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingBottom="60dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -63,17 +64,19 @@
                     android:layout_centerInParent="true"
                     android:src="@drawable/ic_app_info_accent" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/fs_apps_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:layout_toEndOf="@id/fs_apps_icon"
+                    android:layout_toStartOf="@id/fs_apps_iv"
                     android:text="@string/apps_info_title"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="16sp" />
 
                 <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/fs_apps_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -104,17 +107,19 @@
                     android:layout_centerInParent="true"
                     android:src="@drawable/dns_home_screen" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/fs_dns_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:layout_toEndOf="@id/fs_dns_icon"
+                    android:layout_toStartOf="@id/fs_dns_iv"
                     android:text="@string/dns_mode_info_title"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="16sp" />
 
                 <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/fs_dns_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -318,17 +323,62 @@
                     android:layout_centerInParent="true"
                     android:src="@drawable/ic_logs_accent" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/fs_logs_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:layout_toEndOf="@id/fs_logs_icon"
+                    android:layout_toStartOf="@id/fs_logs_iv"
                     android:text="@string/lbl_logs"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="16sp" />
 
                 <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/fs_logs_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_right_arrow_white" />
+            </RelativeLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/fs_advanced_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/fs_advanced_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:alpha="0.8"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_advanced_settings" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fs_advanced_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_toStartOf="@id/fs_advanced_iv"
+                    android:layout_toEndOf="@id/fs_advanced_icon"
+                    android:text="@string/lbl_advanced"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="16sp" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/fs_advanced_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
