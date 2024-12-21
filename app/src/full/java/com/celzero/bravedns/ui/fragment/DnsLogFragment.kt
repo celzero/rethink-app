@@ -131,10 +131,8 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
 
         val recyclerAdapter = DnsQueryAdapter(requireContext(), persistentState.fetchFavIcon)
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.dnsLogsList.observe(viewLifecycleOwner) {
-                    recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
-                }
+            viewModel.dnsLogsList.observe(viewLifecycleOwner) {
+                recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
             }
         }
         b.recyclerQuery.adapter = recyclerAdapter

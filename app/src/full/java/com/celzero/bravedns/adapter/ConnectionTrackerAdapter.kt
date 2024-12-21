@@ -90,14 +90,31 @@ class ConnectionTrackerAdapter(private val context: Context) :
     }
 
     override fun onBindViewHolder(holder: ConnectionTrackerViewHolder, position: Int) {
-        val connTracker: ConnectionTracker = getItem(position) ?: return
+        val connTracker: ConnectionTracker? = getItem(position)
 
+        if (connTracker == null) {
+            holder.clear()
+            return
+        }
         holder.update(connTracker)
         holder.setTag(connTracker)
     }
 
     inner class ConnectionTrackerViewHolder(private val b: ConnectionTransactionRowBinding) :
         RecyclerView.ViewHolder(b.root) {
+
+        fun clear() {
+            b.connectionResponseTime.text = ""
+            b.connectionFlag.text = ""
+            b.connectionIpAddress.text = ""
+            b.connectionDomain.text = ""
+            b.connectionAppName.text = ""
+            b.connectionAppIcon.setImageDrawable(null)
+            b.connectionDataUsage.text = ""
+            b.connectionDelay.text = ""
+            b.connectionStatusIndicator.visibility = View.INVISIBLE
+            b.connectionSummaryLl.visibility = View.GONE
+        }
 
         fun update(connTracker: ConnectionTracker) {
             displayTransactionDetails(connTracker)

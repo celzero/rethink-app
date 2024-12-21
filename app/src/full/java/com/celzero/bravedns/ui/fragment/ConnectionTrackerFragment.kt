@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -135,19 +136,19 @@ class ConnectionTrackerFragment :
     private fun setupRecyclerView() {
         b.recyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(requireContext())
+        (layoutManager as LinearLayoutManager).isItemPrefetchEnabled = true
         b.recyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
-        recyclerAdapter.stateRestorationPolicy =
-            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.connectionTrackerList.observe(viewLifecycleOwner) { pagingData ->
-                    recyclerAdapter.submitData(lifecycle, pagingData)
-                }
-            }
+        recyclerAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT
+        viewModel.connectionTrackerList.observe(viewLifecycleOwner) { pagingData ->
+            val currentSnapshot = recyclerAdapter.snapshot()
+            recyclerAdapter.submitData(lifecycle, pagingData)
         }
-        recyclerAdapter.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
+        if (recyclerAdapter.itemCount > 0) {
+            recyclerAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+        }
+        recyclerAdapter.addLoadStateListener { loadState ->
+            if (loadState.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
                     if (fromUniversalFirewallScreen || fromWireGuardScreen) {
                         b.connectionListLogsDisabledTv.text = getString(R.string.ada_ip_no_connection)

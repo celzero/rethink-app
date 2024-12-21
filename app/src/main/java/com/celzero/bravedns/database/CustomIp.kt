@@ -61,9 +61,12 @@ class CustomIp {
         return result
     }
 
-    fun getCustomIpAddress(): Pair<IPAddress, Int> {
-        val ip = IPAddressString(ipAddress).address
-        val port = port
-        return Pair(ip, port)
+    fun getCustomIpAddress(): Pair<IPAddress, Int>? {
+        try {
+            val ip = IPAddressString(ipAddress).address
+            return Pair(ip, port)
+        } catch (e: Exception) {
+            return null
+        }
     }
 }

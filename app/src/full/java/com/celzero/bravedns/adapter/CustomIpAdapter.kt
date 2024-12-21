@@ -469,13 +469,13 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         private fun updateFlagIfAvailable(ip: CustomIp) {
             if (ip.wildcard) return
 
-            b.customIpFlag.text =
-                getFlag(
-                    getCountryCode(
-                        IPAddressString(ip.ipAddress).hostAddress.toInetAddress(),
-                        context
-                    )
-                )
+            val inetAddr = try {
+                IPAddressString(ip.ipAddress).hostAddress.toInetAddress()
+            } catch (e: Exception) {
+                null // invalid ip
+            }
+
+            b.customIpFlag.text = getFlag(getCountryCode(inetAddr, context))
         }
 
         private fun toggleActionsUi() {
@@ -719,13 +719,13 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         private fun updateFlagIfAvailable(ip: CustomIp) {
             if (ip.wildcard) return
 
-            b.customIpFlag.text =
-                getFlag(
-                    getCountryCode(
-                        IPAddressString(ip.ipAddress).hostAddress.toInetAddress(),
-                        context
-                    )
-                )
+            val inetAddr = try {
+                IPAddressString(ip.ipAddress).hostAddress.toInetAddress()
+            } catch (e: Exception) {
+                null // invalid ip
+            }
+
+            b.customIpFlag.text = getFlag(getCountryCode(inetAddr, context))
         }
 
         private fun toggleActionsUi() {
