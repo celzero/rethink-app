@@ -29,7 +29,7 @@ import com.celzero.bravedns.databinding.ActivityAntiCensorshipBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastS
+import com.celzero.bravedns.util.Utilities.isOsVersionAbove412
 import org.koin.android.ext.android.inject
 import settings.Settings
 
@@ -41,6 +41,10 @@ class AntiCensorshipActivity : AppCompatActivity(R.layout.activity_anti_censorsh
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
                 Configuration.UI_MODE_NIGHT_YES
+    }
+
+    companion object {
+        private const val DESYNC_SUPPORTED_VERSION = "4.12"
     }
 
     enum class DialStrategies(val mode: Int) {
@@ -70,8 +74,8 @@ class AntiCensorshipActivity : AppCompatActivity(R.layout.activity_anti_censorsh
     }
 
     private fun updateDialStrategy(selectedState: Int) {
-        if (!isAtleastS()) {
-            // desync is not supported in Android 11 and below versions
+        if (!isOsVersionAbove412(DESYNC_SUPPORTED_VERSION)) {
+            // desync is not supported for os version below 4.12
             // so reset the dial strategy to split auto if desync is selected
             if (selectedState == DialStrategies.DESYNC.mode) {
                 persistentState.dialStrategy = DialStrategies.SPLIT_AUTO.mode
