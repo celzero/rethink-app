@@ -98,7 +98,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
         updateVersionInfo()
 
-        b.sponsorInfoUsage.text = getSponsorInfo()
+        updateSponsorInfo()
 
         b.aboutSponsor.setOnClickListener(this)
         b.aboutWebsite.setOnClickListener(this)
@@ -152,6 +152,16 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         }
     }
 
+    private fun updateSponsorInfo() {
+        if (persistentState.enableWarp) {
+            b.sponsorInfoUsage.visibility = View.GONE
+            b.aboutSponsor.visibility = View.GONE
+            return
+        }
+
+        b.sponsorInfoUsage.text = getSponsorInfo()
+    }
+
     private fun getVersionName(): String {
         val pInfo: PackageInfo? =
             Utilities.getPackageMetadata(
@@ -170,7 +180,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         val days = (timeDiff / (1000 * 60 * 60 * 24)).toDouble()
         val month = days / 30
         val amount = month * (0.60 + 0.20)
-        val msg = "You’ve been using Rethink for ${days.toInt()} days, which translates to a usage cost of ${"%.2f".format(amount)}$."
+        val msg = getString(
+            R.string.sponser_dialog_usage_msg,
+            days.toInt().toString(),
+            "%.2f".format(amount)
+        )
         return msg
     }
 
