@@ -110,7 +110,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcUndelegatedDomainsSwitch.isChecked = persistentState.useSystemDnsForUndelegatedDomains
         b.connectedStatusTitle.text = getConnectedDnsType()
         b.dvBypassDnsBlockSwitch.isChecked = persistentState.bypassBlockInDns
-        updateSpiltDnsUi()
+        showSplitDnsUi()
     }
 
     private fun updateLocalBlocklistUi() {
@@ -150,7 +150,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         }
     }
 
-    private fun updateSpiltDnsUi() {
+    private fun showSplitDnsUi() {
         if (persistentState.enableDnsAlg) {
             b.dcSplitDnsRl.visibility = View.VISIBLE
             b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
@@ -158,6 +158,15 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             b.dcSplitDnsRl.visibility = View.GONE
             b.dcSplitDnsSwitch.isChecked = false
         }
+    }
+
+    private fun updateSpiltDns() {
+        if (persistentState.enableDnsAlg) {
+            persistentState.splitDns = persistentState.splitDns
+        } else {
+            persistentState.splitDns = false
+        }
+        showSplitDnsUi()
     }
 
     private fun updateConnectedStatus(connectedDns: String) {
@@ -313,7 +322,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcAlgSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcAlgSwitch)
             persistentState.enableDnsAlg = enabled
-            updateSpiltDnsUi()
+            updateSpiltDns()
         }
 
         b.dcAlgRl.setOnClickListener { b.dcAlgSwitch.isChecked = !b.dcAlgSwitch.isChecked }
