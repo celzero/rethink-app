@@ -78,14 +78,15 @@ object EnhancedBugReport {
                 return
             }
             val time = Utilities.convertLongToTime(System.currentTimeMillis(), Constants.TIME_FORMAT_3)
-            val l = "$time: $logs\n" // append a new line character
+            val l = "$time: $logs"
             file.appendText(l, Charset.defaultCharset())
+            Log.v(LOG_TAG_BUG_REPORT, "logs written to file: ${file.absolutePath}")
         } catch (e: Exception) {
             Log.e(LOG_TAG_BUG_REPORT, "err writing logs to file: ${e.message}", e)
         }
     }
 
-    fun getFileToWrite(context: Context): File? {
+    private fun getFileToWrite(context: Context): File? {
         val file = getTombstoneFile(context)
         Log.d(LOG_TAG_BUG_REPORT, "file to write logs: ${file?.name}")
         return file
