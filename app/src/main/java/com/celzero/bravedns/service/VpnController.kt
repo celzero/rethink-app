@@ -31,6 +31,7 @@ import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.service.BraveVPNService.Companion.FAIL_OPEN_ON_NO_NETWORK
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.wireguard.Config
 import java.net.Socket
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -39,6 +40,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -46,6 +48,7 @@ object VpnController : KoinComponent {
 
     private var braveVpnService: BraveVPNService? = null
     private var connectionState: BraveVPNService.State? = null
+    private var lastConnectedServerName: String? = null
     private val persistentState by inject<PersistentState>()
     private var states: Channel<BraveVPNService.State?>? = null
     private var protocol: Pair<Boolean, Boolean> = Pair(false, false)
@@ -120,6 +123,10 @@ object VpnController : KoinComponent {
         externalScope?.launch { states?.send(state) }
     }
 
+    fun onServerNameUpdated(ech: String?) {
+        lastConnectedServerName = ech
+    }
+
     private fun updateState(state: BraveVPNService.State?) {
         connectionState = state
         connectionStatus.postValue(state)
@@ -155,7 +162,7 @@ object VpnController : KoinComponent {
     fun state(): VpnState {
         val requested: Boolean = persistentState.getVpnEnabled()
         val on = isOn()
-        return VpnState(requested, on, connectionState)
+        return VpnState(requested, on, connectionState, lastConnectedServerName)
     }
 
     @Deprecated(message = "use hasTunnel() instead", replaceWith = ReplaceWith("hasTunnel()"))
@@ -228,10 +235,6 @@ object VpnController : KoinComponent {
 
     suspend fun isSplitTunnelProxy(id: String, pair: Pair<Boolean, Boolean>): Boolean {
         return braveVpnService?.isSplitTunnelProxy(id, pair) ?: false
-    }
-
-    suspend fun canRouteIp(proxyId: String, ip: String, default: Boolean): Boolean {
-        return braveVpnService?.canRouteIp(proxyId, ip, default) ?: false
     }
 
     suspend fun syncP50Latency(id: String) {
@@ -308,10 +311,6 @@ object VpnController : KoinComponent {
 
     fun refreshProxies() {
         braveVpnService?.refreshProxies()
-    }
-
-    suspend fun initiateWgPing(wgId: String) {
-        braveVpnService?.initiateWgPing(wgId)
     }
 
     fun closeConnectionsIfNeeded(uid: Int = INVALID_UID) {
