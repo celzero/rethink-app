@@ -22,10 +22,8 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.os.SystemClock
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -53,10 +51,12 @@ import com.celzero.bravedns.scheduler.BugReportZipper.getZipFileName
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.sendEmailIntent
@@ -82,6 +82,7 @@ import java.util.zip.ZipInputStream
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
 
+    private val persistentState by inject<PersistentState>()
     private var lastAppExitInfoDialogInvokeTime = INIT_TIME_MS
     private val workScheduler by inject<WorkScheduler>()
 
@@ -91,10 +92,13 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun initView() {
-
         if (isFdroidFlavour()) {
             b.aboutAppUpdate.visibility = View.GONE
         }
+
+        updateVersionInfo()
+
+        b.sponsorInfoUsage.text = getSponsorInfo()
 
         b.aboutSponsor.setOnClickListener(this)
         b.aboutWebsite.setOnClickListener(this)
@@ -104,10 +108,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutPrivacyPolicy.setOnClickListener(this)
         b.aboutMail.setOnClickListener(this)
         b.aboutTelegram.setOnClickListener(this)
+        b.aboutReddit.setOnClickListener(this)
+        b.aboutMastodon.setOnClickListener(this)
+        b.aboutElement.setOnClickListener(this)
         b.aboutFaq.setOnClickListener(this)
         b.mozillaImg.setOnClickListener(this)
         b.fossImg.setOnClickListener(this)
-        b.osomImg.setOnClickListener(this)
         b.aboutAppUpdate.setOnClickListener(this)
         b.aboutWhatsNew.setOnClickListener(this)
         b.aboutAppInfo.setOnClickListener(this)
@@ -117,16 +123,30 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppVersion.setOnClickListener(this)
         b.aboutAppContributors.setOnClickListener(this)
         b.aboutAppTranslate.setOnClickListener(this)
+        b.aboutStats.setOnClickListener(this)
+    }
 
+    private fun updateVersionInfo() {
         try {
-            val version = getVersionName() ?: ""
+            val version = getVersionName()
             // take first 7 characters of the version name, as the version has build number
             // appended to it, which is not required for the user to see.
-            val slicedVersion = version.slice(0..6) ?: ""
+            val slicedVersion = version.slice(0..6)
             b.aboutWhatsNew.text = getString(R.string.about_whats_new, slicedVersion)
-            // show the complete version name along with the source of installation
-            b.aboutAppVersion.text =
-                getString(R.string.about_version_install_source, version, getDownloadSource())
+
+            // complete version name along with the source of installation
+            val v = getString(R.string.about_version_install_source, version, getDownloadSource())
+
+            // show the go version if the log level is less than INFO, ie, DEBUG or VERBOSE
+            if (Logger.LoggerType.fromId(persistentState.goLoggerLevel.toInt())
+                    .isLessThan(Logger.LoggerType.INFO)
+            ) {
+                val build = VpnController.goBuildVersion(false)
+                b.aboutAppVersion.text = "$v\n$build"
+            } else {
+                b.aboutAppVersion.text = v
+
+            }
         } catch (e: PackageManager.NameNotFoundException) {
             Logger.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
         }
@@ -139,6 +159,19 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 requireContext().packageName
             )
         return pInfo?.versionName ?: ""
+    }
+
+    private fun getSponsorInfo(): String {
+        val installTime = requireContext().packageManager.getPackageInfo(
+            requireContext().packageName,
+            0
+        ).firstInstallTime
+        val timeDiff = System.currentTimeMillis() - installTime
+        val days = (timeDiff / (1000 * 60 * 60 * 24)).toDouble()
+        val month = days / 30
+        val amount = month * (0.60 + 0.20)
+        val msg = "You’ve been using Rethink for ${days.toInt()} days, which translates to a usage cost of ${"%.2f".format(amount)}$."
+        return msg
     }
 
     private fun getDownloadSource(): String {
@@ -188,9 +221,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.fossImg -> {
                 openActionViewIntent(getString(R.string.about_foss_link).toUri())
             }
-            b.osomImg -> {
-                openActionViewIntent(getString(R.string.about_osom_link).toUri())
-            }
             b.aboutAppUpdate -> {
                 (requireContext() as HomeScreenActivity).checkForUpdate(
                     AppUpdater.UserPresent.INTERACTIVE
@@ -216,6 +246,59 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.aboutPrivacyPolicy -> {
                 openActionViewIntent(getString(R.string.about_privacy_policy_link).toUri())
+            }
+            b.aboutReddit -> {
+                openActionViewIntent(getString(R.string.about_reddit_handle).toUri())
+            }
+            b.aboutMastodon -> {
+                openActionViewIntent(getString(R.string.about_mastodom_handle).toUri())
+            }
+            b.aboutElement -> {
+                openActionViewIntent(getString(R.string.about_matrix_handle).toUri())
+            }
+            b.aboutStats -> {
+                openStatsDialog()
+            }
+        }
+    }
+
+    private fun openStatsDialog() {
+        io {
+            val stat = VpnController.getNetStat()
+            val formatedStat = UIUtils.formatNetStat(stat)
+            uiCtx {
+                val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
+                val builder =
+                    MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+                val lp = WindowManager.LayoutParams()
+                val dialog = builder.create()
+                dialog.show()
+                lp.copyFrom(dialog.window?.attributes)
+                lp.width = WindowManager.LayoutParams.MATCH_PARENT
+                lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+
+                dialog.setCancelable(true)
+                dialog.window?.attributes = lp
+
+                val heading = dialogBinding.infoRulesDialogRulesTitle
+                val okBtn = dialogBinding.infoRulesDialogCancelImg
+                val descText = dialogBinding.infoRulesDialogRulesDesc
+                dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
+
+                heading.text = "Network Stats"
+                heading.setCompoundDrawablesWithIntrinsicBounds(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_log_level),
+                    null,
+                    null,
+                    null
+                )
+
+                descText.movementMethod = LinkMovementMethod.getInstance()
+                descText.text = formatedStat
+
+                okBtn.setOnClickListener { dialog.dismiss() }
+
+                dialog.show()
             }
         }
     }
@@ -299,12 +382,14 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun emailBugReport() {
         try {
             // get the rethink.tombstone file
-            val tombstoneFile = EnhancedBugReport.getTombstoneZipFile(requireContext())
-            // Get the bug_report.zip file
+            val tombstoneFile:File? = EnhancedBugReport.getTombstoneZipFile(requireContext())
+
+            // get the bug_report.zip file
             val dir = requireContext().filesDir
             val file = File(getZipFileName(dir))
-            val uri = getFileUri(file)
+            val uri = getFileUri(file) ?: throw Exception("file uri is null")
 
+            // create an intent for sending email with or without multiple attachments
             val emailIntent = if (tombstoneFile != null) {
                 Intent(Intent.ACTION_SEND_MULTIPLE)
             } else {
@@ -316,14 +401,19 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 Intent.EXTRA_SUBJECT,
                 getString(R.string.about_mail_bugreport_subject)
             )
-            emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.about_mail_bugreport_text))
 
-            // attach extra as list or single file based on the availability
+            // attach extra files (either as a list or single file based on availability)
             if (tombstoneFile != null) {
-                val tombstoneUri = getFileUri(tombstoneFile)
+                val tombstoneUri =
+                    getFileUri(tombstoneFile) ?: throw Exception("tombstoneUri is null")
+                val uriList = arrayListOf<Uri>(uri, tombstoneUri)
                 // send multiple attachments
-                emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, arrayListOf(uri, tombstoneUri))
+                emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriList)
             } else {
+                // ensure EXTRA_TEXT is passed correctly as an ArrayList<CharSequence>
+                val bugReportText = getString(R.string.about_mail_bugreport_text)
+                val bugReportTextList = arrayListOf<CharSequence>(bugReportText)
+                emailIntent.putCharSequenceArrayListExtra(Intent.EXTRA_TEXT, bugReportTextList)
                 emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
             }
             Logger.i(LOG_TAG_UI, "email with attachment: $uri, ${tombstoneFile?.path}")
