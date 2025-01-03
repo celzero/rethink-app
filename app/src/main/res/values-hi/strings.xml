@@ -872,4 +872,6 @@
     <string name="lbl_random" translatable="true">(बेतरतीब)</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">डियोटी एंडपॉइंट हटाएं?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">सहेजे गए कॉन्फ़िगरेशन से टीएलएस एंडपॉइंट पर डीएनएस हटाएं।</string>
+    <string name="lbl_status" translatable="true">स्थिति</string>
+    <string name="lbl_private" translatable="true">निजी</string>
 </resources>
