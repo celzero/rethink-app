@@ -1024,4 +1024,6 @@
     <string name="wireguard_disable_failure" translatable="true">\"Always-on WireGuard\" kann nicht abgeschaltet werden</string>
     <string name="one_wg_dialog_desc" translatable="true">Alle Verbindungen von allen Apps, einschließlich DNS, werden zu einem einzigen, aktiven WireGuard VPN weitergeleitet. Andere aktive WireGuard VPNs, falls vorhanden, werden gestoppt.</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Alle Verbindungen und Apps, die nicht von anderen WireGuard VPNs geroutet werden, werden von diesem weitergeleitet.</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">Der Erwachsenenfilter blockiert den Zugang zu allen nicht jugendfreien, pornografischen und expliziten Webseiten. Er blockiert weder Proxys oder VPNs noch Webseiten mit gemischten Inhalten. Webseiten wie Reddit sind erlaubt. Google und Bing sind auf den sicheren Modus eingestellt.</string>
+    <string name="quad9_dns_desc" translatable="true">Quad9 leitet Ihre DNS-Anfragen über ein sicheres Netz von Servern rund um den Globus.</string>
 </resources>
