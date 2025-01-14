@@ -149,4 +149,6 @@
     <string name="alert_firewall_accessibility_exception" translatable="true">Nastavení expozic Přístupů. Vyzkoušejte znovu!</string>
     <string name="lbl_peer" translatable="true">Peer</string>
     <string name="brave_dns_connect_mode_change_dns" translatable="true">Zvolte režim</string>
+    <string name="default_dns_name" translatable="true">RDNS Výchozí</string>
+    <string name="custom_url_error_invalid_url" translatable="true">Neplatná URL</string>
 </resources>
