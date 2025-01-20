@@ -81,7 +81,7 @@
     <string name="block" translatable="true">блокирај</string>
     <string name="bypass_universal" translatable="true">заобиђи универзално</string>
     <string name="exclude" translatable="true">изузми</string>
-    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="lbl_peer" translatable="true">Равноправни члан</string>
     <string name="bypass_dns_firewall" translatable="true">заобиђи днс и заштитни зид</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Додирните да промените подешавања заштите</string>
     <string name="firewall_mode_notification_title" translatable="true">Заштићени! Повезани са заштитним зидом.</string>

@@ -141,4 +141,6 @@
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">ei suojattu</string>
     <string name="firewall_mode_info_title" translatable="true">Palomuuri</string>
     <string name="apps_info_title" translatable="true">Sovellukset</string>
+    <string name="ada_noapp_dialog_positive" translatable="true">Hyvä on</string>
+    <string name="fapps_info_dialog_positive_btn" translatable="true">Hyvä on</string>
 </resources>
