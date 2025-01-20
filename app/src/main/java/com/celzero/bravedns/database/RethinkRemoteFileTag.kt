@@ -40,6 +40,7 @@ class RethinkRemoteFileTag {
     override fun equals(other: Any?): Boolean {
         if (other !is RethinkRemoteFileTag) return false
         if (value != other.value) return false
+        if (isSelected != other.isSelected) return false
         return true
     }
 

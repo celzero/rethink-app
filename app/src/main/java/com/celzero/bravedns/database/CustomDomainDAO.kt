@@ -36,6 +36,8 @@ interface CustomDomainDAO {
 
     @Delete fun delete(customDomain: CustomDomain)
 
+    @Delete fun deleteAll(customDomains: List<CustomDomain>)
+
     @Transaction
     @Query("select * from CustomDomain order by modifiedTs desc")
     fun getAllDomains(): List<CustomDomain>
@@ -75,7 +77,7 @@ interface CustomDomainDAO {
     fun cpUpdate(status: Int, clause: String): Int
 
     @Query(
-        "select * from CustomDomain where uid != ${Constants.UID_EVERYBODY} and domain like :query order by uid"
+        "SELECT * FROM (SELECT *, (SELECT COUNT(*) FROM CustomDomain cd2 WHERE cd2.uid = cd1.uid AND cd2.rowid <= cd1.rowid) row_num FROM CustomDomain cd1 WHERE uid != ${Constants.UID_EVERYBODY} AND domain LIKE :query) WHERE row_num <= 5 ORDER BY uid, row_num"
     )
     fun getAllDomainRules(query: String): PagingSource<Int, CustomDomain>
 }

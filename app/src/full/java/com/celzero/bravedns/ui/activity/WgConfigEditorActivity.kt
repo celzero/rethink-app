@@ -109,10 +109,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
                         wgInterface?.getAddresses()?.joinToString { it.toString() }
                     )
                 }
-                if (
-                    wgInterface?.listenPort?.isPresent == true &&
-                        wgInterface?.listenPort?.get() != 1 && wgType.isOneWg()
-                ) {
+                if (showListenPort()) {
                     b.listenPortText.setText(wgInterface?.listenPort?.get().toString())
                 }
                 if (wgInterface?.mtu?.isPresent == true) {
@@ -120,6 +117,12 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
                 }
             }
         }
+    }
+
+    private fun showListenPort(): Boolean {
+        val isPresent = wgInterface?.listenPort?.isPresent == true && wgInterface?.listenPort?.get() != 1
+        val byType = wgType.isOneWg() || (!persistentState.randomizeListenPort && wgType.isDefault())
+        return isPresent && byType
     }
 
     private fun setupClickListeners() {
