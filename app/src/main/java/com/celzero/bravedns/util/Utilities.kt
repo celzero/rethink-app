@@ -453,10 +453,7 @@ object Utilities {
             ctx.packageManager.getApplicationIcon(packageName)
         } catch (e: PackageManager.NameNotFoundException) {
             // Not adding exception details in logs.
-            Logger.e(
-                LOG_TAG_FIREWALL,
-                "app icon not available for package: $packageName" + e.message
-            )
+            Logger.e(LOG_TAG_FIREWALL, "no app icon for $packageName" + e.message)
             getDefaultIcon(ctx)
         }
     }
