@@ -86,7 +86,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.deleteByUid(uid)
     }
 
-    suspend fun getDataUsageByUid(uid: Int): DataUsage {
+    suspend fun getDataUsageByUid(uid: Int): DataUsage? {
         return appInfoDAO.getDataUsageByUid(uid)
     }
 

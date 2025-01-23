@@ -149,7 +149,7 @@ interface AppInfoDAO {
     @Query(
         "select uid as uid, downloadBytes as downloadBytes, uploadBytes as uploadBytes from AppInfo where uid = :uid"
     )
-    fun getDataUsageByUid(uid: Int): DataUsage
+    fun getDataUsageByUid(uid: Int): DataUsage?
 
     @Query(
         "update AppInfo set  uploadBytes = :uploadBytes, downloadBytes = :downloadBytes where uid = :uid"

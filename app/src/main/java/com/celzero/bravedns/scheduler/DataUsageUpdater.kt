@@ -50,7 +50,8 @@ class DataUsageUpdater(context: Context, workerParams: WorkerParameters) :
             if (it.uid == Constants.INVALID_UID) return@forEach
 
             try {
-                val currentDataUsage = appInfoRepository.getDataUsageByUid(it.uid)
+                val currentDataUsage = appInfoRepository.getDataUsageByUid(it.uid) ?: return@forEach
+
                 val upload = currentDataUsage.uploadBytes + it.uploadBytes
                 val download = currentDataUsage.downloadBytes + it.downloadBytes
                 Logger.d(LOG_TAG_SCHEDULER, "Data usage for ${it.uid}, $upload, $download")
@@ -72,8 +73,8 @@ class DataUsageUpdater(context: Context, workerParams: WorkerParameters) :
             val uid =
                 appInfoRepository.getAppInfoUidForPackageName(Constants.RETHINK_PACKAGE)
 
-            val prevDataUsage = rethinkDb.getDataUsage(prev, curr)
-            val currDataUsage = appInfoRepository.getDataUsageByUid(uid)
+            val prevDataUsage = rethinkDb.getDataUsage(prev, curr) ?: return
+            val currDataUsage = appInfoRepository.getDataUsageByUid(uid) ?: return
 
             if (currDataUsage.uploadBytes == 0L && currDataUsage.downloadBytes == 0L) {
                 // if the data usage is 0, then no need to update the database
