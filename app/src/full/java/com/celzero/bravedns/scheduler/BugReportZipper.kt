@@ -86,6 +86,9 @@ object BugReportZipper {
         } catch (e: ZipException) {
             Logger.w(LOG_TAG_BUG_REPORT, "Zip exception while creating zip file", e)
             null
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BUG_REPORT, "Exception while creating zip file", e)
+            null
         }
     }
 
