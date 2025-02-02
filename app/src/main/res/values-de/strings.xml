@@ -945,7 +945,7 @@
     <string name="lbl_split" translatable="true">Teilen</string>
     <string name="lbl_idle" translatable="true">Leerlauf</string>
     <string name="lbl_anonymous" translatable="true">anonym</string>
-    <string name="lbl_unselected" translatable="true">Unausgewählt</string>
+    <string name="lbl_unselected" translatable="true">Nicht ausgewählt</string>
     <string name="lbl_on_device" translatable="true">auf dem Gerät</string>
     <string name="lbl_cache" translatable="true">Cache</string>
     <string name="lbl_starting" translatable="true">Wird gestartet</string>
