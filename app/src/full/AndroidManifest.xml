@@ -140,6 +140,12 @@
         <activity
             android:name=".ui.activity.DomainConnectionsActivity"
             android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.PingTestActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.TroubleshootActivity"
+            android:finishOnTaskLaunch="true" />
 
         <receiver
             android:name=".receiver.BraveAutoStartReceiver"
