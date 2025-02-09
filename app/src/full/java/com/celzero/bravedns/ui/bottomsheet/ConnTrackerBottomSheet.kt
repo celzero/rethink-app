@@ -714,7 +714,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
             val ipPair = IpRulesManager.getIpNetPort(info!!.ipAddress)
             val ip = ipPair.first ?: return@io
-            IpRulesManager.addIpRule(info!!.uid, ip, /*wildcard-port*/ 0, ipRuleStatus)
+            IpRulesManager.addIpRule(info!!.uid, ip, /*wildcard-port*/ 0, ipRuleStatus, proxyId = "", proxyCC = "")
         }
     }
 

@@ -36,6 +36,8 @@ class CustomIp {
     var port: Int = UNSPECIFIED_PORT
     var protocol: String = ""
     var isActive: Boolean = true
+    var proxyId: String = ""
+    var proxyCC: String = ""
 
     // BLOCK(0), WHITELIST(1), NONE(2)
     var status: Int = 0

@@ -103,7 +103,7 @@ class CustomDomainFragment :
 
     private fun setupAppSpecificRules(rule: CustomRulesActivity.RULES) {
         observeCustomRules()
-        adapter = CustomDomainAdapter(requireContext(), rule)
+        adapter = CustomDomainAdapter(requireContext(), this, rule)
         b.cdaRecycler.adapter = adapter
         viewModel.setUid(uid)
         viewModel.customDomains.observe(this as LifecycleOwner) {
@@ -132,7 +132,7 @@ class CustomDomainFragment :
 
     private fun setupAllRules(rule: CustomRulesActivity.RULES) {
         observeAllRules()
-        adapter = CustomDomainAdapter(requireContext(), rule)
+        adapter = CustomDomainAdapter(requireContext(), this, rule)
         b.cdaRecycler.adapter = adapter
         viewModel.allDomainRules.observe(this as LifecycleOwner) {
             adapter.submitData(this.lifecycle, it)

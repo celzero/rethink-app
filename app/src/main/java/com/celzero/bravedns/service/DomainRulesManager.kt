@@ -97,7 +97,8 @@ object DomainRulesManager : KoinComponent {
     // update the cache with the domain and its status based on the domain type
     fun updateTrie(cd: CustomDomain) {
         val key = mkTrieKey(cd.domain, cd.uid)
-        trie.set(key, cd.status.toString())
+        val value = mkTrieValue(cd.status.toString(), cd.proxyId, cd.proxyCC)
+        trie.set(key, value)
     }
 
     private fun mkTrieKey(d: String, uid: Int): String {
@@ -113,13 +114,18 @@ object DomainRulesManager : KoinComponent {
         return domain.lowercase(Locale.ROOT)
     }
 
+    private fun mkTrieValue(status: String, proxyId: String, proxyCC: String): String {
+        return "${status}:${proxyId}:${proxyCC}"
+    }
+
     suspend fun load(): Long {
         trie.clear()
         trustedTrie.clear()
         trustedMap.clear()
         db.getAllCustomDomains().forEach { cd ->
             val key = mkTrieKey(cd.domain, cd.uid)
-            trie.set(key, cd.status.toString())
+            val value = mkTrieValue(cd.status.toString(), cd.proxyId, cd.proxyCC)
+            trie.set(key, value)
             maybeAddToTrustedMap(cd)
         }
         return trie.len()
@@ -156,8 +162,8 @@ object DomainRulesManager : KoinComponent {
     private fun matchesWildcard(domain: String, uid: Int): Status {
         val key = mkTrieKey(domain, uid)
         val match = trie.getAny(key) // matches the longest prefix
-
-        if (match.isNullOrEmpty()) {
+        val status = match.split(":")[0]
+        if (status.isNullOrEmpty()) {
             return Status.NONE
         }
 
@@ -167,10 +173,40 @@ object DomainRulesManager : KoinComponent {
     fun getDomainRule(domain: String, uid: Int): Status {
         val key = mkTrieKey(domain, uid)
         val match = trie.get(key)
-        if (match.isNullOrEmpty()) {
+        val status = match.split(":")[0]
+        if (status.isNullOrEmpty()) {
             return Status.NONE
         }
-        return Status.getStatus(match.toIntOrNull())
+        return Status.getStatus(status.toIntOrNull())
+    }
+
+    fun getProxyForDomain(uid: Int, domain: String): Pair<String, String> {
+        val key = mkTrieKey(domain, uid)
+        var proxyId = ""
+        var proxyCC = ""
+        val match = trie.get(key)
+        if (match.isEmpty()) {
+            return Pair("", "")
+        }
+        if (match.split(":").size < 2) {
+            return Pair("", "")
+        }
+        proxyId = match.split(":")[1]
+        if (proxyId.isNotEmpty()) {
+            proxyCC = match.split(":")[2]
+            return Pair(proxyId, proxyCC)
+        } else {
+            val wild = trie.getAny(key)
+            if (wild.isEmpty()) {
+                return Pair("", "")
+            }
+            if (wild.split(":").size < 2) {
+                return Pair("", "")
+            }
+            proxyId = wild.split(":")[1]
+            proxyCC = wild.split(":")[2]
+            return Pair(proxyId, proxyCC)
+        }
     }
 
     fun isDomainTrusted(d: String?): Boolean {
@@ -372,13 +408,29 @@ object DomainRulesManager : KoinComponent {
         val desc = doms.sortedByDescending { selector(it.domain) }
         desc.forEach { cd ->
             val key = mkTrieKey(cd.domain, cd.uid)
-            trie.set(key, cd.status.toString())
+            val value = mkTrieValue(cd.status.toString(), cd.proxyId, cd.proxyCC)
+            trie.set(key, value)
             maybeAddToTrustedMap(cd)
         }
     }
 
     private fun clearTrie(uid: Int) {
         trie.delAll(uid.toString())
+    }
+
+    suspend fun setCC(cd: CustomDomain, cc: String) {
+        cd.proxyCC = cc
+        val newCd = CustomDomain(cd.domain, cd.uid, cd.ips, cd.type, cd.status, cd.proxyId, cc, cd.modifiedTs, 0L, cd.version)
+        Logger.d(LOG_TAG_DNS, "setCC: updating domain: ${cd.domain} to cc: $cc")
+        db.update(cd, newCd)
+        Logger.i(LOG_TAG_DNS, "setCC: updated domain: ${cd.domain} to $cc")
+    }
+
+    suspend fun setProxyId(cd: CustomDomain, proxyId: String) {
+        cd.proxyId = proxyId
+        val newCd = CustomDomain(cd.domain, cd.uid, cd.ips, cd.type, cd.status, proxyId, cd.proxyCC, cd.modifiedTs, 0L, cd.version)
+        db.update(cd, newCd)
+        Logger.i(LOG_TAG_DNS, "setProxyId: updated domain: ${cd.domain} to $proxyId")
     }
 
     fun isWildCardEntry(url: String): Boolean {
@@ -390,7 +442,9 @@ object DomainRulesManager : KoinComponent {
         uid: Int,
         ips: String = "",
         type: DomainType,
-        status: Int
+        status: Int,
+        proxyId: String = "",
+        proxyCC: String = ""
     ): CustomDomain {
         return CustomDomain(
             domain,
@@ -398,6 +452,8 @@ object DomainRulesManager : KoinComponent {
             ips,
             type.id,
             status,
+            proxyId,
+            proxyCC,
             Calendar.getInstance().timeInMillis,
             Constants.INIT_TIME_MS,
             CustomDomain.getCurrentVersion()

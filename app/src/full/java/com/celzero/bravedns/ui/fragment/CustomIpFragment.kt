@@ -271,7 +271,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     private fun insertCustomIp(ip: IPAddress?, port: Int?, status: IpRulesManager.IpRuleStatus) {
         if (ip == null) return
 
-        io { IpRulesManager.addIpRule(uid, ip, port, status) }
+        io { IpRulesManager.addIpRule(uid, ip, port, status, proxyId = "", proxyCC = "") }
         Utilities.showToastUiCentered(
             requireContext(),
             getString(R.string.ci_dialog_added_success),

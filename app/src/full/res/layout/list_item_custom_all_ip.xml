@@ -152,71 +152,7 @@
 
     </RelativeLayout>
 
-    <com.google.android.material.button.MaterialButtonToggleGroup
-        android:id="@+id/custom_ip_toggle_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/custom_ip_container"
-        android:gravity="center"
-        app:selectionRequired="true"
-        app:singleSelection="true">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/custom_ip_tg_no_rule"
-            style="@style/toggleButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="5dp"
-            android:tag="0"
-            android:text="@string/ci_no_rule"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/mini_font_text_view" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/custom_ip_tg_block"
-            style="@style/toggleButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="5dp"
-            android:tag="1"
-            android:text="@string/ci_block"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/mini_font_text_view" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/custom_ip_tg_bypass_app"
-            style="@style/toggleButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="5dp"
-            android:tag="2"
-            android:text="@string/ci_trust_rule"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/mini_font_text_view" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/custom_ip_tg_bypass_univ"
-            style="@style/toggleButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="5dp"
-            android:tag="3"
-            android:text="@string/ci_bypass_universal"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/mini_font_text_view" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/custom_ip_tg_delete"
-            style="@style/toggleButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="5dp"
-            android:tag="4"
-            android:text="@string/ci_delete"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/mini_font_text_view" />
-
-    </com.google.android.material.button.MaterialButtonToggleGroup>
 
 
 </RelativeLayout>
