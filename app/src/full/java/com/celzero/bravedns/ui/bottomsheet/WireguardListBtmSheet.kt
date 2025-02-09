@@ -1,6 +1,7 @@
 package com.celzero.bravedns.ui.bottomsheet
 
 import Logger
+import Logger.LOG_TAG_UI
 import android.content.DialogInterface
 import android.content.res.Configuration
 import android.os.Bundle
@@ -44,6 +45,14 @@ class WireguardListBtmSheet(val input: InputType, val obj: Any?, val data: List<
     private val ci: CustomIp? = if (input == InputType.IP) obj as CustomIp else null
     private val appInfo: AppInfo? = if (input == InputType.APP) obj as AppInfo else null
 
+    companion object {
+        fun newInstance(input: InputType, obj: Any?, data: List<Config>, listener: WireguardDismissListener): WireguardListBtmSheet {
+            return WireguardListBtmSheet(input, obj, data, listener)
+        }
+
+        private const val TAG = "WglBtmSht"
+    }
+
     interface WireguardDismissListener {
         fun onDismissWg(obj: Any?)
     }
@@ -78,6 +87,7 @@ class WireguardListBtmSheet(val input: InputType, val obj: Any?, val data: List<
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Logger.v(LOG_TAG_UI, "$TAG: view created")
         init()
     }
 
@@ -87,7 +97,7 @@ class WireguardListBtmSheet(val input: InputType, val obj: Any?, val data: List<
 
         val lst = data.map { it }
         val adapter = RecyclerViewAdapter(lst) { selectedItem ->
-            Logger.d("TEST", "Selected item: ${selectedItem.getName()}, do something with it")
+            Logger.v(LOG_TAG_UI, "$TAG: Item clicked: ${selectedItem.getName()}")
             when (input) {
                 InputType.DOMAIN -> {
                     processDomain(selectedItem)
@@ -104,38 +114,40 @@ class WireguardListBtmSheet(val input: InputType, val obj: Any?, val data: List<
         b.recyclerView.adapter = adapter
     }
 
-    private fun processDomain(selectedItem: Config) {
+    private fun processDomain(config: Config) {
         io {
             if (cd == null) {
-                Logger.d("TEST", "Custom domain is null")
+                Logger.w(LOG_TAG_UI, "$TAG: Custom domain is null")
                 return@io
             }
-            val id = ID_WG_BASE + selectedItem.getId()
+            val id = ID_WG_BASE + config.getId()
             DomainRulesManager.setProxyId(cd, id)
+            Logger.v(LOG_TAG_UI, "$TAG: wg-endpoint set to ${config.getName()} for ${cd.domain}")
             cd.proxyId = id
             uiCtx {
                 Utilities.showToastUiCentered(
                     requireContext(),
-                    "Wireguard endpoint set to ${selectedItem.getName()}",
+                    "Wireguard endpoint set to ${config.getName()}",
                     Toast.LENGTH_SHORT
                 )
             }
         }
     }
 
-    private fun processIp(selectedItem: Config) {
+    private fun processIp(config: Config) {
         io {
             if (ci == null) {
-                Logger.d("TEST", "Custom IP is null")
+                Logger.w(LOG_TAG_UI, "$TAG: Custom IP is null")
                 return@io
             }
-            val id = ID_WG_BASE + selectedItem.getId()
+            val id = ID_WG_BASE + config.getId()
             IpRulesManager.updateProxyId(ci, id)
+            Logger.v(LOG_TAG_UI, "$TAG: wg-endpoint set to ${config.getName()} for ${ci.ipAddress}")
             ci.proxyId = id
             uiCtx {
                 Utilities.showToastUiCentered(
                     requireContext(),
-                    "Wireguard endpoint set to ${selectedItem.getName()}",
+                    "Wireguard endpoint set to ${config.getName()}",
                     Toast.LENGTH_SHORT
                 )
             }
@@ -154,7 +166,7 @@ class WireguardListBtmSheet(val input: InputType, val obj: Any?, val data: List<
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(data[position], position)
+            holder.bind(data[position])
         }
 
         override fun getItemCount(): Int = data.size
@@ -162,13 +174,12 @@ class WireguardListBtmSheet(val input: InputType, val obj: Any?, val data: List<
         inner class ViewHolder(private val bb: ListItemEndpointBinding) :
             RecyclerView.ViewHolder(bb.root) {
 
-            fun bind(item: Config, position: Int) {
+            fun bind(item: Config) {
                 bb.endpointName.text = item.getName()
                 //bb.endpointCheck.isChecked = position == 0
                 when (input) {
                     InputType.DOMAIN -> {
                         val id = ID_WG_BASE + item.getId()
-                        Logger.d("TEST", "Domain --> ID: $id, Proxy ID: ${cd?.proxyId}")
                         if (id == cd?.proxyId) {
                             bb.endpointCheck.isChecked = true
                             bb.endpointDesc.text = "Selected"
@@ -179,7 +190,6 @@ class WireguardListBtmSheet(val input: InputType, val obj: Any?, val data: List<
                     }
                     InputType.IP -> {
                         val id = ID_WG_BASE + item.getId()
-                        Logger.i("TEST", "IP --> ID: $id, ProxyId: ${ci?.proxyId}")
                         if (id == ci?.proxyId) {
                             bb.endpointCheck.isChecked = true
                             bb.endpointDesc.text = "Selected"
@@ -193,7 +203,6 @@ class WireguardListBtmSheet(val input: InputType, val obj: Any?, val data: List<
                     }
                 }
                 bb.endpointListContainer.setOnClickListener {
-                    Logger.d("TEST", "Item clicked: ${item.getName()}")
                     onItemClicked(item)
                     notifyDataSetChanged()
                 }
@@ -211,6 +220,7 @@ class WireguardListBtmSheet(val input: InputType, val obj: Any?, val data: List<
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
+        Logger.v(LOG_TAG_UI, "$TAG: Dismissed, input: ${input.name}")
         when (input) {
             InputType.DOMAIN -> {
                 listener.onDismissWg(cd)

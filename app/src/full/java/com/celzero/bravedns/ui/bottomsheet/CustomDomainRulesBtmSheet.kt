@@ -1,6 +1,7 @@
 package com.celzero.bravedns.ui.bottomsheet
 
 import Logger
+import Logger.LOG_TAG_UI
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
@@ -70,7 +71,7 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        Logger.v(LOG_TAG_UI, "$TAG, view created for ${cd.domain}")
         init()
         initClickListeners()
 
@@ -79,6 +80,7 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
             io {
                 val v = WireguardManager.getAllConfigs()
                 if (v.isEmpty()) {
+                    Logger.v(LOG_TAG_UI, "$TAG No Wireguard configs found")
                     uiCtx {
                         Utilities.showToastUiCentered(
                             ctx,
@@ -89,9 +91,8 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
                     return@io
                 }
                 uiCtx {
-                    //showRecyclerBottomSheet(names, ctx)
+                    Logger.v(LOG_TAG_UI, "$TAG show wg list(${v.size} for ${cd.domain}")
                     showWgListBtmSheet(v)
-                    Logger.d("TEST", "Button 1 clicked")
                 }
             }
         }
@@ -100,6 +101,7 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
             io {
                 val ctrys = RpnProxyManager.getProtonUniqueCC()
                 if (ctrys.isEmpty()) {
+                    Logger.v(LOG_TAG_UI, "$TAG No ProtonVPN country codes found")
                     uiCtx {
                         Utilities.showToastUiCentered(
                             requireContext(),
@@ -110,9 +112,8 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
                     return@io
                 }
                 uiCtx {
-                    //showRecyclerBottomSheet(ctrys, requireContext())
+                    Logger.v(LOG_TAG_UI, "$TAG show countries(${ctrys.size} for ${cd.domain}")
                     showProxyCountriesBtmSheet(ctrys)
-                    Logger.d("TEST", "Button 2 clicked")
                 }
             }
         }
@@ -120,7 +121,7 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
 
     private fun init() {
         val uid = cd.uid
-        Logger.d("TEST", "UID: $uid, Domain: $cd.domain")
+        Logger.v(LOG_TAG_UI, "$TAG, init for ${cd.domain}, uid: $uid")
         val rules = DomainRulesManager.getDomainRule(cd.domain, uid)
         b.customDomainTv.text = cd.domain
         updateStatusUi(
@@ -322,17 +323,6 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
         }
     }
 
-    private fun toggleActionsUi() {
-        if (b.customDomainToggleGroup.tag == 0) {
-            b.customDomainToggleGroup.tag = 1
-            b.customDomainToggleGroup.visibility = View.VISIBLE
-            return
-        }
-
-        b.customDomainToggleGroup.tag = 0
-        b.customDomainToggleGroup.visibility = View.GONE
-    }
-
     private fun updateToggleGroup(id: Int) {
         val fid = findSelectedRuleByTag(id) ?: return
 
@@ -369,7 +359,7 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
     }
 
     private fun showWgListBtmSheet(data: List<Config>) {
-        val bottomSheetFragment = WireguardListBtmSheet(WireguardListBtmSheet.InputType.DOMAIN, cd, data, this)
+        val bottomSheetFragment = WireguardListBtmSheet.newInstance(WireguardListBtmSheet.InputType.DOMAIN, cd, data, this)
         bottomSheetFragment.show(
             requireActivity().supportFragmentManager,
             bottomSheetFragment.tag
@@ -400,9 +390,9 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
                 DomainRulesManager.Status.getStatus(cd.status),
                 cd.modifiedTs
             )
-            Logger.i("TEST", "onDismissCC: ${cd.domain}, ${cd.proxyCC}")
+            Logger.i(LOG_TAG_UI, "$TAG onDismissCC: ${cd.domain}, ${cd.proxyCC}")
         } catch (e: Exception) {
-            Logger.e("TEST", "err in onDismiss", e)
+            Logger.e(LOG_TAG_UI, "$TAG err in onDismissCC ${e.message}", e)
         }
     }
 
@@ -414,9 +404,9 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
                 DomainRulesManager.Status.getStatus(cd.status),
                 cd.modifiedTs
             )
-            Logger.i("TEST", "onDismissWg: ${cd.domain}, ${cd.proxyId}")
+            Logger.i(LOG_TAG_UI, "$TAG onDismissWg: ${cd.domain}, ${cd.proxyId}")
         } catch (e: Exception) {
-            Logger.e("TEST", "err in onDismiss", e)
+            Logger.e(LOG_TAG_UI, "$TAG err in onDismissWg ${e.message}", e)
         }
     }
 
