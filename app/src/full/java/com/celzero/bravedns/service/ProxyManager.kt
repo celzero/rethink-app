@@ -296,6 +296,8 @@ object ProxyManager : KoinComponent {
         // if id is not Ipn.Base, Ipn.Block, Ipn.Exit then it is proxied
         return ipnProxyId != Backend.Base &&
             ipnProxyId != Backend.Block &&
-            ipnProxyId != Backend.Exit
+            ipnProxyId != Backend.Exit &&
+            ipnProxyId != Backend.Auto &&
+            ipnProxyId != Backend.Ingress
     }
 }
