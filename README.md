@@ -99,7 +99,7 @@ We aren't there yet, may never will be but these are some tenets for the project
 - Practice what you preach: Be obsessively private and secure.
 
 ## Backstory
-[<img src="https://fossunited.org/files/fossunited-white.svg"
+[<img src="https://raw.githubusercontent.com/fossunited/Branding/main/asset/FOSS%20United%20Logo/Extra/Extra%20Logo%20white%20on%20black.jpg"
      alt="FOSS United"
      height="40">](https://fossunited.org/grants)&emsp;
 [<img src="https://rethinkdns.com/ico/moz-builders-2000x550.png"
