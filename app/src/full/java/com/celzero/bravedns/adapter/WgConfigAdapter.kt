@@ -295,7 +295,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
         }
 
-        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, dnsStatusId: Long?, stats: RouterStats?) {
+        private fun updateStatusUi(config: WgConfigFiles, statusPair: Pair<Long?, String>, dnsStatusId: Long?, stats: RouterStats?) {
             if (config.isActive) {
                 b.interfaceSwitch.isChecked = true
                 b.interfaceDetailCard.strokeWidth = 2
@@ -327,11 +327,11 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                                 .replaceFirstChar(Char::titlecase)
                     } else {
                         // if dns status is not failing, then update the proxy status
-                        updateProxyStatusUi(statusId, stats)
+                        updateProxyStatusUi(statusPair, stats)
                     }
                 } else {
                     // in one wg mode, if dns status should be available, this is a fallback case
-                    updateProxyStatusUi(statusId, stats)
+                    updateProxyStatusUi(statusPair, stats)
                 }
             } else {
                 b.interfaceActiveLayout.visibility = View.GONE
@@ -354,13 +354,19 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
         }
 
-        private fun getStatusText(
-            status: UIUtils.ProxyStatus?,
+        private fun getStatusText(status: UIUtils.ProxyStatus?,
             handshakeTime: String? = null,
-            stats: RouterStats?
+            stats: RouterStats?,
+            errMsg: String? = null
         ): String {
-            if (status == null) return context.getString(R.string.status_waiting)
-                .replaceFirstChar(Char::titlecase)
+            if (status == null) {
+                val txt = if (errMsg != null) {
+                    return context.getString(R.string.status_waiting) + "($errMsg)"
+                } else {
+                    context.getString(R.string.status_waiting)
+                }
+                return txt.replaceFirstChar(Char::titlecase)
+            }
 
             val baseText = context.getString(UIUtils.getProxyStatusStringRes(status.id))
                 .replaceFirstChar(Char::titlecase)
@@ -380,17 +386,21 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             return context.getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
         }
 
-        private fun updateProxyStatusUi(statusId: Long?, stats: RouterStats?) {
-            val status = UIUtils.ProxyStatus.entries.find { it.id == statusId } // Convert to enum
+        private fun updateProxyStatusUi(statusPair: Pair<Long?, String>, stats: RouterStats?) {
+            val status = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first } // Convert to enum
 
             val handshakeTime = getHandshakeTime(stats).toString()
 
             val strokeColor = getStrokeColorForStatus(status, stats)
             b.interfaceDetailCard.strokeColor = fetchColor(context, strokeColor)
-
-            val statusText = getIdleStatusText(status, stats)
-                .ifEmpty { getStatusText(status, handshakeTime, stats) }
-
+            val statusText = getIdleStatusText(status, stats).ifEmpty {
+                getStatusText(
+                    status,
+                    handshakeTime,
+                    stats,
+                    statusPair.second
+                )
+            }
             b.interfaceStatus.text = statusText
         }
 
@@ -418,6 +428,9 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
         private fun getUpTime(stats: RouterStats?): CharSequence {
             if (stats == null) {
+                return ""
+            }
+            if (stats.since <= 0L) {
                 return ""
             }
             val now = System.currentTimeMillis()

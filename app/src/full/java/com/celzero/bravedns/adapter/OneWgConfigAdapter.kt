@@ -187,7 +187,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             }
 
             val id = ProxyManager.ID_WG_BASE + config.id
-            val statusId = VpnController.getProxyStatusById(id)
+            val statusPair = VpnController.getProxyStatusById(id)
             val pair = VpnController.getSupportedIpVersion(id)
             val c = WireguardManager.getConfigById(config.id)
             val stats = VpnController.getProxyStats(id)
@@ -199,7 +199,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                     false
                 }
             uiCtx {
-                updateStatusUi(config, statusId, dnsStatusId, stats)
+                updateStatusUi(config, statusPair, dnsStatusId, stats)
                 updateProtocolChip(pair)
                 updateSplitTunnelChip(isSplitTunnel)
             }
@@ -212,7 +212,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             return s == Transaction.Status.BAD_QUERY || s == Transaction.Status.BAD_RESPONSE || s == Transaction.Status.NO_RESPONSE || s == Transaction.Status.SEND_FAIL || s == Transaction.Status.CLIENT_ERROR || s == Transaction.Status.INTERNAL_ERROR || s == Transaction.Status.TRANSPORT_ERROR
         }
 
-        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, dnsStatusId: Long?, stats: RouterStats?) {
+        private fun updateStatusUi(config: WgConfigFiles, statusPair: Pair<Long?, String>, dnsStatusId: Long?, stats: RouterStats?) {
             if (config.isActive && VpnController.hasTunnel()) {
                 b.interfaceDetailCard.strokeWidth = 2
                 b.oneWgCheck.isChecked = true
@@ -227,11 +227,11 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
                             context.getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
                     } else {
                         // if dns status is not failing, then update the proxy status
-                        updateProxyStatusUi(statusId, stats)
+                        updateProxyStatusUi(statusPair, stats)
                     }
                 } else {
                     // in one wg mode, if dns status should be available, this is a fallback case
-                    updateProxyStatusUi(statusId, stats)
+                    updateProxyStatusUi(statusPair, stats)
                 }
 
                 b.interfaceActiveLayout.visibility = View.VISIBLE
@@ -263,13 +263,26 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             }
         }
 
-        private fun getStatusText(status: UIUtils.ProxyStatus?, handshakeTime: String? = null, stats: RouterStats?): String {
-            if (status == null) return context.getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
+        private fun getStatusText(
+            status: UIUtils.ProxyStatus?,
+            handshakeTime: String? = null,
+            stats: RouterStats?,
+            errMsg: String? = null
+        ): String {
+            if (status == null) {
+                val txt = if (errMsg != null) {
+                    return context.getString(R.string.status_waiting) + "($errMsg)"
+                } else {
+                    context.getString(R.string.status_waiting)
+                }
+                return txt.replaceFirstChar(Char::titlecase)
+            }
 
-            val baseText = context.getString(UIUtils.getProxyStatusStringRes(status.id)).replaceFirstChar(Char::titlecase)
+            val baseText = context.getString(UIUtils.getProxyStatusStringRes(status.id))
+                .replaceFirstChar(Char::titlecase)
 
             return if (stats?.lastOK != 0L && handshakeTime != null) {
-                context.getString(R.string.about_version_install_source,baseText, handshakeTime)
+                context.getString(R.string.about_version_install_source, baseText, handshakeTime)
             } else {
                 baseText
             }
@@ -283,17 +296,22 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             return context.getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
         }
 
-        private fun updateProxyStatusUi(statusId: Long?, stats: RouterStats?) {
-            val status = UIUtils.ProxyStatus.entries.find { it.id == statusId } // Convert to enum
+        private fun updateProxyStatusUi(statusPair: Pair<Long?, String>, stats: RouterStats?) {
+            val status =
+                UIUtils.ProxyStatus.entries.find { it.id == statusPair.first } // Convert to enum
 
             val handshakeTime = getHandshakeTime(stats).toString()
 
             val strokeColor = getStrokeColorForStatus(status, stats)
             b.interfaceDetailCard.strokeColor = fetchColor(context, strokeColor)
-
-            val statusText =  getIdleStatusText(status, stats)
-                .ifEmpty { getStatusText(status, handshakeTime, stats) }
-
+            val statusText = getIdleStatusText(status, stats).ifEmpty {
+                getStatusText(
+                    status,
+                    handshakeTime,
+                    stats,
+                    statusPair.second
+                )
+            }
             b.interfaceStatus.text = statusText
         }
 
@@ -309,6 +327,9 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
         private fun getUpTime(stats: RouterStats?): CharSequence {
             if (stats == null) {
+                return ""
+            }
+            if (stats.since <= 0L) {
                 return ""
             }
             val now = System.currentTimeMillis()
