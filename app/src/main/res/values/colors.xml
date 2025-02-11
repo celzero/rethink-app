@@ -228,4 +228,137 @@
     <color name="defaultToggleBtnTxtBlack">#FDFDFD</color>
     <color name="defaultToggleBtnBgBlack">#121212</color>
 
+    <!-- light theme plus -->
+    <color name="colorPrimaryLightPlus">#21a095</color>
+    <color name="colorPrimaryDarkLightPlus">#183531</color>
+    <color name="colorSecondaryLightPlus">#1b8078</color>
+    <color name="colorBackgroundFloatingLightPlus">#e6f4f2</color>
+
+    <color name="navBarColorLightPlus">#FFFFFF</color>
+
+    <color name="accentGoodLightPlus">#21a095</color>
+    <color name="accentBadLightPlus">#ff4b5c</color>
+
+    <color name="backgroundLightPlus">#f0fbfa</color>
+    <color name="dividerLightPlus">#d0e5e3</color>
+    <color name="borderLightPlus">#8ca9a6</color>
+    <color name="textViewBackgroundLightPlus">#1a000000</color>
+    <color name="homeScreenBtnBackgroundLightPlus">#daf3f0</color>
+    <color name="buttonBackgroundLightPlus">#21a095</color>
+    <color name="tabIndicatorLightPlus">#ff6f6f</color>
+
+    <color name="switchNormalLightPlus">#b3b3b3</color>
+    <color name="colorControlActivatedLightPlus">#21a095</color>
+    <color name="colorControlActivatedBadLightPlus">#ff4b5c</color>
+    <color name="colorSwitchThumbNormalLightPlus">#b3b3b3</color>
+    <color name="colorSurfaceLightPlus">#FFFFFF</color>
+
+    <color name="chipBackgroundColorLightPlus">#c8edea</color>
+
+    <color name="chipBgPositiveLightPlus">#d9f7f5</color>
+    <color name="chipTextPositiveLightPlus">#126d64</color>
+
+    <color name="chipBgNegativeLightPlus">#ffe6e8</color>
+    <color name="chipTextNegativeLightPlus">#d82426</color>
+
+    <color name="chipColorBgNormalLightPlus">#f5fffe</color>
+
+    <color name="chipBgNeutralLightPlus">#d0eae7</color>
+    <color name="chipTextNeutralLightPlus">#183531</color>
+
+    <color name="chipColorBgHighlightLightPlus">#21a095</color>
+
+    <color name="strokeLightPlus">#000000</color>
+    <color name="fillLightPlus">#00000000</color>
+
+    <color name="primaryTextLightPlus">#000000</color>
+    <color name="primaryLightColorTextLightPlus">#8c000000</color>
+    <color name="primaryDarkColorTextLightPlus">#FFFFFF</color>
+    <color name="chipTextColorLightPlus">#000000</color>
+    <color name="invertedPrimaryTextLightPlus">#FFFFFF</color>
+    <color name="secondaryTextLightPlus">#183531</color>
+    <color name="textColorAccentBadLightPlus">#ff5e61</color>
+    <color name="homeScreenHeaderTextColorLightPlus">#000000</color>
+
+    <color name="fabBackgroundLightPlus">#FFFFFF</color>
+
+    <color name="selectedCardBgLightPlus">#daf3f0</color>
+
+    <color name="firewallNoRuleToggleBtnTxtLightPlus">#C5E1A5</color>
+    <color name="firewallNoRuleToggleBtnBgLightPlus">#33691E</color>
+    <color name="firewallBlockToggleBtnTxtLightPlus">#F48FB1</color>
+    <color name="firewallBlockToggleBtnBgLightPlus">#C51162</color>
+    <color name="firewallWhiteListToggleBtnTxtLightPlus">#ffd149</color>
+    <color name="firewallWhiteListToggleBtnBgLightPlus">#c67100</color>
+    <color name="firewallExcludeToggleBtnTxtLightPlus">#ffbcd7</color>
+    <color name="firewallExcludeToggleBtnBgLightPlus">#7b2549</color>
+
+    <color name="defaultToggleBtnTxtLightPlus">#000000</color>
+    <color name="defaultToggleBtnBgLightPlus">#e6f4f2</color>
+
+
+    <!-- dark theme plus -->
+    <color name="colorPrimaryBlackPlus">#2D404E</color>
+    <color name="colorPrimaryDarkBlackPlus">#1B2A33</color>
+    <color name="colorSecondaryBlackPlus">#617C8C</color>
+    <color name="colorBackgroundFloatingBlackPlus">#0E1B21</color>
+
+    <color name="navBarColorBlackPlus">#1A2630</color>
+
+    <color name="accentGoodBlackPlus">#00A859</color>
+    <color name="accentBadBlackPlus">#FF5A5E</color>
+
+    <color name="chipBackgroundColorBlackPlus">#00A859</color>
+    <color name="backgroundBlackPlus">#0E1B21</color>
+    <color name="dividerBlackPlus">#243341</color>
+    <color name="borderBlackPlus">#495966</color>
+    <color name="homeScreenBtnBackgroundBlackPlus">#2D404E</color>
+    <color name="buttonBackgroundBlackPlus">#00A859</color>
+    <color name="textViewBackgroundBlackPlus">#1C2A34</color>
+    <color name="tabIndicatorBlackPlus">#00A859</color>
+
+    <color name="colorControlActivatedBlackPlus">#00A859</color>
+    <color name="colorControlActivatedBadBlackPlus">#FF5A5E</color>
+    <color name="colorSwitchThumbNormalBlackPlus">#7B8A95</color>
+    <color name="switchNormalBlackPlus">#7B8A95</color>
+    <color name="colorSurfaceBlackPlus">#0E1B21</color>
+
+    <color name="strokeBlackPlus">#B0C4D4</color>
+    <color name="fillBlackPlus">#00000000</color>
+
+    <color name="primaryTextBlackPlus">#D0E1F2</color>
+    <color name="primaryLightColorTextBlackPlus">#BAC7D3</color>
+    <color name="chipTextColorBlackPlus">#C8D6E5</color>
+    <color name="invertedPrimaryTextBlackPlus">#00A859</color>
+    <color name="secondaryTextBlackPlus">#A3BEC9</color>
+    <color name="textColorAccentBadBlackPlus">#FF5A5E</color>
+    <color name="homeScreenHeaderTextColorBlackPlus">#D0E1F2</color>
+
+    <color name="chipBgPositiveBlackPlus">#1C3328</color>
+    <color name="chipTextPositiveBlackPlus">#00FF76</color>
+
+    <color name="chipBgNegativeBlackPlus">#3B2127</color>
+    <color name="chipTextNegativeBlackPlus">#FF5A5E</color>
+
+    <color name="chipColorBgNormalBlackPlus">#293541</color>
+    <color name="chipColorBgHighlightBlackPlus">#00A859</color>
+
+    <color name="chipBgNeutralBlackPlus">#37454F</color>
+    <color name="chipTextNeutralBlackPlus">#FFB84A</color>
+
+    <color name="fabBackgroundBlackPlus">#1E3A4B</color>
+
+    <color name="selectedCardBgBlackPlus">#2D404E</color>
+
+    <color name="firewallNoRuleToggleBtnTxtBlackPlus">#8EE6A9</color>
+    <color name="firewallNoRuleToggleBtnBgBlackPlus">#1D3328</color>
+    <color name="firewallBlockToggleBtnTxtBlackPlus">#FF6C71</color>
+    <color name="firewallBlockToggleBtnBgBlackPlus">#6B2A35</color>
+    <color name="firewallWhiteListToggleBtnTxtBlackPlus">#FFBF52</color>
+    <color name="firewallWhiteListToggleBtnBgBlackPlus">#7B4A00</color>
+    <color name="firewallExcludeToggleBtnTxtBlackPlus">#F78FB1</color>
+    <color name="firewallExcludeToggleBtnBgBlackPlus">#8A2D49</color>
+    <color name="defaultToggleBtnTxtBlackPlus">#D0E1F2</color>
+    <color name="defaultToggleBtnBgBlackPlus">#0E1B21</color>
+
 </resources>

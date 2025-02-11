@@ -223,13 +223,152 @@
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlack</item>
     </style>
 
+    <style name="AppThemeWhitePlus" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
+        <item name="colorPrimary">@color/colorPrimaryLightPlus</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkLightPlus</item>
+        <item name="colorSecondary">@color/colorSecondaryLightPlus</item>
+        <item name="colorBackgroundFloating">@color/colorBackgroundFloatingLightPlus</item>
+        <item name="android:colorBackgroundFloating">@color/colorBackgroundFloatingLightPlus</item>
+
+        <item name="android:colorAccent">@color/accentGoodLightPlus</item>
+        <item name="colorAccent">@color/accentGoodLightPlus</item>
+        <item name="accentGood">@color/accentGoodLightPlus</item>
+        <item name="accentBad">@color/accentBadLightPlus</item>
+
+        <item name="switchNormal">@color/switchNormalLightPlus</item>
+        <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalLightPlus</item>
+        <item name="controlActivated">@color/colorControlActivatedLightPlus</item>
+        <item name="controlActivatedBad">@color/colorControlActivatedBadLightPlus</item>
+        <item name="android:navigationBarColor">@color/switchNormalLightPlus</item>
+        <item name="colorSurface">@color/colorSurfaceLightPlus</item>
+
+        <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>
+        <item name="tabIndicator">@color/tabIndicatorLightPlus</item>
+        <item name="android:splitMotionEvents">false</item>
+        <item name="android:windowEnableSplitTouch">false</item>
+        <item name="android:searchViewStyle">@style/SearchView.Custom</item>
+
+        <item name="background">@color/backgroundLightPlus</item>
+        <item name="navBarColor">@color/navBarColorLightPlus</item>
+        <item name="divider">@color/dividerLightPlus</item>
+        <item name="border">@color/borderLightPlus</item>
+        <item name="textViewBackground">@color/textViewBackgroundLightPlus</item>
+        <item name="homeScreenBtnBackground">@color/homeScreenBtnBackgroundLightPlus</item>
+        <item name="buttonBackground">@color/buttonBackgroundLightPlus</item>
+
+        <item name="primaryTextColor">@color/primaryTextLightPlus</item>
+        <item name="primaryLightColorText">@color/primaryLightColorTextLightPlus</item>
+        <item name="invertedPrimaryTextColor">@color/invertedPrimaryTextLightPlus</item>
+        <item name="chipTextColor">@color/chipTextColorLightPlus</item>
+        <item name="secondaryTextColor">@color/secondaryTextLightPlus</item>
+        <item name="textColorAccentBad">@color/textColorAccentBadLightPlus</item>
+        <item name="homeScreenHeaderTextColor">@color/homeScreenHeaderTextColorLightPlus</item>
+
+        <item name="svgStrokeColor">@color/strokeLightPlus</item>
+        <item name="svgFillColor">@color/fillLightPlus</item>
+
+        <item name="chipBackgroundColor">@color/chipBackgroundColorLightPlus</item>
+        <item name="chipBgColorPositive">@color/chipBgPositiveLightPlus</item>
+        <item name="chipTextPositive">@color/chipTextPositiveLightPlus</item>
+        <item name="chipBgColorNegative">@color/chipBgNegativeLightPlus</item>
+        <item name="chipTextNegative">@color/chipTextNegativeLightPlus</item>
+        <item name="chipBgColorNeutral">@color/chipBgNeutralLightPlus</item>
+        <item name="chipTextNeutral">@color/chipTextNeutralLightPlus</item>
+        <item name="chipColorBgNormal">@color/chipColorBgNormalLightPlus</item>
+        <item name="chipColorBgHighlight">@color/chipColorBgHighlightLightPlus</item>
+
+        <item name="fabBackgroundColor">@color/fabBackgroundLightPlus</item>
+        <item name="selectedCardBg">@color/selectedCardBgLightPlus</item>
+
+        <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtLightPlus</item>
+        <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgLightPlus</item>
+        <item name="firewallBlockToggleBtnTxt">@color/firewallBlockToggleBtnTxtLightPlus</item>
+        <item name="firewallBlockToggleBtnBg">@color/firewallBlockToggleBtnBgLightPlus</item>
+        <item name="firewallWhiteListToggleBtnTxt">@color/firewallWhiteListToggleBtnTxtLightPlus</item>
+        <item name="firewallWhiteListToggleBtnBg">@color/firewallWhiteListToggleBtnBgLightPlus</item>
+        <item name="firewallExcludeToggleBtnTxt">@color/firewallExcludeToggleBtnTxtLightPlus</item>
+        <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgLightPlus</item>
+        <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtLightPlus</item>
+        <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgLightPlus</item>
+    </style>
+
+    <style name="AppThemeTrueBlackPlus" parent="Theme.MaterialComponents.NoActionBar.Bridge">
+        <item name="colorPrimary">@color/colorPrimaryBlackPlus</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkBlackPlus</item>
+        <item name="colorSecondary">@color/colorSecondaryBlackPlus</item>
+        <item name="colorBackgroundFloating">@color/colorPrimaryBlackPlus</item>
+        <item name="android:colorBackgroundFloating">@color/colorPrimaryBlackPlus</item>
+
+        <item name="android:colorAccent">@color/accentGoodBlackPlus</item>
+        <item name="colorAccent">@color/accentGoodBlackPlus</item>
+        <item name="accentGood">@color/accentGoodBlackPlus</item>
+        <item name="accentBad">@color/accentBadBlackPlus</item>
+
+        <item name="navBarColor">@color/navBarColorBlackPlus</item>
+        <item name="android:navigationBarColor">@color/navBarColorBlackPlus</item>
+        <item name="tabIndicator">@color/tabIndicatorBlackPlus</item>
+
+        <item name="switchNormal">@color/switchNormalBlackPlus</item>
+        <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalBlackPlus</item>
+        <item name="controlActivated">@color/colorControlActivatedBlackPlus</item>
+        <item name="controlActivatedBad">@color/colorControlActivatedBadBlackPlus</item>
+        <item name="colorSurface">@color/colorSurfaceBlackPlus</item>
+
+        <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>
+        <item name="android:splitMotionEvents">false</item>
+        <item name="android:windowEnableSplitTouch">false</item>
+        <item name="android:searchViewStyle">@style/SearchView.Custom</item>
+
+        <item name="background">@color/backgroundBlackPlus</item>
+        <item name="divider">@color/dividerBlackPlus</item>
+        <item name="border">@color/borderBlackPlus</item>
+        <item name="homeScreenBtnBackground">@color/homeScreenBtnBackgroundBlackPlus</item>
+        <item name="textViewBackground">@color/textViewBackgroundBlackPlus</item>
+        <item name="buttonBackground">@color/buttonBackgroundBlackPlus</item>
+        <item name="homeScreenHeaderTextColor">@color/homeScreenHeaderTextColorBlackPlus</item>
+
+        <item name="primaryTextColor">@color/primaryTextBlackPlus</item>
+        <item name="primaryLightColorText">@color/primaryLightColorTextBlackPlus</item>
+        <item name="chipTextColor">@color/chipTextColorBlackPlus</item>
+        <item name="invertedPrimaryTextColor">@color/invertedPrimaryTextBlackPlus</item>
+        <item name="secondaryTextColor">@color/secondaryTextBlackPlus</item>
+        <item name="textColorAccentBad">@color/textColorAccentBadBlackPlus</item>
+
+        <item name="svgStrokeColor">@color/strokeBlackPlus</item>
+        <item name="svgFillColor">@color/fillBlackPlus</item>
+
+        <item name="chipBackgroundColor">@color/chipBackgroundColorBlackPlus</item>
+        <item name="chipBgColorPositive">@color/chipBgPositiveBlackPlus</item>
+        <item name="chipTextPositive">@color/chipTextPositiveBlackPlus</item>
+        <item name="chipBgColorNegative">@color/chipBgNegativeBlackPlus</item>
+        <item name="chipTextNegative">@color/chipTextNegativeBlackPlus</item>
+        <item name="chipBgColorNeutral">@color/chipBgNeutralBlackPlus</item>
+        <item name="chipTextNeutral">@color/chipTextNeutralBlackPlus</item>
+        <item name="chipColorBgNormal">@color/chipColorBgNormalBlackPlus</item>
+        <item name="chipColorBgHighlight">@color/chipColorBgHighlightBlackPlus</item>
+
+        <item name="fabBackgroundColor">@color/fabBackgroundBlackPlus</item>
+        <item name="selectedCardBg">@color/selectedCardBgBlackPlus</item>
+
+        <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtBlackPlus</item>
+        <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgBlackPlus</item>
+        <item name="firewallBlockToggleBtnTxt">@color/firewallBlockToggleBtnTxtBlackPlus</item>
+        <item name="firewallBlockToggleBtnBg">@color/firewallBlockToggleBtnBgBlackPlus</item>
+        <item name="firewallWhiteListToggleBtnTxt">@color/firewallWhiteListToggleBtnTxtBlackPlus</item>
+        <item name="firewallWhiteListToggleBtnBg">@color/firewallWhiteListToggleBtnBgBlackPlus</item>
+        <item name="firewallExcludeToggleBtnTxt">@color/firewallExcludeToggleBtnTxtBlackPlus</item>
+        <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgBlackPlus</item>
+        <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtBlackPlus</item>
+        <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlackPlus</item>
+    </style>
+
     <style name="CustomWidget.MaterialComponents.CompoundButton.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
         <item name="materialThemeOverlay">@style/CustomCompoundButtonSwitch</item>
     </style>
 
 
     <style name="CustomCompoundButtonSwitch">
-        <item name="colorSurface">?attr/colorPrimary</item>
+        <item name="colorSurface">?attr/colorSwitchThumbNormal</item>
         <item name="colorOnSurface">?attr/switchNormal</item>
         <item name="colorControlActivated">?attr/controlActivated</item>
     </style>
@@ -305,6 +444,48 @@
         <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgBlack</item>
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtBlack</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlack</item>
+    </style>
+
+    <style name="BottomSheetDialogThemeWhitePlus" parent="BaseBottomSheetDialog">
+        <item name="colorSurface">@color/switchNormalLightPlus</item>
+        <item name="colorOnSurface">@color/switchNormalLightPlus</item>
+        <item name="colorSwitchThumbNormal">@color/switchNormalLightPlus</item>
+        <item name="colorControlActivated">@color/colorControlActivatedBadLightPlus</item>
+        <item name="android:colorForeground">@color/switchNormalLightPlus</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:navigationBarColor">@color/navBarColorLightPlus</item>
+
+        <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtLightPlus</item>
+        <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgLightPlus</item>
+        <item name="firewallBlockToggleBtnTxt">@color/firewallBlockToggleBtnTxtLightPlus</item>
+        <item name="firewallBlockToggleBtnBg">@color/firewallBlockToggleBtnBgLightPlus</item>
+        <item name="firewallWhiteListToggleBtnTxt">@color/firewallWhiteListToggleBtnTxtLightPlus</item>
+        <item name="firewallWhiteListToggleBtnBg">@color/firewallWhiteListToggleBtnBgLightPlus</item>
+        <item name="firewallExcludeToggleBtnTxt">@color/firewallExcludeToggleBtnTxtLightPlus</item>
+        <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgLightPlus</item>
+        <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtLightPlus</item>
+        <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgLightPlus</item>
+    </style>
+
+    <style name="BottomSheetDialogThemeTrueBlackPlus" parent="BaseBottomSheetDialog">
+        <item name="colorSurface">@color/switchNormalBlackPlus</item>
+        <item name="colorOnSurface">@color/switchNormalBlackPlus</item>
+        <item name="colorSwitchThumbNormal">@color/switchNormalBlackPlus</item>
+        <item name="colorControlActivated">@color/colorControlActivatedBadBlackPlus</item>
+        <item name="android:colorForeground">@color/switchNormalBlackPlus</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:navigationBarColor">@color/navBarColorBlackPlus</item>
+
+        <item name="firewallNoRuleToggleBtnTxt">@color/firewallNoRuleToggleBtnTxtBlackPlus</item>
+        <item name="firewallNoRuleToggleBtnBg">@color/firewallNoRuleToggleBtnBgBlackPlus</item>
+        <item name="firewallBlockToggleBtnTxt">@color/firewallBlockToggleBtnTxtBlackPlus</item>
+        <item name="firewallBlockToggleBtnBg">@color/firewallBlockToggleBtnBgBlackPlus</item>
+        <item name="firewallWhiteListToggleBtnTxt">@color/firewallWhiteListToggleBtnTxtBlackPlus</item>
+        <item name="firewallWhiteListToggleBtnBg">@color/firewallWhiteListToggleBtnBgBlackPlus</item>
+        <item name="firewallExcludeToggleBtnTxt">@color/firewallExcludeToggleBtnTxtBlackPlus</item>
+        <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgBlackPlus</item>
+        <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtBlackPlus</item>
+        <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlackPlus</item>
     </style>
 
     <style name="SearchView.Custom" parent="Widget.AppCompat.SearchView">
