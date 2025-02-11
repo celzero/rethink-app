@@ -23,6 +23,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.TypedArray
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -31,6 +32,7 @@ import android.text.Spanned
 import android.text.format.DateUtils
 import android.util.TypedValue
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
@@ -81,7 +83,7 @@ object UIUtils {
         }
     }
 
-    fun getProxyStatusStringRes(statusId: Long): Int {
+    fun getProxyStatusStringRes(statusId: Long?): Int {
         return when (statusId) {
             Backend.TUP -> {
                 R.string.lbl_starting
@@ -679,5 +681,9 @@ object UIUtils {
         stats = stats.replace(",", "\n")
 
         return stats
+    }
+
+    fun AppCompatTextView.underline() {
+        paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
     }
 }
