@@ -154,7 +154,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsCardLogsTv.text = getString(R.string.lbl_logs).replaceFirstChar(Char::titlecase)
 
         // do not show the sponsor card if the rethink plus is enabled
-        if (persistentState.enableWarp) {
+        if (persistentState.useRpn) {
             b.fhsSponsor.visibility = View.GONE
         } else {
             b.fhsSponsor.visibility = View.VISIBLE
@@ -223,7 +223,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         b.fhsSponsor.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on sponsor card")
-            if (persistentState.enableWarp) {
+            if (persistentState.useRpn) {
                 Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
                 return@setOnClickListener
             }
@@ -457,7 +457,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun observeProxyStates() {
         persistentState.getProxyStatus().observe(viewLifecycleOwner) {
             if (it != -1) {
-                updateUiWithProxyStates(it)
+                ui("proxyStates") {
+                    while (true) {
+                        if (!isAdded) return@ui
+                        updateUiWithProxyStates(it)
+                        // show protos
+                        kotlinx.coroutines.delay(2500L)
+                    }
+                }
+
             } else {
                 b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
                 b.fhsCardOtherProxyCount.visibility = View.VISIBLE
@@ -467,12 +475,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun updateUiWithProxyStates(resId: Int) {
+        if (!isAdded) return
+
         // get proxy type from app config
         val proxyType = AppConfig.ProxyType.of(appConfig.getProxyType())
 
         if (proxyType.isProxyTypeWireguard()) {
             io {
-                val proxies = WireguardManager.getEnabledConfigs()
+                val proxies = WireguardManager.getActiveConfigs()
                 var active = 0
                 var failing = 0
                 var idle = 0
@@ -491,7 +501,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         failing++
                         return@forEach
                     }
-                    val status = VpnController.getProxyStatusById(proxyId)
+                    val status = VpnController.getProxyStatusById(proxyId).first
                     if (status != null) {
                         // consider starting and up as active
                         if (status == Backend.TZZ) {
@@ -513,6 +523,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     }
                 }
                 uiCtx {
+                    if (!isAdded) return@uiCtx
                     b.fhsCardOtherProxyCount.visibility = View.VISIBLE
                     var text = ""
                     // show as 3 active 1 failing 1 idle, if failing is 0 show as 4 active
