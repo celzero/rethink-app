@@ -33,6 +33,8 @@ import java.util.stream.Collectors
  */
 @NonNullForAll
 class WgInterface private constructor(builder: Builder) {
+
+
     private val addresses: Set<InetNetwork> // The collection is already immutable.
 
     /**
@@ -71,6 +73,17 @@ class WgInterface private constructor(builder: Builder) {
      */
     val listenPort: Optional<Int>
 
+    private val clientId: Optional<String>
+    private val jc: Optional<Int>
+    private val jmin: Optional<Int>
+    private val jmax: Optional<Int>
+    private val s1: Optional<Int>
+    private val s2: Optional<Int>
+    private val h1: Optional<Long>
+    private val h2: Optional<Long>
+    private val h3: Optional<Long>
+    private val h4: Optional<Long>
+
     /**
      * Returns the MTU used for the WireGuard interface.
      *
@@ -90,6 +103,16 @@ class WgInterface private constructor(builder: Builder) {
         keyPair = Objects.requireNonNull(builder.keyPair, "Interfaces must have a private key")!!
         listenPort = builder.listenPort
         mtu = builder.mtu
+        clientId = builder.clientId
+        jc = builder.jc
+        jmin = builder.jmin
+        jmax = builder.jmax
+        s1 = builder.s1
+        s2 = builder.s2
+        h1 = builder.h1
+        h2 = builder.h2
+        h3 = builder.h3
+        h4 = builder.h4
     }
 
     override fun equals(obj: Any?): Boolean {
@@ -101,7 +124,17 @@ class WgInterface private constructor(builder: Builder) {
             includedApplications == obj.includedApplications &&
             keyPair == obj.keyPair &&
             listenPort == obj.listenPort &&
-            mtu == obj.mtu
+            mtu == obj.mtu &&
+            clientId == obj.clientId &&
+            jc == obj.jc &&
+            jmin == obj.jmin &&
+            jmax == obj.jmax &&
+            s1 == obj.s1 &&
+            s2 == obj.s2 &&
+            h1 == obj.h1 &&
+            h2 == obj.h2 &&
+            h3 == obj.h3 &&
+            h4 == obj.h4
     }
 
     /**
@@ -132,6 +165,16 @@ class WgInterface private constructor(builder: Builder) {
         hash = 31 * hash + keyPair.hashCode()
         hash = 31 * hash + listenPort.hashCode()
         hash = 31 * hash + mtu.hashCode()
+        hash = 31 * hash + clientId.hashCode()
+        hash = 31 * hash + jc.hashCode()
+        hash = 31 * hash + jmin.hashCode()
+        hash = 31 * hash + jmax.hashCode()
+        hash = 31 * hash + s1.hashCode()
+        hash = 31 * hash + s2.hashCode()
+        hash = 31 * hash + h1.hashCode()
+        hash = 31 * hash + h2.hashCode()
+        hash = 31 * hash + h3.hashCode()
+        hash = 31 * hash + h4.hashCode()
         return hash
     }
 
@@ -207,6 +250,16 @@ class WgInterface private constructor(builder: Builder) {
         listenPort.ifPresent { lp: Int? -> sb.append("ListenPort = ").append(lp).append('\n') }
         mtu.ifPresent { m: Int? -> sb.append("MTU = ").append(m).append('\n') }
         sb.append("PrivateKey = ").append(keyPair.getPrivateKey().base64()).append('\n')
+        clientId.ifPresent { c: String? -> sb.append("ClientID = ").append(c).append('\n') }
+        jc.ifPresent { j: Int? -> sb.append("JC = ").append(j).append('\n') }
+        jmin.ifPresent { j: Int? -> sb.append("JMin = ").append(j).append('\n') }
+        jmax.ifPresent { j: Int? -> sb.append("JMax = ").append(j).append('\n') }
+        s1.ifPresent { s: Int? -> sb.append("S1 = ").append(s).append('\n') }
+        s2.ifPresent { s: Int? -> sb.append("S2 = ").append(s).append('\n') }
+        h1.ifPresent { h: Long? -> sb.append("H1 = ").append(h).append('\n') }
+        h2.ifPresent { h: Long? -> sb.append("H2 = ").append(h).append('\n') }
+        h3.ifPresent { h: Long? -> sb.append("H3 = ").append(h).append('\n') }
+        h4.ifPresent { h: Long? -> sb.append("H4 = ").append(h).append('\n') }
         return sb.toString()
     }
 
@@ -232,6 +285,29 @@ class WgInterface private constructor(builder: Builder) {
      * endpoint=yul-359-wg.whiskergalaxy.com:443
      * preshared_key=550a01550c4c9a0b6d80687d24207038f8b09c5615ebf3f2d6d462fdfdfc0c42
      *
+     * below is converted to amnezia userspace format
+     *
+     * private_key=281755d88bfea685d9902399ba44a8df49a87551eac8ee7e18275f84fe27e342
+     * address=100.80.213.126/32
+     * dns=10.255.255.3
+     * mtu=1280
+     * jc=0
+     * jmin=0
+     * jmax=0
+     * s1=0
+     * s2=0
+     * h1=0
+     * h2=0
+     * h3=0
+     * h4=0
+     * replace_peers=true
+     * public_key=9df151a45674657595a33f02e203f9b62ed5d6c9c54f5815f04708c53589b41e
+     * allowed_ip=0.0.0.0/0
+     * allowed_ip=::/0
+     * endpoint=172.98.68.207:443
+     * endpoint=yul-359-wg.whiskergalaxy.com:443
+     * preshared_key=550a01550c4c9a0b6d80687d24207038f8b09c5615ebf3f2d6d462fdfdfc0c42
+     *
      */
     fun toWgUserspaceString(skipListenPort: Boolean): String {
         val dnsServerStrings =
@@ -243,15 +319,69 @@ class WgInterface private constructor(builder: Builder) {
 
         val sb = StringBuilder()
         sb.append("private_key=").append(keyPair.getPrivateKey().hex()).append('\n')
-        sb.append("address=").append(Attribute.join(addresses)).append('\n')
-        sb.append("dns=").append(Attribute.join(dnsServerStrings)).append('\n')
-        sb.append("mtu=").append(mtu.orElse(1280)).append('\n')
         // Skip the listen port if it's not set or if we're in advanced mode.
         // In advanced mode, the port may already be in use by another interface.
         if (!skipListenPort) {
             listenPort.ifPresent { lp: Int? -> sb.append("listen_port=").append(lp).append('\n') }
         }
+        // non-standard wireguard userspace format
+        // address, dns, and mtu required by firestack
+        sb.append("address=").append(Attribute.join(addresses)).append('\n')
+        sb.append("dns=").append(Attribute.join(dnsServerStrings)).append('\n')
+        sb.append("mtu=").append(mtu.orElse(DEFAULT_MTU)).append('\n') // -1 if not present
+        // clientId required by warp
+        clientId.ifPresent { c: String? -> sb.append("client_id=").append(c).append('\n') }
+        // amnezia specific attributes
+        jc.ifPresent { j: Int? -> sb.append("jc=").append(j).append('\n') }
+        jmin.ifPresent { j: Int? -> sb.append("jmin=").append(j).append('\n') }
+        jmax.ifPresent { j: Int? -> sb.append("jmax=").append(j).append('\n') }
+        s1.ifPresent { s: Int? -> sb.append("s1=").append(s).append('\n') }
+        s2.ifPresent { s: Int? -> sb.append("s2=").append(s).append('\n') }
+        h1.ifPresent { h: Long? -> sb.append("h1=").append(h).append('\n') }
+        h2.ifPresent { h: Long? -> sb.append("h2=").append(h).append('\n') }
+        h3.ifPresent { h: Long? -> sb.append("h3=").append(h).append('\n') }
+        h4.ifPresent { h: Long? -> sb.append("h4=").append(h).append('\n') }
         return sb.toString()
+    }
+
+    fun getClientId(): Optional<String> {
+        return clientId
+    }
+
+    fun getJc(): Optional<Int> {
+        return jc
+    }
+
+    fun getJmin(): Optional<Int> {
+        return jmin
+    }
+
+    fun getJmax(): Optional<Int> {
+        return jmax
+    }
+
+    fun getS1(): Optional<Int> {
+        return s1
+    }
+
+    fun getS2(): Optional<Int> {
+        return s2
+    }
+
+    fun getH1(): Optional<Long> {
+        return h1
+    }
+
+    fun getH2(): Optional<Long> {
+        return h2
+    }
+
+    fun getH3(): Optional<Long> {
+        return h3
+    }
+
+    fun getH4(): Optional<Long> {
+        return h4
     }
 
     class Builder {
@@ -275,6 +405,18 @@ class WgInterface private constructor(builder: Builder) {
 
         // Defaults to not present.
         var listenPort = Optional.empty<Int>()
+
+        var clientId = Optional.empty<String>()
+
+        var jc = Optional.empty<Int>()
+        var jmin = Optional.empty<Int>()
+        var jmax = Optional.empty<Int>()
+        var s1 = Optional.empty<Int>()
+        var s2 = Optional.empty<Int>()
+        var h1 = Optional.empty<Long>()
+        var h2 = Optional.empty<Long>()
+        var h3 = Optional.empty<Long>()
+        var h4 = Optional.empty<Long>()
 
         // Defaults to not present.
         var mtu = Optional.empty<Int>()
@@ -307,6 +449,56 @@ class WgInterface private constructor(builder: Builder) {
 
         fun addDnsSearchDomains(dnsSearchDomains: Collection<String>?): Builder {
             this.dnsSearchDomains.addAll(dnsSearchDomains!!)
+            return this
+        }
+
+        fun setClientId(clientId: Optional<String>): Builder {
+            this.clientId = clientId
+            return this
+        }
+
+        fun setJc(jc: Int): Builder {
+            this.jc = Optional.of(jc)
+            return this
+        }
+
+        fun setJmin(jmin: Int): Builder {
+            this.jmin = Optional.of(jmin)
+            return this
+        }
+
+        fun setJmax(jmax: Int): Builder {
+            this.jmax = Optional.of(jmax)
+            return this
+        }
+
+        fun setS1(s1: Int): Builder {
+            this.s1 = Optional.of(s1)
+            return this
+        }
+
+        fun setS2(s2: Int): Builder {
+            this.s2 = Optional.of(s2)
+            return this
+        }
+
+        fun setH1(h1: Long): Builder {
+            this.h1 = Optional.of(h1)
+            return this
+        }
+
+        fun setH2(h2: Long): Builder {
+            this.h2 = Optional.of(h2)
+            return this
+        }
+
+        fun setH3(h3: Long): Builder {
+            this.h3 = Optional.of(h3)
+            return this
+        }
+
+        fun setH4(h4: Long): Builder {
+            this.h4 = Optional.of(h4)
             return this
         }
 
@@ -417,6 +609,87 @@ class WgInterface private constructor(builder: Builder) {
             }
         }
 
+        fun parseClientId(clientId: String): Builder {
+            try {
+                return setClientId(Optional.of(clientId))
+            } catch (e: NullPointerException) {
+                val throwable = Throwable(e)
+                throw BadConfigException(Section.INTERFACE, Location.CLIENT_ID, throwable)
+            }
+        }
+
+        fun parseJc(jc: String): Builder {
+            return try {
+                setJc(jc.toInt())
+            } catch (e: NumberFormatException) {
+                throw BadConfigException(Section.INTERFACE, Location.AMNEZIA, jc, e)
+            }
+        }
+
+        fun parseJmin(jmin: String): Builder {
+            return try {
+                setJmin(jmin.toInt())
+            } catch (e: NumberFormatException) {
+                throw BadConfigException(Section.INTERFACE, Location.AMNEZIA, jmin, e)
+            }
+        }
+
+        fun parseJmax(jmax: String): Builder {
+            return try {
+                setJmax(jmax.toInt())
+            } catch (e: NumberFormatException) {
+                throw BadConfigException(Section.INTERFACE, Location.AMNEZIA, jmax, e)
+            }
+        }
+
+        fun parseS1(s1: String): Builder {
+            return try {
+                setS1(s1.toInt())
+            } catch (e: NumberFormatException) {
+                throw BadConfigException(Section.INTERFACE, Location.AMNEZIA, s1, e)
+            }
+        }
+
+        fun parseS2(s2: String): Builder {
+            return try {
+                setS2(s2.toInt())
+            } catch (e: NumberFormatException) {
+                throw BadConfigException(Section.INTERFACE, Location.AMNEZIA, s2, e)
+            }
+        }
+
+        fun parseH1(h1: String): Builder {
+            return try {
+                setH1(h1.toLong())
+            } catch (e: NumberFormatException) {
+                throw BadConfigException(Section.INTERFACE, Location.AMNEZIA, h1, e)
+            }
+        }
+
+        fun parseH2(h2: String): Builder {
+            return try {
+                setH2(h2.toLong())
+            } catch (e: NumberFormatException) {
+                throw BadConfigException(Section.INTERFACE, Location.AMNEZIA, h2, e)
+            }
+        }
+
+        fun parseH3(h3: String): Builder {
+            return try {
+                setH3(h3.toLong())
+            } catch (e: NumberFormatException) {
+                throw BadConfigException(Section.INTERFACE, Location.AMNEZIA, h3, e)
+            }
+        }
+
+        fun parseH4(h4: String): Builder {
+            return try {
+                setH4(h4.toLong())
+            } catch (e: NumberFormatException) {
+                throw BadConfigException(Section.INTERFACE, Location.AMNEZIA, h4, e)
+            }
+        }
+
         fun setKeyPair(keyPair: KeyPair?): Builder {
             this.keyPair = keyPair
             return this
@@ -437,14 +710,14 @@ class WgInterface private constructor(builder: Builder) {
 
         @Throws(BadConfigException::class)
         fun setMtu(mtu: Int): Builder {
-            if (mtu < 0)
+            if (mtu < -1)
                 throw BadConfigException(
                     Section.INTERFACE,
-                    Location.LISTEN_PORT,
+                    Location.MTU,
                     Reason.INVALID_VALUE,
                     mtu.toString()
                 )
-            this.mtu = if (mtu == 0) Optional.empty() else Optional.of(mtu)
+            this.mtu = if (mtu == 0 || mtu == DEFAULT_MTU) Optional.empty() else Optional.of(mtu)
             return this
         }
     }
@@ -452,6 +725,7 @@ class WgInterface private constructor(builder: Builder) {
     companion object {
         private const val MAX_UDP_PORT = 65535
         private const val MIN_UDP_PORT = 0
+        private const val DEFAULT_MTU = -1 // -1 means not set
 
         /**
          * Parses an series of "KEY = VALUE" lines into an `Interface`. Throws [ParseException] if
@@ -482,6 +756,16 @@ class WgInterface private constructor(builder: Builder) {
                     "mtu" -> builder.parseMtu(attribute.value)
                     "privatekey" -> builder.parsePrivateKey(attribute.value)
                     "publickey" -> {} // Ignore public key
+                    "clientid" -> builder.parseClientId(attribute.value)
+                    "jc" -> builder.parseJc(attribute.value)
+                    "jmin" -> builder.parseJmin(attribute.value)
+                    "jmax" -> builder.parseJmax(attribute.value)
+                    "s1" -> builder.parseS1(attribute.value)
+                    "s2" -> builder.parseS2(attribute.value)
+                    "h1" -> builder.parseH1(attribute.value)
+                    "h2" -> builder.parseH2(attribute.value)
+                    "h3" -> builder.parseH3(attribute.value)
+                    "h4" -> builder.parseH4(attribute.value)
                     else ->
                         throw BadConfigException(
                             Section.INTERFACE,

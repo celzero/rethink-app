@@ -117,13 +117,13 @@ class Config private constructor(builder: Builder) {
      *
      * @return the `Config` represented as a series of "key=value" lines
      */
-    fun toWgUserspaceString(skipListenPort: Boolean = false): String {
+    fun toWgUserspaceString(skipListenPort: Boolean = false, isAmz: Boolean = false): String {
         // Skip the listen port if we're in advanced mode or randomize (adv) setting is enabled.
         val sb = StringBuilder()
         sb.append(wgInterface?.toWgUserspaceString(skipListenPort) ?: "")
         sb.append("replace_peers=true\n")
         if (peers != null) {
-            for (peer in peers) sb.append(peer.toWgUserspaceString())
+            for (peer in peers) sb.append(peer.toWgUserspaceString(isAmz))
         }
         return sb.toString()
     }

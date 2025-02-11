@@ -442,6 +442,25 @@
                         app:rippleColor="?attr/secondaryTextColor" />
 
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/hop_btn"
+                        style="@style/Widget.AppCompat.Button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="30dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="30dp"
+                        android:alpha="0.75"
+                        android:background="@drawable/rectangle_border_background"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center"
+                        android:padding="15dp"
+                        android:text="Hop"
+                        android:textColor="?attr/secondaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        app:rippleColor="?attr/secondaryTextColor" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/logs_btn"
                         style="@style/Widget.AppCompat.Button"
                         android:layout_width="match_parent"

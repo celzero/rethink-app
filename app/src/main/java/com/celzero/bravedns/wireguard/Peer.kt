@@ -20,6 +20,7 @@ package com.celzero.bravedns.wireguard
 
 import backend.Backend
 import backend.WgKey
+import com.celzero.bravedns.RethinkDnsApplication
 import com.celzero.bravedns.wireguard.BadConfigException.*
 import inet.ipaddr.IPAddressString
 import java.util.*
@@ -169,11 +170,17 @@ class Peer private constructor(builder: Builder) {
      *
      * @return the `Peer` represented as a series of "key=value" lines
      */
-    fun toWgUserspaceString(): String {
+    fun toWgUserspaceString(isAmz: Boolean): String {
         val sb = StringBuilder()
         // The order here is important: public_key signifies the beginning of a new peer.
         sb.append("public_key=").append(publicKey.hex()).append('\n')
-        for (allowedIp in allowedIps) sb.append("allowed_ip=").append(allowedIp).append('\n')
+        // for testing purposes, make sure the allowed_ips is set to 0.0.0.0/0 for all peers
+        // in amz + debug mode
+        if (isAmz && RethinkDnsApplication.DEBUG) {
+            sb.append("allowed_ip=").append("0.0.0.0/0").append('\n')
+        } else {
+            for (allowedIp in allowedIps) sb.append("allowed_ip=").append(allowedIp).append('\n')
+        }
         endpoint.flatMap<Any>(InetEndpoint::getResolved).ifPresent { ep: Any? ->
             sb.append("endpoint=").append(ep).append('\n')
         }
