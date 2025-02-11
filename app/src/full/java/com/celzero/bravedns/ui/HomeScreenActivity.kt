@@ -121,6 +121,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         setupNavigationItemSelectedListener()
 
+
         // handle intent receiver for backup/restore
         handleIntent()
 
@@ -148,8 +149,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun isBiometricEnabled(): Boolean {
         val type = MiscSettingsActivity.BioMetricType.fromValue(persistentState.biometricAuthType)
-        // use the biometricAuth flag for backward compatibility with older versions
-        return persistentState.biometricAuth || type.enabled()
+        // use the biometricAuth flag for backward compatibility with older version
+        return type.enabled()
     }
 
     // check if app running on TV
@@ -415,6 +416,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         if (persistentState.biometricAuth) {
             persistentState.biometricAuthType = MiscSettingsActivity.BioMetricType.FIFTEEN_MIN.action
         }
+        persistentState.biometricAuth = false
     }
 
     // fixme: find a cleaner way to implement this, move this to some other place
