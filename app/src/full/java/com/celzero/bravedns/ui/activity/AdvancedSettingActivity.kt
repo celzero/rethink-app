@@ -15,17 +15,20 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.CompoundButton
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.databinding.ActivityAdvancedSettingBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
@@ -35,6 +38,15 @@ import org.koin.android.ext.android.inject
 class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_setting) {
     private val persistentState by inject<PersistentState>()
     private val b by viewBinding(ActivityAdvancedSettingBinding::bind)
+
+    // Handler to update the dialer timeout value when the seekbar is moved
+    private val handler = Handler(Looper.getMainLooper())
+    private var updateRunnable: Runnable? = null
+
+    companion object {
+        private const val TAG = "AdvSetAct"
+        private const val ONE_SEC = 1000L
+    }
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -65,6 +77,27 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         b.settingsActivitySlowdownSwitch.isChecked = persistentState.slowdownMode
 
         b.dvExperimentalSwitch.isChecked = persistentState.nwEngExperimentalFeatures
+
+        updateDialerTimeOutUi()
+    }
+
+    private fun updateDialerTimeOutUi() {
+        val valueMin = persistentState.dialTimeoutSec / 60
+        Logger.d(LOG_TAG_UI, "$TAG; dialer timeout value: $valueMin, persistentState: ${persistentState.dialTimeoutSec}")
+        val displayText = if (valueMin == 0) {
+            "Selected Value: (disabled)"
+        } else {
+            "Selected Value: $valueMin mins"
+        }
+        b.dvTimeoutDesc.text = displayText
+        Logger.d(LOG_TAG_UI, "$TAG; dialer timeout value: $valueMin, progress: ${b.dvTimeoutSeekbar.progress}")
+        if (valueMin == b.dvTimeoutSeekbar.progress) return
+        b.dvTimeoutSeekbar.progress = valueMin
+    }
+
+    private fun updateDialerTimeOut(valueMin: Int) {
+        persistentState.dialTimeoutSec = valueMin * 60
+        updateDialerTimeOutUi()
     }
 
     private fun setupClickListeners() {
@@ -121,6 +154,29 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         b.dvExperimentalSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.nwEngExperimentalFeatures = isChecked
         }
+
+        b.dvTimeoutSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                handler.removeCallbacks(updateRunnable ?: Runnable {})
+
+                updateRunnable = Runnable {
+                    updateDialerTimeOut(progress)
+                }
+
+                handler.postDelayed(updateRunnable!!, ONE_SEC)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                handler.removeCallbacks(updateRunnable ?: Runnable {})
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                updateRunnable?.let {
+                    handler.removeCallbacks(it)
+                    handler.post(it)
+                }
+            }
+        })
     }
 
     private fun openConsoleLogActivity() {
@@ -128,7 +184,7 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
             val intent = Intent(this, ConsoleLogActivity::class.java)
             startActivity(intent)
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_UI, "error opening console log activity ${e.message}", e)
+            Logger.e(LOG_TAG_UI, "$TAG; err opening console log activity ${e.message}", e)
         }
     }
 }
