@@ -44,8 +44,8 @@ object WireguardManager : KoinComponent {
     private val appConfig: AppConfig by inject()
 
     // 120 sec + 5 sec buffer
-    val WG_HANDSHAKE_TIMEOUT = 125 * DateUtils.SECOND_IN_MILLIS
-    val WG_UPTIME_THRESHOLD = 5 * DateUtils.SECOND_IN_MILLIS
+    const val WG_HANDSHAKE_TIMEOUT = 125 * DateUtils.SECOND_IN_MILLIS
+    const val WG_UPTIME_THRESHOLD = 5 * DateUtils.SECOND_IN_MILLIS
 
     // contains db values of wg configs (db stores path of the config file)
     private var mappings: CopyOnWriteArraySet<WgConfigFilesImmutable> = CopyOnWriteArraySet()
@@ -360,10 +360,6 @@ object WireguardManager : KoinComponent {
         if (default.isNotEmpty()) proxyIds.add(default)
 
         return proxyIds
-    }
-
-    suspend fun getAllActiveCatchAllConfigIds(): List<String> {
-        return mappings.filter { it.isActive && it.isCatchAll }.map { ProxyManager.ID_WG_BASE + it.id }
     }
 
     private fun convertStringIdToId(id: String): Int {
@@ -727,10 +723,6 @@ object WireguardManager : KoinComponent {
 
     fun oneWireGuardEnabled(): Boolean {
         return mappings.any { it.oneWireGuard && it.isActive }
-    }
-
-    fun catchAllEnabled(): Boolean {
-        return mappings.any { it.isCatchAll && it.isActive }
     }
 
     fun getOneWireGuardProxyId(): Int? {
