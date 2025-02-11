@@ -41,6 +41,7 @@ import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.database.RethinkDnsEndpointRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.InternetProtocol
@@ -1011,6 +1012,11 @@ internal constructor(
     fun isOrbotProxyEnabled(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
         return proxyProvider.isProxyProviderOrbot()
+    }
+
+    fun isWgEnabled(): Boolean {
+        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
+        return proxyProvider.isProxyProviderWireguard()
     }
 
     fun isProxyEnabled(): Boolean {
