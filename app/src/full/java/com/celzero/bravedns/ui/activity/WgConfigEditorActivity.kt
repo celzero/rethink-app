@@ -54,7 +54,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
     companion object {
         const val INTENT_EXTRA_WG_ID = "WIREGUARD_TUNNEL_ID"
         private const val CLIPBOARD_PUBLIC_KEY_LBL = "Public Key"
-        private const val DEFAULT_MTU = "1280"
+        private const val DEFAULT_MTU = "-1"
         // when dns is set to auto, the default dns is set to 1.1.1.1. this differs from official
         // wireguard for android, because rethink requires a dns to be set in "Simple" mode
         private const val DEFAULT_DNS = "1.1.1.1"

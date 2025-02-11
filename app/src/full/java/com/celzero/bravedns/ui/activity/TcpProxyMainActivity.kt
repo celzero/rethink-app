@@ -15,13 +15,14 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityTcpProxyBinding
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.SEC_WARP_ID
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_ID
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.isWarpWorking
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.service.WireguardManager.SEC_WARP_ID
-import com.celzero.bravedns.service.WireguardManager.WARP_ID
-import com.celzero.bravedns.service.WireguardManager.isWarpWorking
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
@@ -92,8 +93,8 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
     private fun displayWarpStatus() {
         io {
             uiCtx {
-                val config = WireguardManager.getWarpConfig()
-                val isActive = WireguardManager.getConfigFilesById(WARP_ID)?.isActive
+                val config = RpnProxyManager.getWarpConfig()
+                val isActive = false
                 if (config == null) {
                     b.warpStatus.text =
                         "Fetch from server" // getString(R.string.tcp_proxy_description)
@@ -170,7 +171,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
         b.enableUdpRelay.setOnCheckedChangeListener { _, b ->
             if (b) {
                 io {
-                    val alreadyDownloaded = WireguardManager.isSecWarpAvailable()
+                    val alreadyDownloaded = RpnProxyManager.isSecWarpAvailable()
                     if (alreadyDownloaded) {
                         val cf = WireguardManager.getConfigFilesById(SEC_WARP_ID) ?: return@io
                         WireguardManager.enableConfig(cf)
@@ -250,7 +251,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
 
     private suspend fun createConfigOrShowErrorLayout() {
         val works = isWarpWorking()
-        if (works) {
+        if (works.first) {
             fetchWarpConfigFromServer()
         } else {
             showConfigCreationError()
@@ -258,7 +259,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
     }
 
     private suspend fun fetchWarpConfigFromServer() {
-        val config = WireguardManager.getNewWarpConfig(SEC_WARP_ID)
+        val config = RpnProxyManager.getNewWarpConfig(true, SEC_WARP_ID, 0)
         Logger.i(Logger.LOG_TAG_PROXY, "new config from server: ${config?.getName()}")
         if (config == null) {
             showConfigCreationError()

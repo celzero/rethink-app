@@ -57,6 +57,10 @@ class WgConfigFiles {
     override fun hashCode(): Int {
         var result = this.id.hashCode()
         result += result * 31 + this.name.hashCode()
+        result += result * 31 + this.isActive.hashCode()
+        result += result * 31 + this.isCatchAll.hashCode()
+        result += result * 31 + this.oneWireGuard.hashCode()
+        result += result * 31 + this.isLockdown.hashCode()
         return result
     }
 

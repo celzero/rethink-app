@@ -282,7 +282,7 @@ class WgMainActivity :
     }
 
     private fun observeDnsName() {
-        val activeConfigs = WireguardManager.getEnabledConfigs()
+        val activeConfigs = WireguardManager.getActiveConfigs()
         if (WireguardManager.oneWireGuardEnabled()) {
             val dnsName = activeConfigs.firstOrNull()?.getName() ?: return
             b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsName)
@@ -336,7 +336,7 @@ class WgMainActivity :
             showGeneralToggle()
         }
         b.oneWgToggleBtn.setOnClickListener {
-            val activeConfigs = WireguardManager.getEnabledConfigs()
+            val activeConfigs = WireguardManager.getActiveConfigs()
             val isAnyConfigActive = activeConfigs.isNotEmpty()
             val isOneWgEnabled = WireguardManager.oneWireGuardEnabled()
             if (isAnyConfigActive && !isOneWgEnabled) {

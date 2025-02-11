@@ -58,7 +58,6 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
-import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isValidPort
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -459,7 +458,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
 
     private fun displayWireguardUi() {
 
-        val activeWgs = WireguardManager.getEnabledConfigs()
+        val activeWgs = WireguardManager.getActiveConfigs()
 
         if (activeWgs.isEmpty()) {
             b.settingsActivityWireguardDesc.text = getString(R.string.wireguard_description)
@@ -469,10 +468,10 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             var wgStatus = ""
             activeWgs.forEach {
                 val id = ProxyManager.ID_WG_BASE + it.getId()
-                val statusId = VpnController.getProxyStatusById(id)
+                val statusPair = VpnController.getProxyStatusById(id)
                 uiCtx {
-                    if (statusId != null) {
-                        val resId = UIUtils.getProxyStatusStringRes(statusId)
+                    if (statusPair.first != null) {
+                        val resId = UIUtils.getProxyStatusStringRes(statusPair.first)
                         val s = getString(resId).replaceFirstChar(Char::titlecase)
                         wgStatus += getString(
                             R.string.ci_ip_label,

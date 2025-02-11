@@ -33,8 +33,10 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.adapter.WgPeersAdapter
 import com.celzero.bravedns.databinding.ActivityWgDetailBinding
+import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
@@ -42,6 +44,7 @@ import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
 import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
+import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
@@ -53,6 +56,7 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
+import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -142,11 +146,13 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.lockdownRl.visibility = View.VISIBLE
             b.catchAllRl.visibility = View.VISIBLE
             b.oneWgInfoTv.visibility = View.GONE
+            b.hopBtn.visibility = View.VISIBLE
         } else if (wgType.isOneWg()) {
             b.wgHeaderTv.text =
                 getString(R.string.rt_list_simple_btn_txt).replaceFirstChar(Char::titlecase)
             b.lockdownRl.visibility = View.GONE
             b.catchAllRl.visibility = View.GONE
+            b.hopBtn.visibility = View.GONE
             b.oneWgInfoTv.visibility = View.VISIBLE
             b.applicationsBtn.isEnabled = false
             b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
@@ -193,21 +199,29 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private suspend fun updateStatusUi(id: Int) {
         val config = WireguardManager.getConfigFilesById(id)
-        val cid = ProxyManager.ID_WG_BASE + id
+        val cid = ID_WG_BASE + id
         if (config?.isActive == true) {
-            val statusId = VpnController.getProxyStatusById(cid)
+            val statusId = VpnController.getProxyStatusById(cid).first
             val stats = VpnController.getProxyStats(cid)
             val ps = UIUtils.ProxyStatus.entries.find { it.id == statusId }
+            val dnsStatusId = if (persistentState.splitDns) {
+                VpnController.getDnsStatus(cid)
+            } else {
+                null
+            }
             uiCtx {
-                if (statusId != null) {
-
+                if (dnsStatusId != null && isDnsError(dnsStatusId)) {
+                    // check for dns failure cases and update the UI
+                    b.interfaceDetailCard.strokeColor = fetchColor(this, R.attr.chipTextNegative)
+                    b.statusText.text = getString(R.string.status_failing)
+                        .replaceFirstChar(Char::titlecase)
+                } else if (statusId != null) {
                     val handshakeTime = getHandshakeTime(stats).toString()
                     val statusText = getIdleStatusText(ps, stats)
                         .ifEmpty { getStatusText(ps, handshakeTime, stats) }
                     b.statusText.text = statusText
                 } else {
-                    b.statusText.text =
-                        getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
+                    b.statusText.text = getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
                 }
                 val strokeColor = getStrokeColorForStatus(ps, stats)
                 b.interfaceDetailCard.strokeWidth = 2
@@ -220,6 +234,13 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                     getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
         }
+    }
+
+    private fun isDnsError(statusId: Long?): Boolean {
+        if (statusId == null) return true
+
+        val s = Transaction.Status.fromId(statusId)
+        return s == Transaction.Status.BAD_QUERY || s == Transaction.Status.BAD_RESPONSE || s == Transaction.Status.NO_RESPONSE || s == Transaction.Status.SEND_FAIL || s == Transaction.Status.CLIENT_ERROR || s == Transaction.Status.INTERNAL_ERROR || s == Transaction.Status.TRANSPORT_ERROR
     }
 
     private fun getStatusText(
@@ -243,7 +264,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private fun getIdleStatusText(status: UIUtils.ProxyStatus?, stats: RouterStats?): String {
         if (status != UIUtils.ProxyStatus.TZZ && status != UIUtils.ProxyStatus.TNT) return ""
         if (stats == null || stats.lastOK == 0L) return ""
-        if (System.currentTimeMillis() - stats.lastOK >= 30 * DateUtils.SECOND_IN_MILLIS) return ""
+        if (System.currentTimeMillis() - stats.lastOK >= WG_HANDSHAKE_TIMEOUT) return ""
 
         return getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
     }
@@ -267,9 +288,9 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun getStrokeColorForStatus(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
         return when (status) {
-            UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) R.attr.chipTextNeutral else R.attr.accentGood
-            UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
-            else -> R.attr.chipTextNegative
+            UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) return R.attr.chipTextNeutral else R.attr.accentGood
+            UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ -> R.attr.chipTextNeutral
+            else -> R.attr.chipTextNegative // TNT, TKO, TEND
         }
     }
 
@@ -488,6 +509,93 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         b.logsBtn.setOnClickListener {
             startActivity(ProxyManager.ID_WG_BASE + configId)
         }
+
+        b.hopBtn.setOnClickListener {
+            io {
+                val id = ProxyManager.ID_WG_BASE + configId
+                val hopId = VpnController.via(id)
+                Logger.d(LOG_TAG_PROXY, "hop result: $hopId")
+                val sid = convertStringIdToId(hopId)
+                val hopables = WgHopManager.getHopableWgs(id)
+                uiCtx { showHopDialog(hopables, sid) }
+            }
+        }
+    }
+
+    private fun convertStringIdToId(id: String): Int {
+        return try {
+            val configId = id.substring(ProxyManager.ID_WG_BASE.length)
+            configId.toIntOrNull() ?: INVALID_CONF_ID
+        } catch (e: Exception) {
+            Logger.i(LOG_TAG_PROXY, "err converting string id to int: $id")
+            INVALID_CONF_ID
+        }
+    }
+
+    private fun showHopDialog(filteredConfigs: List<Config>, sid: Int) {
+        val curr = WireguardManager.getConfigById(configId)
+        if (curr == null) {
+            Utilities.showToastUiCentered(
+                this,
+                "Config not found",
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+        /*val configs = WireguardManager.getActiveConfigs()
+        val filteredConfigs = configs.filter { it.getId() != configId }
+        if (filteredConfigs.isEmpty()) {
+            Utilities.showToastUiCentered(
+                this,
+                "No other configs to hop to",
+                Toast.LENGTH_SHORT
+            )
+            return
+        } */
+        val configNames = filteredConfigs.map { it.getName() }.toTypedArray()
+        val selectedIndex = if (sid == -1) {
+            -1
+        } else {
+            filteredConfigs.indexOfFirst { it.getId() == sid }
+        }
+        Logger.v(LOG_TAG_PROXY, "hop: configs: ${filteredConfigs.map { it.getId() }}")
+        Logger.v(LOG_TAG_PROXY, "hop dialog: selected Index: $selectedIndex")
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setTitle("Select a config to hop")
+        builder.setSingleChoiceItems(configNames, selectedIndex) { dialog, which ->
+            val config = filteredConfigs[which]
+            io {
+                val res = if (which == selectedIndex) {
+                    // set empty via so that it is removed from the map
+                    WgHopManager.deleteBySrc(ID_WG_BASE + curr.getId())
+                } else {
+                    WgHopManager.hop(curr.getId(), config.getId())
+                }
+                Logger.d(LOG_TAG_PROXY, "hop result: res:${res.first}, err: ${res.second}")
+                uiCtx {
+                    if (res.first) {
+                        Utilities.showToastUiCentered(
+                            this,
+                            "Hop successful",
+                            Toast.LENGTH_SHORT
+                        )
+                    } else {
+                        Utilities.showToastUiCentered(
+                            this,
+                            res.second,
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                }
+                WgHopManager.printMaps()
+            }
+            dialog.dismiss()
+        }
+
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.create().show()
     }
 
     private fun startActivity(searchParam: String?) {
@@ -501,19 +609,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private fun updateLockdown(enabled: Boolean) {
         io { WireguardManager.updateLockdownConfig(configId, enabled) }
     }
-
-    /* private fun updateOneWireGuard(enabled: Boolean) {
-        io {
-            WireguardManager.updateOneWireGuardConfig(configId, enabled)
-            uiCtx {
-                // disable add apps button
-                b.applicationsBtn.isEnabled = !enabled
-                b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
-                Toast.makeText(this, getString(R.string.one_wg_success_toast), Toast.LENGTH_SHORT)
-                    .show()
-            }
-        }
-    }*/
 
     private fun updateCatchAll(enabled: Boolean) {
         io {
