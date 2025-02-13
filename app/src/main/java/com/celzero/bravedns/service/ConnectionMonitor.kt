@@ -289,7 +289,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         private val maxReachabilityCount = 10L
 
         companion object {
-            private const val DEFAULT_MTU = 1500 // same as BraveVpnService#VPN_INTERFACE_MTU
+            private const val DEFAULT_MTU = 1280 // same as BraveVpnService#VPN_INTERFACE_MTU
             private const val MIN_MTU = 1280
         }
 
