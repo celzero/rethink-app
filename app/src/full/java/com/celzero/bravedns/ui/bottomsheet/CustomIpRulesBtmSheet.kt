@@ -2,6 +2,7 @@ package com.celzero.bravedns.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_UI
+import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
@@ -14,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.databinding.BottomSheetCustomIpsBinding
+import com.celzero.bravedns.rpnproxy.RegionalWgConf
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
@@ -70,7 +72,7 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        Logger.v(LOG_TAG_UI, "$TAG: onViewCreated for ${ci.ipAddress}")
         init()
         initClickListeners()
 
@@ -338,9 +340,9 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
         )
     }
 
-    private fun showProxyCountriesBtmSheet(data: List<String>) {
+    private fun showProxyCountriesBtmSheet(data: List<RegionalWgConf>) {
         Logger.v(LOG_TAG_UI, "$TAG: show pcc btm sheet for ${ci.ipAddress}")
-        val bottomSheetFragment = ProxyCountriesBtmSheet(ProxyCountriesBtmSheet.InputType.IP, ci, data, this)
+        val bottomSheetFragment = ProxyCountriesBtmSheet.newInstance(ProxyCountriesBtmSheet.InputType.IP, ci, data, this)
         bottomSheetFragment.show(
             requireActivity().supportFragmentManager,
             bottomSheetFragment.tag
@@ -367,6 +369,11 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
         } catch (e: Exception) {
             Logger.w(LOG_TAG_UI, "$TAG: err in onDismissWg ${e.message}", e)
         }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        Logger.v(LOG_TAG_UI, "$TAG: onDismiss; ip: ${ci.ipAddress}")
     }
 
     private fun io(f: suspend () -> Unit) {

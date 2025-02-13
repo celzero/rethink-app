@@ -18,19 +18,23 @@ import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.databinding.BottomSheetProxiesListBinding
 import com.celzero.bravedns.databinding.ListItemEndpointBinding
+import com.celzero.bravedns.databinding.ListItemProxyCcWgBinding
+import com.celzero.bravedns.rpnproxy.RegionalWgConf
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
+import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.getFlag
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List<String>, val listener: CountriesDismissListener) :
+class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List<RegionalWgConf>, val listener: CountriesDismissListener) :
     BottomSheetDialogFragment() {
     private var _binding: BottomSheetProxiesListBinding? = null
 
@@ -51,7 +55,7 @@ class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List
     }
 
     companion object {
-        fun newInstance(input: InputType, obj: Any?, data: List<String>, listener: CountriesDismissListener): ProxyCountriesBtmSheet {
+        fun newInstance(input: InputType, obj: Any?, data: List<RegionalWgConf>, listener: CountriesDismissListener): ProxyCountriesBtmSheet {
             return ProxyCountriesBtmSheet(input, obj, data, listener)
         }
 
@@ -98,7 +102,7 @@ class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List
             Logger.v(LOG_TAG_UI, "$TAG: country selected: $selectedItem")
             // TODO: Implement the action to be taken when an item is selected
             val selectedCountry = selectedItem
-            val canSelectCC = RpnProxyManager.canSelectCountryCode(selectedCountry)
+            val canSelectCC = RpnProxyManager.canSelectCountryCode(selectedCountry.cc)
             if (!canSelectCC) {
                 Utilities.showToastUiCentered(
                     requireContext(),
@@ -115,8 +119,8 @@ class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List
                             Logger.w(LOG_TAG_UI, "$TAG: custom domain is null")
                             return@io
                         }
-                        DomainRulesManager.setCC(cd, selectedCountry)
-                        cd.proxyCC = selectedCountry
+                        DomainRulesManager.setCC(cd, selectedCountry.cc)
+                        cd.proxyCC = selectedCountry.cc
                         uiCtx {
                             Utilities.showToastUiCentered(
                                 requireContext(),
@@ -130,8 +134,8 @@ class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List
                             Logger.w(LOG_TAG_UI, "$TAG: custom ip is null")
                             return@io
                         }
-                        IpRulesManager.updateProxyCC(ci, selectedCountry)
-                        ci.proxyCC = selectedCountry
+                        IpRulesManager.updateProxyCC(ci, selectedCountry.cc)
+                        ci.proxyCC = selectedCountry.cc
                         uiCtx {
                             Utilities.showToastUiCentered(
                                 requireContext(),
@@ -149,13 +153,13 @@ class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List
     }
 
     inner class RecyclerViewAdapter(
-        private val data: List<String>,
-        private val onItemClicked: (String) -> Unit
+        private val data: List<RegionalWgConf>,
+        private val onItemClicked: (RegionalWgConf) -> Unit
     ) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view =
-                ListItemEndpointBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                ListItemProxyCcWgBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             return ViewHolder(view)
         }
 
@@ -165,31 +169,37 @@ class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List
 
         override fun getItemCount(): Int = data.size
 
-        inner class ViewHolder(private val bb: ListItemEndpointBinding) :
+        inner class ViewHolder(private val bb: ListItemProxyCcWgBinding) :
             RecyclerView.ViewHolder(bb.root) {
 
-            fun bind(item: String) {
+            fun bind(item: RegionalWgConf) {
+                Logger.v(LOG_TAG_UI, "$TAG: binding item: ${item.cc}, ${item.name}")
+                val flag = getFlag(item.cc)
+                val ccName = item.name.ifEmpty { getCountryNameFromFlag(flag) }
                 when (input) {
                     InputType.DOMAIN -> {
-                        bb.endpointName.text = item
-                        bb.endpointCheck.isChecked = item == cd?.proxyCC
-                        if (item == cd?.proxyCC) {
-                            bb.endpointDesc.text = "Selected"
-                        }
+                        bb.proxyNameCc.text = item.cc
+                        bb.proxyIconCc.text = flag
+                        bb.proxyRadioCc.isChecked = item.cc == cd?.proxyCC
+                        bb.proxyDescCc.text = ccName
                     }
                     InputType.IP -> {
-                        bb.endpointName.text = item
-                        bb.endpointCheck.isChecked = item == ci?.proxyCC
-                        if (item == ci?.proxyCC) {
-                            bb.endpointDesc.text = "Selected"
-                        }
+                        bb.proxyNameCc.text = item.cc
+                        bb.proxyIconCc.text = flag
+                        bb.proxyRadioCc.isChecked = item.cc == ci?.proxyCC
+                        bb.proxyDescCc.text = ccName
                     }
                     InputType.APP -> {
                         // TODO: Implement this
                     }
                 }
 
-                bb.endpointListContainer.setOnClickListener {
+                bb.proxyRadioCc.setOnClickListener {
+                    notifyDataSetChanged()
+                    onItemClicked(item)
+                }
+
+                bb.lipCcWgParent.setOnClickListener {
                     notifyDataSetChanged()
                     onItemClicked(item)
                 }

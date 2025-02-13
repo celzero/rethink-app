@@ -2,6 +2,7 @@ package com.celzero.bravedns.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_UI
+import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
@@ -15,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.databinding.BottomSheetCustomDomainsBinding
+import com.celzero.bravedns.rpnproxy.RegionalWgConf
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.PersistentState
@@ -80,11 +82,11 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
             io {
                 val v = WireguardManager.getAllConfigs()
                 if (v.isEmpty()) {
-                    Logger.v(LOG_TAG_UI, "$TAG No Wireguard configs found")
+                    Logger.v(LOG_TAG_UI, "$TAG no wireguard configs found")
                     uiCtx {
                         Utilities.showToastUiCentered(
                             ctx,
-                            "No ProtonVPN country codes found",
+                            "No country codes found",
                             Toast.LENGTH_SHORT
                         )
                     }
@@ -101,7 +103,7 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
             io {
                 val ctrys = RpnProxyManager.getProtonUniqueCC()
                 if (ctrys.isEmpty()) {
-                    Logger.v(LOG_TAG_UI, "$TAG No ProtonVPN country codes found")
+                    Logger.v(LOG_TAG_UI, "$TAG no country codes found")
                     uiCtx {
                         Utilities.showToastUiCentered(
                             requireContext(),
@@ -359,6 +361,7 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
     }
 
     private fun showWgListBtmSheet(data: List<Config>) {
+        Logger.v(LOG_TAG_UI, "$TAG show wg list(${data.size} for ${cd.domain}")
         val bottomSheetFragment = WireguardListBtmSheet.newInstance(WireguardListBtmSheet.InputType.DOMAIN, cd, data, this)
         bottomSheetFragment.show(
             requireActivity().supportFragmentManager,
@@ -366,8 +369,9 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
         )
     }
 
-    private fun showProxyCountriesBtmSheet(data: List<String>) {
-        val bottomSheetFragment = ProxyCountriesBtmSheet(ProxyCountriesBtmSheet.InputType.DOMAIN, cd,  data, this)
+    private fun showProxyCountriesBtmSheet(data: List<RegionalWgConf>) {
+        Logger.v(LOG_TAG_UI, "$TAG show countries(${data.size} for ${cd.domain}")
+        val bottomSheetFragment = ProxyCountriesBtmSheet.newInstance(ProxyCountriesBtmSheet.InputType.DOMAIN, cd,  data, this)
         bottomSheetFragment.show(
             requireActivity().supportFragmentManager,
             bottomSheetFragment.tag
@@ -408,6 +412,11 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
         } catch (e: Exception) {
             Logger.e(LOG_TAG_UI, "$TAG err in onDismissWg ${e.message}", e)
         }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        Logger.v(LOG_TAG_UI, "$TAG onDismiss; domain: ${cd.domain}")
     }
 
 }

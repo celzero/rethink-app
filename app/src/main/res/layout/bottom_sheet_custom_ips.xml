@@ -35,9 +35,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:ellipsize="end"
+        android:fontFamily="sans-serif"
         android:gravity="center"
         android:text="ssdfsdf"
-        android:fontFamily="sans-serif"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/small_font_subheading_text" />
 
@@ -104,14 +104,14 @@
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
-    <com.google.android.material.card.MaterialCardView
+    <RelativeLayout
         android:id="@+id/choose_country_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clipToPadding="true"
-        app:cardCornerRadius="2dp"
-        app:cardElevation="2dp"
-        app:cardUseCompatPadding="true">
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/rectangle_border_background">
 
         <RelativeLayout
             android:id="@+id/choose_country_rl"
@@ -172,17 +172,17 @@
 
         </RelativeLayout>
 
-    </com.google.android.material.card.MaterialCardView>
+    </RelativeLayout>
 
 
-    <com.google.android.material.card.MaterialCardView
+    <RelativeLayout
         android:id="@+id/choose_proxy_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clipToPadding="true"
-        app:cardCornerRadius="2dp"
-        app:cardElevation="2dp"
-        app:cardUseCompatPadding="true">
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/rectangle_border_background">
 
         <RelativeLayout
             android:id="@+id/choose_proxy_rl"
@@ -217,8 +217,8 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="?attr/primaryTextColor"
                     android:text="Proxy"
+                    android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
                 <TextView
@@ -226,8 +226,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
-                    android:textColor="?attr/primaryLightColorText"
                     android:text="Select a proxy"
+                    android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
@@ -243,7 +243,7 @@
 
         </RelativeLayout>
 
-    </com.google.android.material.card.MaterialCardView>
+    </RelativeLayout>
 
 </LinearLayout>
 
