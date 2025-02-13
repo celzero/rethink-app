@@ -221,8 +221,8 @@ object VpnController : KoinComponent {
         braveVpnService?.decreasePauseDuration(durationMs)
     }
 
-    suspend fun getProxyStatusById(id: String): Long? {
-        return braveVpnService?.getProxyStatusById(id)
+    suspend fun getProxyStatusById(id: String): Pair<Long?, String> {
+        return braveVpnService?.getProxyStatusById(id) ?: Pair(null, "vpn service not available")
     }
 
     suspend fun getProxyStats(id: String): RouterStats? {
@@ -275,7 +275,7 @@ object VpnController : KoinComponent {
     }
 
     fun mtu(): Int {
-        return braveVpnService?.underlyingNetworks?.minMtu ?: BraveVPNService.VPN_INTERFACE_MTU
+        return braveVpnService?.tunMtu() ?: 0
     }
 
     fun netType(): String {
@@ -351,5 +351,61 @@ object VpnController : KoinComponent {
 
     fun writeConsoleLog(log: ConsoleLog) {
         braveVpnService?.writeConsoleLog(log)
+    }
+
+    suspend fun registerAndFetchWarpConfig(publicKey: String): JSONObject? {
+        return braveVpnService?.registerAndFetchWarpConfig(publicKey)
+    }
+
+    suspend fun registerAndFetchAmneziaConfig(publicKey: String): JSONObject? {
+        return braveVpnService?.registerAndFetchAmneziaConfig(publicKey)
+    }
+
+    suspend fun isProxyReachable(proxyId: String, ippcsv: String): Boolean {
+        return braveVpnService?.isProxyReachable(proxyId, ippcsv) ?: false
+    }
+
+    suspend fun registerSEToTunnel(): Boolean {
+        return braveVpnService?.registerSEToTunnel() ?: false
+    }
+
+    suspend fun registerProton(): ByteArray? {
+        return braveVpnService?.registerProton()
+    }
+
+    suspend fun createWgHop(origin: Config, via: Config?): Pair<Boolean, String> {
+        return (braveVpnService?.createWgHop(origin, via) ?: Pair(false, "vpn service not available"))
+    }
+
+    suspend fun via(proxyId: String): String {
+        return braveVpnService?.via(proxyId) ?: ""
+    }
+
+    suspend fun testWarp(): Boolean {
+        return braveVpnService?.testWarp() ?: false
+    }
+
+    suspend fun testSE(): Boolean {
+        return braveVpnService?.testSE() ?: false
+    }
+
+    suspend fun testAmz(): Boolean {
+        return braveVpnService?.testAmz() ?: false
+    }
+
+    suspend fun testProton(): Boolean {
+        return braveVpnService?.testProton() ?: false
+    }
+
+    suspend fun testExit64(): Boolean {
+        return braveVpnService?.testExit64() ?: false
+    }
+
+    fun setAutoUsageId(autoUsageId: String) {
+        braveVpnService?.setAutoUsageId(autoUsageId)
+    }
+
+    fun getAutoUsageId(): String {
+        return braveVpnService?.getAutoUsageId() ?: ""
     }
 }
