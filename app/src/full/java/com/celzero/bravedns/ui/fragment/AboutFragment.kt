@@ -56,6 +56,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
+import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
@@ -124,6 +125,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppContributors.setOnClickListener(this)
         b.aboutAppTranslate.setOnClickListener(this)
         b.aboutStats.setOnClickListener(this)
+        b.aboutCloseConns.setOnClickListener(this)
     }
 
     private fun updateVersionInfo() {
@@ -153,7 +155,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun updateSponsorInfo() {
-        if (persistentState.enableWarp) {
+        if (persistentState.useRpn) {
             b.sponsorInfoUsage.visibility = View.GONE
             b.aboutSponsor.visibility = View.GONE
             return
@@ -272,6 +274,18 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.aboutStats -> {
                 openStatsDialog()
+            }
+            b.aboutCloseConns -> {
+                io {
+                    VpnController.closeConnectionsIfNeeded(UID_EVERYBODY)
+                    uiCtx {
+                        showToastUiCentered(
+                            requireContext(),
+                            "Connections closed",
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                }
             }
         }
     }
