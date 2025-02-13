@@ -21,6 +21,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.deleteBlocklistResidue
 import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.deleteOldFiles
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
@@ -87,7 +88,6 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                 return false
             }
 
-            BlocklistDownloadHelper.deleteFromCanonicalPath(context)
             val dir =
                 File(BlocklistDownloadHelper.getExternalFilePath(context, timestamp.toString()))
             if (!dir.isDirectory) {
@@ -139,10 +139,18 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             val result = updateTagsToDb(timestamp)
 
             updatePersistenceOnCopySuccess(timestamp)
+            // delete the old files in the external directory (downloaded by the download manager)
             deleteOldFiles(context, timestamp, RethinkBlocklistManager.DownloadType.LOCAL)
+            // delete the residue files in the app data directory (local_blocklist)
+            deleteBlocklistResidue(
+                context,
+                Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                timestamp
+            )
+            Logger.i(LOG_TAG_DOWNLOAD, "FileHandleWorker, copyFiles success? $result")
             return true
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_DOWNLOAD, "AppDownloadManager Copy exception: ${e.message}", e)
+            Logger.e(LOG_TAG_DOWNLOAD, "FileHandleWorker Copy exception: ${e.message}", e)
         }
         return false
     }
@@ -188,10 +196,10 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                 "tdmd5: $tdmd5, rdmd5: $rdmd5, remotetd: $remoteTdmd5, remoterd: $remoteRdmd5"
             )
             val isDownloadValid = tdmd5 == remoteTdmd5 && rdmd5 == remoteRdmd5
-            Logger.i(LOG_TAG_DOWNLOAD, "AppDownloadManager, isDownloadValid? $isDownloadValid")
+            Logger.i(LOG_TAG_DOWNLOAD, "FileHandleWorker, isDownloadValid? $isDownloadValid")
             return isDownloadValid
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_DOWNLOAD, "AppDownloadManager, isDownloadValid err: ${e.message}", e)
+            Logger.e(LOG_TAG_DOWNLOAD, "FileHandleWorker, isDownloadValid err: ${e.message}", e)
         }
         return false
     }

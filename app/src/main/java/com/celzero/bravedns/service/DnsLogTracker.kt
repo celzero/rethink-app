@@ -43,6 +43,7 @@ internal constructor(
 
     companion object {
         const val DNS_LEAK_TEST = "dnsleaktest"
+        const val ECH = "ech."
 
         // Some apps like firefox, instagram do not respect ttls
         // add a reasonable grace period to account for that
@@ -85,6 +86,8 @@ internal constructor(
         transaction.relayName = summary.relayServer ?: ""
         transaction.msg = summary.msg ?: ""
         transaction.upstreamBlock = summary.upstreamBlocks
+        transaction.region = summary.region
+
         return transaction
     }
 
@@ -103,6 +106,7 @@ internal constructor(
         dnsLog.time = transaction.responseCalendar.timeInMillis
         dnsLog.msg = transaction.msg
         dnsLog.upstreamBlock = transaction.upstreamBlock
+        dnsLog.region = transaction.region
         val typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt())
         if (typeName == ResourceRecordTypes.UNKNOWN) {
             dnsLog.typeName = transaction.type.toString()
@@ -200,6 +204,8 @@ internal constructor(
         if (transaction.status === Transaction.Status.COMPLETE) {
             if (isLocallyResolved(transaction)) return
             VpnController.onConnectionStateChanged(BraveVPNService.State.WORKING)
+            // only update the server name if it is not empty as its only used to show ech
+            VpnController.onServerNameUpdated(transaction.serverName)
         } else {
             val vpnState = vpnStateMap[transaction.status] ?: BraveVPNService.State.FAILING
             VpnController.onConnectionStateChanged(vpnState)

@@ -30,9 +30,11 @@ import com.celzero.bravedns.databinding.ActivityNetworkLogsBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity.Companion.RULES_SEARCH_ID
 import com.celzero.bravedns.ui.fragment.ConnectionTrackerFragment
 import com.celzero.bravedns.ui.fragment.DnsLogFragment
 import com.celzero.bravedns.ui.fragment.RethinkLogFragment
+import com.celzero.bravedns.ui.fragment.WgNwStatsFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.google.android.material.tabs.TabLayoutMediator
@@ -42,6 +44,11 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
     private val b by viewBinding(ActivityNetworkLogsBinding::bind)
     private var fragmentIndex = 0
     private var searchParam = ""
+    // to handle search navigation from universal firewall, to show only the search results
+    // of the selected universal rule, show only network logs tab
+    private var isUnivNavigated = false
+    // to handle the wireguard connections
+    private var isWireGuardLogs = false
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
@@ -49,7 +56,12 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
     enum class Tabs(val screen: Int) {
         NETWORK_LOGS(0),
         DNS_LOGS(1),
-        RETHINK_LOGS(2)
+        RETHINK_LOGS(2),
+        WIREGUARD_STATS(3)
+    }
+    
+    companion object {
+        const val RULES_SEARCH_ID_WIREGUARD = "W:"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +69,11 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
         super.onCreate(savedInstanceState)
         fragmentIndex = intent.getIntExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, 0)
         searchParam = intent.getStringExtra(Constants.SEARCH_QUERY) ?: ""
+        if (searchParam.contains(RULES_SEARCH_ID)) {
+            isUnivNavigated = true
+        } else if(searchParam.contains(RULES_SEARCH_ID_WIREGUARD)) {
+            isWireGuardLogs = true
+        }
         init()
     }
 
@@ -87,9 +104,25 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
         b.logsActViewpager.setCurrentItem(fragmentIndex, false)
 
         observeAppState()
+
+        b.appLogs.setOnClickListener {
+            openConsoleLogActivity()
+        }
+    }
+
+    private fun openConsoleLogActivity() {
+        val intent = Intent(this, ConsoleLogActivity::class.java)
+        startActivity(intent)
     }
 
     private fun getCount(): Int {
+        if (isUnivNavigated) {
+            return 1
+        }
+        if (isWireGuardLogs) {
+            return 2
+        }
+
         var count = 0
         if (persistentState.routeRethinkInRethink) {
             count = 1
@@ -102,6 +135,16 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
     }
 
     private fun getFragment(position: Int): Fragment {
+        if (isUnivNavigated) {
+            return ConnectionTrackerFragment.newInstance(searchParam)
+        }
+        if (isWireGuardLogs) {
+            return when(position) {
+                0 -> ConnectionTrackerFragment.newInstance(searchParam)
+                1 -> WgNwStatsFragment.newInstance(searchParam)
+                else -> ConnectionTrackerFragment.newInstance(searchParam)
+            }
+        }
         return when (position) {
             0 -> {
                 if (appConfig.getBraveMode().isDnsMode()) {
@@ -132,6 +175,14 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
 
     // get tab text based on brave mode
     private fun getTabText(position: Int): String {
+        if (isWireGuardLogs) {
+            return when(position) {
+                0 -> getString(R.string.firewall_act_network_monitor_tab)
+                1 -> "Stats"
+                else -> getString(R.string.firewall_act_network_monitor_tab)
+            }
+        }
+
         return when (position) {
             0 -> {
                 if (appConfig.getBraveMode().isDnsMode()) {

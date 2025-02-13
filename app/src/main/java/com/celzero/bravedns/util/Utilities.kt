@@ -45,6 +45,7 @@ import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
@@ -168,11 +169,11 @@ object Utilities {
         } catch (e: Settings.SettingNotFoundException) {
             Logger.e(
                 LOG_TAG_VPN,
-                "isAccessibilityServiceEnabled Exception on isAccessibilityServiceEnabledViaSettingsSecure() ${e.message}",
+                "isAccessibilityServiceEnabled err on isAccessibilityServiceEnabledViaSettingsSecure() ${e.message}",
                 e
             )
         }
-        Logger.w(LOG_TAG_VPN, "Accessibility service not enabled via Settings Secure")
+        Logger.w(LOG_TAG_VPN, "accessibility service not enabled via Settings Secure")
         return isAccessibilityServiceEnabled(context, accessibilityService)
     }
 
@@ -196,7 +197,7 @@ object Utilities {
         try {
             countryMap = CountryMap(context.assets)
         } catch (e: IOException) {
-            Logger.e(LOG_TAG_VPN, "Failure fetching country map ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "err fetching country map ${e.message}", e)
         }
     }
 
@@ -254,9 +255,14 @@ object Utilities {
     }
 
     fun isLanIpv4(ipAddress: String): Boolean {
-        val ip = IPAddressString(ipAddress).address ?: return false
+        try {
+            val ip = IPAddressString(ipAddress).address ?: return false
 
-        return ip.isLoopback || ip.isLocal || ip.isAnyLocal || UNSPECIFIED_IP_IPV4.equals(ip)
+            return ip.isLoopback || ip.isLocal || ip.isAnyLocal || UNSPECIFIED_IP_IPV4.equals(ip)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "err in isLanIpv4 ${e.message}", e)
+        }
+        return false
     }
 
     fun isValidLocalPort(port: Int?): Boolean {
@@ -288,7 +294,34 @@ object Utilities {
 
     fun showToastUiCentered(context: Context, message: String, toastLength: Int) {
         try {
-            Toast.makeText(context, message, toastLength).show()
+            // check if the context is ui context or not
+            if (context is androidx.appcompat.app.AppCompatActivity) {
+                context.runOnUiThread {
+                    Toast.makeText(context, message, toastLength).show()
+                }
+                return
+            } else if (context is androidx.fragment.app.FragmentActivity) {
+                context.runOnUiThread {
+                    Toast.makeText(context, message, toastLength).show()
+                }
+                return
+            } else if (context is android.app.Activity) {
+                context.runOnUiThread {
+                    Toast.makeText(context, message, toastLength).show()
+                }
+                return
+            } else if (context is android.app.Application) {
+                Logger.w(LOG_TAG_VPN, "toast err: context not found")
+                if (DEBUG) { // for testing purpose
+                    Toast.makeText(context, message, toastLength).show()
+                }
+            } else {
+                Logger.w(LOG_TAG_VPN, "toast err: context not found")
+                if (DEBUG) { // for testing purpose
+                    Toast.makeText(context, message, toastLength).show()
+                }
+            }
+
         } catch (e: IllegalStateException) {
             Logger.w(LOG_TAG_VPN, "toast err: ${e.message}")
         } catch (e: IllegalAccessException) {
@@ -313,7 +346,7 @@ object Utilities {
                     pm.getPackageInfo(pi, PackageManager.GET_META_DATA)
                 }
         } catch (e: PackageManager.NameNotFoundException) {
-            Logger.w(LOG_TAG_APP_DB, "Application not available $pi" + e.message, e)
+            Logger.w(LOG_TAG_APP_DB, "app not available $pi" + e.message, e)
         }
         return metadata
     }
@@ -350,7 +383,7 @@ object Utilities {
 
             src.copyTo(dest, true)
         } catch (e: Exception) { // Throws NoSuchFileException, IOException
-            Logger.e(LOG_TAG_DOWNLOAD, "Error copying file ${e.message}", e)
+            Logger.e(LOG_TAG_DOWNLOAD, "err copying file ${e.message}", e)
             return false
         }
 
@@ -372,7 +405,7 @@ object Utilities {
             writeStream.close()
             true
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_DOWNLOAD, "Issue while copying files using streams: ${e.message}, $e")
+            Logger.w(LOG_TAG_DOWNLOAD, "err while copying files using streams: ${e.message}, $e")
             false
         }
     }
@@ -395,7 +428,7 @@ object Utilities {
             val alwaysOn = Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
             context.packageName == alwaysOn
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "Failure while retrieving Settings.Secure value ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "err while retrieving Settings.Secure value ${e.message}", e)
             false
         }
     }
@@ -406,7 +439,7 @@ object Utilities {
             val alwaysOn = Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
             !TextUtils.isEmpty(alwaysOn) && context.packageName != alwaysOn
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "Failure while retrieving Settings.Secure value ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "err while retrieving Settings.Secure value ${e.message}", e)
             false
         }
     }
@@ -420,10 +453,7 @@ object Utilities {
             ctx.packageManager.getApplicationIcon(packageName)
         } catch (e: PackageManager.NameNotFoundException) {
             // Not adding exception details in logs.
-            Logger.e(
-                LOG_TAG_FIREWALL,
-                "Application Icon not available for package: $packageName" + e.message
-            )
+            Logger.e(LOG_TAG_FIREWALL, "no app icon for $packageName" + e.message)
             getDefaultIcon(ctx)
         }
     }
@@ -442,7 +472,7 @@ object Utilities {
             try {
                 updateUi()
             } catch (e: Exception) {
-                Logger.e(LOG_TAG_VPN, "Failure in delay function ${e.message}", e)
+                Logger.e(LOG_TAG_VPN, "err in delay fn ${e.message}", e)
             }
         }
     }
@@ -451,9 +481,9 @@ object Utilities {
         try {
             return ctx.packageManager.getPackagesForUid(uid)
         } catch (e: PackageManager.NameNotFoundException) {
-            Logger.w(LOG_TAG_FIREWALL, "Package Not Found: " + e.message)
+            Logger.w(LOG_TAG_FIREWALL, "package not found: " + e.message)
         } catch (e: SecurityException) {
-            Logger.w(LOG_TAG_FIREWALL, "Package Not Found: " + e.message)
+            Logger.w(LOG_TAG_FIREWALL, "package not found: " + e.message)
         }
         return null
     }
@@ -548,7 +578,7 @@ object Utilities {
                 }
             Logger.d(LOG_TAG_DOWNLOAD, "deleteRecursive File : ${fileOrDirectory.path}, $isDeleted")
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_DOWNLOAD, "File delete exception: ${e.message}", e)
+            Logger.w(LOG_TAG_DOWNLOAD, "err on file delete: ${e.message}", e)
         }
     }
 
@@ -589,7 +619,7 @@ object Utilities {
 
             return File(localBlocklist)
         } catch (e: IOException) {
-            Logger.e(LOG_TAG_VPN, "Could not fetch local blocklist: " + e.message, e)
+            Logger.e(LOG_TAG_VPN, "err fetching local blocklist: " + e.message, e)
             null
         }
     }
@@ -600,11 +630,7 @@ object Utilities {
         val remoteFile =
             blocklistFile(remoteDir.absolutePath, Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
                 ?: return false
-        if (remoteFile.exists()) {
-            return true
-        }
-
-        return false
+        return remoteFile.exists()
     }
 
     fun blocklistDir(ctx: Context?, which: String, timestamp: Long): File? {
@@ -746,9 +772,9 @@ object Utilities {
             val exp = (ln(bytes.toDouble()) / ln(unit.toDouble())).toInt()
             val pre = ("KMGTPE")[exp - 1] + if (si) "" else "i"
             val totalBytes = bytes / Math.pow(unit.toDouble(), exp.toDouble())
-            return String.format("%.1f %sB", totalBytes, pre)
+            return String.format(Locale.ROOT, "%.1f %sB", totalBytes, pre)
         } catch (e: NumberFormatException) {
-            Logger.e(LOG_TAG_DOWNLOAD, "Number format exception: ${e.message}", e)
+            Logger.e(LOG_TAG_DOWNLOAD, "err in humanReadableByteCount: ${e.message}", e)
         } catch (e: Exception) {
             Logger.e(LOG_TAG_DOWNLOAD, "err in humanReadableByteCount: ${e.message}", e)
         }
@@ -792,5 +818,36 @@ object Utilities {
         if (n1 == null || n2 == null) return false
 
         return n1.networkHandle == n2.networkHandle
+    }
+
+    // used to check if the current os version is above 4.12 for anti-censorship feature
+    // desync requires os version above 4.12
+    fun isOsVersionAbove412(targetVersion: String): Boolean {
+        // get the os version from system properties
+        val osVersion = System.getProperty("os.version") ?: return false
+
+        // extract the version part without any additional details after a '-'
+        val currentVersion =
+            osVersion.split("-").first()  // use only the part before '-' if present
+
+        val version1Parts = currentVersion.split(".")
+        val version2Parts = targetVersion.split(".")
+
+        // find the maximum length to compare up to the longest version component
+        val maxLength = maxOf(version1Parts.size, version2Parts.size)
+
+        for (i in 0 until maxLength) {
+            // convert each part to an integer for numerical comparison, default to 0 if null
+            val part1 = version1Parts.getOrNull(i)?.toIntOrNull() ?: 0
+            val part2 = version2Parts.getOrNull(i)?.toIntOrNull() ?: 0
+
+            // if parts differ, return comparison result
+            if (part1 != part2) {
+                val c = part1.compareTo(part2)
+                return c >= 0
+            }
+        }
+
+        return true // versions are equal
     }
 }

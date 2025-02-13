@@ -34,6 +34,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.receiver.NotificationActionReceiver
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
@@ -144,10 +145,11 @@ internal constructor(
             val pxm = ProxyManager.load()
             val wgm = WireguardManager.load()
             val tcpm = TcpProxyHelper.load()
+            val rpn = RpnProxyManager.load()
 
             Logger.i(
                 LOG_TAG_APP_DB,
-                "reload: fm: ${fm}; ip: ${ipm}; dom: ${dm}; px: ${pxm}; wg: ${wgm}; t: ${tcpm}"
+                "reload: fm: ${fm}; ip: ${ipm}; dom: ${dm}; px: ${pxm}; wg: ${wgm}; t: $tcpm"
             )
 
             val trackedApps = FirewallManager.getAllApps()
@@ -343,7 +345,7 @@ internal constructor(
         }
         val ai = maybeFetchAppInfo(uid)
         val pkg = ai?.packageName ?: ""
-        Logger.i(LOG_TAG_APP_DB, "insert app; uid: $uid, pkg: ${pkg}")
+        Logger.i(LOG_TAG_APP_DB, "insert app; uid: $uid, pkg: $pkg")
         if (ai != null) {
             // uid may be different from the one in ai, if the app is installed in a different user
             insertApp(ai)
@@ -583,6 +585,7 @@ internal constructor(
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE
         )
+        intent.putExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, app.uid)
 
         val pendingIntent =
             getActivityPendingIntent(
@@ -664,7 +667,7 @@ internal constructor(
         val intent = Intent(ctx, HomeScreenActivity::class.java)
         val nm = ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         val pendingIntent =
-            Utilities.getActivityPendingIntent(
+            getActivityPendingIntent(
                 ctx,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT,

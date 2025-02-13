@@ -81,43 +81,11 @@ class IPUtil {
             // get the first segment from ipv6 address
             val segment = ipv6.getSegment(0)
             // Decimal value for the 64(hexa) is 100
-            if (segment.segmentValue == 100) {
-                return true
-            }
-
-            return false
+            return segment.segmentValue == 100
         }
 
-        fun getIpAddress(ip: String): IPAddress? {
-            return IPAddressString(ip).address
-        }
-
-        fun isIPv4Address(ip: String): Boolean {
-            return ip.split(".").size == 4
-        }
-
-        fun isIPv6Address(ip: String): Boolean {
-            return ip.split(":").size > 2
-        }
-
-        fun isIPV4MappedIPV6Address(ip: String): Boolean {
-            return ip.startsWith("::ffff:")
-        }
-
-        fun isIPV4MappedIPV6Address(ip: String, port: Int): Boolean {
-            return ip.startsWith("::ffff:") && port == 53
-        }
-
-        fun isIPV4MappedIPV6Address(ip: String, port: Int, protocol: String): Boolean {
-            return ip.startsWith("::ffff:") && port == 53 && protocol == "udp"
-        }
 
         // ref: github.com/M66B/NetGuard/blob/master/app/src/main/java/eu/faircode/netguard
-        @Throws(UnknownHostException::class)
-        fun toCIDR(start: String?, end: String?): List<CIDR?>? {
-            return toCIDR(InetAddress.getByName(start), InetAddress.getByName(end))
-        }
-
         @Throws(UnknownHostException::class)
         fun toCIDR(start: InetAddress?, end: InetAddress?): List<CIDR>? {
             if (start == null || end == null) return null
