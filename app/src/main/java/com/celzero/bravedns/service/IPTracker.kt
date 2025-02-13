@@ -131,20 +131,24 @@ internal constructor(
     private fun convertIpV6ToIpv4IfNeeded(ip: String): InetAddress? {
         // ip maybe a wildcard, so we need to check if it is a valid IP
         if (ip.isEmpty() || isUnspecifiedIp(ip)) return null
+        try {
+            val inetAddress = HostName(ip).toInetAddress()
+            val ipAddress = IPAddressString(ip).address ?: return inetAddress
 
-        val inetAddress = HostName(ip).toInetAddress()
-        val ipAddress = IPAddressString(ip).address ?: return inetAddress
+            // no need to check if IP is not of type IPv6
+            if (!IPUtil.isIpV6(ipAddress)) return inetAddress
 
-        // no need to check if IP is not of type IPv6
-        if (!IPUtil.isIpV6(ipAddress)) return inetAddress
+            val ipv4 = IPUtil.ip4in6(ipAddress)
 
-        val ipv4 = IPUtil.ip4in6(ipAddress)
-
-        return if (ipv4 != null) {
-            ipv4.toInetAddress()
-        } else {
-            inetAddress
+            return if (ipv4 != null) {
+                ipv4.toInetAddress()
+            } else {
+                inetAddress
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_FIREWALL, "err while converting IP to InetAddress: $ip")
         }
+        return null
     }
 
     private suspend fun fetchApplicationName(uid: Int): String {
