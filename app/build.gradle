@@ -288,11 +288,11 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:8bab3067be@aar'
-    websiteImplementation 'com.github.celzero:firestack:8bab3067be@aar'
-    fdroidImplementation 'com.github.celzero:firestack:8bab3067be@aar'
+    download 'com.github.celzero:firestack:a668364411@aar'
+    websiteImplementation 'com.github.celzero:firestack:a668364411@aar'
+    fdroidImplementation 'com.github.celzero:firestack:a668364411@aar'
     // debug symbols
-    playImplementation 'com.github.celzero:firestack:8bab3067be:debug@aar'
+    playImplementation 'com.github.celzero:firestack:a668364411:debug@aar'
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.9.1') {
@@ -332,10 +332,13 @@ dependencies {
     fullImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
     fullImplementation 'com.simplecityapps:recyclerview-fastscroll:2.0.1'
 
-    implementation 'com.android.billingclient:billing:7.1.1'
-
+    // for confetti animation
     fullImplementation 'nl.dionsegijn:konfetti-xml:2.0.4'
-    implementation 'com.stripe:stripe-android:21.2.1'
+    // for in-app purchases
+    playImplementation 'com.android.billingclient:billing:7.1.1'
+    // for stripe payment gateway
+    websiteImplementation 'com.stripe:stripe-android:21.2.1'
+    fdroidImplementation 'com.stripe:stripe-android:21.2.1'
 }
 
 // github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903
