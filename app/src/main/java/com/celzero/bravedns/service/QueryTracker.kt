@@ -45,7 +45,8 @@ class QueryTracker(val persistentState: PersistentState) {
 
     private suspend fun refreshP50Latency(id: String) {
         // Dnsx.Local is multicast DNS, ignore its latency
-        if (id == Backend.Local) return
+        // Dnsx.Cache is a reply from the local cache, always 0ms.
+        if (id == Backend.Local || id == Backend.CT) return
 
         VpnController.syncP50Latency(id)
     }
