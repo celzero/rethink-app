@@ -67,6 +67,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val TCP_KEEP_ALIVE = "tcp_keep_alive"
         const val USE_SYSTEM_DNS_FOR_UNDELEGATED_DOMAINS = "use_system_dns_for_undelegated_domains"
         const val SLOWDOWN_MODE = "slowdown_mode"
+        const val NETWORK_ENGINE_EXPERIMENTAL = "network_engine_experimental"
+        const val USE_RPN = "use_rpn_features"
+        const val DIAL_TIMEOUT_SEC = "dial_timeout_sec"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -329,6 +332,13 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var useSystemDnsForUndelegatedDomains by booleanPref("use_system_dns_for_undelegated_domains").withDefault<Boolean>(false)
 
     var slowdownMode by booleanPref("slowdown_mode").withDefault<Boolean>(false)
+
+    // use rpn features, default false (enabled after user opts in), paid feature
+    var useRpn by booleanPref("use_rpn_features").withDefault<Boolean>(false)
+
+    var nwEngExperimentalFeatures by booleanPref("network_engine_experimental").withDefault<Boolean>(false)
+
+    var dialTimeoutSec by intPref("dial_timeout_sec").withDefault<Int>(0)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
