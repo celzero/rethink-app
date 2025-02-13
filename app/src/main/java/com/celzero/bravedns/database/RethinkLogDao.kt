@@ -38,10 +38,11 @@ interface RethinkLogDao {
     fun insertBatch(logs: List<RethinkLog>)
 
     @Query(
-        "update RethinkLog set downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId"
+        "update RethinkLog set proxyDetails = :pid, downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId"
     )
     fun updateSummary(
         connId: String,
+        pid: String,
         downloadBytes: Long,
         uploadBytes: Long,
         duration: Int,
@@ -112,7 +113,7 @@ interface RethinkLogDao {
     @Query(
         "SELECT uid, SUM(uploadBytes) AS uploadBytes, SUM(downloadBytes) AS downloadBytes FROM RethinkLog where timeStamp >= :fromTime and timeStamp <= :toTime"
     )
-    fun getDataUsage(fromTime: Long, toTime: Long): DataUsage
+    fun getDataUsage(fromTime: Long, toTime: Long): DataUsage?
 
     @Query(
         "SELECT uid, '' as ipAddress, port, COUNT(dnsQuery) as count, flag as flag, 0 as blocked, dnsQuery as appOrDnsName FROM RethinkLog WHERE timeStamp > :to and dnsQuery != '' GROUP BY dnsQuery ORDER BY count DESC LIMIT 3"

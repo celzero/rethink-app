@@ -41,6 +41,7 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
                 val flag = it.flag ?: ""
                 connectionTrackerDAO.updateSummary(
                     it.connId,
+                    it.pid,
                     it.downloadBytes,
                     it.uploadBytes,
                     it.duration,
@@ -52,6 +53,7 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
             } else {
                 connectionTrackerDAO.updateSummary(
                     it.connId,
+                    it.pid,
                     it.downloadBytes,
                     it.uploadBytes,
                     it.duration,

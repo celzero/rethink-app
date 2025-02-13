@@ -40,10 +40,11 @@ interface ConnectionTrackerDAO {
     fun insertBatch(connTrackerList: List<ConnectionTracker>)
 
     @Query(
-        "update ConnectionTracker set downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId"
+        "update ConnectionTracker set proxyDetails = :pid, downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId"
     )
     fun updateSummary(
         connId: String,
+        pid: String,
         downloadBytes: Long,
         uploadBytes: Long,
         duration: Int,
@@ -52,10 +53,11 @@ interface ConnectionTrackerDAO {
     )
 
     @Query(
-        "update ConnectionTracker set downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message, ipAddress = :ipAddress, flag = :flag where connId = :connId"
+        "update ConnectionTracker set proxyDetails = :pid, downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message, ipAddress = :ipAddress, flag = :flag where connId = :connId"
     )
     fun updateSummary(
         connId: String,
+        pid: String,
         downloadBytes: Long,
         uploadBytes: Long,
         duration: Int,
@@ -306,4 +308,12 @@ interface ConnectionTrackerDAO {
         "select uid as uid, '' as ipAddress, 0 as port, COUNT(connId) count, flag as flag, 0 as blocked, appName as appOrDnsName,  SUM(uploadBytes) AS uploadBytes, SUM(downloadBytes) AS downloadBytes, 0 as totalBytes from ConnectionTracker where timeStamp > :to and flag like :query and isBlocked = 0 GROUP BY appName, uid ORDER BY count DESC"
     )
     fun getFlagConnections(query: String, to: Long): PagingSource<Int, AppConnection>
+
+    @Query("SELECT uid AS uid, '' AS ipAddress, 0 AS port, COUNT(id) AS count, flag AS flag, 0 AS blocked, appName AS appOrDnsName, SUM(downloadBytes) AS downloadBytes, SUM(uploadBytes) AS uploadBytes, SUM(uploadBytes + downloadBytes) AS totalBytes FROM ConnectionTracker WHERE proxyDetails like :wgId AND timeStamp > :to GROUP BY appName ORDER BY totalBytes DESC")
+    fun getWgAppNetworkActivity(wgId: String, to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, ict.meteredDataUsage as meteredDataUsage from ConnectionTracker as ct join (select sum(downloadBytes + uploadBytes) as meteredDataUsage from ConnectionTracker where connType like :meteredTxt and timeStamp > :to) as ict where timeStamp > :to and proxyDetails like :wgId"
+    )
+    fun getTotalUsagesByWgId(to: Long, meteredTxt: String, wgId: String): DataUsageSummary
 }

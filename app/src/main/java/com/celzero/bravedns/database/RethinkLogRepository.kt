@@ -33,6 +33,7 @@ class RethinkLogRepository(private val logDao: RethinkLogDao) {
         summary.forEach {
             logDao.updateSummary(
                 it.connId,
+                it.pid,
                 it.downloadBytes,
                 it.uploadBytes,
                 it.duration,
@@ -54,7 +55,7 @@ class RethinkLogRepository(private val logDao: RethinkLogDao) {
         return logDao.logsCount()
     }
 
-    fun getDataUsage(from: Long, to: Long): DataUsage {
+    fun getDataUsage(from: Long, to: Long): DataUsage? {
         return logDao.getDataUsage(from, to)
     }
 }
