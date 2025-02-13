@@ -173,4 +173,37 @@ object EncryptedFileManager {
         }
         return false
     }
+
+
+    fun write(ctx: Context, data: ByteArray, file: File): Boolean {
+        try {
+            Logger.d(Logger.LOG_TAG_PROXY, "write into $file")
+            val masterKey =
+                MasterKey.Builder(ctx.applicationContext)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build()
+            val encryptedFile =
+                EncryptedFile.Builder(
+                        ctx.applicationContext,
+                        file,
+                        masterKey,
+                        EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+                    )
+                    .build()
+
+            if (file.exists()) {
+                file.delete()
+            }
+
+            encryptedFile.openFileOutput().apply {
+                write(data)
+                flush()
+                close()
+            }
+            return true
+        } catch (e: Exception) {
+            Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
+        }
+        return false
+    }
 }
