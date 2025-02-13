@@ -34,6 +34,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.receiver.NotificationActionReceiver
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
@@ -144,6 +145,7 @@ internal constructor(
             val pxm = ProxyManager.load()
             val wgm = WireguardManager.load()
             val tcpm = TcpProxyHelper.load()
+            val rpn = RpnProxyManager.load()
 
             Logger.i(
                 LOG_TAG_APP_DB,

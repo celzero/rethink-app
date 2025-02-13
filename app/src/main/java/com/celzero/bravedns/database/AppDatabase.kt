@@ -25,10 +25,10 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.celzero.bravedns.service.WireguardManager.SEC_WARP_FILE_NAME
-import com.celzero.bravedns.service.WireguardManager.SEC_WARP_NAME
-import com.celzero.bravedns.service.WireguardManager.WARP_FILE_NAME
-import com.celzero.bravedns.service.WireguardManager.WARP_NAME
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.SEC_WARP_FILE_NAME
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.SEC_WARP_NAME
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_FILE_NAME
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_NAME
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
 import java.io.File
@@ -53,9 +53,11 @@ import java.io.File
         ProxyApplicationMapping::class,
         TcpProxyEndpoint::class,
         DoTEndpoint::class,
-        ODoHEndpoint::class
+        ODoHEndpoint::class,
+        RpnProxy::class,
+        WgHopMap::class
     ],
-    version = 24,
+    version = 25,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -100,6 +102,10 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_21_22)
                 .addMigrations(MIGRATION_22_23)
                 .addMigrations(MIGRATION_23_24)
+                .addMigrations(MIGRATION_24_25)
+                //.addMigrations(MIGRATION_25_26) // should remove this, part of 24_25
+                //.addMigrations(MIGRATION_26_27) // should remove this, part of 24_25
+                //.addMigrations(MIGRATION_27_28) // should remove this, part of 24_25
                 .build()
 
         private val roomCallback: Callback =
@@ -981,6 +987,77 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
+        private val MIGRATION_24_25: Migration =
+            object : Migration(24, 25) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        "CREATE TABLE 'RpnProxy' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'configPath' TEXT NOT NULL, 'serverResPath' TEXT NOT NULL, 'isActive' INTEGER NOT NULL, 'isLockdown' INTEGER NOT NULL, 'createdTs' INTEGER NOT NULL, 'modifiedTs' INTEGER NOT NULL, 'misc' TEXT NOT NULL, 'tunId' TEXT NOT NULL, 'latency' INTEGER NOT NULL, PRIMARY KEY (id))"
+                    )
+                    db.execSQL(
+                        "CREATE TABLE 'WgHopMap' ('id' INTEGER NOT NULL, 'src' TEXT NOT NULL, 'via' TEXT NOT NULL, 'isActive' INTEGER NOT NULL, 'status' TEXT NOT NULL, primary key (id))"
+                    )
+                    db.execSQL(
+                        "ALTER TABLE CustomDomain ADD COLUMN proxyId TEXT NOT NULL DEFAULT ''"
+                    )
+                    db.execSQL(
+                        "ALTER TABLE CustomDomain ADD COLUMN proxyCC TEXT NOT NULL DEFAULT ''"
+                    )
+                    db.execSQL(
+                        "ALTER TABLE CustomIp ADD COLUMN proxyId TEXT NOT NULL DEFAULT ''"
+                    )
+                    db.execSQL(
+                        "ALTER TABLE CustomIp ADD COLUMN proxyCC TEXT NOT NULL DEFAULT ''"
+                    )
+                }
+            }
+
+        private val MIGRATION_25_26: Migration =
+            object : Migration(25, 26) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    /*db.execSQL(
+                        "CREATE TABLE 'WgHopMap' ('id' INTEGER NOT NULL, 'src' TEXT NOT NULL, 'via' TEXT NOT NULL, 'isActive' INTEGER NOT NULL, 'status' TEXT NOT NULL, primary key (id))"
+                    )*/
+                }
+            }
+
+        private val MIGRATION_26_27: Migration =
+            object : Migration(26, 27) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    try {
+                        db.execSQL(
+                            "ALTER TABLE CustomDomain ADD COLUMN proxyId TEXT NOT NULL DEFAULT ''"
+                        )
+                        db.execSQL(
+                            "ALTER TABLE CustomDomain ADD COLUMN proxyCC TEXT NOT NULL DEFAULT ''"
+                        )
+                        db.execSQL(
+                            "ALTER TABLE CustomIp ADD COLUMN proxyId TEXT NOT NULL DEFAULT ''"
+                        )
+                        db.execSQL(
+                            "ALTER TABLE CustomIp ADD COLUMN proxyCC TEXT NOT NULL DEFAULT ''"
+                        )
+                    } catch (e: Exception) {
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: columns already exist, ignore")
+                    }
+                }
+            }
+
+        private val MIGRATION_27_28: Migration =
+            object : Migration(27, 28) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    try {
+                        db.execSQL(
+                            "ALTER TABLE CustomIp ADD COLUMN proxyId TEXT NOT NULL DEFAULT ''"
+                        )
+                        db.execSQL(
+                            "ALTER TABLE CustomIp ADD COLUMN proxyCC TEXT NOT NULL DEFAULT ''"
+                        )
+                    } catch (e: Exception) {
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_27_28: columns already exist, ignore")
+                    }
+                }
+            }
+
         // ref: stackoverflow.com/a/57204285
         private fun doesColumnExistInTable(
             db: SupportSQLiteDatabase,
@@ -1042,6 +1119,10 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun odohEndpointDao(): ODoHEndpointDAO
 
+    abstract fun rpnProxyDao(): RpnProxyDao
+
+    abstract fun wgHopMapDao(): WgHopMapDao
+
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
 
     fun dohEndpointRepository() = DoHEndpointRepository(dohEndpointsDAO())
@@ -1080,4 +1161,8 @@ abstract class AppDatabase : RoomDatabase() {
     fun dotEndpointRepository() = DoTEndpointRepository(dotEndpointDao())
 
     fun odohEndpointRepository() = ODoHEndpointRepository(odohEndpointDao())
+
+    fun rpnProxyRepository() = RpnProxyRepository(rpnProxyDao())
+
+    fun wgHopMapRepository() = WgHopMapRepository(wgHopMapDao())
 }
