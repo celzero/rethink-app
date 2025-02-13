@@ -310,6 +310,9 @@ class Constants {
         // wireguard folder name
         const val WIREGUARD_FOLDER_NAME = "wireguard"
 
+        // rpn proxy folder name
+        const val RPN_PROXY_FOLDER_NAME = "rpnproxy"
+
         val DEFAULT_RDNS_REMOTE_DNS_NAMES =
             listOf(
                 "RDNS Default",
