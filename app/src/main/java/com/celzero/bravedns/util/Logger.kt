@@ -23,11 +23,10 @@ import org.koin.core.component.inject
 
 object Logger : KoinComponent {
     private val persistentState by inject<PersistentState>()
-    private val inMemDb by inject<ConsoleLogRepository>()
     private var logLevel = persistentState.goLoggerLevel
 
     const val LOG_TAG_APP_UPDATE = "NonStoreAppUpdater"
-    const val LOG_TAG_VPN = "VpnLifecycle"
+    const val LOG_TAG_VPN = "RethinkDnsVpn"
     const val LOG_TAG_CONNECTION = "ConnectivityEvents"
     const val LOG_TAG_DNS = "DnsManager"
     const val LOG_TAG_FIREWALL = "FirewallManager"
@@ -43,6 +42,7 @@ object Logger : KoinComponent {
     const val LOG_QR_CODE = "QrCodeFromFileScanner"
     const val LOG_GO_LOGGER = "LibLogger"
     const val LOG_TAG_APP_OPS = "AppOpsService"
+    const val LOG_IAB = "InAppBilling"
 
     // github.com/celzero/firestack/blob/bce8de917f/intra/log/logger.go#L76
     enum class LoggerType(val id: Long) {
@@ -155,8 +155,6 @@ object Logger : KoinComponent {
             if (tag.isEmpty()) {
                 val log = ConsoleLog(0, msg, System.currentTimeMillis())
                 VpnController.writeConsoleLog(log)
-                // TODO: use send instead of trySend
-                //inMemDb.logChannel.trySend(log)
             } else if (type.id >= logLevel) {
                 val l = when (type) {
                     LoggerType.VERBOSE -> "V"
@@ -176,7 +174,6 @@ object Logger : KoinComponent {
                 } else {
                     ConsoleLog(0, "$l $tag: $msg", System.currentTimeMillis())
                 }
-                //inMemDb.logChannel.trySend(log)
                 VpnController.writeConsoleLog(log)
             } else {
                 // Do nothing
