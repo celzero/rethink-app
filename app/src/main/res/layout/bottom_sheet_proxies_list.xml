@@ -14,6 +14,15 @@
         android:background="?attr/border" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/ip_domain_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="@dimen/extra_large_font_text_view" />
+
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

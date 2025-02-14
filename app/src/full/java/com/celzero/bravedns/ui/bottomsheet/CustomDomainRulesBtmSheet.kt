@@ -15,6 +15,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomDomain
+import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.BottomSheetCustomDomainsBinding
 import com.celzero.bravedns.rpnproxy.RegionalWgConf
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
@@ -80,7 +81,7 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
         b.chooseProxyCard.setOnClickListener {
             val ctx = requireContext()
             io {
-                val v = WireguardManager.getAllConfigs()
+                val v = WireguardManager.getAllMappings()
                 if (v.isEmpty()) {
                     Logger.v(LOG_TAG_UI, "$TAG no wireguard configs found")
                     uiCtx {
@@ -360,7 +361,7 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
         return tag.toString().toIntOrNull() ?: 0
     }
 
-    private fun showWgListBtmSheet(data: List<Config>) {
+    private fun showWgListBtmSheet(data: List<WgConfigFilesImmutable>) {
         Logger.v(LOG_TAG_UI, "$TAG show wg list(${data.size} for ${cd.domain}")
         val bottomSheetFragment = WireguardListBtmSheet.newInstance(WireguardListBtmSheet.InputType.DOMAIN, cd, data, this)
         bottomSheetFragment.show(

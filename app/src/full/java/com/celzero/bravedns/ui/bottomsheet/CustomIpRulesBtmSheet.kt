@@ -14,6 +14,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomIp
+import com.celzero.bravedns.database.WgConfigFiles
+import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.BottomSheetCustomIpsBinding
 import com.celzero.bravedns.rpnproxy.RegionalWgConf
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
@@ -79,7 +81,7 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
         b.chooseProxyCard.setOnClickListener {
             val ctx = requireContext()
             io {
-                val v = WireguardManager.getAllConfigs()
+                val v = WireguardManager.getAllMappings()
                 if (v.isEmpty()) {
                     Logger.w(LOG_TAG_UI, "$TAG No Wireguard configs found")
                     uiCtx {
@@ -332,7 +334,7 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
         return tag.toString().toIntOrNull() ?: 0
     }
 
-    private fun showWgListBtmSheet(data: List<Config>) {
+    private fun showWgListBtmSheet(data: List<WgConfigFilesImmutable>) {
         val bottomSheetFragment = WireguardListBtmSheet.newInstance(WireguardListBtmSheet.InputType.IP, ci, data, this)
         bottomSheetFragment.show(
             requireActivity().supportFragmentManager,

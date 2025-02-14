@@ -49,6 +49,8 @@ object DomainRulesManager : KoinComponent {
     // RFC 1035: https://tools.ietf.org/html/rfc1035#section-2.3.4
     private val wcRegex = Pattern.compile("^(\\*\\.)?([a-zA-Z0-9-]+\\.)+[a-zA-Z0-9-]+$")
 
+    private val selectedCCs: MutableSet<String> = mutableSetOf()
+
     enum class Status(val id: Int) {
         NONE(0),
         BLOCK(1),
@@ -127,8 +129,14 @@ object DomainRulesManager : KoinComponent {
             val value = mkTrieValue(cd.status.toString(), cd.proxyId, cd.proxyCC)
             trie.set(key, value)
             maybeAddToTrustedMap(cd)
+            if (cd.proxyCC.isNotEmpty()) selectedCCs.add(cd.proxyCC)
         }
         return trie.len()
+    }
+
+    fun getAllUniqueCCs(): List<String> {
+        Logger.v(LOG_TAG_DNS, "getAllUniqueCCs: $selectedCCs")
+        return selectedCCs.toList()
     }
 
     private fun maybeAddToTrustedMap(cd: CustomDomain) {

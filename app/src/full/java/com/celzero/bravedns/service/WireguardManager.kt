@@ -134,6 +134,10 @@ object WireguardManager : KoinComponent {
         return configs.toList()
     }
 
+    fun getAllMappings(): List<WgConfigFilesImmutable> {
+        return mappings.toList()
+    }
+
     fun getActiveConfigs(): List<Config> {
         val m = mappings.filter { it.isActive }
         val l = mutableListOf<Config>()

@@ -17,7 +17,6 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.databinding.BottomSheetProxiesListBinding
-import com.celzero.bravedns.databinding.ListItemEndpointBinding
 import com.celzero.bravedns.databinding.ListItemProxyCcWgBinding
 import com.celzero.bravedns.rpnproxy.RegionalWgConf
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
@@ -34,7 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List<RegionalWgConf>, val listener: CountriesDismissListener) :
+class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List<RegionalWgConf>, val listener: CountriesDismissListener) :
     BottomSheetDialogFragment() {
     private var _binding: BottomSheetProxiesListBinding? = null
 
@@ -44,9 +43,9 @@ class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List
 
     private val persistentState by inject<PersistentState>()
 
-    private val cd: CustomDomain? = if (input == InputType.DOMAIN) obj as CustomDomain else null
-    private val ci: CustomIp? = if (input == InputType.IP) obj as CustomIp else null
-    private val appInfo: AppInfo? = if (input == InputType.APP) obj as AppInfo else null
+    private val cd: CustomDomain? = if (type == InputType.DOMAIN) obj as CustomDomain else null
+    private val ci: CustomIp? = if (type == InputType.IP) obj as CustomIp else null
+    private val ai: AppInfo? = if (type == InputType.APP) obj as AppInfo else null
 
     enum class InputType(val id: Int) {
         DOMAIN (0),
@@ -97,59 +96,88 @@ class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List
         b.title.text = "Select Proxy Country"
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        val lst = data.map { it }
-        val adapter = RecyclerViewAdapter(lst) { selectedItem ->
-            Logger.v(LOG_TAG_UI, "$TAG: country selected: $selectedItem")
-            // TODO: Implement the action to be taken when an item is selected
-            val selectedCountry = selectedItem
-            val canSelectCC = RpnProxyManager.canSelectCountryCode(selectedCountry.cc)
-            if (!canSelectCC) {
-                Utilities.showToastUiCentered(
-                    requireContext(),
-                    "Country code limit reached for the selected endpoint",
-                    Toast.LENGTH_SHORT
-                )
-                Logger.w(LOG_TAG_UI, "$TAG: Country code limit reached for the selected endpoint")
-                return@RecyclerViewAdapter
+        when (type) {
+            InputType.IP -> {
+                b.ipDomainInfo.visibility = View.VISIBLE
+                b.ipDomainInfo.text = ci?.ipAddress
             }
-            io {
-                when (input) {
-                    InputType.DOMAIN -> {
-                        if (cd == null) {
-                            Logger.w(LOG_TAG_UI, "$TAG: custom domain is null")
-                            return@io
-                        }
-                        DomainRulesManager.setCC(cd, selectedCountry.cc)
-                        cd.proxyCC = selectedCountry.cc
-                        uiCtx {
-                            Utilities.showToastUiCentered(
-                                requireContext(),
-                                "Country code updated for ${cd.domain}",
-                                Toast.LENGTH_SHORT
-                            )
-                         }
-                    }
-                    InputType.IP -> {
-                        if (ci == null) {
-                            Logger.w(LOG_TAG_UI, "$TAG: custom ip is null")
-                            return@io
-                        }
-                        IpRulesManager.updateProxyCC(ci, selectedCountry.cc)
-                        ci.proxyCC = selectedCountry.cc
-                        uiCtx {
-                            Utilities.showToastUiCentered(
-                                requireContext(),
-                                "Country code updated for ${ci.ipAddress}",
-                                Toast.LENGTH_SHORT
-                            )
-                        }
-                    }
-                    InputType.APP -> TODO()
-                }
+            InputType.DOMAIN -> {
+                b.ipDomainInfo.visibility = View.VISIBLE
+                b.ipDomainInfo.text = cd?.domain
+            }
+            InputType.APP -> {
+                // TODO: Implement this
             }
         }
 
+        val lst = confs.map { it }
+        val adapter = RecyclerViewAdapter(lst) { conf ->
+            handleOnItemClicked(conf)
+        }
+
         b.recyclerView.adapter = adapter
+    }
+
+    private fun handleOnItemClicked(conf: RegionalWgConf) {
+        Logger.v(LOG_TAG_UI, "$TAG: Item clicked: ${conf.name}")
+        Logger.v(LOG_TAG_UI, "$TAG: country selected: $conf")
+        // TODO: Implement the action to be taken when an item is selected
+        // returns a pair of boolean and error message
+        val pair = RpnProxyManager.canSelectCountryCode(conf.cc)
+        if (!pair.first) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                pair.second,
+                Toast.LENGTH_SHORT
+            )
+            Logger.w(LOG_TAG_UI, "$TAG: err on selecting cc: ${pair.second}")
+            return
+        }
+        io {
+            when (type) {
+                InputType.DOMAIN -> {
+                    processDomain(conf)
+                }
+                InputType.IP -> {
+                    processIp(conf)
+                }
+                InputType.APP -> {
+                    // processApp(config)
+                }
+            }
+        }
+    }
+
+    private suspend fun processDomain(conf: RegionalWgConf) {
+        if (cd == null) {
+            Logger.w(LOG_TAG_UI, "$TAG: custom domain is null")
+            return
+        }
+        DomainRulesManager.setCC(cd, conf.cc)
+        cd.proxyCC = conf.cc
+        uiCtx {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                "Country code updated for ${cd.domain}",
+                Toast.LENGTH_SHORT
+            )
+        }
+    }
+
+    private suspend fun processIp(conf: RegionalWgConf) {
+        if (ci == null) {
+            Logger.w(LOG_TAG_UI, "$TAG: custom ip is null")
+            return
+        }
+        IpRulesManager.updateProxyCC(ci, conf.cc)
+        ci.proxyCC = conf.cc
+        uiCtx {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                "Country code updated for ${ci.ipAddress}",
+                Toast.LENGTH_SHORT
+            )
+        }
     }
 
     inner class RecyclerViewAdapter(
@@ -172,21 +200,21 @@ class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List
         inner class ViewHolder(private val bb: ListItemProxyCcWgBinding) :
             RecyclerView.ViewHolder(bb.root) {
 
-            fun bind(item: RegionalWgConf) {
-                Logger.v(LOG_TAG_UI, "$TAG: binding item: ${item.cc}, ${item.name}")
-                val flag = getFlag(item.cc)
-                val ccName = item.name.ifEmpty { getCountryNameFromFlag(flag) }
-                when (input) {
+            fun bind(conf: RegionalWgConf) {
+                Logger.v(LOG_TAG_UI, "$TAG: binding item: ${conf.cc}, ${conf.name}")
+                val flag = getFlag(conf.cc)
+                val ccName = conf.name.ifEmpty { getCountryNameFromFlag(flag) }
+                when (type) {
                     InputType.DOMAIN -> {
-                        bb.proxyNameCc.text = item.cc
+                        bb.proxyNameCc.text = conf.cc
                         bb.proxyIconCc.text = flag
-                        bb.proxyRadioCc.isChecked = item.cc == cd?.proxyCC
+                        bb.proxyRadioCc.isChecked = conf.cc == cd?.proxyCC
                         bb.proxyDescCc.text = ccName
                     }
                     InputType.IP -> {
-                        bb.proxyNameCc.text = item.cc
+                        bb.proxyNameCc.text = conf.cc
                         bb.proxyIconCc.text = flag
-                        bb.proxyRadioCc.isChecked = item.cc == ci?.proxyCC
+                        bb.proxyRadioCc.isChecked = conf.cc == ci?.proxyCC
                         bb.proxyDescCc.text = ccName
                     }
                     InputType.APP -> {
@@ -196,12 +224,12 @@ class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List
 
                 bb.proxyRadioCc.setOnClickListener {
                     notifyDataSetChanged()
-                    onItemClicked(item)
+                    onItemClicked(conf)
                 }
 
                 bb.lipCcWgParent.setOnClickListener {
                     notifyDataSetChanged()
-                    onItemClicked(item)
+                    onItemClicked(conf)
                 }
             }
         }
@@ -209,7 +237,7 @@ class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        when (input) {
+        when (type) {
             InputType.DOMAIN -> {
                 listener.onDismissCC(cd)
             }
@@ -217,7 +245,7 @@ class ProxyCountriesBtmSheet(val input: InputType, val obj: Any?, val data: List
                 listener.onDismissCC(ci)
             }
             InputType.APP -> {
-                listener.onDismissCC(appInfo)
+                listener.onDismissCC(ai)
             }
         }
     }

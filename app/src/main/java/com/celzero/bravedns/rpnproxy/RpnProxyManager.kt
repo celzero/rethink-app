@@ -70,7 +70,7 @@ object RpnProxyManager : KoinComponent {
     private var secWarpConfig: Config? = null
     private var protonConfig: ProtonConfig? = null
 
-    private val selectedCountries = mutableListOf<String>()
+    private val selectedCountries = mutableSetOf<String>()
 
     suspend fun load() {
         // Load the RPN proxies from separate database
@@ -86,8 +86,11 @@ object RpnProxyManager : KoinComponent {
                 "$TAG: proton config loaded ${protonConfig?.regionalWgConfs?.size}"
             )
             selectedCountries.clear()
-            // val dcc = DomainRulesManager.getCCs()
-            // val icc  = IpRulesManager.getCCs()
+            val dcc = DomainRulesManager.getAllUniqueCCs()
+            val icc  = IpRulesManager.getAllUniqueCCs()
+            selectedCountries.addAll(dcc)
+            selectedCountries.addAll(icc)
+            Logger.d(LOG_TAG_PROXY, "$TAG: cc: ${selectedCountries.size}, $selectedCountries")
             // val acc = FirewallManager.getCCs()
         } else {
             Logger.e(LOG_TAG_PROXY, "$TAG: proton config file not found")
@@ -545,15 +548,19 @@ object RpnProxyManager : KoinComponent {
         }
     }
 
-    fun canSelectCountryCode(cc: String): Boolean {
+    fun canSelectCountryCode(cc: String): Pair<Boolean, String> {
         // Check if the country code is available in the proton config
         // and see if only max of 5 countries can be selected
         val isAvailable = protonConfig?.regionalWgConfs?.any { it.cc == cc } ?: false
+        if (!isAvailable) {
+            return Pair(false, "Country code not available in the proton config")
+        }
         return if (selectedCountries.size >= 5) {
-            false
+            Logger.d(LOG_TAG_PROXY, "$TAG: cc limit reached, selected: ${selectedCountries.size}, $selectedCountries")
+            Pair(false, "Country code limit reached for the selected endpoint")
         } else {
             selectedCountries.add(cc)
-            true
+            Pair(true, "")
         }
     }
 

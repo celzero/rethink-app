@@ -48,6 +48,8 @@ object IpRulesManager : KoinComponent {
     private val resultsCache: Cache<CacheKey, IpRuleStatus> =
         CacheBuilder.newBuilder().maximumSize(CACHE_MAX_SIZE).build()
 
+    private val selectedCCs = mutableSetOf<String>()
+
     enum class IPRuleType(val id: Int) {
         IPV4(0),
         IPV6(2)
@@ -106,12 +108,18 @@ object IpRulesManager : KoinComponent {
                 try {
                     logd("iptree.add($k, $v)")
                     iptree.add(k, v)
+                    if (it.proxyCC.isNotEmpty()) selectedCCs.add(it.proxyCC)
                 } catch (e: Exception) {
                     Logger.e(LOG_TAG_FIREWALL, "err iptree.add($k, $v)", e)
                 }
             }
         }
         return iptree.len()
+    }
+
+    fun getAllUniqueCCs(): Set<String> {
+        Logger.v(LOG_TAG_FIREWALL, "ip selectedCCs: $selectedCCs")
+        return selectedCCs
     }
 
     fun getCustomIpsLiveData(): LiveData<Int> {
