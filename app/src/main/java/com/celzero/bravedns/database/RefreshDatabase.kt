@@ -139,6 +139,7 @@ internal constructor(
             latestRefreshTime = current
             val pm = ctx.packageManager ?: return
 
+            // make sure to maintain the order of the below calls
             val fm = FirewallManager.load()
             val ipm = IpRulesManager.load()
             val dm = DomainRulesManager.load()
@@ -149,7 +150,7 @@ internal constructor(
 
             Logger.i(
                 LOG_TAG_APP_DB,
-                "reload: fm: ${fm}; ip: ${ipm}; dom: ${dm}; px: ${pxm}; wg: ${wgm}; t: $tcpm"
+                "reload: fm: ${fm}; ip: ${ipm}; dom: ${dm}; px: ${pxm}; wg: ${wgm}; t: $tcpm, rpn: $rpn"
             )
 
             val trackedApps = FirewallManager.getAllApps()

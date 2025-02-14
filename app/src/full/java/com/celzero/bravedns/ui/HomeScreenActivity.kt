@@ -121,6 +121,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         setupNavigationItemSelectedListener()
 
+        // added for testing purpose; TODO: remove this
+        persistentState.useRpn = false
 
         // handle intent receiver for backup/restore
         handleIntent()
