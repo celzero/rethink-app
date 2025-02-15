@@ -79,8 +79,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        PaymentConfiguration.init(requireContext().applicationContext, PUBLISHABLE_KEY)
-        paymentSheet = PaymentSheet(this, ::onPaymentSheetResult)
+        // PaymentConfiguration.init(requireContext().applicationContext, PUBLISHABLE_KEY)
+        // paymentSheet = PaymentSheet(this, ::onPaymentSheetResult)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
