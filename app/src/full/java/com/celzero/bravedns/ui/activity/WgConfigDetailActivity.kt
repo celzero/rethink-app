@@ -201,9 +201,9 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         val config = WireguardManager.getConfigFilesById(id)
         val cid = ID_WG_BASE + id
         if (config?.isActive == true) {
-            val statusId = VpnController.getProxyStatusById(cid).first
+            val statusPair = VpnController.getProxyStatusById(cid)
             val stats = VpnController.getProxyStats(cid)
-            val ps = UIUtils.ProxyStatus.entries.find { it.id == statusId }
+            val ps = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first }
             val dnsStatusId = if (persistentState.splitDns) {
                 VpnController.getDnsStatus(cid)
             } else {
@@ -215,13 +215,20 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                     b.interfaceDetailCard.strokeColor = fetchColor(this, R.attr.chipTextNegative)
                     b.statusText.text = getString(R.string.status_failing)
                         .replaceFirstChar(Char::titlecase)
-                } else if (statusId != null) {
+                } else if (statusPair.first != null) {
                     val handshakeTime = getHandshakeTime(stats).toString()
                     val statusText = getIdleStatusText(ps, stats)
-                        .ifEmpty { getStatusText(ps, handshakeTime, stats) }
+                        .ifEmpty { getStatusText(ps, handshakeTime, stats, statusPair.second) }
                     b.statusText.text = statusText
                 } else {
-                    b.statusText.text = getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
+                    if (statusPair.second.isEmpty()) {
+                        b.statusText.text =
+                            getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
+                    } else {
+                        val txt =
+                            getString(R.string.status_waiting).replaceFirstChar(Char::titlecase) + "(${statusPair.second})"
+                        b.statusText.text = txt
+                    }
                 }
                 val strokeColor = getStrokeColorForStatus(ps, stats)
                 b.interfaceDetailCard.strokeWidth = 2
@@ -246,10 +253,17 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private fun getStatusText(
         status: UIUtils.ProxyStatus?,
         handshakeTime: String? = null,
-        stats: RouterStats?
+        stats: RouterStats?,
+        errMsg: String? = null
     ): String {
-        if (status == null) return getString(R.string.status_waiting)
-            .replaceFirstChar(Char::titlecase)
+        if (status == null) {
+            val txt = if (!errMsg.isNullOrEmpty()) {
+                return getString(R.string.status_waiting) + "($errMsg)"
+            } else {
+                getString(R.string.status_waiting)
+            }
+            return txt.replaceFirstChar(Char::titlecase)
+        }
 
         val baseText = getString(UIUtils.getProxyStatusStringRes(status.id))
             .replaceFirstChar(Char::titlecase)
