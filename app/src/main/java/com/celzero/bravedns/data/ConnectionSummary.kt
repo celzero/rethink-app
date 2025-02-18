@@ -20,7 +20,8 @@ import java.io.Serializable
 // do not use as key in map or set, as some fields are mutable
 data class ConnectionSummary(
     val uid: String,
-    val pid: String,
+    val pid: String, // proxy id
+    val rpid: String, // relay proxy id
     val connId: String,
     val downloadBytes: Long,
     val uploadBytes: Long,

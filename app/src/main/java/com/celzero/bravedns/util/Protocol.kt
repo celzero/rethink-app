@@ -33,6 +33,7 @@ enum class Protocol(val protocolType: Int) {
     GRE(47),
     ESP(50),
     AH(51),
+    ICMPV6(58),
     MTP(92),
     BEETPH(94),
     ENCAP(98),
@@ -44,7 +45,7 @@ enum class Protocol(val protocolType: Int) {
     OTHER(-1);
 
     companion object {
-        private val map = values().associateBy(Protocol::protocolType)
+        private val map = entries.associateBy(Protocol::protocolType)
 
         fun getProtocolName(protocolType: Int): Protocol {
             return map[protocolType.hashCode()] ?: OTHER

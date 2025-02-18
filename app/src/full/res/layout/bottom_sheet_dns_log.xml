@@ -177,7 +177,7 @@
             android:id="@+id/bsdl_domain_rule_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/dns_block_blocked_desc"
+            android:layout_below="@id/dns_region"
             android:layout_marginLeft="2dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="2dp"
@@ -225,6 +225,18 @@
             android:textSize="@dimen/default_font_text_view"
             android:visibility="visible" />
 
+        <TextView
+            android:id="@+id/dns_region"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/dns_block_blocked_desc"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:padding="5dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view"
+            android:visibility="visible" />
     </RelativeLayout>
 
     <LinearLayout
