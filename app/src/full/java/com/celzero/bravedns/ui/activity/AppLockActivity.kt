@@ -100,13 +100,10 @@ class AppLockActivity : AppCompatActivity(R.layout.activity_app_lock) {
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
-                    Logger.i(
-                        LOG_TAG_UI,
-                        "$TAG biometric auth error (code: $errorCode): $errString"
-                    )
-                    Logger.v(LOG_TAG_UI, "$TAG biometric auth error, finishing activity")
+                    Logger.i(LOG_TAG_UI, "$TAG auth error(code: $errorCode): $errString")
+                    Logger.v(LOG_TAG_UI, "$TAG biometric auth err, finishing activity")
                     showToastUiCentered(this@AppLockActivity, errString.toString(), Toast.LENGTH_SHORT)
-                    finish()
+                    finishAffinity()
                 }
 
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
@@ -138,6 +135,7 @@ class AppLockActivity : AppCompatActivity(R.layout.activity_app_lock) {
     private fun startHomeActivity() {
         Logger.v(LOG_TAG_UI, "$TAG starting home activity")
         val intent = Intent(this, HomeScreenActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         intent.putExtras(this.intent)
         startActivity(intent)
         finish()

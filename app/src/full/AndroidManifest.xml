@@ -26,6 +26,7 @@
             android:name=".ui.activity.FirewallActivity"
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.HomeScreenActivity"
+            android:clearTaskOnLaunch="true"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.activity.AppLockActivity"
