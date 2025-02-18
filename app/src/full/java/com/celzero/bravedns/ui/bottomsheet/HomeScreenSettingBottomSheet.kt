@@ -85,16 +85,6 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         b.bsHomeScreenConnectedStatus.text = getConnectionStatus()
         val selectedIndex = appConfig.getBraveMode().mode
         Logger.d(LOG_TAG_VPN, "Home screen bottom sheet selectedIndex: $selectedIndex")
-
-        if (DEBUG) {
-            val timeSinceLastAuth = abs(SystemClock.elapsedRealtime() - persistentState.biometricAuthTime)
-            b.bsHomeScreenAppLockTime.visibility = View.VISIBLE
-            b.bsHomeScreenAppLockTime.text = java.util.concurrent.TimeUnit.MILLISECONDS.toMinutes(timeSinceLastAuth).toString() + " minutes"
-            Logger.d(LOG_TAG_VPN, "last auth time: ${persistentState.biometricAuthTime}")
-        } else {
-            b.bsHomeScreenAppLockTime.visibility = View.GONE
-        }
-
         updateStatus(selectedIndex)
     }
 

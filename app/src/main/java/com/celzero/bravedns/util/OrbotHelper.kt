@@ -40,6 +40,7 @@ import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Constants.Companion.HTTP_PROXY_PORT
 import com.celzero.bravedns.util.Constants.Companion.SOCKS_DEFAULT_PORT
 import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
@@ -278,7 +279,7 @@ class OrbotHelper(
         val pendingIntent =
             getActivityPendingIntent(
                 context,
-                Intent(context, HomeScreenActivity::class.java),
+                Intent(context, AppLockActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT,
                 mutable = false
             )

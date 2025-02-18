@@ -47,6 +47,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.NotificationHandlerDialog
+import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.PlayStoreCategory
@@ -665,7 +666,7 @@ internal constructor(
             return
         }
 
-        val intent = Intent(ctx, HomeScreenActivity::class.java)
+        val intent = Intent(ctx, AppLockActivity::class.java)
         val nm = ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         val pendingIntent =
             getActivityPendingIntent(

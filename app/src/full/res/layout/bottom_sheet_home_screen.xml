@@ -298,18 +298,6 @@
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/small_font_text_view" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/bs_home_screen_app_lock_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_below="@id/bs_home_screen_app_uptime"
-            android:layout_margin="5dp"
-            android:gravity="center"
-            android:alpha="0.75"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/small_font_text_view" />
-
     </RelativeLayout>
 
 </LinearLayout>

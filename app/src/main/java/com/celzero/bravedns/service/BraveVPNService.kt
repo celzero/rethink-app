@@ -87,6 +87,8 @@ import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_AL
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.NotificationHandlerDialog
+import com.celzero.bravedns.ui.activity.AppLockActivity
+import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.CoFactory
 import com.celzero.bravedns.util.Constants
@@ -962,7 +964,7 @@ class BraveVPNService :
         val pendingIntent =
             Utilities.getActivityPendingIntent(
                 this,
-                Intent(this, HomeScreenActivity::class.java),
+                Intent(this, AppLockActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT,
                 mutable = false
             )
@@ -1309,11 +1311,20 @@ class BraveVPNService :
         return Observer { settingUpOrbot.set(it) }
     }
 
+    private fun isAppLockEnabled(): Boolean {
+        if (isAppRunningOnTv()) return false
+
+        // TODO: should we check for last unlock time here?
+        MiscSettingsActivity.BioMetricType.fromValue(persistentState.biometricAuthType).let {
+            return it.enabled()
+        }
+    }
+
     private fun updateNotificationBuilder(): Notification {
         val pendingIntent =
             Utilities.getActivityPendingIntent(
                 this,
-                Intent(this, HomeScreenActivity::class.java),
+                Intent(this, AppLockActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT,
                 mutable = false
             )
@@ -1361,10 +1372,9 @@ class BraveVPNService :
         // 1. Pause / Resume, Stop action button.
         // 2. RethinkDNS modes (dns & dns+firewall mode)
         // 3. No action button.
-        val isAppLockEnabled = persistentState.biometricAuth && !isAppRunningOnTv()
         // do not show notification action when app lock is enabled
         val notifActionType =
-            if (isAppLockEnabled) {
+            if (isAppLockEnabled()) {
                 NotificationActionType.NONE
             } else {
                 NotificationActionType.getNotificationActionType(
@@ -2687,7 +2697,7 @@ class BraveVPNService :
             val pendingIntent =
                 Utilities.getActivityPendingIntent(
                     this,
-                    Intent(this, HomeScreenActivity::class.java),
+                    Intent(this, AppLockActivity::class.java),
                     PendingIntent.FLAG_UPDATE_CURRENT,
                     mutable = false
                 )
@@ -3588,7 +3598,7 @@ class BraveVPNService :
         val pendingIntent =
             Utilities.getActivityPendingIntent(
                 this,
-                Intent(this, HomeScreenActivity::class.java),
+                Intent(this, AppLockActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT,
                 mutable = false
             )
@@ -4331,7 +4341,7 @@ class BraveVPNService :
         val pendingIntent =
             Utilities.getActivityPendingIntent(
                 this,
-                Intent(this, HomeScreenActivity::class.java),
+                Intent(this, AppLockActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT,
                 mutable = false
             )

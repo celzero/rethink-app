@@ -137,7 +137,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     override fun onResume() {
         super.onResume()
         Logger.v(LOG_TAG_UI, "isActivityStarted: $isActivityStarted, intent: $intent, action: ${intent?.action}")
-        if (!isActivityStarted) {
+        /*if (!isActivityStarted) {
             isActivityStarted = true
             Logger.vv(LOG_TAG_UI, "HomeScreenActivity is resumed")
             if (intent != null) { // intent is not null means the activity is started from intent
@@ -147,7 +147,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     biometricPrompt()
                 }
             }
-        }
+        }*/
     }
 
     private fun isBiometricEnabled(): Boolean {
@@ -410,16 +410,15 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[2].url
         }
         moveRemoteBlocklistFileFromAsset()
-        // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
-        // to SystemClock.elapsedRealtime
-        persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
         // set the rethink app in firewall mode as allowed by default
         io { appInfoDb.resetRethinkAppFirewallMode() }
         // if biometric auth is enabled, then set the biometric auth type to 3 (15 minutes)
         if (persistentState.biometricAuth) {
             persistentState.biometricAuthType = MiscSettingsActivity.BioMetricType.FIFTEEN_MIN.action
+            // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
+            // to SystemClock.elapsedRealtime
+            persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
         }
-        persistentState.biometricAuth = false
 
         // delete residue wgs from database, remove this post v055o
         io { WireguardManager.deleteResidueWgs() }

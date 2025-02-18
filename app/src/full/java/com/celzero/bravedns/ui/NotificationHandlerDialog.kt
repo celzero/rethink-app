@@ -29,6 +29,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.INTENT_UID
 import com.celzero.bravedns.ui.activity.AppListActivity
+import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.util.Constants
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -100,7 +101,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
     }
 
     private fun launchHomeScreenAndFinish() {
-        startActivity(Intent(this, HomeScreenActivity::class.java))
+        startActivity(Intent(this, AppLockActivity::class.java))
         finish()
     }
 

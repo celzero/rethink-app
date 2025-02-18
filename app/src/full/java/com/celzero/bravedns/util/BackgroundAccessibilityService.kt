@@ -47,6 +47,7 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Utilities.isAtleastN
 import com.celzero.bravedns.util.Utilities.isAtleastP
 import com.celzero.bravedns.util.Utilities.isAtleastT
@@ -244,7 +245,7 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
     }
 
     private fun getPendingIntent(): PendingIntent {
-        val intent = Intent(applicationContext, HomeScreenActivity::class.java)
+        val intent = Intent(applicationContext, AppLockActivity::class.java)
         return PendingIntent.getActivity(
             applicationContext, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
