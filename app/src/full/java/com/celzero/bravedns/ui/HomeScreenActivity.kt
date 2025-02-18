@@ -96,13 +96,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val appUpdateManager by inject<AppUpdater>()
     private val rdb by inject<RefreshDatabase>()
 
-    // support for biometric authentication
-    private lateinit var executor: Executor
-    private lateinit var biometricPrompt: BiometricPrompt
-    private lateinit var promptInfo: BiometricPrompt.PromptInfo
-
-    private var isActivityStarted = false
-
     // TODO - #324 - Usage of isDarkTheme() in all activities.
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -123,7 +116,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         setupNavigationItemSelectedListener()
 
         // added for testing purpose; TODO: remove this
-        //persistentState.useRpn = false
+        persistentState.useRpn = false
 
         // handle intent receiver for backup/restore
         handleIntent()
@@ -131,29 +124,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         initUpdateCheck()
 
         observeAppState()
-        isActivityStarted = false
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Logger.v(LOG_TAG_UI, "isActivityStarted: $isActivityStarted, intent: $intent, action: ${intent?.action}")
-        /*if (!isActivityStarted) {
-            isActivityStarted = true
-            Logger.vv(LOG_TAG_UI, "HomeScreenActivity is resumed")
-            if (intent != null) { // intent is not null means the activity is started from intent
-                Logger.vv(LOG_TAG_UI, "HomeScreenActivity is started from intent")
-                Logger.vv(LOG_TAG_UI, "isBiometricEnabled: ${isBiometricEnabled()}, isAppRunningOnTv: ${isAppRunningOnTv()}")
-                if (isBiometricEnabled() && !isAppRunningOnTv()) {
-                    biometricPrompt()
-                }
-            }
-        }*/
-    }
-
-    private fun isBiometricEnabled(): Boolean {
-        val type = MiscSettingsActivity.BioMetricType.fromValue(persistentState.biometricAuthType)
-        // use the biometricAuth flag for backward compatibility with older version
-        return type.enabled()
     }
 
     // check if app running on TV
@@ -163,118 +133,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
         } catch (ignored: Exception) {
             false
-        }
-    }
-
-    private fun biometricPrompt() {
-        // if the biometric authentication is already done in the last 15 minutes, then skip
-        val minutes = MiscSettingsActivity.BioMetricType.fromValue(persistentState.biometricAuthType).mins
-
-        val timeoutMinutes = if (minutes == -1L) { // this is for backward compatibility with older versions
-           MiscSettingsActivity.BioMetricType.FIFTEEN_MIN.mins
-        } else {
-            minutes
-        }
-
-        Logger.d(LOG_TAG_UI, "Biometric timeout: $timeoutMinutes, biometricAuthTime: ${persistentState.biometricAuthTime}")
-        val timeSinceLastAuth = abs(SystemClock.elapsedRealtime() - persistentState.biometricAuthTime)
-        if (timeSinceLastAuth < TimeUnit.MINUTES.toMillis(timeoutMinutes)) {
-            Logger.i(LOG_TAG_UI, "Biometric auth skipped, time since last auth: $timeSinceLastAuth")
-            return
-        }
-
-        promptInfo =
-            BiometricPrompt.PromptInfo.Builder()
-                .setTitle(getString(R.string.hs_biometeric_title))
-                .setSubtitle(getString(R.string.hs_biometeric_desc))
-                .setAllowedAuthenticators(
-                    BiometricManager.Authenticators.BIOMETRIC_WEAK or
-                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
-                )
-                .setConfirmationRequired(false)
-                .build()
-
-        // ref: https://developer.android.com/training/sign-in/biometric-auth
-        executor = ContextCompat.getMainExecutor(this)
-        biometricPrompt =
-            BiometricPrompt(
-                this,
-                executor,
-                object : BiometricPrompt.AuthenticationCallback() {
-                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                        super.onAuthenticationError(errorCode, errString)
-                        Logger.i(
-                            LOG_TAG_UI,
-                            "Biometric authentication error (code: $errorCode): $errString"
-                        )
-                        // error code 5 (ERROR_CANCELED), this may happen when the device is locked
-                        // or another pending operation prevents or disables it
-                        // error code 10 (ERROR_USER_CANCELED), retry once after user cancelled
-                        // the biometric prompt. ref issuetracker.google.com/issues/145231213
-                        // commenting the code below, as the retry is buggy and not working as
-                        // expected, have to revisit this code later
-                        /* if (
-                            biometricPromptRetryCount > 0 &&
-                                (errorCode == BiometricPrompt.ERROR_CANCELED ||
-                                    errorCode == BiometricPrompt.ERROR_USER_CANCELED)
-                        ) {
-                            biometricPromptRetryCount--
-                            if (isInForeground()) biometricPrompt.authenticate(promptInfo)
-                        } else {
-                            showToastUiCentered(
-                                applicationContext,
-                                errString.toString(),
-                                Toast.LENGTH_SHORT
-                            )
-                            finish()
-                        } */
-                        showToastUiCentered(
-                            this@HomeScreenActivity,
-                            errString.toString(),
-                            Toast.LENGTH_SHORT
-                        )
-                        finish()
-                    }
-
-                    override fun onAuthenticationSucceeded(
-                        result: BiometricPrompt.AuthenticationResult
-                    ) {
-                        super.onAuthenticationSucceeded(result)
-                        // biometricPromptRetryCount = 1
-                        persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
-                        Logger.i(LOG_TAG_UI, "Biometric success @ ${SystemClock.elapsedRealtime()}")
-                    }
-
-                    override fun onAuthenticationFailed() {
-                        super.onAuthenticationFailed()
-                        showToastUiCentered(
-                            this@HomeScreenActivity,
-                            getString(R.string.hs_biometeric_failed),
-                            Toast.LENGTH_SHORT
-                        )
-                        Logger.i(LOG_TAG_UI, "Biometric authentication failed")
-                        // show the biometric prompt again only if the ui is in foreground
-                        if (isInForeground()) biometricPrompt.authenticate(promptInfo)
-                    }
-                }
-            )
-
-        // BIOMETRIC_WEAK :Any biometric (e.g. fingerprint, iris, or face) on the device that meets
-        // or exceeds the requirements for Class 2(formerly Weak), as defined by the Android CDD.
-        if (
-            BiometricManager.from(this)
-                .canAuthenticate(
-                    BiometricManager.Authenticators.BIOMETRIC_WEAK or
-                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
-                ) == BiometricManager.BIOMETRIC_SUCCESS
-        ) {
-            biometricPrompt.authenticate(promptInfo)
-        } else {
-            showToastUiCentered(
-                applicationContext,
-                getString(R.string.hs_biometeric_feature_not_supported),
-                Toast.LENGTH_SHORT
-            )
         }
     }
 
