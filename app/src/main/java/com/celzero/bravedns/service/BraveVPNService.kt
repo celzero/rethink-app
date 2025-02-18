@@ -82,7 +82,6 @@ import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_ID
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
@@ -1610,69 +1609,6 @@ class BraveVPNService :
         }
     }
 
-    private suspend fun handleWarp(): Boolean {
-        // see if the warp conf is available, if not create a new one
-        val cf = RpnProxyManager.getWarpConfig()
-        if (cf.first == null) {
-            return createWarpConfig()
-        } else {
-            Logger.i(LOG_TAG_VPN, "warp config already exists")
-        }
-        return true
-    }
-
-    private suspend fun createWarpConfig(): Boolean {
-        // create a new warp config
-        val config = RpnProxyManager.getNewWarpConfig(true, WARP_ID, 0)
-        if (config == null) {
-            Logger.e(LOG_TAG_VPN, "err creating warp config")
-            return false
-        }
-        return true
-    }
-
-    private suspend fun addWarpToTunnel() {
-        if (vpnAdapter?.isRpnWarpEnabled() == true) {
-            Logger.i(LOG_TAG_VPN, "warp already enabled")
-            return
-        }
-        handleWarp()
-    }
-
-    private suspend fun addAmzToTunnel() {
-        if (!handleAmz()) {
-            Logger.e(LOG_TAG_VPN, "err handling amz")
-            return
-        }
-        val cf = RpnProxyManager.getAmneziaConfig().first
-        if (cf == null) {
-            Logger.e(LOG_TAG_VPN, "err adding amz to tunnel")
-            return
-        }
-        RpnProxyManager.enableConfig(cf.getId())
-    }
-
-    private suspend fun handleAmz(): Boolean {
-        // see if the amz conf is available, if not create a new one
-        val cf = RpnProxyManager.getAmneziaConfig().first
-        if (cf == null) {
-            return createAmzConfig()
-        } else {
-            Logger.i(LOG_TAG_VPN, "amz config already exists")
-        }
-        return true
-    }
-
-    private suspend fun createAmzConfig(): Boolean {
-        // create a new amz config
-        val config = RpnProxyManager.getAmneziaConfig().first
-        if (config == null) {
-            Logger.e(LOG_TAG_VPN, "err creating amz config")
-            return false
-        }
-        return true
-    }
-
     private suspend fun handleRpnProxies() {
         if (persistentState.useRpn) {
             val wt = vpnAdapter?.testWarp() ?: false
@@ -1682,7 +1618,8 @@ class BraveVPNService :
             Logger.i(LOG_TAG_VPN, "handleRpnProxies: warp: $wt, se: $st, amz: $at, proton: $pt")
             if (wt) {
                 Logger.i(LOG_TAG_VPN, "handleRpnProxies: warp not enabled, add warp to tunnel")
-                addWarpToTunnel()
+                val existingBytes = RpnProxyManager.getWarpExistingData()
+                vpnAdapter?.registerAndFetchWarpConfig(existingBytes)
             }
             if (st) {
                 Logger.i(LOG_TAG_VPN, "handleRpnProxies: se not enabled, register se")
@@ -1690,11 +1627,13 @@ class BraveVPNService :
             }
             if (at) {
                 Logger.i(LOG_TAG_VPN, "handleRpnProxies: amz not enabled, register amz")
-                addAmzToTunnel()
+                val existingBytes = RpnProxyManager.getAmneziaExistingData()
+                vpnAdapter?.registerAndFetchAmneziaConfig(existingBytes)
             }
             if (pt) {
                 Logger.i(LOG_TAG_VPN, "handleRpnProxies: proton not enabled, register proton")
-                vpnAdapter?.registerProton()
+                val existingBytes = RpnProxyManager.getProtonExistingData()
+                vpnAdapter?.registerProton(existingBytes)
             }
 
             // TODO: get the list of other countries other than default, add all of them
@@ -1720,6 +1659,11 @@ class BraveVPNService :
             }
         } else {
             Logger.i(LOG_TAG_VPN, "handleRpnProxies: plus disabled")
+            // unregister the rpn proxies
+            vpnAdapter?.unregisterWarp()
+            vpnAdapter?.unregisterSE()
+            vpnAdapter?.unregisterAmnezia()
+            vpnAdapter?.unregisterProton()
         }
     }
 
@@ -1779,7 +1723,7 @@ class BraveVPNService :
         Logger.i(LOG_TAG_VPN, "mtu; proxy: $overlayMtu, underlying: $underlyingMtu, min: $minMtu")
         // min mtu should be at least MIN_MTU (1280)
         if (minMtu <= MIN_MTU) {
-            Logger.w(LOG_TAG_VPN, "mtu less than $MIN_MTU, using $MIN_MTU")
+            Logger.w(LOG_TAG_VPN, "mtu less than or equal to $MIN_MTU, using $MIN_MTU")
             return MIN_MTU
         }
         return minMtu
@@ -2080,7 +2024,7 @@ class BraveVPNService :
                 }
             }
             PersistentState.USE_RPN -> {
-                io("enableWarp") {
+                io("rpnUpdated") {
                     handleRpnProxies()
                 }
             }
@@ -3531,6 +3475,13 @@ class BraveVPNService :
                 Logger.v(LOG_TAG_VPN, "onRpnWgUpdated: $rpnId, $updatedStateJson")
                 RpnProxyManager.onWarpConfigUpdated(updatedStateJson)
             }
+        } else if (rpnId == Backend.RpnAmz) {
+            io("onRpnAmzUpdated") {
+                Logger.v(LOG_TAG_VPN, "onRpnAmzUpdated: $rpnId, $updatedStateJson")
+                RpnProxyManager.onAmzConfigUpdated(updatedStateJson)
+            }
+        } else {
+            Logger.e(LOG_TAG_VPN, "onRpnUpdated: unknown/ignored rpnId: $rpnId")
         }
     }
 
@@ -4416,11 +4367,11 @@ class BraveVPNService :
     }
 
     suspend fun registerAndFetchWarpConfig(publicKey: String): JSONObject? {
-        return vpnAdapter?.registerAndFetchWarpConfig(publicKey)
+        return vpnAdapter?.registerAndFetchWarpConfig()
     }
 
     suspend fun registerAndFetchAmneziaConfig(publicKey: String): JSONObject? {
-        return vpnAdapter?.registerAndFetchAmneziaConfig(publicKey)
+        return vpnAdapter?.registerAndFetchAmneziaConfig()
     }
 
     suspend fun isProxyReachable(proxyId: String, csv: String): Boolean { // can be ippcsv or hostpcsv

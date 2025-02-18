@@ -40,6 +40,10 @@ class RpnProxyRepository(private val dao: RpnProxyDao) {
         return dao.getProxyById(id)
     }
 
+    suspend fun getAllProxies(): List<RpnProxy> {
+        return dao.getAllProxies()
+    }
+
     suspend fun deleteConfig(id: Int) {
         dao.deleteById(id)
     }

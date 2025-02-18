@@ -8,19 +8,14 @@ import backend.Backend
 import backend.WgKey
 import com.celzero.bravedns.customdownloader.IWireguardWarp
 import com.celzero.bravedns.customdownloader.RetrofitManager
-import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.RpnProxy
 import com.celzero.bravedns.database.RpnProxyRepository
-import com.celzero.bravedns.database.WgConfigFiles
-import com.celzero.bravedns.database.WgConfigFilesRepository
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.EncryptedFileManager
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants.Companion.RPN_PROXY_FOLDER_NAME
-import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
 import com.celzero.bravedns.wireguard.BadConfigException
 import com.celzero.bravedns.wireguard.Config
 import com.google.gson.Gson
@@ -76,24 +71,48 @@ object RpnProxyManager : KoinComponent {
         // Load the RPN proxies from separate database
         // need to read the filepath from database and load the file
         // there will be an entry in the database for each RPN proxy
-        val filePath = getProtonConfigFilePath()
-        val protonConfigFile = File(filePath)
-        if (protonConfigFile.exists()) {
-            val json = EncryptedFileManager.read(applicationContext, protonConfigFile)
-            protonConfig = stringToProtonConfig(json)
-            Logger.i(
-                LOG_TAG_PROXY,
-                "$TAG: proton config loaded ${protonConfig?.regionalWgConfs?.size}"
-            )
+
+        try {
+            val rpnProxies = db.getAllProxies()
+            Logger.i(LOG_TAG_PROXY, "$TAG: rpn proxies loaded: ${rpnProxies.size}")
+            rpnProxies.forEach {
+                val cfgFile = File(it.configPath)
+                if (cfgFile.exists()) {
+                    if (it.id == PROTON_ID) {
+                        val json = EncryptedFileManager.read(applicationContext, cfgFile)
+                        protonConfig = stringToProtonConfig(json)
+                        Logger.i(
+                            LOG_TAG_PROXY,
+                            "$TAG: proton config loaded ${protonConfig?.regionalWgConfs?.size}"
+                        )
+                    } else if (it.id == WARP_ID || it.id == SEC_WARP_ID || it.id == RPN_AMZ_ID) {
+                        val cfg = EncryptedFileManager.read(applicationContext, cfgFile)
+                        val config = Config.parse(ByteArrayInputStream(cfg.toByteArray(StandardCharsets.UTF_8)))
+
+                        if (it.id == WARP_ID) {
+                            warpConfig = config
+                        } else if (it.id == SEC_WARP_ID) {
+                            secWarpConfig = config
+                        } else if (it.id == RPN_AMZ_ID) {
+                            amneziaConfig = config
+                        }
+                        Logger.i(
+                            LOG_TAG_PROXY,
+                            "$TAG: wg config loaded: ${config.getName()}, ${config.getId()}"
+                        )
+                    } else {
+                        // no need to handle the other configs
+                    }
+                }
+            }
             selectedCountries.clear()
             val dcc = DomainRulesManager.getAllUniqueCCs()
-            val icc  = IpRulesManager.getAllUniqueCCs()
+            val icc = IpRulesManager.getAllUniqueCCs()
             selectedCountries.addAll(dcc)
             selectedCountries.addAll(icc)
             Logger.d(LOG_TAG_PROXY, "$TAG: cc: ${selectedCountries.size}, $selectedCountries")
-            // val acc = FirewallManager.getCCs()
-        } else {
-            Logger.e(LOG_TAG_PROXY, "$TAG: proton config file not found")
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG: err loading rpn proxies: ${e.message}", e)
         }
     }
 
@@ -125,20 +144,25 @@ object RpnProxyManager : KoinComponent {
     }
 
     suspend fun onProtonConfigUpdated(byteArray: ByteArray?) {
-        if (byteArray != null) {
-            saveProtonConfig(byteArray)
-            protonConfig = byteArrayToProtonWgConfig(byteArray)
-            Logger.i(
-                LOG_TAG_PROXY,
-                "$TAG, p: ${protonConfig?.uid}, ${protonConfig?.certRefreshTime}, ${protonConfig?.sessionAccessToken}"
-            )
-            Logger.i(
-                LOG_TAG_PROXY,
-                "$TAG: proton config updated ${protonConfig?.regionalWgConfs?.size}"
-            )
-        } else {
-            // Handle the error
+        if (byteArray == null) {
             Logger.e(LOG_TAG_PROXY, "$TAG: err in getting the proton config")
+            return
+        }
+
+        try {
+            val p = byteArrayToProtonWgConfig(byteArray)
+            if (p != null) {
+                protonConfig = p
+                Logger.i(
+                    LOG_TAG_PROXY,
+                    "$TAG: proton config updated ${protonConfig?.regionalWgConfs?.size}"
+                )
+                saveProtonConfig(byteArray)
+            } else {
+                Logger.e(LOG_TAG_PROXY, "$TAG: err parsing proton config")
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG: err updating proton config: ${e.message}", e)
         }
     }
 
@@ -149,7 +173,6 @@ object RpnProxyManager : KoinComponent {
         }
 
         try {
-
             // convert the bytearray to json object
             val jsonString = byteArray.toString(StandardCharsets.UTF_8)
             val jsonObject = JSONObject(jsonString)
@@ -169,13 +192,49 @@ object RpnProxyManager : KoinComponent {
                         .build()
                 warpConfig = c
 
-                Logger.i(LOG_TAG_PROXY, "New wireguard config: ${c.getName()}, ${c.getId()}")
+                Logger.i(LOG_TAG_PROXY, "warp updated: ${c.getName()}, ${c.getId()}")
                 writeConfigAndUpdateDb(c, jsonObject.toString())
             } else {
                 Logger.e(LOG_TAG_PROXY, "$TAG: err parsing warp config")
             }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG: err updating warp config: ${e.message}", e)
+        }
+    }
+
+    suspend fun onAmzConfigUpdated(byteArray: ByteArray?) {
+        if (byteArray == null) {
+            Logger.e(LOG_TAG_PROXY, "$TAG: err in getting the amnezia config")
+            return
+        }
+
+        try {
+            // convert the bytearray to json object
+            val jsonString = byteArray.toString(StandardCharsets.UTF_8)
+            val jsonObject = JSONObject(jsonString)
+            val pvtKey = amneziaConfig?.getInterface()?.getKeyPair()?.getPrivateKey()
+            if (pvtKey == null) {
+                Logger.e(LOG_TAG_PROXY, "$TAG: amnezia private key is null")
+                return
+            }
+            val config = parseNewConfigJsonResponse(pvtKey, jsonObject)
+            if (config != null) {
+                val c =
+                    Config.Builder()
+                        .setId(RPN_AMZ_ID)
+                        .setName(RPN_AMZ_NAME)
+                        .setInterface(config.getInterface())
+                        .addPeers(config.getPeers())
+                        .build()
+                amneziaConfig = c
+
+                Logger.i(LOG_TAG_PROXY, "amz updated: ${c.getName()}, ${c.getId()}")
+                writeConfigAndUpdateDb(c, jsonObject.toString())
+            } else {
+                Logger.e(LOG_TAG_PROXY, "$TAG: err parsing amnezia config")
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG: err updating amnezia config: ${e.message}", e)
         }
     }
 
@@ -190,6 +249,54 @@ object RpnProxyManager : KoinComponent {
 
     fun getAmneziaConfig(): Pair<Config?, Boolean> {
         return Pair(amneziaConfig, false) // config, isActive
+    }
+
+    suspend fun getWarpExistingData(): ByteArray? {
+        try {
+            val db = db.getProxyById(WARP_ID)
+            if (db != null) {
+                val cfgFile = File(db.serverResPath)
+                if (cfgFile.exists()) {
+                    val s = EncryptedFileManager.read(applicationContext, cfgFile)
+                    return s.toByteArray(StandardCharsets.UTF_8)
+                }
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG: err getting warp existing data: ${e.message}", e)
+        }
+        return null
+    }
+
+    suspend fun getAmneziaExistingData(): ByteArray? {
+        try {
+            val db = db.getProxyById(RPN_AMZ_ID)
+            if (db != null) {
+                val cfgFile = File(db.serverResPath)
+                if (cfgFile.exists()) {
+                    val s = EncryptedFileManager.read(applicationContext, cfgFile)
+                    return s.toByteArray(StandardCharsets.UTF_8)
+                }
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG: err getting amz existing data: ${e.message}", e)
+        }
+        return null
+    }
+
+    suspend fun getProtonExistingData(): ByteArray? {
+        try {
+            val db = db.getProxyById(PROTON_ID)
+            if (db != null) {
+                val cfgFile = File(db.serverResPath)
+                if (cfgFile.exists()) {
+                    val s = EncryptedFileManager.read(applicationContext, cfgFile)
+                    return s.toByteArray(StandardCharsets.UTF_8)
+                }
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG: err getting proton existing data: ${e.message}", e)
+        }
+        return null
     }
 
     fun isSecWarpAvailable(): Boolean {
@@ -212,17 +319,42 @@ object RpnProxyManager : KoinComponent {
         return protonConfig?.regionalWgConfs?.distinctBy { it.cc }?.sortedBy { it.cc } ?: emptyList()
     }
 
-    private fun saveProtonConfig(byteArray: ByteArray) {
-        // write the byte array to the file
-        val filePath = getProtonConfigFilePath()
-        val protonConfigFile = File(filePath)
-        EncryptedFileManager.write(applicationContext, byteArray, protonConfigFile)
+    private suspend fun saveProtonConfig(byteArray: ByteArray) {
+        try {
+            // write the byte array to the file
+            val filePath = getProtonConfigFilePath()
+            val protonConfigFile = File(filePath)
+            EncryptedFileManager.write(applicationContext, byteArray, protonConfigFile)
+            val serverResPath = getJsonResponseFileName(PROTON_ID)
+            val serverRes = File(
+                applicationContext.filesDir.absolutePath +
+                        File.separator +
+                        RPN_PROXY_FOLDER_NAME + File.separator + serverResPath
+            )
+            EncryptedFileManager.write(applicationContext, byteArray, serverRes)
+            val rpnpro = db.getProxyById(PROTON_ID)
+            val rpnProxy = RpnProxy(
+                id = PROTON_ID,
+                name = PROTON,
+                configPath = protonConfigFile.absolutePath,
+                serverResPath = serverRes.absolutePath ?: "",
+                isActive = rpnpro?.isActive ?: false,
+                isLockdown = rpnpro?.isLockdown ?: false,
+                createdTs = rpnpro?.createdTs ?: System.currentTimeMillis(),
+                modifiedTs = System.currentTimeMillis(),
+                misc = rpnpro?.misc ?: "",
+                tunId = rpnpro?.tunId ?: "",
+                latency = rpnpro?.latency ?: 0
+            )
+            db.insert(rpnProxy)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG: err saving proton config: ${e.message}", e)
+        }
     }
 
     private fun byteArrayToProtonWgConfig(byteArray: ByteArray): ProtonConfig? {
         try {
             val jsonString = byteArray.toString(StandardCharsets.UTF_8)
-            Logger.i(LOG_TAG_PROXY, "$TAG: proton json string: $jsonString")
             val p = Gson().fromJson(jsonString, ProtonConfig::class.java)
             Logger.i(
                 LOG_TAG_PROXY,
@@ -239,7 +371,6 @@ object RpnProxyManager : KoinComponent {
 
     private fun stringToProtonConfig(jsonString: String): ProtonConfig? {
         try {
-            Logger.i(LOG_TAG_PROXY, "$TAG: proton json string: $jsonString")
             val p = Gson().fromJson(jsonString, ProtonConfig::class.java)
             Logger.i(
                 LOG_TAG_PROXY,
@@ -321,7 +452,7 @@ object RpnProxyManager : KoinComponent {
                         secWarpConfig = c
                     }
 
-                    Logger.i(LOG_TAG_PROXY, "New wireguard config: ${c.getName()}, ${c.getId()}")
+                    Logger.i(LOG_TAG_PROXY, "new warp config: ${c.getName()}, ${c.getId()}")
                     writeConfigAndUpdateDb(c, jsonObject.toString())
                     return c
                 }
@@ -374,52 +505,52 @@ object RpnProxyManager : KoinComponent {
     }
 
     private suspend fun writeConfigAndUpdateDb(cfg: Config, json: String) {
-        // write the config to the file
-        val dir = File(
-            applicationContext.filesDir.absolutePath +
-                    File.separator +
-                    RPN_PROXY_FOLDER_NAME +
-                    File.separator +
-                    cfg.getName() +
-                    File.separator
-        )
-        if (!dir.exists()) {
-            dir.mkdirs()
-        }
+        try {
+            // write the config to the file
+            val dir = File(
+                applicationContext.filesDir.absolutePath +
+                        File.separator +
+                        RPN_PROXY_FOLDER_NAME +
+                        File.separator +
+                        cfg.getName() +
+                        File.separator
+            )
+            if (!dir.exists()) {
+                dir.mkdirs()
+            }
 
-        val id = cfg.getId()
-        val cfgFileName = getConfigFileName(id)
-        val cfgFile = File(dir.absolutePath + File.separator + cfgFileName)
-        val parsedCfg = cfg.toWgQuickString()
-        EncryptedFileManager.write(applicationContext, parsedCfg, cfgFile)
+            val id = cfg.getId()
+            val cfgFileName = getConfigFileName(id)
+            val cfgFile = File(dir.absolutePath + File.separator + cfgFileName)
+            val parsedCfg = cfg.toWgQuickString()
+            EncryptedFileManager.write(applicationContext, parsedCfg, cfgFile)
 
-        Logger.i(LOG_TAG_PROXY, "$TAG writing wg config to file: ${cfgFile.absolutePath}")
+            Logger.i(LOG_TAG_PROXY, "$TAG writing wg config to file: ${cfgFile.absolutePath}")
 
-        val resFileName = getJsonResponseFileName(id)
-        val resFile = File(dir.absolutePath + File.separator + resFileName)
-        EncryptedFileManager.write(applicationContext, json, resFile)
+            val resFileName = getJsonResponseFileName(id)
+            val resFile = File(dir.absolutePath + File.separator + resFileName)
+            EncryptedFileManager.write(applicationContext, json, resFile)
 
-        Logger.i(LOG_TAG_PROXY, "$TAG writing server response to file: ${resFile.absolutePath}")
+            Logger.i(LOG_TAG_PROXY, "$TAG writing server response to file: ${resFile.absolutePath}")
 
-        val prev = db.getProxyById(id)
+            val prev = db.getProxyById(id)
 
-        val rpnProxy = RpnProxy(
-            id = id,
-            name = cfg.getName(),
-            configPath = cfgFile.absolutePath,
-            serverResPath = resFile.absolutePath,
-            isActive = prev?.isActive ?: false,
-            isLockdown = prev?.isLockdown ?: false,
-            createdTs = prev?.createdTs ?: System.currentTimeMillis(),
-            modifiedTs = System.currentTimeMillis(),
-            misc = prev?.misc ?: "",
-            tunId = prev?.tunId ?: "",
-            latency = prev?.latency ?: 0
-        )
-        db.insert(rpnProxy)
-
-        if (rpnProxy.isActive) {
-            VpnController.addWireGuardProxy(id = ProxyManager.ID_WG_BASE + cfg.getId())
+            val rpnProxy = RpnProxy(
+                id = id,
+                name = cfg.getName(),
+                configPath = cfgFile.absolutePath,
+                serverResPath = resFile.absolutePath,
+                isActive = prev?.isActive ?: false,
+                isLockdown = prev?.isLockdown ?: false,
+                createdTs = prev?.createdTs ?: System.currentTimeMillis(),
+                modifiedTs = System.currentTimeMillis(),
+                misc = prev?.misc ?: "",
+                tunId = prev?.tunId ?: "",
+                latency = prev?.latency ?: 0
+            )
+            db.insert(rpnProxy)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG: err writing config to file: ${e.message}", e)
         }
     }
 
@@ -535,7 +666,7 @@ object RpnProxyManager : KoinComponent {
                 )
                 null
             }
-        Logger.i(LOG_TAG_PROXY, "New wireguard config: ${cfg?.getName()}, ${cfg?.getId()}")
+        Logger.i(LOG_TAG_PROXY, "parse complete for: ${cfg?.getName()}, ${cfg?.getId()}")
         return cfg
     }
 

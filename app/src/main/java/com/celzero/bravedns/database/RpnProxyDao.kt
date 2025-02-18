@@ -38,4 +38,6 @@ interface RpnProxyDao {
     @Query("delete from RpnProxy where id = :id") fun deleteById(id: Int)
 
     @Query("select * from RpnProxy where id = :id") fun getProxyById(id: Int): RpnProxy?
+
+    @Query("select * from RpnProxy") fun getAllProxies(): List<RpnProxy>
 }
