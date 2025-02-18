@@ -24,6 +24,10 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.database.WgConfigFilesRepository
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.SEC_WARP_ID
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.SEC_WARP_NAME
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_ID
+import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_NAME
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
 import com.celzero.bravedns.wireguard.Config
@@ -73,6 +77,8 @@ object WireguardManager : KoinComponent {
         if (configs.isNotEmpty()) {
             Logger.i(LOG_TAG_PROXY, "configs already loaded; refreshing...")
         }
+        // remove this post v055o
+        deleteResidueWgs()
         val m = db.getWgConfigs().map { it.toImmutable() }
         mappings = CopyOnWriteArraySet(m)
         mappings.forEach {
@@ -82,6 +88,9 @@ object WireguardManager : KoinComponent {
             if (config == null) {
                 Logger.e(LOG_TAG_PROXY, "err loading wg config: $path, invalid config")
                 // TODO: delete the config from the db?
+                if ((it.id == WARP_ID && it.name == WARP_NAME) || (it.id == SEC_WARP_ID && it.name == SEC_WARP_NAME)) {
+                    deleteConfig(it.id)
+                }
                 return@forEach
             }
             // print the config to logcat
@@ -99,6 +108,21 @@ object WireguardManager : KoinComponent {
             }
         }
         return configs.size
+    }
+
+    // remove this post v055o,  sometimes the db update does not delete the entry, so adding this
+    // as precaution.
+    suspend fun deleteResidueWgs() {
+        val wgs = db.getWarpSecWarpConfig()
+        if (wgs.isEmpty()) {
+            return
+        }
+        wgs.forEach {
+            if (it.name == SEC_WARP_NAME || it.name == WARP_NAME) {
+                Logger.i(LOG_TAG_PROXY, "deleting residue wg config: ${it.id}, ${it.name}")
+                deleteConfig(it.id)
+            }
+        }
     }
 
     private fun clearLoadedConfigs() {
@@ -455,14 +479,7 @@ object WireguardManager : KoinComponent {
     fun deleteConfig(id: Int) {
         val cf = mappings.find { it.id == id }
         Logger.i(LOG_TAG_PROXY, "deleteConfig start: $id, ${cf?.name}, ${cf?.configPath}")
-        mappings.forEach {
-            Logger.i(LOG_TAG_PROXY, "deleteConfig: ${it.id}, ${it.name}, ${it.configPath}")
-        }
-        val canDelete = cf?.isDeletable ?: false
-        if (!canDelete) {
-            Logger.e(LOG_TAG_PROXY, "wg config not deletable for id: $id")
-            return
-        }
+
         // delete the config file
         val config = configs.find { it.getId() == id }
         if (cf?.isActive == true) {

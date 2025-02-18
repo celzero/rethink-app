@@ -44,6 +44,11 @@ interface WgConfigFilesDAO {
     )
     fun getWgConfigs(): List<WgConfigFiles>
 
+    // TODO: should remove this query post v055o
+    // sometimes the db update does not delete the entry, so adding this as precaution
+    @Query("select * from WgConfigFiles where id in (0, 1)")
+    fun getWarpSecWarpConfig(): List<WgConfigFiles>
+
     @Query("select max(id) from WgConfigFiles") fun getLastAddedConfigId(): Int
 
     @Delete fun delete(wgConfigFiles: WgConfigFiles)

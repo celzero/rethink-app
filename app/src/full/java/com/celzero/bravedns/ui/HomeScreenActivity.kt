@@ -62,6 +62,7 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
@@ -122,7 +123,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         setupNavigationItemSelectedListener()
 
         // added for testing purpose; TODO: remove this
-        persistentState.useRpn = false
+        //persistentState.useRpn = false
 
         // handle intent receiver for backup/restore
         handleIntent()
@@ -419,6 +420,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             persistentState.biometricAuthType = MiscSettingsActivity.BioMetricType.FIFTEEN_MIN.action
         }
         persistentState.biometricAuth = false
+
+        // delete residue wgs from database, remove this post v055o
+        io { WireguardManager.deleteResidueWgs() }
     }
 
     // fixme: find a cleaner way to implement this, move this to some other place
@@ -457,7 +461,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         persistentState.showWhatsNewChip = true
 
         // FIXME: remove this post v054
-        // this is to fix the local blocklist default download location
         removeThisMethod()
     }
 
