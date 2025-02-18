@@ -69,7 +69,7 @@ object EncryptedFileManager {
             ist.close()
             byteArrayOutputStream.close()
         } catch (e: Exception) {
-            Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${e.message}", e)
+            Logger.w(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${e.message}")
         }
 
         return config
