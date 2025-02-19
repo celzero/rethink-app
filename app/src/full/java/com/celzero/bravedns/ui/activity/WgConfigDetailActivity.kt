@@ -45,6 +45,7 @@ import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
 import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
 import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
+import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
@@ -258,11 +259,18 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     ): String {
         if (status == null) {
             val txt = if (!errMsg.isNullOrEmpty()) {
-                return getString(R.string.status_waiting) + "($errMsg)"
+                getString(R.string.status_waiting) + "($errMsg)"
             } else {
                 getString(R.string.status_waiting)
             }
             return txt.replaceFirstChar(Char::titlecase)
+        }
+
+        val now = System.currentTimeMillis()
+        val lastOk = stats?.lastOK ?: 0L
+        val since = stats?.since ?: 0L
+        if (now - since > WG_UPTIME_THRESHOLD && lastOk == 0L) {
+            return getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
         }
 
         val baseText = getString(UIUtils.getProxyStatusStringRes(status.id))
@@ -278,7 +286,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private fun getIdleStatusText(status: UIUtils.ProxyStatus?, stats: RouterStats?): String {
         if (status != UIUtils.ProxyStatus.TZZ && status != UIUtils.ProxyStatus.TNT) return ""
         if (stats == null || stats.lastOK == 0L) return ""
-        if (System.currentTimeMillis() - stats.lastOK >= WG_HANDSHAKE_TIMEOUT) return ""
+        if (System.currentTimeMillis() - stats.since >= WG_HANDSHAKE_TIMEOUT) return ""
 
         return getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
     }

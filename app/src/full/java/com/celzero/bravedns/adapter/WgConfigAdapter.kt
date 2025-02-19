@@ -44,6 +44,7 @@ import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
 import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
+import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
@@ -361,11 +362,18 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         ): String {
             if (status == null) {
                 val txt = if (errMsg != null) {
-                    return context.getString(R.string.status_waiting) + "($errMsg)"
+                    context.getString(R.string.status_waiting) + "($errMsg)"
                 } else {
                     context.getString(R.string.status_waiting)
                 }
                 return txt.replaceFirstChar(Char::titlecase)
+            }
+
+            val now = System.currentTimeMillis()
+            val lastOk = stats?.lastOK ?: 0L
+            val since = stats?.since ?: 0L
+            if (now - since > WG_UPTIME_THRESHOLD && lastOk == 0L) {
+                return context.getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
             }
 
             val baseText = context.getString(UIUtils.getProxyStatusStringRes(status.id))
@@ -381,7 +389,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         private fun getIdleStatusText(status: UIUtils.ProxyStatus?, stats: RouterStats?): String {
             if (status != UIUtils.ProxyStatus.TZZ && status != UIUtils.ProxyStatus.TNT) return ""
             if (stats == null || stats.lastOK == 0L) return ""
-            if (System.currentTimeMillis() - stats.lastOK >= WG_HANDSHAKE_TIMEOUT) return ""
+            if (System.currentTimeMillis() - stats.since >= WG_HANDSHAKE_TIMEOUT) return ""
 
             return context.getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
         }
