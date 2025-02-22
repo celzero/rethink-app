@@ -433,7 +433,7 @@
     <string name="cd_dialog_title" translatable="true">Dodaj zasadę domeny</string>
     <string name="cd_dialog_edittext_hint" translatable="true">Wpisz %1$s</string>
     <string name="cd_dialog_error_invalid_domain" translatable="true">Nieprawidłowy adres URL lub nazwa domeny</string>
-    <string name="cd_dialog_error_invalid_wildcard" translatable="true">Błędny wildcard.</string>
+    <string name="cd_dialog_error_invalid_wildcard" translatable="true">Błędny wildcard URLa lub domeny.</string>
     <string name="cd_no_rule_initial" translatable="true">N</string>
     <string name="cd_no_rule_txt" translatable="true">Nie ma reguły</string>
     <string name="ci_dialog_title" translatable="true">Dodaj regułę IP / Port</string>
@@ -883,7 +883,7 @@
     <string name="lbl_generated" translatable="true">(wygenerowano)</string>
     <string name="bad_config_explanation_positive_number" translatable="true">: Musi być pozytywny</string>
     <string name="bad_config_reason_missing_section" translatable="true">Brakująca sekcja</string>
-    <string name="wireguard_no_config_msg">Brak konfiguracji WireGuard</string>
+    <string name="wireguard_no_config_msg">Brak VPNów WireGuard. Stwórz jakiś by zacząć.</string>
     <string name="new_warp_error_toast" translatable="true">Nie można pobrać konfiguracji WARP</string>
     <string name="bad_config_context" translatable="true">%1$s\'s %2$s</string>
     <string name="settings_go_log_heading" translatable="true">Poziom dziennika</string>
@@ -994,4 +994,6 @@
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Usuń punkt końcowy DNS przez TLS z zapisanej konfiguracji.</string>
     <string name="memory_notification_text">Rethink ma mało pamięci. Akcje systemowe mogą być ograniczone.</string>
     <string name="failed_using_default" translatable="true">Niepowodzenie: użycie zapasowego DNS</string>
+    <string name="wireguard_disable_message" translatable="true">Zatrzymać aktywne VPNy WireGuard?</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Ta apka omija proxy</string>
 </resources>
