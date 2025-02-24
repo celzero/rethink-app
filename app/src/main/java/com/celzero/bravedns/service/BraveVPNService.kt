@@ -85,7 +85,6 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
@@ -148,7 +147,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import rnet.ServerSummary
 import rnet.Tab
@@ -1621,51 +1619,44 @@ class BraveVPNService :
 
     private suspend fun handleRpnProxies() {
         if (persistentState.useRpn) {
-            val wt = vpnAdapter?.testWarp() ?: false
-            val st = vpnAdapter?.testSE() ?: false
-            val at = vpnAdapter?.testAmnezia() ?: false
-            val pt = vpnAdapter?.testProton() ?: false
+            val wt = vpnAdapter?.testRpnProxy(RpnProxyManager.RpnType.WARP) ?: false
+            val st = vpnAdapter?.testRpnProxy(RpnProxyManager.RpnType.SE) ?: false
+            val at = vpnAdapter?.testRpnProxy(RpnProxyManager.RpnType.AMZ) ?: false
+            val pt = vpnAdapter?.testRpnProxy(RpnProxyManager.RpnType.PROTON) ?: false
             Logger.i(LOG_TAG_VPN, "handleRpnProxies: warp: $wt, se: $st, amz: $at, proton: $pt")
             if (wt) {
                 Logger.i(LOG_TAG_VPN, "handleRpnProxies: warp not enabled, add warp to tunnel")
                 val existingBytes = RpnProxyManager.getWarpExistingData()
-                vpnAdapter?.registerAndFetchWarpConfig(existingBytes)
+                val bytes = vpnAdapter?.registerAndFetchWarpConfigIfNeeded(existingBytes)
+                if (bytes != null) {
+                    RpnProxyManager.updateWarpConfig(bytes)
+                }
             }
             if (st) {
                 Logger.i(LOG_TAG_VPN, "handleRpnProxies: se not enabled, register se")
-                vpnAdapter?.registerSurfEasy()
+                vpnAdapter?.registerSurfEasyIfNeeded()
             }
             if (at) {
                 Logger.i(LOG_TAG_VPN, "handleRpnProxies: amz not enabled, register amz")
-                val existingBytes = RpnProxyManager.getAmneziaExistingData()
-                vpnAdapter?.registerAndFetchAmneziaConfig(existingBytes)
+                val existingBytes = RpnProxyManager.getAmzExistingData()
+                val json = vpnAdapter?.registerAndFetchAmzConfigIfNeeded(existingBytes)
+                if (json != null) {
+                    RpnProxyManager.updateAmzConfig(json)
+                }
             }
             if (pt) {
                 Logger.i(LOG_TAG_VPN, "handleRpnProxies: proton not enabled, register proton")
                 val existingBytes = RpnProxyManager.getProtonExistingData()
-                vpnAdapter?.registerProton(existingBytes)
+                vpnAdapter?.registerAndFetchProtonIfNeeded(existingBytes)
             }
 
             // TODO: get the list of other countries other than default, add all of them
             // make sure it doesnt exceed the max number of allowed configs (5)
-            val isProtonAvailable = RpnProxyManager.isProtonConfigAvailable()
-            if (isProtonAvailable) {
-                Logger.i(LOG_TAG_VPN, "handleRpnProxies: proton available, add proton to tunnel")
-                // fixme: correct cc should be added, also multiple proton servers should be added
-                val protonConf = RpnProxyManager.getProtonConfigByCC("US")
-                val wg = protonConf.first().toWgUserspaceString(false, false)
-                addProtonProxy(wg)
-            } else {
-                Logger.i(LOG_TAG_VPN, "handleRpnProxies: proton not available")
-                val newConf = RpnProxyManager.getNewProtonConfig()
-                if (newConf != null) {
-                    Logger.i(LOG_TAG_VPN, "handleRpnProxies: proton config created")
-                    val protonConf = RpnProxyManager.getProtonConfigByCC("US")
-                    val wg = protonConf.first().toWgUserspaceString(false, false)
-                    addProtonProxy(wg)
-                } else {
-                    Logger.i(LOG_TAG_VPN, "handleRpnProxies: proton config not created")
-                }
+            // if the user has selected a country, then add that country to the list
+            val countries = RpnProxyManager.getSelectedCCs()
+            if (countries.isNotEmpty()) {
+                Logger.i(LOG_TAG_VPN, "handleRpnProxies: selected countries: $countries")
+                // TODO: add the selected countries to the tunnel, new API needed
             }
         } else {
             Logger.i(LOG_TAG_VPN, "handleRpnProxies: plus disabled")
@@ -2143,7 +2134,7 @@ class BraveVPNService :
             }
 
             AppConfig.ProxyProvider.TCP -> {
-                vpnAdapter?.setTcpProxy()
+                //vpnAdapter?.setTcpProxy()
             }
 
             AppConfig.ProxyProvider.WIREGUARD -> {
@@ -3478,17 +3469,17 @@ class BraveVPNService :
         if (rpnId == Backend.RpnPro) {
             io("onRpnProUpdated") {
                 Logger.v(LOG_TAG_VPN, "onRpnProUpdated: $rpnId, $updatedStateJson")
-                RpnProxyManager.onProtonConfigUpdated(updatedStateJson)
+                RpnProxyManager.updateProtonConfig(updatedStateJson)
             }
         } else if (rpnId == Backend.RpnWg) {
             io("onRpnWgUpdated") {
                 Logger.v(LOG_TAG_VPN, "onRpnWgUpdated: $rpnId, $updatedStateJson")
-                RpnProxyManager.onWarpConfigUpdated(updatedStateJson)
+                RpnProxyManager.updateWarpConfig(updatedStateJson)
             }
         } else if (rpnId == Backend.RpnAmz) {
             io("onRpnAmzUpdated") {
                 Logger.v(LOG_TAG_VPN, "onRpnAmzUpdated: $rpnId, $updatedStateJson")
-                RpnProxyManager.onAmzConfigUpdated(updatedStateJson)
+                RpnProxyManager.updateAmzConfig(updatedStateJson)
             }
         } else {
             Logger.e(LOG_TAG_VPN, "onRpnUpdated: unknown/ignored rpnId: $rpnId")
@@ -4376,55 +4367,32 @@ class BraveVPNService :
         netLogTracker.writeConsoleLog(log)
     }
 
-    suspend fun registerAndFetchWarpConfig(publicKey: String): JSONObject? {
-        return vpnAdapter?.registerAndFetchWarpConfig()
+    suspend fun registerAndFetchWarpConfig(): ByteArray? {
+        return vpnAdapter?.registerAndFetchWarpConfigIfNeeded()
     }
 
-    suspend fun registerAndFetchAmneziaConfig(publicKey: String): JSONObject? {
-        return vpnAdapter?.registerAndFetchAmneziaConfig()
+    suspend fun registerAndFetchAmneziaConfig(): ByteArray? {
+        return vpnAdapter?.registerAndFetchAmzConfigIfNeeded()
     }
 
     suspend fun isProxyReachable(proxyId: String, csv: String): Boolean { // can be ippcsv or hostpcsv
-        /*val one = vpnAdapter?.isWarpReady() ?: false
-        val two = vpnAdapter?.isReachableAuto(csv) ?: false
-        val three = vpnAdapter?.isReachableExit(csv) ?: false
-        val four = vpnAdapter?.isReachableSE(csv) ?: false
-        val five = vpnAdapter?.isSEReady() ?: false
-        Logger.i(LOG_TAG_VPN, "testPing SE? $four, ready? $five")
-        return Triple(one, two, three)*/
         return vpnAdapter?.isProxyReachable(proxyId, csv) ?: false
     }
 
-    suspend fun testWarp(): Boolean {
-        return vpnAdapter?.testWarp() ?: false
+    suspend fun testRpnProxy(type: RpnProxyManager.RpnType): Boolean {
+        return vpnAdapter?.testRpnProxy(type) ?: false
     }
 
-    suspend fun testSE(): Boolean {
-        return vpnAdapter?.testSE() ?: false
-    }
-
-    suspend fun testAmz(): Boolean {
-        return vpnAdapter?.testAmnezia() ?: false
-    }
-
-    suspend fun testProton(): Boolean {
-        return vpnAdapter?.testProton() ?: false
-    }
-
-    suspend fun testExit64(): Boolean {
-        return vpnAdapter?.testExit64() ?: false
+    suspend fun getRpnStatus(type: RpnProxyManager.RpnType): Long? {
+        return vpnAdapter?.getRpnStatus(type)
     }
 
     suspend fun registerSEToTunnel(): Boolean {
-        return vpnAdapter?.registerSurfEasy() ?: false
+        return vpnAdapter?.registerSurfEasyIfNeeded() ?: false
     }
 
-    suspend fun registerProton(): ByteArray? {
-        return vpnAdapter?.registerProton()
-    }
-
-    suspend fun addProtonProxy(conf: String): Boolean {
-        return vpnAdapter?.addProtonProxy("", conf) ?: false
+    suspend fun registerAndFetchProtonIfNeeded(prevBytes: ByteArray?): ByteArray? {
+        return vpnAdapter?.registerAndFetchProtonIfNeeded(prevBytes)
     }
 
     suspend fun createWgHop(origin: Config, via: Config?): Pair<Boolean, String> {

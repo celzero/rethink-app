@@ -28,6 +28,7 @@ import backend.RDNS
 import backend.RouterStats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConsoleLog
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.BraveVPNService.Companion.FAIL_OPEN_ON_NO_NETWORK
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
@@ -40,7 +41,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -353,12 +353,12 @@ object VpnController : KoinComponent {
         braveVpnService?.writeConsoleLog(log)
     }
 
-    suspend fun registerAndFetchWarpConfig(publicKey: String): JSONObject? {
-        return braveVpnService?.registerAndFetchWarpConfig(publicKey)
+    suspend fun registerAndFetchWarpConfig(): ByteArray? {
+        return braveVpnService?.registerAndFetchWarpConfig()
     }
 
-    suspend fun registerAndFetchAmneziaConfig(publicKey: String): JSONObject? {
-        return braveVpnService?.registerAndFetchAmneziaConfig(publicKey)
+    suspend fun registerAndFetchAmneziaConfig(): ByteArray? {
+        return braveVpnService?.registerAndFetchAmneziaConfig()
     }
 
     suspend fun isProxyReachable(proxyId: String, ippcsv: String): Boolean {
@@ -369,8 +369,8 @@ object VpnController : KoinComponent {
         return braveVpnService?.registerSEToTunnel() ?: false
     }
 
-    suspend fun registerProton(): ByteArray? {
-        return braveVpnService?.registerProton()
+    suspend fun registerAndFetchProtonIfNeeded(prevBytes: ByteArray?): ByteArray? {
+        return braveVpnService?.registerAndFetchProtonIfNeeded(prevBytes)
     }
 
     suspend fun createWgHop(origin: Config, via: Config?): Pair<Boolean, String> {
@@ -381,24 +381,12 @@ object VpnController : KoinComponent {
         return braveVpnService?.via(proxyId) ?: ""
     }
 
-    suspend fun testWarp(): Boolean {
-        return braveVpnService?.testWarp() ?: false
+    suspend fun testRpnProxy(type: RpnProxyManager.RpnType): Boolean {
+        return braveVpnService?.testRpnProxy(type) ?: false
     }
 
-    suspend fun testSE(): Boolean {
-        return braveVpnService?.testSE() ?: false
-    }
-
-    suspend fun testAmz(): Boolean {
-        return braveVpnService?.testAmz() ?: false
-    }
-
-    suspend fun testProton(): Boolean {
-        return braveVpnService?.testProton() ?: false
-    }
-
-    suspend fun testExit64(): Boolean {
-        return braveVpnService?.testExit64() ?: false
+    suspend fun getRpnStatus(type: RpnProxyManager.RpnType): Long? {
+        return braveVpnService?.getRpnStatus(type)
     }
 
     fun setAutoUsageId(autoUsageId: String) {

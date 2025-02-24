@@ -42,12 +42,6 @@ class RetrofitManager {
                 .client(okHttpClient(dnsId))
         }
 
-        fun getWarpBaseBuilder(dnsId: Int): Retrofit.Builder {
-            return Retrofit.Builder()
-                .baseUrl(Constants.DOWNLOAD_BASE_URL)
-                .client(okHttpClient(dnsId))
-        }
-
         fun getTcpProxyBaseBuilder(dnsId: Int): Retrofit.Builder {
             return Retrofit.Builder()
                 .baseUrl(Constants.TCP_PROXY_BASE_URL)
