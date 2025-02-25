@@ -353,7 +353,7 @@
     <string name="cd_dialog_error_invalid_domain">URL atau nama domain tidak valid</string>
     <string name="settings_socks5_dialog_hint_username">Nama pengguna (tidak wajib)</string>
     <string name="settings_theme_dialog_themes_3">Gelap</string>
-    <string name="lbl_proceed">Melanjutkan</string>
+    <string name="lbl_proceed">Lanjutkan</string>
     <string name="bypass_universal">memintas (bypass) aturan secara universal</string>
     <string name="dns_crypt_relay_remove_dialog_title">Hapus Jembatan Penghubung (Relay) DNSCrypt\?</string>
     <string name="univ_ip_delete_individual_toast">%1$s telah dihapus.</string>
@@ -795,7 +795,7 @@
     <string name="lbl_blocked" translatable="true">Diblokir</string>
     <string name="firewall_rule_block_domain" translatable="true">Domain (Aplikasi)</string>
     <string name="lbl_disabled" translatable="true">Dimatikan</string>
-    <string name="lbl_domain" translatable="true">Domain Laman</string>
+    <string name="lbl_domain" translatable="true">Laman</string>
     <string name="firewall_rule_block_domain_desc" translatable="true">Aturan firewall yang diterapkan \"Pengguna\" memblokir <i>Domain</i>.<br/><br/> Untuk mengubahnya, pergi ke tampilan <i>Firewall khusus aplikasi</i>.</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Domain Tepercaya (Aplikasi)</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true">Sambungan ini diizinkan karena <i>domain</i> ditetapkan sebagai domain tepercaya.<br/><br/> Untuk mengubahnya, buka tampilan <i>Firewall khusus aplikasi</i>.</string>
@@ -859,7 +859,7 @@
     <string name="lbl_generated" translatable="true">(dihasilkan)</string>
     <string name="lbl_random" translatable="true">(acak)</string>
     <string name="lbl_mtu" translatable="true">MTU</string>
-    <string name="lbl_auto" translatable="true">(oto)</string>
+    <string name="lbl_auto" translatable="true">(otomatis)</string>
     <string name="lbl_include" translatable="true">Termasuk</string>
     <string name="lbl_select_all" translatable="true">Pilih semua</string>
     <string name="lbl_very" translatable="true">sangat</string>
@@ -978,7 +978,7 @@
     <string name="lbl_remove" translatable="true">Hapus</string>
     <string name="lbl_last" translatable="true">Terakhir</string>
     <string name="lbl_overall" translatable="true">Keseluruhan</string>
-    <string name="lbl_stopped" translatable="true">Terhenti</string>
+    <string name="lbl_stopped" translatable="true">Dihentikan</string>
     <string name="lbl_private" translatable="true">Pribadi</string>
     <string name="lbl_secure" translatable="true">aman</string>
     <string name="lbl_anonymous" translatable="true">anonim</string>
@@ -1016,7 +1016,7 @@
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Terlindungi! Terhubung dengan DNS + Firewall + Proksi.</string>
     <string name="dc_proxy_dns_desc" translatable="true">Jangan lakukan proksi DNS melalui Always-on WireGuard, SOCKS5, dan proksi HTTP.</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s dimatikan dikarenakan proksi aktif</string>
-    <string name="lbl_idle" translatable="true">Menganggur</string>
+    <string name="lbl_idle" translatable="true">Siaga</string>
     <string name="lbl_split" translatable="true">Pisah</string>
     <string name="lbl_on_device" translatable="true">pada perangkat</string>
     <string name="settings_connectivity_checks" translatable="true">Melakukan pemeriksaan konektivitas</string>

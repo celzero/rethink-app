@@ -416,13 +416,13 @@
     <string name="settings_ptrans_desc" translatable="true">תרגם תעבורת IPv6 יוצאת ל-IPv4 במכשיר. הפעל אם אתה מחובר לרשת IPv4 בלבד.</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">כאשר כבוי, למעטים Proxy (SOCKS5, HTTP, DNS) יישומים קדימה יותר ממנהרת VPN של Rethink.</string>
     <string name="settings_orbot_notification_action" translatable="true">פתיחת Orbot</string>
-    <string name="settings_app_notification_persistent_heading" translatable="true">התראה מתמדת</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">התראה תמידית</string>
     <string name="settings_socks5_dialog_hint_username" translatable="true">שם משתמש (אופציונלי)</string>
     <string name="settings_socks5_dialog_hint_password" translatable="true">סיסמה (אופציונלי)</string>
     <string name="settings_notification_desc" translatable="true">לחצני פעולה להצגה עם הודעת Rethink: %1$s</string>
     <string name="settings_notification_desc1" translatable="true">השהיה / עצירה (ברירת מחדל)</string>
     <string name="settings_protocol_translation_dns_inactive" translatable="true">עבור למצב DNS/DNS+חומת אש כדי להפעיל הגדרה זו</string>
-    <string name="settings_pcap_dialog_option_3" translatable="true">הוצא פלט לתיקיית ההורדות</string>
+    <string name="settings_pcap_dialog_option_3" translatable="true">הוצאת פלט לתיקיית ההורדות</string>
     <string name="firewall_status_block_unmetered" translatable="true">חסום ברשתות (wifi) לא מדודות</string>
     <string name="firewall_status_block_metered" translatable="true">חסום ברשתות מדודות (סלולריות).</string>
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink זקוק להרשאה להגדיר VPN מקומי כדי להצפין את בקשות ה-DNS של המכשיר, לפקח על הרשת ולאכוף כללי חומת אש.
@@ -547,7 +547,7 @@
     <string name="settings_import_export_heading" translatable="true">גיבוי ושחזור</string>
     <string name="settings_app_notification_a13_heading" translatable="true">התראת אפליקציה</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">כבוי (ברירת מחדל)</string>
-    <string name="settings_pcap_dialog_option_2" translatable="true">הוצא פלט ל-Logcat</string>
+    <string name="settings_pcap_dialog_option_2" translatable="true">הוצאת פלט ל-Logcat</string>
     <string name="hs_biometeric_title" translatable="true">בטל את הנעילה של Rethink</string>
     <string name="lbl_battery_optimization" translatable="true">מיטוב סוללה</string>
     <string name="about_website" translatable="true">בקר בrethinkdns.com</string>
