@@ -151,4 +151,20 @@
     <string name="brave_dns_connect_mode_change_dns" translatable="true">Zvolte režim</string>
     <string name="default_dns_name" translatable="true">RDNS Výchozí</string>
     <string name="custom_url_error_invalid_url" translatable="true">Neplatná URL</string>
+    <string name="bsct_block" translatable="true">Blokovat, obejít, vyloučit, izolovat <u>tuto aplikaci</u></string>
+    <string name="always_on_dialog_positive_btn" translatable="true">Přejít do nastavení</string>
+    <string name="bsct_app_info" translatable="true">O Aplikaci</string>
+    <string name="bsct_conn_desc_blocked" translatable="true">blokován na %1$s %2$s</string>
+    <string name="dns_query_clear_logs_title" translatable="true">Smazat všechny DNS záznamy?</string>
+    <string name="bsct_block_ip" translatable="true">Blokovat, důvěřovat <u>tuto IP</u> pro <u>tuto aplikaci</u></string>
+    <string name="bsct_block_domain" translatable="true">Blokovat, důvěřovat <u>doménu</u> pro <u>tuto aplikaci</u></string>
+    <string name="dns_query_clear_logs_message" translatable="true">Toto odstraní DNS záznamy na zařízení. Tato operace není vratná. Chcete pokračovat?</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Blokovat připojení aplikace k Internetu.\n <u>#2</u>: Blokovat připojení libovolné aplikace k určité IP adrese.\n <u>#3</u>: Blokovat všechna připojení, když je zařízení uzamčeno (Univerzální Firewall).\n <u>#4</u>: Blokovat jakoukoli nepoužívanou aplikaci (Univerzální Firewall).\n <u>#5</u>: Blokovat připojení, když je zdrojová aplikace neznámá (Univerzální Firewall).\n <u>#6</u>: Blokovat veškerý provoz UDP kromě DNS (Univerzální Firewall).\n <u>#7</u>: Blokovat připojení při obcházení DNS (Univerzální Firewall).</string>
+    <string name="always_on_dialog" translatable="true">\"Always-On VPN\" je na tomto zařízení povolena. Chcete-li začít Rethink, přejděte do aplikace Nastavení a deaktivujte \"Always-on VPN\".</string>
+    <string name="always_on_dialog_heading" translatable="true">Zakázat Always-on VPN</string>
+    <string name="conn_track_clear_logs_title" translatable="true">Odstranit všechny síťové záznamy?</string>
+    <string name="conn_track_clear_logs_message" translatable="true">Toto jen odstraní záznamy sítě, ale ne pravidla firewallu. Tato operace není vratná. Chcete pokračovat?</string>
+    <string name="bsct_conn_block_desc" translatable="true">blokován %1$s od %2$s</string>
+    <string name="bsct_conn_block_desc_device" translatable="true">blokován %1$s na zařízení</string>
+    <string name="bsct_conn_desc_allowed" translatable="true">povolen na %1$s %2$s</string>
 </resources>
