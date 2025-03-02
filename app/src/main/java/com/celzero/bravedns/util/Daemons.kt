@@ -90,7 +90,8 @@ class CoFactory<T>(
             channelsMutex.unlock()
             return Channel(Channel.RENDEZVOUS)
         }
-        val x = channels.removeLast()
+        // changes for android 15, removeLast() is replaced with removeAt(size - 1)
+        val x = channels.removeAt(channels.size - 1)
         channelsMutex.unlock()
         return x
     }
