@@ -703,8 +703,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             dialog.dismiss()
             val item = items[which]
             // https://developer.android.com/guide/topics/resources/app-languages#app-language-settings
-            val locale = languages.getOrDefault(item, "en-US")
-            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(locale))
+            val locale = Locale.forLanguageTag(languages.getOrDefault(item, "en-US"))
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(locale))
         }
         alertBuilder.setNeutralButton(getString(R.string.settings_locale_dialog_neutral)) { dialog,
                                                                                             _ ->
