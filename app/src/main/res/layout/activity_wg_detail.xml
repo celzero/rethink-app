@@ -19,43 +19,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <LinearLayout
-                android:id="@+id/new_conf_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:src="@drawable/new_conf_illustrator" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="30dp"
-                    android:padding="10dp"
-                    android:text="@string/new_warp_config_desc"
-                    android:textColor="?attr/secondaryTextColor"
-                    android:textSize="@dimen/extra_large_font_text_view" />
-
-                <ProgressBar
-                    android:id="@+id/new_conf_progress_bar"
-                    style="@android:style/Widget.DeviceDefault.ProgressBar.Large"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:visibility="gone" />
-
-            </LinearLayout>
-
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/interface_detail_card"
                 android:layout_width="match_parent"

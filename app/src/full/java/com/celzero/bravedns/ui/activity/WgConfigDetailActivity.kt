@@ -48,6 +48,7 @@ import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
+import com.celzero.bravedns.ui.dialog.WgHopDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
@@ -170,7 +171,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             return
         }
 
-        // handleWarpConfigView()
         if (mapping != null) {
             // if catch all is enabled, disable the add apps button and lockdown
             b.catchAllCheck.isChecked = mapping.isCatchAll
@@ -188,11 +188,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.applicationsBtn.isEnabled = false
             // texts are updated based on the catch all and one-wg
         }
-
-        /*if (config == null && configId == WARP_ID) {
-            showNewWarpConfigLayout()
-            return@uiCtx
-        }*/
 
         io { updateStatusUi(config.getId()) }
         prefillConfig(config)
@@ -398,81 +393,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }*/
     }
 
-    /*private suspend fun createConfigOrShowErrorLayout() {
-        val works = isWarpWorking()
-        if (works) {
-            fetchWarpConfigFromServer()
-        } else {
-            showConfigCreationError()
-        }
-    }
-
-    private suspend fun showConfigCreationError() {
-        uiCtx {
-            Toast.makeText(this, getString(R.string.new_warp_error_toast), Toast.LENGTH_LONG).show()
-        }
-    }*/
-
-    /*private suspend fun fetchWarpConfigFromServer() {
-        val config = WireguardManager.getNewWarpConfig(WARP_ID)
-        Log.i(LOG_TAG_PROXY, "new config from server: ${config?.getName()}")
-        if (config == null) {
-            showConfigCreationError()
-            return
-        }
-        uiCtx {
-            showWarpConfig()
-            prefillWarpConfig(config)
-        }
-    }*/
-
-    /* private suspend fun handleWarpConfigView() {
-        if (configId == WARP_ID) {
-            if (isWarpConfAvailable()) {
-                if (DEBUG) Log.d(LOG_TAG_PROXY, "warp config already available")
-                showWarpConfig()
-            } else {
-                if (DEBUG) Log.d(LOG_TAG_PROXY, "warp config not found, show new config layout")
-                showNewWarpConfigLayout()
-            }
-        } else {
-            b.interfaceEdit.visibility = View.VISIBLE
-            b.interfaceDelete.visibility = View.VISIBLE
-            b.interfaceRefresh.visibility = View.GONE
-            b.addPeerFab.visibility = View.VISIBLE
-        }
-    }
-
-    private suspend fun isWarpConfAvailable(): Boolean {
-        return WireguardManager.getWarpConfig() != null
-    }*/
-
-    /*private fun showNewWarpConfigLayout() {
-            b.interfaceDetailCard.visibility = View.GONE
-            b.peersList.visibility = View.GONE
-            b.addPeerFab.visibility = View.GONE
-            b.newConfLayout.visibility = View.VISIBLE
-        }
-
-        private fun showWarpConfig() {
-            b.interfaceDetailCard.visibility = View.VISIBLE
-            b.peersList.visibility = View.VISIBLE
-            b.addPeerFab.visibility = View.GONE
-            b.interfaceEdit.visibility = View.GONE
-            b.interfaceDelete.visibility = View.GONE
-            b.interfaceRefresh.visibility = View.VISIBLE
-            hideNewWarpConfLayout()
-        }
-
-        private fun hideNewWarpConfLayout() {
-            b.newConfLayout.visibility = View.GONE
-            b.interfaceDetailCard.visibility = View.VISIBLE
-            b.peersList.visibility = View.VISIBLE
-        }
-    */
-
     private fun handleAppsCount() {
-        val id = ProxyManager.ID_WG_BASE + configId
+        val id = ID_WG_BASE + configId
         b.applicationsBtn.isEnabled = true
         mappingViewModel.getAppCountById(id).observe(this) {
             if (it == 0) {
@@ -534,19 +456,20 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
         b.hopBtn.setOnClickListener {
             io {
-                val id = ProxyManager.ID_WG_BASE + configId
+                val id = ID_WG_BASE + configId
                 val hopId = VpnController.via(id)
                 Logger.d(LOG_TAG_PROXY, "hop result: $hopId")
                 val sid = convertStringIdToId(hopId)
                 val hopables = WgHopManager.getHopableWgs(id)
-                uiCtx { showHopDialog(hopables, sid) }
+                //uiCtx { showHopDialog(hopables, sid) }
+                uiCtx { openHopDialog(hopables, sid) }
             }
         }
     }
 
     private fun convertStringIdToId(id: String): Int {
         return try {
-            val configId = id.substring(ProxyManager.ID_WG_BASE.length)
+            val configId = id.substring(ID_WG_BASE.length)
             configId.toIntOrNull() ?: INVALID_CONF_ID
         } catch (e: Exception) {
             Logger.i(LOG_TAG_PROXY, "err converting string id to int: $id")
@@ -564,16 +487,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             )
             return
         }
-        /*val configs = WireguardManager.getActiveConfigs()
-        val filteredConfigs = configs.filter { it.getId() != configId }
-        if (filteredConfigs.isEmpty()) {
-            Utilities.showToastUiCentered(
-                this,
-                "No other configs to hop to",
-                Toast.LENGTH_SHORT
-            )
-            return
-        } */
+
         val configNames = filteredConfigs.map { it.getName() }.toTypedArray()
         val selectedIndex = if (sid == -1) {
             -1
@@ -711,13 +625,29 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun openAppsDialog(proxyName: String) {
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        val proxyId = ProxyManager.ID_WG_BASE + configId
+        val proxyId = ID_WG_BASE + configId
         val appsAdapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
         mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
         val includeAppsDialog =
             WgIncludeAppsDialog(this, appsAdapter, mappingViewModel, themeId, proxyId, proxyName)
         includeAppsDialog.setCanceledOnTouchOutside(false)
         includeAppsDialog.show()
+    }
+
+    private fun openHopDialog(hopables: List<Config>, selectedId: Int) {
+        val curr = WireguardManager.getConfigById(configId)
+        if (curr == null) {
+            Utilities.showToastUiCentered(
+                this,
+                "Config not found",
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        val hopDialog = WgHopDialog(this, themeId, hopables, selectedId)
+        hopDialog.setCanceledOnTouchOutside(false)
+        hopDialog.show()
     }
 
     private fun showDeleteInterfaceDialog() {
