@@ -19,6 +19,7 @@ import Logger
 import Logger.LOG_TAG_APP_DB
 import Logger.LOG_TAG_DOWNLOAD
 import Logger.LOG_TAG_FIREWALL
+import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
@@ -634,7 +635,10 @@ object Utilities {
     }
 
     fun blocklistDir(ctx: Context?, which: String, timestamp: Long): File? {
-        if (ctx == null) return null
+        if (ctx == null) {
+            Logger.v(LOG_TAG_UI, "Context is null, returning null")
+            return null
+        }
         return try {
             File(blocklistDownloadBasePath(ctx, which, timestamp))
         } catch (e: IOException) {
@@ -673,10 +677,11 @@ object Utilities {
         mutable: Boolean
     ): PendingIntent {
         return if (isAtleastS()) {
-            val sFlag = if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
+            val sFlag = flag or if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
             PendingIntent.getActivity(context, 0, intent, sFlag)
         } else {
-            PendingIntent.getActivity(context, 0, intent, flag)
+            val sFlag = flag or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.getActivity(context, 0, intent, sFlag)
         }
     }
 
@@ -688,10 +693,11 @@ object Utilities {
         mutable: Boolean
     ): PendingIntent {
         return if (isAtleastS()) {
-            val sFlag = if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
+            val sFlag = flag or if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
             PendingIntent.getBroadcast(context, requestCode, intent, sFlag)
         } else {
-            PendingIntent.getBroadcast(context, requestCode, intent, flag)
+            val sFlag = flag or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.getBroadcast(context, requestCode, intent, sFlag)
         }
     }
 
