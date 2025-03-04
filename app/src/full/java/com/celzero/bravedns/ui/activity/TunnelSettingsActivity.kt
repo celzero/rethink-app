@@ -544,7 +544,11 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                     )
                 b.settingsActivityPtransRl.visibility = View.GONE
                 b.settingsActivityConnectivityChecksRl.visibility = View.VISIBLE
-                b.settingsActivityPingIpsBtn.visibility = View.VISIBLE
+                if (persistentState.connectivityChecks) {
+                    b.settingsActivityPingIpsBtn.visibility = View.VISIBLE
+                } else {
+                    b.settingsActivityPingIpsBtn.visibility = View.GONE
+                }
             }
             else -> {
                 b.genSettingsIpDesc.text =
@@ -554,6 +558,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                     )
                 b.settingsActivityPtransRl.visibility = View.GONE
                 b.settingsActivityConnectivityChecksRl.visibility = View.GONE
+                b.settingsActivityPingIpsBtn.visibility = View.GONE
             }
         }
     }
@@ -623,6 +628,4 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
     }
-
-
 }
