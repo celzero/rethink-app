@@ -260,6 +260,7 @@
             android:gravity="center"
             android:marqueeRepeatLimit="marquee_forever"
             android:maxLines="3"
+            android:alpha="0.8"
             android:paddingStart="8dp"
             android:paddingEnd="10dp"
             android:scrollHorizontally="true"
