@@ -15,6 +15,8 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.fragment
 
+import Logger
+import Logger.LOG_TAG_UI
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
@@ -22,10 +24,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -67,6 +66,7 @@ class ConnectionTrackerFragment :
     private var fromUniversalFirewallScreen: Boolean = false
 
     companion object {
+        private const val TAG = "ConnTrackFrag"
         const val PROTOCOL_FILTER_PREFIX = "P:"
         private const val QUERY_TEXT_TIMEOUT: Long = 600
 
@@ -102,10 +102,10 @@ class ConnectionTrackerFragment :
                 b.connectionSearch.setQuery(query, true)
             }
         }
+        Logger.v(LOG_TAG_UI, "$TAG, view created from univ? $fromUniversalFirewallScreen, from wg? $fromWireGuardScreen")
     }
 
     private fun initView() {
-
         if (!persistentState.logsEnabled) {
             b.connectionListLogsDisabledTv.visibility = View.VISIBLE
             b.connectionCardViewTop.visibility = View.GONE
@@ -373,7 +373,6 @@ class ConnectionTrackerFragment :
         b.filterChipParentGroup.visibility = View.GONE
     }
 
-    // fixme: move this to viewmodel scope
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
     }

@@ -47,6 +47,7 @@ class RethinkLog {
     var uploadBytes: Long = 0
     var duration: Int = 0
     var synack: Int = 0
+    var rpid = "" // relay proxy id
     var message: String = ""
     var connType: String = ""
 

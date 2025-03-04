@@ -34,6 +34,7 @@ class RethinkLogRepository(private val logDao: RethinkLogDao) {
             logDao.updateSummary(
                 it.connId,
                 it.pid,
+                it.rpid,
                 it.downloadBytes,
                 it.uploadBytes,
                 it.duration,

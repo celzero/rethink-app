@@ -52,7 +52,8 @@ class ConnectionTracker {
     var downloadBytes: Long = 0
     var uploadBytes: Long = 0
     var duration: Int = 0
-    var synack: Int = 0
+    var synack: Int = 0 // treat it as rtt (round trip time)
+    var rpid: String = "" // relay proxy id
     var message: String = ""
     var connType: String = ""
 

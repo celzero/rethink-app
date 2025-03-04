@@ -40,11 +40,12 @@ interface ConnectionTrackerDAO {
     fun insertBatch(connTrackerList: List<ConnectionTracker>)
 
     @Query(
-        "update ConnectionTracker set proxyDetails = :pid, downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId"
+        "update ConnectionTracker set proxyDetails = :pid, rpid = :rpid, downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId"
     )
     fun updateSummary(
         connId: String,
         pid: String,
+        rpid: String, // relay proxy id
         downloadBytes: Long,
         uploadBytes: Long,
         duration: Int,
@@ -53,11 +54,12 @@ interface ConnectionTrackerDAO {
     )
 
     @Query(
-        "update ConnectionTracker set proxyDetails = :pid, downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message, ipAddress = :ipAddress, flag = :flag where connId = :connId"
+        "update ConnectionTracker set proxyDetails = :pid, rpid = :rpid, downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message, ipAddress = :ipAddress, flag = :flag where connId = :connId"
     )
     fun updateSummary(
         connId: String,
         pid: String,
+        rpid: String,
         downloadBytes: Long,
         uploadBytes: Long,
         duration: Int,

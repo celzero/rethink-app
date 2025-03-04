@@ -38,11 +38,12 @@ interface RethinkLogDao {
     fun insertBatch(logs: List<RethinkLog>)
 
     @Query(
-        "update RethinkLog set proxyDetails = :pid, downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId"
+        "update RethinkLog set proxyDetails = :pid, rpid = :rpid, downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId"
     )
     fun updateSummary(
         connId: String,
         pid: String,
+        rpid: String,
         downloadBytes: Long,
         uploadBytes: Long,
         duration: Int,

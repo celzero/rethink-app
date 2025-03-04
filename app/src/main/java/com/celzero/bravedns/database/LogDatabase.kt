@@ -30,7 +30,7 @@ import com.celzero.bravedns.util.Utilities
 
 @Database(
     entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class],
-    version = 10,
+    version = 11,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -70,6 +70,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_7_8)
                 .addMigrations(Migration_8_9)
                 .addMigrations(Migration_9_10)
+                .addMigrations(MIGRATION_10_11)
                 .fallbackToDestructiveMigration() // recreate the database if no migration is found
                 .build()
         }
@@ -285,6 +286,13 @@ abstract class LogDatabase : RoomDatabase() {
         private val Migration_9_10: Migration = object : Migration(9, 10) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("CREATE INDEX IF NOT EXISTS index_ConnectionTracker_proxyDetails ON ConnectionTracker(proxyDetails)")
+            }
+        }
+
+        private val MIGRATION_10_11: Migration = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE ConnectionTracker ADD COLUMN rpid TEXT DEFAULT '' NOT NULL")
+                db.execSQL("ALTER TABLE RethinkLog ADD COLUMN rpid TEXT DEFAULT '' NOT NULL")
             }
         }
     }

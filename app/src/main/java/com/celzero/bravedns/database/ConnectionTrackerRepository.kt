@@ -42,6 +42,7 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
                 connectionTrackerDAO.updateSummary(
                     it.connId,
                     it.pid,
+                    it.rpid,
                     it.downloadBytes,
                     it.uploadBytes,
                     it.duration,
@@ -54,6 +55,7 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
                 connectionTrackerDAO.updateSummary(
                     it.connId,
                     it.pid,
+                    it.rpid,
                     it.downloadBytes,
                     it.uploadBytes,
                     it.duration,
