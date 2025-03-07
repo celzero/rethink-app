@@ -436,8 +436,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         }
 
         private fun determineMtu(useActiveNetwork: Boolean): Int {
-            var minMtu4: Int = DEFAULT_MTU
-            var minMtu6: Int = DEFAULT_MTU
+            var minMtu4: Int = -1
+            var minMtu6: Int = -1
             if (!isAtleastQ()) {
                 return minMtu4
             }
@@ -445,13 +445,15 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 connectivityManager.activeNetwork?.let {
                     val lp = connectivityManager.getLinkProperties(it)
                     minMtu4 = minNonZeroMtu(lp?.mtu, minMtu4)
-                    minMtu6 = minMtu4 // assume same mtu for both ipv4 and ipv6
+                    minMtu6 = minNonZeroMtu(lp?.mtu, minMtu6)
+                    Logger.v(LOG_TAG_CONNECTION, "active network mtu: ${lp?.mtu}, minMtu4: $minMtu4, minMtu6: $minMtu6")
                 }
-                    ?: {
+                    ?: run {
                         // consider first network in underlying network as active network,
                         //  in case active network is null
                         val lp4 = trackedIpv4Networks.firstOrNull()?.linkProperties
                         val lp6 = trackedIpv6Networks.firstOrNull()?.linkProperties
+                        Logger.v(LOG_TAG_CONNECTION, "tracked network mtu: ${lp4?.mtu}, ${lp6?.mtu}")
                         minMtu4 = minNonZeroMtu(lp4?.mtu, minMtu4)
                         minMtu6 = minNonZeroMtu(lp6?.mtu, minMtu6)
                     }
@@ -459,10 +461,12 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 // parse through all the networks and get the minimum mtu
                 trackedIpv4Networks.forEach {
                     val c = it.linkProperties
+                    Logger.v(LOG_TAG_CONNECTION, "tracked network4 mtu: ${c?.mtu}")
                     minMtu4 = minNonZeroMtu(c?.mtu, minMtu4)
                 }
                 trackedIpv6Networks.forEach {
                     val c = it.linkProperties
+                    Logger.v(LOG_TAG_CONNECTION, "tracked network6 mtu: ${c?.mtu}")
                     minMtu6 = minNonZeroMtu(c?.mtu, minMtu6)
                 }
             }
@@ -476,7 +480,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             return if (m1 != null && m1 > 0) {
                 // mtu can be null when lp is null
                 // mtu can be 0 when the value is not set, see:LinkProperties#getMtu()
-                min(m1, m2)
+                if (m2 <= 0) m1 else min(m1, m2)
             } else {
                 m2
             }
@@ -749,7 +753,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
 
                 val yes = tcp80(nw, host) || tcp53(nw, host)
 
-                Logger.d(LOG_TAG_CONNECTION, "$host isReachable on network($nw): $yes")
+                Logger.d(LOG_TAG_CONNECTION, "$host isReachable on network ${nw?.networkHandle},($nw): $yes")
                 return yes
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_CONNECTION, "err isReachable: ${e.message}")
@@ -796,7 +800,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 socket.connect(s, timeout)
                 val c = socket.isConnected
                 val b = socket.isBound
-                Logger.d(LOG_TAG_CONNECTION, "tcpEcho80: $host, ${nw?.networkHandle}: $c, $b")
+                Logger.d(LOG_TAG_CONNECTION, "tcpEcho80: $host, ${nw?.networkHandle}, $c, $b, $nw")
 
                 return true
             } catch (e: IOException) {
@@ -828,7 +832,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 socket.connect(s, timeout)
                 val c = socket.isConnected
                 val b = socket.isBound
-                Logger.d(LOG_TAG_CONNECTION, "tcpEcho53: $host, ${nw?.networkHandle}: $c, $b")
+                Logger.d(LOG_TAG_CONNECTION, "tcpEcho53: $host, ${nw?.networkHandle}: $c, $b, $nw")
                 return true
             } catch (e: IOException) {
                 Logger.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
