@@ -191,4 +191,106 @@
 \n <u>#5</u>: Блокира връзките, когато източникът на приложението е неизвестен (Universal Firewall).
 \n <u>#6</u>: Блокира целия UDP трафик с изключение на DNS (универсална защитна стена).
 \n <u>#7</u>: Блокиране на връзки, когато DNS е заобиколен (Universal Firewall).</string>
+    <string name="connection_http3" translatable="true">HTTP3</string>
+    <string name="settings_allow_bypass_desc" translatable="true">Позволете на заявяващите приложения да заобикалят защитната стена на RethinkDNS при поискване. Някои приложения за аудио/видеоконференции, като Zoom и WhatsApp, може да изискват заобикаляне при поискване, за да функционират правилно.</string>
+    <string name="info_dialog_copy_toast_msg" translatable="true">Копиран IP адрес.</string>
+    <string name="orbot_http_desc" translatable="true">Установява HTTP CONNECT тунел към Orbot.</string>
+    <string name="configure_dns_connection_name" translatable="true">Свързан с %1$s</string>
+    <string name="settings_connectivity_checks" translatable="true">Извършете проверки за свързаност</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">Не може да се позволи заобикаляне или настройка на прокси сървъри, когато VPN работи в режим на блокиране. <u>Отидете в настройките на VPN</u>.</string>
+    <string name="orbot" translatable="true">Орбот</string>
+    <string name="download_update_dialog_failure_message" translatable="true">Нашите сървъри са повредени или връзката не може да бъде установена. Моля, опитайте отново след известно време.</string>
+    <string name="download_update_dialog_trylater_title" translatable="true">Не мога да актуализирам точно сега</string>
+    <string name="status_protected_with_wg" translatable="true">защитен с wireguard</string>
+    <string name="configure_dns_connected_dns_proxy_status" translatable="true">DNS прокси</string>
+    <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Търсене в списъци на блокове</font></string>
+    <string name="app_mode_firewall" translatable="true">Защитна стена</string>
+    <string name="app_mode_dns_firewall" translatable="true">DNS и защитна стена (по подразбиране)</string>
+    <string name="app_mode_wireguard" translatable="true">VPN</string>
+    <string name="settings_allow_lan_desc" translatable="true">Изключете маршрутите LAN, loopback и link-local от VPN тунела на Rethink.</string>
+    <string name="info_dialog_url_copy_toast_msg" translatable="true">Копиран URL адрес</string>
+    <string name="settings_ptrans_desc" translatable="true">Преобразувайте изходящия IPv6 трафик в IPv4 на устройството. Разрешете, ако сте свързани към мрежа, която използва само IPv4.</string>
+    <string name="orbot_status_arg_3" translatable="true">DNS и TCP</string>
+    <string name="settings_allow_bypass_heading" translatable="true">Активирайте видимостта на мрежата</string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Не може да се настроят проксита, когато VPN работи в режим само DNS или в режим на блокиране. <u>Отидете в настройките на VPN</u></string>
+    <string name="whats_new_version_update" translatable="true">&lt;b&gt;RA Fisher!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Нова функция&lt;/i&gt;: &lt;br/&gt; 2. &lt;i&gt;Нова функция&lt;/i&gt;: Изцяло нов екран \"Статистика\": Защитете това приложение с помощта на заключване на екрана.&lt;br/&gt; 3. &lt;i&gt;Нова функция&lt;/i&gt;: Изберете предпочитания от вас език от настройките на приложението.&lt;br/&gt; 4. &lt;i&gt;Нова функция&lt;/i&gt;: RDNS+ &lt;i&gt;Прост&lt;/i&gt; изглед показва само добре подбрани списъци.&lt;br/&gt; 5. преименуване: &lt;i&gt;Режимът на заключване на приложението&lt;/i&gt; вече е &lt;i&gt;Изолиран&lt;/i&gt; режим.&lt;br/&gt; 6. преименуване: &lt;i&gt;Правилата за заобикаляне на приложенията&lt;/i&gt; вече се нарича &lt;i&gt;Доверен&lt;/i&gt; IP.&lt;br/&gt; 7. Поправяне на срив, когато Rethink е инсталиран в работен профил.&lt;br/&gt; 8. сега се изтриват специфичните за приложението правила, когато приложението е деинсталирано.&lt;br/&gt; 9. и други дребни промени в потребителския интерфейс и поправки на грешки.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Помощ за превод на това приложение&lt;/a&gt;</string>
+    <string name="orbot_socks5_desc" translatable="true">Препраща всички TCP връзки към Orbot.</string>
+    <string name="orbot_app_issue" translatable="true">Не може да стартира Orbot. Инсталиран ли е?</string>
+    <string name="orbot_http" translatable="true">HTTP прокси</string>
+    <string name="orbot_bs_status_4" translatable="true">Настройка на Tor-as-a-Proxy (Orbot) с едно кликване.</string>
+    <string name="orbot_both_desc" translatable="true">Всичко изброено по-горе.</string>
+    <string name="orbot_stop_dialog_neutral" translatable="true">Промяна на DNS</string>
+    <string name="dns_proxy_remove_dialog_message" translatable="true">Изтриване на DNS Proxy от запаметената конфигурация.</string>
+    <string name="local_blocklist_redownload_desc" translatable="true">Списъците с блокове в устройството вече са в най-новата версия v%1$s.</string>
+    <string name="blocklist_update_check_not_required" translatable="true">Блоковите списъци вече са в последната версия.</string>
+    <string name="show_logs_disabled_dns_message" translatable="true">Регистрирането на DNS заявки е деактивирано. За да го активирате отново, отидете на <i>Settings (Настройки)</i> и включете <i>Enable on-device logging (Активиране на регистрирането на заявки на устройството).</i></string>
+    <string name="configure_dns_crypt" translatable="true">DNSCrypt: %1$s резолвери</string>
+    <string name="http_proxy_dialog_heading" translatable="true">Задаване на HTTP(S) прокси</string>
+    <string name="download_update_dialog_title" translatable="true">Нова актуализация!</string>
+    <string name="download_update_dialog_message_ok_title" translatable="true">В крак с времето!</string>
+    <string name="download_update_dialog_message_ok" translatable="true">Вече сте с най-новата версия.</string>
+    <string name="download_update_dialog_message_success" translatable="true">Изтеглянето на блоковия списък е успешно.</string>
+    <string name="download_update_dialog_failure_title" translatable="true">Нещо се обърка</string>
+    <string name="download_update_dialog_trylater_message" translatable="true">Актуализацията не може да бъде изпълнена в момента, моля, опитайте отново по-късно.</string>
+    <string name="search_firewall_all_apps" translatable="true"><font size="12">Търсене на приложения по uid, име</font></string>
+    <string name="search_dns_logs" translatable="true"><font size="12">Търсене на имена на домейни или IP адреси</font></string>
+    <string name="search_universal_ips" translatable="true"><font size="12">Търсене на IP адреси</font></string>
+    <string name="search_proxy_add_apps" translatable="true">Търсене на приложения по име</string>
+    <string name="info_dialog_rethink_toast_msg" translatable="true">Копиран като RDNS+ DNS-over-HTTPS URL</string>
+    <string name="app_mode_dns_low_battery" translatable="true">DNS (пестене на батерията)</string>
+    <string name="app_mode_dns" translatable="true">DNS</string>
+    <string name="relative_time_today" translatable="true">Днес</string>
+    <string name="settings_ip_network_desc" translatable="true">Изберете между версиите на интернет протокола.</string>
+    <string name="settings_ip_network_heading" translatable="true">Изберете IP версия</string>
+    <string name="settings_ptrans_heading" translatable="true">Принудително извеждане на IPv4</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">Проверките за свързаност се изпращат, за да се установи достъпността.</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Приложения за препращане на прокси за обратна връзка</string>
+    <string name="orbot_bs_status_1" translatable="true">Пренасочване на %1$s връзки към Orbot.</string>
+    <string name="orbot_bs_status_2" translatable="true">Зададено е HTTP прокси (приложенията могат да го игнорират).</string>
+    <string name="orbot_status_arg_2" translatable="true">TCP</string>
+    <string name="orbot_bs_status_trying_connect" translatable="true">Настройване на Orbot…</string>
+    <string name="orbot_stop_dialog_title" translatable="true">Необходима е ръчна намеса</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt Релето е изтрито.</string>
+    <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
+    <string name="blocklist_update_check_failure" translatable="true">Нещо се е объркало. Опитайте отново по-късно!</string>
+    <string name="relative_time_yesterday" translatable="true">Вчера</string>
+    <string name="settings_allow_lan_heading" translatable="true">Не маршрутизирайте частни IP адреси (експериментално)</string>
+    <string name="orbot_stop_dialog_message" translatable="true">RethinkDNS е спрял да препраща връзки към Orbot, но Orbot може да работи във фонов режим.</string>
+    <string name="refresh_complete" translatable="true">Повторната синхронизация на списъка с приложения е завършена.</string>
+    <string name="configure_dns_connected_doh_status" translatable="true">DNS през HTTPS</string>
+    <string name="download_update_dialog_message" translatable="true">Новата версия на приложението е достъпна за изтегляне от уебсайта. Искате ли да продължите?</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">защитен с wireguard и частен dns</string>
+    <string name="public_key_copy_toast_msg" translatable="true">Копиран публичният ключ.</string>
+    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="orbot_both" translatable="true">TCP + HTTP прокси</string>
+    <string name="dns_proxy_remove_success" translatable="true">Изтриване на DNS прокси.</string>
+    <string name="local_blocklist_download" translatable="true">Изтегляне на блокови списъци</string>
+    <string name="local_blocklist_download_desc" translatable="true">Изтегляне на списъци с блокове (около 60 MB) за използване на тази функция?</string>
+    <string name="local_blocklist_redownload" translatable="true">В крак с времето!</string>
+    <string name="show_logs_disabled_network_message" translatable="true">Регистрирането на връзките е деактивирано. За да го активирате отново, отидете на <i>Settings (Настройки)</i> и включете <i>Enable on-device logging (Активиране на регистрирането на връзката на устройството).</i></string>
+    <string name="settings_enable_logs" translatable="true">Активиране на регистрацията на устройството</string>
+    <string name="app_mode_choose" translatable="true">Изберете режим</string>
+    <string name="orbot_none" translatable="true">Няма (по подразбиране)</string>
+    <string name="orbot_none_desc" translatable="true">Нито едно от изброените.</string>
+    <string name="memory_notification_text">Rethink има недостатъчна памет. Системните действия може да са ограничени.</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">Изтриване на DNS прокси?</string>
+    <string name="search_firewall_network_log" translatable="true"><font size="12">Търсене на приложения, IP адреси, домейни</font></string>
+    <string name="search_custom_domains" translatable="true"><font size="12">Търсене на имена на домейни</font></string>
+    <string name="settings_enable_logs_desc" translatable="true">Съхранявайте логовете на DNS и защитната стена локално в устройството.</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Когато е деактивирано, изключва прокси (SOCKS5, HTTP, DNS) пренасочващи приложения от VPN тунела на Rethink.</string>
+    <string name="settings_proxy_header" translatable="true">прокси</string>
+    <string name="settings_socks5_heading" translatable="true">Настройка на прокси сървър SOCKS5</string>
+    <string name="settings_socks5_desc" translatable="true">Препращане на връзки към крайна точка SOCKS5.</string>
+    <string name="settings_https_heading" translatable="true">Настройка на прокси сървър HTTP(S)</string>
+    <string name="settings_https_desc" translatable="true">Препращайте връзките към крайната точка HTTP(S) CONNECT.</string>
+    <string name="orbot_socks5" translatable="true">Прокси само за TCP</string>
+    <string name="orbot_bs_status_3" translatable="true">Пренасочване %1$s към Orbot, зададено е и HTTP Proxy.</string>
+    <string name="orbot_stop_dialog_dns_message" translatable="true">RethinkDNS е настроена да препраща DNS заявки към Orbot. Променете го, както е необходимо.</string>
+    <string name="orbot_stop_dialog_negative" translatable="true">Спиране на Orbot</string>
+    <string name="lbl_unselected" translatable="true">Неизбрано</string>
+    <string name="lbl_on_device" translatable="true">на устройството</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Защитен! Свързан към DNS + Firewall.</string>
+    <string name="lbl_notification" translatable="true">известие</string>
+    <string name="lbl_idle" translatable="true">Неактивен</string>
+    <string name="lbl_split" translatable="true">Разбивка</string>
 </resources>
