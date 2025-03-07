@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
@@ -49,21 +50,15 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+        Logger.v(LOG_TAG_UI, "init configure rethink base activity")
         val type = intent.getIntExtra(INTENT, FragmentLoader.REMOTE.ordinal)
         val fl = FragmentLoader.entries[type]
         val fragment = fragment(fl)
-
-        if (savedInstanceState == null) {
-            supportFragmentManager
-                .beginTransaction()
-                .add(R.id.root_container, fragment, fragment.javaClass.simpleName)
-                .commit()
-        } else {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.root_container, fragment, fragment.javaClass.simpleName)
-                .commit()
-        }
+        Logger.i(LOG_TAG_UI, "loading fragment: ${fragment.javaClass.simpleName}")
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.root_container, fragment, fragment.javaClass.simpleName)
+            .commit()
     }
 
     private fun fragment(fl: FragmentLoader): Fragment {
