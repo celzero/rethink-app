@@ -27,7 +27,6 @@ class ConsoleLogManager(private val repository: ConsoleLogRepository) {
     suspend fun insertBatch(logs: List<*>) {
         val l = logs as? List<ConsoleLog> ?: return
 
-        l.sortedBy { it.id }
         repository.insertBatch(l)
     }
 }
