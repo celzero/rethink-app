@@ -61,6 +61,7 @@ import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastR
@@ -706,26 +707,11 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             val locale = Locale.forLanguageTag(languages.getOrDefault(item, "en-US"))
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(locale))
         }
-        alertBuilder.setNeutralButton(getString(R.string.settings_locale_dialog_neutral)) { dialog,
-                                                                                            _ ->
+        alertBuilder.setNeutralButton(getString(R.string.settings_locale_dialog_neutral)) { dialog, _ ->
             dialog.dismiss()
-            openActionViewIntent(getString(R.string.about_translate_link).toUri())
+            openUrl(this, getString(R.string.about_translate_link))
         }
         alertBuilder.create().show()
-    }
-
-    private fun openActionViewIntent(uri: Uri) {
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        try {
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            showToastUiCentered(
-                this,
-                getString(R.string.intent_launch_error, intent.data),
-                Toast.LENGTH_SHORT
-            )
-            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
-        }
     }
 
     // read the list of supported languages from locale_config.xml

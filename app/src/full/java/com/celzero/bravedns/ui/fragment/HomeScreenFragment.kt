@@ -76,6 +76,7 @@ import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openNetworkSettings
+import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.delay
@@ -140,8 +141,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun initializeValues() {
-        isVpnActivated = VpnController.state().activationRequested
-
         themeNames =
             arrayOf(
                 getString(R.string.settings_theme_dialog_themes_1),
@@ -273,8 +272,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         usageTxt.text = msg
 
         sponsorBtn.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
-            startActivity(intent)
+            openUrl(requireContext(), RETHINKDNS_SPONSOR_LINK)
         }
 
         dialog.show()
@@ -453,19 +451,22 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             b.fhsCardAlertsApps.isSelected = true
         }
     } */
+    private var proxyStateListenerJob: Job? = null
 
     private fun observeProxyStates() {
         persistentState.getProxyStatus().observe(viewLifecycleOwner) {
             if (it != -1) {
-                ui("proxyStates") {
+                proxyStateListenerJob = ui("proxyStates") {
                     while (true) {
-                        if (!isAdded) return@ui
+                        if (!isVisible || !isAdded) {
+                            proxyStateListenerJob?.cancel()
+                            return@ui
+                        }
+
                         updateUiWithProxyStates(it)
-                        // show protos
                         kotlinx.coroutines.delay(2500L)
                     }
                 }
-
             } else {
                 b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
                 b.fhsCardOtherProxyCount.visibility = View.VISIBLE
@@ -475,7 +476,20 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun updateUiWithProxyStates(resId: Int) {
-        if (!isAdded) return
+        if (
+            !viewLifecycleOwner
+                .lifecycle
+                .currentState
+                .isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)
+        ) {
+            proxyStateListenerJob?.cancel()
+            return
+        }
+
+        if (!isVpnActivated) {
+            disableProxyCard()
+            return
+        }
 
         // get proxy type from app config
         val proxyType = AppConfig.ProxyType.of(appConfig.getProxyType())
@@ -487,6 +501,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 var failing = 0
                 var idle = 0
                 val now = System.currentTimeMillis()
+                Logger.v(LOG_TAG_UI, "$TAG wg active proxies: ${proxies.size}")
                 proxies.forEach {
                     val proxyId = "${ProxyManager.ID_WG_BASE}${it.getId()}"
                     val stats = VpnController.getProxyStats(proxyId)
@@ -523,7 +538,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     }
                 }
                 uiCtx {
-                    if (!isAdded) return@uiCtx
+                    if (!isVisible || !isAdded) return@uiCtx
                     b.fhsCardOtherProxyCount.visibility = View.VISIBLE
                     var text = ""
                     // show as 3 active 1 failing 1 idle, if failing is 0 show as 4 active
@@ -558,6 +573,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             getString(R.string.lbl_idle).replaceFirstChar(Char::titlecase)
                         )
                     }
+                    Logger.v(LOG_TAG_UI, "$TAG overall wg proxy status: $text")
                     if (text.isEmpty()) {
                         b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
                     } else {
@@ -583,6 +599,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun disableProxyCard() {
+        proxyStateListenerJob?.cancel()
         b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
         b.fhsCardOtherProxyCount.text = getString(R.string.lbl_disabled)
@@ -1066,6 +1083,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     override fun onResume() {
         super.onResume()
+        isVpnActivated = VpnController.state().activationRequested
         handleShimmer()
         maybeAutoStartVpn()
         updateCardsUi()
@@ -1260,6 +1278,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         super.onPause()
         stopShimmer()
         stopTrafficStats()
+        proxyStateListenerJob?.cancel()
     }
 
     private fun startDnsActivity(screenToLoad: Int) {

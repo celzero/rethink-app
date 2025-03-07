@@ -59,6 +59,7 @@ import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.openAppInfo
+import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.sendEmailIntent
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
@@ -73,6 +74,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
+import retrofit2.http.Url
 import java.io.File
 import java.io.FileInputStream
 import java.util.concurrent.TimeUnit
@@ -201,16 +203,16 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     override fun onClick(view: View?) {
         when (view) {
             b.aboutTelegram -> {
-                openActionViewIntent(getString(R.string.about_telegram_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_telegram_link))
             }
             b.aboutBlog -> {
-                openActionViewIntent(getString(R.string.about_docs_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_docs_link))
             }
             b.aboutFaq -> {
-                openActionViewIntent(getString(R.string.about_faq_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_faq_link))
             }
             b.aboutGithub -> {
-                openActionViewIntent(getString(R.string.about_github_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_github_link))
             }
             b.aboutCrashLog -> {
                 if (isAtleastO()) {
@@ -223,19 +225,19 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 sendEmailIntent(requireContext())
             }
             b.aboutTwitter -> {
-                openActionViewIntent(getString(R.string.about_twitter_handle).toUri())
+                openUrl(requireContext(), getString(R.string.about_twitter_handle))
             }
             b.aboutWebsite -> {
-                openActionViewIntent(getString(R.string.about_website_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_website_link))
             }
             b.aboutSponsor -> {
-                openActionViewIntent(RETHINKDNS_SPONSOR_LINK.toUri())
+                openUrl(requireContext(), RETHINKDNS_SPONSOR_LINK)
             }
             b.mozillaImg -> {
-                openActionViewIntent(getString(R.string.about_mozilla_alumni_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_mozilla_alumni_link))
             }
             b.fossImg -> {
-                openActionViewIntent(getString(R.string.about_foss_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_foss_link))
             }
             b.aboutAppUpdate -> {
                 (requireContext() as HomeScreenActivity).checkForUpdate(
@@ -258,19 +260,20 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 showContributors()
             }
             b.aboutAppTranslate -> {
-                openActionViewIntent(getString(R.string.about_translate_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_translate_link))
             }
             b.aboutPrivacyPolicy -> {
-                openActionViewIntent(getString(R.string.about_privacy_policy_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_privacy_policy_link))
             }
             b.aboutReddit -> {
-                openActionViewIntent(getString(R.string.about_reddit_handle).toUri())
+                openUrl(requireContext(), getString(R.string.about_reddit_handle))
             }
             b.aboutMastodon -> {
-                openActionViewIntent(getString(R.string.about_mastodom_handle).toUri())
+                openUrl(requireContext(), getString(R.string.about_mastodom_handle))
             }
             b.aboutElement -> {
-                openActionViewIntent(getString(R.string.about_matrix_handle).toUri())
+                openUrl(requireContext(), getString(R.string.about_matrix_handle))
+                persistentState.useRpn = !persistentState.useRpn
             }
             b.aboutStats -> {
                 openStatsDialog()
@@ -341,20 +344,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         }
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ -> dialog.dismiss() }
         builder.create().show()
-    }
-
-    private fun openActionViewIntent(uri: Uri) {
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        try {
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            showToastUiCentered(
-                requireContext(),
-                getString(R.string.intent_launch_error, intent.data),
-                Toast.LENGTH_SHORT
-            )
-            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
-        }
     }
 
     private fun openNotificationSettings() {
