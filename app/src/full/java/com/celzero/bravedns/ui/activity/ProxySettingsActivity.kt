@@ -125,17 +125,26 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         b.orbotTitle.text = getString(R.string.orbot).lowercase()
         b.otherTitle.text = getString(R.string.category_name_others).lowercase()
 
+        if (persistentState.useRpn) {
+            b.rpnTitle.visibility = View.VISIBLE
+            b.settingsActivityRpnContainer.visibility = View.VISIBLE
+        } else {
+            b.rpnTitle.visibility = View.GONE
+            b.settingsActivityRpnContainer.visibility = View.GONE
+        }
         observeCustomProxy()
-        displayTcpProxyUi()
         displayHttpProxyUi()
         displaySocks5Ui()
     }
 
     private fun initClickListeners() {
 
-        b.wgRefresh.setOnClickListener { refresh() }
+        b.settingsActivityRpnContainer.setOnClickListener {
+            val intent = Intent(this, TroubleshootActivity::class.java)
+            startActivity(intent)
+        }
 
-        b.settingsActivityTcpProxyContainer.setOnClickListener { handleTcpProxy() }
+        b.wgRefresh.setOnClickListener { refresh() }
 
         b.settingsActivitySocks5Rl.setOnClickListener {
             b.settingsActivitySocks5Switch.isChecked = !b.settingsActivitySocks5Switch.isChecked
@@ -253,58 +262,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.wgRefresh.clearAnimation()
             showToastUiCentered(this, getString(R.string.dc_refresh_toast), Toast.LENGTH_SHORT)
         }
-    }
-
-    private fun handleTcpProxy() {
-        // disable the click event until below coroutine is completed.
-        disableTcpProxyUi()
-
-        io {
-            when (TcpProxyHelper.getTcpProxyPaymentStatus()) {
-                TcpProxyHelper.PaymentStatus.PAID -> {
-                    uiCtx {
-                        enableTcpProxyUi()
-                        val intent = Intent(this, TcpProxyMainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-                        startActivity(intent)
-                    }
-                }
-                TcpProxyHelper.PaymentStatus.INITIATED -> {
-                    uiCtx {
-                        enableTcpProxyUi()
-                        val intent = Intent(this, CheckoutActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-                        startActivity(intent)
-                    }
-                }
-                else -> {
-                    val isTcpWorking = TcpProxyHelper.publicKeyUsable()
-                    uiCtx {
-                        if (isTcpWorking) {
-                            enableTcpProxyUi()
-                            val intent = Intent(this, CheckoutActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-                            startActivity(intent)
-                        } else {
-                            showTcpProxyErrorDialog()
-                            enableTcpProxyUi()
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun disableTcpProxyUi() {
-        b.settingsActivityTcpProxyContainer.isClickable = false
-        b.settingsActivityTcpProxyProgress.visibility = View.VISIBLE
-        b.settingsActivityTcpProxyImg.visibility = View.GONE
-    }
-
-    private fun enableTcpProxyUi() {
-        b.settingsActivityTcpProxyContainer.isClickable = true
-        b.settingsActivityTcpProxyProgress.visibility = View.GONE
-        b.settingsActivityTcpProxyImg.visibility = View.VISIBLE
     }
 
     private fun showTcpProxyErrorDialog() {
@@ -435,25 +392,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 }
             }
         }
-    }
-
-    private fun displayTcpProxyUi() {
-        // v055f, no-op
-        return
-
-        val tcpProxies = TcpProxyHelper.getActiveTcpProxy()
-        if (tcpProxies == null || !tcpProxies.isActive) {
-            b.settingsActivityTcpProxyDesc.text =
-                "Not active" // getString(R.string.tcp_proxy_description)
-            return
-        }
-
-        Logger.i(
-            LOG_TAG_UI,
-            "displayTcpProxyUi: ${tcpProxies?.isActive}, ${tcpProxies?.name}, ${tcpProxies?.url}"
-        )
-        b.settingsActivityTcpProxyDesc.text =
-            "Active" // getString(R.string.tcp_proxy_description_active)
     }
 
     private fun displayWireguardUi() {
@@ -802,7 +740,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.settingsActivityOrbotContainer.alpha = 1f
             b.settingsActivityVpnLockdownDesc.visibility = View.GONE
             b.settingsActivityWireguardContainer.alpha = 1f
-            b.settingsActivityTcpProxyContainer.alpha = 1f
             b.settingsActivitySocks5Rl.alpha = 1f
             b.settingsActivityHttpProxyContainer.alpha = 1f
             b.wgRefresh.visibility = View.VISIBLE
@@ -810,7 +747,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.settingsActivityOrbotContainer.alpha = 0.5f
             b.settingsActivityWireguardContainer.alpha = 0.5f
             b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
-            b.settingsActivityTcpProxyContainer.alpha = 0.5f
             b.settingsActivitySocks5Rl.alpha = 0.5f
             b.settingsActivityHttpProxyContainer.alpha = 0.5f
             b.wgRefresh.visibility = View.GONE
@@ -819,9 +755,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         // Wireguard
         b.settingsActivityWireguardImg.isEnabled = canEnableProxy
         b.settingsActivityWireguardContainer.isEnabled = canEnableProxy
-        // TCP Proxy
-        b.settingsActivityTcpProxyIcon.isEnabled = canEnableProxy
-        b.settingsActivityTcpProxyContainer.isEnabled = canEnableProxy
         // Orbot
         b.settingsActivityOrbotImg.isEnabled = canEnableProxy
         b.settingsActivityOrbotContainer.isEnabled = canEnableProxy
