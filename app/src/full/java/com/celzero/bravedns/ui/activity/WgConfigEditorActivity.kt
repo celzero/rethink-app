@@ -115,6 +115,12 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
                 if (wgInterface?.mtu?.isPresent == true) {
                     b.mtuText.setText(wgInterface?.mtu?.get().toString())
                 }
+                if (wgInterface?.isAmnezia() == true) {
+                    b.amzProps.visibility = android.view.View.VISIBLE
+                    b.amzProps.text = wgInterface?.getAmzProps()
+                } else {
+                    b.amzProps.visibility = android.view.View.GONE
+                }
             }
         }
     }
