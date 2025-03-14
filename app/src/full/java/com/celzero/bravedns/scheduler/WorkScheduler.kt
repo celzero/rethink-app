@@ -28,12 +28,16 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import androidx.work.workDataOf
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.util.Utilities
 import com.google.common.util.concurrent.ListenableFuture
+import java.util.UUID
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 class WorkScheduler(val context: Context) {
+    private val rpnProxiesWorkMap = mutableMapOf<RpnProxyManager.RpnType, UUID>()
 
     companion object {
         const val APP_EXIT_INFO_ONE_TIME_JOB_TAG = "OnDemandCollectAppExitInfoJob"
@@ -43,6 +47,7 @@ class WorkScheduler(val context: Context) {
         const val BLOCKLIST_UPDATE_CHECK_JOB_TAG = "ScheduledBlocklistUpdateCheckJob"
         const val DATA_USAGE_JOB_TAG = "ScheduledDataUsageJob"
         const val CONSOLE_LOG_SAVE_JOB_TAG = "ConsoleLogSaveJob"
+        const val RPN_PROXIES_UPDATE_JOB_TAG = "RpnProxiesUpdateJob"
 
         const val APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS: Long = 7
         const val PURGE_LOGS_TIME_INTERVAL_HOURS: Long = 4
@@ -89,7 +94,7 @@ class WorkScheduler(val context: Context) {
                 for (workStatus in workInfos) {
                     running =
                         workStatus.state == WorkInfo.State.RUNNING ||
-                            workStatus.state == WorkInfo.State.ENQUEUED
+                                workStatus.state == WorkInfo.State.ENQUEUED
                 }
                 Logger.i(LOG_TAG_SCHEDULER, "Job $tag already scheduled? $running")
                 running
@@ -111,10 +116,10 @@ class WorkScheduler(val context: Context) {
         Logger.i(LOG_TAG_SCHEDULER, "App exit info job scheduled")
         val bugReportCollector =
             PeriodicWorkRequest.Builder(
-                    BugReportCollector::class.java,
-                    APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS,
-                    TimeUnit.DAYS
-                )
+                BugReportCollector::class.java,
+                APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS,
+                TimeUnit.DAYS
+            )
                 .addTag(APP_EXIT_INFO_JOB_TAG)
                 .build()
         WorkManager.getInstance(context.applicationContext)
@@ -128,10 +133,10 @@ class WorkScheduler(val context: Context) {
     fun schedulePurgeConnectionsLog() {
         val purgeLogs =
             PeriodicWorkRequest.Builder(
-                    PurgeConnectionLogs::class.java,
-                    PURGE_LOGS_TIME_INTERVAL_HOURS,
-                    TimeUnit.HOURS
-                )
+                PurgeConnectionLogs::class.java,
+                PURGE_LOGS_TIME_INTERVAL_HOURS,
+                TimeUnit.HOURS
+            )
                 .addTag(PURGE_CONNECTION_LOGS_JOB_TAG)
                 .build()
 
@@ -147,10 +152,10 @@ class WorkScheduler(val context: Context) {
     fun schedulePurgeConsoleLogs() {
         val purgeLogs =
             PeriodicWorkRequest.Builder(
-                    PurgeConsoleLogs::class.java,
+                PurgeConsoleLogs::class.java,
                 PURGE_CONSOLE_LOGS_TIME_INTERVAL_HOURS,
-                    TimeUnit.HOURS
-                )
+                TimeUnit.HOURS
+            )
                 .addTag(PURGE_CONSOLE_LOGS_JOB_TAG)
                 .build()
 
@@ -190,10 +195,10 @@ class WorkScheduler(val context: Context) {
         Logger.i(LOG_TAG_SCHEDULER, "Scheduled blocklist update check")
         val blocklistUpdateCheck =
             PeriodicWorkRequest.Builder(
-                    BlocklistUpdateCheckJob::class.java,
-                    BLOCKLIST_UPDATE_CHECK_INTERVAL_DAYS,
-                    TimeUnit.DAYS
-                )
+                BlocklistUpdateCheckJob::class.java,
+                BLOCKLIST_UPDATE_CHECK_INTERVAL_DAYS,
+                TimeUnit.DAYS
+            )
                 .addTag(BLOCKLIST_UPDATE_CHECK_JOB_TAG)
                 .build()
         WorkManager.getInstance(context.applicationContext)
@@ -208,10 +213,10 @@ class WorkScheduler(val context: Context) {
         Logger.i(LOG_TAG_SCHEDULER, "Data usage job scheduled")
         val workRequest =
             PeriodicWorkRequest.Builder(
-                    DataUsageUpdater::class.java,
-                    DATA_USAGE_TIME_INTERVAL_MINS,
-                    TimeUnit.MINUTES // Set the repeat interval for every 15 minutes
-                )
+                DataUsageUpdater::class.java,
+                DATA_USAGE_TIME_INTERVAL_MINS,
+                TimeUnit.MINUTES // Set the repeat interval for every 15 minutes
+            )
                 .addTag(DATA_USAGE_JOB_TAG)
                 .build()
 
@@ -238,5 +243,35 @@ class WorkScheduler(val context: Context) {
                 ExistingWorkPolicy.REPLACE,
                 workRequest
             )
+    }
+
+    fun scheduleRpnProxiesUpdate(type: RpnProxyManager.RpnType, expiryTimeMs: Long) {
+        Logger.v(LOG_TAG_SCHEDULER, "init; rpn proxies update scheduled for ${type.name}")
+        val now = System.currentTimeMillis()
+        val inputDataKey = "type"
+
+        // cancel the existing work if any
+        rpnProxiesWorkMap[type]?.let {
+            WorkManager.getInstance(context.applicationContext).cancelWorkById(it)
+        }
+        val delay = expiryTimeMs - now
+        if (delay <= 0) {
+            Logger.i(LOG_TAG_SCHEDULER, "rpn proxies update expired for ${type.name}")
+            return
+        }
+
+        val inputData = Data.Builder().putInt(inputDataKey, type.id).build()
+        val workRequest =
+            OneTimeWorkRequestBuilder<RpnProxiesUpdateWorker>()
+                .setInitialDelay(expiryTimeMs, TimeUnit.MILLISECONDS)
+                .setInputData(inputData)
+                .build()
+
+        WorkManager.getInstance(context.applicationContext)
+            .enqueue(workRequest)
+
+        rpnProxiesWorkMap[type] = workRequest.id
+        Logger.i(LOG_TAG_SCHEDULER, "rpn proxies update scheduled for ${type.name}")
+        Logger.v(LOG_TAG_SCHEDULER, "rpn proxies update map: $rpnProxiesWorkMap")
     }
 }
