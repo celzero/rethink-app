@@ -34,7 +34,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
-import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
+import com.celzero.bravedns.databinding.ListItemConnTrackBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.ProxyManager
@@ -62,15 +62,13 @@ class ConnectionTrackerAdapter(private val context: Context) :
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<ConnectionTracker>() {
 
-                override fun areItemsTheSame(
-                    oldConnection: ConnectionTracker,
-                    newConnection: ConnectionTracker
-                ) = oldConnection.id == newConnection.id
+                override fun areItemsTheSame(old: ConnectionTracker, new: ConnectionTracker): Boolean {
+                    return old.id == new.id
+                }
 
-                override fun areContentsTheSame(
-                    oldConnection: ConnectionTracker,
-                    newConnection: ConnectionTracker
-                ) = oldConnection == newConnection
+                override fun areContentsTheSame(old: ConnectionTracker, new: ConnectionTracker): Boolean {
+                    return old == new
+                }
             }
 
         private const val MAX_BYTES = 500000 // 500 KB
@@ -81,7 +79,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionTrackerViewHolder {
         val itemBinding =
-            ConnectionTransactionRowBinding.inflate(
+            ListItemConnTrackBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -100,7 +98,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
         holder.setTag(connTracker)
     }
 
-    inner class ConnectionTrackerViewHolder(private val b: ConnectionTransactionRowBinding) :
+    inner class ConnectionTrackerViewHolder(private val b: ListItemConnTrackBinding) :
         RecyclerView.ViewHolder(b.root) {
 
         fun clear() {
@@ -330,22 +328,22 @@ class ConnectionTrackerAdapter(private val context: Context) :
                         context.getString(R.string.symbol_key)
                     )
             }
-            // rtt -> show bunny if less than 100ms, treat it as rtt
+            // rtt -> show rocket if less than 20ms, treat it as rtt
             if (isRoundTripShorter(ct.synack, ct.isBlocked)) {
                 b.connectionDelay.text =
                     context.getString(
                         R.string.ci_desc,
                         b.connectionDelay.text,
-                        context.getString(R.string.symbol_bunny)
+                        context.getString(R.string.symbol_rocket)
                     )
             }
-            // rocket in case rpid as present
+            // bunny in case rpid as present
             if (containsRelayProxy(ct.rpid)) {
                 b.connectionDelay.text =
                     context.getString(
                         R.string.ci_desc,
                         b.connectionDelay.text,
-                        context.getString(R.string.symbol_rocket)
+                        context.getString(R.string.symbol_bunny)
                     )
             }
             if (b.connectionDelay.text.isEmpty() && b.connectionDataUsage.text.isEmpty()) {
@@ -354,7 +352,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
         }
 
         private fun isRoundTripShorter(rtt: Int, blocked: Boolean): Boolean {
-            return rtt in 1..99 && !blocked
+            return rtt in 1..20 && !blocked
         }
 
         private fun containsRelayProxy(rpid: String): Boolean {
