@@ -78,7 +78,7 @@ object EnhancedBugReport {
                 return
             }
             val time = Utilities.convertLongToTime(System.currentTimeMillis(), Constants.TIME_FORMAT_3)
-            val l = "$time: $logs"
+            val l = "\n$time: $logs"
             file.appendText(l, Charset.defaultCharset())
             Log.v(LOG_TAG_BUG_REPORT, "logs written to file: ${file.absolutePath}")
         } catch (e: Exception) {
