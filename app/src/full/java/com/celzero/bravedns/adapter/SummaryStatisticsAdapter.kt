@@ -75,21 +75,14 @@ class SummaryStatisticsAdapter(
     companion object {
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<AppConnection>() {
-                override fun areItemsTheSame(
-                    oldConnection: AppConnection,
-                    newConnection: AppConnection
-                ): Boolean {
-                    return (oldConnection == newConnection)
+                override fun areItemsTheSame(old: AppConnection, new: AppConnection): Boolean {
+                    return (old == new)
                 }
 
-                override fun areContentsTheSame(
-                    oldConnection: AppConnection,
-                    newConnection: AppConnection
-                ): Boolean {
-                    return (oldConnection == newConnection)
+                override fun areContentsTheSame(old: AppConnection, new: AppConnection): Boolean {
+                    return (old == new)
                 }
             }
-
     }
 
     override fun onCreateViewHolder(
@@ -106,8 +99,8 @@ class SummaryStatisticsAdapter(
     }
 
     override fun onBindViewHolder(holder: AppNetworkActivityViewHolder, position: Int) {
-        val appNetworkActivity = getItem(position) ?: return
-        holder.bind(appNetworkActivity)
+        val conn = getItem(position) ?: return
+        holder.bind(conn)
     }
 
     private fun calculatePercentage(c: Double): Int {
