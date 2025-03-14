@@ -16,9 +16,7 @@ import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityTcpProxyBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.SEC_WARP_ID
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_ID
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.isWarpWorking
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
@@ -169,23 +167,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
         }
 
         b.enableUdpRelay.setOnCheckedChangeListener { _, b ->
-            if (b) {
-                io {
-                    val alreadyDownloaded = RpnProxyManager.isSecWarpAvailable()
-                    if (alreadyDownloaded) {
-                        val cf = WireguardManager.getConfigFilesById(SEC_WARP_ID) ?: return@io
-                        WireguardManager.enableConfig(cf)
-                    } else {
-                        createConfigOrShowErrorLayout()
-                    }
-                }
-            } else {
 
-                io {
-                    val cf = WireguardManager.getConfigFilesById(SEC_WARP_ID) ?: return@io
-                    WireguardManager.disableConfig(cf)
-                }
-            }
         }
 
         b.warpSwitch.setOnCheckedChangeListener { _, checked ->
@@ -247,24 +229,6 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
         val intent = Intent(this, WgConfigDetailActivity::class.java)
         intent.putExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, WARP_ID)
         startActivity(intent)
-    }
-
-    private suspend fun createConfigOrShowErrorLayout() {
-        val works = isWarpWorking()
-        if (works.first) {
-            fetchWarpConfigFromServer()
-        } else {
-            showConfigCreationError()
-        }
-    }
-
-    private suspend fun fetchWarpConfigFromServer() {
-        val config = RpnProxyManager.getNewWarpConfig(true, SEC_WARP_ID, 0)
-        Logger.i(Logger.LOG_TAG_PROXY, "new config from server: ${config?.getName()}")
-        if (config == null) {
-            showConfigCreationError()
-            return
-        }
     }
 
     private suspend fun showConfigCreationError() {
