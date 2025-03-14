@@ -168,7 +168,9 @@ class ConnectionTrackerFragment :
             }
         }
         b.recyclerConnection.adapter = recyclerAdapter
-
+        b.recyclerConnection.post {
+            b.recyclerConnection.invalidateItemDecorations()
+        }
         setupRecyclerScrollListener()
     }
 
