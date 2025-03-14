@@ -170,6 +170,7 @@ class RethinkBlocklistFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Logger.v(LOG_TAG_UI, "init Rethink blocklist fragment")
         init()
         initObservers()
         initClickListeners()
@@ -373,12 +374,15 @@ class RethinkBlocklistFragment :
             } else { // remote blocklist
                 // default remote download will happen from rethink-dns list screen
                 // check RethinkListFragment.kt
+                // if it enters this block, download the blocklist regardless of the timestamp
                 ioCtx {
                     appDownloadManager.downloadRemoteBlocklist(
                         persistentState.remoteBlocklistTimestamp,
-                        isRedownload = false
+                        isRedownload = true
                     )
                 }
+                b.lbDownloadProgressRemote.visibility = View.GONE
+                hasBlocklist()
             }
         }
     }
