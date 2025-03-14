@@ -158,6 +158,10 @@ object BugReportZipper {
         if (file.isDirectory) return
 
         Logger.i(LOG_TAG_BUG_REPORT, "Add new file: ${file.name} to bug_report.zip")
+        if (!file.exists()) {
+            Logger.w(LOG_TAG_BUG_REPORT, "File does not exist: ${file.name}")
+            return
+        }
         val entry = ZipEntry(file.name)
         zo.putNextEntry(entry)
         FileInputStream(file).use { inStream -> copy(inStream, zo) }
