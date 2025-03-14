@@ -143,4 +143,6 @@
     <string name="apps_info_title" translatable="true">Sovellukset</string>
     <string name="ada_noapp_dialog_positive" translatable="true">Hyvä on</string>
     <string name="fapps_info_dialog_positive_btn" translatable="true">Hyvä on</string>
+    <string name="lbl_notification" translatable="true">ilmoitus</string>
+    <string name="memory_notification_text">Rethink kokee alhaista muistin määrää. Järjestelmä toimet saattaa rajoittua.</string>
 </resources>
