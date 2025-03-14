@@ -31,9 +31,17 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityAdvancedSettingBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.RethinkBlocklistManager
+import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Utilities.blocklistCanonicalPath
+import com.celzero.bravedns.util.Utilities.blocklistDir
+import com.celzero.bravedns.util.Utilities.deleteRecursive
 import com.celzero.bravedns.util.Utilities.isAtleastS
+import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
+import java.io.File
 
 class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_setting) {
     private val persistentState by inject<PersistentState>()
@@ -155,6 +163,10 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
             persistentState.nwEngExperimentalFeatures = isChecked
         }
 
+        b.settingsClearResidueRl.setOnClickListener {
+            clearResidueAfterConfirmation()
+        }
+
         b.dvTimeoutSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 handler.removeCallbacks(updateRunnable ?: Runnable {})
@@ -177,6 +189,48 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
                 }
             }
         })
+    }
+
+    private fun clearResidueAfterConfirmation() {
+        val alertBuilder = MaterialAlertDialogBuilder(this)
+        alertBuilder.setTitle("Clear Residue")
+        val msg = "Are you sure you want to clear the residue?"
+        alertBuilder.setMessage(msg)
+        alertBuilder.setCancelable(false)
+        alertBuilder.setPositiveButton(getString(R.string.lbl_proceed)) { dialog, _ ->
+            dialog.dismiss()
+            clearResidue()
+        }
+        alertBuilder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ ->
+            dialog.dismiss()
+        }
+        alertBuilder.create().show()
+    }
+
+    private fun clearResidue() {
+        // when app is in play store version delete the local blocklists
+        if (isPlayStoreFlavour()) {
+            // delete the local blocklists
+            deleteLocalBlocklists()
+        }
+        deleteUnusedBlocklists()
+        deleteLogs()
+    }
+
+    private fun deleteLocalBlocklists() {
+        // in play version so delete the local blocklists
+        val path = blocklistCanonicalPath(this, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME)
+        val dir = File(path)
+        deleteRecursive(dir)
+        Logger.i(LOG_TAG_UI, "$TAG; local blocklists deleted, path: $path")
+    }
+
+    private fun deleteUnusedBlocklists() {
+        // delete all the blocklists other than the one in the settings
+    }
+
+    private fun deleteLogs() {
+        // delete the logs older than 7 days?
     }
 
     private fun openConsoleLogActivity() {
