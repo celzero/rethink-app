@@ -35,6 +35,8 @@ import com.celzero.bravedns.databinding.ActivityAppLockBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import org.koin.android.ext.android.inject
 import java.util.concurrent.Executor
@@ -135,7 +137,10 @@ class AppLockActivity : AppCompatActivity(R.layout.activity_app_lock) {
     private fun startHomeActivity() {
         Logger.v(LOG_TAG_UI, "$TAG starting home activity")
         val intent = Intent(this, HomeScreenActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        if (isAtleastR()) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_REQUIRE_DEFAULT)
+        }
         intent.putExtras(this.intent)
         startActivity(intent)
         finish()
