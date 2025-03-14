@@ -85,7 +85,7 @@ class ConsoleLogAdapter(private val context: Context) :
                     )
                 else ->
                     b.logDetail.setTextColor(
-                        UIUtils.fetchColor(context, R.attr.firewallNoRuleToggleBtnTxt)
+                        UIUtils.fetchColor(context, R.attr.primaryLightColorText)
                     )
             }
             b.logDetail.text = log.message
