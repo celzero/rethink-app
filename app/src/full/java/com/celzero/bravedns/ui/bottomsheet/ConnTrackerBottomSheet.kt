@@ -465,6 +465,19 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                             return@io
                         }
 
+                        if (FirewallManager.isUnknownPackage(info!!.uid)) {
+                            uiCtx {
+                                // reset the spinner to previous selection
+                                updateFirewallRulesUi(a, c)
+                                showToastUiCentered(
+                                    requireContext(),
+                                    "Exclude not possible for app with no package name",
+                                    Toast.LENGTH_LONG
+                                )
+                            }
+                            return@io
+                        }
+
                         Logger.i(
                             LOG_TAG_FIREWALL,
                             "Change in firewall rule for app uid: ${info?.uid}, firewall status: $fStatus, conn status: $connStatus"

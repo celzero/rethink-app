@@ -149,6 +149,15 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                     setDomainsAdapter()
                     setIpAdapter()
                 }
+
+                // disable exclude app option for apps with no package name
+                if (FirewallManager.isUnknownPackage(uid)) {
+                    b.aadAppSettingsExclude.alpha = 0.5f
+                    b.aadAppSettingsExclude.isEnabled = false
+                } else {
+                    b.aadAppSettingsExclude.alpha = 1.0f
+                    b.aadAppSettingsExclude.isEnabled = true
+                }
             }
         }
     }
