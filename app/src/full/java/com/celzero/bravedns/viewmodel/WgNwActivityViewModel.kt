@@ -33,7 +33,8 @@ import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class WgNwActivityViewModel(private val dao: ConnectionTrackerDAO) : ViewModel() {
 
-    var startTime: MutableLiveData<Long> = MutableLiveData<Long>()
+    private var startTime: MutableLiveData<Long> = MutableLiveData<Long>()
+    private var networkActivity: MutableLiveData<String> = MutableLiveData()
 
     private var wgId: String = ""
     private var timeCategory: TimeCategory = TimeCategory.ONE_HOUR
@@ -47,6 +48,7 @@ class WgNwActivityViewModel(private val dao: ConnectionTrackerDAO) : ViewModel()
     init {
         // set from and to time to current and 1 hr before
         startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
+        networkActivity.value = ""
     }
 
     enum class TimeCategory(val value: Int) {
@@ -84,11 +86,16 @@ class WgNwActivityViewModel(private val dao: ConnectionTrackerDAO) : ViewModel()
                 startTime.value = System.currentTimeMillis() - ONE_WEEK_MILLIS
             }
         }
+        networkActivity.value = ""
     }
 
-    // Paging data flow using PagingSource for WireGuard filtering
-    val wgAppNwActivity: LiveData<PagingData<AppConnection>> = startTime.switchMap { to ->
+    fun setWgId(wgId: String) {
+        this.wgId = wgId
+    }
+
+    val wgAppNwActivity: LiveData<PagingData<AppConnection>> = networkActivity.switchMap { _ ->
         Pager(pagingConfig) {
+            val to = startTime.value ?: 0L
             dao.getWgAppNetworkActivity(wgId, to)
         }.liveData.cachedIn(viewModelScope)
     }

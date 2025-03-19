@@ -21,6 +21,7 @@ import androidx.room.PrimaryKey
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -39,6 +40,7 @@ import java.util.Locale
 class DnsLog {
 
     @PrimaryKey(autoGenerate = true) var id: Int = 0
+    var uid: Int = INVALID_UID
     var queryStr: String = ""
     var time: Long = INIT_TIME_MS
     var flag: String = ""

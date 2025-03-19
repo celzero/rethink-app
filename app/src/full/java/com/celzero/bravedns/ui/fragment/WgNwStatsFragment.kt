@@ -39,6 +39,7 @@ import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import com.celzero.bravedns.viewmodel.WgNwActivityViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -57,6 +58,7 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
             val args = Bundle()
             args.putString(WG_ID, param)
             val fragment = WgNwStatsFragment()
+            Logger.d(LOG_TAG_UI, "$TAG: newInstance called with param for $WG_ID: $param")
             fragment.arguments = args
             return fragment
         }
@@ -64,7 +66,7 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        Logger.v(LOG_TAG_UI, "$TAG: onViewCreated")
         if (arguments != null) {
             wgId = requireArguments().getString(WG_ID, "")
             // remove the search id from the wg id
@@ -80,7 +82,6 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
         }
 
         initView()
-
     }
 
     private fun initView() {
@@ -88,6 +89,7 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
         highlightToggleBtn()
         setRecyclerView()
         setClickListeners()
+        handleTotalUsagesUi()
     }
 
     private fun setClickListeners() {
@@ -105,11 +107,9 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
         b.statsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.statsRecyclerView.adapter = adapter
 
-        // Observe the paging data using a Flow
-        lifecycleScope.launch {
-            viewModel.wgAppNwActivity.observe(viewLifecycleOwner) {
-                adapter.submitData(viewLifecycleOwner.lifecycle, it)
-            }
+        viewModel.setWgId(wgId)
+        viewModel.wgAppNwActivity.observe(viewLifecycleOwner) {
+            adapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
     }
 
@@ -129,10 +129,9 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
                 val timeCategory =
                     WgNwActivityViewModel.TimeCategory.fromValue(tcValue)
                         ?: WgNwActivityViewModel.TimeCategory.ONE_HOUR
-                io {
-                    uiCtx { viewModel.timeCategoryChanged(timeCategory) }
-                    handleTotalUsagesUi()
-                }
+                Logger.d(LOG_TAG_UI, "$TAG: time category changed to $timeCategory")
+                viewModel.timeCategoryChanged(timeCategory)
+                handleTotalUsagesUi()
                 return@OnButtonCheckedListener
             }
 
@@ -214,16 +213,15 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
 
     private fun showErrorDialog() {
         // Show error dialog
-    }
-
-    private fun convertStringIdToId(id: String): Int {
-        return try {
-            val configId = id.substring(ProxyManager.ID_WG_BASE.length)
-            configId.toIntOrNull() ?: INVALID_CONF_ID
-        } catch (e: Exception) {
-            Logger.i(LOG_TAG_UI, "err converting string id to int: $id")
-            INVALID_CONF_ID
-        }
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Invalid WireGuard")
+            .setMessage("Invalid WireGuard configuration. Please go back and try again.")
+            .setPositiveButton(R.string.dns_info_positive) { _, _ ->
+                requireActivity().onBackPressedDispatcher
+            }
+            .setCancelable(false)
+            .create()
+        dialog.show()
     }
 
     private fun io(f: suspend () -> Unit) {
