@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:background="?attr/background"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/dns_parent_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/dns_status_indicator"
+            android:layout_width="1.5dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorRed_A400"
+            android:padding="5dp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/dns_flag"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:alpha="0.9"
+            android:ellipsize="none"
+            android:gravity="center"
+            android:maxWidth="32dp"
+            android:maxHeight="16dp"
+            android:minWidth="16dp"
+            android:singleLine="true"
+            android:src="@drawable/default_app_icon"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textSize="26sp"
+            tools:text="" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/dns_fav_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:layout_margin="3dp"
+            android:alpha="0.9"
+            android:contentDescription="@string/apps_icon_content_desc"
+            android:src="@drawable/ic_about" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingTop="5dp"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.65"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/dns_ips"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center_vertical"
+                        android:ellipsize="start"
+                        android:fontFamily="sans-serif-light"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:maxLines="2"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="10dp"
+                        android:scrollHorizontally="true"
+                        android:singleLine="false"
+                        android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.2"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_latency"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/drawable_purple_gradient"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:singleLine="true"
+                        android:textAppearance="@android:style/TextAppearance.Material.Subhead"
+                        android:textSize="@dimen/mini_font_text_view"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.15"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/dns_app_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_margin="3dp"
+                        android:layout_gravity="center"
+                        android:alpha="0.9"
+                        android:contentDescription="@string/apps_icon_content_desc"
+                        android:src="@drawable/ic_about" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingBottom="7dp"
+                android:weightSum="1">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.65"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_query"
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:ellipsize="end"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:maxLines="1"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="10dp"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        android:typeface="monospace" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_app_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:alpha="0.7"
+                        android:ellipsize="end"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:fontFamily="sans-serif-light"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:maxLines="1"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="10dp"
+                        android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.20"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/dns_wall_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="sans-serif-condensed"
+                        android:singleLine="true"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/default_font_text_view" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.15"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/dns_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_keyboard_arrow_down" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/dns_summary_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingBottom="10dp"
+                android:weightSum="1">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.65"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_type_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center_vertical"
+                        android:ellipsize="start"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:maxLines="1"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="10dp"
+                        android:scrollHorizontally="true"
+                        android:singleLine="false"
+                        android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.2"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/dns_duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.15"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/dns_unicode_hint"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:maxHeight="16dp"
+                        android:maxLines="1"
+                        android:minWidth="16dp"
+                        android:singleLine="true"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/default_font_text_view" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/divider" />
+</LinearLayout>

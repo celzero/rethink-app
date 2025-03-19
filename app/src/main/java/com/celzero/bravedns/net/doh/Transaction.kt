@@ -17,16 +17,19 @@
 package com.celzero.bravedns.net.doh
 
 import backend.Backend
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import java.util.Calendar
 
 class Transaction {
 
+    var uid: Int = INVALID_UID
     var queryTime: Long = 0L
-    var name: String = ""
+    var qName: String = ""
     var type: Long = 0
-    var responseTime: Long = 0
+    var latency: Long = 0
     var status: Status = Status.START
     var response: String = ""
+    var responseCode: Long = 0L
     var responseCalendar: Calendar = Calendar.getInstance()
     var serverName: String = ""
     var blocklist: String = ""

@@ -21,15 +21,13 @@ import android.widget.CompoundButton
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.DnsQueryAdapter
+import com.celzero.bravedns.adapter.DnsLogAdapter
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
 import com.celzero.bravedns.service.PersistentState
@@ -129,7 +127,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerQuery.layoutManager = layoutManager
 
-        val recyclerAdapter = DnsQueryAdapter(requireContext(), persistentState.fetchFavIcon)
+        val recyclerAdapter = DnsLogAdapter(requireContext(), persistentState.fetchFavIcon)
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.dnsLogsList.observe(viewLifecycleOwner) {
                 recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
