@@ -22,6 +22,7 @@ import android.util.Patterns
 import androidx.lifecycle.LiveData
 import backend.Backend
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.util.Constants
@@ -32,6 +33,9 @@ import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
+import kotlin.collections.get
+import kotlin.compareTo
+import kotlin.text.get
 
 object DomainRulesManager : KoinComponent {
 
@@ -171,49 +175,55 @@ object DomainRulesManager : KoinComponent {
         val key = mkTrieKey(domain, uid)
         val match = trie.getAny(key) // matches the longest prefix
         val status = match.split(":")[0]
-        if (status.isNullOrEmpty()) {
-            return Status.NONE
-        }
-
-        return Status.getStatus(match.toIntOrNull())
+        val res = Status.getStatus(status.toIntOrNull())
+        if (DEBUG) Logger.vv(LOG_TAG_DNS, "matchesWildcard: $domain($uid), res: $res")
+        return res
     }
 
     fun getDomainRule(domain: String, uid: Int): Status {
         val key = mkTrieKey(domain, uid)
         val match = trie.get(key)
         val status = match.split(":")[0]
-        if (status.isNullOrEmpty()) {
-            return Status.NONE
-        }
-        return Status.getStatus(status.toIntOrNull())
+        val res = Status.getStatus(status.toIntOrNull())
+        if (DEBUG) Logger.vv(LOG_TAG_DNS, "getDomainRule: $domain($uid), res: $res")
+        return res
     }
 
     fun getProxyForDomain(uid: Int, domain: String): Pair<String, String> {
-        val key = mkTrieKey(domain, uid)
-        var proxyId = ""
-        var proxyCC = ""
-        val match = trie.get(key)
-        if (match.isEmpty()) {
-            return Pair("", "")
-        }
-        if (match.split(":").size < 2) {
-            return Pair("", "")
-        }
-        proxyId = match.split(":")[1]
-        if (proxyId.isNotEmpty()) {
-            proxyCC = match.split(":")[2]
-            return Pair(proxyId, proxyCC)
-        } else {
-            val wild = trie.getAny(key)
-            if (wild.isEmpty()) {
+        try {
+            val key = mkTrieKey(domain, uid)
+            var proxyId = ""
+            var proxyCC = ""
+            val match = trie.get(key)
+            if (match.isEmpty()) {
                 return Pair("", "")
             }
-            if (wild.split(":").size < 2) {
-                return Pair("", "")
+            val parts = match.split(":")
+
+            if (parts.size <= 2) return Pair("", "")
+
+            // not expecting index out of bounds here, as the value is constructed while inserting
+            // still adding try-catch to avoid any crashes
+            // status:proxyId:proxyCC
+            proxyId = parts[1]
+            proxyCC = parts[2]
+
+            // empty proxyId means no proxy rule for the domain, check for wildcard
+            if (proxyId.isNotEmpty() || proxyCC.isNotEmpty()) {
+                return Pair(proxyId, proxyCC)
+            } else {
+                val wild = trie.getAny(key)
+                if (wild.isEmpty()) return Pair("", "")
+
+                val wildParts = wild.split(":")
+                if (wildParts.size <= 2) return Pair("", "")
+
+                proxyId = wildParts[1]
+                proxyCC = wildParts[2]
+                return Pair(proxyId, proxyCC)
             }
-            proxyId = wild.split(":")[1]
-            proxyCC = wild.split(":")[2]
-            return Pair(proxyId, proxyCC)
+        } catch (ignored: Exception) {
+            return Pair("", "")
         }
     }
 

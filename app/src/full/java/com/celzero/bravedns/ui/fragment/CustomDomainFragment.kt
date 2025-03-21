@@ -210,8 +210,10 @@ class CustomDomainFragment :
         var selectedType: DomainRulesManager.DomainType = DomainRulesManager.DomainType.DOMAIN
 
         dBind.dacdDomainEditText.addTextChangedListener {
-            if (it?.contains("*") == true) {
+            if (it?.startsWith("*") == true || it?.startsWith(".") == true) {
                 dBind.dacdWildcardChip.isChecked = true
+            } else {
+                dBind.dacdDomainChip.isChecked = true
             }
         }
 
