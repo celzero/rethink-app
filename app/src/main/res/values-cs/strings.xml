@@ -4,167 +4,966 @@
     <string name="title_settings" translatable="true">Nastavení</string>
     <string name="title_statistics" translatable="true">Statistiky</string>
     <string name="lbl_rules" translatable="true">pravidla</string>
-    <string name="lbl_configure" translatable="true">Konfigurace</string>
+    <string name="lbl_configure" translatable="true">Konfigurovat</string>
     <string name="lbl_logs" translatable="true">záznamy</string>
     <string name="lbl_network" translatable="true">síť</string>
     <string name="lbl_create" translatable="true">Vytvořit</string>
     <string name="lbl_qr_code" translatable="true">QR kód</string>
     <string name="lbl_public_key" translatable="true">Veřejný klíč</string>
     <string name="lbl_addresses" translatable="true">Adresy</string>
-    <string name="lbl_ip_rules" translatable="true">IP pravidla</string>
+    <string name="lbl_ip_rules" translatable="true">Pravidla IP</string>
     <string name="lbl_delete" translatable="true">Smazat</string>
-    <string name="lbl_private_key" translatable="true">Privátní klíč</string>
-    <string name="lbl_generated" translatable="true">(generováno)</string>
+    <string name="lbl_private_key" translatable="true">Soukromý klíč</string>
+    <string name="lbl_generated" translatable="true">(vygenerováno)</string>
     <string name="lbl_random" translatable="true">(náhodné)</string>
     <string name="lbl_select_all" translatable="true">vybrat vše</string>
     <string name="lbl_day" translatable="true">den</string>
-    <string name="about_title_desc" translatable="true">Detekce a blokování hrozeb zabezpečení sítě</string>
+    <string name="about_title_desc" translatable="true">Detekujte a blokujte hrozby síťového zabezpečení</string>
     <string name="txt_home" translatable="true">Domů</string>
     <string name="next" translatable="true">Další</string>
-    <string name="finish" translatable="true">Dokončení</string>
-    <string name="lbl_dismiss" translatable="true">Odmítnout</string>
+    <string name="finish" translatable="true">Dokončit</string>
+    <string name="lbl_dismiss" translatable="true">Zavřít</string>
     <string name="skip" translatable="true">Přeskočit</string>
     <string name="lbl_cancel" translatable="true">Zrušit</string>
     <string name="lbl_apply" translatable="true">Použít</string>
     <string name="lbl_blocked" translatable="true">Blokováno</string>
-    <string name="lbl_allowed" translatable="true">Povolené</string>
+    <string name="lbl_allowed" translatable="true">Povoleno</string>
     <string name="lbl_dns_servers" translatable="true">DNS servery</string>
     <string name="lbl_applications" translatable="true">Aplikace</string>
     <string name="lbl_slow" translatable="true">pomalé</string>
-    <string name="lbl_fast" translatable="true">rychle</string>
+    <string name="lbl_fast" translatable="true">rychlé</string>
     <string name="lbl_very" translatable="true">velmi</string>
     <string name="lbl_add" translatable="true">přidat</string>
     <string name="lbl_save" translatable="true">uložit</string>
-    <string name="slide_2_desc" translatable="true">Rethink je nejjednodušší způsob, jak sledovat síťovou aktivitu, obcházet cenzuru internetu a aplikovat firewall na aplikace v zařízení se systémem Android.</string>
+    <string name="slide_2_desc" translatable="true">Rethink je nejjednodušší způsob, jak monitorovat síťovou aktivitu, obejít internetovou cenzuru a firewallovat aplikace na vašem zařízení Android.</string>
     <string name="slide_2_title" translatable="true">Vítejte</string>
-    <string name="lbl_cache" translatable="true">Mezipaměť</string>
+    <string name="lbl_cache" translatable="true">Cache</string>
     <string name="lbl_status" translatable="true">Stav</string>
     <string name="lbl_remove" translatable="true">Odebrat</string>
-    <string name="settings_title_desc" translatable="true">Vysoce přizpůsobitelný DNS a firewall</string>
-    <string name="accessibility_service_description" translatable="true">Rethink využívá službu přístupnosti pro detekci a firewall aplikaci na pozadí. Rethink neshromažďuje ani neprodává žádné informace.</string>
+    <string name="settings_title_desc" translatable="true">Vysoce přizpůsobitelný DNS a Firewall</string>
+    <string name="accessibility_service_description" translatable="true">Rethink používá službu zpřístupnění (Accessibility service) k detekci a firewallování aplikací běžících na pozadí. Rethink neshromažďuje ani neprodává žádné informace.</string>
     <string name="lbl_all" translatable="true">Vše</string>
     <string name="lbl_maybe_blocked" translatable="true">Možná blokováno</string>
     <string name="lbl_domain" translatable="true">Doména</string>
     <string name="lbl_wildcard" translatable="true">Zástupný znak</string>
-    <string name="lbl_action_required" translatable="true">Požadována akce</string>
+    <string name="lbl_action_required" translatable="true">Je vyžadována akce</string>
     <string name="lbl_disabled" translatable="true">Vypnuto</string>
     <string name="lbl_import" translatable="true">Importovat</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
-    <string name="lbl_domain_rules" translatable="true">Pravidla domény</string>
+    <string name="lbl_domain_rules" translatable="true">Pravidla domén</string>
     <string name="lbl_proceed" translatable="true">Pokračovat</string>
-    <string name="lbl_listen_port" translatable="true">Poslouchej port</string>
+    <string name="lbl_listen_port" translatable="true">Port pro naslouchání</string>
     <string name="lbl_auto" translatable="true">(auto)</string>
     <string name="lbl_include" translatable="true">Zahrnout</string>
     <string name="lbl_active" translatable="true">Aktivní</string>
     <string name="lbl_http" translatable="true">HTTP</string>
     <string name="lbl_inactive" translatable="true">Neaktivní</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
-    <string name="lbl_http_socks5" translatable="true">HTTPS a SOCKS5</string>
-    <string name="lbl_app_wise" translatable="true">dle aplikace</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="lbl_app_wise" translatable="true">pro každou app</string>
     <string name="lbl_sec" translatable="true">s</string>
-    <string name="lbl_min" translatable="true">m</string>
-    <string name="lbl_hour" translatable="true">h</string>
-    <string name="lbl_preshared_key" translatable="true">Předsdílený klíč</string>
-    <string name="lbl_insecure" translatable="true">(nebezpečné)</string>
+    <string name="lbl_min" translatable="true">min</string>
+    <string name="lbl_hour" translatable="true">hod</string>
+    <string name="lbl_preshared_key" translatable="true">Předem sdílený klíč</string>
+    <string name="lbl_insecure" translatable="true">(nezabezpečené)</string>
     <string name="lbl_optional" translatable="true">(volitelné)</string>
-    <string name="lbl_persistent_keepalive" translatable="true">Vždy naživu</string>
-    <string name="lbl_allowed_ips" translatable="true">Povolené IP adresy</string>
-    <string name="lbl_stopped" translatable="true">Zastaven</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Permanentní keepalive</string>
+    <string name="lbl_allowed_ips" translatable="true">Povolené IP</string>
+    <string name="lbl_stopped" translatable="true">Zastaveno</string>
     <string name="lbl_last" translatable="true">Poslední</string>
-    <string name="lbl_starting" translatable="true">Startuje</string>
-    <string name="lbl_overall" translatable="true">Celkový</string>
-    <string name="lbl_idle" translatable="true">Nečinný</string>
-    <string name="lbl_private" translatable="true">privátní</string>
-    <string name="lbl_secure" translatable="true">bezpečné</string>
+    <string name="lbl_starting" translatable="true">Spouštím</string>
+    <string name="lbl_overall" translatable="true">Celkově</string>
+    <string name="lbl_idle" translatable="true">Nečinné</string>
+    <string name="lbl_private" translatable="true">soukromé</string>
+    <string name="lbl_secure" translatable="true">zabezpečené</string>
     <string name="lbl_anonymous" translatable="true">anonymní</string>
-    <string name="block" translatable="true">blok</string>
-    <string name="exclude" translatable="true">vynechat</string>
-    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">čekám</string>
-    <string name="status_protected_with_socks5_private_dns" translatable="true">chrání sock5 a privátní dns</string>
-    <string name="status_protected_with_http_private_dns" translatable="true">chrání http proxy a privátní dns</string>
+    <string name="block" translatable="true">blokovat</string>
+    <string name="exclude" translatable="true">vyloučit</string>
+    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">čekání</string>
+    <string name="status_protected_with_socks5_private_dns" translatable="true">chráněno pomocí socks5 &amp; private dns</string>
+    <string name="status_protected_with_http_private_dns" translatable="true">chráněno pomocí http proxy &amp; private dns</string>
     <string name="notification_action_resume_vpn" translatable="true">OBNOVIT</string>
-    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">chráněn</string>
-    <string name="status_protected_with_http" translatable="true">chrání http proxy</string>
-    <string name="status_protected_with_proxy" translatable="true">chrání proxy</string>
-    <string name="status_protected_with_wg" translatable="true">chrání wireguard</string>
-    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">nechráněn</string>
-    <string name="dns_explanation_firewall_connected" translatable="true">Firewall připojen</string>
-    <string name="status_protected_with_wg_private_dns" translatable="true">chrání wireguard a privátní dns</string>
-    <string name="notification_action_stop_vpn" translatable="true">STOP</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">chráněno</string>
+    <string name="status_protected_with_http" translatable="true">chráněno pomocí http proxy</string>
+    <string name="status_protected_with_proxy" translatable="true">chráněno pomocí proxy</string>
+    <string name="status_protected_with_wg" translatable="true">chráněno přes wireguard</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">nechráněno</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">Připojeno k Firewallu</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">chráněno přes wireguard &amp; private dns</string>
+    <string name="notification_action_stop_vpn" translatable="true">UKONČIT</string>
     <string name="notification_action_dns_mode" translatable="true">DNS</string>
     <string name="notification_action_dns_firewall_mode" translatable="true">DNS + Firewall</string>
-    <string name="allow" translatable="true">povol</string>
+    <string name="allow" translatable="true">povolit</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Upozornění: Rethink byl deaktivován</string>
     <string name="isolate" translatable="true">izolovat</string>
-    <string name="untracked" translatable="true">nesledován</string>
-    <string name="lbl_notification" translatable="true">oznámení</string>
-    <string name="slide_1_title" translatable="true">Zdarma a otevřený zdroj</string>
-    <string name="status_app_error" translatable="true">chyba app</string>
-    <string name="status_dns_error" translatable="true">chyba dns</string>
-    <string name="status_no_internet" translatable="true">bez internetu</string>
-    <string name="status_dns_server_down" translatable="true">dns server neběží</string>
-    <string name="status_protected_with_tor" translatable="true">chrání tor</string>
-    <string name="status_protected_with_private_dns" translatable="true">chrání privátní dns</string>
-    <string name="status_protected_with_tor_private_dns" translatable="true">chrání tor a privátní dns</string>
-    <string name="status_protected_with_proxy_private_dns" translatable="true">chrání proxy a privátní dns</string>
-    <string name="status_protected_with_socks5" translatable="true">chrání socks proxy</string>
-    <string name="notification_action_pause_vpn" translatable="true">PAUZA</string>
+    <string name="untracked" translatable="true">nesledováno</string>
+    <string name="lbl_notification" translatable="true">notifikace</string>
+    <string name="slide_1_title" translatable="true">Zdarma a open source</string>
+    <string name="status_app_error" translatable="true">chyba aplikace</string>
+    <string name="status_dns_error" translatable="true">chyba DNS</string>
+    <string name="status_no_internet" translatable="true">bez připojení k internetu</string>
+    <string name="status_dns_server_down" translatable="true">DNS server je nedostupný</string>
+    <string name="status_protected_with_tor" translatable="true">chráněno pomocí tor</string>
+    <string name="status_protected_with_private_dns" translatable="true">chráněno pomocí private dns</string>
+    <string name="status_protected_with_tor_private_dns" translatable="true">chráněno pomocí tor &amp; private dns</string>
+    <string name="status_protected_with_proxy_private_dns" translatable="true">chráněno pomocí proxy &amp; private dns</string>
+    <string name="status_protected_with_socks5" translatable="true">chráněno pomocí socks proxy</string>
+    <string name="notification_action_pause_vpn" translatable="true">POZASTAVIT</string>
     <string name="dns_mode_info_title" translatable="true">DNS</string>
-    <string name="lbl_unselected" translatable="true">Nevybrán</string>
-    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">privátní dns povoleno</string>
+    <string name="lbl_unselected" translatable="true">Neoznačeno</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">private dns je zapnuté</string>
     <string name="lbl_split" translatable="true">Rozdělit</string>
-    <string name="pause_title_desc" translatable="true">dřímám…</string>
+    <string name="pause_title_desc" translatable="true">dávám si šlofíka…</string>
     <string name="lbl_mtu" translatable="true">MTU</string>
     <string name="lbl_on_device" translatable="true">v zařízení</string>
-    <string name="memory_notification_text">Rethink má málo paměťi. Systémové akce mohou být omezené.</string>
-    <string name="bypass_dns_firewall" translatable="true">obejít dns a firewall</string>
-    <string name="bypass_universal" translatable="true">obejít univerzální</string>
-    <string name="hybrid_mode_notification_title" translatable="true">Chráněno! Připojeno DNS + Firewall.</string>
-    <string name="dns_mode_notification_title" translatable="true">Chráněno! Připojeno k rychlé a bezpečné DNS.</string>
-    <string name="firewall_mode_notification_title" translatable="true">Chráněno! Připojen Firewall.</string>
-    <string name="slide_1_desc" translatable="true">Rethink je program s otevřeným zdrojem podpořen Mozilla Builders MVP programem.</string>
-    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Klepněte pro nastavení ochrany</string>
-    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Chráněno! Připojeno DNS + Firewall + Proxy.</string>
-    <string name="pause_mode_notification_title" translatable="true">Pauza! Blokované aplikace zůstanou za firewallem.</string>
+    <string name="memory_notification_text">Rethink zaznamenává nízkou dostupnou paměť. Systémové akce mohou být omezeny.</string>
+    <string name="bypass_dns_firewall" translatable="true">obejít dns &amp; firewall</string>
+    <string name="bypass_universal" translatable="true">univerzální obcházení</string>
+    <string name="hybrid_mode_notification_title" translatable="true">Chráněno! Připojeno k DNS + Firewallu.</string>
+    <string name="dns_mode_notification_title" translatable="true">Chráněno! Připojeno k rychlému a zabezpečenému DNS.</string>
+    <string name="firewall_mode_notification_title" translatable="true">Chráněno! Připojeno k Firewallu.</string>
+    <string name="slide_1_desc" translatable="true">Rethink je open source software podpořený programem Mozilla Builders MVP.</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Klepnutím změníte nastavení ochrany</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Chráněno! Připojeno k DNS + Firewall + Proxy.</string>
+    <string name="pause_mode_notification_title" translatable="true">Pozastaveno! Blokované aplikace budou nadále firewallovány.</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">selhává</string>
-    <string name="failed_using_default" translatable="true">Selhalo: použito záložní DNS</string>
-    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Připojeno k RethinkDNS a Firewall</string>
-    <string name="firewall_mode_info_explanation_new" translatable="true">Monitorovat aktivitu sítě a firewallu, jakoukoliv aplikaci nebo IP adresu.</string>
+    <string name="failed_using_default" translatable="true">Selhalo: používá se záložní DNS</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Připojeno k RethinkDNS a Firewallu</string>
+    <string name="firewall_mode_info_explanation_new" translatable="true">Monitorujte síťovou aktivitu a firewallujte jakoukoli aplikaci nebo IP adresu.</string>
     <string name="dns_explanation_dns_connected" translatable="true">Připojeno k RethinkDNS</string>
-    <string name="brave_dns_connect_mode_change_firewall" translatable="true">Zvolit mód.</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">Vyberte mód.</string>
     <string name="apps_info_title" translatable="true">Aplikace</string>
-    <string name="hybrid_mode_info_title" translatable="true">DNS + firewall</string>
-    <string name="universal_firewall_explanation" translatable="true">Použij pravidla firewallu na všechny aplikace na základě událostí zařízení, například firewall, když je zařízení zamčeno, nebo když se konkrétní aplikace nepoužívá.</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink využívá službu přístupnosti, pro zjištění které aplikace se používají (vpopředí) oproti těm, které nejsou používány (na pozadí).
-\n
-\nRethink neshromažďuje žádné informace, ani vás nešpehuje jakýmkoli způsobem.</string>
-    <string name="dns_mode_info_explanation_new" translatable="true">Hlídat, blokovat a šifrovat DNS požadavky.</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Služba rethink přístupnosti přestala nebo spadl. <i><b>Přejděte na Nastavení a Force Stop</b></i> Rethink a začněte znovu používat <i>Block žádnou aplikaci, která není v použití</i> funkce.
-\n
-\nRethink využívá službu přístupnosti, ke kterým se aplikace používají (foreground) oproti těm, které nejsou používány (background).</string>
-    <string name="firewall_rules" translatable="true">Pravidla sítě</string>
+    <string name="hybrid_mode_info_title" translatable="true">DNS + Firewall</string>
+    <string name="universal_firewall_explanation" translatable="true">Použijte firewallová pravidla pro všechny aplikace na základě událostí zařízení, například firewall při uzamčení zařízení nebo pokud aplikace není používána.</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink využívá službu Zpřístupnění (Accessibility), aby sledoval, které aplikace jsou používány (v popředí) a které běží na pozadí.\n\nRethink neshromažďuje žádné informace ani vás nešpehuje.</string>
+    <string name="dns_mode_info_explanation_new" translatable="true">Monitorujte, blokujte a šifrujte DNS požadavky.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Služba Rethink Accessibility přestala fungovat nebo došlo k pádu. <i><b>Jděte do Nastavení a Vynuceně zastavte</b></i> Rethink a spusťte jej znovu pro využití funkce <i>Blokovat aplikaci, která není používána</i>.\n\nRethink využívá službu Zpřístupnění ke sledování, které aplikace jsou v popředí a které běží na pozadí.</string>
+    <string name="firewall_rules" translatable="true">Síťová pravidla</string>
     <string name="firewall_mode_info_title" translatable="true">Firewall</string>
-    <string name="dns_firewall_mode_info_explanation_new" translatable="true">Vše výše + obejít cenzuru internetu.</string>
-    <string name="alert_permission_accessibility" translatable="true">Povolení - Přístupnost</string>
-    <string name="alert_firewall_accessibility_exception" translatable="true">Nastavení expozic Přístupů. Vyzkoušejte znovu!</string>
+    <string name="dns_firewall_mode_info_explanation_new" translatable="true">Vše výše + obejití internetové cenzury.</string>
+    <string name="alert_permission_accessibility" translatable="true">Oprávnění – Zpřístupnění</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">Selhalo otevření nastavení Zpřístupnění. Zkuste to později!</string>
     <string name="lbl_peer" translatable="true">Peer</string>
-    <string name="brave_dns_connect_mode_change_dns" translatable="true">Zvolte režim</string>
+    <string name="brave_dns_connect_mode_change_dns" translatable="true">Vyberte mód.</string>
     <string name="default_dns_name" translatable="true">RDNS Výchozí</string>
     <string name="custom_url_error_invalid_url" translatable="true">Neplatná URL</string>
-    <string name="bsct_block" translatable="true">Blokovat, obejít, vyloučit, izolovat <u>tuto aplikaci</u></string>
-    <string name="always_on_dialog_positive_btn" translatable="true">Přejít do nastavení</string>
-    <string name="bsct_app_info" translatable="true">O Aplikaci</string>
-    <string name="bsct_conn_desc_blocked" translatable="true">blokován na %1$s %2$s</string>
+    <string name="bsct_block" translatable="true">Blokovat, obejít, vyloučit, izolovat <u>tuto app</u></string>
+    <string name="always_on_dialog_positive_btn" translatable="true">Přejít do Nastavení</string>
+    <string name="bsct_app_info" translatable="true">Info o aplikaci</string>
+    <string name="bsct_conn_desc_blocked" translatable="true">blokováno na %1$s %2$s</string>
     <string name="dns_query_clear_logs_title" translatable="true">Smazat všechny DNS záznamy?</string>
-    <string name="bsct_block_ip" translatable="true">Blokovat, důvěřovat <u>tuto IP</u> pro <u>tuto aplikaci</u></string>
-    <string name="bsct_block_domain" translatable="true">Blokovat, důvěřovat <u>doménu</u> pro <u>tuto aplikaci</u></string>
-    <string name="dns_query_clear_logs_message" translatable="true">Toto odstraní DNS záznamy na zařízení. Tato operace není vratná. Chcete pokračovat?</string>
+    <string name="bsct_block_ip" translatable="true">Blokovat, důvěřovat <u>tomuto IP</u> pro <u>tuto app</u></string>
+    <string name="bsct_block_domain" translatable="true">Blokovat, důvěřovat <u>doméně/doménám</u> pro <u>tuto app</u></string>
+    <string name="dns_query_clear_logs_message" translatable="true">Tímto smažete DNS záznamy uložené v zařízení. Tato akce je nevratná. Chcete pokračovat?</string>
     <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Blokovat připojení aplikace k Internetu.\n <u>#2</u>: Blokovat připojení libovolné aplikace k určité IP adrese.\n <u>#3</u>: Blokovat všechna připojení, když je zařízení uzamčeno (Univerzální Firewall).\n <u>#4</u>: Blokovat jakoukoli nepoužívanou aplikaci (Univerzální Firewall).\n <u>#5</u>: Blokovat připojení, když je zdrojová aplikace neznámá (Univerzální Firewall).\n <u>#6</u>: Blokovat veškerý provoz UDP kromě DNS (Univerzální Firewall).\n <u>#7</u>: Blokovat připojení při obcházení DNS (Univerzální Firewall).</string>
-    <string name="always_on_dialog" translatable="true">\"Always-On VPN\" je na tomto zařízení povolena. Chcete-li začít Rethink, přejděte do aplikace Nastavení a deaktivujte \"Always-on VPN\".</string>
-    <string name="always_on_dialog_heading" translatable="true">Zakázat Always-on VPN</string>
-    <string name="conn_track_clear_logs_title" translatable="true">Odstranit všechny síťové záznamy?</string>
-    <string name="conn_track_clear_logs_message" translatable="true">Toto jen odstraní záznamy sítě, ale ne pravidla firewallu. Tato operace není vratná. Chcete pokračovat?</string>
-    <string name="bsct_conn_block_desc" translatable="true">blokován %1$s od %2$s</string>
-    <string name="bsct_conn_block_desc_device" translatable="true">blokován %1$s na zařízení</string>
-    <string name="bsct_conn_desc_allowed" translatable="true">povolen na %1$s %2$s</string>
+    <string name="always_on_dialog" translatable="true">Funkce „Always-On VPN“ je na tomto zařízení aktivní. Chcete-li spustit Rethink, přejděte do Nastavení a vypněte „Always-on VPN“.</string>
+    <string name="always_on_dialog_heading" translatable="true">Vypnout funkci Always-on VPN</string>
+    <string name="conn_track_clear_logs_title" translatable="true">Smazat všechny síťové záznamy?</string>
+    <string name="conn_track_clear_logs_message" translatable="true">Tímto smažete pouze síťové záznamy, nikoli firewallová pravidla. Tato akce je nevratná. Chcete pokračovat?</string>
+    <string name="bsct_conn_block_desc" translatable="true">blokováno %1$s přes %2$s</string>
+    <string name="bsct_conn_block_desc_device" translatable="true">blokováno %1$s v zařízení</string>
+    <string name="bsct_conn_desc_allowed" translatable="true">povoleno na %1$s %2$s</string>
+    <string name="always_on_dialog_positive" translatable="true">Zastavit</string>
+    <string name="dns_act_configure_tab" translatable="true">Konfigurace</string>
+    <string name="doh_custom_url_remove_success" translatable="true">Endpoint odstraněn.</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Smazat DoT endpoint?</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Smazat DNSCrypt Relay?</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt Relay byl smazán.</string>
+    <string name="dns_proxy_remove_dialog_message" translatable="true">Smazat DNS Proxy z uložené konfigurace.</string>
+    <string name="configure_dns_connection_name" translatable="true">Připojeno k %1$s</string>
+    <string name="download_update_dialog_message" translatable="true">Nová verze aplikace je k dispozici ke stažení z webu. Přejete si pokračovat?</string>
+    <string name="search_dns_logs" translatable="true"><font size="12">Hledat názvy domén nebo IP</font></string>
+    <string name="app_mode_dns" translatable="true">DNS</string>
+    <string name="settings_socks5_desc" translatable="true">Přesměrovat připojení na SOCKS5 endpoint.</string>
+    <string name="orbot_install_dialog_title" translatable="true">Nainstalovat Orbot?</string>
+    <string name="settings_orbot_notification_action" translatable="true">Otevřít Orbot</string>
+    <string name="settings_general_header" translatable="true">obecné</string>
+    <string name="settings_socks5_dialog_hint_ip" translatable="true">IP adresa</string>
+    <string name="settings_socks5_dialog_hint_port" translatable="true">Port</string>
+    <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
+    <string name="settings_notification_heading" translatable="true">Vybrat akci notifikace</string>
+    <string name="settings_notification_desc3" translatable="true">Žádné</string>
+    <string name="hsf_start_btn_state" translatable="true">spustit</string>
+    <string name="about_bug_no_log_dialog_message" translatable="true">Nepodařilo se získat crash logy. Chcete chybu nahlásit ručně?</string>
+    <string name="about_web" translatable="true">odkazy</string>
+    <string name="about_website" translatable="true">Navštívit rethinkdns.com</string>
+    <string name="dns_query_latency" translatable="true">%1$sms</string>
+    <string name="fapps_firewall_filter_bypass_universal" translatable="true">Obcházeno</string>
+    <string name="fapps_firewall_filter_excluded" translatable="true">Vyloučeno</string>
+    <string name="fapps_info_metered_msg" translatable="true">Povolit / Blokovat v účtované (mobilní) síti.</string>
+    <string name="dns_proxy_toast_parameter" translatable="true">DNS Proxy</string>
+    <string name="copy_clipboard_label" translatable="true">URL</string>
+    <string name="coming_soon_toast" translatable="true">již brzy</string>
+    <string name="pause_text" translatable="true">pozastaveno</string>
+    <string name="cd_dialog_edittext_hint" translatable="true">Zadejte %1$s</string>
+    <string name="cd_blocked_initial" translatable="true">B</string>
+    <string name="radio_sky_btn" translatable="true">⛅ Sky</string>
+    <string name="bsrf_sub_group_heading" translatable="true">Podskupina</string>
+    <string name="bsrf_clear_filter" translatable="true">Vymazat</string>
+    <string name="crypt_relay_france" translatable="true">Anonymizovaný DNS relay v Paříži, Francie, poskytováno https://cryptostrom.is/.</string>
+    <string name="dns_crypt_url_remove_success" translatable="true">DNSCrypt resolver byl smazán.</string>
+    <string name="download_update_dialog_title" translatable="true">Nová aktualizace!</string>
+    <string name="settings_http_proxy_error_text3" translatable="true">Hostname je prázdný</string>
+    <string name="apps_card_ips_count" translatable="true">%1$s IP &amp; Port pravidel</string>
+    <string name="fapps_unblock_dialog_title" translatable="true">Povolit aplikace</string>
+    <string name="fapps_exclude_block_dialog_message" translatable="true">Vyloučit <i>vybrané</i> aplikace z DNS i Firewallu?</string>
+    <string name="notif_channel_download" translatable="true">Upozornění ke stažení</string>
+    <string name="always_on_dialog_stop_message" translatable="true">Always-on VPN je zapnuto pro Rethink. Opravdu chcete Rethink zastavit?</string>
+    <string name="firewall_act_network_monitor_tab" translatable="true">Síť</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Smazat DNS over TLS endpoint z uložené konfigurace.</string>
+    <string name="blocklist_update_check_failure" translatable="true">Něco se pokazilo. Zkuste to prosím později!</string>
+    <string name="blocklist_update_check_not_required" translatable="true">Blokovací seznamy jsou již v nejnovější verzi.</string>
+    <string name="show_logs_disabled_dns_message" translatable="true">Logování DNS požadavků je vypnuto. Pro opětovné zapnutí jděte do <i>Nastavení</i> a zapněte <i>Povolit logování v zařízení</i>.</string>
+    <string name="search_firewall_network_log" translatable="true"><font size="12">Hledat aplikace, IP adresy, domény</font></string>
+    <string name="search_universal_ips" translatable="true"><font size="12">Hledat IP adresy</font></string>
+    <string name="search_custom_domains" translatable="true"><font size="12">Hledat názvy domén</font></string>
+    <string name="settings_ip_network_heading" translatable="true">Vybrat IP verzi</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback proxy forwarder aplikace</string>
+    <string name="settings_allow_bypass_heading" translatable="true">Povolit viditelnost sítě</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">Některé možnosti jsou zakázány, když je VPN v režimu lockdown. <u>Viz nastavení VPN</u>.</string>
+    <string name="orbot_socks5_desc" translatable="true">Přesměrovává veškerá TCP připojení do Orbotu.</string>
+    <string name="orbot_http" translatable="true">HTTP Proxy</string>
+    <string name="orbot_none_desc" translatable="true">Nic z uvedeného.</string>
+    <string name="settings_check_update_heading" translatable="true">Vyhledat aktualizace aplikace</string>
+    <string name="settings_app_notification_a13_desc" translatable="true">Povolte oprávnění pro oznámení aplikace</string>
+    <string name="settings_theme_heading" translatable="true">Vzhled</string>
+    <string name="settings_rinr_heading" translatable="true">Loopback (experimentální)</string>
+    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimentální)</string>
+    <string name="settings_default_dns_heading" translatable="true">Vybrat záložní DNS</string>
+    <string name="hsf_start_dialog_positive" translatable="true">Spustit</string>
+    <string name="about_mail_subject" translatable="true">[Rethink]:</string>
+    <string name="vpn_profile_error" translatable="true">Nelze otevřít VPN profil.</string>
+    <string name="private_dns_error" translatable="true">Nelze otevřít obrazovku soukromého DNS.</string>
+    <string name="error_loading_log_file" translatable="true">Chyba při načítání log souboru</string>
+    <string name="collecting_logs_progress_text" translatable="true">Zachycuji…</string>
+    <string name="cd_custom_dns_proxy_name" translatable="true">Proxy %1$s</string>
+    <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Povolit v neomezené síti</string>
+    <string name="other_dns_list_tab3" translatable="true">Dns Proxy</string>
+    <string name="notif_dialog_pause_dialog_message" translatable="true">Aplikace je v pozastaveném stavu, obnovte pro pokračování</string>
+    <string name="ada_noapp_dialog_positive" translatable="true">OK</string>
+    <string name="ada_app_exclude" translatable="true">Vyloučit</string>
+    <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">Vymazat záznamy</string>
+    <string name="always_on_dialog_stop_heading" translatable="true">Always-on VPN</string>
+    <string name="private_dns_dialog_heading" translatable="true">Vypnout Private DNS</string>
+    <string name="private_dns_dialog_desc" translatable="true">Nastavení DNS v Rethink je přepsáno Androidím Private DNS.\n\nChcete-li používat DNS z Rethink, přejděte do Nastavení systému Android a vypněte „Private DNS“.</string>
+    <string name="firewall_act_universal_tab" translatable="true">univerzální</string>
+    <string name="univ_firewall_dialog_title" translatable="true">Smazat pravidlo IP?</string>
+    <string name="univ_firewall_dialog_message" translatable="true">Smazáním tohoto pravidla umožníte libovolné aplikaci připojení k této IP. Chcete pokračovat?</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Smazat DNSCrypt relay z uložené konfigurace.</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">Smazat DNS Proxy?</string>
+    <string name="dns_proxy_remove_success" translatable="true">DNS Proxy bylo smazáno.</string>
+    <string name="local_blocklist_download" translatable="true">Stáhnout blokovací seznamy</string>
+    <string name="local_blocklist_download_desc" translatable="true">Stáhnout blokovací seznamy (cca 60 MB), abyste mohli tuto funkci použít?</string>
+    <string name="local_blocklist_redownload" translatable="true">Aktuální verze!</string>
+    <string name="local_blocklist_redownload_desc" translatable="true">Blokovací seznamy v zařízení jsou již na nejnovější verzi v%1$s.</string>
+    <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast --> Seznam aplikací byl znovu synchronizován.</string>
+    <string name="show_logs_disabled_network_message" translatable="true">Protokolování připojení je vypnuto. Pro opětovné zapnutí jděte do <i>Nastavení</i> a zapněte <i>Povolit logování v zařízení</i>.</string>
+    <string name="configure_dns_connected_doh_status" translatable="true">DNS přes HTTPS</string>
+    <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
+    <string name="configure_dns_connected_dns_proxy_status" translatable="true">DNS Proxy</string>
+    <string name="configure_dns_crypt" translatable="true">DNSCrypt: %1$s resolverů</string>
+    <string name="http_proxy_dialog_heading" translatable="true">Nastavit HTTP(S) CONNECT Proxy</string>
+    <string name="http_proxy_dialog_desc" translatable="true">Nastavte URL ve formátu &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Příklad: http://proxy.example.com:8080/</string>
+    <string name="download_update_dialog_message_ok_title" translatable="true">Nejnovější verze!</string>
+    <string name="download_update_dialog_message_ok" translatable="true">Již máte nejnovější verzi.</string>
+    <string name="download_update_dialog_message_success" translatable="true">Blokovací seznamy úspěšně staženy.</string>
+    <string name="download_update_dialog_failure_title" translatable="true">Něco se pokazilo!</string>
+    <string name="download_update_dialog_failure_message" translatable="true">Naše servery mohou být nedostupné, nebo se nelze připojit. Zkuste to prosím znovu za chvíli.</string>
+    <string name="download_update_dialog_trylater_title" translatable="true">Teď to nelze provést</string>
+    <string name="download_update_dialog_trylater_message" translatable="true">Aktualizaci nyní není možné provést, zkuste to prosím později.</string>
+    <string name="search_firewall_all_apps" translatable="true"><font size="12">Hledat aplikace podle UID či jména</font></string>
+    <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Hledat blokovací seznamy</font></string>
+    <string name="search_proxy_add_apps" translatable="true">Hledat aplikace podle jména</string>
+    <string name="app_mode_dns_low_battery" translatable="true">DNS (šetření baterie)</string>
+    <string name="app_mode_firewall" translatable="true">Firewall</string>
+    <string name="app_mode_dns_firewall" translatable="true">DNS a Firewall (výchozí)</string>
+    <string name="app_mode_wireguard" translatable="true">VPN</string>
+    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="info_dialog_copy_toast_msg" translatable="true">IP adresa zkopírována.</string>
+    <string name="info_dialog_url_copy_toast_msg" translatable="true">URL zkopírována</string>
+    <string name="public_key_copy_toast_msg" translatable="true">Veřejný klíč zkopírován.</string>
+    <string name="info_dialog_rethink_toast_msg" translatable="true">Zkopírováno jako RDNS+ DNS-over-HTTPS URL</string>
+    <string name="settings_enable_logs_desc" translatable="true">Ukládat DNS a Firewall logy lokálně v zařízení.</string>
+    <string name="settings_enable_logs" translatable="true">Povolit logování v zařízení</string>
+    <string name="app_mode_choose" translatable="true">Vyberte mód</string>
+    <string name="connection_http3" translatable="true">HTTP3</string>
+    <string name="relative_time_today" translatable="true">Dnes</string>
+    <string name="settings_ip_network_desc" translatable="true">Zvolte mezi verzemi internetového protokolu.</string>
+    <string name="settings_ptrans_heading" translatable="true">Vynutit odchozí IPv4</string>
+    <string name="settings_ptrans_desc" translatable="true">Převádí odchozí IPv6 provoz na IPv4 přímo v zařízení. Zapněte, pokud jste připojeni do sítě, která podporuje pouze IPv4.</string>
+    <string name="settings_allow_lan_heading" translatable="true">Neroutovat privátní IP (experimentální)</string>
+    <string name="settings_allow_lan_desc" translatable="true">Vynechat LAN, loopback, multicast, link-local z tunelu Rethink VPN.</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Je-li vypnuto, vyjímá proxy (SOCKS5, HTTP, DNS) forwarder aplikace z VPN tunelu Rethink.</string>
+    <string name="settings_allow_bypass_desc" translatable="true">Povolit aplikacím, které to vyžadují, přístup ke všem dostupným sítím a možnost obejít tunel Rethink VPN na vyžádání. Některé konferenční aplikace (např. Zoom či Meet) to mohou potřebovat pro správnou funkci.</string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Nelze nastavit proxy, pokud VPN běží pouze v režimu DNS.</string>
+    <string name="settings_proxy_header" translatable="true">proxy</string>
+    <string name="settings_socks5_heading" translatable="true">Nastavit SOCKS5 Proxy</string>
+    <string name="settings_https_heading" translatable="true">Nastavit HTTP(S) CONNECT Proxy</string>
+    <string name="settings_https_desc" translatable="true">Přesměrovat připojení na endpoint HTTP(S) CONNECT.</string>
+    <string name="orbot_socks5" translatable="true">Proxy pouze TCP</string>
+    <string name="orbot_http_desc" translatable="true">Vytváří HTTP CONNECT tunel k Orbotu.</string>
+    <string name="orbot_both" translatable="true">TCP + HTTP Proxy</string>
+    <string name="orbot_both_desc" translatable="true">Vše výše uvedené.</string>
+    <string name="orbot_none" translatable="true">Žádné (výchozí)</string>
+    <string name="orbot_bs_status_1" translatable="true">Přesměrovávám %1$s připojení do Orbotu.</string>
+    <string name="orbot_bs_status_2" translatable="true">HTTP Proxy je nastaveno.</string>
+    <string name="orbot_bs_status_3" translatable="true">Přesměrovávám %1$s do Orbotu, HTTP Proxy je také nastaveno.</string>
+    <string name="orbot_bs_status_4" translatable="true">Jednoduché nastavení Toru jako proxy (Orbot).</string>
+    <string name="orbot_status_arg_2" translatable="true">TCP</string>
+    <string name="orbot_status_arg_3" translatable="true">DNS a TCP</string>
+    <string name="orbot_app_issue" translatable="true">Nepodařilo se spustit Orbot. Je nainstalován?</string>
+    <string name="orbot_bs_status_trying_connect" translatable="true">Nastavuji Orbot…</string>
+    <string name="orbot_stop_dialog_title" translatable="true">Je nutný ruční zásah</string>
+    <string name="orbot_stop_dialog_message" translatable="true">Rethink přestal přesměrovávat připojení do Orbotu, ale Orbot může dál běžet na pozadí.</string>
+    <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink je nastaven k přesměrování DNS dotazů do Orbotu. Změňte to dle potřeby.</string>
+    <string name="orbot_stop_dialog_negative" translatable="true">Zastavit Orbot</string>
+    <string name="orbot_stop_dialog_neutral" translatable="true">Změnit DNS</string>
+    <string name="orbot_title" translatable="true">Orbot a Proxy</string>
+    <string name="orbot_install_dialog_message" translatable="true">Orbot přináší funkce a možnosti Toru do Androidu.</string>
+    <string name="orbot_install_dialog_positive" translatable="true">Nainstalovat</string>
+    <string name="orbot_install_dialog_neutral" translatable="true">web</string>
+    <string name="orbot_no_app_toast" translatable="true">Přidejte alespoň jednu aplikaci pro povolení Orbotu</string>
+    <string name="settings_orbot_heading" translatable="true">Nastavit Orbot</string>
+    <string name="settings_orbot_header" translatable="true">Orbot\t❯</string>
+    <string name="settings_orbot_desc" translatable="true">Orbot v režimu non-vpn s HTTPS/SOCKS5.</string>
+    <string name="settings_orbot_install_desc" translatable="true">Klepněte sem pro instalaci Orbotu</string>
+    <string name="settings_socks5_disabled_error" translatable="true">Připojeno k %1$s. Vypněte jej pro pokračování.</string>
+    <string name="settings_socks5_vpn_disabled_error" translatable="true">Spusťte Rethink pro pokračování.</string>
+    <string name="settings_orbot_disabled_error" translatable="true">Vypněte HTTP(S) a/nebo SOCKS5 proxy pro pokračování v nastavení Toru jako proxy.</string>
+    <string name="settings_general_customize" translatable="true">přizpůsobit</string>
+    <string name="settings_autostart_bootup_heading" translatable="true">Automatický start po zapnutí (experimentální)</string>
+    <string name="settings_autostart_bootup_desc" translatable="true">Po zapnutí zařízení spustí Rethink, pokud běžel před vypnutím.</string>
+    <string name="settings_network_all_networks" translatable="true">Využívat všechny dostupné sítě (experimentální)</string>
+    <string name="settings_network_all_networks_desc" translatable="true">Je-li zapnuto, Rethink používá všechny dostupné sítě k připojení k internetu. Jinak použije tu, kterou Android označí za „aktivní“.</string>
+    <string name="settings_check_update_desc" translatable="true">Automaticky vyhledávat aktualizace jednou týdně.</string>
+    <string name="settings_import_export_heading" translatable="true">Záloha &amp; Obnova</string>
+    <string name="settings_import_export_desc" translatable="true">Ruční záloha nebo obnova dat a nastavení aplikace.</string>
+    <string name="settings_app_notification_a13_heading" translatable="true">Oznámení aplikace</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">Trvalé oznámení</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Udržovat oznámení neustále zobrazené</string>
+    <string name="settings_theme_desc" translatable="true">Tmavý/světlý motiv</string>
+    <string name="settings_go_log_heading" translatable="true">Úroveň logů</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Směřovat vlastní provoz Rethink (stahování blokovacích seznamů, kontroly připojení, DNS) zpět do tunelu.</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">Rethink směřuje vlastní provoz přes tunel. Pokud nevíte, co děláte, raději to vypněte.</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">Tím se také povolí<!--settings_network_all_networks--> %1$s. Chcete pokračovat?</string>
+    <string name="settings_http_proxy_desc" translatable="true">Přesměrování na %1$s</string>
+    <string name="settings_dns_proxy_dialog_header" translatable="true">Nastavit SOCKS5 Proxy</string>
+    <string name="settings_http_proxy_dialog_title" translatable="true">Vlastní URL serveru</string>
+    <string name="settings_http_proxy_error_text1" translatable="true">Rozsah portů by měl být 1024–65535</string>
+    <string name="settings_http_proxy_error_text2" translatable="true">Neplatný port</string>
+    <string name="settings_dns_proxy_dialog_app" translatable="true">Aplikace</string>
+    <string name="settings_http_proxy_error_text4" translatable="true">Nepodařilo se připojit k hostiteli. Zkuste to znovu.</string>
+    <string name="settings_http_proxy_toast_success" translatable="true">HTTP proxy nastaveno</string>
+    <string name="settings_dns_proxy_dialog_hostname" translatable="true">Hostname</string>
+    <string name="settings_dns_proxy_dialog_port_number" translatable="true">Číslo portu</string>
+    <string name="settings_dns_proxy_dialog_username" translatable="true">Uživatelské jméno</string>
+    <string name="settings_dns_proxy_dialog_password" translatable="true">Heslo</string>
+    <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">nastavit</string>
+    <string name="settings_app_list_default_app" translatable="true">Žádná</string>
+    <string name="settings_socks_forwarding_desc" translatable="true">Přesměrování na %1$s:%2$s, %3$s</string>
+    <string name="settings_socks_forwarding_desc_no_app" translatable="true">Přesměrování na %1$s:%2$s</string>
+    <string name="settings_socks_forwarding_default_desc" translatable="true">Přesměrovat připojení na SOCKS5 endpoint.</string>
+    <string name="settings_socks5_dialog_hint_username" translatable="true">Uživatelské jméno (volitelné)</string>
+    <string name="settings_socks5_dialog_hint_password" translatable="true">Heslo (volitelné)</string>
+    <string name="settings_theme_dialog_title" translatable="true">Vzhled</string>
+    <string name="settings_theme_dialog_themes_1" translatable="true">Podle systému</string>
+    <string name="settings_theme_dialog_themes_2" translatable="true">Světlý</string>
+    <string name="settings_theme_dialog_themes_3" translatable="true">Tmavý</string>
+    <string name="settings_ip_dialog_ipv46" translatable="true">Auto (experimentální)</string>
+    <string name="settings_ip_text_ipv6" translatable="true">IPv6</string>
+    <string name="settings_notification_desc1" translatable="true">Pozastavit / Zastavit (výchozí)</string>
+    <string name="settings_notification_desc2" translatable="true">DNS / DNS + Firewall</string>
+    <string name="settings_notification_dialog_title" translatable="true">Vybrat akci notifikace</string>
+    <string name="settings_notification_dialog_option_1" translatable="true">\nPozastavit / Zastavit (výchozí): Zobrazí dvě tlačítka pro rychlé pozastavení a zastavení Rethinku.</string>
+    <string name="settings_notification_dialog_option_2" translatable="true">\nDNS / DNS + Firewall: Zobrazí dvě tlačítka pro rychlé přepínání mezi režimem DNS pro úsporu baterie a běžným DNS + Firewall.</string>
+    <string name="settings_notification_dialog_option_3" translatable="true">\nŽádné: Nezobrazí žádné tlačítko.\n</string>
+    <string name="settings_locale_heading" translatable="true">Změnit jazyk</string>
+    <string name="settings_locale_desc" translatable="true">Vyberte preferovaný jazyk</string>
+    <string name="settings_locale_dialog_title" translatable="true">Vyberte preferovaný jazyk</string>
+    <string name="settings_locale_dialog_neutral" translatable="true">Pomozte přeložit tuto aplikaci</string>
+    <string name="settings_biometeric_heading" translatable="true">Zapnout uzamčení aplikace</string>
+    <string name="settings_biometric_desc" translatable="true">Zajistěte tuto aplikaci pomocí zámku obrazovky</string>
+    <string name="settings_selected_theme" translatable="true">Aktuální motiv: %1$s</string>
+    <string name="settings_protocol_translation_dns_inactive" translatable="true">Přepněte do režimu DNS/DNS+Firewall pro povolení této volby</string>
+    <string name="settings_default_dns_desc" translatable="true">Ve vzácných případech, kdy nelze určit uživatelsky preferované DNS, se použije záložní DNS.</string>
+    <string name="settings_pcap_heading" translatable="true">Zachytávání paketů</string>
+    <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
+    <string name="firewall_status_block_unmetered" translatable="true">blokováno v neomezené (wifi) síti</string>
+    <string name="firewall_status_block_metered" translatable="true">blokováno v účtované (mobilní) síti</string>
+    <string name="firewall_status_unknown" translatable="true">neznámé</string>
+    <string name="ct_bs_app_info_error" translatable="true">Informace o aplikaci nenalezeny</string>
+    <string name="hs_biometeric_title" translatable="true">Odemkněte Rethink</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">Vypnuto (výchozí)</string>
+    <string name="firewall_status_allow" translatable="true">povoleno</string>
+    <string name="firewall_status_isolate" translatable="true">izolováno</string>
+    <string name="firewall_status_whitelisted" translatable="true">obchází univerzální firewallová pravidla</string>
+    <string name="firewall_status_bypass_dns_firewall" translatable="true">obchází dns &amp; firewallová pravidla</string>
+    <string name="hs_biometeric_desc" translatable="true">Pro odemknutí Rethinku použijte biometrické ověření</string>
+    <string name="hs_biometeric_feature_not_supported" translatable="true">Biometrické ověření není podporováno nebo je zakázáno na tomto zařízení</string>
+    <string name="hs_biometeric_failed" translatable="true">Biometrické ověření selhalo</string>
+    <string name="hs_biometeric_error" translatable="true">Chyba biometrického ověření</string>
+    <string name="firewall_card_status_active" translatable="true">%1$s aplikací</string>
+    <string name="firewall_card_text_active" translatable="true">%1$s blokováno\n%2$s obcházeno\n%3$s vyloučeno\n%4$s izolováno</string>
+    <string name="firewall_card_text_inactive" translatable="true">Zapněte firewallový režim.</string>
+    <string name="dns_card_latency_inactive" translatable="true">Zapněte režim DNS.</string>
+    <string name="logs_card_duration" translatable="true">od %1$s</string>
+    <string name="hsf_vpn_dialog_header" translatable="true">Pozor!</string>
+    <string name="firewall_card_universal_rules" translatable="true">%1$s univerzálních pravidel</string>
+    <string name="rules_card_domain_count" translatable="true">%1$s doménových pravidel</string>
+    <string name="logs_card_network_count" translatable="true">%1$s připojení</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s dotazů</string>
+    <string name="hsf_downtime" translatable="true">(neaktivní od %1$s)</string>
+    <string name="hsf_vpn_prepare_failure" translatable="true">Chybí oprávnění VPN nebo jiná aplikace běží v režimu Always-on VPN.</string>
+    <string name="hsf_notification_permission_failure" translatable="true">Povolte přístup k oznámením v Nastavení</string>
+    <string name="hsf_start_dialog_header" translatable="true">Spustit %1$s</string>
+    <string name="hsf_start_dialog_message" translatable="true">Jste jen krůček od bezpečného a chráněného Androidu: Ihned uvidíte síťovou aktivitu a můžete blokovat weby, IP adresy a problematické aplikace.</string>
+    <string name="hsf_whats_new_chip_text" translatable="true">Co je nového</string>
+    <string name="hsf_exclude_error" translatable="true">Vyloučení není možné v režimu VPN lockdown</string>
+    <string name="hsf_proxy_chip_removed_toast" translatable="true">Proxy bylo vypnuto</string>
+    <string name="hsf_proxy_chip_remove_text" translatable="true">Zastavuji…</string>
+    <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Zachytávání paketů zakázáno</string>
+    <string name="hsf_whats_new_remove_text" translatable="true">Zavírám…</string>
+    <string name="hsf_blocklist_updating_text" translatable="true">Povoluji…</string>
+    <string name="hsf_chip_appearance" translatable="true">Motiv: %1$s</string>
+    <string name="hsf_pause_vpn_failure" translatable="true">Nelze pozastavit: Rethink není aktivní</string>
+    <string name="lbl_background_data" translatable="true">Omezování dat na pozadí</string>
+    <string name="lbl_battery_optimization" translatable="true">Optimalizace baterie</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">Vypnout %1$s</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> může vést ke ztrátě konektivity. Změňte nastavení, abyste Rethinku povolili používat data a další prostředky na pozadí.</string>
+    <string name="dc_block_heading" translatable="true">pravidla</string>
+    <string name="dc_other_dns_heading" translatable="true">typ</string>
+    <string name="dc_custom_dns_radio" translatable="true">Jiné DNS</string>
+    <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
+    <string name="dc_local_block_heading" translatable="true">Blokovací seznamy v zařízení</string>
+    <string name="dc_local_block_desc_1" translatable="true">Vyberte si z 195+ blokovacích seznamů. Klepnutím stáhněte nebo upravte seznamy.</string>
+    <string name="dc_custom_block_heading" translatable="true">Doménová pravidla</string>
+    <string name="dc_check_update_desc" translatable="true">Kontrola aktualizace blokovacích seznamů jednou za <i>tři</i> dny</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Nikdy neproxyovat DNS</string>
+    <string name="dc_proxy_dns_desc" translatable="true">Nepoužívat proxy pro DNS při Always-on WireGuard, SOCKS5, HTTP proxyně.</string>
+    <string name="dc_dns_website_desc" translatable="true">Stahuje ikony webů z <i>nextdns.io</i> a <i>duckduckgo.com</i>. Může spotřebovat až 350 MB diskového prostoru</string>
+    <string name="dc_dns_leaks_heading" translatable="true">Zamezit únikům DNS</string>
+    <string name="dc_dns_leaks_desc" translatable="true">Je-li zapnuto, Rethink zachytává všechny pakety na portu 53 a přesměrovává je na uživatelsky zvolené DNS</string>
+    <string name="dc_check_update_heading" translatable="true">Upozornit na aktualizaci blokovacích seznamů</string>
+    <string name="about_bravedns_explantion" translatable="true">Rethink je nejjednodušší způsob, jak monitorovat aktivitu aplikací, obcházet internetovou cenzuru a firewallovat aplikace na zařízení s Androidem.</string>
+    <string name="about_bravedns_whoarewe" translatable="true">Rethink je bezplatný open-source projekt, který vedou bývalí inženýři Amazonu, IBM a Scientific Games.</string>
+    <string name="about_bravedns_toreport_text" translatable="true">pomoc &amp; zpětná vazba</string>
+    <string name="about_bug_report_desc" translatable="true">poslat crash log emailem</string>
+    <string name="about_join_telegram" translatable="true">Telegram</string>
+    <string name="about_bug_report" translatable="true">Nahlásit chybu</string>
+    <string name="about_bug_report_dialog_positive_btn" translatable="true">Poslat email</string>
+    <string name="about_bug_no_log_dialog_title" translatable="true">Nahlásit chybu</string>
+    <string name="about_bug_no_log_dialog_positive_btn" translatable="true">Poslat email</string>
+    <string name="about_github" translatable="true">Přispět na GitHubu</string>
+    <string name="about_faq" translatable="true">Zobrazit FAQ</string>
+    <string name="about_docs" translatable="true">Přečíst dokumentaci</string>
+    <string name="about_privacy_policy" translatable="true">Přečíst zásady ochrany soukromí</string>
+    <string name="about_connect" translatable="true">kontakt</string>
+    <string name="about_settings_vpn_profile" translatable="true">VPN profil</string>
+    <string name="about_settings_notification" translatable="true">Nastavení oznámení</string>
+    <string name="about_twitter" translatable="true">Sledujte nás na Twitteru</string>
+    <string name="about_mozilla" translatable="true">Rethink je podpořen Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
+    <string name="about_whats_new" translatable="true">Co je nového ve verzi %1$s</string>
+    <string name="about_app_update_check" translatable="true">Zkontrolovat aktualizace aplikace</string>
+    <string name="about_app_contributors" translatable="true">Autoři</string>
+    <string name="about_app_translate" translatable="true">Překlady</string>
+    <string name="about_dialog_positive_button" translatable="true">Jdeme na to</string>
+    <string name="about_mail_to" translatable="true">hello@celzero.com</string>
+    <string name="about_mail_to_string" translatable="true">mailto:</string>
+    <string name="about_dialog_neutral_button" translatable="true">Navrhnout funkce</string>
+    <string name="about_mail_bugreport_subject" translatable="true">[Rethink]: Chyba</string>
+    <string name="about_mail_bugreport_text" translatable="true">Poslat tento email na : hello@celzero.com</string>
+    <string name="about_mail_bugreport_share_title" translatable="true">Vyberte poskytovatele e-mailu</string>
+    <string name="app_info_error" translatable="true">Nelze spustit informace o aplikaci.</string>
+    <string name="notification_screen_error" translatable="true">Nelze otevřít obrazovku s oznámeními aplikace.</string>
+    <string name="intent_launch_error" translatable="true">Nelze spustit %1$s</string>
+    <string name="no_browser_error" translatable="true">Nelze otevřít odkaz v prohlížeči.</string>
+    <string name="log_file_not_available" translatable="true">Žádný crash report nenalezen</string>
+    <string name="logs_disclaimer" translatable="true">Zobrazuji prvních 20 000 znaků</string>
+    <string name="contributors_dialog_title" translatable="true">Autoři</string>
+    <string name="cd_custom_dns_proxy_default_app" translatable="true">Žádná</string>
+    <string name="cd_dns_crypt_dialog_title" translatable="true">Přidat DNSCrypt Resolver nebo Relay</string>
+    <string name="cd_dns_crypt_name_default" translatable="true">DNSCrypt</string>
+    <string name="cd_dns_crypt_name" translatable="true">DNSCrypt %1$s</string>
+    <string name="cd_dns_crypt_relay_name" translatable="true">DNSRelay %1$s</string>
+    <string name="cd_dns_crypt_dialog_heading" translatable="true">Přidat DNSCrypt Resolver nebo Relay</string>
+    <string name="cd_dns_crypt_dialog_stamp" translatable="true">Stamp</string>
+    <string name="cd_dns_crypt_dialog_desc" translatable="true">Popis (volitelné)</string>
+    <string name="cd_dns_crypt_error_text_1" translatable="true">Stamp nesmí být prázdný</string>
+    <string name="cd_doh_dialog_heading" translatable="true">Přidat DNS over HTTPS</string>
+    <string name="cd_doh_dialog_resolver_name" translatable="true">Název resolveru</string>
+    <string name="cd_doh_dialog_resolver_url" translatable="true">URL resolveru</string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true">Nevalidovat TLS certifikáty serveru (povolte jen pokud víte, co děláte)</string>
+    <string name="cd_dnscrypt_relay_heading" translatable="true">Relay</string>
+    <string name="cd_dns_alg_heading" translatable="true">Pokročilé filtrování DNS (experimentální)</string>
+    <string name="cd_dns_alg_desc" translatable="true">Přiřadit každému DNS dotazu unikátní IP</string>
+    <string name="ctbs_app_info_not_available_toast" translatable="true">Stránka s nastavením aplikace nebyla nalezena</string>
+    <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s dalších aplikací</string>
+    <string name="ctbs_block_other_apps" translatable="true">Pravidla pro %1$s se vztahují i na další %2$s aplikací</string>
+    <string name="ctbs_dialog_negative_btn" translatable="true">Zpět</string>
+    <string name="dns_log_dialog_positive" translatable="true">Smazat záznamy</string>
+    <string name="dns_btm_sheet_chip" translatable="true">+%1$s dalších IP</string>
+    <string name="dns_btm_sheet_chip_no_answer" translatable="true">Žádná odpověď</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">vyřešeno <u>anonymně</u> %1$s přes %2$s via %3$s</string>
+    <string name="dns_btm_resolved_doh" translatable="true">vyřešeno %1$s přes %2$s</string>
+    <string name="dns_btm_resolved_doh_no_server" translatable="true">vyřešeno %1$s</string>
+    <string name="dns_btm_latency_ms" translatable="true">%1$sms</string>
+    <string name="dns_btm_record_type" translatable="true">Typ dotazu: %1$s</string>
+    <string name="hs_download_positive_default" translatable="true">OK</string>
+    <string name="univ_firewall_rule_1" translatable="true">Blokovat všechny aplikace, když je zařízení uzamčené</string>
+    <string name="univ_delete_firewall_dialog_title" translatable="true">Smazat všechna IP pravidla?</string>
+    <string name="univ_delete_firewall_dialog_message" translatable="true">Smazáním těchto pravidel povolíte libovolné aplikaci připojení k aktuálně blokovaným IP.</string>
+    <string name="univ_accessibility_crash_dialog_positive" translatable="true">Přejít do Nastavení</string>
+    <string name="univ_accessibility_dialog_positive" translatable="true">Povolit</string>
+    <string name="univ_accessibility_dialog_negative" translatable="true">Odepřít</string>
+    <string name="univ_firewall_heading" translatable="true">Univerzální firewallová pravidla</string>
+    <string name="app_ip_domain_rules_desc" translatable="true">Upravit IP / Doménová pravidla pro jednotlivé aplikace.</string>
+    <string name="dns_connected_rethink_plus" translatable="true">Připojeno. V provozu %1$s blokovacích seznamů</string>
+    <string name="app_ip_domain_rules" translatable="true">Pravidla IP / Domén pro každou aplikaci</string>
+    <string name="dns_connected_no_count" translatable="true">Připojeno</string>
+    <string name="dns_connected" translatable="true">Připojeno</string>
+    <string name="dns_info_positive" translatable="true">Ok</string>
+    <string name="dns_info_neutral" translatable="true">Kopírovat</string>
+    <string name="dns_crypt_relay_error_toast" translatable="true">Není vybrán žádný resolver</string>
+    <string name="dns_proxy_dialog_message_no_app" translatable="true">IP adresa: %1$s\n\nČíslo portu: %2$s</string>
+    <string name="dns_proxy_name" translatable="true">Název Proxy</string>
+    <string name="dns_proxy_port" translatable="true">Číslo portu</string>
+    <string name="fapps_filter_filter_heading" translatable="true">Typ</string>
+    <string name="fapps_filter_categories_heading" translatable="true">Kategorie</string>
+    <string name="fapps_filter_clear_btn" translatable="true">Vymazat</string>
+    <string name="fapps_filter_parent_installed" translatable="true">Nainstalováno</string>
+    <string name="fapps_filter_parent_system" translatable="true">Systém</string>
+    <string name="fapps_firewall_filter_isolate" translatable="true">Izolováno</string>
+    <string name="fapps_info_dialog_message" translatable="true">Blokujte aplikacím přístup k internetu. Omezení přístupu k internetu pomáhá bránit nevyžádanému využívání dat a také šetří baterii.</string>
+    <string name="fapps_info_unmetered_msg" translatable="true">Povolit / Blokovat v neomezené (WiFi) síti.</string>
+    <string name="fapps_info_bypass_msg" translatable="true">Obcházet univerzální firewallová pravidla.</string>
+    <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Obcházet DNS &amp; firewallová pravidla.</string>
+    <string name="fapps_info_exclude_msg" translatable="true">Vyloučit z DNS i Firewallu.</string>
+    <string name="fapps_info_isolate_msg" translatable="true">Blokovat vše kromě důvěryhodných IP.</string>
+    <string name="fapps_info_dialog_positive_btn" translatable="true">OK</string>
+    <string name="fapps_unmetered_block_dialog_title" translatable="true">Blokovat v neomezené síti</string>
+    <string name="fapps_unmetered_block_dialog_message" translatable="true">Blokovat připojení v neomezené (WiFi) síti u <i>vybraných</i> aplikací?</string>
+    <string name="fapps_unmetered_unblock_dialog_message">Povolit připojení v neomezené (WiFi) síti u <i>vybraných</i> aplikací?</string>
+    <string name="fapps_metered_block_dialog_title" translatable="true">Blokovat v účtované síti</string>
+    <string name="fapps_metered_block_dialog_message" translatable="true">Blokovat připojení v účtované (mobilní) síti u <i>vybraných</i> aplikací?</string>
+    <string name="fapps_metered_unblock_dialog_title" translatable="true">Povolit v účtované síti</string>
+    <string name="fapps_metered_unblock_dialog_message" translatable="true">Povolit připojení v účtované (mobilní) síti u <i>vybraných</i> aplikací?</string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true">Obcházet univerzální firewallová pravidla pro <i>vybrané</i> aplikace?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Obcházet aplikace</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Obcházet univerzální DNS &amp; firewallová pravidla pro <i>vybrané</i> aplikace?</string>
+    <string name="fapps_unblock_dialog_message" translatable="true">Povolit připojení pro <i>vybrané</i> aplikace?</string>
+    <string name="fapps_exclude_block_dialog_title" translatable="true">Vyloučit aplikace</string>
+    <string name="fapps_isolate_block_dialog_title" translatable="true">Izolovat aplikace</string>
+    <string name="fapps_isolate_block_dialog_message" translatable="true">Izolovat <i>vybrané</i> aplikace?</string>
+    <string name="fapps_firewall_filter_hint" translatable="true">Zobrazuji všechny aplikace</string>
+    <string name="rules_load_failure_desc" translatable="true">Nebyla nalezena žádná firewallová pravidla</string>
+    <string name="rules_load_failure_reload" translatable="true">znovu načíst</string>
+    <string name="network_log_app_name_unknown" translatable="true">Neznámé</string>
+    <string name="network_log_app_name_unnamed" translatable="true">Nepojmenováno (%1$s)</string>
+    <string name="dns_crypt_connection_failure" translatable="true">Chyba při připojování k DNSCrypt serveru.</string>
+    <string name="dns_proxy_connection_failure" translatable="true">Chyba při připojování k DNS Proxy serveru.</string>
+    <string name="system_dns_connection_failure" translatable="true">Nelze zjistit aktuální DNS server</string>
+    <string name="update_complete_snack_message" translatable="true">Nová verze byla stažena.</string>
+    <string name="update_complete_action_snack" translatable="true">RESTART</string>
+    <string name="settings_local_blocklist_in_use" translatable="true">Používá se %1$s blokovacích seznamů</string>
+    <string name="settings_local_blocklist_dialog_positive" translatable="true">Stáhnout</string>
+    <string name="settings_local_blocklist_version" translatable="true">Verze: v%1$s</string>
+    <string name="accessibility_notification_content" translatable="true">Služba zpřístupnění Rethink se zastavila nebo spadla. Už neblokuje aplikace na pozadí. Klepněte pro opětovné zapnutí.</string>
+    <string name="accessibility_failure_toast" translatable="true">Služba zpřístupnění Rethink se zastavila nebo spadla. Aplikace na pozadí již nejsou blokovány.</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s je vypnuto, protože jsou aktivní proxy</string>
+    <string name="pause_desc" translatable="true">Poznámka: %1$s blokovaných aplikací bude nadále firewallováno.</string>
+    <string name="other_dns_list_tab1" translatable="true">DoH</string>
+    <string name="other_dns_list_tab2" translatable="true">Dnscrypt</string>
+    <string name="hs_btm_sheet_lock_down" translatable="true">Nelze změnit režim, pokud je VPN v <i>lockdown</i>. Klepněte pro <u>úpravu nastavení VPN</u>.</string>
+    <string name="firewall_rule_no_rule" translatable="true">Žádné pravidlo</string>
+    <string name="firewall_rule_block_app" translatable="true">Aplikace blokována</string>
+    <string name="firewall_rule_block_unmetered" translatable="true">Neomezené (WiFi)</string>
+    <string name="firewall_rule_block_metered" translatable="true">Účtované (Mobilní)</string>
+    <string name="firewall_rule_univ_block_metered" translatable="true">Účtované (Univerzální)</string>
+    <string name="firewall_rule_isolate" translatable="true">Izolovat</string>
+    <string name="firewall_rule_bypass_dns_firewall" translatable="true">Obcházená aplikace</string>
+    <string name="firewall_rule_block_app_new_install" translatable="true">Nová aplikace</string>
+    <string name="firewall_rule_block_app_exception" translatable="true">Chyba</string>
+    <string name="firewall_rule_block_ip" translatable="true">IP / Port (Aplikace)</string>
+    <string name="firewall_rule_block_univ_ip" translatable="true">IP / Port (Univerzální)</string>
+    <string name="firewall_rule_trusted_ip" translatable="true">Důvěryhodná IP</string>
+    <string name="firewall_rule_bypass_universal_ip" translatable="true">Obcházená IP</string>
+    <string name="firewall_rule_unknown" translatable="true">Zdroj neznámý</string>
+    <string name="firewall_rule_block_udp_ntp" translatable="true">UDP blokováno</string>
+    <string name="firewall_rule_block_dns_bypass" translatable="true">DNS obcházeno</string>
+    <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">Obcházená aplikace</string>
+    <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNS Proxováno</string>
+    <string name="firewall_rule_exempt_orbot_setup" translatable="true">Orbot Setup</string>
+    <string name="firewall_rule_block_http" translatable="true">Nezabezpečené HTTP</string>
+    <string name="firewall_rule_global_lockdown" translatable="true">Lockdown</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Důvěryhodná doména (Aplikace)</string>
+    <string name="notif_dialog_pause_dialog_title" translatable="true">Aplikace pozastavena!</string>
+    <string name="firewall_rule_block_domain" translatable="true">Doména (Aplikace)</string>
+    <string name="firewall_rule_dns_blocked" translatable="true">DNS blokováno</string>
+    <string name="firewall_rule_no_rule_desc" translatable="true">Žádná firewallová pravidla pro toto připojení.</string>
+    <string name="new_app_notification_action_toast_allow" translatable="true">Připojení této aplikaci bylo povoleno</string>
+    <string name="new_app_notification_action_toast_deny" translatable="true">Připojení této aplikaci bylo zakázáno</string>
+    <string name="notif_dialog_pause_dialog_positive" translatable="true">Obnovit</string>
+    <string name="notif_dialog_pause_dialog_negative" translatable="true">Zahodit</string>
+    <string name="notif_dialog_pause_dialog_neutral" translatable="true">Zobrazit</string>
+    <string name="notif_channel_vpn_notification" translatable="true">Aktivní VPN</string>
+    <string name="notif_channel_vpn_failure" translatable="true">Neaktivní VPN</string>
+    <string name="notif_channel_firewall_alerts" translatable="true">Upozornění Firewall</string>
+    <string name="notif_channel_proxy_failure" translatable="true">Upozornění Proxy</string>
+    <string name="notif_channel_desc_vpn_notification" translatable="true">Informovat, když Rethink běží na pozadí</string>
+    <string name="notif_channel_desc_vpn_failure" translatable="true">Informovat, když je Rethink ukončen Androidem nebo jinou VPN aplikací</string>
+    <string name="notif_channel_desc_firewall_alerts" translatable="true">Upozorňovat na chyby a anomálie Firewallu</string>
+    <string name="notif_channel_desc_proxy_failure" translatable="true">Upozorňovat na chyby a anomálie Proxy</string>
+    <string name="notif_channed_desc_download" translatable="true">Upozorňovat na průběh stahování On-device blokovacích seznamů</string>
+    <string name="category_name_sys_components" translatable="true">Systémové komponenty</string>
+    <string name="category_name_sys_apps" translatable="true">Systémové aplikace</string>
+    <string name="category_name_others" translatable="true">Ostatní</string>
+    <string name="category_name_non_app_sys" translatable="true">Systémové služby</string>
+    <string name="build__flavor_website" translatable="true">website</string>
+    <string name="cd_remove_dialog_message" translatable="true">Smazat doménu z uložené konfigurace.</string>
+    <string name="cd_no_rules_text" translatable="true">Žádná doménová pravidla.</string>
+    <string name="cd_dialog_edit_title" translatable="true">Upravit doménové pravidlo</string>
+    <string name="cd_toast_edit" translatable="true">Upraveno</string>
+    <string name="cd_dialog_title" translatable="true">Přidat doménové pravidlo</string>
+    <string name="cd_dialog_desc" translatable="true">Adresa URL nebo doménové jméno s volitelným zástupným znakem: *.test.com, test.com/test</string>
+    <string name="cd_dialog_error_invalid_domain" translatable="true">Neplatné URL nebo doménové jméno</string>
+    <string name="cd_dialog_error_invalid_wildcard" translatable="true">Neplatný zástupný znak v URL nebo doméně</string>
+    <string name="cd_no_rule_initial" translatable="true">N</string>
+    <string name="cd_no_rule_txt" translatable="true">Žádné pravidlo</string>
+    <string name="ci_dialog_desc" translatable="true">Povolit (obejít) nebo blokovat IP adresu, IP subnet (rozsah), Port. Příklad: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
+    <string name="ci_dialog_title" translatable="true">Přidat IP / Port pravidlo</string>
+    <string name="ci_dialog_edittext_hint" translatable="true">IP adresa, subnet nebo port</string>
+    <string name="ci_dialog_error_invalid_ip" translatable="true">Neplatná IP adresa, subnet nebo port.</string>
+    <string name="ci_dialog_added_success" translatable="true">IP přidána do seznamu</string>
+    <string name="ci_no_rules_text" translatable="true">Žádná pravidla IP či Portu.</string>
+    <string name="ci_bypass_universal_initial" translatable="true">BU</string>
+    <string name="ci_blocked_initial" translatable="true">B</string>
+    <string name="ci_bypass_universal_txt" translatable="true">Obejít univerzálně</string>
+    <string name="ci_trust_initial" translatable="true">T</string>
+    <string name="ci_trust_txt" translatable="true">Důvěryhodné</string>
+    <string name="ci_no_rule_initial" translatable="true">N</string>
+    <string name="ci_no_rule_txt" translatable="true">Žádné pravidlo</string>
+    <string name="ci_no_rule" translatable="true">Žádné pravidlo</string>
+    <string name="ci_block" translatable="true">Blokovat</string>
+    <string name="ada_ip_connection_count" translatable="true">Připojeno k %1$s IP adresám</string>
+    <string name="ada_noapp_dialog_title" translatable="true">Tato aplikace neexistuje</string>
+    <string name="ada_noapp_dialog_message" translatable="true">Informace o aplikaci chybí. Možná byla odinstalována?</string>
+    <string name="ada_ip_connection_count_zero" translatable="true">0 IP adres</string>
+    <string name="ada_ip_no_connection" translatable="true">Tato aplikace nemá žádné síťové záznamy.</string>
+    <string name="ada_app_status_allow" translatable="true">je povolena</string>
+    <string name="ada_app_status_block" translatable="true">je blokována</string>
+    <string name="ada_app_status_block_wifi" translatable="true">je blokována v neomezené (wifi) síti</string>
+    <string name="ada_app_status_block_md" translatable="true">je blokována v účtované (mobilní) síti</string>
+    <string name="ada_app_status_whitelist" translatable="true">obchází univerzální firewallová pravidla</string>
+    <string name="ada_app_status_exclude" translatable="true">je vyloučena z DNS a firewallu</string>
+    <string name="ada_app_status_isolate" translatable="true">je izolována; povoleny jsou pouze důvěryhodné IP</string>
+    <string name="ada_app_status_bypass_dns_firewall" translatable="true">obchází univerzální dns &amp; firewall pravidla</string>
+    <string name="ada_app_status_unknown" translatable="true">je neznámá</string>
+    <string name="ada_firewall_title" translatable="true">firewallová pravidla pro tuto aplikaci</string>
+    <string name="ada_network_log_title" translatable="true">síťové záznamy pro tuto aplikaci</string>
+    <string name="ada_app_firewall" translatable="true">Firewall</string>
+    <string name="ada_app_metered" translatable="true">Účtované</string>
+    <string name="ada_app_unmetered" translatable="true">Neomezené</string>
+    <string name="ada_app_bypass_univ" translatable="true">Obejít univerzálně</string>
+    <string name="ada_app_bypass_dns_firewall" translatable="true">Obejít DNS &amp; Firewall</string>
+    <string name="ada_app_isolate" translatable="true">Izolovat</string>
+    <string name="ada_app_dns_settings" translatable="true">Nastavení DNS</string>
+    <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Smazat všechny záznamy související s touto aplikací.</string>
+    <string name="bypass_dns_firewall_tooltip">%1$s funguje pouze s DNS Rethink</string>
+    <string name="bsdl_blocked_desc" translatable="true">blokováno %1$s přes %2$s</string>
+    <string name="network_dns" translatable="true">Systémové DNS</string>
+    <string name="notif_download_content_text" translatable="true">Probíhá stahování…</string>
+    <string name="notif_download_failure_content" translatable="true">Stahování selhalo. Zkuste to znovu.</string>
+    <string name="notif_download_cancel_content" translatable="true">Stahování zrušeno.</string>
+    <string name="notif_download_success_content" translatable="true">Stahování úspěšné.</string>
+    <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Rodičovská kontrola</string>
+    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blokuje obsah pro dospělé &amp; pirátský obsah, online hazard &amp; seznamky a sociální sítě.</string>
+    <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Soukromí</string>
+    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blokuje attentionware, spyware, scareware.</string>
+    <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Zabezpečení</string>
+    <string name="rt_dialog_message" translatable="true">Chcete aplikovat nově nakonfigurované blokovací seznamy?</string>
+    <string name="rt_dialog_neutral" translatable="true">Pokračovat</string>
+    <string name="rt_download_start" translatable="true">Stahuji blokovací seznamy…</string>
+    <string name="rt_chip_update_available" translatable="true">Dostupná aktualizace</string>
+    <string name="rt_chip_check_update" translatable="true">Zkontrolovat aktualizaci</string>
+    <string name="rt_download_desc" translatable="true">Stáhněte blokovací seznamy (cca 60 MB) pro využití této funkce.</string>
+    <string name="radio_max_btn" translatable="true">🪂 Max</string>
+    <string name="rethink_max_desc" translatable="true">50+ lokalit; více soukromí; recursive resolver běžící na fly.io</string>
+    <string name="dc_local_block_enabled" translatable="true">Zapnuto</string>
+    <string name="rethink_sky_desc" translatable="true">280+ lokalit; vyšší dostupnost; stub resolver běžící na cloudflare.com</string>
+    <string name="dc_refresh_toast" translatable="true">Obnovení dokončeno</string>
+    <string name="lbbs_configure" translatable="true">Konfigurovat</string>
+    <string name="lbbs_copy" translatable="true">Zkopírovat jako RDNS+ URL</string>
+    <string name="brbs_title" translatable="true">Záloha &amp; obnova</string>
+    <string name="brbs_backup_desc" translatable="true">Zálohovat nastavení aplikace, síťové záznamy a DNS logy</string>
+    <string name="brbs_backup_dialog_message" translatable="true">Zálohuje nastavení aplikace, síťové a DNS logy do souboru. Tím se restartuje VPN.</string>
+    <string name="brbs_restore_dialog_positive" translatable="true">Obnovit</string>
+    <string name="brbs_backup_dialog_failure_title" translatable="true">Záloha se nezdařila</string>
+    <string name="brbs_backup_dialog_failure_message" translatable="true">Nelze provést zálohu. Zkusit znovu?</string>
+    <string name="brbs_backup_dialog_failure_positive" translatable="true">Zkusit znovu zálohu</string>
+    <string name="brbs_restore_dialog_failure_title" translatable="true">Obnovení se nezdařilo</string>
+    <string name="brbs_restore_dialog_failure_message" translatable="true">Nelze provést obnovu. Zkusit znovu?</string>
+    <string name="brbs_backup_complete_toast" translatable="true">Záloha dokončena</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">nejčastěji povolované aplikace</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">nejčastěji blokované aplikace</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">nejčastěji navštěvované domény</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">nejčastěji kontaktované země</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">nejčastěji blokované domény</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">nejčastěji kontaktované IP</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">nejčastěji blokované IP</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">nejčastěji blokované země</string>
+    <string name="ssv_see_more" translatable="true">Zobrazit vše</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">Neplatný klíč</string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true">Neznámý atribut</string>
+    <string name="bad_config_reason_unknown_section" translatable="true">Neznámá sekce</string>
+    <string name="parse_error_inet_endpoint" translatable="true">Endpoint</string>
+    <string name="parse_error_integer" translatable="true">číslo</string>
+    <string name="bad_config_explanation_pka" translatable="true">: Musí být kladné a ne větší než 65535</string>
+    <string name="bad_config_context" translatable="true">%1$s: %2$s</string>
+    <string name="generic_error" translatable="true">Neznámá chyba „%s“</string>
+    <string name="parse_error_generic" translatable="true">řetězec</string>
+    <string name="bad_config_error" translatable="true">%1$s v %2$s</string>
+    <string name="parse_error_reason" translatable="true">Nelze analyzovat %1$s „%2$s“</string>
+    <string name="unknown_error" translatable="true">Neznámá chyba</string>
+    <string name="invalid_file_error" translatable="true">neplatný soubor</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Vybrané aplikace budou směrovány pouze přes tento WireGuard VPN bez ohledu na to, zda je VPN aktivní či nikoli.</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">Always-on</string>
+    <string name="routing_remaining_apps" translatable="true">Směruji zbývající aplikace</string>
+    <string name="config_add_success_toast" translatable="true">Hotovo</string>
+    <string name="exclude_all_app_wg_dialog_desc" translatable="true">Vyloučit všechny aplikace z této WireGuard VPN?</string>
+    <string name="wireguard_enabled_failure" translatable="true">Zastavte jiné aktivní proxy pro povolení WireGuard</string>
+    <string name="wireguard_disable_failure" translatable="true">„Always-on WireGuard“ nelze vypnout</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">součást %1$s</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">Zahrnout %1$s aplikací</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">Vyloučit %1$s aplikací</string>
+    <string name="wireguard_disclaimer" translatable="true">DNS je přesměrováno na %1$s, ICMP (např. ping) zůstává v podkladové síti.</string>
+    <string name="wireguard_disable_title" translatable="true">Zastavit WireGuard</string>
+    <string name="wireguard_disable_message" translatable="true">Zastavit všechny aktivní WireGuard VPN?</string>
+    <string name="google_dns_desc" translatable="true">Nezablokuje žádné DNS požadavky. Využívá Google DNS.</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">Adult filtr blokuje přístup ke všem webům pro dospělé a explicitní obsah. Neblokuje proxy ani VPN, ani smíšené stránky jako Reddit. Google a Bing jsou nastaveny do Bezpečného režimu.</string>
+    <string name="quad9_dns_desc" translatable="true">Quad9 směruje vaše DNS dotazy přes zabezpečenou globální síť serverů.</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Blokuje přístup ke všem webům pro dospělé a explicitní obsah, včetně proxy a VPN domén. Reddit a podobné smíšené stránky jsou také blokovány. Google, Bing a YouTube jsou v Bezpečném režimu.</string>
+    <string name="crypt_adguard_desc" translatable="true">Chrání vaše zařízení před malwarem a dalším.</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
+    <string name="crypt_relay_netherlands" translatable="true">Anonymizovaný DNS relay v Nizozemsku</string>
+    <string name="crypt_relay_sweden" translatable="true">Anonymizovaný DNS relay ve Švédsku, poskytováno https://cryptostrom.is/.</string>
+    <string name="crypt_relay_us" translatable="true">Anonymizovaný DNS relay v USA - Los Angeles, CA, poskytováno https://cryptostrom.is/.</string>
+    <string name="crypt_relay_singapore" translatable="true">Anonymizovaný DNS relay v Singapuru.</string>
+    <string name="whats_new_version_update" translatable="true"><b>Nepanikař 2</b><br/><br/>1. Nové: Zachytávat chyby síťového enginu v uživatelských hlášeních chyb.<br/>2. Nové: používat systémové DNS pro nedelegované domény, pokud je zapnuto „Zabránit únikům DNS“.<br/>3. Vylepšení: Dual-stack (IPv4 + IPv6) konektivita ve WireGuardu.<br/>4. Vylepšení: Zabraňovat blokování prvků uživatelského rozhraní, když síťový engine neodpovídá.<br/>5. Oprava: Vypršení časového limitu při zapnutém pokročilém filtrování DNS.<br/>6. Oprava: Peer endpointy WireGuardu s doménovými názvy se mohou při změnách sítě zaseknout.<br/><br/><a href="https://svc.rethinkdns.com/r/translate">Pomozte přeložit tuto aplikaci</a></string>
+    <string name="pcap_failure_toast" translatable="true">Chyba při vytváření pcap souboru, zkuste to znovu!</string>
+    <string name="firewall_status_blocked" translatable="true">blokováno</string>
+    <string name="dc_entries" translatable="true">%1$s záznamů »</string>
+    <string name="dc_dns_website_heading" translatable="true">Zobrazit ikonu webu v DNS záznamech (experimentální)</string>
+    <string name="fapps_bypass_block_dialog_title" translatable="true">Obcházet aplikace</string>
+    <string name="settings_go_log_desc" translatable="true">Pro účely ladění</string>
+    <string name="firewall_rule_device_lock" translatable="true">Zařízení uzamčeno</string>
+    <string name="firewall_rule_foreground" translatable="true">Aplikace není v popředí</string>
+    <string name="rt_filter_hint" translatable="true">Zobrazuji <u>všechny</u> blokovací seznamy</string>
+    <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink běží v režimu VPN Lockdown. Pokud jej zastavíte, ztratíte připojení k internetu v tomto uživatelském profilu. Opravdu chcete pokračovat?</string>
+    <string name="always_on_dialog_neutral" translatable="true">Nastavení</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">Smazat DoH endpoint?</string>
+    <string name="doh_custom_url_remove_dialog_message" translatable="true">Smazat DNS over HTTPS endpoint z uložené konfigurace.</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Smazat DNSCrypt resolver?</string>
+    <string name="dns_crypt_url_remove_dialog_message" translatable="true">Smazat DNSCrypt resolver z uložené konfigurace.</string>
+    <string name="relative_time_yesterday" translatable="true">Včera</string>
+    <string name="settings_connectivity_checks" translatable="true">Provádět kontroly připojení</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">Ke zjištění dosažitelnosti jsou odesílány testy připojení.</string>
+    <string name="orbot_explanation" translatable="true">Orbot je bezplatná proxy aplikace, která umožňuje ostatním aplikacím používat internet více <u>bezpečně</u>.<br/>\nOrbot využívá <u>Tor</u> k šifrování vašeho internetového provozu, což pomáhá <u>obejít cenzuru</u> a chránit před formami <u>sledování sítě</u>, které ohrožují osobní svobodu a soukromí.<br/>\n<u>TCP Proxy</u>: Rethink přeposílá pouze TCP spojení <i>zahrnutých</i> aplikací do Orbotu.\n<u>HTTP Proxy</u>: Rethink <i>vytváří</i> HTTP CONNECT tunel do Orbotu a přeposílá pouze TCP spojení <i>zahrnutých</i> aplikací.</string>
+    <string name="settings_https_disabled_error" translatable="true">Připojeno k %1$s. Vypněte jej pro pokračování.</string>
+    <string name="settings_orbot_notification_content" translatable="true">Nepodařilo se spustit Tor jako proxy. Otevřete aplikaci Orbot a spusťte ji ručně.</string>
+    <string name="settings_custom_downloader_heading" translatable="true">Použít vestavěný stahovač</string>
+    <string name="settings_custom_downloader_desc" translatable="true">Je-li vypnuto, používá se integrovaný <i>Download Manager</i> systému Android</string>
+    <string name="settings_ip_dialog_title" translatable="true">Vybrat IP verzi</string>
+    <string name="settings_theme_dialog_themes_4" translatable="true">Opravdu černý</string>
+    <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (výchozí)</string>
+    <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (experimentální)</string>
+    <string name="settings_ip_text_ipv46" translatable="true">Auto</string>
+    <string name="settings_notification_desc" translatable="true">Tlačítka akce, která se mají zobrazit v oznámení Rethink: %1$s</string>
+    <string name="settings_pcap_dialog_option_2" translatable="true">Výstup do Logcat</string>
+    <string name="settings_pcap_dialog_option_3" translatable="true">Výstup do složky Stažené soubory</string>
+    <string name="apps_icon_content_desc" translatable="true">Ikona aplikace</string>
+    <string name="firewall_status_excluded" translatable="true">vyloučeno z dns a firewallu</string>
+    <string name="hsf_stop_btn_state" translatable="true">zastavit</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">Rethink potřebuje oprávnění k nastavení místní VPN, aby šifroval DNS požadavky zařízení, implementoval monitorování sítě a prosazoval pravidla firewallu.\n\nRethink neshromažďuje žádné informace ani vás nijak nesleduje.</string>
+    <string name="hsf_proxy_chip_text" translatable="true">Proxy aktivní</string>
+    <string name="hsf_packet_capture_chip_text" translatable="true">Zachytávání paketů aktivní</string>
+    <string name="hsf_blocklist_chip_text_no_data" translatable="true">Povolit RDNS+</string>
+    <string name="about_sponsor_link_text" translatable="true">Sponzorovat</string>
+    <string name="about_email" translatable="true">Napište nám e-mail</string>
+    <string name="about_settings" translatable="true">systém</string>
+    <string name="about_settings_app_info" translatable="true">Info o aplikaci</string>
+    <string name="cd_dns_proxy_mode_internal" translatable="true">Interní</string>
+    <string name="cd_dns_proxy_mode_external" translatable="true">Externí</string>
+    <string name="cd_dns_proxy_error_text_1" translatable="true">Neplatná IP adresa</string>
+    <string name="cd_dns_proxy_error_text_2" translatable="true">Rozsah portů 1024–65535</string>
+    <string name="cd_dns_proxy_error_text_3" translatable="true">Neplatný port</string>
+    <string name="hs_download_positive_website" translatable="true">Navštívit web</string>
+    <string name="hs_download_negative_default" translatable="true">Připomenout později</string>
+    <string name="univ_firewall_rule_2" translatable="true">Blokovat aplikaci, pokud není použita</string>
+    <string name="hs_download_positive_play_store" translatable="true">Dokončit aktualizaci</string>
+    <string name="univ_firewall_rule_3" translatable="true">Blokovat, pokud je zdrojová aplikace neznámá</string>
+    <string name="univ_firewall_rule_4" translatable="true">Blokovat UDP kromě DNS a NTP</string>
+    <string name="univ_firewall_rule_5" translatable="true">Blokovat, pokud je DNS obcházeno</string>
+    <string name="univ_firewall_rule_6" translatable="true">Blokovat nově nainstalované aplikace ve výchozím stavu</string>
+    <string name="univ_firewall_rule_7" translatable="true">Blokovat IPv4 v IPv6 (experimentální)</string>
+    <string name="univ_firewall_rule_8" translatable="true">Blokovat provoz na portu 80 (nezabezpečené HTTP)</string>
+    <string name="univ_firewall_rule_9" translatable="true">Blokovat na účtované (mobilní) síti</string>
+    <string name="univ_firewall_rule_10" translatable="true">Blokovat vše kromě aplikací a IP, které mají výjimku</string>
+    <string name="univ_view_blocked_ip" translatable="true">IP &amp; Port pravidla</string>
+    <string name="univ_view_blocked_ip_desc" translatable="true">Upravit blokované nebo důvěryhodné domény, IP / Port.</string>
+    <string name="univ_ip_delete_individual_toast" translatable="true">%1$s smazáno.</string>
+    <string name="univ_ip_delete_dialog_positive" translatable="true">Smazat vše</string>
+    <string name="univ_ip_delete_toast_success" translatable="true">Všechna IP pravidla byla smazána.</string>
+    <string name="dns_proxy_dialog_message" translatable="true">Název aplikace: %1$s\n\nIP adresa: %2$s\n\nČíslo portu: %3$s</string>
+    <string name="dns_proxy_dialog_header_dns" translatable="true">Přidat DNS Proxy</string>
+    <string name="dns_proxy_app" translatable="true">Aplikace</string>
+    <string name="dns_proxy_ip_address" translatable="true">IP adresa</string>
+    <string name="dns_proxy_connection_failure_lockdown" translatable="true">Vyloučení %1$s pro %2$s v režimu lockdown může způsobit ztrátu internetového připojení.</string>
+    <string name="socks5_proxy_toast_parameter" translatable="true">SOCKS5 Proxy</string>
+    <string name="orbot_toast_parameter" translatable="true">Tor-as-a-proxy</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">Doména (Univ)</string>
+    <string name="firewall_rule_domain_trusted_univ" translatable="true">Důvěryhodná doména (Univ)</string>
+    <string name="firewall_rule_proxied" translatable="true">Proxy</string>
+    <string name="new_app_bulk_notification_title" translatable="true">Pozor</string>
+    <string name="new_app_bulk_notification_content" translatable="true">Rethink zablokoval %1$s nových aplikací. Klepněte pro zobrazení nebo úpravu.</string>
+    <string name="new_app_notification_content" translatable="true">Rethink zablokoval nedávno nainstalovanou aplikaci, %1$s.</string>
+    <string name="new_app_notification_action_deny" translatable="true">Pokračovat v blokování</string>
+    <string name="build__flavor_fdroid" translatable="true">fdroid</string>
+    <string name="category_name_installed" translatable="true">Nainstalované aplikace</string>
+    <string name="build__flavor_play_store" translatable="true">play</string>
+    <string name="cd_toast_deleted" translatable="true">Doména odstraněna z vlastního seznamu</string>
+    <string name="cd_toast_added" translatable="true">Doména úspěšně přidána</string>
+    <string name="cd_remove_dialog_title" translatable="true">Smazat doménu?</string>
+    <string name="cd_deleted_toast" translatable="true">Všechna doménová pravidla smazána</string>
+    <string name="ci_bypass_universal" translatable="true">Obejít univerzálně</string>
+    <string name="ci_trust_rule" translatable="true">Důvěřovat</string>
+    <string name="ci_delete" translatable="true">smazat</string>
+    <string name="brbs_restore_no_uri_toast" translatable="true">Obnovení selhalo, zkuste znovu</string>
+    <string name="bad_config_reason_missing_section" translatable="true">Chybějící sekce</string>
+    <string name="bad_config_reason_syntax_error" translatable="true">Syntax error</string>
+    <string name="private_dns_dialog_positive" translatable="true">Přejít do Nastavení</string>
+    <string name="cd_dns_crypt_resolver_heading" translatable="true">Resolver</string>
+    <string name="cd_dns_crypt_relay_heading" translatable="true">Relay</string>
+    <string name="cd_dns_crypt_dialog_name" translatable="true">Název</string>
+    <string name="brbs_backup_dialog_positive" translatable="true">Zálohovat</string>
+    <string name="cloudflare_dns_desc" translatable="true">Nezablokuje žádné DNS požadavky. Využívá Cloudflare 1.1.1.1.</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">Blokuje malware a obsah pro dospělé. Využívá Cloudflare 1.1.1.3.</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">Blokuje škodlivý obsah. Využívá Cloudflare 1.1.1.2.</string>
+    <string name="cd_dns_crypt_title" translatable="true">resolvery</string>
+    <string name="cd_custom_dns_proxy_title" translatable="true">Vlastní DNS Proxy</string>
+    <string name="cd_custom_doh_dialog_title" translatable="true">Vlastní URL serveru</string>
+    <string name="cd_custom_doh_url_name_default" translatable="true">DoH</string>
+    <string name="cd_custom_doh_url_name" translatable="true">DoH %1$s</string>
+    <string name="cd_custom_dns_proxy_name_default" translatable="true">Proxy</string>
+    <string name="brbs_backup_title" translatable="true">Záloha</string>
+    <string name="orbot" translatable="true">Orbot</string>
+    <string name="dns_card_latency_active" translatable="true">%1$sms</string>
+    <string name="about_app" translatable="true">aplikace</string>
+    <string name="rules_load_failure_heading" translatable="true">Poznámka</string>
+    <string name="exclude_apps_from_proxy">Obcházet aplikaci pro všechny proxy</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Tato aplikace již obchází proxy</string>
+    <string name="bsac_title_desc" translatable="true">Pravidla platí pouze pro tuto aplikaci.</string>
+    <string name="bsdl_block_desc" translatable="true">Blokovat, důvěřovat <u>této doméně</u></string>
+    <string name="notif_download_content_title" translatable="true">Stahování On-Device blokovacího seznamu</string>
+    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blokuje malware, ransomware, cryptoware, phishing a další hrozby.</string>
+    <string name="rt_dialog_title" translatable="true">Uložit změny</string>
+    <string name="rt_edit_dialog_positive" translatable="true">Upravit</string>
+    <string name="rt_download" translatable="true">Stáhnout blokovací seznamy</string>
+    <string name="rt_re_download" translatable="true">Znovu stáhnout blokovací seznamy</string>
+    <string name="rt_list_simple_btn_txt" translatable="true">jednoduché</string>
+    <string name="lbl_advanced" translatable="true">pokročilé</string>
+    <string name="rt_filter_parent_selected" translatable="true">Vybráno</string>
+    <string name="dc_setting_dns_cache_heading" translatable="true">DNS booster</string>
+    <string name="dc_setting_dns_cache_desc" translatable="true">Spojování požadavků, cachování odpovědí, odolné proti chybám</string>
+    <string name="lbbs_enabled" translatable="true">Zapnuto</string>
+    <string name="lbbs_search" translatable="true">Hledat domény v blokovacích seznamech</string>
+    <string name="lbbs_update_check" translatable="true">Zkontrolovat aktualizaci</string>
+    <string name="lbbs_redownload" translatable="true">Znovu stáhnout blokovací seznamy</string>
+    <string name="lbbs_download" translatable="true">Aktualizovat blokovací seznamy</string>
+    <string name="lbbs_heading" translatable="true">Konfigurace 195+ blokovacích seznamů</string>
+    <string name="brbs_restore_title" translatable="true">Obnovit</string>
+    <string name="brbs_restore_desc" translatable="true">Obnovit ze souboru zálohy</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Nezaručeno mezi různými verzemi aplikace</string>
+    <string name="brbs_backup_dialog_title" translatable="true">Vytvořit zálohu</string>
+    <string name="brbs_restore_dialog_failure_positive" translatable="true">Zkusit znovu obnovu</string>
+    <string name="brbs_restore_complete_toast" translatable="true">Obnova dokončena, restartuji aplikaci…</string>
+    <string name="brbs_restore_dialog_title" translatable="true">Obnovit zálohu</string>
+    <string name="brbs_restore_dialog_message" translatable="true">Obnoví nastavení aplikace, síťové a DNS logy ze souboru zálohy. Aplikace se poté restartuje.</string>
+    <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s blokovacích seznamů</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Spusťte Rethink pro pokračování</string>
+    <string name="bad_config_reason_invalid_number" translatable="true">Neplatné číslo</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">Neplatná hodnota</string>
+    <string name="bad_config_reason_missing_attribute" translatable="true">Chybějící atribut</string>
+    <string name="key_length_explanation_base64" translatable="true">: WireGuard base64 klíče musí mít 44 znaků (32 bajtů)</string>
+    <string name="key_length_explanation_binary" translatable="true">: WireGuard klíče musí mít 32 bajtů</string>
+    <string name="key_length_explanation_hex" translatable="true">: WireGuard hex klíče musí mít 64 znaků (32 bajtů)</string>
+    <string name="key_contents_error" translatable="true">Špatné znaky v klíči</string>
+    <string name="key_length_error" translatable="true">Nesprávná délka klíče</string>
+    <string name="parse_error_inet_address" translatable="true">IP adresa</string>
+    <string name="parse_error_inet_network" translatable="true">IP síť</string>
+    <string name="bad_config_explanation_positive_number" translatable="true">: Musí být kladné</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">: Musí být platné číslo UDP portu</string>
+    <string name="import_error" translatable="true">Nelze importovat tunel: %s</string>
+    <string name="illegal_filename_error" translatable="true">Neplatný název souboru „%s“</string>
+    <string name="no_configs_error" translatable="true">Žádné konfigurace nenalezeny</string>
+    <string name="bad_extension_error" translatable="true">Soubor musí mít příponu .conf nebo .zip</string>
+    <string name="setup_wireguard" translatable="true">Nastavit WireGuard</string>
+    <string name="wireguard_description" translatable="true">WireGuard jako proxy.</string>
+    <string name="new_warp_config_desc" translatable="true">Získat WARP konfiguraci ze serveru</string>
+    <string name="new_warp_error_toast" translatable="true">Nelze načíst WARP konfiguraci</string>
+    <string name="new_warp_invalid_config_toast" translatable="true">Neplatná WARP konfigurace</string>
+    <string name="one_wg_apps_added" translatable="true">Směruji všechny aplikace</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">Lockdown</string>
+    <string name="one_wg_dialog_desc" translatable="true">Veškeré připojení pro všechny aplikace, včetně DNS, bude směrováno do jediné aktivní WireGuard VPN. Ostatní aktivní WireGuard VPN budou zastaveny.</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">Všechna připojení a aplikace, které nejsou směrovány jinými WireGuard VPN, budou směrovány touto VPN.</string>
+    <string name="one_wg_error_toast" translatable="true">Pro přepnutí na Pokročilé režimy zastavte WireGuard v režimu Jednoduché</string>
+    <string name="add_remove_apps" translatable="true">Přidat / Odebrat (%1$s aplikací)</string>
+    <string name="add_peer" translatable="true">Přidat Peer</string>
+    <string name="config_delete_dialog_desc" translatable="true">Opravdu chcete odstranit tuto konfiguraci WireGuard VPN?</string>
+    <string name="config_delete_dialog_title" translatable="true">Smazat</string>
+    <string name="include_all_app_wg_dialog_title" translatable="true">Zahrnout všechny aplikace</string>
+    <string name="include_all_app_wg_dialog_desc" translatable="true">Použít tuto WireGuard VPN pro všechny aplikace?</string>
+    <string name="exclude_all_app_wg_dialog_title" translatable="true">Vyloučit všechny aplikace</string>
+    <string name="wireguard_no_config_msg" translatable="true">Žádné konfigurace WireGuard VPN. Pro začátek něco přidejte.</string>
+    <string name="wireguard_connection_error" translatable="true">Připojení WireGuard VPN selhává</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Zahrnout všechny zbývající aplikace, které nejsou směrovány žádnou jinou proxy</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">Rodinný filtr blokuje veškerý pornografický a explicitní obsah. Blokuje také proxy a VPN domény pro obcházení filtrů. Smíšené weby (např. Reddit) jsou rovněž blokovány. Google, Bing a YouTube jsou nastaveny do Bezpečného režimu.</string>
+    <string name="lbl_remaining_apps" translatable="true">Zbývající aplikace</string>
+    <string name="remaining_apps_dialog_title" translatable="true">Zahrnout zbývající aplikace</string>
+    <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS s bezpečným vyhledáváním a blokováním obsahu pro dospělé.</string>
+    <string name="contributors_list" translatable="true">&lt;i&gt;Rethink Open Source Project&lt;/i&gt; vděčí za svou existenci těmto dobrovolníkům, kteří věnovali nespočet hodin jeho vývoji.&lt;br/&gt; &lt;br/&gt;🛡️ Android aplikace &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Síťový engine &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Lanius-collaris&gt;Lanius-collaris&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Komunitní moderátoři &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;Andersen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Překlady &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Ikony &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Ikony&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Build servery &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="firewall_rule_unknown_desc" translatable="true">Toto připojení bylo blokováno firewallem, protože <i>zdrojová aplikace</i> nemohla být určena.<br/><br/> Pro změnu tohoto chování přejděte na záložku <i>Univerzální</i>.</string>
+    <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true">Toto připojení bylo povoleno, protože probíhalo <i>nastavení Toru jako proxy jedním kliknutím</i> přes Orbot.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Uživatelem nastavené pravidlo firewallu zablokovalo <i>doménu</i>.<br/><br/> Pro změnu přejděte na obrazovku <i>Firewall specifický pro aplikace</i>.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Toto připojení bylo povoleno, protože <i>doména</i> je nastavena jako důvěryhodná v Univerzálních pravidlech domén.<br/><br/> Pro změnu tohoto chování přejděte na záložku <i>Konfigurace DNS</i>.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">Toto připojení bylo zablokováno, protože <i>doména</i> je blokována DNS preferovaným uživatelem.<br/><br/> Pro změnu tohoto chování přejděte na záložku <i>Konfigurace DNS</i>.</string>
+    <string name="firewall_rule_block_ip_univ_desc" translatable="true">Uživatelem nastavené pravidlo firewallu zablokovalo <i>cílovou IP adresu / Port</i>.<br/><br/> Pro změnu přejděte na záložku <i>Univerzální</i>.</string>
+    <string name="firewall_rule_isolate_desc" translatable="true">Uživatelem nastavené pravidlo firewallu zablokovalo tuto <i>aplikaci</i> při připojování k jiným než <i>obcházeným IP adresám</i>.<br/><br/> Pro změnu přejděte na záložku <i>Všechny aplikace</i>.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">Uživatelem nastavené univerzální pravidlo firewallu zablokovalo tuto <i>aplikaci</i> při pokusu o připojení v <i>Měřené</i> (Mobilní) síti.<br/><br/> Pro změnu přejděte na záložku <i>Univerzální</i>.</string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">Uživatelem nastavené pravidlo firewallu zablokovalo tuto <i>aplikaci</i> při pokusu o připojení na <i>neomezené</i> síti.<br/><br/> Pro změnu přejděte na kartu <i>Všechny aplikace</i>.</string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true">Zobrazeno <u>%1$s</u> %2$s aplikací v kategoriích: %3$s</string>
+    <string name="firewall_rule_block_ip_desc" translatable="true">Uživatelem nastavené pravidlo firewallu zablokovalo <i>cílovou IP adresu</i>.<br/><br/> Pro změnu přejděte na obrazovku <i>Firewall specifický pro aplikace</i>.</string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true">Toto připojení bylo povoleno, protože <i>cílová IP adresa</i> je nastavena jako Důvěryhodná IP.<br/><br/> Pro změnu přejděte na obrazovku <i>Firewall specifický pro aplikace</i>.</string>
+    <string name="rt_filter_desc" translatable="true">Zobrazuji <u>%1$s</u> seznamy blokování</string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s blokovací seznam(y)</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="fapps_firewall_filter_desc" translatable="true">Zobrazeno <u>%1$s</u> %2$s aplikací</string>
+    <string name="firewall_rule_block_app_desc" translatable="true">A uživatelem nastavené pravidlo firewallu zablokovalo tuto <i>aplikaci</i>.<br/><br/> Pro změnu přejděte na kartu <i>Všechny aplikace</i>.</string>
+    <string name="firewall_rule_new_app_desc" translatable="true">Tato aplikace navázala spojení <i>poprvé</i>.<br/><br/> Pro změnu přejděte na kartu <i>Univerzální</i>.</string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true">Uživatelem nastavené pravidlo firewallu zablokovalo tuto <i>aplikaci</i> při pokusu o připojení na <i>měřené</i> síti.<br/><br/> Pro změnu přejděte na kartu <i>Všechny aplikace</i>.</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Toto připojení bylo povoleno, protože <i>zdrojová aplikace</i> má nastaveno <i>obcházení pravidel DNS a firewallu</i>.<br/><br/> Pro změnu přejděte na obrazovku <i>Firewall specifický pro aplikace</i>.</string>
+    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">Toto připojení bylo povoleno, protože <i>cílová IP adresa</i> je nastavena tak, aby obcházela všechna univerzální pravidla firewallu.<br/><br/> Pro změnu přejděte na <i>IP pravidla</i> v záložce <i>Univerzální</i>.</string>
+    <string name="firewall_rule_device_lock_desc" translatable="true">Toto připojení bylo blokováno firewallem, protože <i>zařízení bylo uzamčeno</i> v daném čase.<br/><br/> Pro změnu tohoto chování přejděte na záložku <i>Univerzální</i>.</string>
+    <string name="firewall_rule_foreground_desc" translatable="true">Toto připojení bylo blokováno firewallem, protože zdrojová aplikace <i>nebyla v popředí</i>.<br/><br/> Pro změnu tohoto chování přejděte na záložku <i>Univerzální</i>.</string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">Toto připojení bylo zablokováno, protože <i>zdrojová aplikace</i> obešla DNS preferované uživatelem.<br/><br/> Pro změnu tohoto chování přejděte na záložku <i>Univerzální</i>.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">Toto připojení bylo povoleno, protože <i>zdrojová aplikace</i> je nastavena na <i>obcházení univerzálních</i> pravidel firewallu.<br/><br/> Pro změnu přejděte na obrazovku <i>Firewall specifický pro aplikace</i>.</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">Toto DNS připojení bylo proxováno a přesměrováno na koncový bod DNS preferovaný uživatelem.<br/><br/> Pro změnu vypněte <i>Zabránit úniku DNS</i> z obrazovky <i>Konfigurace</i> DNS.</string>
+    <string name="firewall_rule_block_http_desc" translatable="true">Toto připojení bylo zablokováno, protože pravděpodobně používalo <i>nezabezpečený HTTP</i>.<br/><br/> Pro změnu přejděte na záložku <i>Univerzální</i>.</string>
+    <string name="firewall_rule_global_lockdown_desc" translatable="true">Toto připojení bylo zablokováno, protože je nastaveno univerzální uzamčení.<br/><br/> Pro změnu přejděte na záložku <i>Univerzální</i>.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Toto připojení bylo povoleno, protože <i>doména</i> je nastavena jako Důvěryhodná doména.<br/><br/> Pro změnu přejděte na obrazovku <i>Firewall specifický pro aplikace</i>.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Toto připojení bylo zablokováno, protože <i>doména</i> je nastavena jako blokovaná v Univerzálních pravidlech domén.<br/><br/> Pro změnu tohoto chování přejděte na záložku <i>Konfigurace DNS</i>.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">Toto připojení bylo přesměrováno na proxy preferovanou uživatelem.<br/><br/> Pro změnu přejděte na <i>Proxy</i> z obrazovky <i>Konfigurace</i>.</string>
+    <string name="ada_firewall_status" translatable="true">Tato aplikace <b><i>%1$s</i></b>.</string>
+    <string name="rt_filter_desc_subgroups" translatable="true">Zobrazuji <u>%1$s</u> seznamy blokování ve skupině: %2$s a podskupině: %3$s</string>
+    <string name="firewall_rule_block_udp_ntp_desc" translatable="true">Uživatelem nastavené pravidlo firewallu zablokovalo toto <i>UDP</i> připojení.<br/><br/> Pro změnu přejděte na záložku <i>Univerzální</i>.</string>
 </resources>
