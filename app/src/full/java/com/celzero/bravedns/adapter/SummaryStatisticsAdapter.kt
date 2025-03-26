@@ -45,6 +45,7 @@ import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.AppInfoActivity
+import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment.SummaryStatisticsType
 import com.celzero.bravedns.util.Constants
@@ -52,6 +53,7 @@ import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastN
+import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -68,22 +70,17 @@ class SummaryStatisticsAdapter(
     ) {
 
     private var maxValue: Int = 0
+    private var timeCategory = SummaryStatisticsViewModel.TimeCategory.ONE_HOUR
 
     companion object {
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<AppConnection>() {
-                override fun areItemsTheSame(
-                    oldConnection: AppConnection,
-                    newConnection: AppConnection
-                ): Boolean {
-                    return (oldConnection == newConnection)
+                override fun areItemsTheSame(old: AppConnection, new: AppConnection): Boolean {
+                    return (old == new)
                 }
 
-                override fun areContentsTheSame(
-                    oldConnection: AppConnection,
-                    newConnection: AppConnection
-                ): Boolean {
-                    return (oldConnection == newConnection)
+                override fun areContentsTheSame(old: AppConnection, new: AppConnection): Boolean {
+                    return (old == new)
                 }
             }
     }
@@ -102,8 +99,8 @@ class SummaryStatisticsAdapter(
     }
 
     override fun onBindViewHolder(holder: AppNetworkActivityViewHolder, position: Int) {
-        val appNetworkActivity = getItem(position) ?: return
-        holder.bind(appNetworkActivity)
+        val conn = getItem(position) ?: return
+        holder.bind(conn)
     }
 
     private fun calculatePercentage(c: Double): Int {
@@ -117,6 +114,10 @@ class SummaryStatisticsAdapter(
         } else {
             (value * 100 / maxValue)
         }
+    }
+
+    fun setTimeCategory(timeCategory: SummaryStatisticsViewModel.TimeCategory) {
+        this.timeCategory = timeCategory
     }
 
     inner class AppNetworkActivityViewHolder(
@@ -160,7 +161,7 @@ class SummaryStatisticsAdapter(
                     R.string.symbol_upload,
                     Utilities.humanReadableByteCount(appConnection.uploadBytes, true)
                 )
-            val total = context.getString(R.string.two_argument, download, upload)
+            val total = context.getString(R.string.two_argument, upload, download)
             itemBinding.ssDataUsage.text = total
             itemBinding.ssCount.text = appConnection.count.toString()
         }
@@ -373,14 +374,7 @@ class SummaryStatisticsAdapter(
                         startAppInfoActivity(appConnection)
                     }
                     SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
-                        if (appConfig.getBraveMode().isDnsMode()) {
-                            showDnsLogs(appConnection)
-                        } else {
-                            showNetworkLogs(
-                                appConnection,
-                                SummaryStatisticsType.MOST_CONTACTED_DOMAINS
-                            )
-                        }
+                        startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.DOMAIN)
                     }
                     SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
                         io {
@@ -409,10 +403,7 @@ class SummaryStatisticsAdapter(
                         showNetworkLogs(appConnection, SummaryStatisticsType.MOST_BLOCKED_IPS)
                     }
                     SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
-                        showNetworkLogs(
-                            appConnection,
-                            SummaryStatisticsType.MOST_CONTACTED_COUNTRIES
-                        )
+                        startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.FLAG)
                     }
                     SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
                         showNetworkLogs(appConnection, SummaryStatisticsType.MOST_BLOCKED_COUNTRIES)
@@ -421,9 +412,21 @@ class SummaryStatisticsAdapter(
             }
         }
 
+        private fun startDomainConnectionsActivity(appConnection: AppConnection, input: DomainConnectionsActivity.InputType) {
+            val intent = Intent(context, DomainConnectionsActivity::class.java)
+            intent.putExtra(DomainConnectionsActivity.INTENT_TYPE, input.type)
+            if (input == DomainConnectionsActivity.InputType.DOMAIN) {
+                intent.putExtra(DomainConnectionsActivity.INTENT_DOMAIN, appConnection.appOrDnsName)
+            } else {
+                intent.putExtra(DomainConnectionsActivity.INTENT_FLAG, appConnection.flag)
+            }
+            intent.putExtra(DomainConnectionsActivity.INTENT_TIME_CATEGORY, timeCategory.value)
+            context.startActivity(intent)
+        }
+
         private fun startAppInfoActivity(appConnection: AppConnection) {
             val intent = Intent(context, AppInfoActivity::class.java)
-            intent.putExtra(AppInfoActivity.UID_INTENT_NAME, appConnection.uid)
+            intent.putExtra(AppInfoActivity.INTENT_UID, appConnection.uid)
             context.startActivity(intent)
         }
 
