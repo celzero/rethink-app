@@ -136,28 +136,26 @@ class ConnectionTrackerFragment :
     private fun setupRecyclerView() {
         b.recyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(requireContext())
-        (layoutManager as LinearLayoutManager).isItemPrefetchEnabled = true
+        layoutManager?.isItemPrefetchEnabled = true
         b.recyclerConnection.layoutManager = layoutManager
+
         val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
-        recyclerAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT
+        recyclerAdapter.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+
+        b.recyclerConnection.adapter = recyclerAdapter
+
         viewModel.connectionTrackerList.observe(viewLifecycleOwner) { pagingData ->
-            val currentSnapshot = recyclerAdapter.snapshot()
             recyclerAdapter.submitData(lifecycle, pagingData)
         }
-        if (recyclerAdapter.itemCount > 0) {
-            recyclerAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-        }
+
         recyclerAdapter.addLoadStateListener { loadState ->
-            if (loadState.append.endOfPaginationReached) {
-                if (recyclerAdapter.itemCount < 1) {
-                    if (fromUniversalFirewallScreen || fromWireGuardScreen) {
-                        b.connectionListLogsDisabledTv.text = getString(R.string.ada_ip_no_connection)
-                        b.connectionListLogsDisabledTv.visibility = View.VISIBLE
-                        b.connectionCardViewTop.visibility = View.GONE
-                    } else {
-                        b.connectionListLogsDisabledTv.visibility = View.GONE
-                        b.connectionCardViewTop.visibility = View.VISIBLE
-                    }
+            val isEmpty = recyclerAdapter.itemCount < 1
+            if (loadState.append.endOfPaginationReached && isEmpty) {
+                if (fromUniversalFirewallScreen || fromWireGuardScreen) {
+                    b.connectionListLogsDisabledTv.text = getString(R.string.ada_ip_no_connection)
+                    b.connectionListLogsDisabledTv.visibility = View.VISIBLE
+                    b.connectionCardViewTop.visibility = View.GONE
                 } else {
                     b.connectionListLogsDisabledTv.visibility = View.GONE
                     b.connectionCardViewTop.visibility = View.VISIBLE
@@ -167,12 +165,21 @@ class ConnectionTrackerFragment :
                 b.connectionCardViewTop.visibility = View.VISIBLE
             }
         }
-        b.recyclerConnection.adapter = recyclerAdapter
+
         b.recyclerConnection.post {
-            b.recyclerConnection.invalidateItemDecorations()
+            try {
+                if (recyclerAdapter.itemCount > 0) {
+                    recyclerAdapter.stateRestorationPolicy =
+                        RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                }
+            } catch (ignored: Exception) {
+                Logger.e(LOG_TAG_UI, "$TAG; err in setting the recycler restoration policy")
+            }
         }
+        b.recyclerConnection.layoutAnimation = null
         setupRecyclerScrollListener()
     }
+
 
     private fun hideSearchLayout() {
         b.connectionCardViewTop.visibility = View.GONE
@@ -190,9 +197,17 @@ class ConnectionTrackerFragment :
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
 
-                    if (recyclerView.getChildAt(0)?.tag == null) return
+                    val firstChild = recyclerView.getChildAt(0)
+                    if (firstChild == null) {
+                        Logger.v(LOG_TAG_UI, "$TAG; err; no child views found in recyclerView")
+                        return
+                    }
 
-                    val tag: Long = recyclerView.getChildAt(0).tag as Long
+                    val tag = firstChild.tag as? Long
+                    if (tag == null) {
+                        Logger.v(LOG_TAG_UI, "$TAG; err; tag is null for first child, rv")
+                        return
+                    }
 
                     b.connectionListScrollHeader.text = formatToRelativeTime(requireContext(), tag)
                     b.connectionListScrollHeader.visibility = View.VISIBLE
@@ -201,7 +216,9 @@ class ConnectionTrackerFragment :
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        b.connectionListScrollHeader.visibility = View.GONE
+                        b.connectionListScrollHeader.postDelayed({
+                            b.connectionListScrollHeader.visibility = View.GONE
+                        }, 300) // small delay to prevent flickering
                     }
                 }
             }

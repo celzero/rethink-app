@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import Logger.LOG_TAG_UI
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
@@ -28,6 +29,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DnsLogAdapter
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
 import com.celzero.bravedns.service.PersistentState
@@ -55,6 +57,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
 
     private val dnsLogRepository by inject<DnsLogRepository>()
     private val persistentState by inject<PersistentState>()
+    private val appConfig by inject<AppConfig>()
 
     companion object {
         fun newInstance(param: String): DnsLogFragment {
@@ -127,7 +130,9 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerQuery.layoutManager = layoutManager
 
-        val recyclerAdapter = DnsLogAdapter(requireContext(), persistentState.fetchFavIcon)
+        val favIcon = persistentState.fetchFavIcon
+        val isRethinkDns = appConfig.isRethinkDnsConnected()
+        val recyclerAdapter = DnsLogAdapter(requireContext(), favIcon, isRethinkDns)
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.dnsLogsList.observe(viewLifecycleOwner) {
                 recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
@@ -141,9 +146,17 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
 
-                    if (recyclerView.getChildAt(0)?.tag == null) return
+                    val firstChild = recyclerView.getChildAt(0)
+                    if (firstChild == null) {
+                        Logger.w(LOG_TAG_UI, "DnsLogs; err; no child views found in recyclerView")
+                        return
+                    }
 
-                    val tag: Long = recyclerView.getChildAt(0).tag as Long
+                    val tag = firstChild.tag as? Long
+                    if (tag == null) {
+                        Logger.w(LOG_TAG_UI, "DnsLogs; err; tag is null")
+                        return
+                    }
 
                     b.queryListRecyclerScrollHeader.text =
                         formatToRelativeTime(requireContext(), tag)
@@ -153,11 +166,14 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        b.queryListRecyclerScrollHeader.visibility = View.GONE
+                        b.queryListRecyclerScrollHeader.postDelayed({
+                            b.queryListRecyclerScrollHeader.visibility = View.GONE
+                        }, 300) // small delay to prevent flickering
                     }
                 }
             }
         b.recyclerQuery.addOnScrollListener(scrollListener)
+        b.recyclerQuery.layoutAnimation = null
     }
 
     private fun remakeFilterChipsUi() {
