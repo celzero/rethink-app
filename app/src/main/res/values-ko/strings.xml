@@ -564,7 +564,6 @@
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">응답 없음</string>
     <string name="ctbs_app_info_not_available_toast" translatable="true">앱 설정 페이지를 찾을 수 없음</string>
     <string name="dns_btm_resolved_doh" translatable="true">%2$s에 의해 %1$s 해결됨</string>
-    <string name="dns_btm_resolved_crypt" translatable="true"></string>
     <string name="dns_btm_latency_ms" translatable="true">%1$sms</string>
     <string name="dns_btm_record_type" translatable="true">쿼리 유형: %1$s</string>
     <string name="univ_firewall_rule_8" translatable="true">포트 80(비보안 HTTP) 트래픽 차단</string>
