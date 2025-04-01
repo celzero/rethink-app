@@ -378,9 +378,9 @@
     <string name="http_proxy_dialog_heading" translatable="true">HTTP(S) 프록시 설정</string>
     <string name="settings_dns_proxy_dialog_app" translatable="true">앱</string>
     <string name="settings_selected_theme" translatable="true">현재 테마: %1$s</string>
-    <string name="settings_protocol_translation_dns_inactive" translatable="true">이 설정을 사용하려면 DNS/DNS+방화벽 모드로 전환하세요.</string>
-    <string name="settings_biometric_desc" translatable="true">화면 잠금을 사용하여 이 앱을 보호하세요.</string>
-    <string name="settings_locale_dialog_neutral" translatable="true">이 앱을 번역하도록 도와주세요.</string>
+    <string name="settings_protocol_translation_dns_inactive" translatable="true">이 설정을 사용하려면 DNS/DNS+방화벽 모드로 전환하세요</string>
+    <string name="settings_biometric_desc" translatable="true">화면 잠금을 사용하여 이 앱을 보호하세요</string>
+    <string name="settings_locale_dialog_neutral" translatable="true">이 앱을 번역하도록 도와주세요</string>
     <string name="firewall_status_block_unmetered" translatable="true">무제한(wifi) 네트워크에서 차단됨</string>
     <string name="dns_proxy_remove_dialog_title" translatable="true">DNS 프록시를 삭제하시겠습니까?</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">저장된 구성에서 DNS 프록시를 삭제합니다.</string>
@@ -399,7 +399,7 @@
     <string name="settings_socks5_dialog_hint_username" translatable="true">사용자이름 (선택)</string>
     <string name="settings_theme_dialog_themes_3" translatable="true">다크 테마</string>
     <string name="settings_ip_dialog_ipv46" translatable="true">자동 (실험적)</string>
-    <string name="settings_notification_desc1" translatable="true">일시 중지/중지(기본값)</string>
+    <string name="settings_notification_desc1" translatable="true">일시 정지/중지(기본값)</string>
     <string name="firewall_status_whitelisted" translatable="true">범용 방화벽 규칙 우회</string>
     <string name="firewall_act_universal_tab" translatable="true">만능인</string>
     <string name="dns_crypt_url_remove_success" translatable="true">DNSCrypt 리졸버가 삭제되었습니다.</string>
@@ -409,9 +409,9 @@
     <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt 릴레이가 삭제되었습니다.</string>
     <string name="dns_proxy_remove_success" translatable="true">DNS 프록시가 삭제되었습니다.</string>
     <string name="settings_orbot_desc" translatable="true">HTTPS/SOCKS5를 사용하는 비vpn 모드의 Orbot.</string>
-    <string name="settings_http_proxy_error_text1" translatable="true">포트 범위는 1024~65535여야 합니다.</string>
+    <string name="settings_http_proxy_error_text1" translatable="true">포트 범위는 1024~65535여야 합니다</string>
     <string name="settings_http_proxy_error_text2" translatable="true">잘못된 포트</string>
-    <string name="settings_http_proxy_error_text3" translatable="true">호스트 이름이 비어 있습니다.</string>
+    <string name="settings_http_proxy_error_text3" translatable="true">호스트 이름이 비어 있습니다</string>
     <string name="settings_http_proxy_error_text4" translatable="true">호스트 연결에 실패했습니다. 다시 시도하십시오.</string>
     <string name="settings_dns_proxy_dialog_username" translatable="true">사용자명</string>
     <string name="settings_dns_proxy_dialog_password" translatable="true">비밀번호</string>
@@ -439,9 +439,7 @@
     <string name="settings_notification_desc2" translatable="true">DNS / DNS + 방화벽</string>
     <string name="settings_notification_desc3" translatable="true">없음</string>
     <string name="settings_notification_dialog_title" translatable="true">알림 작업 선택</string>
-    <string name="settings_notification_dialog_option_1" translatable="true">"
-\n일시 중지/중지(기본값):
-\nRethink를 빠르게 일시 중지하고 중지하는 두 개의 버튼을 표시합니다."</string>
+    <string name="settings_notification_dialog_option_1" translatable="true">\n일시 정지/중지(기본값):\nRethink를 빠르게 일시 정지하고 중지하는 두 개의 버튼을 표시합니다.</string>
     <string name="settings_notification_dialog_option_2" translatable="true">"
 \nDNS / DNS + 방화벽:
 \n배터리 절약 DNS 모드와 일반 DNS + 방화벽 모드 사이를 빠르게 전환하는 두 개의 버튼이 표시됩니다."</string>
@@ -472,7 +470,7 @@
     <string name="logs_card_duration" translatable="true">%1$s부터</string>
     <string name="hsf_vpn_dialog_header" translatable="true">주목!</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s 보편적인 규칙</string>
-    <string name="firewall_card_text_active" translatable="true">%1$s 차단됨, %2$s 우회됨, %3$s 제외됨, %4$s 격리됨</string>
+    <string name="firewall_card_text_active" translatable="true">%1$s 차단됨\n%2$s 우회됨\n%3$s 제외됨\n%4$s 격리됨</string>
     <string name="hsf_start_btn_state" translatable="true">시작</string>
     <string name="hsf_vpn_prepare_failure" translatable="true">VPN 권한이 없거나 다른 앱이 Always-on VPN 모드에 있습니다.</string>
     <string name="rules_card_domain_count" translatable="true">%1$s 도메인 규칙</string>
@@ -480,7 +478,7 @@
 \n
 \nRethink는 정보를 수집하거나 어떤 식으로든 사용자를 염탐하지 않습니다.</string>
     <string name="hsf_start_dialog_header" translatable="true">시작 %1$s</string>
-    <string name="hs_biometeric_feature_not_supported" translatable="true">이 기기에서는 생체 인증이 지원되지 않거나 비활성화됩니다.</string>
+    <string name="hs_biometeric_feature_not_supported" translatable="true">이 기기에서는 생체 인증이 지원되지 않거나 비활성화됩니다</string>
     <string name="hs_biometeric_failed" translatable="true">생체인증 실패</string>
     <string name="hs_biometeric_error" translatable="true">생체인증 오류</string>
     <string name="firewall_card_status_active" translatable="true">%1$s 앱</string>
@@ -497,7 +495,7 @@
     <string name="dc_custom_block_heading" translatable="true">도메인 규칙</string>
     <string name="dc_local_block_heading" translatable="true">온디바이스 차단 목록</string>
     <string name="dc_dns_website_heading" translatable="true">DNS 로그에 웹사이트 아이콘 표시(실험)</string>
-    <string name="dc_dns_website_desc" translatable="true"><i>nextdns.io</i> 및 <i>duckduckgo.com</i>에서 웹사이트 아이콘을 가져옵니다. 최대 350MB의 디스크 공간을 사용합니다.</string>
+    <string name="dc_dns_website_desc" translatable="true"><i>nextdns.io</i> 및 <i>duckduckgo.com</i>에서 웹사이트 아이콘을 가져옵니다. 최대 350MB의 디스크 공간을 사용합니다</string>
     <string name="dc_dns_leaks_heading" translatable="true">DNS 유출 방지</string>
     <string name="dc_dns_leaks_desc" translatable="true">활성화되면, Rethink는 포트 53에서 모든 패킷을 캡처하고 사용자가 설정한 DNS 엔드포인트로 전달합니다</string>
     <string name="cd_dns_proxy_error_text_3" translatable="true">잘못된 포트</string>
@@ -516,7 +514,7 @@
     <string name="hsf_packet_capture_chip_text" translatable="true">패킷 캡처 활성화</string>
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">RDNS+ 활성화</string>
     <string name="hsf_proxy_chip_text" translatable="true">프록시 활성화</string>
-    <string name="hsf_exclude_error" translatable="true">VPN 잠금 모드에서는 제외할 수 없습니다.</string>
+    <string name="hsf_exclude_error" translatable="true">VPN 잠금 모드에서는 제외할 수 없습니다</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">프록시 제거됨</string>
     <string name="hsf_proxy_chip_remove_text" translatable="true">중지 중…</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">패킷 캡처 비활성화됨</string>
@@ -535,11 +533,11 @@
     <string name="about_join_telegram" translatable="true">텔레그램</string>
     <string name="cd_dns_proxy_mode_external" translatable="true">외부의</string>
     <string name="cd_dns_proxy_error_text_1" translatable="true">잘못된 IP 주소 입니다</string>
-    <string name="cd_dns_proxy_error_text_2" translatable="true">포트 범위는 1024~65535여야 합니다.</string>
+    <string name="cd_dns_proxy_error_text_2" translatable="true">포트 범위는 1024~65535여야 합니다</string>
     <string name="dc_proxy_dns_desc" translatable="true">항상 WireGuard, SOCKS5, HTTP 프록시에서 DNS를 프록시하지 마십시오.</string>
     <string name="battery_optimization_dialog_heading" translatable="true">비활성화 %1$s</string>
     <string name="lbl_battery_optimization" translatable="true">배터리 최적화</string>
-    <string name="cd_dns_crypt_error_text_1" translatable="true">스탬프는 비워둘 수 없습니다.</string>
+    <string name="cd_dns_crypt_error_text_1" translatable="true">스탬프는 비워둘 수 없습니다</string>
     <string name="cd_dns_crypt_dialog_desc" translatable="true">설명 (선택 사항)</string>
     <string name="cd_dnscrypt_relay_heading" translatable="true">중계서버</string>
     <string name="cd_dns_crypt_dialog_stamp" translatable="true">우표</string>
@@ -565,4 +563,146 @@
     <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s 차단 목록</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">응답 없음</string>
     <string name="ctbs_app_info_not_available_toast" translatable="true">앱 설정 페이지를 찾을 수 없음</string>
+    <string name="dns_btm_resolved_doh" translatable="true">%2$s에 의해 %1$s 해결됨</string>
+    <string name="dns_btm_resolved_crypt" translatable="true"></string>
+    <string name="dns_btm_latency_ms" translatable="true">%1$sms</string>
+    <string name="dns_btm_record_type" translatable="true">쿼리 유형: %1$s</string>
+    <string name="univ_firewall_rule_8" translatable="true">포트 80(비보안 HTTP) 트래픽 차단</string>
+    <string name="fapps_info_metered_msg" translatable="true">요금제(모바일) 네트워크에서 허용/차단합니다.</string>
+    <string name="univ_firewall_rule_2" translatable="true">사용하지 않는 앱 차단</string>
+    <string name="fapps_info_dialog_message" translatable="true">앱이 인터넷에 연결되지 않도록 차단합니다. 인터넷 액세스를 제한하면 보증되지 않은 데이터 사용을 방지하고 배터리를 절약할 수 있습니다.</string>
+    <string name="univ_delete_firewall_dialog_title" translatable="true">모든 IP 규칙을 삭제하시겠습니까?</string>
+    <string name="hs_btm_sheet_lock_down" translatable="true">VPN이 <i>잠금</i>인 경우 모드를 변경할 수 없습니다. <u>VPN 설정 편집</u>을 탭하세요.</string>
+    <string name="firewall_rule_block_univ_ip" translatable="true">IP / 포트(범용)</string>
+    <string name="fapps_info_exclude_msg" translatable="true">DNS + 방화벽 모두에서 제외합니다.</string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true"><i>나열된</i> 앱에 대한 범용 방화벽 규칙을 우회하시겠습니까?</string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true">카테고리에서 <u>%1$s</u> %2$s 앱 표시: %3$s</string>
+    <string name="accessibility_notification_content" translatable="true">Rethink 접근성 서비스가 중지되었거나 충돌했습니다. 더 이상 백그라운드 앱을 차단하지 않습니다. 다시 활성화하려면 탭하세요.</string>
+    <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">앱 우회</string>
+    <string name="firewall_rule_device_lock" translatable="true">장치 잠김</string>
+    <string name="firewall_rule_block_unmetered" translatable="true">무제한(WiFi)</string>
+    <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNS 프록시됨</string>
+    <string name="fapps_info_isolate_msg" translatable="true">신뢰할 수 있는 IP를 제외하고 모두 차단합니다.</string>
+    <string name="univ_firewall_rule_6" translatable="true">기본적으로 새로 설치된 앱 차단</string>
+    <string name="univ_firewall_rule_7" translatable="true">IPv6에서 IPv4 차단(실험적)</string>
+    <string name="univ_delete_firewall_dialog_message" translatable="true">이러한 규칙을 삭제하면 모든 애플리케이션이 현재 차단된 IP에 연결할 수 있습니다.</string>
+    <string name="dns_proxy_ip_address" translatable="true">IP 주소</string>
+    <string name="fapps_filter_parent_system" translatable="true">시스템</string>
+    <string name="fapps_firewall_filter_bypass_universal" translatable="true">우회</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">도메인 (범용)</string>
+    <string name="univ_firewall_rule_9" translatable="true">종량제(모바일) 네트워크에서 차단</string>
+    <string name="univ_firewall_rule_10" translatable="true">우회된 앱 및 IP를 제외한 모든 항목 차단</string>
+    <string name="univ_view_blocked_ip" translatable="true">IP 및 포트 규칙</string>
+    <string name="univ_accessibility_dialog_positive" translatable="true">승인하다</string>
+    <string name="univ_accessibility_dialog_negative" translatable="true">거절</string>
+    <string name="univ_firewall_heading" translatable="true">범용 방화벽 규칙</string>
+    <string name="app_ip_domain_rules" translatable="true">앱 IP / 도메인 규칙</string>
+    <string name="app_ip_domain_rules_desc" translatable="true">앱 IP / 도메인 규칙 당 수정.</string>
+    <string name="dns_query_latency" translatable="true">%1$sms</string>
+    <string name="dns_proxy_dialog_header_dns" translatable="true">DNS 프록시 추가</string>
+    <string name="dns_proxy_app" translatable="true">앱</string>
+    <string name="fapps_filter_parent_installed" translatable="true">설치됨</string>
+    <string name="fapps_metered_block_dialog_title" translatable="true">측정 시 차단</string>
+    <string name="fapps_exclude_block_dialog_title" translatable="true">앱 제외</string>
+    <string name="fapps_firewall_filter_desc" translatable="true"><u>%1$s</u> %2$s 앱 표시 중</string>
+    <string name="orbot_toast_parameter" translatable="true">Tor-as-a-proxy</string>
+    <string name="firewall_rule_block_app" translatable="true">차단된 앱</string>
+    <string name="firewall_rule_bypass_dns_firewall" translatable="true">우회된 앱</string>
+    <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">우회된 앱</string>
+    <string name="firewall_rule_bypass_universal_ip" translatable="true">우회된 IP</string>
+    <string name="firewall_rule_unknown" translatable="true">알 수 없는 소스</string>
+    <string name="firewall_rule_domain_trusted_univ" translatable="true">신뢰할 수 있는 도메인 (범용)</string>
+    <string name="univ_accessibility_crash_dialog_positive" translatable="true">설정으로 바로 가기</string>
+    <string name="dns_proxy_name" translatable="true">프록시 이름</string>
+    <string name="fapps_firewall_filter_excluded" translatable="true">제외</string>
+    <string name="fapps_unmetered_unblock_dialog_title" translatable="true">무제한 허용</string>
+    <string name="fapps_unmetered_unblock_dialog_message"><i>나열된</i> 앱에 대해 무제한(WiFi) 네트워크 연결을 허용하시겠습니까?</string>
+    <string name="fapps_bypass_block_dialog_title" translatable="true">앱 우회</string>
+    <string name="fapps_unblock_dialog_title" translatable="true">앱 허용</string>
+    <string name="fapps_unblock_dialog_message" translatable="true"><i>나열된</i> 앱에 대한 연결을 허용하시겠습니까?</string>
+    <string name="settings_local_blocklist_version" translatable="true">버전: %1$s</string>
+    <string name="dns_btm_resolved_doh_no_server" translatable="true">해결됨 %1$s</string>
+    <string name="hs_download_positive_play_store" translatable="true">업데이트 완료</string>
+    <string name="univ_ip_delete_dialog_positive" translatable="true">모두 삭제</string>
+    <string name="univ_ip_delete_toast_success" translatable="true">모든 IP 규칙을 삭제했습니다.</string>
+    <string name="fapps_info_bypass_msg" translatable="true">범용 방화벽 규칙을 우회합니다.</string>
+    <string name="fapps_info_dialog_positive_btn" translatable="true">확인</string>
+    <string name="fapps_unmetered_block_dialog_title" translatable="true">무제한 차단</string>
+    <string name="fapps_unmetered_block_dialog_message" translatable="true"><i>나열된</i> 앱에 대해 무제한(WiFi) 네트워크 연결을 차단하시겠습니까?</string>
+    <string name="fapps_metered_unblock_dialog_title" translatable="true">측정 시 허용</string>
+    <string name="fapps_metered_unblock_dialog_message" translatable="true"><i>나열된</i> 앱에 대해 데이터 통신(모바일) 네트워크 연결을 허용하시겠습니까?</string>
+    <string name="firewall_rule_isolate" translatable="true">격리</string>
+    <string name="firewall_rule_block_udp_ntp" translatable="true">UDP 차단됨</string>
+    <string name="update_complete_snack_message" translatable="true">새 버전이 다운로드되었습니다.</string>
+    <string name="update_complete_action_snack" translatable="true">재시작</string>
+    <string name="hs_download_positive_default" translatable="true">좋아요</string>
+    <string name="hs_download_positive_website" translatable="true">웹사이트 방문</string>
+    <string name="hs_download_negative_default" translatable="true">나중에 알림</string>
+    <string name="univ_firewall_rule_1" translatable="true">기기가 잠겨 있을 때 모든 앱 차단</string>
+    <string name="univ_firewall_rule_3" translatable="true">소스 앱을 알 수 없는 경우 차단</string>
+    <string name="univ_firewall_rule_4" translatable="true">DNS 및 NTP를 제외한 UDP 차단</string>
+    <string name="univ_firewall_rule_5" translatable="true">DNS 우회 시 차단</string>
+    <string name="univ_view_blocked_ip_desc" translatable="true">차단되거나 신뢰할 수 있는 도메인, IP/포트 규칙을 수정합니다.</string>
+    <string name="univ_ip_delete_individual_toast" translatable="true">%1$s 삭제되었습니다.</string>
+    <string name="dns_connected_rethink_plus" translatable="true">연결되었습니다. %1$s 사용 중인 차단 목록</string>
+    <string name="dns_connected_no_count" translatable="true">연결됨</string>
+    <string name="dns_connected" translatable="true">연결됨</string>
+    <string name="dns_info_neutral" translatable="true">복사</string>
+    <string name="dns_proxy_dialog_message" translatable="true">앱 이름: %1$s\n\nIP 주소: %2$s\n\n포트 번호: %3$s</string>
+    <string name="dns_proxy_dialog_message_no_app" translatable="true">IP 주소: %1$s\n\n포트 번호: %2$s</string>
+    <string name="dns_proxy_port" translatable="true">포트 번호</string>
+    <string name="fapps_filter_filter_heading" translatable="true">형식</string>
+    <string name="fapps_filter_clear_btn" translatable="true">제거</string>
+    <string name="fapps_info_unmetered_msg" translatable="true">무제한(WiFi) 네트워크에서 허용/차단합니다.</string>
+    <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">DNS 및 방화벽 규칙을 우회합니다.</string>
+    <string name="fapps_metered_block_dialog_message" translatable="true"><i>나열된</i> 앱에 대한 데이터 통신(모바일) 네트워크 연결을 차단하시겠습니까?</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true"><i>나열된</i> 앱에 대한 범용 DNS &amp; 방화벽 규칙을 우회하시겠습니까?</string>
+    <string name="fapps_exclude_block_dialog_message" translatable="true">DNS 및 방화벽에서 <i>나열된</i> 앱을 제외하시겠습니까?</string>
+    <string name="fapps_isolate_block_dialog_title" translatable="true">앱 격리</string>
+    <string name="fapps_isolate_block_dialog_message" translatable="true"><i>등록된</i> 앱을 격리하시겠습니까?</string>
+    <string name="fapps_firewall_filter_hint" translatable="true">모든 앱 표시</string>
+    <string name="rules_load_failure_heading" translatable="true">공지</string>
+    <string name="rules_load_failure_desc" translatable="true">방화벽 규칙을 찾을 수 없음</string>
+    <string name="dns_crypt_connection_failure" translatable="true">DNSCrypt 서버에 연결하는 동안 오류가 발생했습니다.</string>
+    <string name="dns_proxy_connection_failure" translatable="true">DNS 프록시 서버에 연결하는 동안 오류가 발생했습니다.</string>
+    <string name="dns_proxy_connection_failure_lockdown" translatable="true">잠금 모드에서 %2$s에 대해 %1$s를 제외하면 인터넷 연결 문제가 발생할 수 있습니다.</string>
+    <string name="dns_proxy_toast_parameter" translatable="true">DNS 프록시</string>
+    <string name="system_dns_connection_failure" translatable="true">현재 DNS 서버를 확인할 수 없습니다</string>
+    <string name="copy_clipboard_label" translatable="true">URL</string>
+    <string name="settings_local_blocklist_in_use" translatable="true">%1$s 사용 중인 차단 목록</string>
+    <string name="pause_desc" translatable="true">참고: %1$s 차단된 앱은 계속해서 방화벽으로 보호됩니다.</string>
+    <string name="other_dns_list_tab1" translatable="true">DoH</string>
+    <string name="other_dns_list_tab2" translatable="true">Dnscrypt</string>
+    <string name="firewall_rule_no_rule" translatable="true">규칙 없음</string>
+    <string name="firewall_rule_block_metered" translatable="true">종량제(모바일)</string>
+    <string name="firewall_rule_block_app_new_install" translatable="true">새로운 앱</string>
+    <string name="firewall_rule_block_app_exception" translatable="true">오류</string>
+    <string name="firewall_rule_block_ip" translatable="true">IP / 포트(앱)</string>
+    <string name="firewall_rule_trusted_ip" translatable="true">신뢰할 수 있는 IP</string>
+    <string name="firewall_rule_foreground" translatable="true">사용하지 않는 앱</string>
+    <string name="firewall_rule_block_dns_bypass" translatable="true">DNS 우회</string>
+    <string name="firewall_rule_exempt_orbot_setup" translatable="true">Orbot 설정</string>
+    <string name="firewall_rule_block_http" translatable="true">안전하지 않은 HTTP</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">신뢰할 수 있는 도메인(앱)</string>
+    <string name="firewall_rule_block_domain" translatable="true">도메인 (앱)</string>
+    <string name="firewall_rule_dns_blocked" translatable="true">DNS가 차단됨</string>
+    <string name="firewall_rule_no_rule_desc" translatable="true">이 연결과 일치하는 방화벽 규칙이 없습니다.</string>
+    <string name="firewall_rule_block_app_desc" translatable="true">사용자 설정 방화벽 규칙이 이 <i>앱</i>을 차단했습니다.<br/><br/> 변경하려면 <i>모든 앱</i> 탭으로 이동하세요.</string>
+    <string name="socks5_proxy_toast_parameter" translatable="true">SOCKS5 proxy</string>
+    <string name="settings_local_blocklist_dialog_positive" translatable="true">다운로드</string>
+    <string name="accessibility_failure_toast" translatable="true">Rethink 접근성 서비스가 중지되었거나 충돌했습니다. 더 이상 백그라운드 앱을 차단하지 않습니다.</string>
+    <string name="other_dns_list_tab3" translatable="true">DNS 프록시</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">프록시가 활성화되어 있으므로 %1$s를 사용할 수 없습니다.</string>
+    <string name="firewall_rule_new_app_desc" translatable="true">이 앱은 <i>처음</i> 시간 동안 연결되었습니다.<br/><br/> 변경하려면 <i>Universal</i> 탭으로 이동합니다.</string>
+    <string name="coming_soon_toast" translatable="true">곧 출시 예정</string>
+    <string name="dns_crypt_relay_error_toast" translatable="true">해결사를 선택하지 않았습니다</string>
+    <string name="fapps_filter_categories_heading" translatable="true">카테고리</string>
+    <string name="fapps_firewall_filter_isolate" translatable="true">격리된</string>
+    <string name="rules_load_failure_reload" translatable="true">다시 불러오기</string>
+    <string name="network_log_app_name_unknown" translatable="true">알 수 없음</string>
+    <string name="network_log_app_name_unnamed" translatable="true">이름 없는 (%1$s)</string>
+    <string name="pause_text" translatable="true">일시 정지</string>
+    <string name="firewall_rule_univ_block_metered" translatable="true">종량제 (범용)</string>
+    <string name="firewall_rule_global_lockdown" translatable="true">잠금</string>
+    <string name="firewall_rule_proxied" translatable="true">프록시 적용됨</string>
 </resources>
