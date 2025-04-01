@@ -33,9 +33,10 @@ import android.os.SystemClock
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -72,6 +73,7 @@ import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getPackageMetadata
+import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isWebsiteFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -83,9 +85,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.util.Calendar
-import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
-import kotlin.math.abs
 
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
@@ -106,6 +106,16 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
 
+        if (isAtleastO_MR1()) {
+            Logger.vv(LOG_TAG_UI, "Setting up window insets for Android 27+")
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.nav_view)) { view, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                view.updatePadding(bottom = systemBars.bottom) // Add bottom padding to keep icons visible
+                insets
+                WindowInsetsCompat.CONSUMED
+            }
+        }
+
         // do not launch on board activity when app is running on TV
         if (persistentState.firstTimeLaunch && !isAppRunningOnTv()) {
             launchOnboardActivity()
@@ -114,9 +124,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         updateNewVersion()
 
         setupNavigationItemSelectedListener()
-
-        // added for testing purpose; TODO: remove this
-        persistentState.useRpn = false
 
         // handle intent receiver for backup/restore
         handleIntent()
