@@ -288,12 +288,16 @@ class SummaryStatisticsAdapter(
                 SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
                     itemBinding.ssContainer.visibility = View.VISIBLE
                     itemBinding.ssDataUsage.visibility = View.VISIBLE
+                    // now there won't be any trailing '.' in the domain name, from v0.5.5o
+                    // TODO: remove this in later versions
                     itemBinding.ssDataUsage.text =
                         appConnection.appOrDnsName?.dropLastWhile { it == '.' }
                 }
                 SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
                     itemBinding.ssContainer.visibility = View.VISIBLE
                     itemBinding.ssDataUsage.visibility = View.VISIBLE
+                    // now there won't be any trailing '.' in the domain name, from v0.5.5o
+                    // TODO: remove this in later versions
                     itemBinding.ssDataUsage.text =
                         appConnection.appOrDnsName?.dropLastWhile { it == '.' }
                 }
