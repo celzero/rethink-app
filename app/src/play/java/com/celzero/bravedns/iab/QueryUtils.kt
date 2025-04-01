@@ -243,13 +243,14 @@ internal class QueryUtils(private val billingClient: BillingClient) {
                 val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
                     .setPurchaseToken(purchase.purchaseToken)
                 billingClient.acknowledgePurchase(acknowledgePurchaseParams.build()) { billingResult ->
+                    logd(mname, "acknowledging purchase for ${purchase.products}, code: ${billingResult.responseCode}")
                     when (BillingResponse(billingResult.responseCode).isOk) {
                         true -> {
                             logd(mname, "payment acknowledged for ${purchase.products}")
                             fetchPurchases(listOf(BillingClient.ProductType.SUBS))
                         }
 
-                        false -> loge(mname, "payment not acknowledged for ${purchase.products}")
+                        false -> loge(mname, "acknowledgement failed for ${purchase.products}")
                     }
                 }
             }
@@ -267,6 +268,7 @@ internal class QueryUtils(private val billingClient: BillingClient) {
                 val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
                     .setPurchaseToken(purchase.purchaseToken)
                 billingClient.acknowledgePurchase(acknowledgePurchaseParams.build()) { billingResult ->
+                    logd(mname, "acknowledging purchase for ${purchase.products}, code: ${billingResult.responseCode}")
                     consumeProduct(purchase, consumableList)
                     when (BillingResponse(billingResult.responseCode).isOk) {
                         true -> {
@@ -274,7 +276,7 @@ internal class QueryUtils(private val billingClient: BillingClient) {
                             fetchPurchases(listOf(BillingClient.ProductType.SUBS))
                         }
 
-                        false -> loge(mname, "payment not acknowledged for ${purchase.products}")
+                        false -> loge(mname, "acknowledgement failed for ${purchase.products}")
                     }
                 }
             } else {
