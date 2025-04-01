@@ -589,12 +589,6 @@ class CustomDomainAdapter(
     }
 
     private fun showButtonsBottomSheet(customDomain: CustomDomain) {
-        Logger.d("TEST", "showButtonsBottomSheet")
-        if (fragment !is Fragment) {
-            Logger.w(LOG_TAG_UI, "err opening the app conn bottom sheet")
-            return
-        }
-
         val bottomSheetFragment = CustomDomainRulesBtmSheet(customDomain)
         bottomSheetFragment.show(fragment.parentFragmentManager, bottomSheetFragment.tag)
     }
