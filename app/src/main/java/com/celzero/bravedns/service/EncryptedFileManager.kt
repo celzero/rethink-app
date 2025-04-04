@@ -69,7 +69,7 @@ object EncryptedFileManager {
             ist.close()
             byteArrayOutputStream.close()
         } catch (e: Exception) {
-            Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${e.message}", e)
+            Logger.w(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${e.message}")
         }
 
         return config
@@ -134,7 +134,7 @@ object EncryptedFileManager {
                 dir.mkdirs()
             }
             val fileToWrite = File(dir, fileName)
-            write(ctx, cfg, fileToWrite)
+            return write(ctx, cfg, fileToWrite)
         } catch (e: Exception) {
             Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
         }
@@ -164,6 +164,39 @@ object EncryptedFileManager {
             val fileContent = data.toByteArray(StandardCharsets.UTF_8)
             encryptedFile.openFileOutput().apply {
                 write(fileContent)
+                flush()
+                close()
+            }
+            return true
+        } catch (e: Exception) {
+            Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
+        }
+        return false
+    }
+
+
+    fun write(ctx: Context, data: ByteArray, file: File): Boolean {
+        try {
+            Logger.d(Logger.LOG_TAG_PROXY, "write into $file")
+            val masterKey =
+                MasterKey.Builder(ctx.applicationContext)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build()
+            val encryptedFile =
+                EncryptedFile.Builder(
+                        ctx.applicationContext,
+                        file,
+                        masterKey,
+                        EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+                    )
+                    .build()
+
+            if (file.exists()) {
+                file.delete()
+            }
+
+            encryptedFile.openFileOutput().apply {
+                write(data)
                 flush()
                 close()
             }

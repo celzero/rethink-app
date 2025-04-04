@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfos
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfosLiveData
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.foregroundUids
@@ -149,6 +150,7 @@ object FirewallManager : KoinComponent {
             return this == ISOLATE
         }
 
+        // even invalid uids are considered as untracked
         fun isUntracked(): Boolean {
             return this == UNTRACKED
         }
@@ -549,6 +551,11 @@ object FirewallManager : KoinComponent {
             LOG_TAG_FIREWALL,
             "Apply firewall rule for uid: ${uid}, ${firewallStatus.name}, ${connectionStatus.name}"
         )
+        if (isUnknownPackage(uid) && firewallStatus.isExclude()) {
+            Logger.w(LOG_TAG_FIREWALL, "Cannot exclude unknown package: $uid")
+            return
+        }
+
         invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
         db.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
     }
@@ -560,6 +567,10 @@ object FirewallManager : KoinComponent {
             }
             return ImmutableList.copyOf(appInfos.values())
         }
+    }
+
+    suspend fun isUnknownPackage(uid: Int): Boolean {
+        return getAppInfoByUid(uid)?.packageName?.startsWith(NO_PACKAGE_PREFIX) ?: false
     }
 
     private suspend fun informObservers() {

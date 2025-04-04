@@ -36,6 +36,8 @@ class CustomIp {
     var port: Int = UNSPECIFIED_PORT
     var protocol: String = ""
     var isActive: Boolean = true
+    var proxyId: String = ""
+    var proxyCC: String = ""
 
     // BLOCK(0), WHITELIST(1), NONE(2)
     var status: Int = 0
@@ -48,18 +50,25 @@ class CustomIp {
 
     override fun equals(other: Any?): Boolean {
         if (other !is CustomIp) return false
-        return !(ipAddress != other.ipAddress && uid != other.uid)
+        if (ipAddress != other.ipAddress) return false
+        if (uid != other.uid) return false
+        if (status != other.status) return false
+        return true
     }
 
     override fun hashCode(): Int {
         var result = this.uid.hashCode()
         result += result * 31 + this.ipAddress.hashCode()
+        result += result * 31 + this.status
         return result
     }
 
-    fun getCustomIpAddress(): Pair<IPAddress, Int> {
-        val ip = IPAddressString(ipAddress).address
-        val port = port
-        return Pair(ip, port)
+    fun getCustomIpAddress(): Pair<IPAddress, Int>? {
+        try {
+            val ip = IPAddressString(ipAddress).address
+            return Pair(ip, port)
+        } catch (e: Exception) {
+            return null
+        }
     }
 }
