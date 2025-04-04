@@ -127,9 +127,7 @@ class RethinkLogFragment :
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        b.connectionListScrollHeader.postDelayed({
-                            b.connectionListScrollHeader.visibility = View.GONE
-                        }, 300) // small delay to prevent flickering
+                        b.connectionListScrollHeader.visibility = View.GONE
                     }
                 }
             }

@@ -166,9 +166,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        b.queryListRecyclerScrollHeader.postDelayed({
-                            b.queryListRecyclerScrollHeader.visibility = View.GONE
-                        }, 300) // small delay to prevent flickering
+                        b.queryListRecyclerScrollHeader.visibility = View.GONE
                     }
                 }
             }
