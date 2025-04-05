@@ -28,6 +28,7 @@ import android.os.SystemClock
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.text.method.LinkMovementMethod
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -35,7 +36,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
@@ -46,6 +46,7 @@ import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogViewLogsBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.BugReportZipper.FILE_PROVIDER_NAME
 import com.celzero.bravedns.scheduler.BugReportZipper.getZipFileName
 import com.celzero.bravedns.scheduler.EnhancedBugReport
@@ -74,7 +75,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
-import retrofit2.http.Url
 import java.io.File
 import java.io.FileInputStream
 import java.util.concurrent.TimeUnit
@@ -157,7 +157,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun updateSponsorInfo() {
-        if (persistentState.useRpn) {
+        if (RpnProxyManager.isRpnActive()) {
             b.sponsorInfoUsage.visibility = View.GONE
             b.aboutSponsor.visibility = View.GONE
             return
@@ -273,7 +273,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.aboutElement -> {
                 openUrl(requireContext(), getString(R.string.about_matrix_handle))
-                persistentState.useRpn = !persistentState.useRpn
             }
             b.aboutStats -> {
                 openStatsDialog()
@@ -492,6 +491,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             null,
             null
         )
+
+        heading.gravity = Gravity.CENTER
+        descText.gravity = Gravity.CENTER
 
         descText.movementMethod = LinkMovementMethod.getInstance()
         descText.text = updateHtmlEncodedText(getString(R.string.contributors_list))
