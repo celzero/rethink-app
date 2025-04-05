@@ -212,6 +212,12 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
         R.string.firewall_rule_bypass_proxy_desc,
         R.integer.allow
     ),
+    RULE16(
+        "App paused",
+        R.string.firewall_rule_paused_app,
+        R.string.firewall_rule_paused_app_desc,
+        R.integer.allow
+    )
     ;
 
     companion object {
@@ -304,6 +310,12 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
             return rule.act != R.integer.allow
         }
 
+        fun isBypassRule(rule: FirewallRuleset): Boolean {
+            return rule.id == RULE1H.id || rule.id == RULE2B.id || rule.id == RULE2C.id ||
+                rule.id == RULE2F.id || rule.id == RULE2H.id || rule.id == RULE2I.id ||
+                rule.id == RULE8.id || rule.id == RULE9B.id
+        }
+
         fun isProxied(rule: FirewallRuleset): Boolean {
             return rule.id == RULE12.id
         }
@@ -321,7 +333,6 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE2C.id -> true
                 RULE2F.id -> true
                 RULE2I.id -> true
-                RULE12.id -> true
                 RULE15.id -> true
                 else -> false
             }
