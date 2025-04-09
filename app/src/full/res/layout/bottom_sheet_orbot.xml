@@ -57,7 +57,7 @@
             android:layout_marginStart="10dp"
             android:layout_toEndOf="@id/bs_orbot_app"
             android:contentDescription="@string/orbot_explanation"
-            android:src="@drawable/brave_mode_info" />
+            android:src="@drawable/ic_info_white" />
     </RelativeLayout>
 
     <com.google.android.material.button.MaterialButton

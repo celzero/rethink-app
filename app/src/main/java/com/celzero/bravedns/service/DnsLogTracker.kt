@@ -23,6 +23,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.celzero.bravedns.util.ResourceRecordTypes
@@ -43,6 +44,7 @@ internal constructor(
 
     companion object {
         const val DNS_LEAK_TEST = "dnsleaktest"
+        const val ECH = "ech."
 
         // Some apps like firefox, instagram do not respect ttls
         // add a reasonable grace period to account for that
@@ -69,15 +71,22 @@ internal constructor(
         val latencyMs = (TimeUnit.SECONDS.toMillis(1L) * summary.latency).toLong()
         val nowMs = SystemClock.elapsedRealtime()
         val queryTimeMs = nowMs - latencyMs
+        var uid = INVALID_UID
+        try {
+            uid = summary.uid.toInt()
+        } catch (ignored: NumberFormatException) { }
+
         val transaction = Transaction()
-        transaction.name = summary.qName
+        transaction.qName = summary.qName
         transaction.type = summary.qType
+        transaction.uid = uid
         transaction.id = summary.id
         transaction.queryTime = queryTimeMs
         transaction.transportType = Transaction.TransportType.getType(summary.type)
         transaction.response = summary.rData ?: ""
+        transaction.responseCode = summary.rCode
         transaction.ttl = summary.rTtl
-        transaction.responseTime = latencyMs
+        transaction.latency = latencyMs
         transaction.serverName = summary.server ?: ""
         transaction.status = Transaction.Status.fromId(summary.status)
         transaction.responseCalendar = Calendar.getInstance()
@@ -85,24 +94,28 @@ internal constructor(
         transaction.relayName = summary.relayServer ?: ""
         transaction.msg = summary.msg ?: ""
         transaction.upstreamBlock = summary.upstreamBlocks
+        transaction.region = summary.region
+
         return transaction
     }
 
     fun makeDnsLogObj(transaction: Transaction): DnsLog {
         val dnsLog = DnsLog()
 
+        dnsLog.uid = transaction.uid
         dnsLog.blockLists = transaction.blocklist
         dnsLog.resolverId = transaction.id
         dnsLog.relayIP = transaction.relayName
         dnsLog.dnsType = transaction.transportType.ordinal
-        dnsLog.latency = transaction.responseTime
-        dnsLog.queryStr = transaction.name
-        dnsLog.responseTime = transaction.responseTime
+        dnsLog.latency = transaction.latency
+        dnsLog.queryStr = transaction.qName
+        dnsLog.responseTime = transaction.latency
         dnsLog.serverIP = transaction.serverName
         dnsLog.status = transaction.status.name
         dnsLog.time = transaction.responseCalendar.timeInMillis
         dnsLog.msg = transaction.msg
         dnsLog.upstreamBlock = transaction.upstreamBlock
+        dnsLog.region = transaction.region
         val typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt())
         if (typeName == ResourceRecordTypes.UNKNOWN) {
             dnsLog.typeName = transaction.type.toString()
@@ -200,6 +213,8 @@ internal constructor(
         if (transaction.status === Transaction.Status.COMPLETE) {
             if (isLocallyResolved(transaction)) return
             VpnController.onConnectionStateChanged(BraveVPNService.State.WORKING)
+            // only update the server name if it is not empty as its only used to show ech
+            VpnController.onServerNameUpdated(transaction.serverName)
         } else {
             val vpnState = vpnStateMap[transaction.status] ?: BraveVPNService.State.FAILING
             VpnController.onConnectionStateChanged(vpnState)

@@ -41,6 +41,7 @@ import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.database.RethinkDnsEndpointRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.InternetProtocol
@@ -135,7 +136,7 @@ internal constructor(
         }
     }
 
-    enum class TunFirewallMode(val mode: Long) {
+    enum class TunFirewallMode(val mode: Int) {
         FILTER_ANDROID9_ABOVE(Settings.BlockModeFilter),
         SINK(Settings.BlockModeSink),
         FILTER_ANDROID8_BELOW(Settings.BlockModeFilterProc),
@@ -195,9 +196,9 @@ internal constructor(
     }
 
     enum class TunDnsMode(val mode: Long) {
-        NONE(Settings.DNSModeNone),
-        DNS_IP(Settings.DNSModeIP),
-        DNS_PORT(Settings.DNSModePort)
+        NONE(Settings.DNSModeNone.toLong()),
+        DNS_IP(Settings.DNSModeIP.toLong()),
+        DNS_PORT(Settings.DNSModePort.toLong())
     }
 
     // TODO: untangle the mess of proxy modes and providers
@@ -335,10 +336,10 @@ internal constructor(
         }
     }
 
-    enum class ProtoTranslationMode(val id: Long) {
+    enum class ProtoTranslationMode(val id: Int) {
         PTMODEAUTO(Settings.PtModeAuto),
         PTMODEFORCE64(Settings.PtModeForce64),
-        PTMODEMAYBE46(Settings.PtModeNo46)
+        PTMODENO46(Settings.PtModeNo46)
     }
 
     fun getInternetProtocol(): InternetProtocol {
@@ -1011,6 +1012,11 @@ internal constructor(
     fun isOrbotProxyEnabled(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
         return proxyProvider.isProxyProviderOrbot()
+    }
+
+    fun isWgEnabled(): Boolean {
+        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
+        return proxyProvider.isProxyProviderWireguard()
     }
 
     fun isProxyEnabled(): Boolean {
