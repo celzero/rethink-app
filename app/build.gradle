@@ -227,7 +227,7 @@ dependencies {
     fullImplementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     fullImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
-    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0'
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0'
 
     // LiveData
@@ -286,11 +286,11 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:de2e9f7199@aar'
-    websiteImplementation 'com.github.celzero:firestack:de2e9f7199@aar'
-    fdroidImplementation 'com.github.celzero:firestack:de2e9f7199@aar'
+    download 'com.github.celzero:firestack:c08714aa4c@aar'
+    websiteImplementation 'com.github.celzero:firestack:c08714aa4c@aar'
+    fdroidImplementation 'com.github.celzero:firestack:c08714aa4c@aar'
     // debug symbols
-    playImplementation 'com.github.celzero:firestack:de2e9f7199:debug@aar'
+    playImplementation 'com.github.celzero:firestack:c08714aa4c:debug@aar'
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.10.0') {
@@ -313,8 +313,8 @@ dependencies {
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
 
-    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.8.8'
-    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.8.8'
+    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.8.9'
+    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.8.9'
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
@@ -335,8 +335,8 @@ dependencies {
     // for in-app purchases
     playImplementation 'com.android.billingclient:billing:7.1.1'
     // for stripe payment gateway
-    websiteImplementation 'com.stripe:stripe-android:21.4.2'
-    fdroidImplementation 'com.stripe:stripe-android:21.4.2'
+    websiteImplementation 'com.stripe:stripe-android:21.7.1'
+    fdroidImplementation 'com.stripe:stripe-android:21.7.1'
 }
 
 // github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903
