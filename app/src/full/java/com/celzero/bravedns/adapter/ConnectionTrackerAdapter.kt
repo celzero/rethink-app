@@ -320,7 +320,16 @@ class ConnectionTrackerAdapter(private val context: Context) :
                         context.getString(R.string.symbol_turtle)
                     )
             }
-            if (isConnectionProxied(ct.blockedByRule, ct.proxyDetails)) {
+            // bunny in case rpid as present, key in case of proxy
+            // bunny and key indicate conn is proxied, so its enough to show one of them
+            if (containsRelayProxy(ct.rpid)) {
+                b.connectionDelay.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.connectionDelay.text,
+                        context.getString(R.string.symbol_bunny)
+                    )
+            } else if (isConnectionProxied(ct.blockedByRule, ct.proxyDetails)) {
                 b.connectionDelay.text =
                     context.getString(
                         R.string.ci_desc,
@@ -328,6 +337,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                         context.getString(R.string.symbol_key)
                     )
             }
+
             // rtt -> show rocket if less than 20ms, treat it as rtt
             if (isRoundTripShorter(ct.synack, ct.isBlocked)) {
                 b.connectionDelay.text =
@@ -337,15 +347,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                         context.getString(R.string.symbol_rocket)
                     )
             }
-            // bunny in case rpid as present
-            if (containsRelayProxy(ct.rpid)) {
-                b.connectionDelay.text =
-                    context.getString(
-                        R.string.ci_desc,
-                        b.connectionDelay.text,
-                        context.getString(R.string.symbol_bunny)
-                    )
-            }
+
             if (b.connectionDelay.text.isEmpty() && b.connectionDataUsage.text.isEmpty()) {
                 b.connectionSummaryLl.visibility = View.GONE
             }
