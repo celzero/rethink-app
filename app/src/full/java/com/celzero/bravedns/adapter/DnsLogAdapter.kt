@@ -33,6 +33,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import backend.Backend
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
@@ -44,9 +45,12 @@ import com.celzero.bravedns.adapter.DnsLogAdapter.DnsLogViewHolder
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.ListItemDnsLogBinding
 import com.celzero.bravedns.glide.FavIconDownloader
+import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.ui.bottomsheet.DnsBlocklistBottomSheet
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.getIcon
@@ -54,8 +58,9 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.internal.concurrent.TaskRunner
 
-class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean) :
+class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethinkDns: Boolean) :
     PagingDataAdapter<DnsLog, DnsLogViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -96,6 +101,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean) :
             b.dnsIps.text = ""
             b.dnsAppIcon.setImageDrawable(null)
             b.dnsTypeName.text = ""
+            b.dnsQueryType.text = ""
             b.dnsUnicodeHint.text = ""
             b.dnsStatusIndicator.visibility = View.INVISIBLE
             b.dnsSummaryLl.visibility = View.GONE
@@ -114,6 +120,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean) :
             displayLogEntryHint(log)
             displayIcon(log)
             displayUnicodeIfNeeded(log)
+            displayDnsType(log)
 
             b.dnsParentLayout.setOnClickListener { openBottomSheet(log) }
         }
@@ -161,18 +168,10 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean) :
             b.dnsIps.isSelected = true
 
             b.dnsLatency.text = context.getString(R.string.dns_query_latency, log.latency.toString())
-            b.dnsTypeName.text = log.typeName
+            b.dnsQueryType.text = log.typeName
         }
 
         private fun displayUnicodeIfNeeded(log: DnsLog) {
-            if (isConnectionProxied(log.resolver)) {
-                b.dnsUnicodeHint.text =
-                    context.getString(
-                        R.string.ci_desc,
-                        b.dnsUnicodeHint.text,
-                        context.getString(R.string.symbol_key)
-                    )
-            }
             // rtt -> show rocket if less than 20ms, treat it as rtt
             if (isRoundTripShorter(log.latency, log.isBlocked)) {
                 b.dnsUnicodeHint.text =
@@ -182,7 +181,8 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean) :
                         context.getString(R.string.symbol_rocket)
                     )
             }
-            // bunny in case rpid as present
+            // bunny in case rpid as present, key in case of proxy
+            // bunny and key indicate conn is proxied, so its enough to show one of them
             if (containsRelayProxy(log.relayIP)) {
                 b.dnsUnicodeHint.text =
                     context.getString(
@@ -190,8 +190,26 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean) :
                         b.dnsUnicodeHint.text,
                         context.getString(R.string.symbol_bunny)
                     )
+            } else if (isConnectionProxied(log.resolver)) {
+                b.dnsUnicodeHint.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.dnsUnicodeHint.text,
+                        context.getString(R.string.symbol_key)
+                    )
             }
-            if (b.dnsUnicodeHint.text.isEmpty() && b.dnsTypeName.text.isEmpty()) {
+
+            // show star if RethinkDNS or RPN is used
+            if (isRethinkUsed(log)) {
+                b.dnsUnicodeHint.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.dnsUnicodeHint.text,
+                        getRethinkUnicode(log)
+                    )
+            }
+
+            if (b.dnsUnicodeHint.text.isEmpty() && b.dnsQueryType.text.isEmpty()) {
                 b.dnsSummaryLl.visibility = View.GONE
             } else {
                 b.dnsSummaryLl.visibility = View.VISIBLE
@@ -212,35 +230,46 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean) :
             return !ProxyManager.isIpnProxy(proxy)
         }
 
-        private fun displayAppDetails(log: DnsLog) {
-            io {
-                uiCtx {
-                    val apps = FirewallManager.getAppNamesByUid(log.uid)
-                    val count = apps.count()
-
-                    val appName = when {
-                        count > 1 -> context.getString(
-                            R.string.ctbs_app_other_apps,
-                            apps.first(),
-                            "${count - 1}"
-                        )
-                        count == 0 -> context.getString(R.string.network_log_app_name_unknown)
-                        else -> apps.first()
-                    }
-
-                    b.dnsAppName.text = appName
-                    if (apps.isEmpty()) {
-                        loadAppIcon(getDefaultIcon(context))
-                    } else {
-                        val p = FirewallManager.getPackageNameByAppName(apps[0])
-                        if (p == null) {
-                            loadAppIcon(getDefaultIcon(context))
-                        } else {
-                            loadAppIcon(getIcon(context, p))
-                        }
-                    }
-                }
+        private fun isRethinkUsed(log: DnsLog): Boolean {
+            if (log.status != Transaction.Status.COMPLETE.name) {
+                return false
             }
+
+            // now the rethink dns is added as preferred in the backend, instead of separate
+            // id, so match it with Preferred and BlockFree
+            val isRdnsResolverUsed = if (isRethinkDns) {
+                (log.resolverId.contains(Backend.Preferred) ||
+                        log.resolverId.contains(Backend.BlockFree))
+            } else {
+                false
+            }
+
+            return isRdnsResolverUsed || log.relayIP.endsWith(Backend.RPN)
+        }
+
+        private fun getRethinkUnicode(log: DnsLog): String {
+            // resolver check for rethink dns is done before calling this method
+            if (log.relayIP.endsWith(Backend.RPN)) return context.getString(R.string.symbol_star)
+
+            return if (log.serverIP.contains(MAX_ENDPOINT)) {
+                context.getString(R.string.symbol_max)
+            } else {
+                context.getString(R.string.symbol_sky)
+            }
+        }
+
+        private fun displayAppDetails(log: DnsLog) {
+            if (log.appName.isEmpty()) {
+                b.dnsAppName.text = context.getString(R.string.network_log_app_name_unknown).uppercase()
+            } else {
+                b.dnsAppName.text = log.appName
+            }
+            if (log.packageName.isEmpty() || log.packageName == Constants.EMPTY_PACKAGE_NAME) {
+                loadAppIcon(getDefaultIcon(context))
+            } else {
+                loadAppIcon(getIcon(context, log.packageName))
+            }
+            return
         }
 
         private fun loadAppIcon(drawable: Drawable?) {
@@ -271,6 +300,31 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean) :
                 // If it is not available then glide will throw an error, do the duckduckgo
                 // url check in that case.
                 displayNextDnsFavIcon(log)
+            }
+        }
+
+        private fun displayDnsType(log: DnsLog) {
+            val type = Transaction.TransportType.fromOrdinal(log.dnsType)
+            when (type) {
+                Transaction.TransportType.DOH -> {
+                    if (isRethinkDns) {
+                        b.dnsTypeName.text = context.getString(R.string.lbl_rdns)
+                    } else {
+                        b.dnsTypeName.text = context.getString(R.string.other_dns_list_tab1)
+                    }
+                }
+                Transaction.TransportType.DNS_CRYPT -> {
+                    b.dnsTypeName.text = context.getString(R.string.lbl_dc_abbr)
+                }
+                Transaction.TransportType.DNS_PROXY -> {
+                    b.dnsTypeName.text = context.getString(R.string.lbl_dp)
+                }
+                Transaction.TransportType.DOT -> {
+                    b.dnsTypeName.text = context.getString(R.string.lbl_dot)
+                }
+                Transaction.TransportType.ODOH -> {
+                    b.dnsTypeName.text = context.getString(R.string.lbl_odoh)
+                }
             }
         }
 
@@ -389,13 +443,5 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean) :
         private fun hideFlag() {
             b.dnsFlag.visibility = View.GONE
         }
-    }
-
-    private fun io(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
-    }
-
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
     }
 }

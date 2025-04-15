@@ -28,22 +28,23 @@
             android:layout_gravity="center"
             android:alpha="0.9"
             android:ellipsize="none"
+            android:layout_margin="10dp"
             android:gravity="center"
             android:maxWidth="32dp"
-            android:maxHeight="16dp"
-            android:minWidth="16dp"
+            android:maxHeight="32dp"
+            android:minWidth="32dp"
             android:singleLine="true"
             android:src="@drawable/default_app_icon"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textSize="26sp"
+            android:textSize="30sp"
             tools:text="" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/dns_fav_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_gravity="center"
-            android:layout_margin="3dp"
+            android:layout_margin="10dp"
             android:alpha="0.9"
             android:contentDescription="@string/apps_icon_content_desc"
             android:src="@drawable/ic_about" />
@@ -73,7 +74,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/dns_ips"
+                        android:id="@+id/dns_query_type"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start|center_vertical"
@@ -98,7 +99,7 @@
                     android:orientation="vertical">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/dns_latency"
+                        android:id="@+id/dns_type_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -237,7 +238,7 @@
                     android:orientation="horizontal">
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/dns_type_name"
+                        android:id="@+id/dns_ips"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start|center_vertical"
@@ -250,7 +251,6 @@
                         android:paddingEnd="10dp"
                         android:scrollHorizontally="true"
                         android:singleLine="false"
-                        android:textAppearance="@android:style/TextAppearance.Material.Body1"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/default_font_text_view" />
                 </LinearLayout>
@@ -263,7 +263,7 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/dns_duration"
+                        android:id="@+id/dns_latency"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
