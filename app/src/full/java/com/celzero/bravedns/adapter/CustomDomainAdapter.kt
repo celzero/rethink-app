@@ -58,6 +58,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.URI
 
 class CustomDomainAdapter(
     val context: Context,
@@ -179,21 +180,19 @@ class CustomDomainAdapter(
         var selectedType: DomainRulesManager.DomainType =
             DomainRulesManager.DomainType.getType(customDomain.type)
 
-        when (selectedType) {
-            DomainRulesManager.DomainType.DOMAIN -> {
-                dBind.dacdDomainChip.isChecked = true
-            }
-
-            DomainRulesManager.DomainType.WILDCARD -> {
-                dBind.dacdWildcardChip.isChecked = true
-            }
+        if (customDomain.domain.startsWith("*") || customDomain.domain.startsWith(".")) {
+            dBind.dacdWildcardChip.isChecked = true
+        } else {
+            dBind.dacdDomainChip.isChecked = true
         }
 
         dBind.dacdDomainEditText.setText(customDomain.domain)
 
         dBind.dacdDomainEditText.addTextChangedListener {
-            if (it?.contains("*") == true) {
+            if (it?.startsWith("*") == true || it?.startsWith(".") == true) {
                 dBind.dacdWildcardChip.isChecked = true
+            } else {
+                dBind.dacdDomainChip.isChecked = true
             }
         }
 
@@ -261,6 +260,12 @@ class CustomDomainAdapter(
     ) {
         dBind.dacdFailureText.visibility = View.GONE
         val url = dBind.dacdDomainEditText.text.toString().trim()
+        val extractedHost = extractHost(url) ?: run {
+            dBind.dacdFailureText.text =
+                context.getString(R.string.cd_dialog_error_invalid_domain)
+            dBind.dacdFailureText.visibility = View.VISIBLE
+            return
+        }
         when (selectedType) {
             DomainRulesManager.DomainType.WILDCARD -> {
                 if (!isWildCardEntry(url)) {
@@ -288,6 +293,41 @@ class CustomDomainAdapter(
                 prevDomain,
                 status
             )
+        }
+    }
+
+    // fixme: same as extractHost in CustomDomainFragment, should be moved to a common place
+    private fun extractHost(input: String): String? {
+        val trimmedInput = input.trim()
+
+        return when {
+            // case: valid wildcard input without schema, eg., *.example.com
+            trimmedInput.startsWith("*.") && !trimmedInput.contains("://") -> {
+                trimmedInput
+            }
+
+            // case: invalid wildcard with schema, eg., https://*.example.com
+            trimmedInput.contains("://") && trimmedInput.contains("*") -> {
+                null // Invalid: Wildcards shouldn't appear in URLs
+            }
+
+            // case: standard URL input, eg., https://www.example.com
+            trimmedInput.contains("://") -> {
+                try {
+                    // return the host part of the URL
+                    // only www. is the common prefix you'd want to strip for cosmetic or
+                    // standardization reasons (like www.google.com → google.com). Other subdomains
+                    // (e.g., mail., api., m.) are actually part of the valid hostname and
+                    // should not be removed
+                    val uri = URI(trimmedInput)
+                    uri.host?.removePrefix("www.") // remove 'www.' prefix if present
+                } catch (e: Exception) {
+                    null
+                }
+            }
+
+            // case: plain domain (no schema, no wildcard), eg., example.com
+            else -> trimmedInput
         }
     }
 
