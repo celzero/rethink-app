@@ -1,45 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/background">
+    android:background="@drawable/welcome_gradient_bg">
 
-    <LinearLayout
+    <ImageView
+        android:id="@+id/img_logo"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/ic_launcher" />
+
+    <TextView
+        android:id="@+id/tv_title"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:weightSum="1">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/img_logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:text="@string/welcome_title"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="28sp"
+        android:textStyle="bold" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            style="@style/TextAppearance.AppCompat.Headline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.2"
-            android:gravity="center"
-            android:text="@string/slide_1_title"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/slide_title" />
+    <TextView
+        android:id="@+id/tv_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_title"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/welcome_desc"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="16sp" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.1"
-            android:gravity="top|center"
-            android:paddingLeft="@dimen/desc_padding"
-            android:paddingRight="@dimen/desc_padding"
-            android:text="@string/slide_1_desc"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/large_font_text_view" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="330dp"
-            android:layout_height="@dimen/img_width_height"
-            android:layout_gravity="center"
-            android:layout_weight="0.5"
-            android:src="@drawable/illustrations_welcome_1" />
-
-    </LinearLayout>
 </RelativeLayout>

@@ -19,7 +19,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
+import android.text.Spanned
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +33,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
@@ -40,40 +44,36 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Themes
 import org.koin.android.ext.android.inject
+import kotlin.collections.toTypedArray
 
 class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
+
     private val b by viewBinding(ActivityWelcomeBinding::bind)
     private lateinit var dots: Array<TextView?>
-    internal val layout: IntArray = intArrayOf(R.layout.welcome_slide2, R.layout.welcome_slide1)
-
-    private lateinit var myPagerAdapter: PagerAdapter
+    private val layouts: IntArray = intArrayOf(
+        R.layout.welcome_slide1,
+        R.layout.welcome_slide2,
+        R.layout.welcome_slide3,
+        R.layout.welcome_slide4
+    )
+    private var myPagerAdapter: MyPagerAdapter? = null
     private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
 
+        // Add bottom dots
         addBottomDots(0)
+
+        // Change status bar color
         changeStatusBarColor()
 
+        // Initialize adapter
         myPagerAdapter = MyPagerAdapter()
 
+        // Set up ViewPager
         b.viewPager.adapter = myPagerAdapter
-
-        b.btnSkip.setOnClickListener { launchHomeScreen() }
-
-        b.btnNext.setOnClickListener {
-            val currentItem = getItem()
-            // size and count() are almost always equivalent. However some lazy Seq cannot know
-            // their size until being fulfilled so size will be undefined for those cases and
-            // calling count() will fulfill the lazy Seq to determine its size.
-            if (currentItem + 1 >= layout.count()) {
-                launchHomeScreen()
-            } else {
-                b.viewPager.currentItem = currentItem + 1
-            }
-        }
-
         b.viewPager.addOnPageChangeListener(
             object : ViewPager.OnPageChangeListener {
                 override fun onPageScrollStateChanged(state: Int) {}
@@ -82,67 +82,71 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
                     position: Int,
                     positionOffset: Float,
                     positionOffsetPixels: Int
-                ) {}
+                ) {
+                }
 
                 override fun onPageSelected(position: Int) {
                     addBottomDots(position)
-                    if (position >= layout.count() - 1) {
+
+                    // Change the next button text 'NEXT' / 'GOT IT'
+                    if (position >= layouts.count() - 1) {
+                        // Last page. Make button text to GOT IT
                         b.btnNext.text = getString(R.string.finish)
-                        b.btnNext.visibility = View.VISIBLE
                         b.btnSkip.visibility = View.INVISIBLE
                     } else {
+                        // Still pages are left
+                        b.btnNext.text = getString(R.string.next)
                         b.btnSkip.visibility = View.VISIBLE
-                        b.btnNext.visibility = View.INVISIBLE
                     }
                 }
             }
         )
 
-        // Note that you shouldn't override the onBackPressed() as that will make the
-        // onBackPressedDispatcher callback not to fire
-        onBackPressedDispatcher.addCallback(
-            this /* lifecycle owner */,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    // Back is pressed...
-                    return
-                }
+        // Set up button click listeners
+        b.btnSkip.setOnClickListener { launchHomeScreen() }
+        b.btnNext.setOnClickListener {
+            // Check if user is on last page, then go to home screen
+            val currentItem = getItem()
+            if (currentItem + 1 >= layouts.count()) {
+                launchHomeScreen()
+            } else {
+                // Otherwise go to next page
+                b.viewPager.currentItem = currentItem + 1
             }
-        )
+        }
     }
 
-    private fun Context.isDarkThemeOn(): Boolean {
+    private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-            Configuration.UI_MODE_NIGHT_YES
-    }
-
-    private fun changeStatusBarColor() {
-        val window: Window = window
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = Color.TRANSPARENT
+                Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun addBottomDots(currentPage: Int) {
-        dots = arrayOfNulls(layout.count())
+        dots = arrayOfNulls(layouts.size)
 
         val colorActive = resources.getIntArray(R.array.array_dot_active)
         val colorInActive = resources.getIntArray(R.array.array_dot_inactive)
 
         b.layoutDots.removeAllViews()
+
         for (i in dots.indices) {
             dots[i] = TextView(this)
-            dots[i]?.layoutParams =
-                LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            dots[i]?.text = HtmlCompat.fromHtml("&#8226;", HtmlCompat.FROM_HTML_MODE_LEGACY)
+            dots[i]?.text = updateHtmlEncodedText("&#8226;")
             dots[i]?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30F)
             dots[i]?.setTextColor(colorInActive[currentPage])
             b.layoutDots.addView(dots[i])
         }
+
         if (dots.isNotEmpty()) {
             dots[currentPage]?.setTextColor(colorActive[currentPage])
+        }
+    }
+
+    fun updateHtmlEncodedText(text: String): Spanned {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
+        } else {
+            HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
     }
 
@@ -152,30 +156,34 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
 
     private fun launchHomeScreen() {
         persistentState.firstTimeLaunch = false
-        val intent = Intent(this, HomeScreenActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
+        startActivity(Intent(this, HomeScreenActivity::class.java))
         finish()
     }
 
-    inner class MyPagerAdapter : PagerAdapter() {
-        private lateinit var layoutInflater: LayoutInflater
+    private fun changeStatusBarColor() {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = Color.TRANSPARENT
+    }
 
+    // ViewPager adapter
+    inner class MyPagerAdapter : PagerAdapter() {
         override fun isViewFromObject(view: View, `object`: Any): Boolean {
             return view == `object`
         }
 
         override fun getCount(): Int {
-            return layout.count()
+            return layouts.count()
         }
 
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
-            layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val view: View = layoutInflater.inflate(layout[position], container, false)
+            val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val view = layoutInflater.inflate(layouts[position], container, false)
             container.addView(view)
             return view
         }
 
-        override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {}
+        override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+            container.removeView(`object` as View)
+        }
     }
 }
