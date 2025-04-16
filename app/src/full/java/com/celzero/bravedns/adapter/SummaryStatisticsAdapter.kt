@@ -311,11 +311,29 @@ class SummaryStatisticsAdapter(
                 }
                 SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
                     itemBinding.ssDataUsage.visibility = View.VISIBLE
-                    itemBinding.ssDataUsage.text = getCountryNameFromFlag(appConnection.flag)
+                    val flag = getCountryNameFromFlag(appConnection.flag)
+                    if (flag.isNotEmpty() && flag != "--") {
+                        itemBinding.ssDataUsage.text = getCountryNameFromFlag(appConnection.flag)
+                    } else {
+                        itemBinding.ssDataUsage.text = context.getString(
+                            R.string.two_argument_space,
+                            context.getString(R.string.network_log_app_name_unknown),
+                            appConnection.flag
+                        )
+                    }
                 }
                 SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
                     itemBinding.ssDataUsage.visibility = View.VISIBLE
-                    itemBinding.ssDataUsage.text = getCountryNameFromFlag(appConnection.flag)
+                    val flag = getCountryNameFromFlag(appConnection.flag)
+                    if (flag.isNotEmpty() && flag != "--") {
+                        itemBinding.ssDataUsage.text = flag
+                    } else {
+                        itemBinding.ssDataUsage.text = context.getString(
+                            R.string.two_argument_space,
+                            context.getString(R.string.network_log_app_name_unknown),
+                            appConnection.flag
+                        )
+                    }
                 }
             }
         }
@@ -325,7 +343,7 @@ class SummaryStatisticsAdapter(
                 if (appInfo?.appName.isNullOrEmpty()) {
                     context.getString(R.string.network_log_app_name_unnamed, "($appConnection.uid)")
                 } else {
-                    appInfo?.appName
+                    appInfo.appName
                 }
             } else {
                 appConnection.appOrDnsName
@@ -557,8 +575,8 @@ class SummaryStatisticsAdapter(
                             }
                         }
                     )
-            } catch (e: Exception) {
-                Logger.d(LOG_TAG_DNS, "Error loading icon, load flag instead")
+            } catch (ignored: Exception) {
+                Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
                 displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)
             }
         }
@@ -604,7 +622,7 @@ class SummaryStatisticsAdapter(
                             }
                         }
                     )
-            } catch (e: Exception) {
+            } catch (ignored: Exception) {
                 Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
                 showFlag()
                 hideFavIcon()
