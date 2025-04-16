@@ -83,10 +83,17 @@ class DomainConnectionsAdapter(private val context: Context) :
         RecyclerView.ViewHolder(b.root) {
 
         fun bind(dc: AppConnection) {
-            b.ssDataUsage.text = dc.appOrDnsName
             io {
                 val appInfo = FirewallManager.getAppInfoByUid(dc.uid)
                 uiCtx {
+                    if (dc.appOrDnsName.isNullOrEmpty()) {
+                        b.ssDataUsage.text = appInfo?.appName ?: context.getString(
+                            R.string.network_log_app_name_unnamed,
+                            "(${dc.uid})"
+                        )
+                    } else {
+                        b.ssDataUsage.text = dc.appOrDnsName
+                    }
                     b.ssIcon.visibility = View.VISIBLE
                     b.ssFlag.visibility = View.GONE
                     loadAppIcon(
