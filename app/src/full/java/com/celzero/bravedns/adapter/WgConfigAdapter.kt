@@ -37,6 +37,7 @@ import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.ListItemWgGeneralInterfaceBinding
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
@@ -50,6 +51,8 @@ import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.wireguard.Config
+import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -117,6 +120,9 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             b.interfaceSwitch.isChecked = config.isActive && VpnController.hasTunnel()
             setupClickListeners(config)
             updateStatusJob(config)
+            updateHopChip(config.id)
+            updateAmneziaChip(config)
+            updateViaChip(config.id)
         }
 
         private fun updateStatusJob(config: WgConfigFiles) {
@@ -134,7 +140,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 b.protocolInfoChipGroup.visibility = View.GONE
                 b.interfaceActiveLayout.visibility = View.GONE
                 b.interfaceStatus.visibility = View.GONE
-                val id = ProxyManager.ID_WG_BASE + config.id
+                val id = ID_WG_BASE + config.id
                 val appsCount = ProxyManager.getAppCountForProxy(id)
                 updateUi(config, appsCount)
             } else {
@@ -148,6 +154,11 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 b.interfaceStatus.visibility = View.VISIBLE
                 b.interfaceStatus.text =
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
+                updateProtocolChip(Pair(false, false))
+                updateSplitTunnelChip(false)
+                updateHopChip(config.id)
+                updateAmneziaChip(config)
+                updateViaChip(config.id)
             }
         }
 
@@ -164,7 +175,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             if (pair == null) return
 
             if (!pair.first && !pair.second) {
-                b.protocolInfoChipGroup.visibility = View.GONE
                 b.protocolInfoChipIpv4.visibility = View.GONE
                 b.protocolInfoChipIpv6.visibility = View.GONE
                 return
@@ -194,6 +204,29 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
         }
 
+        private fun updateHopChip(id: Int) {
+            val sid = ID_WG_BASE + id
+            val hop = WgHopManager.getMapBySrc(sid)
+            if (hop.isNotEmpty()) {
+                b.protocolInfoChipGroup.visibility = View.VISIBLE
+                b.chipHop.visibility = View.VISIBLE
+                b.chipHop.text = b.chipHop.text.toString() + ": " + hop.map { it.via }.joinToString()
+            } else {
+                b.chipHop.visibility = View.GONE
+            }
+        }
+
+        private fun updateViaChip(id: Int) {
+            val sid = ID_WG_BASE + id
+            val via = WgHopManager.isAlreadyVia(sid)
+            if (via) {
+                b.protocolInfoChipGroup.visibility = View.VISIBLE
+                b.chipVia.visibility = View.VISIBLE
+            } else {
+                b.chipVia.visibility = View.GONE
+            }
+        }
+
         fun cancelJobIfAny() {
             if (job?.isActive == true) {
                 job?.cancel()
@@ -201,7 +234,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         }
 
         private suspend fun updateStatus(config: WgConfigFiles) {
-            val id = ProxyManager.ID_WG_BASE + config.id
+            val id = ID_WG_BASE + config.id
             val appsCount = ProxyManager.getAppCountForProxy(id)
             val statusId = VpnController.getProxyStatusById(id)
             val pair = VpnController.getSupportedIpVersion(id)
@@ -235,7 +268,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 updateUi(config, appsCount)
                 updateProtocolChip(pair)
                 updateSplitTunnelChip(isSplitTunnel)
-                updateAmneziaChip(config)
             }
         }
 
@@ -244,6 +276,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
             c.getInterface()?.let {
                 if (isAmneziaConfig(it)) {
+                    b.protocolInfoChipGroup.visibility = View.VISIBLE
                     b.chipAmnezia.visibility = View.VISIBLE
                 } else {
                     b.chipAmnezia.visibility = View.GONE
