@@ -20,12 +20,12 @@ import Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.text.format.DateUtils
 import backend.Backend
+import com.celzero.bravedns.backup.BackupHelper
+import com.celzero.bravedns.backup.BackupHelper.Companion.TEMP_WG_DIR
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.database.WgConfigFilesRepository
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.SEC_WARP_ID
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.SEC_WARP_NAME
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_ID
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_NAME
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
@@ -69,6 +69,13 @@ object WireguardManager : KoinComponent {
     // invalid config id
     const val INVALID_CONF_ID = -1
 
+    const val SEC_WARP_ID = 0
+    const val SEC_WARP_NAME = "SEC_WARP"
+
+    init {
+        io { load() }
+    }
+
     suspend fun load(): Int {
         // go through all files in the wireguard directory and load them
         // parse the files as those are encrypted
@@ -77,8 +84,6 @@ object WireguardManager : KoinComponent {
         if (configs.isNotEmpty()) {
             Logger.i(LOG_TAG_PROXY, "configs already loaded; refreshing...")
         }
-        // remove this post v055o
-        deleteResidueWgs()
         val m = db.getWgConfigs().map { it.toImmutable() }
         mappings = CopyOnWriteArraySet(m)
         mappings.forEach {
@@ -87,14 +92,13 @@ object WireguardManager : KoinComponent {
                 EncryptedFileManager.readWireguardConfig(applicationContext, path)
             if (config == null) {
                 Logger.e(LOG_TAG_PROXY, "err loading wg config: $path, invalid config")
-                // TODO: delete the config from the db?
+                // TODO: delete the warp config from the wireguard directory, now part of rpn proxy
+                // below code should be removed post v055o
                 if ((it.id == WARP_ID && it.name == WARP_NAME) || (it.id == SEC_WARP_ID && it.name == SEC_WARP_NAME)) {
                     deleteConfig(it.id)
                 }
                 return@forEach
             }
-            // print the config to logcat
-
             if (configs.none { i -> i.getId() == it.id }) {
                 val c =
                     Config.Builder()
@@ -152,10 +156,6 @@ object WireguardManager : KoinComponent {
 
     fun isAdvancedWgActive(): Boolean {
         return mappings.any { it.isActive && !it.oneWireGuard }
-    }
-
-    fun getAllConfigs(): List<Config> {
-        return configs.toList()
     }
 
     fun getAllMappings(): List<WgConfigFilesImmutable> {
@@ -246,14 +246,6 @@ object WireguardManager : KoinComponent {
         return mappings.any { it.oneWireGuard && it.isActive && it.id != id }
     }
 
-    fun canEnableWg(): Boolean {
-        val canEnableProxy = appConfig.canEnableProxy()
-        val canEnableWireGuardProxy = appConfig.canEnableWireguardProxy()
-        val canEnable = canEnableProxy && canEnableWireGuardProxy
-        Logger.i(LOG_TAG_PROXY, "canEnableConfig? $canEnableProxy && $canEnableWireGuardProxy")
-        return canEnable
-    }
-
     fun canDisableConfig(map: WgConfigFilesImmutable): Boolean {
         // do not allow to disable the proxy if it is catch-all
         return !map.isCatchAll
@@ -330,10 +322,19 @@ object WireguardManager : KoinComponent {
         return
     }
 
+    // no need to check for app excluded from proxy here, expected to call this fn after that
     suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, default: String = ""): List<String> {
         val proxyIds: MutableList<String> = mutableListOf()
-        val configId = ProxyManager.getProxyIdForApp(uid)
+        if (oneWireGuardEnabled()) {
+            val id = getOneWireGuardProxyId()
+            proxyIds.add(ProxyManager.ID_WG_BASE + id)
+            // add default to the list, can route check is done in go-tun
+            if (default.isNotEmpty()) proxyIds.add(default)
+            Logger.i(LOG_TAG_PROXY, "one-wg enabled, return $proxyIds")
+            return proxyIds
+        }
 
+        // returns Pair(String,String) - first is ProxyId, second is CC
         val ipConfig = IpRulesManager.hasProxy(uid, ip, port)
         val domainConfig = DomainRulesManager.getProxyForDomain(uid, domain)
 
@@ -342,39 +343,79 @@ object WireguardManager : KoinComponent {
 
         if (ipConfig.first.isNotEmpty()) {
             Logger.i(LOG_TAG_PROXY, "wg id for ip $ip:$port => ${ipConfig.first}")
-            proxyIds.add(ipConfig.first)
-            return proxyIds
+            // even after adding the ip specific config, check if any catch-all config is enabled
+            // there is a possibility that the ip specific config is disabled or not capable of
+            // routing
+            val id = if (ipConfig.first.isNotEmpty()) convertStringIdToId(ipConfig.first) else INVALID_CONF_ID
+            val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
+            if (config != null && config.isLockdown) {
+                proxyIds.add(ipConfig.first)
+                return proxyIds // no need to proceed further for lockdown
+            }
+
+            if (config != null && config.isActive) {
+                proxyIds.add(ipConfig.first)
+            }
         }
 
         if (domainConfig.first.isNotEmpty()) {
             Logger.i(LOG_TAG_PROXY, "wg id for domain $domain => ${domainConfig.first}")
             proxyIds.add(domainConfig.first)
-            return proxyIds
+            val id =
+                if (domainConfig.first.isNotEmpty()) convertStringIdToId(domainConfig.first) else INVALID_CONF_ID
+            val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
+            if (config != null && config.isLockdown) {
+                proxyIds.add(domainConfig.first)
+                return proxyIds // no need to proceed further for lockdown
+            }
+
+            if (config != null && config.isActive) {
+                proxyIds.add(domainConfig.first)
+            }
         }
 
+        val configId = ProxyManager.getProxyIdForApp(uid)
         val id = if (configId.isNotEmpty()) convertStringIdToId(configId) else INVALID_CONF_ID
         val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
 
         if (config != null && config.isLockdown) {
             Logger.i(LOG_TAG_PROXY, "lockdown enabled for app: $uid => $configId")
-            proxyIds.add(configId)
+            proxyIds.add(configId) // already WG appended to it
+            // return the lockdown config, no need to check for other configs
+            // even if the lockdown config is disabled, we expect the connection to be blocked
             return proxyIds
         }
 
         if (config != null && config.isActive) {
-            proxyIds.add(configId)
+            proxyIds.add(configId) // apps specific config
         }
 
         if (univIpConfig.first.isNotEmpty()) {
-            proxyIds.clear()
-            proxyIds.add(univIpConfig.first)
-            return proxyIds
+            val id =
+                if (univIpConfig.first.isNotEmpty()) convertStringIdToId(univIpConfig.first) else INVALID_CONF_ID
+            val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
+            if (config != null && config.isLockdown) {
+                proxyIds.add(univIpConfig.first)
+                return proxyIds // no need to proceed further for lockdown
+            }
+
+            if (config != null && config.isActive) {
+                proxyIds.add(univIpConfig.first)
+            }
         }
 
         if (univDomainConfig.first.isNotEmpty()) {
-            proxyIds.clear()
-            proxyIds.add(univDomainConfig.first)
-            return proxyIds
+            val id =
+                if (univDomainConfig.first.isNotEmpty()) convertStringIdToId(univIpConfig.first) else INVALID_CONF_ID
+            val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
+            if (config != null && config.isLockdown) {
+                proxyIds.add(univDomainConfig.first)
+                return proxyIds
+            }
+
+            if (config != null && config.isActive) {
+                proxyIds.add(univDomainConfig.first)
+            }
         }
 
         // once the app-specific config is added, check if any catch-all config is enabled
@@ -387,6 +428,9 @@ object WireguardManager : KoinComponent {
         // add the default proxy to the end, will not be true for lockdown
         if (default.isNotEmpty()) proxyIds.add(default)
 
+        // the proxyIds list will contain the ip-app specific, domain-app specific, app specific,
+        // universal ip, universal domain, catch-all and default configs in the order of priority
+        // the go-tun will check the routing based on the order of the list
         return proxyIds
     }
 
@@ -394,7 +438,7 @@ object WireguardManager : KoinComponent {
         return try {
             val configId = id.substring(ProxyManager.ID_WG_BASE.length)
             configId.toIntOrNull() ?: INVALID_CONF_ID
-        } catch (e: Exception) {
+        } catch (ignored: Exception) {
             Logger.i(LOG_TAG_PROXY, "err converting string id to int: $id")
             INVALID_CONF_ID
         }
@@ -730,16 +774,48 @@ object WireguardManager : KoinComponent {
         return configs.find { it.getId() == id }?.getPeers()?.toMutableList() ?: mutableListOf()
     }
 
-    fun restoreProcessDeleteWireGuardEntries() {
-        // during a restore, we do not posses the keys to decrypt the wireguard configs
-        // so, delete the wireguard configs carried over from the backup
-        io {
-            val count = db.deleteOnAppRestore()
-            ProxyManager.removeWgProxies()
-            Logger.i(LOG_TAG_PROXY, "deleted wg entries count: $count")
-            clearLoadedConfigs()
-            load()
+    suspend fun restoreProcessRetrieveWireGuardConfigs() {
+        val count = db.getWgConfigs().size
+        Logger.i(LOG_TAG_PROXY, "restored wg entries count: $count")
+        clearLoadedConfigs()
+        performRestore()
+        load()
+    }
+
+    suspend fun performRestore() {
+        // during restore process, plain text wg configs are present in the temp dir
+        // move the files to the wireguard directory and load the configs
+        val tempDir = File(applicationContext.filesDir, TEMP_WG_DIR)
+        val dbconfs = db.getWgConfigs()
+        Logger.v(LOG_TAG_PROXY, "temp dir: ${tempDir.listFiles()?.size}, db size: ${dbconfs.size}")
+        dbconfs.forEach { c ->
+            // for each database entry, corresponding file with $id.conf is present in the temp dir
+            // move the file to the wireguard directory with the name available in the database
+            val file = File(tempDir, "${c.id}.conf")
+            if (file.exists()) {
+                Logger.i(LOG_TAG_PROXY, "file exists: ${file.absolutePath}, proceed restore")
+            } else {
+                Logger.i(LOG_TAG_PROXY, "no wg file, delete config: ${file.absolutePath}")
+                db.deleteConfig(c.id)
+                return@forEach
+            }
+            // read the contents of the file and write it to the EncryptedFileManager
+            val bytes = file.readBytes()
+            val encryptFile = File(c.configPath)
+            if (!encryptFile.exists()) {
+                encryptFile.parentFile?.mkdirs()
+                encryptFile.createNewFile()
+            }
+            val res = EncryptedFileManager.write(applicationContext, bytes, encryptFile)
+            if (res) {
+                Logger.i(LOG_TAG_PROXY, "restored wg config: ${c.id}, ${c.name}")
+            } else {
+                Logger.e(LOG_TAG_PROXY, "err restoring wg config: ${c.id}, ${c.name}")
+                // in case of error, delete the entry from the database
+                db.deleteConfig(c.id)
+            }
         }
+        tempDir.deleteRecursively()
     }
 
     fun oneWireGuardEnabled(): Boolean {
