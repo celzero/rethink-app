@@ -27,11 +27,14 @@ import android.view.View
 import android.widget.CompoundButton
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityAdvancedSettingBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
+import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.blocklistCanonicalPath
@@ -40,6 +43,8 @@ import com.celzero.bravedns.util.Utilities.deleteRecursive
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.io.File
 
@@ -63,6 +68,7 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(R.style.OptOutEdgeToEdgeEnforcement, /* force */ false)
         super.onCreate(savedInstanceState)
         initView()
         setupClickListeners()
@@ -215,13 +221,17 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         }
         deleteUnusedBlocklists()
         deleteLogs()
+        io { WireguardManager.deleteResidueWgs() }
     }
 
     private fun deleteLocalBlocklists() {
         // in play version so delete the local blocklists
-        val path = blocklistCanonicalPath(this, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME)
+        val path = blocklistCanonicalPath(this, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME)
         val dir = File(path)
         deleteRecursive(dir)
+        // reset the local blocklists
+        persistentState.localBlocklistStamp = ""
+        persistentState.localBlocklistTimestamp = 0L
         Logger.i(LOG_TAG_UI, "$TAG; local blocklists deleted, path: $path")
     }
 
@@ -240,5 +250,9 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         } catch (e: Exception) {
             Logger.e(LOG_TAG_UI, "$TAG; err opening console log activity ${e.message}", e)
         }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }
