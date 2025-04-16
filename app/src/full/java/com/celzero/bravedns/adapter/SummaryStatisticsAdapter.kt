@@ -343,7 +343,7 @@ class SummaryStatisticsAdapter(
                 if (appInfo?.appName.isNullOrEmpty()) {
                     context.getString(R.string.network_log_app_name_unnamed, "($appConnection.uid)")
                 } else {
-                    appInfo.appName
+                    appInfo?.appName ?: context.getString(R.string.network_log_app_name_unnamed, "(${appConnection.uid})")
                 }
             } else {
                 appConnection.appOrDnsName

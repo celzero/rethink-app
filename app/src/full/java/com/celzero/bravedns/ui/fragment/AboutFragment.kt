@@ -127,7 +127,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppContributors.setOnClickListener(this)
         b.aboutAppTranslate.setOnClickListener(this)
         b.aboutStats.setOnClickListener(this)
-        b.aboutCloseConns.setOnClickListener(this)
     }
 
     private fun updateVersionInfo() {
@@ -276,18 +275,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.aboutStats -> {
                 openStatsDialog()
-            }
-            b.aboutCloseConns -> {
-                io {
-                    VpnController.closeConnectionsIfNeeded(UID_EVERYBODY)
-                    uiCtx {
-                        showToastUiCentered(
-                            requireContext(),
-                            "Connections closed",
-                            Toast.LENGTH_SHORT
-                        )
-                    }
-                }
             }
         }
     }
