@@ -20,9 +20,12 @@ import Logger
 import Logger.LOG_TAG_SCHEDULER
 import android.content.Context
 import androidx.work.BackoffPolicy
+import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
@@ -253,6 +256,7 @@ class WorkScheduler(val context: Context) {
         // cancel the existing work if any
         rpnProxiesWorkMap[type]?.let {
             WorkManager.getInstance(context.applicationContext).cancelWorkById(it)
+            rpnProxiesWorkMap.remove(type)
         }
         val delay = expiryTimeMs - now
         if (delay <= 0) {
@@ -261,10 +265,19 @@ class WorkScheduler(val context: Context) {
         }
 
         val inputData = Data.Builder().putInt(inputDataKey, type.id).build()
+        // schedule the work when the internet is available
+        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+
         val workRequest =
             OneTimeWorkRequestBuilder<RpnProxiesUpdateWorker>()
-                .setInitialDelay(expiryTimeMs, TimeUnit.MILLISECONDS)
+                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                 .setInputData(inputData)
+                .setConstraints(constraints)
+                .setBackoffCriteria(
+                    BackoffPolicy.EXPONENTIAL,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
+                    TimeUnit.MILLISECONDS
+                )
                 .build()
 
         WorkManager.getInstance(context.applicationContext)
