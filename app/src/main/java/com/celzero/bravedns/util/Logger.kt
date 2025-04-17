@@ -33,14 +33,14 @@ object Logger : KoinComponent {
     const val LOG_BATCH_LOGGER = "BatchLogger"
     const val LOG_TAG_APP_DB = "AppDatabase"
     const val LOG_TAG_DOWNLOAD = "DownloadManager"
-    const val LOG_TAG_UI = "ActivityManager"
+    const val LOG_TAG_UI = "RethinkUI"
     const val LOG_TAG_SCHEDULER = "JobScheduler"
     const val LOG_TAG_BUG_REPORT = "BugReport"
     const val LOG_TAG_BACKUP_RESTORE = "BackupRestore"
     const val LOG_PROVIDER = "BlocklistProvider"
     const val LOG_TAG_PROXY = "ProxyLogs"
     const val LOG_QR_CODE = "QrCodeFromFileScanner"
-    const val LOG_GO_LOGGER = "LibLogger"
+    const val LOG_GO_LOGGER = "GoLog"
     const val LOG_TAG_APP_OPS = "AppOpsService"
     const val LOG_IAB = "InAppBilling"
 
@@ -128,7 +128,7 @@ object Logger : KoinComponent {
 
     fun goLog(message: String, type: LoggerType) {
         // no need to log the go logs, add it to the database
-        dbWrite("", message, type)
+        dbWrite(LOG_GO_LOGGER, message, type)
     }
 
     fun log(tag: String, msg: String, type: LoggerType, e: Exception? = null) {
@@ -150,36 +150,33 @@ object Logger : KoinComponent {
         // write to the database only if console log is set to true
         if (!persistentState.consoleLogEnabled) return
 
-        try {
-            // cannot check for log levels when tag is empty; tag is empty for logs coming from go
-            if (tag.isEmpty()) {
-                val log = ConsoleLog(0, msg, System.currentTimeMillis())
-                VpnController.writeConsoleLog(log)
-            } else if (type.id >= logLevel) {
-                val l = when (type) {
-                    LoggerType.VERBOSE -> "V"
-                    LoggerType.DEBUG -> "D"
-                    LoggerType.INFO -> "I"
-                    LoggerType.WARN -> "W"
-                    LoggerType.ERROR -> "E"
-                    LoggerType.STACKTRACE -> "E"
-                    else -> "V"
-                }
-                val log = if (e != null) {
-                    ConsoleLog(
-                        0,
-                        "$l $tag: $msg\n${Log.getStackTraceString(e)}",
-                        System.currentTimeMillis()
-                    )
-                } else {
-                    ConsoleLog(0, "$l $tag: $msg", System.currentTimeMillis())
-                }
-                VpnController.writeConsoleLog(log)
-            } else {
-                // Do nothing
-            }
-        } catch (ex: Exception) {
-            Log.e(LOG_GO_LOGGER, "err while writing log to the database: ${ex.message}", ex)
+        if (type.id < logLevel) return
+
+        val now = System.currentTimeMillis()
+        val l = when (type) {
+            LoggerType.VERY_VERBOSE -> "VV"
+            LoggerType.VERBOSE -> "V"
+            LoggerType.DEBUG -> "D"
+            LoggerType.INFO -> "I"
+            LoggerType.WARN -> "W"
+            LoggerType.ERROR -> "E"
+            LoggerType.STACKTRACE -> "E"
+            else -> "V"
         }
+
+        val formattedMsg = if (tag == LOG_GO_LOGGER) {
+            "$l $tag: $msg"
+        } else {
+            if (e != null) {
+                "$l $tag: $msg\n${Log.getStackTraceString(e)}"
+            } else {
+                "$l $tag: $msg"
+            }
+        }
+
+        try {
+            val c = ConsoleLog(0, formattedMsg, now)
+            VpnController.writeConsoleLog(c)
+        } catch (ignored: Exception) { }
     }
 }
