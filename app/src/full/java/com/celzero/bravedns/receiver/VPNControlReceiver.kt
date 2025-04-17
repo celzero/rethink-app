@@ -17,9 +17,12 @@
 package com.celzero.bravedns.receiver
 
 
+import Logger
+import Logger.LOG_TAG_VPN
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.VpnService
 import com.celzero.bravedns.service.VpnController
 import org.koin.core.component.KoinComponent
 
@@ -27,10 +30,24 @@ class VPNControlReceiver : BroadcastReceiver(), KoinComponent {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == ACTION_START) {
-            VpnController.start(context)
+            val prepareVpnIntent: Intent? =
+                try {
+                    Logger.i(LOG_TAG_VPN, "Attempting to prepare VPN before starting")
+                    VpnService.prepare(context)
+                } catch (e: NullPointerException) {
+                    Logger.w(LOG_TAG_VPN, "Device does not support system-wide VPN mode")
+                    return
+                }
+            if (prepareVpnIntent == null) {
+                Logger.i(LOG_TAG_VPN, "VPN is prepared, invoking start")
+                VpnController.start(context)
+                return
+            }
         }
         if (intent.action == ACTION_STOP) {
+            Logger.i(LOG_TAG_VPN, "VPN stopping")
             VpnController.stop(context)
+            return
         }
     }
 
