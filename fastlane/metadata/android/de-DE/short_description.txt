@@ -1,1 +1,1 @@
-Benutz die Firewall, WireGuard VPN, das Netzwerk überwachen, Malware blockieren, DNS ändern.
+Firewall, Netzwerküberwachung, DNS, WireGuard VPN & Blockieren schädl. Websites.

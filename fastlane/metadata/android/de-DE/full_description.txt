@@ -1,21 +1,31 @@
-Sagen Sie Hallo zu einem sichereren, transparenten und sicheren Android.
+Sag Hallo zu einem sichereren, transparenten und sicheren Android.
 
-VPN: Verbindet sich mit mehreren WireGuard VPNs Ihrer Wahl.
+VPN: Verbindet sich mit WireGuard VPNs deiner Wahl.
 
-Sicher: Zeigt die Netzwerkaktivität von installierten Apps an und ermöglicht es Ihnen, diese zu deaktivieren, zu deinstallieren oder mit einer Firewall zu schützen.
+Überwachung: Zeigt die Netzwerkaktivität von installierten Apps an und schützt sie mit einer Firewall.
 
-Sicher: Erste Verteidigungslinie gegen Spyware, Ransomware und Malware, die persönliche Daten stehlen und Konten übernehmen. Schützt vor DNS-Manipulationen, die typischerweise zur Zensur von Websites, sozialen Medien und Messaging-Apps eingesetzt werden.
+Sicher: Erste Verteidigungslinie gegen Spyware, Ransomware und Malware, die deine persönliche Daten stehlen und Konten übernehmen. Schützt vor DNS-Manipulationen, die typischerweise zur Zensur von Websites, sozialen Medien und Messaging-Apps eingesetzt werden.
 
-Schnell: DNS-Server an mehr als 300 Standorten weltweit, um sicherzustellen, dass Ihr Internet so schnell und hochverfügbar wie möglich ist.
+Schnell: DNS-Server an mehr als 300 Standorten weltweit, um sicherzustellen, dass dein Internet so latenzfrei und hochverfügbar wie möglich ist.
 
-Offen: Open Source und frei von Trackern.
+Offen: Open-Source und frei von Trackern.
 
 ***Features***
 
-Firewall: Verhindert, dass sich Anwendungen mit dem Internet verbinden. Blockieren Sie Spyware, Malware, Ransomware und mehr.
-     
-Eine Firewall blockiert jede App, die sich über WiFi oder mobile Daten mit dem Internet verbindet. Da die meisten Formen der Überwachung erfordern, dass die Daten über das Netzwerk an einen Server gesendet werden, wird die Bedrohung durch eine Firewall wirksam eingedämmt (Dateimanager, Wecker, Taschenrechner sind nur einige Beispiele für Apps, die keinen Internetzugang benötigen, um zu funktionieren). Die Firewall-Funktion nutzt den Accessibility Service, um Hintergrundanwendungen zu erkennen und zu sperren.
+Firewall: Verhindert, dass sich Apps mit dem Internet verbinden. Blockieren Sie Spyware, Malware, Ransomware und mehr.
 
-Überwachung: Überwachen Sie den ein- und ausgehenden Internetverkehr. 
+Eine Firewall blockiert jede App, die über WLAN oder mobile Daten eine Verbindung zum Internet herstellen möchte. Da die meisten Überwachungsmethoden darauf angewiesen sind, Daten über das Netzwerk an einen Server zu senden, lässt sich diese Bedrohung durch eine Firewall wirksam eindämmen. (Dateimanager, Wecker oder Taschenrechner sind Beispiele für Apps, die keine Internetverbindung benötigen, um zu funktionieren.) Die Firewall-Funktion nutzt den Dienst für Barrierefreiheit, um Hintergrundanwendungen zu erkennen und zu blockieren.
+
+Überwachung: Verfolge den ein- und ausgehenden Internetverkehr aller Apps auf deinem Gerät.
 
 Falls aktiviert, werden die Verbindungsprotokolle gesammelt und analysiert. Automatische Berichte zeigen bisher unbekannte oder verdächtige Verbindungen an und geben Aufschluss über das Ausmaß der Versuche von Spyware-Netzwerken, Daten zu stehlen. In unseren Tests wurden etwa 60 % des Datenverkehrs erkannt und zurückgewiesen.
+
+WireGuard: Schützt den Internetverkehr auf deinem Gerät.
+
+Die App verwendet das schnelle, moderne, schlanke und sichere WireGuard-Protokoll, um Netzwerkverbindungen mithilfe eines beliebigen kompatiblen VPN-Anbieters deiner Wahl zu verschlüsseln.
+
+Zensurumgehung:
+
+Die App verschlüsselt deine Internetverbindung zu einem Domain Name System (DNS)-Server, der von Rethink betrieben wird und an über 300 Standorten weltweit existiert. DNS-Server sind das Adressbuch des Internets: Ein DNS-Server liefert die exakte Adresse, die du benötigst, um eine Website zu besuchen oder eine App zu öffnen.
+
+Datenverbrauch: Überwacht den Datenverbrauch (mobil und WLAN) pro App und pro Verbindung.
