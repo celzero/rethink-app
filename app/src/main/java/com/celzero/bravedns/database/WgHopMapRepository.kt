@@ -36,11 +36,19 @@ class WgHopMapRepository(private val dao: WgHopMapDao) {
         return dao.getAll()
     }
 
+    suspend fun getBySrc(src: String): WgHopMap? {
+        return dao.getBySrc(src)
+    }
+
     suspend fun delete(map: WgHopMap) {
         dao.delete(map)
     }
 
     suspend fun deleteById(id: Int) {
         dao.deleteById(id)
+    }
+
+    suspend fun deleteAll() {
+        dao.deleteAll()
     }
 }

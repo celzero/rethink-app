@@ -35,7 +35,6 @@ import com.celzero.bravedns.adapter.WgPeersAdapter
 import com.celzero.bravedns.databinding.ActivityWgDetailBinding
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
@@ -451,18 +450,48 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         b.catchAllCheck.setOnClickListener { updateCatchAll(b.catchAllCheck.isChecked) }
 
         b.logsBtn.setOnClickListener {
-            startActivity(ProxyManager.ID_WG_BASE + configId)
+            startActivity(ID_WG_BASE + configId)
         }
 
         b.hopBtn.setOnClickListener {
-            io {
-                val id = ID_WG_BASE + configId
-                val hopId = VpnController.via(id)
-                Logger.d(LOG_TAG_PROXY, "hop result: $hopId")
-                val sid = convertStringIdToId(hopId)
-                val hopables = WgHopManager.getHopableWgs(id)
-                //uiCtx { showHopDialog(hopables, sid) }
-                uiCtx { openHopDialog(hopables, sid) }
+            val mapping = WireguardManager.getConfigFilesById(configId)
+            if (mapping == null) {
+                Utilities.showToastUiCentered(this, "Mapping not found", Toast.LENGTH_SHORT)
+                return@setOnClickListener
+            }
+
+            if (mapping.isActive || mapping.isLockdown || mapping.isCatchAll) {
+                io {
+                    val sid = ID_WG_BASE + configId
+                    val isVia = WgHopManager.isAlreadyVia(sid)
+                    if (isVia) {
+                        uiCtx {
+                            Utilities.showToastUiCentered(
+                                this,
+                                "Cannot hop, already via",
+                                Toast.LENGTH_SHORT
+                            )
+                        }
+                        return@io
+                    }
+                    val hopId = WgHopManager.getVia(configId)
+                    Logger.d(LOG_TAG_PROXY, "hop result: $hopId")
+                    val iid = convertStringIdToId(hopId)
+                    val hopables = WgHopManager.getHopableWgs(configId)
+                    uiCtx {
+                        if (hopables.isEmpty()) {
+                            Utilities.showToastUiCentered(
+                                this,
+                                "No hopable WireGuard found",
+                                Toast.LENGTH_SHORT
+                            )
+                        } else {
+                            openHopDialog(hopables, iid)
+                        }
+                    }
+                }
+            } else {
+                Utilities.showToastUiCentered(this, "WireGuard must be active", Toast.LENGTH_SHORT)
             }
         }
     }
@@ -475,63 +504,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             Logger.i(LOG_TAG_PROXY, "err converting string id to int: $id")
             INVALID_CONF_ID
         }
-    }
-
-    private fun showHopDialog(filteredConfigs: List<Config>, sid: Int) {
-        val curr = WireguardManager.getConfigById(configId)
-        if (curr == null) {
-            Utilities.showToastUiCentered(
-                this,
-                "Config not found",
-                Toast.LENGTH_SHORT
-            )
-            return
-        }
-
-        val configNames = filteredConfigs.map { it.getName() }.toTypedArray()
-        val selectedIndex = if (sid == -1) {
-            -1
-        } else {
-            filteredConfigs.indexOfFirst { it.getId() == sid }
-        }
-        Logger.v(LOG_TAG_PROXY, "hop: configs: ${filteredConfigs.map { it.getId() }}")
-        Logger.v(LOG_TAG_PROXY, "hop dialog: selected Index: $selectedIndex")
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle("Select a config to hop")
-        builder.setSingleChoiceItems(configNames, selectedIndex) { dialog, which ->
-            val config = filteredConfigs[which]
-            io {
-                val res = if (which == selectedIndex) {
-                    // set empty via so that it is removed from the map
-                    WgHopManager.deleteBySrc(ID_WG_BASE + curr.getId())
-                } else {
-                    WgHopManager.hop(curr.getId(), config.getId())
-                }
-                Logger.d(LOG_TAG_PROXY, "hop result: res:${res.first}, err: ${res.second}")
-                uiCtx {
-                    if (res.first) {
-                        Utilities.showToastUiCentered(
-                            this,
-                            "Hop successful",
-                            Toast.LENGTH_SHORT
-                        )
-                    } else {
-                        Utilities.showToastUiCentered(
-                            this,
-                            res.second,
-                            Toast.LENGTH_SHORT
-                        )
-                    }
-                }
-                WgHopManager.printMaps()
-            }
-            dialog.dismiss()
-        }
-
-        builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ ->
-            dialog.dismiss()
-        }
-        builder.create().show()
     }
 
     private fun startActivity(searchParam: String?) {
@@ -645,7 +617,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             return
         }
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        val hopDialog = WgHopDialog(this, themeId, hopables, selectedId)
+        val hopDialog = WgHopDialog(this, themeId, configId, hopables, selectedId)
         hopDialog.setCanceledOnTouchOutside(false)
         hopDialog.show()
     }

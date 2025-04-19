@@ -20,6 +20,7 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
@@ -68,7 +69,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val USE_SYSTEM_DNS_FOR_UNDELEGATED_DOMAINS = "use_system_dns_for_undelegated_domains"
         const val SLOWDOWN_MODE = "slowdown_mode"
         const val NETWORK_ENGINE_EXPERIMENTAL = "network_engine_experimental"
-        const val USE_RPN = "use_rpn_features"
+        const val USE_RPN = "rpn_state"
         const val DIAL_TIMEOUT_SEC = "dial_timeout_sec"
     }
 
@@ -333,8 +334,11 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     var slowdownMode by booleanPref("slowdown_mode").withDefault<Boolean>(false)
 
-    // use rpn features, default false (enabled after user opts in), paid feature
-    var useRpn by booleanPref("use_rpn_features").withDefault<Boolean>(false)
+    // different modes the rpn proxy can function, see enum RpnMode
+    var rpnMode by intPref("rpn_mode").withDefault<Int>(RpnProxyManager.RpnMode.ANTI_CENSORSHIP.id)
+
+    // current rpn state, see enum RpnState
+    var rpnState by intPref("rpn_state").withDefault<Int>(RpnProxyManager.RpnState.INACTIVE.id)
 
     var nwEngExperimentalFeatures by booleanPref("network_engine_experimental").withDefault<Boolean>(false)
 
@@ -478,11 +482,11 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     }
 
     fun getProxyStatus(): MutableLiveData<Int> {
-        if (proxyStatus.value == null || proxyStatus.value == -1) updateProxyStatus()
-        return proxyStatus
+        //if (proxyStatus.value == null || proxyStatus.value == -1) updateProxyStatus()
+        return updateProxyStatus()
     }
 
-    fun updateProxyStatus() {
+    fun updateProxyStatus(): MutableLiveData<Int> {
         val status =
             when (AppConfig.ProxyProvider.getProxyProvider(proxyProvider)) {
                 AppConfig.ProxyProvider.WIREGUARD -> {
@@ -513,5 +517,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
                 }
             }
         proxyStatus.postValue(status)
+        return proxyStatus
     }
 }

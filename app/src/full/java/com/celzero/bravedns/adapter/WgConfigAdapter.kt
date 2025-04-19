@@ -210,7 +210,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             if (hop.isNotEmpty()) {
                 b.protocolInfoChipGroup.visibility = View.VISIBLE
                 b.chipHop.visibility = View.VISIBLE
-                b.chipHop.text = b.chipHop.text.toString() + ": " + hop.map { it.via }.joinToString()
+                b.chipHop.text = "Hop: " + hop.map { it.via }.joinToString()
             } else {
                 b.chipHop.visibility = View.GONE
             }
