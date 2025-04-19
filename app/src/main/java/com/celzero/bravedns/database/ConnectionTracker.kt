@@ -37,6 +37,7 @@ class ConnectionTracker {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var appName: String = ""
     var uid: Int = 0
+    var packageName: String = ""
     var usrId: Int = 0
     var ipAddress: String = ""
     var port: Int = 0

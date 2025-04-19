@@ -41,15 +41,19 @@ class DnsLog {
 
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var uid: Int = INVALID_UID
+    var appName: String = ""
+    var packageName: String = ""
     var queryStr: String = ""
     var time: Long = INIT_TIME_MS
     var flag: String = ""
     var resolver: String = ""
     var latency: Long = 0L
+    var ttl: Long = 0L
     var typeName: String = ""
     var isBlocked: Boolean = false
     var blockLists: String = ""
     var serverIP: String = ""
+    var proxyId: String = ""
     var relayIP: String = ""
     var responseTime: Long = INIT_TIME_MS
     var response: String = ""

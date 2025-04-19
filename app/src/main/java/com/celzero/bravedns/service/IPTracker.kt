@@ -26,6 +26,7 @@ import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.RethinkLog
 import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.util.AndroidUidConfig
+import com.celzero.bravedns.util.Constants.Companion.EMPTY_PACKAGE_NAME
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.IPUtil
 import com.celzero.bravedns.util.Utilities
@@ -70,7 +71,10 @@ internal constructor(
         val countryCode: String? = getCountryCode(serverAddress, ctx)
         connTracker.flag = getFlag(countryCode)
 
-        connTracker.appName = fetchApplicationName(connTracker.uid)
+        // returns pair of appName and packageName
+        val appNamePackagePair = fetchAppPackageName(connTracker.uid)
+        connTracker.appName = appNamePackagePair.first
+        connTracker.packageName = appNamePackagePair.second
 
         return connTracker
     }
@@ -93,7 +97,8 @@ internal constructor(
         val countryCode: String? = getCountryCode(serverAddress, ctx)
         rlog.flag = getFlag(countryCode)
 
-        rlog.appName = fetchApplicationName(rlog.uid)
+        // no need to use package name for rethink logs
+        rlog.appName = fetchAppPackageName(rlog.uid).first
 
         return rlog
     }
@@ -151,16 +156,23 @@ internal constructor(
         return null
     }
 
-    private suspend fun fetchApplicationName(uid: Int): String {
+    private suspend fun fetchAppPackageName(uid: Int): Pair<String, String> {
         if (uid == INVALID_UID) {
-            return ctx.getString(R.string.network_log_app_name_unknown)
+            return Pair(ctx.getString(R.string.network_log_app_name_unknown), EMPTY_PACKAGE_NAME)
         }
 
-        val pkgs = getPackageInfoForUid(ctx, uid)
+        val cachedPkgs = FirewallManager.getPackageNamesByUid(uid)
+
+        val pkgs = if (cachedPkgs.isEmpty()) {
+            // query the package manager for the package name
+            getPackageInfoForUid(ctx, uid)?.toList() ?: emptyList()
+        } else {
+            cachedPkgs
+        }
 
         val appName: String =
-            if (pkgs != null && pkgs.isNotEmpty()) {
-                appNameForUidOrPackage(uid, pkgs[0])
+            if (pkgs.isNotEmpty()) {
+                appNameForUidOrPackage(uid, pkgs.firstOrNull() ?: EMPTY_PACKAGE_NAME)
             } else { // For UNKNOWN or Non-App.
                 val androidUidConfig = AndroidUidConfig.fromFileSystemUid(uid)
                 Logger.i(
@@ -174,7 +186,7 @@ internal constructor(
                     androidUidConfig.name
                 }
             }
-        return appName
+        return Pair(appName, pkgs.firstOrNull() ?: EMPTY_PACKAGE_NAME)
     }
 
     private suspend fun appNameForUidOrPackage(uid: Int, packageName: String): String {

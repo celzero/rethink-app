@@ -34,6 +34,7 @@ class Transaction {
     var serverName: String = ""
     var blocklist: String = ""
     var relayName: String = ""
+    var proxyId: String = ""
     var id: String = ""
     var ttl: Long = 0L
     var transportType: TransportType = TransportType.DOH
@@ -81,6 +82,10 @@ class Transaction {
                     Backend.ODOH -> ODOH
                     else -> DOH
                 }
+            }
+
+            fun fromOrdinal(ordinal: Int): TransportType {
+                return TransportType.entries[ordinal]
             }
         }
     }

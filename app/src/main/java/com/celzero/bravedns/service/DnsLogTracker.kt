@@ -16,14 +16,20 @@
 
 package com.celzero.bravedns.service
 
+import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.os.SystemClock
+import androidx.paging.LOG_TAG
 import backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.util.AndroidUidConfig
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.EMPTY_PACKAGE_NAME
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.Constants.Companion.UNKNOWN_APP
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.celzero.bravedns.util.ResourceRecordTypes
@@ -67,17 +73,28 @@ internal constructor(
         vpnStateMap[Transaction.Status.INTERNAL_ERROR] = BraveVPNService.State.APP_ERROR
     }
 
-    fun processOnResponse(summary: backend.DNSSummary): Transaction {
+    fun processOnResponse(summary: backend.DNSSummary, rethinkUid: Int): Transaction {
         val latencyMs = (TimeUnit.SECONDS.toMillis(1L) * summary.latency).toLong()
         val nowMs = SystemClock.elapsedRealtime()
         val queryTimeMs = nowMs - latencyMs
         var uid = INVALID_UID
+
         try {
-            uid = summary.uid.toInt()
-        } catch (ignored: NumberFormatException) { }
+            uid = if (summary.uid == Backend.UidSelf) {
+                rethinkUid
+            } else if (summary.uid == Backend.UidSystem) {
+                AndroidUidConfig.SYSTEM.uid // 1000
+            } else {
+                summary.uid.toInt()
+            }
+        } catch (ignored: NumberFormatException) {
+            Logger.w(LOG_TAG_VPN, "onQuery: invalid uid: ${summary.uid}, using default uid: $uid")
+        }
 
         val transaction = Transaction()
-        transaction.qName = summary.qName
+        // remove the trailing dot from the qName if present, it causes discrepancies in the
+        // stats summary page when qname is used along domain from ConnectionTracker
+        transaction.qName = summary.qName.dropLastWhile { it == '.' }
         transaction.type = summary.qType
         transaction.uid = uid
         transaction.id = summary.id
@@ -91,7 +108,8 @@ internal constructor(
         transaction.status = Transaction.Status.fromId(summary.status)
         transaction.responseCalendar = Calendar.getInstance()
         transaction.blocklist = summary.blocklists ?: ""
-        transaction.relayName = summary.relayServer ?: ""
+        transaction.relayName = summary.rpid ?: ""
+        transaction.proxyId = summary.pid ?: ""
         transaction.msg = summary.msg ?: ""
         transaction.upstreamBlock = summary.upstreamBlocks
         transaction.region = summary.region
@@ -99,12 +117,13 @@ internal constructor(
         return transaction
     }
 
-    fun makeDnsLogObj(transaction: Transaction): DnsLog {
+    suspend fun makeDnsLogObj(transaction: Transaction): DnsLog {
         val dnsLog = DnsLog()
 
         dnsLog.uid = transaction.uid
         dnsLog.blockLists = transaction.blocklist
         dnsLog.resolverId = transaction.id
+        dnsLog.proxyId = transaction.proxyId
         dnsLog.relayIP = transaction.relayName
         dnsLog.dnsType = transaction.transportType.ordinal
         dnsLog.latency = transaction.latency
@@ -113,6 +132,7 @@ internal constructor(
         dnsLog.serverIP = transaction.serverName
         dnsLog.status = transaction.status.name
         dnsLog.time = transaction.responseCalendar.timeInMillis
+        dnsLog.ttl = transaction.ttl
         dnsLog.msg = transaction.msg
         dnsLog.upstreamBlock = transaction.upstreamBlock
         dnsLog.region = transaction.region
@@ -128,6 +148,10 @@ internal constructor(
         // mark the query as blocked if the transaction id is Dnsx.BlockAll, no need to check
         // for blocklist as it is already marked as blocked
         if (transaction.id == Backend.BlockAll) {
+            // TODO: rdata should be empty for block all
+            if (transaction.response.isNotEmpty()) {
+                Logger.w(LOG_TAG_VPN, "id is BlockAll, but rdata is not empty: ${transaction.response} for ${transaction.qName}")
+            }
             dnsLog.isBlocked = true
         }
 
@@ -185,6 +209,17 @@ internal constructor(
         if (persistentState.fetchFavIcon) {
             fetchFavIcon(context, dnsLog)
         }
+
+        // fetch appName and packageName from uid
+        if (transaction.uid != INVALID_UID) {
+            val appInfo = FirewallManager.getAppInfoByUid(transaction.uid)
+            dnsLog.appName = appInfo?.appName ?: context.getString(R.string.network_log_app_name_unnamed, transaction.uid.toString())
+            dnsLog.packageName = appInfo?.packageName ?: EMPTY_PACKAGE_NAME
+        } else {
+            dnsLog.appName = context.getString(R.string.network_log_app_name_unknown)
+            dnsLog.packageName = EMPTY_PACKAGE_NAME
+        }
+
         return dnsLog
     }
 
