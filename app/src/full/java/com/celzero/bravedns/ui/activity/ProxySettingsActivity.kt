@@ -17,7 +17,6 @@ package com.celzero.bravedns.ui.activity
 
 import Logger
 import Logger.LOG_TAG_PROXY
-import Logger.LOG_TAG_UI
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -44,6 +43,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.databinding.DialogSetProxyBinding
 import com.celzero.bravedns.databinding.FragmentProxyConfigureBinding
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
@@ -125,7 +125,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         b.orbotTitle.text = getString(R.string.orbot).lowercase()
         b.otherTitle.text = getString(R.string.category_name_others).lowercase()
 
-        if (persistentState.useRpn) {
+        if (RpnProxyManager.isRpnActive()) {
             b.rpnTitle.visibility = View.VISIBLE
             b.settingsActivityRpnContainer.visibility = View.VISIBLE
         } else {
@@ -140,7 +140,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     private fun initClickListeners() {
 
         b.settingsActivityRpnContainer.setOnClickListener {
-            val intent = Intent(this, TroubleshootActivity::class.java)
+            val intent = Intent(this, RethinkPlusDashboardActivity::class.java)
             startActivity(intent)
         }
 
