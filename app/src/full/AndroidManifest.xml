@@ -144,9 +144,11 @@
             android:name=".ui.activity.PingTestActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.activity.TroubleshootActivity"
+            android:name=".ui.activity.RethinkPlusDashboardActivity"
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.RpnCountriesActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.RpnAvailabilityCheckActivity"
             android:finishOnTaskLaunch="true" />
 
         <receiver
