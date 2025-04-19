@@ -44,6 +44,7 @@ import com.celzero.bravedns.ui.bottomsheet.LocalBlocklistsBottomSheet
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -151,16 +152,30 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     }
 
     private fun showSplitDnsUi() {
-        if (persistentState.enableDnsAlg) {
+        if (isAtleastR()) {
+            // show split dns by default only if the device is running on Android 12 or above
             b.dcSplitDnsRl.visibility = View.VISIBLE
             b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
         } else {
-            b.dcSplitDnsRl.visibility = View.GONE
-            b.dcSplitDnsSwitch.isChecked = false
+            if (persistentState.enableDnsAlg) {
+                b.dcSplitDnsRl.visibility = View.VISIBLE
+                b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
+            } else {
+                b.dcSplitDnsRl.visibility = View.GONE
+                b.dcSplitDnsSwitch.isChecked = false
+            }
         }
     }
 
     private fun updateSpiltDns() {
+        if (isAtleastR()) {
+            // no-op, no need to depend of alg when device is running on Android 12 or above
+            // as split dns option is shown to user regardless of dns alg
+            b.dcSplitDnsRl.visibility = View.VISIBLE
+            b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
+            return
+        }
+
         if (persistentState.enableDnsAlg) {
             persistentState.splitDns = persistentState.splitDns
         } else {
@@ -231,7 +246,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         if (WireguardManager.oneWireGuardEnabled()) {
             b.wireguardRb.visibility = View.VISIBLE
             b.wireguardRb.isChecked = true
-            b.wireguardRb.setChecked(true)
+            b.wireguardRb.isChecked = true
             b.wireguardRb.isEnabled = true
             disableAllDns()
             return
@@ -242,18 +257,18 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             b.networkDnsRb.isChecked = true
             b.rethinkPlusDnsRb.isChecked = false
             b.customDnsRb.isChecked = false
-            b.networkDnsRb.setChecked(true)
+            b.networkDnsRb.isChecked = true
         } else if (isRethinkDns()) {
             b.rethinkPlusDnsRb.isChecked = true
             b.customDnsRb.isChecked = false
             b.networkDnsRb.isChecked = false
-            b.rethinkPlusDnsRb.setChecked(true)
+            b.rethinkPlusDnsRb.isChecked = true
         } else {
             // connected to custom dns, update the dns details
             b.customDnsRb.isChecked = true
             b.rethinkPlusDnsRb.isChecked = false
             b.networkDnsRb.isChecked = false
-            b.customDnsRb.setChecked(true)
+            b.customDnsRb.isChecked = true
         }
     }
 
