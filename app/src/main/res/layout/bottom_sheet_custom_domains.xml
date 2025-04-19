@@ -122,6 +122,7 @@
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackground"
             android:paddingTop="15dp"
+            android:visibility="gone"
             android:paddingBottom="15dp">
 
             <androidx.appcompat.widget.AppCompatImageView
