@@ -36,6 +36,7 @@
                 android:fontFamily="sans-serif-smallcaps"
                 android:lineSpacingExtra="5dp"
                 android:padding="10dp"
+                android:textIsSelectable="true"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/extra_large_font_text_view" />
 
