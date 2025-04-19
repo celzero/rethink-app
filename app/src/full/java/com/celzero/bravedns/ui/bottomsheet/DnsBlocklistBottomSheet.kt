@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_DNS
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
@@ -41,6 +42,7 @@ import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
+import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
@@ -48,12 +50,14 @@ import com.celzero.bravedns.databinding.DialogIpDetailsLayoutBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -123,7 +127,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         }
 
         b.bsdlDomainRuleDesc.text = updateHtmlEncodedText(getString(R.string.bsdl_block_desc))
-        b.dnsBlockUrl.text = log!!.queryStr
+        b.dnsBlockUrl.text = log!!.queryStr + "      ❯"
         b.dnsBlockIpAddress.text = getResponseIp()
         b.dnsBlockConnectionFlag.text = log!!.flag
         b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, log!!.latency.toString())
@@ -170,6 +174,14 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun setupClickListeners() {
+
+        b.dnsBlockHeaderContainer.setOnClickListener {
+            startDomainConnectionsActivity(log!!.queryStr)
+        }
+
+        b.dnsBlockUrl.setOnClickListener {
+            startDomainConnectionsActivity(log!!.queryStr)
+        }
 
         b.bsdlDomainRuleSpinner.adapter =
             FirewallStatusSpinnerAdapter(
@@ -351,6 +363,14 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                     ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorNegative))
             }
         }
+    }
+
+    private fun startDomainConnectionsActivity(domain: String) {
+        val intent = Intent(requireContext(), DomainConnectionsActivity::class.java)
+        intent.putExtra(DomainConnectionsActivity.INTENT_TYPE, DomainConnectionsActivity.InputType.DOMAIN.type)
+        intent.putExtra(DomainConnectionsActivity.INTENT_DOMAIN, domain)
+        intent.putExtra(DomainConnectionsActivity.INTENT_TIME_CATEGORY, DomainConnectionsViewModel.TimeCategory.SEVEN_DAYS.value)
+        requireContext().startActivity(intent)
     }
 
     private fun showBlocklistDialog(groupNames: Multimap<String, String>) {
