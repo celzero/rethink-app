@@ -32,12 +32,13 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -53,13 +54,14 @@ object InAppBillingHandler : KoinComponent {
     private var billingListener: BillingListener? = null
     private val persistentState by inject<PersistentState>()
 
-    const val TAG = LOG_IAB
+    const val TAG = "Handler"
 
     const val HISTORY_LINK = "https://play.google.com/store/account/orderhistory"
     const val LINK = "https://play.google.com/store/account/subscriptions?sku=$1&package=$2"
 
-    //private const val PRODUCT_ID_TEST = "test_product_acp"
-    const val PRODUCT_ID_TEST = "test_monthly_sub_1usd"
+    //const val PRODUCT_ID_TEST = "test_monthly_sub_1usd"
+    const val PROD_ID_ANNUAL_TEST = "proxy_annual_subscription_test"
+    const val PROD_ID_MONTHLY_TEST = "proxy_monthly_subscription_test"
 
     private val queryUtils: QueryUtils by lazy { QueryUtils(billingClient) }
     private val productDetails: CopyOnWriteArrayList<ProductDetail> = CopyOnWriteArrayList()
@@ -80,7 +82,7 @@ object InAppBillingHandler : KoinComponent {
     private var lastPurchaseFetchTime: Long = 0
 
     // 1 minute interval
-    private const val LAST_PURCHASE_FETCH_TIME_INTERVAL = 1 * 60 * 1000
+    private const val PURCHASE_REFRESH_INTERVAL = 1 * 60 * 1000
 
     // Result state for the billing client
     enum class Priority(val value: Int) {
@@ -108,22 +110,22 @@ object InAppBillingHandler : KoinComponent {
     }
 
     private fun logd(methodName: String, msg: String) {
-        Logger.d(TAG, "$methodName: $msg")
+        Logger.d(LOG_IAB, "$TAG $methodName: $msg")
     }
 
     private fun logv(methodName: String, msg: String) {
-        Logger.v(TAG, "$methodName: $msg")
+        Logger.v(LOG_IAB, "$TAG $methodName: $msg")
     }
 
     private fun loge(methodName: String, msg: String, e: Exception? = null) {
-        Logger.e(TAG, "$methodName: $msg", e)
+        Logger.e(LOG_IAB, "$TAG $methodName: $msg", e)
     }
 
     private fun log(methodName: String, msg: String) {
-        Logger.i(TAG, "$methodName: $msg")
+        Logger.i(LOG_IAB, "$TAG $methodName: $msg")
     }
 
-    fun initiate(context: Context, billingListener: BillingListener?) {
+    fun initiate(context: Context, billingListener: BillingListener? = null) {
         this.billingListener = billingListener
         setupBillingClient(context)
         startConnection { isSuccess, message ->
@@ -169,9 +171,9 @@ object InAppBillingHandler : KoinComponent {
     }
 
     fun isListenerRegistered(l: BillingListener?): Boolean {
-        // compares reference equality when comparing objects
         val mname = this::isListenerRegistered.name
         logv(mname, "checking if listener is registered")
+        // compares reference equality when comparing objects
         val isRegistered = billingListener == l
         log(mname, "isRegistered: $isRegistered")
         return isRegistered
@@ -210,6 +212,7 @@ object InAppBillingHandler : KoinComponent {
                     // only fetch the purchases for the subscription type
                     val prodTypes = listOf(ProductType.SUBS)
                     fetchPurchases(prodTypes)
+                    queryProductDetails()
                 } else {
                     log(mname, "billing client setup failed; code: ${billingResult.responseCode}, msg: ${billingResult.debugMessage}")
                 }
@@ -245,7 +248,6 @@ object InAppBillingHandler : KoinComponent {
                 response.isOk -> {
                     Result.setResultState(ResultState.PURCHASING_SUCCESSFULLY)
                     handlePurchase(purchasesList)
-                    //fetchPurchases(purchasesList)
                     return@PurchasesUpdatedListener
                 }
                 response.isAlreadyOwned -> {
@@ -329,7 +331,7 @@ object InAppBillingHandler : KoinComponent {
         if (lastPurchaseFetchTime != 0L) {
             val currentTime = System.currentTimeMillis()
             val diff = currentTime - lastPurchaseFetchTime
-            if (diff < LAST_PURCHASE_FETCH_TIME_INTERVAL) {
+            if (diff < PURCHASE_REFRESH_INTERVAL) {
                 loge(mname, "fetching purchases within 60 seconds, skipping")
                 return
             }
@@ -402,6 +404,8 @@ object InAppBillingHandler : KoinComponent {
                     )
                     val productDetailsList = queryUtils.queryProductDetailsAsync(productParams)
                     completePurchaseList.add(CompletePurchase(purchase, productDetailsList))
+                } else {
+                    logd(mname, "product not purchased: ${purchase.products}")
                 }
             }
 
@@ -447,13 +451,13 @@ object InAppBillingHandler : KoinComponent {
             purchaseDetails.clear()
             purchaseDetails.addAll(resultList)
             _purchasesLiveData.postValue(resultList)
-            if (resultList.isEmpty()) {
-                logv(mname, "no purchases found, disabling R+")
-                persistentState.enableWarp = false
+            logv(mname, "purchases processed: $resultList")
+            if (resultList.isNotEmpty()) {
+                RpnProxyManager.activateRpn()
             } else {
-                logv(mname, "purchases found, enabling R+")
-                persistentState.enableWarp = true
+                RpnProxyManager.deactivateRpn()
             }
+
             if (billingListener == null) {
                 loge(mname, "billing listener is null")
                 return@io
@@ -467,13 +471,12 @@ object InAppBillingHandler : KoinComponent {
         if (purchase?.purchaseState == null) {
             return false
         }
-        return purchase.purchaseState == Purchase.PurchaseState.PURCHASED && purchase.isAutoRenewing
-        // use signature verification in future
-        /*return if (isSignatureValid(purchase)) {
+        return if (isSignatureValid(purchase)) {
+            // there is no one-time purchase for now, so only check for subscription
             purchase.purchaseState == Purchase.PurchaseState.PURCHASED && purchase.isAutoRenewing
         } else {
             false
-        }*/
+        }
     }
 
     private fun isSignatureValid(purchase: Purchase): Boolean {
@@ -488,20 +491,18 @@ object InAppBillingHandler : KoinComponent {
         return formatter.format(Date(this))
     }
 
-    fun queryProductDetailsWithTimeout() {
+    suspend fun queryProductDetailsWithTimeout() {
         val mname = this::queryProductDetailsWithTimeout.name
         logv(mname, "init query product details with timeout")
         if (storeProductDetails.isNotEmpty()) {
             loge(mname, "store product details is not empty, skipping product details query")
             return
         }
-        io {
-            val result = withTimeoutOrNull(5000) {
-                queryProductDetails()
-            }
-            if (result == null) {
-                loge(mname, "query product details timed out")
-            }
+        val result = withTimeoutOrNull(5000) {
+            queryProductDetails()
+        }
+        if (result == null) {
+            loge(mname, "query product details timed out")
         }
     }
 
@@ -509,7 +510,11 @@ object InAppBillingHandler : KoinComponent {
         val mname = this::queryProductDetails.name
         val productListParams = listOf(
             QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(PRODUCT_ID_TEST)
+                .setProductId(PROD_ID_MONTHLY_TEST)
+                .setProductType(ProductType.SUBS)
+                .build(),
+            QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(PROD_ID_ANNUAL_TEST)
                 .setProductType(ProductType.SUBS)
                 .build()
         )
@@ -520,7 +525,7 @@ object InAppBillingHandler : KoinComponent {
 
         billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
             logd(mname, "result: ${billingResult.responseCode}, ${billingResult.debugMessage}")
-            logv(mname, "product details: $productDetailsList")
+            logv(mname, "product details: ${productDetailsList.size}")
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 processProductList(productDetailsList)
             }
@@ -530,6 +535,7 @@ object InAppBillingHandler : KoinComponent {
     private fun processProductList(productDetailsList: List<ProductDetails>) {
         val mname = this::processProductList.name
         val queryProductDetail = arrayListOf<QueryProductDetail>()
+        logd(mname, "product details size: ${productDetailsList.size}, $productDetailsList")
         productDetailsList.forEach { pd ->
             logd(mname, "product details: $pd")
 
@@ -561,12 +567,13 @@ object InAppBillingHandler : KoinComponent {
 
                 ProductType.SUBS -> {
                     pd.subscriptionOfferDetails?.let { offersList ->
-                        log(mname, "subs; offersList: $offersList")
+                        log(mname, "subs; offersList: ${offersList.size}")
                         offersList.forEach tag@{ offer ->       // Weekly, Monthly, etc // Free-Regular  // Regular
-
+                            log(mname, "offer: ${offer.basePlanId}, ${offer.offerId}, ${offer.pricingPhases}")
                             val isExist =
                                 this.productDetails.any { it.productId == pd.productId && it.planId == offer.basePlanId }
                             val isExistInStore = storeProductDetails.any { it.productDetail.productId == pd.productId && it.productDetail.planId == offer.basePlanId }
+                            logd(mname, "exist? $isExist, $isExistInStore, for $pd, ${offer.basePlanId}, ${pd.productId}")
                             if (isExist && isExistInStore) {
                                 logd(mname, "exist: ${storeProductDetails.size}, ${this.productDetails.size} $pd, ${offer.basePlanId}, ${pd.productId}")
                                 loge(mname, "product already exists, skipping")
@@ -618,17 +625,29 @@ object InAppBillingHandler : KoinComponent {
                             if (!isExistInStore) {
                                 queryProductDetail.add(QueryProductDetail(productDetail, pd, offer))
                             }
-                            logd(mname, "product added: $productDetail")
+                            logd(mname, "product added: ${productDetail.productId}, ${productDetail.planId}, ${productDetail.productTitle}, ${productDetail.pricingDetails.map { it.price }}")
                         }
                     }
                 }
             }
         }
 
-        storeProductDetails.clear()
+
         storeProductDetails.addAll(queryProductDetail)
         log(mname, "storeProductDetailsList: $storeProductDetails")
         Result.setResultState(ResultState.CONSOLE_QUERY_PRODUCTS_COMPLETED)
+
+        // remove duplicates from storeProductDetails and productDetails
+        // to make sure the list is unique and not duplicated
+        val s = storeProductDetails.distinctBy { it.productDetail.productId }
+        val p = productDetails.distinctBy { it.productId }
+
+        storeProductDetails.clear()
+        storeProductDetails.addAll(s)
+        productDetails.clear()
+        productDetails.addAll(p)
+
+        logd(mname, "final storeProductDetails: ${storeProductDetails.size}, productDetails: ${productDetails.size}")
 
         _productDetailsLiveData.postValue(productDetails)
 
@@ -738,7 +757,7 @@ object InAppBillingHandler : KoinComponent {
         }
     }
 
-    private val scope = CoroutineScope(Dispatchers.IO + Job())
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private fun io(f: suspend () -> Unit) {
           scope.launch { f() }
     }
