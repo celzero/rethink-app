@@ -18,17 +18,26 @@ package com.celzero.bravedns.rpnproxy
 import Logger
 import Logger.LOG_TAG_PROXY
 import android.content.Context
+import backend.Backend
 import com.celzero.bravedns.database.RpnProxy
 import com.celzero.bravedns.database.RpnProxyRepository
+import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.EncryptedFileManager
 import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.RPN_PROXY_FOLDER_NAME
+import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.BadConfigException
 import com.celzero.bravedns.wireguard.Config
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -43,6 +52,8 @@ object RpnProxyManager : KoinComponent {
     private const val TAG = "RpnMgr"
 
     private val db: RpnProxyRepository by inject()
+    private val workScheduler by inject<WorkScheduler>()
+    private val persistentState by inject<PersistentState>()
 
     // warp primary and secondary config names, ids and file names
     const val WARP_ID = 1
@@ -66,23 +77,89 @@ object RpnProxyManager : KoinComponent {
 
     private val selectedCountries = mutableSetOf<String>()
 
+    enum class RpnMode(val id: Int, val value: String) {
+        ANTI_CENSORSHIP(1, Backend.Auto),
+        HIDE_IP(2, listOf(Backend.RpnWg, Backend.RpnAmz, Backend.RpnPro, Backend.Rpn64, Backend.RpnSE).joinToString(","));
+
+        companion object {
+            fun fromId(id: Int) = RpnMode.entries.first { it.id == id }
+        }
+
+        fun isAntiCensorship() = this == ANTI_CENSORSHIP
+
+        fun isHideIp() = this == HIDE_IP
+    }
+
+    enum class RpnState(val id: Int) {
+        INACTIVE(0),
+        PAUSED(1),
+        ACTIVE(2);
+
+        companion object {
+            fun fromId(id: Int) = RpnState.entries.first { it.id == id }
+        }
+
+        fun isActive() = this == ACTIVE
+        fun isPaused() = this == PAUSED
+        fun isInactive() = this == INACTIVE
+    }
+
+    fun isRpnActive() = RpnState.fromId(persistentState.rpnState).isActive()
+
+    fun rpnMode() = RpnMode.fromId(persistentState.rpnMode)
+
+    fun rpnState() = RpnState.fromId(persistentState.rpnState)
+
+    fun deactivateRpn() {
+        persistentState.rpnState = RpnState.INACTIVE.id
+    }
+
+    fun activateRpn() {
+        persistentState.rpnState = RpnState.ACTIVE.id
+    }
+
+    fun pauseRpn() {
+        persistentState.rpnState = RpnState.PAUSED.id
+    }
+
     enum class RpnType(val id: Int) {
         WARP(1),
         AMZ(2),
         PROTON(3),
         SE(4),
         EXIT_64(5),
-        EXIT(6)
+        EXIT(6);
+
+        companion object {
+            fun fromId(id: Int) = entries.first { it.id == id }
+        }
     }
 
-    suspend fun load() {
+    data class RpnProps(val id: String, val status: Long, val type: String, val kids: String, val addr: String, val created: Long, val expires: Long, val who: String) {
+        override fun toString(): String {
+            val cts = getTime(created)
+            val ets = getTime(expires)
+            val s = applicationContext.getString(UIUtils.getProxyStatusStringRes(status))
+            return "id = $id\nstatus = $s\ntype = $type\nkids = $kids\naddr = $addr\ncreated = $cts\nexpires = $ets\nwho = $who"
+        }
+    }
+
+    private fun getTime(time: Long): String {
+        return  Utilities.convertLongToTime(time, Constants.TIME_FORMAT_4)
+    }
+
+    init {
+        io { load() }
+    }
+
+    suspend fun load(): Int {
         // need to read the filepath from database and load the file
         // there will be an entry in the database for each RPN proxy
-        try {
-            selectedCountries.clear()
-            val rpnProxies = db.getAllProxies()
-            Logger.i(LOG_TAG_PROXY, "$TAG; init load, db size: ${rpnProxies.size}")
-            rpnProxies.forEach {
+        selectedCountries.clear()
+        val rpnProxies = db.getAllProxies()
+        Logger.i(LOG_TAG_PROXY, "$TAG; init load, db size: ${rpnProxies.size}")
+        rpnProxies.forEach {
+            try {
                 val cfgFile = File(it.configPath)
                 if (!cfgFile.exists()) {
                     Logger.w(LOG_TAG_PROXY, "$TAG; load, file not found: ${it.configPath}")
@@ -92,14 +169,19 @@ object RpnProxyManager : KoinComponent {
                     PROTON_ID -> {
                         val json = EncryptedFileManager.read(applicationContext, cfgFile)
                         protonConfig = stringToProtonConfig(json)
-                        Logger.i(LOG_TAG_PROXY, "$TAG; proton config loaded, ${protonConfig != null}")
+                        Logger.i(
+                            LOG_TAG_PROXY,
+                            "$TAG; proton config loaded, ${protonConfig != null}"
+                        )
                     }
                     WARP_ID, AMZ_ID -> {
                         val cfg = EncryptedFileManager.read(applicationContext, cfgFile)
-                        val inputStream = ByteArrayInputStream(cfg.toByteArray(StandardCharsets.UTF_8))
+                        val inputStream =
+                            ByteArrayInputStream(cfg.toByteArray(StandardCharsets.UTF_8))
                         val c = Config.parse(inputStream)
                         // set name and id to the config
-                        val config = Config.Builder().setId(it.id).setName(it.name).setInterface(c.getInterface())
+                        val config = Config.Builder().setId(it.id).setName(it.name)
+                            .setInterface(c.getInterface())
                             .addPeers(c.getPeers()).build()
                         if (it.id == WARP_ID) {
                             warpConfig = config
@@ -109,14 +191,18 @@ object RpnProxyManager : KoinComponent {
                         Logger.i(LOG_TAG_PROXY, "$TAG; config loaded: ${it.name}")
                     }
                 }
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; err loading rpn proxy: ${it.name}, ${e.message}")
             }
-
-            selectedCountries.addAll(DomainRulesManager.getAllUniqueCCs()) // add the domain rules cc
-            selectedCountries.addAll(IpRulesManager.getAllUniqueCCs()) // add the ip rules cc
-            Logger.d(LOG_TAG_PROXY, "$TAG; total selected countries: ${selectedCountries.size}, $selectedCountries")
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_PROXY, "$TAG; err loading rpn proxies: ${e.message}", e)
         }
+
+        selectedCountries.addAll(DomainRulesManager.getAllUniqueCCs()) // add the domain rules cc
+        selectedCountries.addAll(IpRulesManager.getAllUniqueCCs()) // add the ip rules cc
+        Logger.d(
+            LOG_TAG_PROXY,
+            "$TAG; total selected countries: ${selectedCountries.size}, $selectedCountries"
+        )
+        return rpnProxies.size
     }
 
     suspend fun getNewProtonConfig(): ProtonConfig? {
@@ -132,6 +218,49 @@ object RpnProxyManager : KoinComponent {
         }
     }
 
+    // This function is called from RpnProxiesUpdateWorker
+    suspend fun registerNewProxy(type: RpnType): Boolean {
+        // in case of update failure, call register with null
+        when (type) {
+            RpnType.WARP -> {
+                val bytes = VpnController.registerAndFetchWarpConfig(null) ?: return false
+                return updateWarpConfig(bytes)
+            }
+            RpnType.AMZ -> {
+                val bytes = VpnController.registerAndFetchAmneziaConfig(null) ?: return false
+                return updateAmzConfig(bytes)
+            }
+            RpnType.PROTON -> {
+                val bytes = VpnController.registerAndFetchProtonIfNeeded(null) ?: return false
+                return updateProtonConfig(bytes)
+            }
+            else -> {
+                Logger.e(LOG_TAG_PROXY, "$TAG; err; invalid type for register: $type")
+                return false
+            }
+        }
+    }
+
+    suspend fun refreshRpnCreds(type: RpnType): Boolean {
+        val bytes = VpnController.updateRpnProxy(type)
+        var res = when (type) {
+            RpnType.WARP -> {
+                updateWarpConfig(bytes)
+            }
+            RpnType.AMZ -> {
+                updateAmzConfig(bytes)
+            }
+            RpnType.PROTON -> {
+                updateProtonConfig(bytes)
+            }
+            else -> {
+                // Do nothing
+                false
+            }
+        }
+        return res
+    }
+
     suspend fun updateProtonConfig(byteArray: ByteArray?): Boolean {
         if (byteArray == null) {
             Logger.e(LOG_TAG_PROXY, "$TAG; err in getting the proton config")
@@ -145,6 +274,14 @@ object RpnProxyManager : KoinComponent {
                 Logger.d(LOG_TAG_PROXY, "$TAG; proton config saved? $res")
                 if (res) {
                     protonConfig = p
+                    // asserting as protonConfig will not be null here
+                    val expiry = getProxyExpiry(RpnType.PROTON) ?: 0
+                    if (expiry == 0L) {
+                        Logger.e(LOG_TAG_PROXY, "$TAG; err getting proton expiry, not scheduling update")
+                    } else {
+                        scheduledUpdateConfig(RpnType.PROTON, expiry)
+                        Logger.i(LOG_TAG_PROXY, "$TAG; scheduled proton, $expiry")
+                    }
                     Logger.d(LOG_TAG_PROXY, "$TAG; proton config updated")
                 }
                 res
@@ -183,6 +320,13 @@ object RpnProxyManager : KoinComponent {
                 Logger.i(LOG_TAG_PROXY, "$TAG; warp config saved? $res")
                 if (res) {
                     warpConfig = c
+                    val expiry = getProxyExpiry(RpnType.WARP) ?: 0
+                    if (expiry == 0L) {
+                        Logger.e(LOG_TAG_PROXY, "$TAG; err getting warp expiry, not scheduling update")
+                    } else {
+                        scheduledUpdateConfig(RpnType.WARP, expiry)
+                        Logger.i(LOG_TAG_PROXY, "$TAG; scheduled warp update, $expiry")
+                    }
                     Logger.d(LOG_TAG_PROXY, "$TAG; warp config updated")
                 }
                 res
@@ -219,6 +363,13 @@ object RpnProxyManager : KoinComponent {
                 Logger.i(LOG_TAG_PROXY, "$TAG; amz config saved? $res")
                 if (res) {
                     amzConfig = c
+                    val expiry = getProxyExpiry(RpnType.AMZ) ?: 0
+                    if (expiry == 0L) {
+                        Logger.e(LOG_TAG_PROXY, "$TAG; err getting amz expiry, not scheduling update")
+                    } else {
+                        scheduledUpdateConfig(RpnType.AMZ, expiry)
+                        Logger.i(LOG_TAG_PROXY, "$TAG; scheduled amz update, $expiry")
+                    }
                     Logger.d(LOG_TAG_PROXY, "$TAG; amz config updated")
                 }
                 res
@@ -230,6 +381,19 @@ object RpnProxyManager : KoinComponent {
             Logger.e(LOG_TAG_PROXY, "$TAG; err updating amz config: ${e.message}", e)
         }
         return false
+    }
+
+    private suspend fun getProxyExpiry(type: RpnType): Long? {
+        return VpnController.getRpnProps(type).first?.expires
+    }
+
+    private fun scheduledUpdateConfig(type: RpnType, expiry: Long) {
+        if (type != RpnType.WARP && type != RpnType.AMZ && type != RpnType.PROTON) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; err; invalid type for scheduled update: $type")
+            return
+        }
+
+        workScheduler.scheduleRpnProxiesUpdate(type, expiry)
     }
 
     fun getWarpConfig(): Pair<Config?, Boolean> {
@@ -259,8 +423,7 @@ object RpnProxyManager : KoinComponent {
             val cfgFile = File(db.serverResPath)
             if (cfgFile.exists()) {
                 Logger.d(LOG_TAG_PROXY, "$TAG; config for $id exists, reading the file")
-                val d = EncryptedFileManager.read(applicationContext, cfgFile)
-                val bytes = d.toByteArray(StandardCharsets.UTF_8)
+                val bytes = EncryptedFileManager.readByteArray(applicationContext, cfgFile)
                 Logger.d(LOG_TAG_PROXY, "$TAG; existing data for $id: ${bytes.size}")
                 return bytes
             } else {
@@ -293,8 +456,8 @@ object RpnProxyManager : KoinComponent {
             val res = EncryptedFileManager.write(applicationContext, byteArray, protonConfigFile)
             Logger.d(LOG_TAG_PROXY, "$TAG; proton config saved? $res")
 
-            val serverRes = File(dir, getJsonResponseFileName(PROTON_ID))
-            val serRes = EncryptedFileManager.write(applicationContext, byteArray, serverRes)
+            val serverResFile = File(dir, getJsonResponseFileName(PROTON_ID))
+            val serRes = EncryptedFileManager.write(applicationContext, byteArray, serverResFile)
             Logger.d(LOG_TAG_PROXY, "$TAG; proton server response saved? $serRes")
 
             val rpnpro = db.getProxyById(PROTON_ID)
@@ -302,7 +465,7 @@ object RpnProxyManager : KoinComponent {
                 id = PROTON_ID,
                 name = PROTON,
                 configPath = protonConfigFile.absolutePath,
-                serverResPath = serverRes.absolutePath ?: "",
+                serverResPath = serverResFile.absolutePath ?: "",
                 isActive = rpnpro?.isActive ?: false,
                 isLockdown = rpnpro?.isLockdown ?: false,
                 createdTs = rpnpro?.createdTs ?: System.currentTimeMillis(),
@@ -356,8 +519,7 @@ object RpnProxyManager : KoinComponent {
 
     suspend fun getNewAmzConfig(): Config? {
         try {
-            val bytes = VpnController.registerAndFetchAmneziaConfig()
-            val res = updateAmzConfig(bytes)
+            val res = registerNewProxy(RpnType.AMZ)
             return if (res) {
                 Logger.i(LOG_TAG_PROXY, "$TAG; new amz config updated")
                 amzConfig
@@ -373,8 +535,7 @@ object RpnProxyManager : KoinComponent {
 
     suspend fun getNewWarpConfig(): Config? {
         try {
-            val bytes = VpnController.registerAndFetchWarpConfig()
-            val res = updateWarpConfig(bytes)
+            val res = registerNewProxy(RpnType.WARP)
             return if (res) {
                 Logger.i(LOG_TAG_PROXY, "$TAG; new warp config updated")
                  warpConfig
@@ -497,6 +658,10 @@ object RpnProxyManager : KoinComponent {
             Logger.d(LOG_TAG_PROXY, "$TAG; cc added to selected list: $cc")
             Pair(true, "")
         }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch { f() }
     }
 
 }
