@@ -440,6 +440,39 @@
                 android:text="@string/about_privacy_policy"
                 android:textSize="@dimen/large_font_text_view" />
 
+            <!-- add terms of service and license text -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_terms_of_service"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_privacy_policy"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="Terms of Service"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_license"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_privacy_policy"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="License"
+                android:textSize="@dimen/large_font_text_view" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -470,7 +503,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="5dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_twitter"
                 android:drawablePadding="20dp"
@@ -504,7 +536,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="5dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_reddit"
                 android:drawablePadding="20dp"
@@ -522,7 +553,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="5dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_element"
                 android:drawablePadding="20dp"
@@ -539,7 +569,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="5dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_mastodon"
                 android:drawablePadding="20dp"
@@ -622,22 +651,6 @@
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/about_close_conns"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:drawableStart="@drawable/ic_log_level"
-                android:drawablePadding="20dp"
-                android:gravity="start|center_vertical"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
-                android:text="Close connections"
-                android:textSize="@dimen/large_font_text_view" />
-
-            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_app_notification"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
@@ -700,10 +713,12 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="50dp"
             android:gravity="center"
+            android:alpha="0.75"
             android:paddingTop="20dp"
             android:paddingBottom="40dp"
+            android:textColor="?attr/primaryLightColorText"
             android:textIsSelectable="true"
-            android:textSize="@dimen/default_font_text_view"
+            android:textSize="@dimen/small_font_text_view"
             android:typeface="monospace" />
 
     </LinearLayout>

@@ -109,6 +109,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutGithub.setOnClickListener(this)
         b.aboutBlog.setOnClickListener(this)
         b.aboutPrivacyPolicy.setOnClickListener(this)
+        b.aboutTermsOfService.setOnClickListener(this)
+        b.aboutLicense.setOnClickListener(this)
         b.aboutMail.setOnClickListener(this)
         b.aboutTelegram.setOnClickListener(this)
         b.aboutReddit.setOnClickListener(this)
@@ -263,6 +265,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.aboutPrivacyPolicy -> {
                 openUrl(requireContext(), getString(R.string.about_privacy_policy_link))
+            }
+            b.aboutTermsOfService -> {
+                openUrl(requireContext(), "https://rethinkdns.com/terms")
+            }
+            b.aboutLicense -> {
+                openUrl(requireContext(), "https://github.com/celzero/rethink-app/blob/main/LICENSE")
             }
             b.aboutReddit -> {
                 openUrl(requireContext(), getString(R.string.about_reddit_handle))
