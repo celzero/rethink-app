@@ -47,7 +47,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
+import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.DnsLogTracker
@@ -497,8 +497,8 @@ object Utilities {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
     }
 
-    fun isAtleastR(): Boolean {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+    fun isAtleastO_MR1(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1
     }
 
     fun isAtleastP(): Boolean {
@@ -507,6 +507,10 @@ object Utilities {
 
     fun isAtleastQ(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+    }
+
+    fun isAtleastR(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     }
 
     fun isAtleastS(): Boolean {
@@ -519,6 +523,10 @@ object Utilities {
 
     fun isAtleastU(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+    }
+
+    fun isAtleastV(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM
     }
 
     fun isFdroidFlavour(): Boolean {
@@ -657,16 +665,25 @@ object Utilities {
     }
 
     fun isNonApp(p: String): Boolean {
-        return p.startsWith(NO_PACKAGE)
+        return p.startsWith(NO_PACKAGE_PREFIX)
     }
 
     fun removeLeadingAndTrailingDots(str: String?): String {
         if (str.isNullOrBlank()) return ""
 
         // remove leading and trailing dots(.) from the given string
-        // eg., (...adsd.asd.asa... will result in adsd.asd.asa)
-        val s = CharMatcher.`is`('.').trimLeadingFrom(str)
-        return CharMatcher.`is`('.').trimTrailingFrom(s)
+        // eg., (....adsd.asd.asa... will result in .adsd.asd.asa)
+        val trimmedTrailing = str.trimEnd('.')
+        val leadingDotMatch = Regex("^\\.*(?=\\w)").find(trimmedTrailing)
+
+        return when {
+            leadingDotMatch != null && leadingDotMatch.value.length > 1 -> {
+                // more than one leading dot, reduce to a single dot
+                "." + trimmedTrailing.drop(leadingDotMatch.value.length)
+            }
+
+            else -> trimmedTrailing
+        }
     }
 
     // https://medium.com/androiddevelopers/all-about-pendingintents-748c8eb8619
