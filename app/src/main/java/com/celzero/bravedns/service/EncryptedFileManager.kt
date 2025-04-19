@@ -24,6 +24,7 @@ import com.celzero.bravedns.wireguard.Config
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.InputStream
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
@@ -35,9 +36,11 @@ object EncryptedFileManager {
 
     fun readWireguardConfig(ctx: Context, fileToRead: String): Config? {
         var config: Config? = null
+        var inputStream: InputStream? = null
+        var ist: ByteArrayInputStream? = null
+        var bos: ByteArrayOutputStream? = null
         try {
             val dir = File(fileToRead)
-            Logger.d(Logger.LOG_TAG_PROXY, "Encrypted File Read1: $fileToRead, ${dir.absolutePath}")
             val masterKey =
                 MasterKey.Builder(ctx.applicationContext)
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -51,25 +54,30 @@ object EncryptedFileManager {
                     )
                     .build()
 
-            Logger.d(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${dir.absolutePath}, $fileToRead")
-            val inputStream = encryptedFile.openFileInput()
-            val byteArrayOutputStream = ByteArrayOutputStream()
+            Logger.d(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${dir.absolutePath}")
+            inputStream = encryptedFile.openFileInput()
+            bos = ByteArrayOutputStream()
             var nextByte: Int = inputStream.read()
             while (nextByte != -1) {
-                byteArrayOutputStream.write(nextByte)
+                bos.write(nextByte)
                 nextByte = inputStream.read()
             }
 
-            inputStream.close()
-            val plaintext: ByteArray = byteArrayOutputStream.toByteArray()
+
+            val plaintext: ByteArray = bos.toByteArray()
             // convert output stream to input stream
-            val ist = ByteArrayInputStream(plaintext)
+            ist = ByteArrayInputStream(plaintext)
 
             config = Config.parse(ist)
-            ist.close()
-            byteArrayOutputStream.close()
         } catch (e: Exception) {
             Logger.w(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${e.message}")
+        } finally {
+            try {
+                inputStream?.close()
+                ist?.close()
+                bos?.flush()
+                bos?.close()
+            } catch (ignored: Exception) { } // no-op
         }
 
         return config
@@ -77,6 +85,17 @@ object EncryptedFileManager {
 
     fun read(ctx: Context, file: File): String {
         var content = ""
+        try {
+            val bytes = readByteArray(ctx, file)
+            content = bytes.toString(Charset.defaultCharset())
+        } catch (e: Exception) {
+            Logger.w(Logger.LOG_TAG_PROXY, "err encrypted file Read: ${e.message}")
+        }
+        return content
+    }
+
+    fun readByteArray(ctx: Context, file: File): ByteArray {
+        var content = ByteArray(0)
         try {
             val masterKey =
                 MasterKey.Builder(ctx.applicationContext)
@@ -91,11 +110,11 @@ object EncryptedFileManager {
                     )
                     .build()
 
-            // Open the file and read its content and return it as a string.
-            val inputStream = encryptedFile.openFileInput()
-            content = inputStream.readBytes().toString(Charset.defaultCharset())
+            encryptedFile.openFileInput().use {
+                content = it.readBytes()
+            }
         } catch (e: Exception) {
-            Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${e.message}")
+            Logger.w(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${e.message}")
         }
         return content
     }
@@ -113,9 +132,13 @@ object EncryptedFileManager {
                 dir.mkdirs()
             }
             val fileToWrite = File(dir, fileName)
-            return write(ctx, cfg, fileToWrite)
+            if (!fileToWrite.exists()) {
+                fileToWrite.createNewFile()
+            }
+            val bytes = cfg.toByteArray(StandardCharsets.UTF_8)
+            return write(ctx, bytes, fileToWrite)
         } catch (e: Exception) {
-            Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
+            Logger.w(Logger.LOG_TAG_PROXY, "err write wg file: ${e.message}")
         }
         return false
     }
@@ -134,42 +157,23 @@ object EncryptedFileManager {
                 dir.mkdirs()
             }
             val fileToWrite = File(dir, fileName)
+            if (!fileToWrite.exists()) {
+                fileToWrite.createNewFile()
+            }
             return write(ctx, cfg, fileToWrite)
         } catch (e: Exception) {
-            Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
+            Logger.w(Logger.LOG_TAG_PROXY, "err write tcp config: ${e.message}")
         }
         return false
     }
 
     fun write(ctx: Context, data: String, file: File): Boolean {
         try {
-            Logger.d(Logger.LOG_TAG_PROXY, "write into $file")
-            val masterKey =
-                MasterKey.Builder(ctx.applicationContext)
-                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                    .build()
-            val encryptedFile =
-                EncryptedFile.Builder(
-                        ctx.applicationContext,
-                        file,
-                        masterKey,
-                        EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-                    )
-                    .build()
-
-            if (file.exists()) {
-                file.delete()
-            }
-
-            val fileContent = data.toByteArray(StandardCharsets.UTF_8)
-            encryptedFile.openFileOutput().apply {
-                write(fileContent)
-                flush()
-                close()
-            }
+            val d = data.toByteArray(StandardCharsets.UTF_8)
+            write(ctx, d, file)
             return true
         } catch (e: Exception) {
-            Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
+            Logger.w(Logger.LOG_TAG_PROXY, "err encrypted file write: ${e.message}")
         }
         return false
     }
@@ -202,7 +206,7 @@ object EncryptedFileManager {
             }
             return true
         } catch (e: Exception) {
-            Logger.e(Logger.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
+            Logger.w(Logger.LOG_TAG_PROXY, "err writing into file ${file.path}, ${e.message}")
         }
         return false
     }
