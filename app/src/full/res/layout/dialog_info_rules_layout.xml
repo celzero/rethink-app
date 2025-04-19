@@ -36,7 +36,7 @@
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
                 android:visibility="gone" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/info_rules_dialog_rules_title"
                 style="@style/Widget.AppCompat.TextView.SpinnerItem"
                 android:layout_width="wrap_content"
@@ -49,20 +49,21 @@
                 android:textSize="@dimen/heading_font_text_view" />
         </LinearLayout>
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/info_rules_dialog_rules_desc"
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:lineSpacingExtra="5dp"
+            android:textIsSelectable="true"
             android:padding="5dp"
             android:text="@string/bsct_conn_rule_explanation"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/large_font_text_view" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
