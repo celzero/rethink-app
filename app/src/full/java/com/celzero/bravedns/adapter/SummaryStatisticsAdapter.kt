@@ -253,13 +253,6 @@ class SummaryStatisticsAdapter(
                         itemBinding.ssFlag.text = appConnection.flag
                     }
                 }
-                SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
-                    uiCtx {
-                        itemBinding.ssIcon.visibility = View.GONE
-                        itemBinding.ssFlag.visibility = View.VISIBLE
-                        itemBinding.ssFlag.text = appConnection.flag
-                    }
-                }
             }
         }
 
@@ -314,19 +307,6 @@ class SummaryStatisticsAdapter(
                     val flag = getCountryNameFromFlag(appConnection.flag)
                     if (flag.isNotEmpty() && flag != "--") {
                         itemBinding.ssDataUsage.text = getCountryNameFromFlag(appConnection.flag)
-                    } else {
-                        itemBinding.ssDataUsage.text = context.getString(
-                            R.string.two_argument_space,
-                            context.getString(R.string.network_log_app_name_unknown),
-                            appConnection.flag
-                        )
-                    }
-                }
-                SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
-                    itemBinding.ssDataUsage.visibility = View.VISIBLE
-                    val flag = getCountryNameFromFlag(appConnection.flag)
-                    if (flag.isNotEmpty() && flag != "--") {
-                        itemBinding.ssDataUsage.text = flag
                     } else {
                         itemBinding.ssDataUsage.text = context.getString(
                             R.string.two_argument_space,
@@ -427,9 +407,6 @@ class SummaryStatisticsAdapter(
                     SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
                         startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.FLAG)
                     }
-                    SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
-                        showNetworkLogs(appConnection, SummaryStatisticsType.MOST_BLOCKED_COUNTRIES)
-                    }
                 }
             }
         }
@@ -504,9 +481,6 @@ class SummaryStatisticsAdapter(
                     )
                 }
                 SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
-                    startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.flag)
-                }
-                SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
                     startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.flag)
                 }
                 else -> {

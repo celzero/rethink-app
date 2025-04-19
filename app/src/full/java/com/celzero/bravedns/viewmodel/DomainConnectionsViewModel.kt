@@ -23,10 +23,10 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.celzero.bravedns.database.ConnectionTrackerDAO
+import com.celzero.bravedns.database.StatsSummaryDao
 import com.celzero.bravedns.util.Constants
 
-class DomainConnectionsViewModel(private val connectionTrackerDAO: ConnectionTrackerDAO) : ViewModel() {
+class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewModel() {
     private var domains: MutableLiveData<String> = MutableLiveData()
     private var flag: MutableLiveData<String> = MutableLiveData()
     private var timeCategory: TimeCategory = TimeCategory.ONE_HOUR
@@ -87,11 +87,11 @@ class DomainConnectionsViewModel(private val connectionTrackerDAO: ConnectionTra
 
     private fun fetchDomainConnections(input: String) =
         Pager(PagingConfig(pageSize = Constants.LIVEDATA_PAGE_SIZE)) {
-            connectionTrackerDAO.getDomainConnections(input, startTime.value!!)
+            statsDao.getDomainDetails(input, startTime.value!!)
         }.liveData.cachedIn(viewModelScope)
 
     private fun fetchFlagConnections(input: String) =
         Pager(PagingConfig(pageSize = Constants.LIVEDATA_PAGE_SIZE)) {
-            connectionTrackerDAO.getFlagConnections(input, startTime.value!!)
+            statsDao.getFlagDetails(input, startTime.value!!)
         }.liveData.cachedIn(viewModelScope)
 }

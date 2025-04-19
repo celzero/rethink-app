@@ -28,9 +28,10 @@ import androidx.paging.liveData
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.RethinkLogDao
+import com.celzero.bravedns.database.StatsSummaryDao
 import com.celzero.bravedns.util.Constants
 
-class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, private val rinrDao: RethinkLogDao) : ViewModel() {
+class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, private val rinrDao: RethinkLogDao, private val statsDao: StatsSummaryDao) : ViewModel() {
     private var ipFilter: MutableLiveData<String> = MutableLiveData()
     private var domainFilter: MutableLiveData<String> = MutableLiveData()
     private var uid: Int = Constants.INVALID_UID
@@ -101,7 +102,7 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
 
     val appIpLogs = ipFilter.switchMap { input -> fetchIpLogs(uid, input) }
     val appDomainLogs = domainFilter.switchMap {
-        input -> fetchAppDomainLogs(uid, input)
+        input -> fetchAppDomainLogs(uid)
     }
 
     val rinrIpLogs = ipFilter.switchMap { input -> fetchRinrIpLogs(input) }
@@ -140,13 +141,11 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
             .cachedIn(viewModelScope)
     }
 
-    private fun fetchAppDomainLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
+    private fun fetchAppDomainLogs(uid: Int): LiveData<PagingData<AppConnection>> {
         val to = getStartTime()
-        return if (input.isEmpty()) {
-            Pager(pagingConfig) { nwlogDao.getAppDomainLogs(uid, to) }
-        } else {
-            Pager(pagingConfig) { nwlogDao.getAppDomainLogsFiltered(uid, to, "%$input%") }
-        }
+        return Pager(pagingConfig) {
+                statsDao.getAllDomainsByUid(uid, to)
+            }
             .liveData
             .cachedIn(viewModelScope)
     }
@@ -174,7 +173,9 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
 
     fun getDomainLogsLimited(uid: Int): LiveData<PagingData<AppConnection>> {
         val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
-        return Pager(pagingConfig) { nwlogDao.getAppDomainLogsLimited(uid, to) }
+        return Pager(pagingConfig) {
+                statsDao.getMostDomainsByUid(uid, to)
+            }
             .liveData
             .cachedIn(viewModelScope)
     }

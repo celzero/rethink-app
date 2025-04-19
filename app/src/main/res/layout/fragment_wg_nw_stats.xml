@@ -15,32 +15,6 @@
         android:orientation="vertical"
         android:weightSum="1">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="15dp">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.Heading.HomeScreen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:alpha="0.5"
-                android:paddingStart="7dp"
-                android:paddingEnd="7dp"
-                android:text="@string/app_name_small_case" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.SubHeading.HomeScreen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:alpha="0.5"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="@string/about_title_desc" />
-
-        </LinearLayout>
-
         <com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggle_group"
             style="@style/toggleButtonStyle"
