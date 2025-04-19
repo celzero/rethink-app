@@ -440,6 +440,10 @@ internal constructor(
         return doHEndpointRepository.getConnectedDoH()
     }
 
+    suspend fun getAllDoHEndpoints(): List<DoHEndpoint> {
+        return doHEndpointRepository.getAllDoHEndpoints()
+    }
+
     suspend fun getDOTDetails(): DoTEndpoint? {
         return doTEndpointRepository.getConnectedDoT()
     }
