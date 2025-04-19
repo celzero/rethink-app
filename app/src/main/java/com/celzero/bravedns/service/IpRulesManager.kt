@@ -160,7 +160,7 @@ object IpRulesManager : KoinComponent {
     }
 
     private fun treeValLike(uid: Int, port: Int): String {
-        return "$uid:$port"
+        return "$uid${Backend.Vsep}$port"
     }
 
     private fun treeValStatus(v: String?): IpRuleStatus {
@@ -168,7 +168,7 @@ object IpRulesManager : KoinComponent {
             return IpRuleStatus.NONE
         }
         try {
-            val items = v.split(":")
+            val items = v.split(Backend.Vsep)
             if (items.size != 3) {
                 return IpRuleStatus.NONE
             }
@@ -184,7 +184,7 @@ object IpRulesManager : KoinComponent {
             return Pair("","")
         }
         try {
-            val items = v.split(":")
+            val items = v.split(Backend.Vsep)
             if (items.size != 5) {
                 return Pair("","")
             }
@@ -202,7 +202,7 @@ object IpRulesManager : KoinComponent {
     }
 
     private fun treeVal(uid: Int, port: Int, rule: Int, proxyId: String, proxyCC: String): String {
-        return "$uid:$port:$rule:$proxyId:$proxyCC"
+        return "$uid${Backend.Vsep}$port${Backend.Vsep}$rule${Backend.Vsep}$proxyId${Backend.Vsep}$proxyCC"
     }
 
     suspend fun removeIpRule(uid: Int, ipstr: String, port: Int) {
@@ -540,7 +540,7 @@ object IpRulesManager : KoinComponent {
         }
     }
 
-    suspend fun addIpRule(uid: Int, ipstr: IPAddress, port: Int?, status: IpRuleStatus, proxyId: String, proxyCC: String) {
+    suspend fun addIpRule(uid: Int, ipstr: IPAddress, port: Int?, status: IpRuleStatus, proxyId: String, proxyCC: String): CustomIp {
         Logger.i(
             LOG_TAG_FIREWALL,
             "ip rule, add rule for ($uid) ip: $ipstr, $port with status: ${status.name}"
@@ -554,6 +554,7 @@ object IpRulesManager : KoinComponent {
             iptree.add(k, treeVal(uid, port ?: 0, status.id, proxyId, proxyCC))
         }
         resultsCache.invalidateAll()
+        return c
     }
 
     suspend fun updateUids(uids: List<Int>, newUids: List<Int>) {

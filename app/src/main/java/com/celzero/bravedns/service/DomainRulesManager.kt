@@ -33,9 +33,6 @@ import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
-import kotlin.collections.get
-import kotlin.compareTo
-import kotlin.text.get
 
 object DomainRulesManager : KoinComponent {
 
@@ -111,7 +108,7 @@ object DomainRulesManager : KoinComponent {
         // *.google.co.uk -> .google.co.uk,<uid>
         // not supported by IpTrie: google.* -> google.,<uid>
         val domain = d.removePrefix("*")
-        return domain.lowercase(Locale.ROOT) + "," + uid
+        return domain.lowercase(Locale.ROOT) + Backend.Ksep + uid
     }
 
     private fun mkTrieKey(d: String): String {
@@ -121,7 +118,7 @@ object DomainRulesManager : KoinComponent {
     }
 
     private fun mkTrieValue(status: String, proxyId: String, proxyCC: String): String {
-        return "${status}:${proxyId}:${proxyCC}"
+        return "${status}${Backend.Vsep}${proxyId}${Backend.Vsep}${proxyCC}"
     }
 
     suspend fun load(): Long {
@@ -174,7 +171,7 @@ object DomainRulesManager : KoinComponent {
     private fun matchesWildcard(domain: String, uid: Int): Status {
         val key = mkTrieKey(domain, uid)
         val match = trie.getAny(key) // matches the longest prefix
-        val status = match.split(":")[0]
+        val status = match.split(Backend.Vsep)[0]
         val res = Status.getStatus(status.toIntOrNull())
         if (DEBUG) Logger.vv(LOG_TAG_DNS, "matchesWildcard: $domain($uid), res: $res")
         return res
@@ -183,7 +180,7 @@ object DomainRulesManager : KoinComponent {
     fun getDomainRule(domain: String, uid: Int): Status {
         val key = mkTrieKey(domain, uid)
         val match = trie.get(key)
-        val status = match.split(":")[0]
+        val status = match.split(Backend.Vsep)[0]
         val res = Status.getStatus(status.toIntOrNull())
         if (DEBUG) Logger.vv(LOG_TAG_DNS, "getDomainRule: $domain($uid), res: $res")
         return res
@@ -198,7 +195,7 @@ object DomainRulesManager : KoinComponent {
             if (match.isEmpty()) {
                 return Pair("", "")
             }
-            val parts = match.split(":")
+            val parts = match.split(Backend.Vsep)
 
             if (parts.size <= 2) return Pair("", "")
 
@@ -215,7 +212,7 @@ object DomainRulesManager : KoinComponent {
                 val wild = trie.getAny(key)
                 if (wild.isEmpty()) return Pair("", "")
 
-                val wildParts = wild.split(":")
+                val wildParts = wild.split(Backend.Vsep)
                 if (wildParts.size <= 2) return Pair("", "")
 
                 proxyId = wildParts[1]
