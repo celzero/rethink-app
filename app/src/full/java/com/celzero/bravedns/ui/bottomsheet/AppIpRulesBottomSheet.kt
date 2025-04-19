@@ -69,6 +69,7 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment() {
         const val UID = "UID"
         const val IP_ADDRESS = "IP_ADDRESS"
         const val DOMAINS = "DOMAINS"
+        private const val TAG = "AppIpRulesBtmSht"
     }
 
     private fun isDarkThemeOn(): Boolean {
@@ -187,7 +188,7 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment() {
         io {
             // no need to send port number for the app info screen
             ipRule = IpRulesManager.getMostSpecificRuleMatch(uid, ipAddress)
-            Logger.d(LOG_TAG_FIREWALL, "Set selection of ip: $ipAddress, ${ipRule.id}")
+            Logger.d(LOG_TAG_FIREWALL, "$TAG set selection of ip: $ipAddress, ${ipRule.id}")
             uiCtx {
                 when (ipRule) {
                     IpRulesManager.IpRuleStatus.TRUST -> {
@@ -239,7 +240,7 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun applyIpRule(status: IpRulesManager.IpRuleStatus) {
-        Logger.i(LOG_TAG_FIREWALL, "ip rule for uid: $uid, ip: $ipAddress (${status.name})")
+        Logger.i(LOG_TAG_FIREWALL, "$TAG ip rule for uid: $uid, ip: $ipAddress (${status.name})")
         ipRule = status
         val ipPair = IpRulesManager.getIpNetPort(ipAddress)
         val ip = ipPair.first ?: return
