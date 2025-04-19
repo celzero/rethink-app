@@ -461,13 +461,13 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 // parse through all the networks and get the minimum mtu
                 trackedIpv4Networks.forEach {
                     val c = it.linkProperties
-                    Logger.v(LOG_TAG_CONNECTION, "tracked network4 mtu: ${c?.mtu}")
                     minMtu4 = minNonZeroMtu(c?.mtu, minMtu4)
+                    Logger.v(LOG_TAG_CONNECTION, "tracked network4 mtu: ${c?.mtu}, using $minMtu4")
                 }
                 trackedIpv6Networks.forEach {
                     val c = it.linkProperties
-                    Logger.v(LOG_TAG_CONNECTION, "tracked network6 mtu: ${c?.mtu}")
                     minMtu6 = minNonZeroMtu(c?.mtu, minMtu6)
+                    Logger.v(LOG_TAG_CONNECTION, "tracked network6 mtu: ${c?.mtu}, using $minMtu6")
                 }
             }
             // set mtu to MIN_MTU (1280) if mtu4/mtu6 are less than MIN_MTU
@@ -501,23 +501,24 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             trackedIpv4Networks.clear()
             trackedIpv6Networks.clear()
 
-            // BraveVPNService also fails open, see FAIL_OPEN_ON_NO_NETWORK
-            val isAnyNwValidated = networks.any { isNwValidated(it.network) }
-
             networks.forEach outer@{ prop ->
                 val network: Network = prop.network
 
                 val lp = connectivityManager.getLinkProperties(network)
                 if (lp == null) {
-                    Logger.i(LOG_TAG_CONNECTION, "skipping: $network; no link properties")
+                    Logger.i(LOG_TAG_CONNECTION, "skipping: ${network.networkHandle}; no link properties")
                     return@outer
                 }
 
-                val isActive = isNetworkSame(network, activeNetwork)
-                if (isActive) {
-                    Logger.d(LOG_TAG_CONNECTION, "processing active network: $network")
-                }
+                val isActiveNull = activeNetwork == null
+                val isActive = !isActiveNull && isNetworkSame(network, activeNetwork)
+                val isCaptive = isCaptivePortal(network)
+                val maybeCaptiveActive = isCaptive && (isActive || isActiveNull)
+                val isValidated = isValidated(network)
+                val hasInternet = hasInternet(network)
+                Logger.d(LOG_TAG_CONNECTION, "processing: ${network.networkHandle}, active? $isActive, activeNull? $isActiveNull, internet? $hasInternet, captive? $isCaptive, validated? $isValidated")
 
+                // TODO: case: CAPTIVE_PORTAL, should we not test reachability?
                 if (testReachability) {
                     // for active network, ICMP echo is additionally used with TCP and UDP checks
                     // but ICMP echo will always return reachable when app is in rinr mode
@@ -531,15 +532,18 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                     val has6 = probeConnectivity(ip6probes, network, useIcmp)
                     if (has4) trackedIpv4Networks.add(prop)
                     if (has6) trackedIpv6Networks.add(prop)
-                    Logger.i(LOG_TAG_CONNECTION, "nw: has4? $has4, has6? $has6, $prop")
+                    Logger.i(LOG_TAG_CONNECTION, "nw(${network.networkHandle}): has4? $has4, has6? $has6, $prop")
                     if (has4 || has6) return@outer
                     // else: fall-through to check reachability with network capabilities
                 }
 
+                // treat captive portal as having internet, if client code is not going to fail-open
+                val failOpen = maybeCaptiveActive || BraveVPNService.FAIL_OPEN_ON_NO_NETWORK
+
                 // see #createNetworksSet for why we are using hasInternet
                 // if no network has been validated, then fail open
-                val failOpen = !isAnyNwValidated && BraveVPNService.FAIL_OPEN_ON_NO_NETWORK
-                if (hasInternet(network) == true && (failOpen || isNwValidated(network))) {
+                // expect captive portal to have internet bound routes
+                if (hasInternet && (failOpen || isValidated)) {
                     var hasDefaultRoute4 = false
                     var hasDefaultRoute6 = false
                     lp.routes.forEach rloop@{
@@ -564,21 +568,22 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
 
                     Logger.i(
                         LOG_TAG_CONNECTION,
-                        "nw: default4? $hasDefaultRoute4, default6? $hasDefaultRoute6 for $prop"
+                        "nw(${network.networkHandle}) default4? $hasDefaultRoute4, default6? $hasDefaultRoute6 for $prop"
                     )
                 } else {
-                    Logger.i(LOG_TAG_CONNECTION, "skip: $network; no internet capability")
+                    Logger.i(LOG_TAG_CONNECTION, "skip: ${network.networkHandle}; no internet capability")
                 }
             }
 
             redoReachabilityIfNeeded(trackedIpv4Networks, trackedIpv6Networks, opPrefs)
 
+            trackedIpv4Networks = rearrangeNetworks(trackedIpv4Networks)
+            trackedIpv6Networks = rearrangeNetworks(trackedIpv6Networks)
+
             Logger.d(
                 LOG_TAG_CONNECTION,
                 "repopulate v6: $trackedIpv6Networks,\nv4: $trackedIpv4Networks"
             )
-            trackedIpv4Networks = rearrangeNetworks(trackedIpv4Networks)
-            trackedIpv6Networks = rearrangeNetworks(trackedIpv6Networks)
         }
 
         private fun redoReachabilityIfNeeded(
@@ -856,16 +861,22 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             }
         }
 
-        private fun hasInternet(network: Network?): Boolean? {
+        private fun hasInternet(network: Network?): Boolean {
             // TODO: consider checking for NET_CAPABILITY_NOT_SUSPENDED, NET_CAPABILITY_VALIDATED?
             if (network == null) return false
 
             return connectivityManager
                 .getNetworkCapabilities(network)
-                ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
         }
 
-        private fun isNwValidated(network: Network): Boolean {
+        private fun isCaptivePortal(network: Network): Boolean {
+            return connectivityManager
+                .getNetworkCapabilities(network)
+                ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_CAPTIVE_PORTAL) == true
+        }
+
+        private fun isValidated(network: Network): Boolean {
             return connectivityManager
                 .getNetworkCapabilities(network)
                 ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
