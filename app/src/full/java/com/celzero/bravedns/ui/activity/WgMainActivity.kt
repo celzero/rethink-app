@@ -293,9 +293,9 @@ class WgMainActivity :
                 var dnsNames: String = dns.ifEmpty { "" }
                 if (persistentState.splitDns) {
                     if (activeConfigs.isNotEmpty()) {
-                        dnsNames += ", "
+                        dnsNames += ","
                     }
-                    dnsNames += activeConfigs.joinToString(", ") { it.getName() }
+                    dnsNames += activeConfigs.joinToString(",") { it.getName() }
                     b.wgWireguardDisclaimer.text =
                         getString(R.string.wireguard_disclaimer, dnsNames)
                 } else {
