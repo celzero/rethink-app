@@ -320,7 +320,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         if (!isNewVersion()) return
 
         val version = getLatestVersion()
-        Logger.i(LOG_TAG_UI, "New version detected, updating the app version, version: $version")
+        Logger.i(LOG_TAG_UI, "new version detected, updating the app version, version: $version")
         persistentState.appVersion = version
         persistentState.showWhatsNewChip = true
 
@@ -336,7 +336,15 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun getLatestVersion(): Int {
         val pInfo: PackageInfo? = getPackageMetadata(this.packageManager, this.packageName)
-        return pInfo?.versionCode ?: 0
+        // TODO: modify this to use the latest version code api
+        val v = pInfo?.versionCode ?: 0
+        // latest version has apk variant (baseAbiVersionCode * 10000000 + variant.versionCode)
+        // so we need to mod the version code by 10000000 to get the actual version code
+        // for example: 10000000 + 45 = 10000045, so the version code is 1
+        // see build.gradle (:app), #project.ext.versionCodes
+        val latestVersionCode = v % 10000000 // 10000000 is the base version code
+        Logger.i(LOG_TAG_UI, "latest version code: $latestVersionCode")
+        return latestVersionCode
     }
 
     // FIXME - Move it to Android's built-in WorkManager
