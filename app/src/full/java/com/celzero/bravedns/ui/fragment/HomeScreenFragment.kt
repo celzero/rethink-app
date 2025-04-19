@@ -55,6 +55,8 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
+import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
@@ -83,6 +85,7 @@ import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.isAtleastN
 import com.celzero.bravedns.util.Utilities.isAtleastP
+import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastU
 import com.celzero.bravedns.util.Utilities.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
@@ -153,7 +156,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsCardLogsTv.text = getString(R.string.lbl_logs).replaceFirstChar(Char::titlecase)
 
         // do not show the sponsor card if the rethink plus is enabled
-        if (persistentState.useRpn) {
+        if (RpnProxyManager.isRpnActive()) {
             b.fhsSponsor.visibility = View.GONE
         } else {
             b.fhsSponsor.visibility = View.VISIBLE
@@ -222,7 +225,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         b.fhsSponsor.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on sponsor card")
-            if (persistentState.useRpn) {
+            if (RpnProxyManager.isRpnActive()) {
                 Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
                 return@setOnClickListener
             }
@@ -231,11 +234,19 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         b.fhsSponsorBottom.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on sponsor card")
+            if (RpnProxyManager.isRpnActive()) {
+                Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
+                return@setOnClickListener
+            }
             promptForAppSponsorship()
         }
 
         b.fhsTitleRethink.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on rethink card")
+            if (RpnProxyManager.isRpnActive()) {
+                Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
+                return@setOnClickListener
+            }
             promptForAppSponsorship()
         }
 
@@ -456,16 +467,17 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun observeProxyStates() {
         persistentState.getProxyStatus().observe(viewLifecycleOwner) {
             if (it != -1) {
+                if (proxyStateListenerJob?.isActive == true) {
+                    Logger.vv(LOG_TAG_UI, "$TAG cancel prev proxy state listener job")
+                    proxyStateListenerJob?.cancel()
+                    proxyStateListenerJob = null
+                }
                 proxyStateListenerJob = ui("proxyStates") {
-                    while (true) {
-                        if (!isVisible || !isAdded) {
-                            proxyStateListenerJob?.cancel()
-                            return@ui
-                        }
-
+                    while (isVisible && isAdded) {
                         updateUiWithProxyStates(it)
                         kotlinx.coroutines.delay(2500L)
                     }
+                    proxyStateListenerJob?.cancel()
                 }
             } else {
                 b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
@@ -504,11 +516,23 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 Logger.v(LOG_TAG_UI, "$TAG wg active proxies: ${proxies.size}")
                 proxies.forEach {
                     val proxyId = "${ProxyManager.ID_WG_BASE}${it.getId()}"
+                    Logger.vv(LOG_TAG_UI, "$TAG init stats check for $proxyId")
                     val stats = VpnController.getProxyStats(proxyId)
+                    // check for dns status of the wg if splitDns is enabled
+                    val dnsStats = if (isSplitDns()) {
+                        VpnController.getDnsStatus(proxyId)
+                    } else {
+                        null
+                    }
+
                     if (stats == null) {
                         failing++
                         return@forEach
                     }
+                    if (dnsStats != null && isDnsError(dnsStats)) {
+                        failing++
+                        return@forEach
+                    } // else proceed
 
                     val lastOk = stats.lastOK
                     val since = stats.since
@@ -587,6 +611,22 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
         b.fhsCardOtherProxyCount.text = getString(resId)
     }
+
+    private fun isSplitDns(): Boolean {
+        // by default, the split dns is enabled for android R and above, as we know the app
+        // which sends dns queries
+        if (isAtleastR()) return true
+
+        return persistentState.splitDns
+    }
+
+    private fun isDnsError(statusId: Long?): Boolean {
+        if (statusId == null) return true
+
+        val s = Transaction.Status.fromId(statusId)
+        return s == Transaction.Status.BAD_QUERY || s == Transaction.Status.BAD_RESPONSE || s == Transaction.Status.NO_RESPONSE || s == Transaction.Status.SEND_FAIL || s == Transaction.Status.CLIENT_ERROR || s == Transaction.Status.INTERNAL_ERROR || s == Transaction.Status.TRANSPORT_ERROR
+    }
+
 
     private fun unobserveProxyStates() {
         persistentState.getProxyStatus().removeObservers(viewLifecycleOwner)
@@ -1530,7 +1570,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     status.connectionState == null -> {
                         // app's waiting here, but such a status is a cause for confusion
                         // R.string.status_waiting
-                        R.string.status_protected
+                        R.string.status_no_internet
                     }
                     status.connectionState === BraveVPNService.State.NEW -> {
                         // app's starting here, but such a status confuses users
