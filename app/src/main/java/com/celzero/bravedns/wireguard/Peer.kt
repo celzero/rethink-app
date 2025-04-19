@@ -176,7 +176,7 @@ class Peer private constructor(builder: Builder) {
         sb.append("public_key=").append(publicKey.hex()).append('\n')
         // for testing purposes, make sure the allowed_ips is set to 0.0.0.0/0 for all peers
         // in amz + debug mode
-        if (isAmz && RethinkDnsApplication.DEBUG) {
+        if (shouldAmzUseBaseAllowedIps(isAmz)) {
             sb.append("allowed_ip=").append("0.0.0.0/0").append('\n')
         } else {
             for (allowedIp in allowedIps) sb.append("allowed_ip=").append(allowedIp).append('\n')
@@ -194,6 +194,11 @@ class Peer private constructor(builder: Builder) {
             }
         )
         return sb.toString()
+    }
+
+    private fun shouldAmzUseBaseAllowedIps(amz: Boolean): Boolean {
+        // future some more decision making logic can be added here
+        return amz && RethinkDnsApplication.DEBUG
     }
 
     class Builder {

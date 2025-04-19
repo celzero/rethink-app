@@ -147,6 +147,15 @@ class WgInterface private constructor(builder: Builder) {
         return addresses
     }
 
+    fun isAmnezia(): Boolean {
+        return jc.isPresent || jmin.isPresent || jmax.isPresent || s1.isPresent || s2.isPresent || h1.isPresent || h2.isPresent || h3.isPresent || h4.isPresent
+    }
+
+    fun getAmzProps(): String {
+        // make all the amz props into a single string
+        return "jc=${jc.orElse(0)}, jmin=${jmin.orElse(0)}, jmax=${jmax.orElse(0)}, s1=${s1.orElse(0)}, s2=${s2.orElse(0)}, h1=${h1.orElse(0)}, h2=${h2.orElse(0)}, h3=${h3.orElse(0)}, h4=${h4.orElse(0)}"
+    }
+
     /**
      * Returns the public/private key pair used by the interface.
      *
