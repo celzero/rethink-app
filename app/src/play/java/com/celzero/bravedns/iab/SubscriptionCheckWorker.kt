@@ -5,9 +5,11 @@ import Logger.LOG_IAB
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.Purchase
 import com.celzero.bravedns.iab.InAppBillingHandler.isListenerRegistered
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -42,13 +44,16 @@ class SubscriptionCheckWorker(
     private fun initiate() {
         if (InAppBillingHandler.isBillingClientSetup() && isListenerRegistered(listener)) {
             Logger.i(LOG_IAB, "initBilling: billing client already setup")
+            InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS))
             return
         }
         if (InAppBillingHandler.isBillingClientSetup() && !isListenerRegistered(listener)) {
             InAppBillingHandler.registerListener(listener)
+            InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS))
             Logger.i(LOG_IAB, "initBilling: billing listener registered")
             return
         }
+        // initiate the billing client, which will also register the listener and fetch purchases
         InAppBillingHandler.initiate(context, listener)
     }
 
@@ -78,15 +83,20 @@ class SubscriptionCheckWorker(
             val first = purchaseDetailList.firstOrNull()
             if (first == null) {
                 Logger.d(LOG_IAB, "$WORK_NAME; No purchases found")
-                persistentState.enableWarp = false
+                RpnProxyManager.deactivateRpn()
                 return
             }
             if (first.productType == ProductType.SUBS) {
                 Logger.d(LOG_IAB, "$WORK_NAME; Subscription found: ${first.state}")
-                persistentState.enableWarp = first.state == Purchase.PurchaseState.PURCHASED
+                val purchased = first.state == Purchase.PurchaseState.PURCHASED
+                if (purchased) {
+                    RpnProxyManager.activateRpn()
+                } else {
+                    RpnProxyManager.deactivateRpn()
+                }
             } else {
                 Logger.d(LOG_IAB, "$WORK_NAME; No subscription found")
-                persistentState.enableWarp = false
+                RpnProxyManager.deactivateRpn()
             }
         }
 
