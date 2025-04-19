@@ -43,7 +43,7 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
 
         companion object {
             fun getCount(): Int {
-                return values().count()
+                return entries.count()
             }
         }
     }

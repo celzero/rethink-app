@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/subs_parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="0.5dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <RelativeLayout
+        android:id="@+id/subs_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:padding="10dp"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/subs_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:text="1 Month"
+            android:maxLines="10"
+            android:layout_alignParentStart="true"
+            android:fontFamily="serif-monospace"
+            android:layout_toStartOf="@id/subs_price"
+            android:layout_centerVertical="true"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/rethink_header_text" />
+
+        <TextView
+            android:id="@+id/subs_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:layout_marginStart="10dp"
+            android:alpha="0.8"
+            android:maxLines="10"
+            android:fontFamily="serif-monospace"
+            android:text="$0.99"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/rethink_header_text" />
+    </RelativeLayout>
+
+</RelativeLayout>

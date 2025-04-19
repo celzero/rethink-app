@@ -245,7 +245,7 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment() {
         val ip = ipPair.first ?: return
 
         // set port number as null for all the rules applied from this screen
-        io { IpRulesManager.addIpRule(uid, ip, null, status) }
+        io { IpRulesManager.addIpRule(uid, ip, null, status, proxyId = "", proxyCC = "") }
     }
 
     override fun onDismiss(dialog: DialogInterface) {

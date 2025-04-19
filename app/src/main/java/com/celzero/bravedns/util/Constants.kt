@@ -310,6 +310,9 @@ class Constants {
         // wireguard folder name
         const val WIREGUARD_FOLDER_NAME = "wireguard"
 
+        // rpn proxy folder name
+        const val RPN_PROXY_FOLDER_NAME = "rpnproxy"
+
         val DEFAULT_RDNS_REMOTE_DNS_NAMES =
             listOf(
                 "RDNS Default",
@@ -318,6 +321,21 @@ class Constants {
                 "RDNS Social Media",
                 "RDNS Security",
                 "RDNS Privacy"
+            )
+
+        val ip4probes =
+            listOf(
+                "216.239.32.27", // google org
+                "104.16.132.229", // cloudflare
+                "31.13.79.53" // whatsapp.net
+            )
+
+
+        val ip6probes =
+            listOf(
+                "2001:4860:4802:32::1b", // google org
+                "2606:4700::6810:84e5", // cloudflare
+                "2606:4700:3033::ac43:a21b" // rethinkdns
             )
     }
 }

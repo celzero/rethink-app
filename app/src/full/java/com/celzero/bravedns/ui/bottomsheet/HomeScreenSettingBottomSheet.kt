@@ -19,6 +19,7 @@ import Logger
 import Logger.LOG_TAG_VPN
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.SystemClock
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +27,7 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
 import com.celzero.bravedns.service.PersistentState
@@ -37,6 +39,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import kotlin.math.abs
 
 class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetHomeScreenBinding? = null
@@ -82,7 +85,6 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         b.bsHomeScreenConnectedStatus.text = getConnectionStatus()
         val selectedIndex = appConfig.getBraveMode().mode
         Logger.d(LOG_TAG_VPN, "Home screen bottom sheet selectedIndex: $selectedIndex")
-
         updateStatus(selectedIndex)
     }
 
