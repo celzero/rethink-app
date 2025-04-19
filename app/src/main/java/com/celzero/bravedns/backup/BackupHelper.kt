@@ -67,6 +67,12 @@ class BackupHelper {
         // restart app after database restore
         const val INTENT_RESTART_APP = "restartApp"
 
+        // wireguard dir to backup the wireguard configs
+        const val BACKUP_WG_DIR = "wireguard"
+
+        // while restoring the wireguard config, the temp dir to store the wireguard config
+        const val TEMP_WG_DIR = "temp_wireguard"
+
         // metadata constants
         // version
         const val VERSION = "version"

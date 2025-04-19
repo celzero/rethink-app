@@ -22,7 +22,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
 
     companion object {
         // No package applications
-        const val NO_PACKAGE = "no_package"
+        const val NO_PACKAGE_PREFIX = "no_package_"
     }
 
     suspend fun delete(appInfo: AppInfo) {

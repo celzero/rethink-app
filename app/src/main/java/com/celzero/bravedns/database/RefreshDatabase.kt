@@ -33,6 +33,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.DomainRulesManager
@@ -45,7 +46,6 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.AndroidUidConfig
@@ -57,6 +57,7 @@ import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
+import com.celzero.bravedns.wireguard.WgHopManager
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 import kotlinx.coroutines.CoroutineName
@@ -70,6 +71,7 @@ internal constructor(
     private var ctx: Context,
     private val connTrackerRepository: ConnectionTrackerRepository,
     private val dnsLogRepository: DnsLogRepository,
+    private val rethinkLogRepository: RethinkLogRepository,
     private val persistentState: PersistentState
 ) {
 
@@ -146,12 +148,13 @@ internal constructor(
             val dm = DomainRulesManager.load()
             val pxm = ProxyManager.load()
             val wgm = WireguardManager.load()
-            val tcpm = TcpProxyHelper.load()
-            val rpn = RpnProxyManager.load()
+            val hm = WgHopManager.load()
+            val tm = TcpProxyHelper.load()
+            val rm = RpnProxyManager.load()
 
             Logger.i(
                 LOG_TAG_APP_DB,
-                "reload: fm: ${fm}; ip: ${ipm}; dom: ${dm}; px: ${pxm}; wg: ${wgm}; t: $tcpm, rpn: $rpn"
+                "reload: fm: $fm; ip: $ipm; dom: $dm; px: $pxm; wg: $wgm; hm: $hm t: $tm, rpn: $rm"
             )
 
             val trackedApps = FirewallManager.getAllApps()
@@ -165,10 +168,13 @@ internal constructor(
                     pm.getInstalledPackages(PackageManager.GET_META_DATA)
                 }
 
-            val installedApps =
-                installedPackages
-                    .map { FirewallManager.AppInfoTuple(it.applicationInfo.uid, it.packageName) }
-                    .toSet()
+            val installedApps: MutableSet<FirewallManager.AppInfoTuple> = mutableSetOf()
+            installedPackages.forEach {
+                val appInfo = it.applicationInfo
+                if (appInfo != null) {
+                    installedApps.add(FirewallManager.AppInfoTuple(appInfo.uid, it.packageName))
+                }
+            }
 
             val packagesToAdd =
                 findPackagesToAdd(trackedApps, installedApps, action == ACTION_REFRESH_RESTORE)
@@ -316,7 +322,7 @@ internal constructor(
         val oldUids = mutableListOf<Int>()
         val newUids = mutableListOf<Int>()
         apps.forEach { old ->
-            // FirewallManager must have been udpated by now, so we can get the latest app info
+            // FirewallManager must have been updated by now, so we can get the latest app info
             // using the package-name (as uid have changed)
             val newinfo = FirewallManager.getAppInfoByPackage(old.packageName) ?: return@forEach
             oldUids.add(old.uid)
@@ -330,7 +336,7 @@ internal constructor(
         val oldUids = mutableListOf<Int>()
         val newUids = mutableListOf<Int>()
         apps.forEach { old ->
-            // FirewallManager must have been udpated by now, so we can get the latest app info
+            // FirewallManager must have been updated by now, so we can get the latest app info
             // using the package-name (as uid have changed)
             val newinfo = FirewallManager.getAppInfoByPackage(old.packageName) ?: return@forEach
             oldUids.add(old.uid)
@@ -375,7 +381,7 @@ internal constructor(
     private suspend fun removeWireGuardProfilesIfNeeded(rmv: Boolean) {
         // may already have been purged by RestoreAgent.startRestore() -> wireguardCleanup()
         if (rmv) {
-            WireguardManager.restoreProcessDeleteWireGuardEntries()
+            WireguardManager.restoreProcessRetrieveWireGuardConfigs()
         } else {
             Logger.d(LOG_TAG_APP_DB, "removeWireGuardProfilesIfNeeded: no-op")
         }
@@ -434,7 +440,7 @@ internal constructor(
                 newAppInfo.isSystemApp = true
                 androidUidConfig.name
             }
-        newAppInfo.packageName = "no_package_$uid"
+        newAppInfo.packageName = "$NO_PACKAGE_PREFIX$uid"
         newAppInfo.appCategory = ctx.getString(FirewallManager.CategoryConstants.NON_APP.nameResId)
         newAppInfo.uid = uid
 
@@ -792,6 +798,7 @@ internal constructor(
         // purge logs older than specified date
         dnsLogRepository.purgeDnsLogsByDate(date)
         connTrackerRepository.purgeLogsByDate(date)
+        rethinkLogRepository.purgeLogsByDate(date)
     }
 
     private fun printAll(c: Collection<FirewallManager.AppInfoTuple>, tag: String) {

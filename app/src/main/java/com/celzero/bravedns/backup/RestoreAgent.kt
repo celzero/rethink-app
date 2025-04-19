@@ -27,6 +27,7 @@ import androidx.work.WorkerParameters
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
 import com.celzero.bravedns.backup.BackupHelper.Companion.METADATA_FILENAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.SHARED_PREFS_BACKUP_FILE_NAME
+import com.celzero.bravedns.backup.BackupHelper.Companion.TEMP_WG_DIR
 import com.celzero.bravedns.backup.BackupHelper.Companion.VERSION
 import com.celzero.bravedns.backup.BackupHelper.Companion.deleteResidue
 import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
@@ -44,6 +45,10 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.ObjectInputStream
+import androidx.core.net.toUri
+import com.celzero.bravedns.service.RethinkBlocklistManager
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.RemoteFileTagUtil
 
 class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), KoinComponent {
@@ -58,7 +63,12 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     override suspend fun doWork(): Result {
-        val restoreUri = Uri.parse(inputData.getString(DATA_BUILDER_RESTORE_URI))
+        val restoreUri = inputData.getString(DATA_BUILDER_RESTORE_URI)?.toUri()
+        if (restoreUri == null) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "restore uri is null, return failure")
+            return Result.failure()
+        }
+
         Logger.d(LOG_TAG_BACKUP_RESTORE, "begin restore process with file uri: $restoreUri")
         val result = startRestore(restoreUri)
 
@@ -70,7 +80,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         }
     }
 
-    private fun startRestore(importUri: Uri): Boolean {
+    private suspend fun startRestore(importUri: Uri): Boolean {
         var inputStream: InputStream? = null
         stopVpn(context)
         try {
@@ -121,14 +131,24 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                 // proceed
             }
 
+            // copy wireguard contents into temp_wg folder
+            // if wireguard copy failed, the proceed with cleanup
+            if (!restoreWireGuardFiles(tempDir)) {
+                Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to restore wireguard files, return failure")
+                // clear WireGuard related entries from database
+                wireGuardCleanup()
+            } else {
+                Logger.i(LOG_TAG_BACKUP_RESTORE, "wireguard files restored to the temp dir")
+            }
+
             // open log database if its not open
             handleDatabaseInit()
 
+            // copy the blocklist file from assets to the remote blocklist folder
+            moveRemoteBlocklistFileFromAsset()
+
             // update app version after the restore process
             updateLatestVersion()
-
-            // clear WireGuard related entries from database
-            wireGuardCleanup()
 
             return true
         } catch (e: Exception) {
@@ -141,6 +161,23 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         } finally {
             inputStream?.close()
         }
+    }
+
+    private suspend fun moveRemoteBlocklistFileFromAsset() {
+        // already there is a remote blocklist file available
+        if (
+            persistentState.remoteBlocklistTimestamp >
+            Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
+        ) {
+            RethinkBlocklistManager.readJson(
+                context,
+                RethinkBlocklistManager.DownloadType.REMOTE,
+                persistentState.remoteBlocklistTimestamp
+            )
+            return
+        }
+
+        RemoteFileTagUtil.moveFileToLocalDir(context.applicationContext, persistentState)
     }
 
     private fun handleDatabaseInit() {
@@ -185,11 +222,6 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         )
         for (file in files) {
             val currentDbFile = File(context.getDatabasePath(file.name).path)
-            Logger.d(
-                LOG_TAG_BACKUP_RESTORE,
-                "db file: ${file.name} backed up from ${file.path} to ${currentDbFile.path}"
-            )
-
             if (
                 !file.name.contains(AppDatabase.DATABASE_NAME) &&
                     !file.name.contains(LogDatabase.LOGS_DATABASE_NAME)
@@ -207,9 +239,65 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                 )
                 return false
             }
+            Logger.i(
+                LOG_TAG_BACKUP_RESTORE,
+                "database file: ${file.name} backed up from ${file.path} to ${currentDbFile.path}"
+            )
         }
 
         deleteResidue(tempDir)
+        return true
+    }
+
+    private fun restoreWireGuardFiles(dir: File): Boolean {
+        if (!dir.exists()) {
+            // no files to restore
+            Logger.i(LOG_TAG_BACKUP_RESTORE, "no wireguard files to restore")
+            return true
+        }
+
+        // store the wireguard files in the temp_wireguard folder and then copy it to the wireguard
+        // folder during db updates, database update is handled in RefreshDatabase
+        // clear if temp_wireguard folder is already there if not, create the folder
+        val tempWgDir = File(context.filesDir, TEMP_WG_DIR)
+        if (tempWgDir.exists()) {
+            Logger.d(LOG_TAG_BACKUP_RESTORE, "$TEMP_WG_DIR folder exists, delete")
+            tempWgDir.deleteRecursively()
+        }
+
+        if (!tempWgDir.mkdirs()) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "failed to create $TEMP_WG_DIR folder")
+            return false
+        }
+
+        // read the wireguard files from the temp dir and write it to the wireguard folder
+        val files = dir.listFiles()
+        if (files == null) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "files to restore is empty, path: ${dir.path}")
+            return false
+        }
+        files.forEach { file ->
+            // if file name ends with .conf, then copy it to the wireguard folder
+            if (!file.name.endsWith(".conf")) {
+                Logger.d(LOG_TAG_BACKUP_RESTORE, "not wg file, file name: ${file.name}")
+                return@forEach
+            }
+
+            val currentWgFile = File(tempWgDir, file.name)
+            if (!Utilities.copy(file.path, currentWgFile.path)) {
+                Logger.w(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "restore process, failure copying wireguard file: ${file.path} to ${currentWgFile.path}"
+                )
+                // no need to return false, proceed with the next file
+                // missing files database entry will be handled (deleted) in RefreshDatabase
+            } else {
+                Logger.i(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "wireguard file: ${file.name} backed up from ${file.path} to ${currentWgFile.path}"
+                )
+            }
+        }
         return true
     }
 
