@@ -83,7 +83,7 @@ class NetLogBatcher<T, V>(
                     signal.close()
                     buffersCh.close()
                     updatesCh.close()
-                    logd("$tag end")
+                    logd("end")
                 }
     }
 
@@ -103,17 +103,21 @@ class NetLogBatcher<T, V>(
 
     private fun logd(msg: String) {
         // write batcher logs only in DEBUG mode to avoid log spam
-        if (DEBUG) Log.d(LOG_BATCH_LOGGER, msg)
+        if (DEBUG) Log.d(LOG_BATCH_LOGGER, "$tag; $msg")
     }
 
     private suspend fun txswap() {
         val b = batches
-        batches = mutableListOf() // swap buffers
-        buffersCh.send(b)
-
         val u = updates
+
+        if (b.size > 0) {
+            batches = mutableListOf() // swap buffers
+            buffersCh.send(b)
+        }
+        if (u.size > 0) {
         updates = mutableListOf() // swap buffers
         updatesCh.send(u)
+        }
 
         logd( "txswap (${lsn}) b: ${b.size}, u: ${u.size}")
 

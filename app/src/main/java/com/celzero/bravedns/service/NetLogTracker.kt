@@ -72,7 +72,7 @@ internal constructor(
     // dispatch buffer to consumer if greater than batch size for dns, ip and rr logs
     private val logBatchSize = 20
     // dispatch buffer to consumer if greater than batch size, for console logs
-    private val consoleLogBatchSize = 100
+    private val consoleLogBatchSize = 256
 
     // a single thread to run sig and batch co-routines in;
     // to avoid use of mutex/semaphores over shared-state
@@ -203,8 +203,8 @@ internal constructor(
 
     // now, this method is doing multiple things which should be removed.
     // fixme: should intend to only write the logs to database.
-    fun processDnsLog(summary: DNSSummary) {
-        val transaction = dnsdb.processOnResponse(summary)
+    fun processDnsLog(summary: DNSSummary, rethinkUid: Int) {
+        val transaction = dnsdb.processOnResponse(summary, rethinkUid)
 
         transaction.responseCalendar = Calendar.getInstance()
         // TODO: move this to generic Dispatcher.IO; serializer is not required
@@ -215,8 +215,10 @@ internal constructor(
 
         if (!persistentState.logsEnabled) return
 
-        val dnsLog = dnsdb.makeDnsLogObj(transaction)
-        serializer("writeDnsLog", looper) { dnsBatcher?.add(dnsLog) }
+        serializer("writeDnsLog", looper) {
+            val dnsLog = dnsdb.makeDnsLogObj(transaction)
+            dnsBatcher?.add(dnsLog)
+        }
     }
 
     fun writeConsoleLog(log: ConsoleLog) {
