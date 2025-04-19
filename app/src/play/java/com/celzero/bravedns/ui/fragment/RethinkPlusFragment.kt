@@ -17,13 +17,20 @@ package com.celzero.bravedns.ui.fragment
 
 import Logger
 import Logger.LOG_IAB
-import android.content.ActivityNotFoundException
+import Logger.LOG_TAG_PROXY
+import Logger.LOG_TAG_UI
 import android.content.Intent
-import android.net.Uri
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.text.HtmlCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -32,35 +39,41 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.Purchase
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.GooglePlaySubsAdapter
+import com.celzero.bravedns.adapter.GooglePlaySubsAdapter.SubscriptionClickListener
 import com.celzero.bravedns.databinding.FragmentRethinkPlusBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
-import com.celzero.bravedns.iab.PricingPhase
+import com.celzero.bravedns.iab.ProductDetail
 import com.celzero.bravedns.iab.Result.resultState
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.RPN_AMZ_ID
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_ID
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.ui.activity.PingTestActivity
-import com.celzero.bravedns.ui.activity.TroubleshootActivity
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
+import com.celzero.bravedns.ui.activity.RpnAvailabilityCheckActivity
+import com.celzero.bravedns.ui.activity.RethinkPlusDashboardActivity
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
+import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.underline
 import com.celzero.bravedns.util.Utilities
+import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
+class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), SubscriptionClickListener {
     private val b by viewBinding(FragmentRethinkPlusBinding::bind)
     private val persistentState by inject<PersistentState>()
     private var productId = ""
     private var planId = ""
     private lateinit var loadingDialog: AlertDialog
     private lateinit var errorDialog: AlertDialog
+
+    companion object {
+        private const val TAG = "PR+Ui"
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -69,6 +82,12 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
         initObservers()
         collectPurchases()
         setupClickListeners()
+    }
+
+    override fun onSubscriptionSelected(prodId: String, planId: String) {
+        productId = prodId
+        this.planId = planId
+        Logger.d(LOG_IAB, "Selected product: $productId, $planId")
     }
 
     private fun initView() {
@@ -89,20 +108,62 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
                 return@io
             }
 
-            addWarpSEToTunnel()
-
             // perform initial checks whether the proxy is working or not
             // should we do this if rethink+ is already subscribed?
             val isTestOk = isTestOk()
 
             if (!isTestOk) {
-                uiCtx { showTestContainerUi() }
+                uiCtx { showRethinkNotAvailableUi("No network connectivity") }
                 return@io
             }
 
             // initiate the product details query
             queryProductDetail()
         }
+    }
+
+    private fun initTermsAndPolicy() {
+        b.termsText.text = updateHtmlEncodedText(getString(R.string.rethink_terms))
+        b.termsText.movementMethod = LinkMovementMethod.getInstance()
+        b.termsText.highlightColor = Color.TRANSPARENT
+    }
+
+    fun updateHtmlEncodedText(text: String): Spanned {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
+        } else {
+            HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startShimmer()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopShimmer()
+    }
+
+    private fun stopShimmer() {
+        if (!b.shimmerViewContainer.isShimmerStarted) return
+
+        b.shimmerViewContainer.stopShimmer()
+    }
+
+    private fun startShimmer() {
+        if (!b.shimmerViewContainer.isVisible) return
+
+        if (b.shimmerViewContainer.isShimmerStarted) return
+
+        val builder = Shimmer.AlphaHighlightBuilder()
+        builder.setDuration(2000)
+        builder.setBaseAlpha(0.85f)
+        builder.setDropoff(1f)
+        builder.setHighlightAlpha(0.35f)
+        b.shimmerViewContainer.setShimmer(builder.build())
+        b.shimmerViewContainer.startShimmer()
     }
 
     private fun isBillingAvailable(): Boolean {
@@ -115,7 +176,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
             return
         }
 
-        InAppBillingHandler.initiate(requireContext(), null)
+        InAppBillingHandler.initiate(requireContext().applicationContext)
         Logger.i(LOG_IAB, "ensureBillingSetup: billing client initiated")
     }
 
@@ -128,12 +189,16 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
     private fun purchaseSubs() {
         if (!isBillingAvailable()) {
             Logger.e(LOG_IAB, "purchaseSubs: billing client not available")
-            Utilities.showToastUiCentered(requireContext(), "Billing client not available, please try again later", Toast.LENGTH_LONG)
+            Utilities.showToastUiCentered(
+                requireContext(),
+                "Billing client not available, please try again later",
+                Toast.LENGTH_LONG
+            )
             return
         }
         // initiate the payment flow
         InAppBillingHandler.purchaseSubs(requireActivity(), productId, planId)
-        Logger.v(LOG_IAB, "purchaseSubs: initiated")
+        Logger.v(LOG_IAB, "purchaseSubs: initiated for $productId, $planId")
     }
 
     private fun showLoadingDialog() {
@@ -155,111 +220,19 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
     }
 
     private suspend fun isRethinkPlusAvailable(): Pair<Boolean, String> {
-        val warpWorks = RpnProxyManager.isWarpWorking()
-        Logger.i(LOG_IAB, "warp works: $warpWorks")
-        return warpWorks
+        // check whether the rethink+ is available for the user or not
+        return Pair(true, "Rethink+ is not available for your device")
     }
 
-    private suspend fun handleWarp(): Boolean {
-        // see if the warp conf is available, if not create a new one
-        val cf = RpnProxyManager.getWarpConfig()
-        if (cf == null) {
-            return createWarpConfig()
-        } else {
-            Logger.i(LOG_IAB, "warp config already exists")
-        }
-        return true
-    }
-
-    private suspend fun handleAmnezia(): Boolean {
-        // see if the amnezia conf is available, if not create a new one
-        val cf = RpnProxyManager.getAmneziaConfig()
-        if (cf == null) {
-            return createAmneziaConfig()
-        } else {
-            Logger.i(LOG_IAB, "amz config already exists")
-        }
-        return true
-    }
-
-    private suspend fun createWarpConfig(): Boolean {
-        // create a new warp config
-        val config = RpnProxyManager.getNewWarpConfig(true, WARP_ID, 0)
-        if (config == null) {
-            Logger.e(LOG_IAB, "err creating warp config")
-            showConfigCreationError(getString(R.string.new_warp_error_toast))
-            return false
-        }
-        return true
-    }
-
-    private suspend fun createAmneziaConfig(): Boolean {
-        // create a new amnezia config
-        val config = RpnProxyManager.getNewAmneziaConfig(RPN_AMZ_ID)
-        if (config == null) {
-            Logger.e(LOG_IAB, "err creating amz config")
-            showConfigCreationError("Error creating Amnezia config")
-            return false
-        }
-        return true
-    }
-
-    private suspend fun addAmneziaToTunnel() {
-        if (!handleAmnezia()) {
-            Logger.e(LOG_IAB, "err handling amz")
-            return
-        }
-        val c = RpnProxyManager.getAmneziaConfig()
-        val config = RpnProxyManager.getAmneziaConfig().first
-        if (config == null) {
-            Logger.e(LOG_IAB, "err adding amz to tunnel")
-            showConfigCreationError("Error adding amz to tunnel")
-            return
-        }
-        if (c.second) {
-            Logger.i(LOG_IAB, "amz already active")
-            return
-        }
-        Logger.i(LOG_IAB, "enabling amnezia(amz) config")
-        RpnProxyManager.enableConfig(config.getId())
-    }
-
-    private suspend fun addWarpToTunnel() {
-        if (!handleWarp()) {
-            Logger.e(LOG_IAB, "err handling warp")
-            return
-        }
-        val cf = RpnProxyManager.getWarpConfig()
-        val config = RpnProxyManager.getWarpConfig().first
-        if (config == null) {
-            Logger.e(LOG_IAB, "err adding warp to tunnel")
-            showConfigCreationError(getString(R.string.new_warp_error_toast))
-            return
-        }
-        if (cf.second) {
-            Logger.i(LOG_IAB, "warp already active")
-            return
-        }
-        Logger.i(LOG_IAB, "enabling warp config")
-        RpnProxyManager.enableConfig(config.getId())
-    }
-
-    private suspend fun registerSEToTunnel() {
-        // add the SE to the tunnel
-        val isRegistered = VpnController.registerSEToTunnel()
-        if (!isRegistered) {
-            Logger.e(LOG_IAB, "err registering SE to tunnel")
-            showConfigCreationError("Error registering SE to tunnel")
-        }
-        Logger.i(LOG_IAB, "SE registered to tunnel")
-    }
-
-    private fun showPaymentContainerUi(purc: List<PricingPhase> = emptyList()) {
+    private fun showPaymentContainerUi(purc: List<ProductDetail> = emptyList()) {
+        initTermsAndPolicy()
         hideLoadingDialog()
         hidePlusSubscribedUi()
         hideNotAvailableUi()
-        hideTestLayoutUi()
+
+        b.shimmerViewContainer.visibility = View.VISIBLE
         b.paymentContainer.visibility = View.VISIBLE
+        b.paymentButtonContainer.visibility = View.VISIBLE
         b.testPingButton.underline()
         setAdapter(purc)
         Logger.i(LOG_IAB, "adapter set")
@@ -267,6 +240,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
 
     private fun hidePaymentContainerUi() {
         b.paymentContainer.visibility = View.GONE
+        b.paymentButtonContainer.visibility = View.GONE
+        b.shimmerViewContainer.visibility = View.GONE
     }
 
     private fun hidePlusSubscribedUi() {
@@ -277,7 +252,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
         hideLoadingDialog()
         hidePlusSubscribedUi()
         hidePaymentContainerUi()
-        hideTestLayoutUi()
         b.notAvailableLayout.visibility = View.VISIBLE
     }
 
@@ -285,28 +259,25 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
         b.notAvailableLayout.visibility = View.GONE
     }
 
-    private fun hideTestLayoutUi() {
-        b.testLayout.visibility = View.GONE
-    }
-
     private fun showPlusSubscribedUi() {
         hideLoadingDialog()
         b.subscribedLayout.visibility = View.VISIBLE
         hidePaymentContainerUi()
-        hideTestLayoutUi()
         hideNotAvailableUi()
-        val res = if (persistentState.enableWarp) "Enable" else "Disable"
-        b.troubleshoot.text = "Troubleshoot: $res"
-        b.pausePlus.text = if (persistentState.enableWarp) "Pause Rethink+" else "Resume Rethink+" // for testing purpose
+        val state = RpnProxyManager.RpnState.fromId(persistentState.rpnState)
+        b.pausePlus.text = if (state.isPaused()) "Resume Rethink+" else "Pause Rethink+"
     }
 
     private suspend fun isTestOk(): Boolean {
-        val warp = VpnController.testWarp()
-        val amz = VpnController.testAmz()
-        val proton = VpnController.testProton()
-        val se = VpnController.testSE()
-        val x64 = VpnController.testExit64()
-        Logger.i(LOG_IAB, "test ok?: warp: $warp, amz: $amz, proton: $proton, se: $se, w64: $x64")
+        val warp = VpnController.testRpnProxy(RpnProxyManager.RpnType.WARP)
+        val amz = VpnController.testRpnProxy(RpnProxyManager.RpnType.AMZ)
+        val proton = VpnController.testRpnProxy(RpnProxyManager.RpnType.PROTON)
+        val se = VpnController.testRpnProxy(RpnProxyManager.RpnType.SE)
+        val x64 = VpnController.testRpnProxy(RpnProxyManager.RpnType.EXIT_64)
+        Logger.i(
+            LOG_IAB,
+            "$TAG test ok?: warp: $warp, amz: $amz, proton: $proton, se: $se, w64: $x64"
+        )
 
         val works = warp || amz || proton || se || x64
         return works
@@ -325,12 +296,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
         builder.create().show()
     }
 
-    private fun showTestContainerUi() {
-        hideLoadingDialog()
-        b.testLayout.visibility = View.VISIBLE
-    }
-
-    private fun setAdapter(list: List<PricingPhase>) {
+    private fun setAdapter(list: List<ProductDetail>) {
         if (list.isEmpty()) {
             Logger.d(LOG_IAB, "pricing phase list is empty/initialized")
             return
@@ -340,7 +306,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
         b.subscriptionPlans.setHasFixedSize(true)
         val layoutManager = LinearLayoutManager(requireContext())
         b.subscriptionPlans.layoutManager = layoutManager
-        b.subscriptionPlans.adapter = GooglePlaySubsAdapter(list)
+        b.subscriptionPlans.adapter = GooglePlaySubsAdapter(this, requireContext(), list)
     }
 
     private fun collectPurchases() {
@@ -348,7 +314,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
             Logger.d(LOG_IAB, "collectPurchases: Purchase details: ${list.size}")
             if (list.isEmpty()) {
                 Logger.d(LOG_IAB, "No purchases found")
-                persistentState.enableWarp = false // rethink+ not subscribed
+                RpnProxyManager.deactivateRpn() // rethink+ not subscribed
                 // initiate the product details query
                 io { queryProductDetail() }
                 return@observe
@@ -381,17 +347,24 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
                     showErrorDialog(i.message)
                 }
             }
-            b.showStatus.text = i.message
+            if (DEBUG) {
+                b.showStatus.visibility = View.VISIBLE
+                b.showStatus.text = i.message
+            }
         }
 
         InAppBillingHandler.connectionStateLiveData.observe(viewLifecycleOwner) { i ->
-            Logger.d(LOG_IAB, "onConnectionResult: isSuccess: ${i.isSuccess}, message: ${i.message}")
+
             if (!i.isSuccess) {
                 Logger.e(LOG_IAB, "Billing connection failed: ${i.message}")
                 ui {
                     if (isAdded && isVisible) {
                         hideLoadingDialog()
-                        Utilities.showToastUiCentered(requireContext(), i.message, Toast.LENGTH_SHORT)
+                        Utilities.showToastUiCentered(
+                            requireContext(),
+                            i.message,
+                            Toast.LENGTH_SHORT
+                        )
                     }
                 }
                 return@observe
@@ -417,13 +390,17 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
                 }
                 return@observe
             }
+            val products = list.filter { it.productType == ProductType.SUBS }
             val first = list.first()
             productId = first.productId
             planId = first.planId
             val product = first.pricingDetails
-            Logger.i(LOG_IAB, "Product details: ${first.productId}, ${first.planId}, ${first.productTitle}, ${first.productType}, ${first.pricingDetails.size}")
+            Logger.i(
+                LOG_IAB,
+                "Product details: ${first.productId}, ${first.planId}, ${first.productTitle}, ${first.productType}, ${first.pricingDetails.size}"
+            )
             if (isAdded && isVisible) {
-                showPaymentContainerUi(product)
+                showPaymentContainerUi(products)
             }
         }
     }
@@ -446,33 +423,26 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
 
     private fun handlePlusSubscribed() {
         showPlusSubscribedUi()
-        io { addWarpSEToTunnel() }
-        persistentState.enableWarp = true
-    }
-
-    private suspend fun addWarpSEToTunnel() {
-        addWarpToTunnel()
-        addAmneziaToTunnel()
-        registerSEToTunnel()
+        RpnProxyManager.activateRpn()
     }
 
     private fun setupClickListeners() {
-        b.termsAndConditions.setOnClickListener {
-            b.termsAndConditionsText.visibility =
-                if (b.termsAndConditionsText.visibility == View.VISIBLE) View.GONE else View.VISIBLE
-        }
 
         b.paymentButton.setOnClickListener {
             purchaseSubs()
         }
 
         b.testPingButton.setOnClickListener {
-            val intent = Intent(requireContext(), PingTestActivity::class.java)
-            startActivity(intent)
-        }
-
-        b.testPing.setOnClickListener {
-            val intent = Intent(requireContext(), PingTestActivity::class.java)
+            if (!VpnController.hasTunnel()) {
+                Logger.i(LOG_IAB, "$TAG; VPN not active, cannot perform tests")
+                Utilities.showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.settings_socks5_vpn_disabled_error),
+                    Toast.LENGTH_LONG
+                )
+                return@setOnClickListener
+            }
+            val intent = Intent(requireContext(), RpnAvailabilityCheckActivity::class.java)
             startActivity(intent)
         }
 
@@ -485,182 +455,45 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
             openBillingHistory()
         }
 
-        b.troubleshoot.setOnClickListener {
-            val intent = Intent(requireContext(), TroubleshootActivity::class.java)
+        b.dashboard.setOnClickListener {
+            val intent = Intent(requireContext(), RethinkPlusDashboardActivity::class.java)
             startActivity(intent)
         }
 
-        b.refreshWarp.setOnClickListener {
-            io {
-                createWarpConfig()
-                addWarpToTunnel()
-            }
-        }
-
         b.contactSupport.setOnClickListener {
-            io { isTestOk() }
+            // no-op
         }
 
         b.pausePlus.setOnClickListener {
-            if (persistentState.enableWarp) {
-                persistentState.enableWarp = false
-                val warp = WireguardManager.getConfigFilesById(WARP_ID)
-                if (warp == null) {
-                    Logger.e(LOG_IAB, "err getting warp config")
-                    return@setOnClickListener
-                }
-                WireguardManager.disableConfig(warp)
+            val state = RpnProxyManager.RpnState.fromId(persistentState.rpnState)
+            if (state.isPaused()) {
+                RpnProxyManager.activateRpn()
+                b.pausePlus.text = "Pause Rethink+"
             } else {
-                persistentState.enableWarp = true
-                io {
-                    addWarpToTunnel()
-                    addAmneziaToTunnel()
-                    registerSEToTunnel()
-                }
+                RpnProxyManager.pauseRpn()
+                b.pausePlus.text = "Resume Rethink+"
             }
-            b.pausePlus.text = if (persistentState.enableWarp) "Pause Rethink+" else "Resume Rethink+"
         }
     }
 
     private fun openBillingHistory() {
-        try {
-            val link = InAppBillingHandler.HISTORY_LINK
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
-        } catch (e: ActivityNotFoundException) {
-            Utilities.showToastUiCentered(
-                requireContext(),
-                "play store not found",
-                Toast.LENGTH_SHORT
-            )
-            Logger.e(LOG_IAB, "Play store not found", e)
-        }
+        val link = InAppBillingHandler.HISTORY_LINK
+        openUrl(requireContext(), link)
     }
 
     private fun managePlayStoreSubs() {
-        try {
-            // link for the play store which has placeholders for subscription id and package name
-            val link = InAppBillingHandler.LINK
-            // replace $1 with subscription id
-            // replace $2 with package name
-            val linkWithSubs = link.replace("\$1", InAppBillingHandler.PRODUCT_ID_TEST)
-            val linkWithSubsAndPackage = linkWithSubs.replace("\$2", requireContext().packageName)
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(linkWithSubsAndPackage)))
-        } catch (e: ActivityNotFoundException) {
-            Utilities.showToastUiCentered(
-                requireContext(),
-                "Play store not found",
-                Toast.LENGTH_SHORT
-            )
-            Logger.e(LOG_IAB, "Play store not found", e)
-        }
+        // link for the play store which has placeholders for subscription id and package name
+        val link = InAppBillingHandler.LINK
+        // replace $1 with subscription id
+        // replace $2 with package name
+        val linkWithSubs = link.replace("\$1", InAppBillingHandler.PROD_ID_MONTHLY_TEST)
+        val linkWithSubsAndPackage = linkWithSubs.replace("\$2", requireContext().packageName)
+        openUrl(requireContext(), linkWithSubsAndPackage)
     }
-
-    private suspend fun showConfigCreationError(msg: String) {
-        uiCtx {
-            if (isAdded && isVisible) {
-                Utilities.showToastUiCentered(
-                    requireContext(),
-                    msg,
-                    Toast.LENGTH_LONG
-                )
-            }
-        }
-    }
-
-    /*private val billingListener = object : BillingListener {
-        override fun onConnectionResult(isSuccess: Boolean, message: String) {
-            *//*Logger.d(LOG_IAB, "onConnectionResult: isSuccess: $isSuccess, message: $message")
-            if (!isSuccess) {
-                Logger.e(LOG_IAB, "Billing connection failed: $message")
-                ui {
-                    if (isAdded && isVisible) {
-                        Utilities.showToastUiCentered(requireContext(), message, Toast.LENGTH_SHORT)
-                    }
-                }
-                return
-            }
-            // check for the subscription status after the connection is established
-            val productType = listOf(ProductType.SUBS)
-            InAppBillingHandler.fetchPurchases(productType)*//*
-        }
-
-        override fun purchasesResult(isSuccess: Boolean, purchaseDetailList: List<PurchaseDetail>) {
-            *//*if (!isSuccess) {
-                Logger.e(LOG_IAB, "query purchase details failed")
-                // TODO: should we show a toast here / retry the query?
-                return
-            }
-
-            if (purchaseDetailList.isEmpty()) {
-                Logger.d(LOG_IAB, "No purchases found")
-                persistentState.enableWarp = false // rethink+ not subscribed
-                // initiate the product details query
-                io { queryProductDetail() }
-                return
-            }
-
-            Logger.d(LOG_IAB, "purchasesResult: Purchase details: ${purchaseDetailList.size}")
-            purchaseDetailList.forEach { it ->
-                if (it.state == Purchase.PurchaseState.PURCHASED && it.productType == ProductType.SUBS) {
-                    io {
-                        uiCtx {
-                            showConfettiEffect()
-                            handlePlusSubscribed()
-                        }
-                    }
-
-                    // add the purchase details to the databased
-                    Logger.d(
-                        LOG_IAB,
-                        "Purchase details: ${it.state}, ${it.productId}, ${it.purchaseToken}, ${it.productTitle}, ${it.purchaseTime}, ${it.productType}, ${it.planId}"
-                    )
-                }
-            }*//*
-        }
-
-        override fun productResult(isSuccess: Boolean, productList: List<ProductDetail>) {
-            *//*Logger.d(LOG_IAB, "productResult: Product details: ${productList.size}, $isSuccess")
-            if (!isSuccess) {
-                Logger.e(LOG_IAB, "Product details failed")
-                io {
-                    uiCtx {
-                        if (isAdded && isVisible) {
-                            Utilities.showToastUiCentered(
-                                requireContext(),
-                                "Error fetching product details",
-                                Toast.LENGTH_LONG
-                            )
-                        }
-                    }
-                }
-                return
-            }
-            if (persistentState.enableWarp) {
-                Logger.i(LOG_IAB, "User already subscribed to Rethink+")
-                return
-            }
-            val first = productList.firstOrNull() // use the first product details for now
-            if (first == null) {
-                Logger.e(LOG_IAB, "Product details is null")
-                return
-            }
-            productId = first.productId
-            planId = first.planId
-            val product = first.pricingDetails
-            Logger.i(LOG_IAB, "Product details: ${first.productId}, ${first.planId}, ${first.productTitle}, ${first.productType}, ${first.pricingDetails.size}")
-            io {
-                uiCtx {
-                    if (isAdded && isVisible) {
-                        showPaymentContainerUi(product)
-                    }
-                }
-            }*//*
-        }
-    }*/
 
     private fun isRethinkPlusSubscribed(): Boolean {
         // check whether the user has already subscribed to Rethink+ or not in database
-        return persistentState.enableWarp // for now
+        return RpnProxyManager.isRpnActive() // for now
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
