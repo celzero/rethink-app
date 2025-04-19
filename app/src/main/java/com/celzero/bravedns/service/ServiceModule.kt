@@ -24,7 +24,7 @@ object ServiceModule {
         single { PersistentState(androidContext()) }
         single { QueryTracker(get()) }
         single { NetLogTracker(androidContext(), get(), get(), get(), get(), get()) }
-        single { RefreshDatabase(androidContext(), get(), get(), get()) }
+        single { RefreshDatabase(androidContext(), get(), get(), get(), get()) }
     }
 
     val modules = listOf(serviceModules)

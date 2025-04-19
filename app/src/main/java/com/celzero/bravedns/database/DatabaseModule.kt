@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.database
 
+import com.celzero.bravedns.data.AppConnection
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -49,8 +50,8 @@ object DatabaseModule {
         single { get<AppDatabase>().wgHopMapDao() }
 
         single { get<LogDatabase>().rethinkConnectionLogDAO() }
-
         single { get<ConsoleLogDatabase>().consoleLogDAO() }
+        single { get<LogDatabase>().statsSummaryDAO() }
     }
     private val repositoryModule = module {
         single { get<AppDatabase>().appInfoRepository() }
