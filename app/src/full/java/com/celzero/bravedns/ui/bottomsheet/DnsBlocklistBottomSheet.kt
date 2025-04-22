@@ -49,6 +49,7 @@ import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogIpDetailsLayoutBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
 import com.celzero.bravedns.util.Constants
@@ -57,6 +58,7 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
@@ -66,6 +68,7 @@ import com.google.common.collect.Multimap
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import java.util.Locale
 
@@ -138,6 +141,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         displayDnsTransactionDetails()
         displayRecordTypeChip()
         setupClickListeners()
+        updateAppDetails(log)
         updateRulesUi(log!!.queryStr)
 
         if (log!!.region.isNotEmpty()) {
@@ -145,6 +149,48 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             b.dnsRegion.text = log!!.region
         } else {
             b.dnsRegion.visibility = View.GONE
+        }
+    }
+
+    private fun updateAppDetails(log: DnsLog?) {
+        if (log == null) {
+            b.dnsAppNameHeader.visibility = View.GONE
+            return
+        }
+
+        io {
+            val appNames = FirewallManager.getAppNamesByUid(log.uid)
+            if (appNames.isEmpty()) {
+                uiCtx {
+                    b.dnsAppNameHeader.visibility = View.GONE
+                }
+                return@io
+            }
+            val pkgName = FirewallManager.getPackageNameByAppName(appNames[0])
+
+            val appCount = appNames.count()
+            uiCtx {
+                if (appCount >= 1) {
+                    b.dnsAppName.text =
+                        if (appCount >= 2) {
+                            getString(
+                                R.string.ctbs_app_other_apps,
+                                appNames[0],
+                                appCount.minus(1).toString()
+                            )
+                        } else {
+                            appNames[0]
+                        }
+                    if (pkgName == null) return@uiCtx
+                    b.dnsAppIcon.setImageDrawable(
+                        getIcon(requireContext(), pkgName, log.appName)
+                    )
+                } else {
+                    // apps which are not available in cache are treated as non app.
+                    // TODO: check packageManager#getApplicationInfo() for appInfo
+                    b.dnsAppNameHeader.visibility = View.GONE
+                }
+            }
         }
     }
 
@@ -635,5 +681,9 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }

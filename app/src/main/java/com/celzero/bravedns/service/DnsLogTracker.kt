@@ -113,7 +113,6 @@ internal constructor(
         transaction.msg = summary.msg ?: ""
         transaction.upstreamBlock = summary.upstreamBlocks
         transaction.region = summary.region
-
         return transaction
     }
 
@@ -219,7 +218,6 @@ internal constructor(
             dnsLog.appName = context.getString(R.string.network_log_app_name_unknown)
             dnsLog.packageName = EMPTY_PACKAGE_NAME
         }
-
         return dnsLog
     }
 

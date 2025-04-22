@@ -44,6 +44,7 @@ import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import java.net.URI
 
@@ -398,7 +399,7 @@ class CustomDomainFragment :
         lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
-    private fun uiCtx(f: suspend () -> Unit) {
-        lifecycleScope.launch(Dispatchers.Main) { f() }
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }
