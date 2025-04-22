@@ -24,6 +24,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpRepository
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import inet.ipaddr.IPAddress
@@ -443,6 +444,22 @@ object IpRulesManager : KoinComponent {
         resultsCache.invalidateAll()
     }
 
+    suspend fun getObj(uid: Int, ipAddress: String, port: Int = 0): CustomIp? {
+        return db.getCustomIpDetail(uid, ipAddress, port)
+    }
+
+    suspend fun mkCustomIp(uid: Int, ipAddress: String, port: Int = UNSPECIFIED_PORT): CustomIp {
+        return makeCustomIp(
+            uid = uid,
+            ipAddress = ipAddress,
+            port = port,
+            status = IpRuleStatus.NONE,
+            wildcard = false,
+            proxyId = "",
+            proxyCC = ""
+        )
+    }
+
     private fun makeCustomIp(
         uid: Int,
         ipAddress: String,
@@ -454,7 +471,7 @@ object IpRulesManager : KoinComponent {
     ): CustomIp {
         val customIp = CustomIp()
         customIp.ipAddress = ipAddress // empty for port-only rules, always normalized
-        customIp.port = port ?: Constants.UNSPECIFIED_PORT
+        customIp.port = port ?: UNSPECIFIED_PORT
         customIp.protocol = ""
         customIp.isActive = true
         customIp.status = status.id

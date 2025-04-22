@@ -80,4 +80,7 @@ interface CustomDomainDAO {
         "SELECT * FROM (SELECT *, (SELECT COUNT(*) FROM CustomDomain cd2 WHERE cd2.uid = cd1.uid AND cd2.rowid <= cd1.rowid) row_num FROM CustomDomain cd1 WHERE uid != ${Constants.UID_EVERYBODY} AND domain LIKE :query) WHERE row_num <= 5 ORDER BY uid, row_num"
     )
     fun getAllDomainRules(query: String): PagingSource<Int, CustomDomain>
+
+    @Query("SELECT * FROM CustomDomain WHERE uid = :uid AND domain = :domain")
+    fun getCustomDomain(uid: Int, domain: String): CustomDomain?
 }

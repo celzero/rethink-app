@@ -97,6 +97,10 @@ object DomainRulesManager : KoinComponent {
         }
     }
 
+    suspend fun getObj(uid: Int, domain: String): CustomDomain? {
+        return db.getCustomDomain(uid, domain)
+    }
+
     // update the cache with the domain and its status based on the domain type
     fun updateTrie(cd: CustomDomain) {
         val key = mkTrieKey(cd.domain, cd.uid)
@@ -390,7 +394,7 @@ object DomainRulesManager : KoinComponent {
     fun isValidDomain(url: String): Boolean {
         return try {
             Patterns.WEB_URL.matcher(url).matches() || Patterns.DOMAIN_NAME.matcher(url).matches()
-        } catch (ignored: MalformedURLException) { // ignored
+        } catch (ignored: MalformedURLException) {
             false
         }
     }
@@ -439,6 +443,7 @@ object DomainRulesManager : KoinComponent {
         Logger.d(LOG_TAG_DNS, "setCC: updating domain: ${cd.domain} to cc: $cc")
         db.update(cd, newCd)
         Logger.i(LOG_TAG_DNS, "setCC: updated domain: ${cd.domain} to $cc")
+        rehydrateFromDB(cd.uid)
     }
 
     suspend fun setProxyId(cd: CustomDomain, proxyId: String) {
@@ -446,10 +451,17 @@ object DomainRulesManager : KoinComponent {
         val newCd = CustomDomain(cd.domain, cd.uid, cd.ips, cd.type, cd.status, proxyId, cd.proxyCC, cd.modifiedTs, 0L, cd.version)
         db.update(cd, newCd)
         Logger.i(LOG_TAG_DNS, "setProxyId: updated domain: ${cd.domain} to $proxyId")
+        rehydrateFromDB(cd.uid)
     }
 
     fun isWildCardEntry(url: String): Boolean {
         return wcRegex.matcher(url).matches()
+    }
+
+    // this is to create a custom domain entry where user want to add proxy without any
+    // rules set, this is created for the new ui, should be made generic
+    fun makeCustomDomain(uid: Int, domain: String): CustomDomain {
+        return mkCustomDomain(domain, uid, "", DomainType.DOMAIN, Status.NONE.id)
     }
 
     private fun mkCustomDomain(

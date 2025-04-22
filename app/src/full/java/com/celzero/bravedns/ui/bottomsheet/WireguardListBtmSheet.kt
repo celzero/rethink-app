@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<WgConfigFilesImmutable>, val listener: WireguardDismissListener) :
+class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<WgConfigFilesImmutable?>, val listener: WireguardDismissListener) :
     BottomSheetDialogFragment() {
     private var _binding: BottomSheetProxiesListBinding? = null
 
@@ -46,7 +46,7 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
     private val ai: AppInfo? = if (type == InputType.APP) obj as AppInfo else null
 
     companion object {
-        fun newInstance(input: InputType, obj: Any?, data: List<WgConfigFilesImmutable>, listener: WireguardDismissListener): WireguardListBtmSheet {
+        fun newInstance(input: InputType, obj: Any?, data: List<WgConfigFilesImmutable?>, listener: WireguardDismissListener): WireguardListBtmSheet {
             return WireguardListBtmSheet(input, obj, data, listener)
         }
 
@@ -110,7 +110,7 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
         val lst = confs.map { it }
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val adapter = RecyclerViewAdapter(lst) { conf ->
-            Logger.v(LOG_TAG_UI, "$TAG: Item clicked: ${conf.name}")
+            Logger.v(LOG_TAG_UI, "$TAG: Item clicked: ${conf?.name ?: "None"}")
             when (type) {
                 InputType.DOMAIN -> {
                     processDomain(conf)
@@ -127,40 +127,52 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
         b.recyclerView.adapter = adapter
     }
 
-    private fun processDomain(conf: WgConfigFilesImmutable) {
+    private fun processDomain(conf: WgConfigFilesImmutable?) {
         io {
             if (cd == null) {
                 Logger.w(LOG_TAG_UI, "$TAG: Custom domain is null")
                 return@io
             }
-            val id = ID_WG_BASE + conf.id
-            DomainRulesManager.setProxyId(cd, id)
-            Logger.v(LOG_TAG_UI, "$TAG: wg-endpoint set to ${conf.name} for ${cd.domain}")
-            cd.proxyId = id
+            if (conf == null) {
+                DomainRulesManager.setProxyId(cd, "")
+                cd.proxyId = ""
+            } else {
+                val id = ID_WG_BASE + conf.id
+                DomainRulesManager.setProxyId(cd, id)
+                cd.proxyId = id
+            }
+            val name = conf?.name ?: "None"
+            Logger.v(LOG_TAG_UI, "$TAG: wg-endpoint set to $name for ${cd.domain}")
             uiCtx {
                 Utilities.showToastUiCentered(
                     requireContext(),
-                    "Wireguard endpoint set to ${conf.name}",
+                    "Wireguard endpoint set to $name",
                     Toast.LENGTH_SHORT
                 )
             }
         }
     }
 
-    private fun processIp(conf: WgConfigFilesImmutable) {
+    private fun processIp(conf: WgConfigFilesImmutable?) {
         io {
             if (ci == null) {
                 Logger.w(LOG_TAG_UI, "$TAG: Custom IP is null")
                 return@io
             }
-            val id = ID_WG_BASE + conf.id
-            IpRulesManager.updateProxyId(ci, id)
-            Logger.v(LOG_TAG_UI, "$TAG: wg-endpoint set to ${conf.name} for ${ci.ipAddress}")
-            ci.proxyId = id
+            if (conf == null) {
+                IpRulesManager.updateProxyId(ci, "")
+                ci.proxyId = ""
+            } else {
+                val id = ID_WG_BASE + conf.id
+                IpRulesManager.updateProxyId(ci, id)
+                ci.proxyId = id
+            }
+            val name = conf?.name ?: "None"
+            Logger.v(LOG_TAG_UI, "$TAG: wg-endpoint set to $name for ${ci.ipAddress}")
             uiCtx {
                 Utilities.showToastUiCentered(
                     requireContext(),
-                    "Wireguard endpoint set to ${conf.name}",
+                    "Wireguard endpoint set to $name",
                     Toast.LENGTH_SHORT
                 )
             }
@@ -168,8 +180,8 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
     }
 
     inner class RecyclerViewAdapter(
-        private val data: List<WgConfigFilesImmutable>,
-        private val onItemClicked: (WgConfigFilesImmutable) -> Unit
+        private val data: List<WgConfigFilesImmutable?>,
+        private val onItemClicked: (WgConfigFilesImmutable?) -> Unit
     ) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -187,20 +199,40 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
         inner class ViewHolder(private val bb: ListItemProxyCcWgBinding) :
             RecyclerView.ViewHolder(bb.root) {
 
-            fun bind(conf: WgConfigFilesImmutable) {
-                bb.proxyNameCc.text = conf.name
-                bb.proxyDescCc.text = if (conf.isActive) "Active" else "Inactive"
+            fun bind(conf: WgConfigFilesImmutable?) {
+                if (conf == null) {
+                    bb.proxyNameCc.text = "None"
+                    bb.proxyDescCc.text = "None"
+                    when (type) {
+                        InputType.DOMAIN -> {
+                            bb.proxyRadioCc.isChecked = cd?.proxyId?.isEmpty() == true
+                        }
 
-                val id = ID_WG_BASE + conf.id
-                when (type) {
-                    InputType.DOMAIN -> {
-                        bb.proxyRadioCc.isChecked = id == cd?.proxyId
+                        InputType.IP -> {
+                            bb.proxyRadioCc.isChecked = ci?.proxyId?.isEmpty() == true
+                        }
+
+                        InputType.APP -> {
+                            // bb.endpointCheck.isChecked = item == appInfo?.proxyId
+                        }
                     }
-                    InputType.IP -> {
-                        bb.proxyRadioCc.isChecked = id == ci?.proxyId
-                    }
-                    InputType.APP -> {
-                        // bb.endpointCheck.isChecked = item == appInfo?.proxyId
+                } else {
+                    bb.proxyNameCc.text = conf.name
+                    bb.proxyDescCc.text = if (conf.isActive) "Active" else "Inactive"
+
+                    val id = ID_WG_BASE + conf.id
+                    when (type) {
+                        InputType.DOMAIN -> {
+                            bb.proxyRadioCc.isChecked = id == cd?.proxyId
+                        }
+
+                        InputType.IP -> {
+                            bb.proxyRadioCc.isChecked = id == ci?.proxyId
+                        }
+
+                        InputType.APP -> {
+                            // bb.endpointCheck.isChecked = item == appInfo?.proxyId
+                        }
                     }
                 }
                 bb.lipCcWgParent.setOnClickListener {

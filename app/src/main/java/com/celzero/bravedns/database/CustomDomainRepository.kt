@@ -43,6 +43,10 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
         return customDomainDAO.getAllDomains()
     }
 
+    fun getCustomDomain(uid: Int, domain: String): CustomDomain? {
+        return customDomainDAO.getCustomDomain(uid, domain)
+    }
+
     fun getDomainsByUID(uid: Int): List<CustomDomain> {
         return customDomainDAO.getDomainsByUID(uid)
     }

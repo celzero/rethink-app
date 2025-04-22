@@ -80,14 +80,16 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
 
         b.chooseProxyCard.setOnClickListener {
             val ctx = requireContext()
+            var v: MutableList<WgConfigFilesImmutable?> = mutableListOf()
             io {
-                val v = WireguardManager.getAllMappings()
-                if (v.isEmpty()) {
+                v.add(null)
+                v.addAll(WireguardManager.getAllMappings())
+                if (v.isEmpty() || v.size == 1) {
                     Logger.w(LOG_TAG_UI, "$TAG No Wireguard configs found")
                     uiCtx {
                         Utilities.showToastUiCentered(
                             ctx,
-                            "No ProtonVPN country codes found",
+                            "No Wireguard configs found",
                             Toast.LENGTH_SHORT
                         )
                     }
@@ -334,7 +336,7 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
         return tag.toString().toIntOrNull() ?: 0
     }
 
-    private fun showWgListBtmSheet(data: List<WgConfigFilesImmutable>) {
+    private fun showWgListBtmSheet(data: List<WgConfigFilesImmutable?>) {
         val bottomSheetFragment = WireguardListBtmSheet.newInstance(WireguardListBtmSheet.InputType.IP, ci, data, this)
         bottomSheetFragment.show(
             requireActivity().supportFragmentManager,

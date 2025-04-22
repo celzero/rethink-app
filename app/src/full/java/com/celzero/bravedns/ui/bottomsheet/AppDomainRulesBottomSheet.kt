@@ -17,20 +17,25 @@ package com.celzero.bravedns.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_FIREWALL
+import Logger.LOG_TAG_UI
 import android.content.DialogInterface
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
+import com.celzero.bravedns.database.CustomDomain
+import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
@@ -41,7 +46,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class AppDomainRulesBottomSheet : BottomSheetDialogFragment() {
+class AppDomainRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmSheet.WireguardDismissListener  {
     private var _binding: BottomSheetAppConnectionsBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
@@ -61,10 +66,12 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment() {
     private var uid: Int = -1
     private var domain: String = ""
     private var domainRule: DomainRulesManager.Status = DomainRulesManager.Status.NONE
+    private var cd: CustomDomain? = null
 
     companion object {
         const val UID = "UID"
         const val DOMAIN = "DOMAIN"
+        private const val TAG = "AppDomainBtmSht"
     }
 
     private fun isDarkThemeOn(): Boolean {
@@ -112,7 +119,12 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment() {
             this.dismiss()
             return
         }
-
+        io {
+            cd = DomainRulesManager.getObj(uid, domain)
+            if (cd == null) {
+                cd = DomainRulesManager.makeCustomDomain(uid, domain)
+            }
+        }
         updateAppDetails()
         // making use of the same layout used for ip rules, so changing the text and
         // removing the recycler related changes
@@ -169,7 +181,7 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment() {
         io {
             // no need to send port number for the app info screen
             domainRule = DomainRulesManager.status(domain, uid)
-            Logger.d(LOG_TAG_FIREWALL, "Set selection of ip: $domain, ${domainRule.id}")
+            Logger.d(LOG_TAG_FIREWALL, "$TAG set selection of ip: $domain, ${domainRule.id}")
             uiCtx {
                 when (domainRule) {
                     DomainRulesManager.Status.TRUST -> {
@@ -215,10 +227,45 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment() {
                 enableTrustUi()
             }
         }
+
+        b.chooseProxyRl.setOnClickListener {
+            val ctx = requireContext()
+            var v: MutableList<WgConfigFilesImmutable?> = mutableListOf()
+            io {
+                v.add(null)
+                v.addAll(WireguardManager.getAllMappings())
+                if (v.isEmpty()) {
+                    Logger.v(LOG_TAG_UI, "$TAG no wireguard configs found")
+                    uiCtx {
+                        Utilities.showToastUiCentered(
+                            ctx,
+                            "No active wireguard proxies found",
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                    return@io
+                }
+                uiCtx {
+                    Logger.v(LOG_TAG_UI, "$TAG show wg list(${v.size} for ${cd?.domain}, $uid")
+                    showWgListBtmSheet(v)
+                }
+            }
+        }
+
+    }
+
+
+    private fun showWgListBtmSheet(data: List<WgConfigFilesImmutable?>) {
+        Logger.v(LOG_TAG_UI, "$TAG show wg list(${data.size} for ${cd?.domain}, uid: $uid")
+        val bottomSheetFragment = WireguardListBtmSheet.newInstance(WireguardListBtmSheet.InputType.DOMAIN, cd, data, this)
+        bottomSheetFragment.show(
+            requireActivity().supportFragmentManager,
+            bottomSheetFragment.tag
+        )
     }
 
     private fun applyDomainRule(status: DomainRulesManager.Status) {
-        Logger.i(LOG_TAG_FIREWALL, "domain rule for uid: $uid:$domain (${status.name})")
+        Logger.i(LOG_TAG_FIREWALL, "$TAG domain rule for uid: $uid:$domain (${status.name})")
         domainRule = status
 
         // set port number as null for all the rules applied from this screen
@@ -271,5 +318,16 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment() {
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
+    }
+
+    override fun onDismissWg(obj: Any?) {
+        try {
+            val customDomain = obj as CustomDomain
+            cd = customDomain
+            setRulesUi()
+            Logger.i(LOG_TAG_UI, "$TAG onDismissWg: ${cd?.domain}, $uid, ${cd?.proxyId}")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "$TAG err in onDismissWg ${e.message}", e)
+        }
     }
 }

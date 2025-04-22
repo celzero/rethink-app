@@ -80,14 +80,16 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
 
         b.chooseProxyCard.setOnClickListener {
             val ctx = requireContext()
+            var v: MutableList<WgConfigFilesImmutable?> = mutableListOf()
             io {
-                val v = WireguardManager.getAllMappings()
+                v.add(null)
+                v.addAll(WireguardManager.getAllMappings())
                 if (v.isEmpty()) {
                     Logger.v(LOG_TAG_UI, "$TAG no wireguard configs found")
                     uiCtx {
                         Utilities.showToastUiCentered(
                             ctx,
-                            "No country codes found",
+                            "No active wireguard proxies found",
                             Toast.LENGTH_SHORT
                         )
                     }
@@ -361,7 +363,7 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
         return tag.toString().toIntOrNull() ?: 0
     }
 
-    private fun showWgListBtmSheet(data: List<WgConfigFilesImmutable>) {
+    private fun showWgListBtmSheet(data: List<WgConfigFilesImmutable?>) {
         Logger.v(LOG_TAG_UI, "$TAG show wg list(${data.size} for ${cd.domain}")
         val bottomSheetFragment = WireguardListBtmSheet.newInstance(WireguardListBtmSheet.InputType.DOMAIN, cd, data, this)
         bottomSheetFragment.show(

@@ -17,21 +17,26 @@ package com.celzero.bravedns.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_FIREWALL
+import Logger.LOG_TAG_UI
 import android.content.DialogInterface
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.adapter.DomainRulesBtmSheetAdapter
+import com.celzero.bravedns.database.CustomIp
+import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
@@ -43,7 +48,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class AppIpRulesBottomSheet : BottomSheetDialogFragment() {
+class AppIpRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmSheet.WireguardDismissListener {
     private var _binding: BottomSheetAppConnectionsBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
@@ -56,6 +61,8 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment() {
     private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
     private var adapter: AppWiseIpsAdapter? = null
     private var position: Int = -1
+
+    private var ci: CustomIp? = null
 
     override fun getTheme(): Int =
         getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
@@ -117,6 +124,13 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment() {
         if (uid == INVALID_UID) {
             this.dismiss()
             return
+        }
+
+        io {
+            ci = IpRulesManager.getObj(uid, ipAddress)
+            if (ci == null) {
+                ci = IpRulesManager.mkCustomIp(uid, ipAddress)
+            }
         }
 
         updateAppDetails()
@@ -237,6 +251,39 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment() {
                 enableTrustUi()
             }
         }
+
+        b.chooseProxyRl.setOnClickListener {
+            val ctx = requireContext()
+            var v: MutableList<WgConfigFilesImmutable?> = mutableListOf()
+            io {
+                v.add(null)
+                v.addAll(WireguardManager.getAllMappings())
+                if (v.isEmpty() || v.size == 1) {
+                    Logger.w(LOG_TAG_UI, "$TAG No Wireguard configs found")
+                    uiCtx {
+                        Utilities.showToastUiCentered(
+                            ctx,
+                            "No ProtonVPN country codes found",
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                    return@io
+                }
+                uiCtx {
+                    Logger.v(LOG_TAG_UI, "$TAG show wg list(${v.size}) for ${ci?.ipAddress ?: ""}")
+                    showWgListBtmSheet(v)
+                }
+            }
+        }
+    }
+
+    private fun showWgListBtmSheet(data: List<WgConfigFilesImmutable?>) {
+        val bottomSheetFragment =
+            WireguardListBtmSheet.newInstance(WireguardListBtmSheet.InputType.IP, ci, data, this)
+        bottomSheetFragment.show(
+            requireActivity().supportFragmentManager,
+            bottomSheetFragment.tag
+        )
     }
 
     private fun applyIpRule(status: IpRulesManager.IpRuleStatus) {
@@ -287,5 +334,16 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment() {
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
+    }
+
+    override fun onDismissWg(obj: Any?) {
+        try {
+            val cip = obj as CustomIp
+            ci = cip
+            setRulesUi()
+            Logger.v(LOG_TAG_UI, "$TAG: onDismissWg: ${cip.ipAddress}, ${cip.proxyCC}")
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_UI, "$TAG: err in onDismissWg ${e.message}", e)
+        }
     }
 }
