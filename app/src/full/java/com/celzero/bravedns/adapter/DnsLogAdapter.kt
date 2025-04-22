@@ -28,8 +28,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -46,7 +44,6 @@ import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.ListItemDnsLogBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.ui.bottomsheet.DnsBlocklistBottomSheet
 import com.celzero.bravedns.util.Constants
@@ -55,10 +52,6 @@ import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.internal.concurrent.TaskRunner
 
 class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethinkDns: Boolean) :
     PagingDataAdapter<DnsLog, DnsLogViewHolder>(DIFF_CALLBACK) {
@@ -121,7 +114,6 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
             displayIcon(log)
             displayUnicodeIfNeeded(log)
             displayDnsType(log)
-
             b.dnsParentLayout.setOnClickListener { openBottomSheet(log) }
         }
 
@@ -207,7 +199,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                         b.dnsUnicodeHint.text,
                         getRethinkUnicode(log)
                     )
-            } else if (isGoosOrSystemUsed(log)) {
+            } else if (isInternalResolverUsed(log)) {
                 // show duck icon in case of system or goos transport
                 b.dnsUnicodeHint.text =
                     context.getString(
@@ -233,7 +225,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
         }
 
         private fun isConnectionProxied(proxy: String?): Boolean {
-            if (proxy == null) return false
+            if (proxy.isNullOrEmpty()) return false
 
             return !ProxyManager.isIpnProxy(proxy)
         }
@@ -255,13 +247,13 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
             return isRdnsResolverUsed || log.relayIP.endsWith(Backend.RPN)
         }
 
-        private fun isGoosOrSystemUsed(log: DnsLog): Boolean {
+        private fun isInternalResolverUsed(log: DnsLog): Boolean {
             if (log.status != Transaction.Status.COMPLETE.name) {
                 return false
             }
 
             return log.resolverId.contains(Backend.Goos) || log.resolverId.contains(Backend.Default) ||
-                    log.resolverId.contains(Backend.System)
+                    log.resolverId.contains(Backend.System) || log.resolverId.contains(Backend.Bootstrap)
         }
 
         private fun getRethinkUnicode(log: DnsLog): String {
