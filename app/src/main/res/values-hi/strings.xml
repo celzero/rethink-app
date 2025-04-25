@@ -995,4 +995,9 @@
     <string name="cleanbrowsing_adult_dns_desc" translatable="true">एडल्ट फ़िल्टर सभी वयस्क, अश्लील और अश्लील साइटों तक पहुँच को ब्लॉक करता है। यह प्रॉक्सी या VPN या मिश्रित सामग्री वाली साइटों को ब्लॉक नहीं करता है। Reddit जैसी साइटों को अनुमति है। Google और Bing को सुरक्षित मोड पर सेट किया गया है।</string>
     <string name="crypt_cleanbrowsing_family_desc" translatable="true">सभी वयस्क, अश्लील और अश्लील साइटों तक पहुँच को ब्लॉक करता है। यह प्रॉक्सी और VPN डोमेन को भी ब्लॉक करता है जिनका उपयोग फ़िल्टर को बायपास करने के लिए किया जाता है। मिश्रित सामग्री वाली साइटें (जैसे Reddit) भी ब्लॉक की जाती हैं। Google, Bing और Youtube को सुरक्षित मोड पर सेट किया गया है।</string>
     <string name="crypt_relay_sweden" translatable="true">https://cryptostrom.is/ द्वारा प्रदान किया गया स्वीडन में होस्ट किया गया अनाम DNS रिले।</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">%1$s ऐप्स शामिल करें</string>
+    <string name="wireguard_disable_failure" translatable="true">\"Always-on WireGuard\" को बंद नहीं किया जा सकता</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">%1$s का हिस्सा</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">चयनित ऐप्स केवल इस वायरगार्ड वीपीएन के माध्यम से मार्गनिर्देशित होंगे, चाहे वह असफल हो या जुड़ा हो।।</string>
+    <string name="lbl_on_device" translatable="true">ऑन-डिवाइस</string>
 </resources>
