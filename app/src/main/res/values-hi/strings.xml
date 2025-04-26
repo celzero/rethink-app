@@ -118,7 +118,7 @@
     <string name="universal_firewall_explanation" translatable="true">डिवाइस घटनाओं के आधार पर फायरवॉल नियम लागू करे जैसे जब, उदाहरण के लिए, डिवाइस लॉक हो या कोई विशेष ऐप उपयोग में न हो।</string>
     <string name="notification_action_pause_vpn" translatable="true">रोके</string>
     <string name="notification_action_stop_vpn" translatable="true">बंद करे</string>
-    <string name="apps_info_title" translatable="true">ऐप्स</string>
+    <string name="apps_info_title" translatable="true">ऍप</string>
     <string name="hybrid_mode_info_title" translatable="true">डीएनएस + फ़ायरवॉल</string>
     <string name="dns_mode_info_explanation_new" translatable="true">डीएनएस अनुरोधों को मॉनिटर, ब्लॉक और एन्क्रिप्ट करें।</string>
     <string name="dns_firewall_mode_info_explanation_new" translatable="true">उपरोक्त सभी + इंटरनेट सेंसरशिप को बायपास करें।</string>
@@ -405,7 +405,7 @@
     <string name="settings_protocol_translation_dns_inactive" translatable="true">इस सेटिंग को सक्षम करने के लिए डीएनएस/डीएनएस+फ़ायरवॉल मोड पर स्विच करें</string>
     <string name="firewall_status_isolate" translatable="true">अलग रखा</string>
     <string name="firewall_status_blocked" translatable="true">अवरोधित</string>
-    <string name="firewall_status_unknown" translatable="true">अज्ञात</string>
+    <string name="firewall_status_unknown" translatable="true">अज्ञात स्थिति</string>
     <string name="ct_bs_app_info_error" translatable="true">ऐप जानकारी नहीं मिली</string>
     <string name="hs_biometeric_title" translatable="true">रीथिंक अनलॉक करें</string>
     <string name="hs_biometeric_desc" translatable="true">रीथिंक अनलॉक करने के लिए बायोमेट्रिक सत्यापन इस्तेमाल करें</string>
@@ -424,7 +424,7 @@
     <string name="cd_dns_crypt_title" translatable="true">रिजॉलवर</string>
     <string name="cd_custom_doh_dialog_title" translatable="true">कस्टम सर्वर यूआरएल</string>
     <string name="cd_custom_dns_proxy_title" translatable="true">कस्टम डीएनएस प्रॉक्सी</string>
-    <string name="cd_custom_dns_proxy_name_default" translatable="true">प्रॉक्सी</string>
+    <string name="cd_custom_dns_proxy_name_default" translatable="true">प्राक्सी नाम</string>
     <string name="cd_dns_crypt_dialog_stamp" translatable="true">स्टेम्प</string>
     <string name="cd_dns_crypt_dialog_desc" translatable="true">विवरण (वैकल्पिक)</string>
     <string name="cd_doh_dialog_resolver_name" translatable="true">रिजॉल्वर नाम</string>
@@ -452,7 +452,7 @@
     <string name="fapps_unblock_dialog_title" translatable="true">ऐप्स को अनुमति दें</string>
     <string name="fapps_exclude_block_dialog_title" translatable="true">ऐप्स को निकाले</string>
     <string name="fapps_info_exclude_msg" translatable="true">डीएनएस + फ़ायरवॉल दोनों से बाहर निकलें।</string>
-    <string name="network_log_app_name_unknown" translatable="true">अज्ञात</string>
+    <string name="network_log_app_name_unknown" translatable="true">अनजान ऐप</string>
     <string name="network_log_app_name_unnamed" translatable="true">बेनाम (%1$s)</string>
     <string name="dns_crypt_connection_failure" translatable="true">डीएनएसक्रिप्ट सर्वर से कनेक्ट करने में त्रुटि।</string>
     <string name="dns_proxy_connection_failure" translatable="true">डीएनएस प्रॉक्सी सर्वर से कनेक्ट करने में त्रुटि।</string>
@@ -554,7 +554,7 @@
     <string name="settings_ptrans_heading" translatable="true">बल आईपीवी4 निकास</string>
     <string name="settings_allow_bypass_heading" translatable="true">नेटवर्क देखना चालू करें</string>
     <string name="settings_allow_bypass_desc" translatable="true">अनुरोध करने वाले ऐप्स को सारे मौजूद नेटवर्क लेने दे। ये ऐप ऑन-डिमांड रीथिंक वीपीएन टनल को बायपास कर सकते है। कुछ ऑडियो/वीडियो कॉन्फ़्रेंस ऐप्स जैसे ज़ूम और मीट को ठीक से काम करने के लिए इसकी ज़रूरत हो सकती है।</string>
-    <string name="settings_proxy_header" translatable="true">प्रॉक्सी</string>
+    <string name="settings_proxy_header" translatable="true">प्राक्सी</string>
     <string name="settings_socks5_heading" translatable="true">सॉक्स5 प्रॉक्सी सेटअप करें</string>
     <string name="settings_https_heading" translatable="true">HTTP(S) CONNECT प्रॉक्सी सेटअप करें</string>
     <string name="orbot_socks5" translatable="true">सिर्फ-टीसीपी प्रॉक्सी</string>
@@ -850,7 +850,7 @@
     <string name="lbl_min" translatable="true">मिनट</string>
     <string name="lbl_private_key" translatable="true">निजी कुंजी</string>
     <string name="lbl_preshared_key" translatable="true">प्रीशेयर चाबी</string>
-    <string name="lbl_applications" translatable="true">ऐप</string>
+    <string name="lbl_applications" translatable="true">एप्स</string>
     <string name="lbl_include" translatable="true">शामिल करें</string>
     <string name="lbl_very" translatable="true">बहुत ज़्यादा</string>
     <string name="lbl_select_all" translatable="true">सब चुनें</string>
@@ -863,6 +863,141 @@
     <string name="dot_custom_url_remove_dialog_message" translatable="true">सहेजे गए कॉन्फ़िगरेशन से टीएलएस एंडपॉइंट पर डीएनएस हटाएं।</string>
     <string name="lbl_status" translatable="true">स्थिति</string>
     <string name="lbl_private" translatable="true">निजी</string>
-    <string name="lbl_remove" translatable="true">हटाएं</string>
+    <string name="lbl_remove" translatable="true">हटाएँ</string>
     <string name="lbl_cache" translatable="true">कैशे</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">लॉकडाउन</string>
+    <string name="lbl_last" translatable="true">अंतिम</string>
+    <string name="lbl_starting" translatable="true">शुरुआत</string>
+    <string name="lbl_overall" translatable="true">समस्त/कुल मिलाकर</string>
+    <string name="lbl_stopped" translatable="true">रुका हुआ</string>
+    <string name="lbl_secure" translatable="true">सुरक्षित करें</string>
+    <string name="lbl_anonymous" translatable="true">अज्ञातकृत</string>
+    <string name="failed_using_default" translatable="true">विफल: फ़ॉलबैक DNS का उपयोग</string>
+    <string name="logs_disclaimer" translatable="true">पहले 20,000 अक्षर दिखाए जा रहे हैं</string>
+    <string name="cd_dialog_edit_title" translatable="true">डोमेन नियम संपादित करें</string>
+    <string name="bad_config_explanation_positive_number" translatable="true">: सकारात्मक होना चाहिए</string>
+    <string name="bad_config_context" translatable="true">%1$s का %2$s</string>
+    <string name="generic_error" translatable="true">अज्ञात \"%s\" त्रुटि</string>
+    <string name="parse_error_generic" translatable="true">स्ट्रिंग</string>
+    <string name="import_error" translatable="true">सुरंग आयात करने में असमर्थ: %s</string>
+    <string name="bad_extension_error" translatable="true">फ़ाइल .conf या .zip होनी चाहिए</string>
+    <string name="setup_wireguard" translatable="true">वायरगार्ड सेटअप करें</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">हमेशा चालू</string>
+    <string name="routing_remaining_apps" translatable="true">शेष ऐप्स को मार्गनिर्देशित करना</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">%1$s ऐप्स को बाहर करें</string>
+    <string name="wireguard_connection_error" translatable="true">वायरगार्ड वीपीएन कनेक्ट करने में विफल</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">सुरक्षित! DNS + फ़ायरवॉल + प्रॉक्सी से कनेक्टेड।</string>
+    <string name="logs_card_duration" translatable="true">%1$s से</string>
+    <string name="lbl_background_data" translatable="true">पृष्ठभूमि(बैकग्राउंड) डेटा प्रतिबंधित करना</string>
+    <string name="lbl_battery_optimization" translatable="true">बैटरी अनुकूलन</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> के कारण कनेक्टिविटी में कमी आ सकती है। सेटिंग बदलें ताकि बैकग्राउंड में होने पर Rethink डेटा और अन्य संसाधनों का उपयोग कर सके।</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">अमान्य मान</string>
+    <string name="crypt_quad9_security_desc" translatable="true">क्वाड9 (एनीकास्ट) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="lbl_notification" translatable="true">अधिसूचना</string>
+    <string name="memory_notification_text">Rethink में मेमोरी कम हो रही है। सिस्टम क्रियाएँ सीमित हो सकती हैं।</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">लूपबैक प्रॉक्सी फ़ॉरवर्डर ऐप्स</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">अक्षम होने पर, यह प्रॉक्सी (SOCKS5, HTTP, DNS) फॉरवर्डर ऐप्स को Rethink के VPN टनल से बाहर कर देता है।</string>
+    <string name="orbot_no_app_toast" translatable="true">Orbot को सक्षम करने के लिए कम से कम एक ऐप जोड़ें</string>
+    <string name="settings_rinr_heading" translatable="true">लूपबैक (प्रायोगिक)</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">रीथिंक के अपने ट्रैफ़िक को, जैसे ब्लॉकलिस्ट डाउनलोड, कनेक्टिविटी जांच, डीएनएस कनेक्शन, वापस सुरंग में रूट करें।</string>
+    <string name="settings_rinr_dialog_title" translatable="true">लूपबैक (प्रयोगात्मक)</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">%1$sबंद करें</string>
+    <string name="dc_proxy_dns_heading" translatable="true">कभी भी DNS प्रॉक्सी न करें</string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true">सर्वर TLS प्रमाणपत्रों को मान्य न करें (केवल तभी सक्षम करें जब आपको पता हो कि आप क्या कर रहे हैं)</string>
+    <string name="univ_firewall_heading" translatable="true">सर्वव्यापक फ़ायरवॉल नियम</string>
+    <string name="app_ip_domain_rules" translatable="true">प्रति ऐप IP / डोमेन नियम</string>
+    <string name="app_ip_domain_rules_desc" translatable="true">प्रति ऐप IP / डोमेन नियम संशोधित करें।</string>
+    <string name="firewall_rule_proxied" translatable="true">प्रॉक्सीड</string>
+    <string name="cd_deleted_toast" translatable="true">सभी डोमेन नियम हटा दिए गए</string>
+    <string name="exclude_apps_from_proxy">सभी प्रॉक्सी से ऐप को बायपास करें</string>
+    <string name="exclude_apps_from_proxy_failure_toast">यह ऐप प्रॉक्सी को बायपास करता है</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">अमान्य कुंजी</string>
+    <string name="bad_config_reason_invalid_number" translatable="true">अमान्य संख्या</string>
+    <string name="bad_config_reason_missing_attribute" translatable="true">अनुपलब्ध गुण</string>
+    <string name="bad_config_reason_missing_section" translatable="true">अनुपलब्ध अनुभाग</string>
+    <string name="bad_config_reason_syntax_error" translatable="true">वक्य रचना त्रुटि</string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true">अज्ञात विशेषता</string>
+    <string name="key_contents_error" translatable="true">कुंजी में अमान्य अक्षर</string>
+    <string name="key_length_error" translatable="true">गलत कुंजी लंबाई</string>
+    <string name="parse_error_inet_address" translatable="true">आईपी पता</string>
+    <string name="parse_error_inet_endpoint" translatable="true">अंतबिंदु</string>
+    <string name="parse_error_inet_network" translatable="true">आईपी नेटवर्क</string>
+    <string name="parse_error_integer" translatable="true">नंबर</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">: एक वैध UDP पोर्ट संख्या होनी चाहिए</string>
+    <string name="bad_config_error" translatable="true">%1$s में %2$s</string>
+    <string name="parse_error_reason" translatable="true">%1$s “%2$s” को पार्स नहीं किया जा सकता</string>
+    <string name="invalid_file_error" translatable="true">अवैध फ़ाइल</string>
+    <string name="illegal_filename_error" translatable="true">अवैध फ़ाइल नाम “%s”</string>
+    <string name="new_warp_invalid_config_toast" translatable="true">अमान्य WARP कॉन्फ़िगरेशन</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">अन्य वायरगार्ड वीपीएन द्वारा मार्गनिर्देशित न किए गए सभी कनेक्शन और ऐप्स इस वीपीएन द्वारा मार्गनिर्देशित किए जाएंगे।</string>
+    <string name="add_peer" translatable="true">पीयर जोड़े</string>
+    <string name="config_delete_dialog_desc" translatable="true">क्या आप वाकई इस WireGuard VPN कॉन्फ़िगरेशन को हटाना चाहते हैं?</string>
+    <string name="config_delete_dialog_title" translatable="true">कॉन्फ़िग हटायें</string>
+    <string name="wireguard_disclaimer" translatable="true">DNS को %1$s पर भेजा जाता है, ICMP (उदाहरण : पिंग) को अंतर्निहित नेटवर्क पर भेजा जाता है।</string>
+    <string name="wireguard_disable_title" translatable="true">वायरगार्ड बंद करें</string>
+    <string name="wireguard_disable_message" translatable="true">सभी सक्रिय WireGuard VPN बंद करें?</string>
+    <string name="lbl_remaining_apps" translatable="true">बचे हुए ऐप्स</string>
+    <string name="remaining_apps_dialog_title" translatable="true">बचे हुए ऐप्स शामिल करें</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">किसी अन्य प्रॉक्सी द्वारा मार्गनिर्देशित न किए गए सभी बचे हुए ऐप्स को शामिल करें</string>
+    <string name="cloudflare_dns_desc" translatable="true">किसी भी DNS अनुरोध को ब्लॉक नहीं करता है। Cloudflare के 1.1.1.1 DNS एंडपॉइंट का उपयोग करता है।</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">मैलवेयर और वयस्क सामग्री को ब्लॉक करता है। क्लाउडफ्लेयर के 1.1.1.3 DNS एंडपॉइंट का उपयोग करता है।</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">दुर्भावनापूर्ण सामग्री को ब्लॉक करता है। Cloudflare के 1.1.1.2 DNS एंडपॉइंट का उपयोग करता है।</string>
+    <string name="google_dns_desc" translatable="true">किसी भी DNS अनुरोध को ब्लॉक नहीं करता है। Google के DNS एंडपॉइंट का उपयोग करता है।</string>
+    <string name="quad9_dns_desc" translatable="true">क्वाड9 आपके DNS प्रश्नों को विश्व भर में सर्वरों के सुरक्षित नेटवर्क के माध्यम से रूट करता है।</string>
+    <string name="crypt_adguard_desc" translatable="true">आपके डिवाइस को मैलवेयर और अन्य से सुरक्षित रखता है।</string>
+    <string name="crypt_adguard_family_desc" translatable="true">सुरक्षित खोज और वयस्क सामग्री अवरोधन के साथ एडगार्ड DNS।</string>
+    <string name="crypt_quad9_desc" translatable="true">क्वाड9 (एनीकास्ट) नो-डीएनएससेक/नो-लॉग/नो-फिल्टर/ईसीएस 9.9.9.12 – 149.112.112.12</string>
+    <string name="crypt_relay_netherlands" translatable="true">नीदरलैंड में होस्ट किया गया अनाम DNS रिले</string>
+    <string name="crypt_relay_france" translatable="true">पेरिस, फ्रांस में होस्ट किया गया अनाम DNS रिले https://cryptostrom.is/ द्वारा प्रदान किया गया है।</string>
+    <string name="crypt_relay_us" translatable="true">https://cryptostrom.is/ स्वीडन द्वारा प्रदान किया गया अनाम डीएनएस रिले।</string>
+    <string name="crypt_relay_singapore" translatable="true">सिंगापुर में होस्ट किया गया अनाम DNS रिले।</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">सर्वाधिक अवरुद्ध देश</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">यह कनेक्शन उपयोगकर्ता-पसंदीदा प्रॉक्सी को अग्रेषित किया गया था।<br/><br/> परिवर्तन करने के लिए <i>कॉन्फ़िगर</i> स्क्रीन से <i>प्रॉक्सी</i> पर जाएं।</string>
+    <string name="cd_toast_edit" translatable="true">संपादित</string>
+    <string name="lbl_unselected" translatable="true">अचयनित किया गया</string>
+    <string name="key_length_explanation_binary" translatable="true">वायरगार्ड कुंजी 32 बाइट्स होना चाहिए</string>
+    <string name="settings_go_log_desc" translatable="true">डीबगिंग प्रयोजनों के लिए</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">अधिसूचना को स्थायी बनाएं</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">सुरंग के माध्यम से रीथिंक के अपने ट्रैफ़िक को रूट करना। जब तक आपको पता न हो कि आप क्या कर रहे हैं, इसे बंद कर दें।</string>
+    <string name="bad_config_explanation_pka" translatable="true">: सकारात्मक होना चाहिए और 65535 से अधिक नहीं होना चाहिए</string>
+    <string name="include_all_app_wg_dialog_desc" translatable="true">क्या आप सभी ऐप्स के लिए WireGuard VPN का उपयोग करते हैं?</string>
+    <string name="new_warp_error_toast" translatable="true">WARP कॉन्फ़िगरेशन प्राप्त करने में असमर्थ</string>
+    <string name="add_remove_apps" translatable="true">(%1$s ऐप्स) जोड़ें / हटाएं</string>
+    <string name="settings_go_log_heading" translatable="true">लॉग स्तर</string>
+    <string name="wireguard_enabled_failure" translatable="true">WireGuard को चालू करने के लिए अन्य सक्रिय प्रॉक्सी रोकें</string>
+    <string name="new_warp_config_desc" translatable="true">सर्वर से WARP कॉन्फ़िगरेशन प्राप्त करें</string>
+    <string name="unknown_error" translatable="true">अज्ञात त्रुटि हुई</string>
+    <string name="key_length_explanation_hex" translatable="true">वायरगार्ड हेक्स कुंजी 64 अक्षर (32 बाइट्स) होना चाहिए</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">फैमिली फ़िल्टर सभी वयस्क, अश्लील और अश्लील साइटों तक पहुँच को अवरुद्ध करता है। यह प्रॉक्सी और VPN डोमेन को भी ब्लॉक करता है जिनका उपयोग हमारे फ़िल्टर को बायपास करने के लिए किया जा सकता है। मिश्रित सामग्री वाली साइटें (जैसे Reddit) भी ब्लॉक की जाती हैं। Google, Bing और Youtube को सुरक्षित मोड पर सेट किया गया है।</string>
+    <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">DNS और फ़ायरवॉल नियमों को बायपास करें।</string>
+    <string name="lbl_peer" translatable="true">पियर</string>
+    <string name="lbl_split" translatable="true">विभाजित करें</string>
+    <string name="lbl_idle" translatable="true">निष्क्रिय</string>
+    <string name="settings_connectivity_checks" translatable="true">कनेक्टिविटी जाँच करें</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">पहुंच क्षमता का पता लगाने के लिए कनेक्टिविटी जांच भेजी जाती है।</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s बंद है क्योंकि प्रॉक्सी सक्रिय/चालू हैं</string>
+    <string name="wireguard_description" translatable="true">WireGuard एक प्रॉक्सी के रूप में।</string>
+    <string name="dc_proxy_dns_desc" translatable="true">DNS को हमेशा चालू रहने वाले WireGuard, SOCKS5, HTTP प्रॉक्सी पर प्रॉक्सी न करें।</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">सर्वाधिक संपर्क वाले देश</string>
+    <string name="no_configs_error" translatable="true">कोई कॉन्फ़िगरेशन नहीं मिला</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">लगातार अधिसूचना</string>
+    <string name="settings_rinr_dialog_desc" translatable="true"><!--settings_network_all_networks-->%1$s सेटिंग भी सक्षम करता है। क्या आप आगे बढ़ना चाहते हैं?</string>
+    <string name="bad_config_reason_unknown_section" translatable="true">अज्ञात अनुभाग</string>
+    <string name="config_add_success_toast" translatable="true">संपन्न</string>
+    <string name="one_wg_apps_added" translatable="true">सभी ऐप्स को मार्गनिर्देशित करना</string>
+    <string name="one_wg_dialog_desc" translatable="true">DNS सहित सभी ऐप्स से सभी कनेक्शन एक ही सक्रिय WireGuard VPN पर मार्गनिर्देशित किए जाएँगे। अन्य सक्रिय WireGuard VPN, यदि कोई हों, तो उन्हें रोक दिया जाएगा।</string>
+    <string name="one_wg_error_toast" translatable="true">उन्नत मोड पर स्विच करने के लिए, WireGuard को सरल मोड में बंद करें</string>
+    <string name="include_all_app_wg_dialog_title" translatable="true">सभी एप्लिकेशन शामिल करें</string>
+    <string name="key_length_explanation_base64" translatable="true">: WireGuard base64 कुंजी 44 अक्षर (32 बाइट्स) होना चाहिए</string>
+    <string name="exclude_all_app_wg_dialog_title" translatable="true">सभी ऐप्स बहिष्कृत करें</string>
+    <string name="exclude_all_app_wg_dialog_desc" translatable="true">इस WireGuard VPN से सभी ऐप्स को बाहर करें?</string>
+    <string name="wireguard_no_config_msg" translatable="true">कोई वायरगार्ड VPN नहीं। आरंभ करने के लिए कुछ जोड़ें।</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">एडल्ट फ़िल्टर सभी वयस्क, अश्लील और अश्लील साइटों तक पहुँच को ब्लॉक करता है। यह प्रॉक्सी या VPN या मिश्रित सामग्री वाली साइटों को ब्लॉक नहीं करता है। Reddit जैसी साइटों को अनुमति है। Google और Bing को सुरक्षित मोड पर सेट किया गया है।</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">सभी वयस्क, अश्लील और अश्लील साइटों तक पहुँच को ब्लॉक करता है। यह प्रॉक्सी और VPN डोमेन को भी ब्लॉक करता है जिनका उपयोग फ़िल्टर को बायपास करने के लिए किया जाता है। मिश्रित सामग्री वाली साइटें (जैसे Reddit) भी ब्लॉक की जाती हैं। Google, Bing और Youtube को सुरक्षित मोड पर सेट किया गया है।</string>
+    <string name="crypt_relay_sweden" translatable="true">https://cryptostrom.is/ द्वारा प्रदान किया गया स्वीडन में होस्ट किया गया अनाम DNS रिले।</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">%1$s ऐप्स शामिल करें</string>
+    <string name="wireguard_disable_failure" translatable="true">\"Always-on WireGuard\" को बंद नहीं किया जा सकता</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">%1$s का हिस्सा</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">चयनित ऐप्स केवल इस वायरगार्ड वीपीएन के माध्यम से मार्गनिर्देशित होंगे, चाहे वह असफल हो या जुड़ा हो।।</string>
+    <string name="lbl_on_device" translatable="true">ऑन-डिवाइस</string>
 </resources>
