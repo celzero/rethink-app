@@ -20,6 +20,10 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
@@ -28,6 +32,8 @@ import com.celzero.bravedns.ui.fragment.RethinkBlocklistFragment
 import com.celzero.bravedns.ui.fragment.RethinkListFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import org.koin.android.ext.android.inject
 
 class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethink_basic) {
@@ -50,6 +56,13 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
+
         Logger.v(LOG_TAG_UI, "init configure rethink base activity")
         val type = intent.getIntExtra(INTENT, FragmentLoader.REMOTE.ordinal)
         val fl = FragmentLoader.entries[type]
