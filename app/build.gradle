@@ -286,11 +286,11 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:930a819ce1@aar'
-    websiteImplementation 'com.github.celzero:firestack:930a819ce1@aar'
-    fdroidImplementation 'com.github.celzero:firestack:930a819ce1@aar'
+    download 'com.github.celzero:firestack:18e9d907b3@aar'
+    websiteImplementation 'com.github.celzero:firestack:18e9d907b3@aar'
+    fdroidImplementation 'com.github.celzero:firestack:18e9d907b3@aar'
     // debug symbols
-    playImplementation 'com.github.celzero:firestack:930a819ce1:debug@aar'
+    playImplementation 'com.github.celzero:firestack:18e9d907b3:debug@aar'
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.10.0') {
@@ -335,8 +335,8 @@ dependencies {
     // for in-app purchases
     playImplementation 'com.android.billingclient:billing:7.1.1'
     // for stripe payment gateway
-    websiteImplementation 'com.stripe:stripe-android:21.8.0'
-    fdroidImplementation 'com.stripe:stripe-android:21.7.1'
+    websiteImplementation 'com.stripe:stripe-android:21.10.0'
+    fdroidImplementation 'com.stripe:stripe-android:21.10.0'
 }
 
 // github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903
