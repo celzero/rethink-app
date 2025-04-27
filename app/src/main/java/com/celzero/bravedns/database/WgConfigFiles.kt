@@ -29,6 +29,7 @@ class WgConfigFiles {
     var isCatchAll: Boolean = false
     var isLockdown: Boolean = false
     var oneWireGuard: Boolean = false
+    var useOnlyOnMetered: Boolean = false
     var isDeletable: Boolean = true
 
     override fun equals(other: Any?): Boolean {
@@ -39,6 +40,7 @@ class WgConfigFiles {
         if (isCatchAll != other.isCatchAll) return false
         if (oneWireGuard != other.oneWireGuard) return false
         if (isLockdown != other.isLockdown) return false
+        if (useOnlyOnMetered != other.useOnlyOnMetered) return false
         return true
     }
 
@@ -49,6 +51,7 @@ class WgConfigFiles {
         result += result * 31 + this.isCatchAll.hashCode()
         result += result * 31 + this.oneWireGuard.hashCode()
         result += result * 31 + this.isLockdown.hashCode()
+        result += result * 31 + this.useOnlyOnMetered.hashCode()
         return result
     }
 
@@ -61,7 +64,9 @@ class WgConfigFiles {
         isActive: Boolean,
         isCatchAll: Boolean,
         isLockdown: Boolean,
-        oneWireGuard: Boolean
+        oneWireGuard: Boolean,
+        useOnlyOnMetered: Boolean,
+        isDeletable: Boolean = true
     ) {
         this.id = id
         this.name = name
@@ -71,6 +76,8 @@ class WgConfigFiles {
         this.isCatchAll = isCatchAll
         this.isLockdown = isLockdown
         this.oneWireGuard = oneWireGuard
+        this.useOnlyOnMetered = useOnlyOnMetered
+        this.isDeletable = isDeletable
     }
 
     constructor(
@@ -81,6 +88,7 @@ class WgConfigFiles {
         isCatchAll: Boolean,
         isLockdown: Boolean,
         oneWireGuard: Boolean,
+        useOnlyOnMetered: Boolean,
         isDeletable: Boolean
     ) {
         this.name = name
@@ -90,6 +98,7 @@ class WgConfigFiles {
         this.isCatchAll = isCatchAll
         this.isLockdown = isLockdown
         this.oneWireGuard = oneWireGuard
+        this.useOnlyOnMetered = useOnlyOnMetered
         this.isDeletable = isDeletable
     }
 
@@ -103,6 +112,7 @@ class WgConfigFiles {
             isCatchAll,
             isLockdown,
             oneWireGuard,
+            useOnlyOnMetered,
             isDeletable
         )
     }
@@ -117,7 +127,8 @@ class WgConfigFiles {
                 data.isActive,
                 data.isCatchAll,
                 data.isLockdown,
-                data.oneWireGuard
+                data.oneWireGuard,
+                data.useOnlyOnMetered
             )
         }
     }
@@ -132,5 +143,6 @@ data class WgConfigFilesImmutable(
     val isCatchAll: Boolean,
     val isLockdown: Boolean,
     val oneWireGuard: Boolean,
+    val useOnlyOnMetered: Boolean,
     val isDeletable: Boolean
 )

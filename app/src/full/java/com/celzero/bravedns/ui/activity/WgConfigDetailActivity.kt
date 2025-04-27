@@ -25,6 +25,10 @@ import android.text.format.DateUtils
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import backend.RouterStats
@@ -54,6 +58,8 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
@@ -101,6 +107,12 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
         configId = intent.getIntExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, INVALID_CONF_ID)
         wgType = WgType.fromInt(intent.getIntExtra(INTENT_EXTRA_WG_TYPE, WgType.DEFAULT.value))
     }
@@ -148,6 +160,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.catchAllRl.visibility = View.VISIBLE
             b.oneWgInfoTv.visibility = View.GONE
             b.hopBtn.visibility = View.VISIBLE
+            b.useMeteredRl.visibility = View.VISIBLE
         } else if (wgType.isOneWg()) {
             b.wgHeaderTv.text =
                 getString(R.string.rt_list_simple_btn_txt).replaceFirstChar(Char::titlecase)
@@ -156,6 +169,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.hopBtn.visibility = View.GONE
             b.oneWgInfoTv.visibility = View.VISIBLE
             b.applicationsBtn.isEnabled = false
+            b.useMeteredRl.visibility = View.GONE
             b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
         } else {
             // invalid wireguard type, finish the activity
