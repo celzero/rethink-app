@@ -19,6 +19,9 @@ value class BillingResponse(private val code: Int) {
             BillingClient.BillingResponseCode.SERVICE_DISCONNECTED,
         )
 
+    val serviceDisconnected: Boolean
+        get() = code == BillingClient.BillingResponseCode.SERVICE_DISCONNECTED
+
     val isNonrecoverableError: Boolean
         get() = code in setOf(
             BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE,

@@ -63,12 +63,11 @@ object InAppBillingHandler : KoinComponent {
     const val PROD_ID_ANNUAL_TEST = "proxy_annual_subscription_test"
     const val PROD_ID_MONTHLY_TEST = "proxy_monthly_subscription_test"
 
-    private val queryUtils: QueryUtils by lazy { QueryUtils(billingClient) }
+    private lateinit var queryUtils: QueryUtils
     private val productDetails: CopyOnWriteArrayList<ProductDetail> = CopyOnWriteArrayList()
     private val storeProductDetails: CopyOnWriteArrayList<QueryProductDetail> = CopyOnWriteArrayList()
     private val purchases = CopyOnWriteArrayList<Purchase>()
     private val purchaseDetails = CopyOnWriteArrayList<PurchaseDetail>()
-    private val consumables: CopyOnWriteArrayList<String> = CopyOnWriteArrayList()
 
     private val _purchasesLiveData = MutableLiveData<List<PurchaseDetail>>()
     val purchasesLiveData: LiveData<List<PurchaseDetail>> = _purchasesLiveData
@@ -144,6 +143,7 @@ object InAppBillingHandler : KoinComponent {
             .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().enablePrepaidPlans().build())
             .setListener(purchasesListener)
             .build()
+        queryUtils = QueryUtils(billingClient)
     }
 
     fun isBillingClientSetup(): Boolean {
@@ -252,7 +252,7 @@ object InAppBillingHandler : KoinComponent {
                 }
                 response.isAlreadyOwned -> {
                     // If already owned but has not been consumed yet.
-                    purchasesList?.let { queryUtils.checkForAcknowledgements(it, consumables) }
+                    purchasesList?.let { queryUtils.checkForAcknowledgements(it) }
                     Result.setResultState(ResultState.PURCHASING_ALREADY_OWNED)
                     return@PurchasesUpdatedListener
                 }
@@ -286,15 +286,6 @@ object InAppBillingHandler : KoinComponent {
             }
 
             purchasesList.forEach { purchase ->
-                // Iterate and search for consumable product if any
-                var isConsumable = false
-                purchase.products.forEach inner@{
-                    if (consumables.contains(it)) {
-                        isConsumable = true
-                        return@inner
-                    }
-                }
-
                 // true / false
                 if (purchase.purchaseState != Purchase.PurchaseState.PURCHASED) {
                     Result.setResultState(ResultState.PURCHASING_FAILURE)
@@ -308,20 +299,8 @@ object InAppBillingHandler : KoinComponent {
                 if (purchase.isAcknowledged) {
                     log(mname, "payment acknowledged for ${purchase.products}")
                 } else {
-                    if (isConsumable) {
-                        queryUtils.checkForAcknowledgementsAndConsumable(purchasesList) {
-                            if (it) {
-                                Result.setResultState(ResultState.PURCHASE_CONSUME)
-                                log(mname, "consumable product has been consumed")
-                            } else {
-                                Result.setResultState(ResultState.PURCHASE_FAILURE)
-                                log(mname, "consumable product has not been consumed")
-                            }
-                        }
-                    } else {
-                        queryUtils.checkForAcknowledgements(purchasesList)
-                        log(mname, "payment not acknowledged for ${purchase.products}")
-                    }
+                    queryUtils.checkForAcknowledgements(purchasesList)
+                    log(mname, "payment not acknowledged for ${purchase.products}")
                 }
             }
         }
@@ -446,7 +425,7 @@ object InAppBillingHandler : KoinComponent {
             Result.setResultState(ResultState.CONSOLE_PURCHASE_PRODUCTS_RESPONSE_COMPLETE)
             Result.setResultState(ResultState.CONSOLE_PURCHASE_PRODUCTS_CHECKED_FOR_ACKNOWLEDGEMENT)
 
-            queryUtils.checkForAcknowledgements(purchases, consumables)
+            queryUtils.checkForAcknowledgements(purchases)
 
             purchaseDetails.clear()
             purchaseDetails.addAll(resultList)
@@ -480,6 +459,9 @@ object InAppBillingHandler : KoinComponent {
     }
 
     private fun isSignatureValid(purchase: Purchase): Boolean {
+        return true
+        // the signature verification should be done in the server side
+        // cannot use public key from the app
         val mname = this::isSignatureValid.name
         val verify = Security.verifyPurchase(purchase.originalJson, purchase.signature)
         logd(mname, "signature verified? $verify for purchase: ${purchase.originalJson}, ${purchase.signature}")

@@ -15,19 +15,11 @@ package com.celzero.bravedns.iab;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/*
- * This class is an sample of how you can check to make sure your purchases on the device came from
- * Google Play. Putting code like this on your server will provide additional protection.
- * <p>
- * One thing that you may also wish to consider doing is caching purchase IDs to make replay attacks
- * harder. The reason this code isn't just part of the library is to allow you to customize it (and
- * rename it!) to make generic patching exploits more difficult.
- */
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -36,14 +28,13 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.logging.Logger;
 
 /**
  * Security-related methods. For a secure implementation, all of this code should be implemented on
  * a server that communicates with the application on the device.
  */
 class Security {
-    static final private String TAG = InAppBillingHandler.TAG;
+    static final private String TAG = "Security";
     static final private String KEY_FACTORY_ALGORITHM = "RSA";
     static final private String SIGNATURE_ALGORITHM = "SHA1withRSA";
 
@@ -53,7 +44,6 @@ class Security {
      * Licensing area. This build has been setup so that if you define base64EncodedPublicKey in
      * your local.properties, it will be echoed into BuildConfig.
      */
-
     final private static String BASE_64_ENCODED_PUBLIC_KEY = "";// BuildConfig.BASE64_ENCODED_PUBLIC_KEY;
 
     /**
@@ -70,7 +60,7 @@ class Security {
             return false;
         }
         try {
-            PublicKey key = generatePublicKey(BASE_64_ENCODED_PUBLIC_KEY);
+            PublicKey key = generatePublicKey();
             return verify(key, signedData, signature);
         } catch (IOException e) {
             Log.e(TAG, "Error generating PublicKey from encoded key: " + e.getMessage());
@@ -81,13 +71,12 @@ class Security {
     /**
      * Generates a PublicKey instance from a string containing the Base64-encoded public key.
      *
-     * @param encodedPublicKey Base64-encoded public key
      * @throws IOException if encoding algorithm is not supported or key specification
      *                     is invalid
      */
-    static private PublicKey generatePublicKey(String encodedPublicKey) throws IOException {
+    static private PublicKey generatePublicKey() throws IOException {
         try {
-            byte[] decodedKey = Base64.decode(encodedPublicKey, Base64.DEFAULT);
+            byte[] decodedKey = Base64.decode(Security.BASE_64_ENCODED_PUBLIC_KEY, Base64.DEFAULT);
             KeyFactory keyFactory = KeyFactory.getInstance(KEY_FACTORY_ALGORITHM);
             return keyFactory.generatePublic(new X509EncodedKeySpec(decodedKey));
         } catch (NoSuchAlgorithmException e) {
@@ -120,7 +109,7 @@ class Security {
         try {
             Signature signatureAlgorithm = Signature.getInstance(SIGNATURE_ALGORITHM);
             signatureAlgorithm.initVerify(publicKey);
-            signatureAlgorithm.update(signedData.getBytes());
+            signatureAlgorithm.update(signedData.getBytes(StandardCharsets.UTF_8));
             if (!signatureAlgorithm.verify(signatureBytes)) {
                 Log.w(TAG, "Signature verification failed...");
                 return false;
