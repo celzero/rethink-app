@@ -119,7 +119,7 @@ class GooglePlaySubsAdapter(val listener: SubscriptionClickListener, val context
 
         private fun getStrokeColorForStatus(isActive: Boolean): Int {
             return if (isActive) {
-                fetchColor(context, R.attr.chipTextPositive)
+                fetchColor(context, R.attr.accentGood)
             } else {
                 fetchColor(context, R.attr.chipBgColorNeutral)
             }

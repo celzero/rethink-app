@@ -19,47 +19,36 @@
             <LinearLayout
                 android:id="@+id/topBanner"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:gravity="center"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:orientation="vertical">
 
-                <ImageView
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:contentDescription="@string/parse_error_generic"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_launcher" />
-
-                <LinearLayout
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmer_view_banner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:shimmer_auto_start="false"
+                    app:shimmer_base_alpha="1.85"
+                    app:shimmer_dropoff="1"
+                    app:shimmer_duration="1000"
+                    app:shimmer_highlight_alpha="0.75">
+
+                    <androidx.viewpager.widget.ViewPager
+                        android:id="@+id/view_pager"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp" />
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/layoutDots"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="@dimen/dots_margin_bottom"
                     android:gravity="center"
-                    android:orientation="vertical">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/app_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:padding="5dp"
-                        android:text="Rethink+"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/proxy_desc"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:gravity="center"
-                        android:padding="5dp"
-                        android:text="Fast proxy servers combined with affordability. Ideal solution for individuals. A reliable and secure way to access the internet anonymously."
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-
+                    android:orientation="horizontal" />
             </LinearLayout>
 
             <LinearLayout
@@ -68,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="80dp"
                 android:orientation="vertical"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -93,50 +82,6 @@
                         app:chipBackgroundColor="?attr/chipBgColorPositive" />
 
                 </RelativeLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:orientation="vertical">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:drawableStart="@drawable/ic_rethink_plus"
-                        android:drawablePadding="10dp"
-                        android:gravity="center_vertical"
-                        android:padding="10dp"
-                        android:text="Anti-censorship: 464" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:drawableStart="@drawable/ic_rethink_plus"
-                        android:drawablePadding="10dp"
-                        android:gravity="center_vertical"
-                        android:padding="10dp"
-                        android:text="Anti-censorship: Auto" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:drawableStart="@drawable/ic_rethink_plus"
-                        android:drawablePadding="10dp"
-                        android:gravity="center_vertical"
-                        android:padding="10dp"
-                        android:text="Anti-censorship: Cloudflare" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:drawableStart="@drawable/ic_rethink_plus"
-                        android:drawablePadding="10dp"
-                        android:gravity="center_vertical"
-                        android:padding="10dp"
-                        android:text="Anti-censorship: " />
-
-                </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/subscription_plans"
@@ -326,7 +271,7 @@
         android:id="@+id/shimmer_view_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:shimmer_auto_start="false"
         app:shimmer_base_alpha="1.85"
@@ -338,19 +283,21 @@
             android:id="@+id/payment_button_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/background"
             android:orientation="vertical"
             android:padding="16dp">
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/payment_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="?attr/accentGood"
-                android:padding="16dp"
+                android:background="@drawable/home_screen_button_start_bg"
+                android:padding="10dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:letterSpacing="0.2"
                 android:text="Subscribe"
-                android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textColor="?attr/homeScreenHeaderTextColor"
+                android:textSize="18sp" />
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

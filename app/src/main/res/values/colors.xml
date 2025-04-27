@@ -150,7 +150,7 @@
     <color name="invertedPrimaryTextLight">#FFFFFF</color>
     <color name="secondaryTextLight">#005cb2</color>
     <color name="textColorAccentBadLight">#CCC51162</color>
-    <color name="homeScreenHeaderTextColorLight">#FFFFFF</color>
+    <color name="homeScreenHeaderTextColorLight">#000000</color>
 
     <color name="fabBackgroundLight">#FFFFFF</color>
 
@@ -229,8 +229,8 @@
     <color name="defaultToggleBtnBgBlack">#121212</color>
 
     <!-- light theme plus -->
-    <color name="colorPrimaryLightPlus">#21a095</color>
-    <color name="colorPrimaryDarkLightPlus">#183531</color>
+    <color name="colorPrimaryLightPlus">#d2fff5</color>
+    <color name="colorPrimaryDarkLightPlus">#4c796f</color>
     <color name="colorSecondaryLightPlus">#1b8078</color>
     <color name="colorBackgroundFloatingLightPlus">#e6f4f2</color>
 

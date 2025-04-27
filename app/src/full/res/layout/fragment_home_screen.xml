@@ -60,17 +60,16 @@
                 android:weightSum="1">
 
                 <LinearLayout
-                    android:id="@+id/fhs_card_dns_ll"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
                     android:orientation="vertical">
 
-                    <androidx.cardview.widget.CardView
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/fhs_card_dns_ll"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:clipToPadding="false"
-                        app:cardBackgroundColor="?attr/homeScreenBtnBackground"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="0dp"
                         app:cardUseCompatPadding="true">
@@ -78,7 +77,7 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="140dp"
-                            android:background="?attr/selectableItemBackground"
+                            android:background="@drawable/home_screen_cards_bg"
                             android:orientation="vertical"
                             android:paddingTop="10dp">
 
@@ -148,6 +147,7 @@
                                 android:layout_marginTop="10dp"
                                 android:layout_marginBottom="10dp"
                                 android:ellipsize="marquee"
+                                android:visibility="gone"
                                 android:marqueeRepeatLimit="marquee_forever"
                                 android:maxLines="1"
                                 android:paddingBottom="5dp"
@@ -157,22 +157,21 @@
 
                         </RelativeLayout>
 
-                    </androidx.cardview.widget.CardView>
+                    </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/fhs_card_firewall_ll"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
                     android:orientation="vertical">
 
-                    <androidx.cardview.widget.CardView
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/fhs_card_firewall_ll"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:clipToPadding="true"
                         android:orientation="vertical"
-                        app:cardBackgroundColor="?attr/homeScreenBtnBackground"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="0dp"
                         app:cardUseCompatPadding="true">
@@ -180,7 +179,7 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="140dp"
-                            android:background="?attr/selectableItemBackground"
+                            android:background="@drawable/home_screen_cards_bg"
                             android:orientation="vertical"
                             android:paddingTop="10dp">
 
@@ -255,7 +254,7 @@
 
 
                         </RelativeLayout>
-                    </androidx.cardview.widget.CardView>
+                    </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
 
 
@@ -272,19 +271,18 @@
                 android:weightSum="1">
 
                 <LinearLayout
-                    android:id="@+id/fhs_card_proxy_ll"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.5"
                     android:baselineAligned="true"
                     android:orientation="vertical">
 
-                    <androidx.cardview.widget.CardView
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/fhs_card_proxy_ll"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:clipToPadding="true"
                         android:orientation="vertical"
-                        app:cardBackgroundColor="?attr/homeScreenBtnBackground"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="0dp"
                         app:cardUseCompatPadding="true">
@@ -292,7 +290,7 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="140dp"
-                            android:background="?attr/selectableItemBackground"
+                            android:background="@drawable/home_screen_cards_bg"
                             android:orientation="vertical"
                             android:paddingTop="10dp">
 
@@ -343,22 +341,21 @@
 
 
                         </RelativeLayout>
-                    </androidx.cardview.widget.CardView>
+                    </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/fhs_card_logs_ll"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
                     android:orientation="vertical">
 
-                    <androidx.cardview.widget.CardView
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/fhs_card_logs_ll"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:clipToPadding="true"
                         android:orientation="vertical"
-                        app:cardBackgroundColor="?attr/homeScreenBtnBackground"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="0dp"
                         app:cardUseCompatPadding="true">
@@ -366,7 +363,7 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="140dp"
-                            android:background="?attr/selectableItemBackground"
+                            android:background="@drawable/home_screen_cards_bg"
                             android:orientation="vertical"
                             android:paddingTop="10dp">
 
@@ -431,7 +428,7 @@
                                 android:visibility="gone" />
 
                         </RelativeLayout>
-                    </androidx.cardview.widget.CardView>
+                    </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
             </LinearLayout>
 
@@ -454,13 +451,12 @@
             android:orientation="horizontal"
             android:weightSum="1">
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/fhs_card_apps_cv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="true"
                 android:orientation="vertical"
-                app:cardBackgroundColor="?attr/homeScreenBtnBackground"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:cardUseCompatPadding="true">
@@ -468,7 +464,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="140dp"
-                    android:background="?attr/selectableItemBackground"
+                    android:background="@drawable/home_screen_cards_bg"
                     android:orientation="vertical"
                     android:paddingTop="10dp">
 
@@ -511,7 +507,7 @@
                             android:gravity="center"
                             android:paddingStart="10dp"
                             android:paddingEnd="0dp"
-                            android:textColor="?attr/chipTextColor"
+                            android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/rethink_header_text" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -528,7 +524,7 @@
                             android:gravity="center"
                             android:padding="5dp"
                             android:text="@string/symbol_slash"
-                            android:textColor="?attr/chipTextColor"
+                            android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/heading_font_text_view" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -543,7 +539,7 @@
                             android:layout_toEndOf="@id/fhs_card_apps_divider"
                             android:alpha="0.8"
                             android:gravity="center"
-                            android:textColor="?attr/chipTextColor"
+                            android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/extra_large_font_text_view" />
 
                         <RelativeLayout
@@ -694,7 +690,7 @@
                         android:visibility="gone" />
                 </RelativeLayout>
 
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <LinearLayout
                 android:id="@+id/fhs_card_alerts_ll"
@@ -711,7 +707,6 @@
                     android:layout_height="match_parent"
                     android:clipToPadding="true"
                     android:orientation="vertical"
-                    app:cardBackgroundColor="?attr/homeScreenBtnBackground"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp"
                     app:cardUseCompatPadding="true">
@@ -843,6 +838,7 @@
                         android:drawableEnd="@drawable/ic_arrow_down"
                         android:paddingStart="20dp"
                         android:paddingEnd="20dp"
+                        android:letterSpacing="0.2"
                         android:text="@string/hsf_start_btn_state" />
 
                     <Button

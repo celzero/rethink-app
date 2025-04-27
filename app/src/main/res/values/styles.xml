@@ -584,7 +584,7 @@
         <item name="android:alpha">0.8</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
-        <item name="android:textColor">?attr/chipTextColor</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
         <item name="android:textSize">@dimen/extra_large_font_text_view</item>
     </style>
 

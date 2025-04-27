@@ -19,6 +19,7 @@ import Logger
 import Logger.LOG_IAB
 import Logger.LOG_TAG_PROXY
 import Logger.LOG_TAG_UI
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
@@ -26,15 +27,24 @@ import android.os.Bundle
 import android.text.Html
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
+import android.util.TypedValue
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager.widget.PagerAdapter
+import androidx.viewpager.widget.ViewPager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.Purchase
@@ -52,6 +62,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
 import com.celzero.bravedns.ui.activity.RpnAvailabilityCheckActivity
 import com.celzero.bravedns.ui.activity.RethinkPlusDashboardActivity
+import com.celzero.bravedns.ui.activity.WelcomeActivity.MyPagerAdapter
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.underline
@@ -93,6 +104,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
     private fun initView() {
         // show a loading dialog
         showLoadingDialog()
+
         io {
             val isRethinkPlusSubscribed = isRethinkPlusSubscribed() // based on persistent state
 
@@ -119,6 +131,66 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
 
             // initiate the product details query
             queryProductDetail()
+        }
+    }
+
+    private fun setBanner() {
+        b.shimmerViewBanner.setShimmer(Shimmer.AlphaHighlightBuilder()
+            .setDuration(2000)
+            .setBaseAlpha(0.85f)
+            .setDropoff(1f)
+            .setHighlightAlpha(0.35f)
+            .build())
+        b.shimmerViewBanner.startShimmer()
+        var myPagerAdapter: MyPagerAdapter? = null
+        // Initialize adapter
+        myPagerAdapter = MyPagerAdapter()
+
+        // Set up ViewPager
+        b.viewPager.adapter = myPagerAdapter
+        b.viewPager.addOnPageChangeListener(
+            object : ViewPager.OnPageChangeListener {
+                override fun onPageScrollStateChanged(state: Int) {}
+
+                override fun onPageScrolled(
+                    position: Int,
+                    positionOffset: Float,
+                    positionOffsetPixels: Int
+                ) {
+                }
+
+                override fun onPageSelected(position: Int) {
+                    addBottomDots(position)
+                }
+            }
+        )
+    }
+
+    inner class MyPagerAdapter : PagerAdapter() {
+        override fun isViewFromObject(view: View, `object`: Any): Boolean {
+            return view == `object`
+        }
+
+        override fun getCount(): Int {
+            return layouts.count()
+        }
+
+        override fun instantiateItem(container: ViewGroup, position: Int): Any {
+            val imageView = ImageView(requireContext()).apply {
+                setImageResource(layouts[position])
+                scaleType =
+                    ImageView.ScaleType.CENTER_CROP  // or FIT_CENTER, CENTER_INSIDE depending on your need
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            }
+            container.addView(imageView)
+            return imageView
+        }
+
+        override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+            container.removeView(`object` as View)
         }
     }
 
@@ -150,6 +222,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
         if (!b.shimmerViewContainer.isShimmerStarted) return
 
         b.shimmerViewContainer.stopShimmer()
+        b.shimmerViewBanner.stopShimmer()
     }
 
     private fun startShimmer() {
@@ -164,6 +237,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
         builder.setHighlightAlpha(0.35f)
         b.shimmerViewContainer.setShimmer(builder.build())
         b.shimmerViewContainer.startShimmer()
+        b.shimmerViewBanner.setShimmer(builder.build())
+        b.shimmerViewBanner.startShimmer()
     }
 
     private fun isBillingAvailable(): Boolean {
@@ -201,12 +276,40 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
         Logger.v(LOG_IAB, "purchaseSubs: initiated for $productId, $planId")
     }
 
+    private lateinit var dots: Array<TextView?>
+    private val layouts: IntArray = intArrayOf(
+        R.drawable.rethink_plus_home_banner,
+        R.drawable.rethink_plus_banner_anti_censorship,
+        R.drawable.rethink_plus_hide_ip_banner
+    )
+
+    private fun addBottomDots(currentPage: Int) {
+        dots = arrayOfNulls(layouts.size)
+
+        val colorActive = resources.getIntArray(R.array.array_dot_active)
+        val colorInActive = resources.getIntArray(R.array.array_dot_inactive)
+
+        b.layoutDots.removeAllViews()
+
+        for (i in dots.indices) {
+            dots[i] = TextView(requireContext())
+            dots[i]?.text = updateHtmlEncodedText("&#8226;")
+            dots[i]?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30F)
+            dots[i]?.setTextColor(colorInActive[currentPage])
+            b.layoutDots.addView(dots[i])
+        }
+
+        if (dots.isNotEmpty()) {
+            dots[currentPage]?.setTextColor(colorActive[currentPage])
+        }
+    }
+
     private fun showLoadingDialog() {
         val builder = MaterialAlertDialogBuilder(requireContext())
         // show progress dialog
         builder.setTitle("Loading")
         builder.setMessage("Please wait while we check the availability of Rethink+.")
-        builder.setCancelable(false)
+        builder.setCancelable(true)
         loadingDialog = builder.create()
         loadingDialog.show()
     }
@@ -230,10 +333,14 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
         hidePlusSubscribedUi()
         hideNotAvailableUi()
 
+        b.topBanner.visibility = View.VISIBLE
         b.shimmerViewContainer.visibility = View.VISIBLE
+        b.shimmerViewBanner.visibility = View.VISIBLE
         b.paymentContainer.visibility = View.VISIBLE
         b.paymentButtonContainer.visibility = View.VISIBLE
         b.testPingButton.underline()
+        addBottomDots(0)
+        setBanner()
         setAdapter(purc)
         Logger.i(LOG_IAB, "adapter set")
     }
@@ -242,6 +349,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
         b.paymentContainer.visibility = View.GONE
         b.paymentButtonContainer.visibility = View.GONE
         b.shimmerViewContainer.visibility = View.GONE
+        b.topBanner.visibility = View.GONE
     }
 
     private fun hidePlusSubscribedUi() {
@@ -269,6 +377,10 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
     }
 
     private suspend fun isTestOk(): Boolean {
+        if (!VpnController.isOn()) {
+            Logger.i(LOG_IAB, "$TAG; VPN not active, cannot perform tests")
+            return true
+        }
         val warp = VpnController.testRpnProxy(RpnProxyManager.RpnType.WARP)
         val amz = VpnController.testRpnProxy(RpnProxyManager.RpnType.AMZ)
         val proton = VpnController.testRpnProxy(RpnProxyManager.RpnType.PROTON)
@@ -353,7 +465,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
             }
         }
 
-        InAppBillingHandler.connectionStateLiveData.observe(viewLifecycleOwner) { i ->
+        InAppBillingHandler.connectionStateLiveData.distinctUntilChanged().observe(viewLifecycleOwner) { i ->
 
             if (!i.isSuccess) {
                 Logger.e(LOG_IAB, "Billing connection failed: ${i.message}")
@@ -394,7 +506,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
             val first = list.first()
             productId = first.productId
             planId = first.planId
-            val product = first.pricingDetails
             Logger.i(
                 LOG_IAB,
                 "Product details: ${first.productId}, ${first.planId}, ${first.productTitle}, ${first.productType}, ${first.pricingDetails.size}"

@@ -585,7 +585,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/rt_edit_dialog_positive"
-                    android:background="@drawable/home_screen_button_stop_bg"
+                    android:background="@drawable/rectangle_border_background"
                     android:layout_gravity="end"
                     android:layout_marginEnd="10dp"
                     android:layout_marginBottom="15dp"
