@@ -41,7 +41,6 @@ import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.database.RethinkDnsEndpointRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
-import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.InternetProtocol
@@ -1092,6 +1091,21 @@ internal constructor(
 
     suspend fun updateOrbotHttpProxy(proxyEndpoint: ProxyEndpoint) {
         proxyEndpointRepository.update(proxyEndpoint)
+    }
+
+    fun stats(): String {
+        val sb = StringBuilder()
+        sb.append("   Brave mode: ${getBraveMode()}\n")
+        sb.append("   DNS type: ${getDnsType()}\n")
+        sb.append("   Proxy type: ${ProxyType.of(getProxyType()).name}\n")
+        sb.append("   Proxy provider: ${getProxyProvider()}\n")
+        sb.append("   Pcap mode: ${getPcapFilePath()}\n")
+        sb.append("   Connected DNS: ${persistentState.connectedDnsName}\n")
+        sb.append("   Prevent DNS leaks: ${persistentState.preventDnsLeaks}\n")
+        sb.append("   Internet protocol: ${getInternetProtocol()}\n")
+        sb.append("   Protocol translation mode: ${getProtocolTranslationMode()}\n")
+
+        return sb.toString()
     }
 
     suspend fun getLeastLoggedNetworkLogs(): Long {

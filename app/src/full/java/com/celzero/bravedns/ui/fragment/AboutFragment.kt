@@ -291,6 +291,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         io {
             val stat = VpnController.getNetStat()
             val formatedStat = UIUtils.formatNetStat(stat)
+            val vpnStats = VpnController.vpnStats()
             uiCtx {
                 val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
                 val builder =
@@ -319,7 +320,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 )
 
                 descText.movementMethod = LinkMovementMethod.getInstance()
-                descText.text = formatedStat
+                descText.text = formatedStat + vpnStats
 
                 okBtn.setOnClickListener { dialog.dismiss() }
 

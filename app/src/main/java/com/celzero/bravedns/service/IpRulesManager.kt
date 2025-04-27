@@ -724,4 +724,14 @@ object IpRulesManager : KoinComponent {
             "$ipNet:$port"
         }
     }
+
+    suspend fun stats(): String {
+        val sb = StringBuilder()
+        sb.append("   iptree len: ${iptree.len()}\n")
+        sb.append("   db len: ${db.getRulesCount()}\n")
+        sb.append("   cache len: ${resultsCache.size()}\n")
+        sb.append("   cache stats: ${resultsCache.stats()}\n")
+
+        return sb.toString()
+    }
 }

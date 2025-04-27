@@ -107,4 +107,6 @@ interface CustomIpDao {
     fun updateUid(uid: Int, newUid: Int)
 
     @Query("delete from CustomIp where uid != $UID_EVERYBODY") fun deleteAllAppsRules()
+
+    @Query("select count(*) from CustomIp") fun getRulesCount(): Int
 }

@@ -79,7 +79,7 @@ object RpnProxyManager : KoinComponent {
 
     enum class RpnMode(val id: Int, val value: String) {
         ANTI_CENSORSHIP(1, Backend.Auto),
-        HIDE_IP(2, listOf(Backend.RpnWg, Backend.RpnAmz, Backend.RpnPro, Backend.Rpn64, Backend.RpnSE).joinToString(","));
+        HIDE_IP(2, Backend.Auto);
 
         companion object {
             fun fromId(id: Int) = RpnMode.entries.first { it.id == id }
@@ -658,6 +658,17 @@ object RpnProxyManager : KoinComponent {
             Logger.d(LOG_TAG_PROXY, "$TAG; cc added to selected list: $cc")
             Pair(true, "")
         }
+    }
+
+    fun stats(): String {
+        val sb = StringBuilder()
+        sb.append("   rpnState: ${rpnState().name}\n")
+        sb.append("   rpnMode: ${rpnMode().name}\n")
+        sb.append("   warp config? ${warpConfig != null}\n")
+        sb.append("   amz config? ${amzConfig != null}\n")
+        sb.append("   proton config? ${protonConfig != null}\n")
+
+        return sb.toString()
     }
 
     private fun io(f: suspend () -> Unit) {

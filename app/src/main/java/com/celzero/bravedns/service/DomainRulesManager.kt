@@ -486,4 +486,13 @@ object DomainRulesManager : KoinComponent {
             CustomDomain.getCurrentVersion()
         )
     }
+
+    suspend fun stats(): String {
+        val sb = StringBuilder()
+        sb.append("   Trie: ${trie.len()}\n")
+        sb.append("   Trusted: ${trustedTrie.len()}\n")
+        sb.append("   db: ${db.getCustomDomainCount()}\n")
+
+        return sb.toString()
+    }
 }

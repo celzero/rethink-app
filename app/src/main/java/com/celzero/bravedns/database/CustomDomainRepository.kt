@@ -92,4 +92,8 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
     suspend fun deleteRules(list: List<CustomDomain>) {
         return customDomainDAO.deleteAll(list)
     }
+
+    suspend fun getCustomDomainCount() : Int {
+        return customDomainDAO.getCustomDomainCount()
+    }
 }

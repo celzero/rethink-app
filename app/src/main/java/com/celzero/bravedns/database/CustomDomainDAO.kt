@@ -83,4 +83,7 @@ interface CustomDomainDAO {
 
     @Query("SELECT * FROM CustomDomain WHERE uid = :uid AND domain = :domain")
     fun getCustomDomain(uid: Int, domain: String): CustomDomain?
+
+    @Query("SELECT COUNT(*) FROM CustomDomain")
+    fun getCustomDomainCount(): Int
 }
