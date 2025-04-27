@@ -36,6 +36,7 @@ import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.UIUtils.fetchFavIcon
 import com.celzero.bravedns.util.Utilities.getCountryCode
 import com.celzero.bravedns.util.Utilities.getFlag
+import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.makeAddressPair
 import com.celzero.bravedns.util.Utilities.normalizeIp
 import java.util.Calendar
@@ -211,9 +212,24 @@ internal constructor(
 
         // fetch appName and packageName from uid
         if (transaction.uid != INVALID_UID) {
-            val appInfo = FirewallManager.getAppInfoByUid(transaction.uid)
-            dnsLog.appName = appInfo?.appName ?: context.getString(R.string.network_log_app_name_unnamed, transaction.uid.toString())
-            dnsLog.packageName = appInfo?.packageName ?: EMPTY_PACKAGE_NAME
+            val appNames = FirewallManager.getAppNamesByUid(transaction.uid)
+            val appCount = appNames.count()
+            if (appCount >= 1) {
+                dnsLog.appName = if (appCount >= 2) {
+                    context.getString(
+                        R.string.ctbs_app_other_apps,
+                        appNames[0],
+                        appCount.minus(1).toString()
+                    )
+                } else {
+                    appNames[0]
+                }
+                val pkgName = FirewallManager.getPackageNameByAppName(appNames[0])
+                dnsLog.packageName = pkgName ?: EMPTY_PACKAGE_NAME
+            } else {
+                dnsLog.appName = context.getString(R.string.network_log_app_name_unnamed, transaction.uid.toString())
+                dnsLog.packageName = EMPTY_PACKAGE_NAME
+            }
         } else {
             dnsLog.appName = context.getString(R.string.network_log_app_name_unknown)
             dnsLog.packageName = EMPTY_PACKAGE_NAME
