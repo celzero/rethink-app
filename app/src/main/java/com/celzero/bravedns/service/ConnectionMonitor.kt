@@ -64,6 +64,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
             .addTransportType(NetworkCapabilities.TRANSPORT_BLUETOOTH)
             .addTransportType(NetworkCapabilities.TRANSPORT_ETHERNET)
+            .addTransportType(NetworkCapabilities.TRANSPORT_VPN)
             .apply { if (isAtleastS()) setIncludeOtherUidNetworks(true) }
             // api27: .addTransportType(NetworkCapabilities.TRANSPORT_WIFI_AWARE)
             // api26: .addTransportType(NetworkCapabilities.TRANSPORT_LOWPAN)
@@ -264,9 +265,11 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
     data class UnderlyingNetworks(
         val ipv4Net: List<NetworkProperties>,
         val ipv6Net: List<NetworkProperties>,
+        val vpnRoutes: Pair<Boolean, Boolean>?,
         val useActive: Boolean,
         val minMtu: Int,
         var isActiveNetworkMetered: Boolean, // may be updated by client listener
+        var isActiveNetworkCellular: Boolean,
         var lastUpdated: Long, // may be updated by client listener
         val dnsServers: Map<InetAddress, Network>
     )
@@ -333,20 +336,23 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             val newActiveNetworkCap = connectivityManager.getNetworkCapabilities(newActiveNetwork)
             // set active network's connection status
             val isActiveNetworkMetered = isActiveConnectionMetered()
+            val isActiveNetworkCellular = isActiveConnectionCellular(newActiveNetwork)
             val newNetworks = createNetworksSet(newActiveNetwork, opPrefs.networkSet)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
+            val vpnRoutes = determineVpnProtos(opPrefs.networkSet)
 
             Logger.i(
                 LOG_TAG_CONNECTION,
                 "Connected network: ${newActiveNetwork?.networkHandle} ${
                     networkType(newActiveNetworkCap)
-                }, new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}"
+                }, new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}," +
+                 "cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered"
             )
 
             if (isNewNetwork || opPrefs.isForceUpdate) {
                 currentNetworks = newNetworks
                 repopulateTrackedNetworks(opPrefs, currentNetworks)
-                informListener(true, isActiveNetworkMetered)
+                informListener(true, isActiveNetworkMetered, isActiveNetworkCellular, vpnRoutes)
             }
         }
 
@@ -357,22 +363,58 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             val isActiveNetworkMetered = isActiveConnectionMetered()
             val newNetworks = createNetworksSet(newActiveNetwork, opPrefs.networkSet)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
+            val vpnRoutes = determineVpnProtos(opPrefs.networkSet)
+            val isActiveNetworkCellular = isActiveConnectionCellular(newActiveNetwork)
 
             Logger.i(
                 LOG_TAG_CONNECTION,
-                "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks}, ${newNetworks}; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}"
+                "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks}, ${newNetworks}; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered"
             )
 
             if (isNewNetwork || opPrefs.isForceUpdate) {
                 currentNetworks = newNetworks
                 repopulateTrackedNetworks(opPrefs, currentNetworks)
-                informListener(false, isActiveNetworkMetered)
+                informListener(false, isActiveNetworkMetered, isActiveNetworkCellular, vpnRoutes)
             }
+        }
+
+        private fun determineVpnProtos(nws: Set<Network?>): Pair<Boolean, Boolean>? {
+            val vpnNw = nws.filter { isVPN(it) == true }
+            if (vpnNw.isEmpty()) {
+                Logger.w(LOG_TAG_CONNECTION, "determineVpnProtos; no vpn networks found")
+                // vpn routes is just the suggestion to mitigate the discrepancy between
+                // actual vpn routes and the ones handled by BraveVpnService, in that case
+                // if the vpn routes are not available, set it to null and return let the
+                // obj(builderRoutes) in BraveVpnService to handle the rest
+                return null
+            }
+
+            val lp = connectivityManager.getLinkProperties(vpnNw.first())
+            var has4 = false
+            var has6 = false
+            lp?.routes?.forEach rloop@{
+                // ref:
+                // androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/net/RouteInfo.java#328
+                val hasDefaultRoute4 = (it.isDefaultRoute && it.destination.address is Inet4Address)
+                val hasDefaultRoute6 = (it.isDefaultRoute && it.destination.address is Inet6Address)
+
+                has4 = has4 || hasDefaultRoute4
+                has6 = has6 || hasDefaultRoute6
+
+                Logger.vv(LOG_TAG_CONNECTION, "determineVpnProtos; for $it, has4? $has4, has6? $has6")
+                if (has4 && has6) return@rloop
+            }
+
+            Logger.i(LOG_TAG_CONNECTION, "determineVpnProtos; has4? $has4, has6? $has6, $lp")
+
+            return Pair(has4, has6)
         }
 
         private fun informListener(
             useActiveNetwork: Boolean = false,
-            isActiveNetworkMetered: Boolean
+            isActiveNetworkMetered: Boolean,
+            isActiveNetworkCellular: Boolean,
+            vpnRoutes: Pair<Boolean, Boolean>?
         ) {
             // TODO: use currentNetworks instead of trackedIpv4Networks and trackedIpv6Networks
             // to determine whether to call onNetworkConnected or onNetworkDisconnected
@@ -393,9 +435,11 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                     UnderlyingNetworks(
                         trackedIpv4Networks.map { it }, // map to produce shallow copy
                         trackedIpv6Networks.map { it },
+                        vpnRoutes,
                         useActiveNetwork,
                         determineMtu(useActiveNetwork),
                         isActiveNetworkMetered,
+                        isActiveNetworkCellular,
                         SystemClock.elapsedRealtime(),
                         Collections.unmodifiableMap(dnsServers)
                     )
@@ -411,9 +455,11 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                     UnderlyingNetworks(
                         emptyList(),
                         emptyList(),
+                        vpnRoutes,
                         useActiveNetwork,
                         DEFAULT_MTU,
                         isActiveNetworkMetered = false,
+                        isActiveNetworkCellular = false,
                         SystemClock.elapsedRealtime(),
                         LinkedHashMap()
                     )
@@ -488,6 +534,16 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
 
         private fun isActiveConnectionMetered(): Boolean {
             return connectivityManager.isActiveNetworkMetered
+        }
+
+        private fun isActiveConnectionCellular(network: Network?): Boolean {
+            if (network == null) {
+                Logger.d(LOG_TAG_CONNECTION, "isActiveConnectionCellular: network is null")
+                return false
+            }
+
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+            return networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
         }
 
         private fun repopulateTrackedNetworks(
@@ -882,7 +938,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
         }
 
-        private fun isVPN(network: Network): Boolean? {
+        private fun isVPN(network: Network?): Boolean? {
+            if (network == null) return null
             return connectivityManager
                 .getNetworkCapabilities(network)
                 ?.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
