@@ -157,8 +157,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         // do not show the sponsor card if the rethink plus is enabled
         if (RpnProxyManager.isRpnActive()) {
-            b.fhsSponsor.visibility = View.GONE
+            b.fhsSponsor.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_rethink_plus_sparkle))
+            b.fhsSponsor.visibility = View.VISIBLE
         } else {
+            b.fhsSponsor.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_heart_accent))
             b.fhsSponsor.visibility = View.VISIBLE
         }
     }
@@ -224,6 +226,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         b.fhsSponsor.setOnClickListener {
+            if (RpnProxyManager.isRpnActive()) {
+                Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
+                return@setOnClickListener
+            }
             Logger.v(LOG_TAG_UI, "$TAG: click event on sponsor card")
             if (RpnProxyManager.isRpnActive()) {
                 Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
@@ -466,6 +472,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun observeProxyStates() {
         persistentState.getProxyStatus().observe(viewLifecycleOwner) {
+            Logger.vv(LOG_TAG_UI, "$TAG proxy state changed to $it")
             if (it != -1) {
                 if (proxyStateListenerJob?.isActive == true) {
                     Logger.vv(LOG_TAG_UI, "$TAG cancel prev proxy state listener job")

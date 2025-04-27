@@ -158,6 +158,13 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             return
         }
 
+        if (log.appName.isNotEmpty() && log.packageName.isNotEmpty()) {
+            b.dnsAppNameHeader.visibility = View.VISIBLE
+            b.dnsAppName.text = log.appName
+            b.dnsAppIcon.setImageDrawable(getIcon(requireContext(), log.packageName, log.appName))
+            return
+        }
+
         io {
             val appNames = FirewallManager.getAppNamesByUid(log.uid)
             if (appNames.isEmpty()) {
