@@ -89,7 +89,6 @@ object WgHopManager: KoinComponent {
         val via = ID_WG_BASE + viaId
         var res = Pair(false, "Map not found")
         val isAvailableInMap = maps.find { it.src == src && it.via == via }
-        if (DEBUG) printMaps()
         Logger.v(LOG_TAG_PROXY, "$TAG removeHop: $src")
         if (isAvailableInMap != null) {
             res = delete(isAvailableInMap)
@@ -173,10 +172,7 @@ object WgHopManager: KoinComponent {
     }
 
     fun getMapBySrc(src: String): List<WgHopMap> {
-        val filtered = maps.filter { it.src == src }
-        Logger.d(LOG_TAG_PROXY, "$TAG getMapBySrc: $src, filtered: $filtered")
-        printMaps()
-        return filtered
+        return maps.filter { it.src == src }
     }
 
     fun getMapByVia(via: String): List<WgHopMap> {

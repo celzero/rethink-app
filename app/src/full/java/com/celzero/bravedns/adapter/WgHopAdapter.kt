@@ -224,7 +224,6 @@ class WgHopAdapter(
             }
             uiCtx {
                 Utilities.showToastUiCentered(context, res.second, Toast.LENGTH_LONG)
-                WgHopManager.printMaps()
                 if (!res.first) {
                     b.wgHopListCheckbox.isChecked = false
                     setCardStroke(false, false)
