@@ -71,6 +71,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val SLOWDOWN_MODE = "slowdown_mode"
         const val NETWORK_ENGINE_EXPERIMENTAL = "network_engine_experimental"
         const val USE_RPN = "rpn_state"
+        const val RPN_MODE = "rpn_mode"
         const val DIAL_TIMEOUT_SEC = "dial_timeout_sec"
     }
 
@@ -483,7 +484,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     }
 
     fun getProxyStatus(): MutableLiveData<Int> {
-        //if (proxyStatus.value == null || proxyStatus.value == -1) updateProxyStatus()
         return updateProxyStatus()
     }
 
