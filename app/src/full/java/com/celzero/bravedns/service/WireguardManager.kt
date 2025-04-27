@@ -20,7 +20,6 @@ import Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.text.format.DateUtils
 import backend.Backend
-import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.backup.BackupHelper.Companion.TEMP_WG_DIR
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.WgConfigFiles
@@ -162,6 +161,12 @@ object WireguardManager : KoinComponent {
         return mappings.toList()
     }
 
+    fun getNumberOfMappings(): Int {
+        return mappings.size
+    }
+
+    fun getActiveWgCount() = mappings.count { it.isActive }
+
     fun getActiveConfigs(): List<Config> {
         val m = mappings.filter { it.isActive }
         val l = mutableListOf<Config>()
@@ -216,6 +221,7 @@ object WireguardManager : KoinComponent {
                 map.isCatchAll,
                 map.isLockdown,
                 map.oneWireGuard,
+                map.useOnlyOnMetered,
                 map.isDeletable
             )
         mappings.add(newMap)
@@ -306,6 +312,7 @@ object WireguardManager : KoinComponent {
                 m.isCatchAll,
                 m.isLockdown,
                 false, // confirms with db.disableConfig query
+                m.useOnlyOnMetered,
                 m.isDeletable
             )
         mappings.add(newMap)
@@ -323,15 +330,19 @@ object WireguardManager : KoinComponent {
     }
 
     // no need to check for app excluded from proxy here, expected to call this fn after that
-    suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, default: String = ""): List<String> {
+    suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMeteredNw: Boolean, default: String = ""): List<String> {
         val proxyIds: MutableList<String> = mutableListOf()
         if (oneWireGuardEnabled()) {
             val id = getOneWireGuardProxyId()
-            proxyIds.add(ProxyManager.ID_WG_BASE + id)
-            // add default to the list, can route check is done in go-tun
-            if (default.isNotEmpty()) proxyIds.add(default)
-            Logger.i(LOG_TAG_PROXY, "one-wg enabled, return $proxyIds")
-            return proxyIds
+            if (checkMeteredEligibility(id, usesMeteredNw)) {
+                proxyIds.add(ProxyManager.ID_WG_BASE + id)
+                // add default to the list, can route check is done in go-tun
+                if (default.isNotEmpty()) proxyIds.add(default)
+                Logger.i(LOG_TAG_PROXY, "one-wg enabled, return $proxyIds")
+                return proxyIds
+            } else {
+                // fall-through as one-wg is enabled only for metered networks
+            }
         }
 
         // returns Pair(String,String) - first is ProxyId, second is CC
@@ -348,59 +359,64 @@ object WireguardManager : KoinComponent {
             // routing
             val id = if (ipConfig.first.isNotEmpty()) convertStringIdToId(ipConfig.first) else INVALID_CONF_ID
             val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
-            if (config != null && config.isLockdown) {
+            if (config != null && config.isLockdown && checkMeteredEligibility(id, usesMeteredNw)) {
                 proxyIds.add(ipConfig.first)
+                Logger.i(LOG_TAG_PROXY, "lockdown enabled for ip: $ip:$port => return $proxyIds")
                 return proxyIds // no need to proceed further for lockdown
             }
 
             if (config != null && config.isActive) {
                 proxyIds.add(ipConfig.first)
+                Logger.i(LOG_TAG_PROXY, "ip config is active: $ip:$port => add ${ipConfig.first}")
             }
         }
 
         if (domainConfig.first.isNotEmpty()) {
-            Logger.i(LOG_TAG_PROXY, "wg id for domain $domain => ${domainConfig.first}")
+            Logger.i(LOG_TAG_PROXY, "wg id for domain $domain => add ${domainConfig.first}")
             proxyIds.add(domainConfig.first)
             val id =
                 if (domainConfig.first.isNotEmpty()) convertStringIdToId(domainConfig.first) else INVALID_CONF_ID
             val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
-            if (config != null && config.isLockdown) {
+            if (config != null && config.isLockdown && checkMeteredEligibility(id, usesMeteredNw)) {
                 proxyIds.add(domainConfig.first)
+                Logger.i(LOG_TAG_PROXY, "lockdown enabled for domain: $domain => return $proxyIds")
                 return proxyIds // no need to proceed further for lockdown
             }
 
-            if (config != null && config.isActive) {
+            if (config != null && config.isActive && checkMeteredEligibility(id, usesMeteredNw)) {
                 proxyIds.add(domainConfig.first)
+                Logger.i(LOG_TAG_PROXY, "domain config is active: $domain => add ${domainConfig.first}")
             }
         }
 
         val configId = ProxyManager.getProxyIdForApp(uid)
         val id = if (configId.isNotEmpty()) convertStringIdToId(configId) else INVALID_CONF_ID
         val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
-
-        if (config != null && config.isLockdown) {
-            Logger.i(LOG_TAG_PROXY, "lockdown enabled for app: $uid => $configId")
+        if (config != null && config.isLockdown && checkMeteredEligibility(id, usesMeteredNw)) {
             proxyIds.add(configId) // already WG appended to it
             // return the lockdown config, no need to check for other configs
             // even if the lockdown config is disabled, we expect the connection to be blocked
+            Logger.i(LOG_TAG_PROXY, "lockdown enabled for app: $uid => return $proxyIds")
             return proxyIds
         }
-
-        if (config != null && config.isActive) {
+        if (config != null && config.isActive && checkMeteredEligibility(id, usesMeteredNw)) {
             proxyIds.add(configId) // apps specific config
+            Logger.i(LOG_TAG_PROXY, "app config is active: $uid => add $configId")
         }
 
         if (univIpConfig.first.isNotEmpty()) {
             val id =
                 if (univIpConfig.first.isNotEmpty()) convertStringIdToId(univIpConfig.first) else INVALID_CONF_ID
             val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
-            if (config != null && config.isLockdown) {
+            if (config != null && config.isLockdown && checkMeteredEligibility(id, usesMeteredNw)) {
                 proxyIds.add(univIpConfig.first)
+                Logger.i(LOG_TAG_PROXY, "lockdown enabled for ip: $ip:$port => return $proxyIds")
                 return proxyIds // no need to proceed further for lockdown
             }
 
-            if (config != null && config.isActive) {
+            if (config != null && config.isActive && checkMeteredEligibility(id, usesMeteredNw)) {
                 proxyIds.add(univIpConfig.first)
+                Logger.i(LOG_TAG_PROXY, "univ ip config is active: $ip:$port => add ${univIpConfig.first}")
             }
         }
 
@@ -408,13 +424,15 @@ object WireguardManager : KoinComponent {
             val id =
                 if (univDomainConfig.first.isNotEmpty()) convertStringIdToId(univIpConfig.first) else INVALID_CONF_ID
             val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
-            if (config != null && config.isLockdown) {
+            if (config != null && config.isLockdown && checkMeteredEligibility(id, usesMeteredNw)) {
                 proxyIds.add(univDomainConfig.first)
+                Logger.i(LOG_TAG_PROXY, "lockdown enabled for domain: $domain => return $proxyIds")
                 return proxyIds
             }
 
-            if (config != null && config.isActive) {
+            if (config != null && config.isActive && checkMeteredEligibility(id, usesMeteredNw)) {
                 proxyIds.add(univDomainConfig.first)
+                Logger.i(LOG_TAG_PROXY, "univ domain config is active: $domain => add ${univDomainConfig.first}")
             }
         }
 
@@ -422,7 +440,13 @@ object WireguardManager : KoinComponent {
         // if catch-all config is enabled, then add the config id to the list
         val catchAllConfig = mappings.filter { it.isActive && it.isCatchAll }
         catchAllConfig.forEach {
-            proxyIds.add(ProxyManager.ID_WG_BASE + it.id)
+            if (checkMeteredEligibility(it.id, usesMeteredNw)) {
+                proxyIds.add(ProxyManager.ID_WG_BASE + it.id)
+                Logger.i(
+                    LOG_TAG_PROXY,
+                    "catch-all config is active: ${it.id}, ${it.name} => add ${ProxyManager.ID_WG_BASE + it.id}"
+                )
+            }
         }
 
         // add the default proxy to the end, will not be true for lockdown
@@ -431,7 +455,23 @@ object WireguardManager : KoinComponent {
         // the proxyIds list will contain the ip-app specific, domain-app specific, app specific,
         // universal ip, universal domain, catch-all and default configs in the order of priority
         // the go-tun will check the routing based on the order of the list
+        Logger.i(LOG_TAG_PROXY, "returning proxy ids for $uid, $ip, $port: $proxyIds")
         return proxyIds
+    }
+
+    private fun checkMeteredEligibility(id: Int?, usesMeteredNw: Boolean): Boolean {
+        if (id == null) return false
+        val config = mappings.find { it.id == id }
+        if (config == null) {
+            Logger.e(LOG_TAG_PROXY, "canAdd: wg not found, id: $id, ${mappings.size}")
+            return false
+        }
+        if (config.useOnlyOnMetered && !usesMeteredNw) {
+            Logger.i(LOG_TAG_PROXY, "canAdd: useOnlyOnMetered is true, but not metered nw")
+            return false
+        }
+        Logger.d(LOG_TAG_PROXY, "canAdd: useOnlyOnMetered is false, metered nw: $usesMeteredNw")
+        return true
     }
 
     private fun convertStringIdToId(id: String): Int {
@@ -575,6 +615,7 @@ object WireguardManager : KoinComponent {
                 m.isCatchAll,
                 isLockdown, // just updating lockdown field
                 m.oneWireGuard,
+                m.useOnlyOnMetered,
                 m.isDeletable
             )
         )
@@ -603,6 +644,7 @@ object WireguardManager : KoinComponent {
                 isEnabled, // just updating catch all field
                 m.isLockdown,
                 m.oneWireGuard,
+                m.useOnlyOnMetered,
                 m.isDeletable
             )
         mappings.add(newMap)
@@ -630,6 +672,7 @@ object WireguardManager : KoinComponent {
                 m.isCatchAll,
                 m.isLockdown,
                 owg, // updating just one wireguard field
+                m.useOnlyOnMetered,
                 m.isDeletable
             )
         )
@@ -710,7 +753,8 @@ object WireguardManager : KoinComponent {
                     isActive = false,
                     isCatchAll = false,
                     isLockdown = false,
-                    oneWireGuard = false
+                    oneWireGuard = false,
+                    useOnlyOnMetered = false
                 )
             db.insert(wgf)
         } else {
@@ -753,7 +797,8 @@ object WireguardManager : KoinComponent {
                     isCatchAll = false,
                     isLockdown = false,
                     oneWireGuard = false,
-                    isDeletable = true
+                    isDeletable = true,
+                    useOnlyOnMetered = false
                 )
             mappings.add(wgf)
         } else {
