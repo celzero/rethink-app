@@ -196,10 +196,8 @@ internal constructor(
             updateExistingPackagesIfNeeded(packagesToUpdate) // updated only for restore
             removeWireGuardProfilesIfNeeded(action == ACTION_REFRESH_RESTORE)
             refreshNonApps(trackedApps, installedApps)
-            // for proxy mapping, restore is a special case, where we clear all proxy->app mappings
-            // and so, packagesToUpdate, even if not empty, is ignored. proxy mappings cannot be
-            // updated during restore.
-            refreshProxyMapping(trackedApps, action == ACTION_REFRESH_RESTORE)
+            // packages to add and delete are calculated based on proxy mapping
+            refreshProxyMapping(trackedApps, packagesToAdd, packagesToUpdate, packagesToDelete)
             // must be called after updateExistingPackagesIfNeeded
             refreshIPRules(packagesToUpdate)
             // must be called after updateExistingPackagesIfNeeded
@@ -389,7 +387,9 @@ internal constructor(
 
     private suspend fun refreshProxyMapping(
         trackedApps: Set<FirewallManager.AppInfoTuple>,
-        emptyAll: Boolean
+        packageToAdd: Set<FirewallManager.AppInfoTuple>,
+        packagesToUpdate: Set<FirewallManager.AppInfoTuple>,
+        packagesToDelete: Set<FirewallManager.AppInfoTuple>
     ) {
         // trackedApps is empty, the installed apps are yet to be added to the database; and so,
         // there's no need to refresh these mappings as apps tracked by FirewallManager is empty
@@ -398,22 +398,10 @@ internal constructor(
             return
         }
 
-        // remove all apps from proxy mapping and add the apps from tracked apps
-        if (emptyAll) {
-            ProxyManager.clear()
-            trackedApps
-                .map { FirewallManager.getAppInfoByPackage(it.packageName) }
-                .forEach { ProxyManager.addNewApp(it) } // it may be null, esp for non-apps
-            Logger.i(
-                LOG_TAG_APP_DB,
-                "empty proxy mapping, trackedApps: ${trackedApps.size}, proxy mapping: ${ProxyManager.trackedApps().size}"
-            )
-            return
-        }
-
         ProxyManager.purgeDupsBeforeRefresh()
 
         // remove the apps from proxy mapping which are not tracked by app info repository
+        // this will just sync the proxy mapping with the app info repository
         val pxm = ProxyManager.trackedApps()
         val del = findPackagesToDelete(pxm, trackedApps)
         val add =
@@ -422,6 +410,23 @@ internal constructor(
             }
         ProxyManager.deleteApps(del)
         ProxyManager.addApps(add)
+
+        // proceed to add/update/delete the apps based on the package manager's installed apps
+        packageToAdd.forEach {
+            val appInfo = FirewallManager.getAppInfoByPackage(it.packageName)
+            if (appInfo != null) {
+                ProxyManager.addApp(appInfo)
+            }
+        }
+
+        packagesToUpdate.forEach {
+            ProxyManager.updateApp(it.uid, it.packageName)
+        }
+
+        packagesToDelete.forEach {
+            ProxyManager.deleteApp(it.uid, it.packageName)
+        }
+
         Logger.i(
             LOG_TAG_APP_DB,
             "refreshing proxy mapping, size: ${pxm.size}, trackedApps: ${trackedApps.size}"

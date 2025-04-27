@@ -94,4 +94,7 @@ interface ProxyApplicationMappingDAO {
         "update ProxyApplicationMapping set proxyId = :cfgId, proxyName = :cfgName where proxyId = ''"
     )
     fun updateProxyForUnselectedApps(cfgId: String, cfgName: String = "")
+
+    @Query("update ProxyApplicationMapping set uid = :uid where packageName = :packageName")
+    fun updateUidForApp(uid: Int, packageName: String)
 }

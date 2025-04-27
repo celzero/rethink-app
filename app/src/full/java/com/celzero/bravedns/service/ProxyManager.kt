@@ -195,6 +195,28 @@ object ProxyManager : KoinComponent {
         m.forEach { addNewApp(it) }
     }
 
+    suspend fun addApp(appInfo: AppInfo?) {
+        addNewApp(appInfo)
+    }
+
+    suspend fun updateApp(uid: Int, packageName: String) {
+        if (pamSet.any { it.uid == uid && it.packageName == packageName }) {
+            Logger.i(LOG_TAG_PROXY, "App already exists in proxy mapping: $packageName")
+            return
+        }
+        // update the uid for the app in the database and the cache
+        // assuming pamSet will always be synced with the database
+        val m = pamSet.filter { it.packageName == packageName }.toSet()
+        if (m.isNotEmpty()) {
+            val n = m.map { ProxyAppMapTuple(uid, packageName, it.proxyId) }
+            pamSet.removeAll(m)
+            pamSet.addAll(n)
+            db.updateUidForApp(uid, packageName)
+        } else {
+            Logger.e(LOG_TAG_PROXY, "updateApp: map not found for uid $uid")
+        }
+    }
+
     suspend fun purgeDupsBeforeRefresh() {
         val visited = mutableSetOf<FirewallManager.AppInfoTuple>()
         val dups = mutableSetOf<FirewallManager.AppInfoTuple>()
@@ -223,6 +245,10 @@ object ProxyManager : KoinComponent {
             Logger.e(LOG_TAG_PROXY, "AppInfo is null, cannot add to proxy")
             return
         }
+        if (pamSet.any { it.uid == appInfo.uid && it.packageName == appInfo.packageName }) {
+            Logger.i(LOG_TAG_PROXY, "App already exists in proxy mapping: ${appInfo.appName}")
+            return
+        }
         val pam =
             ProxyApplicationMapping(
                 appInfo.uid,
@@ -238,9 +264,9 @@ object ProxyManager : KoinComponent {
         Logger.i(LOG_TAG_PROXY, "Adding app for mapping: ${pam.appName}, ${pam.uid}")
     }
 
-    private fun deleteFromCache(pam: ProxyApplicationMapping) {
+    private fun deleteFromCache(uid: Int, packageName: String) {
         pamSet.forEach {
-            if (it.uid == pam.uid && it.packageName == pam.packageName) {
+            if (it.uid == uid && it.packageName == packageName) {
                 pamSet.remove(it)
             }
         }
@@ -251,17 +277,16 @@ object ProxyManager : KoinComponent {
         m.forEach { deleteApp(it.uid, it.packageName) }
     }
 
-    private suspend fun deleteApp(uid: Int, packageName: String) {
-        val pam = ProxyApplicationMapping(uid, packageName, "", "", false, "")
-        deleteFromCache(pam)
-        db.deleteApp(pam)
-        Logger.d(LOG_TAG_PROXY, "Deleting app for mapping: ${pam.appName}, ${pam.uid}")
+    suspend fun deleteApp(uid: Int, packageName: String) {
+        deleteFromCache(uid, packageName)
+        db.deleteApp(uid, packageName)
+        Logger.d(LOG_TAG_PROXY, "deleting app for mapping: $uid, $packageName")
     }
 
     suspend fun clear() {
         pamSet.clear()
         db.deleteAll()
-        Logger.d(LOG_TAG_PROXY, "Deleting all apps for mapping")
+        Logger.d(LOG_TAG_PROXY, "deleting all apps for mapping")
     }
 
     fun isAnyAppSelected(proxyId: String): Boolean {
@@ -301,5 +326,15 @@ object ProxyManager : KoinComponent {
             ipnProxyId != Backend.Auto &&
             ipnProxyId != Backend.Ingress &&
             !ipnProxyId.endsWith(Backend.RPN)
+    }
+
+    fun stats(): String {
+        val sb = StringBuilder()
+        sb.append("   apps: ${pamSet.size}\n")
+        sb.append("   wg: ${WireguardManager.getNumberOfMappings()}\n")
+        sb.append("   active wgs: ${WireguardManager.getActiveWgCount()}\n")
+        sb.append("   isOneWgActive: ${WireguardManager.oneWireGuardEnabled()}\n")
+
+        return sb.toString()
     }
 }
