@@ -65,6 +65,8 @@ class AppWiseDomainsAdapter(
                     newConnection: AppConnection
                 ) = oldConnection == newConnection
             }
+
+        private const val TAG = "AppWiseDomainsAdapter"
     }
 
     private lateinit var adapter: AppWiseDomainsAdapter
@@ -84,7 +86,7 @@ class AppWiseDomainsAdapter(
     }
 
     override fun onBindViewHolder(
-        holder: AppWiseDomainsAdapter.ConnectionDetailsViewHolder,
+        holder: ConnectionDetailsViewHolder,
         position: Int
     ) {
         val appConnection: AppConnection = getItem(position) ?: return
@@ -139,7 +141,7 @@ class AppWiseDomainsAdapter(
 
         private fun openBottomSheet(appConn: AppConnection) {
             if (context !is AppCompatActivity) {
-                Logger.w(LOG_TAG_UI, "Error opening the app conn bottom sheet")
+                Logger.w(LOG_TAG_UI, "$TAG err opening the app conn bottom sheet")
                 return
             }
 
@@ -147,6 +149,7 @@ class AppWiseDomainsAdapter(
                 return
             }
 
+            Logger.v(LOG_TAG_UI, "$TAG open bottom sheet for uid: $uid, ip: ${appConn.ipAddress}, domain: ${appConn.appOrDnsName}")
             val bottomSheetFragment = AppDomainRulesBottomSheet()
             // Fix: free-form window crash
             // all BottomSheetDialogFragment classes created must have a public, no-arg constructor.

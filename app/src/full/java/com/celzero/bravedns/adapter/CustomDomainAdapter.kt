@@ -72,7 +72,7 @@ class CustomDomainAdapter(
     private lateinit var adapter: CustomDomainAdapter
 
     companion object {
-
+        private const val TAG = "CustomDomainAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<CustomDomain>() {
                 override fun areItemsTheSame(
@@ -197,6 +197,7 @@ class CustomDomainAdapter(
         }
 
         dBind.dacdDomainChip.setOnCheckedChangeListener { _, isSelected ->
+            Logger.vv(LOG_TAG_UI, "$TAG domain chip selected: $isSelected")
             if (isSelected) {
                 selectedType = DomainRulesManager.DomainType.DOMAIN
                 dBind.dacdDomainEditText.hint =
@@ -213,6 +214,7 @@ class CustomDomainAdapter(
         }
 
         dBind.dacdWildcardChip.setOnCheckedChangeListener { _, isSelected ->
+            Logger.vv(LOG_TAG_UI, "$TAG wildcard chip selected: $isSelected")
             if (isSelected) {
                 selectedType = DomainRulesManager.DomainType.WILDCARD
                 dBind.dacdDomainEditText.hint =
@@ -264,31 +266,35 @@ class CustomDomainAdapter(
             dBind.dacdFailureText.text =
                 context.getString(R.string.cd_dialog_error_invalid_domain)
             dBind.dacdFailureText.visibility = View.VISIBLE
+            Logger.vv(LOG_TAG_UI, "$TAG invalid domain: $url")
             return
         }
         when (selectedType) {
             DomainRulesManager.DomainType.WILDCARD -> {
-                if (!isWildCardEntry(url)) {
+                if (!isWildCardEntry(extractedHost)) {
                     dBind.dacdFailureText.text =
                         context.getString(R.string.cd_dialog_error_invalid_wildcard)
                     dBind.dacdFailureText.visibility = View.VISIBLE
+                    Logger.vv(LOG_TAG_UI, "$TAG invalid wildcard domain: $url")
                     return
                 }
             }
 
             DomainRulesManager.DomainType.DOMAIN -> {
-                if (!isValidDomain(url)) {
+                if (!isValidDomain(extractedHost)) {
                     dBind.dacdFailureText.text =
                         context.getString(R.string.cd_dialog_error_invalid_domain)
                     dBind.dacdFailureText.visibility = View.VISIBLE
+                    Logger.vv(LOG_TAG_UI, "$TAG invalid domain: $url")
                     return
                 }
             }
         }
 
         io {
+            Logger.vv(LOG_TAG_UI, "$TAG domain: $extractedHost, type: $selectedType")
             insertDomain(
-                Utilities.removeLeadingAndTrailingDots(url),
+                Utilities.removeLeadingAndTrailingDots(extractedHost),
                 selectedType,
                 prevDomain,
                 status
@@ -337,6 +343,7 @@ class CustomDomainAdapter(
         prevDomain: CustomDomain,
         status: DomainRulesManager.Status
     ) {
+        Logger.i(LOG_TAG_UI, "$TAG insert/update domain: $domain, type: $type")
         DomainRulesManager.updateDomainRule(domain, status, type, prevDomain)
         uiCtx {
             Utilities.showToastUiCentered(

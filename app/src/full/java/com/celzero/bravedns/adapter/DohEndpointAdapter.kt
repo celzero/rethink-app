@@ -53,6 +53,7 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
 
     companion object {
         private const val ONE_SEC = 1000L
+        private const val TAG = "DohEndpointAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<DoHEndpoint>() {
                 override fun areItemsTheSame(
@@ -174,10 +175,7 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
         }
 
         private fun updateConnection(endpoint: DoHEndpoint) {
-            Logger.d(
-                LOG_TAG_DNS,
-                "on doh change - ${endpoint.dohName}, ${endpoint.dohURL}, ${endpoint.isSelected}"
-            )
+            Logger.d(LOG_TAG_DNS, "$TAG update doh; ${endpoint.dohName}, ${endpoint.dohURL}, ${endpoint.isSelected}")
             io {
                 endpoint.isSelected = true
                 appConfig.handleDoHChanges(endpoint)
@@ -186,6 +184,7 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
 
         private fun deleteEndpoint(id: Int) {
             io {
+                Logger.i(LOG_TAG_DNS, "$TAG delete endpoint; $id")
                 appConfig.deleteDohEndpoint(id)
                 uiCtx {
                     Utilities.showToastUiCentered(

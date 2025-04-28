@@ -48,12 +48,9 @@ import com.celzero.bravedns.ui.bottomsheet.CustomIpRulesBtmSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getCountryCode
 import com.celzero.bravedns.util.Utilities.getFlag
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
@@ -68,6 +65,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
     private var isSelectionMode = false
 
     companion object {
+        private const val TAG = "CustomIpAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<CustomIp>() {
 
@@ -105,15 +103,15 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         val customIp: CustomIp = getItem(position) ?: return
 
         when (holder) {
-            is CustomIpAdapter.CustomIpsViewHolderWithHeader -> {
+            is CustomIpsViewHolderWithHeader -> {
                 holder.update(customIp)
 
             }
-            is CustomIpAdapter.CustomIpsViewHolderWithoutHeader -> {
+            is CustomIpsViewHolderWithoutHeader -> {
                 holder.update(customIp)
             }
             else -> {
-                Logger.w(LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
+                Logger.w(LOG_TAG_UI, "$TAG unknown view holder in CustomDomainRulesAdapter")
                 return
             }
         }
@@ -218,18 +216,22 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
     }
 
     private suspend fun byPassUniversal(customIp: CustomIp) {
+        Logger.i(LOG_TAG_UI, "$TAG by pass universal ip: ${customIp.ipAddress}")
         IpRulesManager.updateBypass(customIp)
     }
 
     private suspend fun byPassAppRule(customIp: CustomIp) {
+        Logger.i(LOG_TAG_UI, "$TAG by pass app rule ip: ${customIp.ipAddress}")
         IpRulesManager.updateTrust(customIp)
     }
 
     private suspend fun blockIp(customIp: CustomIp) {
+        Logger.i(LOG_TAG_UI, "$TAG block ip: ${customIp.ipAddress}")
         IpRulesManager.updateBlock(customIp)
     }
 
     private suspend fun noRuleIp(customIp: CustomIp) {
+        Logger.i(LOG_TAG_UI, "$TAG no rule ip: ${customIp.ipAddress}")
         IpRulesManager.updateNoRule(customIp)
     }
 
@@ -644,7 +646,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                 dBind.daciFailureTextView.visibility = View.VISIBLE
                 return@ui
             }
-
+            Logger.i(LOG_TAG_UI, "$TAG ip: $ip, port: $port, status: $status")
             updateCustomIp(customIp, ip, port, status)
         }
     }

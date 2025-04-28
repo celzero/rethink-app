@@ -57,6 +57,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
     PagingDataAdapter<DnsLog, DnsLogViewHolder>(DIFF_CALLBACK) {
 
     companion object {
+        private const val TAG = "DnsLogAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<DnsLog>() {
 
@@ -119,7 +120,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
 
         private fun openBottomSheet(log: DnsLog) {
             if (context !is FragmentActivity) {
-                Logger.w(LOG_TAG_UI, "err opening dns log btm sheet, no ctx to activity")
+                Logger.w(LOG_TAG_UI, "$TAG err opening dns log btm sheet, no ctx to activity")
                 return
             }
 
@@ -429,7 +430,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                         }
                     )
             } catch (ignored: Exception) {
-                Logger.d(LOG_TAG_DNS, "Error loading icon, load flag instead")
+                Logger.d(LOG_TAG_DNS, "$TAG err loading icon, load flag instead")
                 showFlag()
                 hideFavIcon()
             }

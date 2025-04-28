@@ -89,7 +89,7 @@ class WgNwStatsAdapter(private val context: Context) :
         fun bind(conn: AppConnection) {
             Logger.d(LOG_TAG_UI, "$TAG: Binding data for ${conn.uid}, ${conn.appOrDnsName}")
             setName(conn)
-            io { setIcon(conn) }
+            setIcon(conn)
             showDataUsage(conn)
             setProgress(conn)
             setConnectionCount(conn)
@@ -124,7 +124,7 @@ class WgNwStatsAdapter(private val context: Context) :
             b.ssCount.text = conn.count.toString()
         }
 
-        private suspend fun setIcon(conn: AppConnection) {
+        private fun setIcon(conn: AppConnection) {
             io {
                 val appInfo = FirewallManager.getAppInfoByUid(conn.uid)
                 uiCtx {

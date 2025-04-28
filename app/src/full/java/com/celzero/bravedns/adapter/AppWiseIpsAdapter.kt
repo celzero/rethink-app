@@ -51,6 +51,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
 
                 override fun areContentsTheSame(old: AppConnection, new: AppConnection) = old == new
             }
+        private const val TAG = "AppWiseIpsAdapter"
     }
 
     private lateinit var adapter: AppWiseIpsAdapter
@@ -108,7 +109,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
 
         private fun openBottomSheet(conn: AppConnection) {
             if (context !is AppCompatActivity) {
-                Logger.w(LOG_TAG_UI, "err opening the app conn bottom sheet")
+                Logger.w(LOG_TAG_UI, "$TAG err opening the app conn bottom sheet")
                 return
             }
 
@@ -116,6 +117,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
                 return
             }
 
+            Logger.vv(LOG_TAG_UI, "$TAG open bottom sheet for uid: $uid, ip: ${conn.ipAddress}, domain: ${conn.appOrDnsName}")
             val bottomSheetFragment = AppIpRulesBottomSheet()
             // Fix: free-form window crash
             // all BottomSheetDialogFragment classes created must have a public, no-arg constructor.

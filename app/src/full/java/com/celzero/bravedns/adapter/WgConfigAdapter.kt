@@ -51,7 +51,6 @@ import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
 import kotlinx.coroutines.Dispatchers
@@ -67,6 +66,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
     companion object {
         private const val ONE_SEC_MS = 1500L
+        private const val TAG = "WgConfigAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
 
@@ -210,7 +210,9 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             if (hop.isNotEmpty()) {
                 b.protocolInfoChipGroup.visibility = View.VISIBLE
                 b.chipHop.visibility = View.VISIBLE
-                b.chipHop.text = "Hop: " + hop.map { it.via }.joinToString()
+                b.chipHop.text = context.getString(
+                    R.string.two_argument_colon, context.getString(R.string.hop_lbl),
+                    hop.joinToString { it.via })
             } else {
                 b.chipHop.visibility = View.GONE
             }
@@ -519,7 +521,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
         private suspend fun disableWgIfPossible(cfg: WgConfigFilesImmutable) {
             if (!VpnController.hasTunnel()) {
-                Logger.i(LOG_TAG_PROXY, "VPN not active, cannot enable WireGuard")
+                Logger.i(LOG_TAG_PROXY, "$TAG VPN not active, cannot enable WireGuard")
                 uiCtx {
                     Utilities.showToastUiCentered(
                         context,
@@ -552,7 +554,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         private suspend fun enableWgIfPossible(cfg: WgConfigFilesImmutable) {
 
             if (!VpnController.hasTunnel()) {
-                Logger.i(LOG_TAG_PROXY, "VPN not active, cannot enable WireGuard")
+                Logger.i(LOG_TAG_PROXY, "$TAG VPN not active, cannot enable WireGuard")
                 uiCtx {
                     Utilities.showToastUiCentered(
                         context,
@@ -567,7 +569,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
 
             if (!WireguardManager.canEnableProxy()) {
-                Logger.i(LOG_TAG_PROXY, "not in DNS+Firewall mode, cannot enable WireGuard")
+                Logger.i(LOG_TAG_PROXY, "$TAG not in DNS+Firewall mode, cannot enable WireGuard")
                 uiCtx {
                     // reset the check box
                     b.interfaceSwitch.isChecked = false
@@ -583,7 +585,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
             if (WireguardManager.oneWireGuardEnabled()) {
                 // this should not happen, ui is disabled if one wireGuard is enabled
-                Logger.w(LOG_TAG_PROXY, "one wireGuard is already enabled")
+                Logger.w(LOG_TAG_PROXY, "$TAG one wireGuard is already enabled")
                 uiCtx {
                     // reset the check box
                     b.interfaceSwitch.isChecked = false
@@ -598,7 +600,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
 
             if (!WireguardManager.isValidConfig(cfg.id)) {
-                Logger.i(LOG_TAG_PROXY, "invalid WireGuard config")
+                Logger.i(LOG_TAG_PROXY, "$TAG invalid WireGuard config")
                 uiCtx {
                     // reset the check box
                     b.interfaceSwitch.isChecked = false

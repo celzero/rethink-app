@@ -67,6 +67,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
     companion object {
         private const val ONE_SEC = 1500L
+        private const val TAG = "OneWgConfigAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
 
@@ -399,7 +400,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
         private suspend fun enableWgIfPossible(config: WgConfigFiles) {
             if (!VpnController.hasTunnel()) {
-                Logger.i(LOG_TAG_PROXY, "VPN not active, cannot enable WireGuard")
+                Logger.i(LOG_TAG_PROXY, "$TAG VPN not active, cannot enable WireGuard")
                 uiCtx {
                     Utilities.showToastUiCentered(
                         context,

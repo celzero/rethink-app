@@ -75,6 +75,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
         private const val MAX_TIME_TCP = 135 // seconds
         private const val MAX_TIME_UDP = 135 // seconds
         private const val NO_USER_ID = 0
+        private const val TAG = "ConnTrackAdapter"
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionTrackerViewHolder {
@@ -131,10 +132,11 @@ class ConnectionTrackerAdapter(private val context: Context) :
 
         private fun openBottomSheet(ct: ConnectionTracker) {
             if (context !is FragmentActivity) {
-                Logger.w(LOG_TAG_UI, "err opening the connection tracker bottomsheet")
+                Logger.w(LOG_TAG_UI, "$TAG err opening the connection tracker bottomsheet")
                 return
             }
 
+            Logger.vv(LOG_TAG_UI, "$TAG show bottom sheet for ${ct.appName}")
             val bottomSheetFragment = ConnTrackerBottomSheet()
             // see AppIpRulesAdapter.kt#openBottomSheet()
             val bundle = Bundle()
