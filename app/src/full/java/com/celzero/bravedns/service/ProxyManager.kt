@@ -325,6 +325,7 @@ object ProxyManager : KoinComponent {
             ipnProxyId != Backend.Exit &&
             ipnProxyId != Backend.Auto &&
             ipnProxyId != Backend.Ingress &&
+            ipnProxyId != Backend.Plus &&
             !ipnProxyId.endsWith(Backend.RPN)
     }
 
