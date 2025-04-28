@@ -42,7 +42,6 @@ import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
-import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
@@ -533,9 +532,13 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             return
         }
 
-        if (log!!.isAnonymized()) { // anonymized queries answered by dns-crypt
-            val text =
-                getString(R.string.dns_btm_resolved_crypt, uptime, log!!.serverIP, log!!.relayIP)
+        if (log!!.isAnonymized()) { // anonymized queries answered by dns-crypt / proxies
+            val p = if (log!!.relayIP.isEmpty()) {
+                log!!.proxyId
+            } else {
+                log!!.relayIP
+            }
+            val text = getString(R.string.dns_btm_resolved_crypt, uptime, log!!.serverIP, p)
             b.dnsBlockBlockedDesc.text = updateHtmlEncodedText(text)
         } else if (log!!.isLocallyAnswered()) { // usually happens when there is a network failure
             b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server, uptime)

@@ -19,6 +19,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
@@ -93,7 +94,7 @@ class DnsLog {
     }
 
     fun isAnonymized(): Boolean {
-        return this.relayIP.isNotEmpty()
+        return this.relayIP.isNotEmpty() || ( this.proxyId.isNotEmpty() && !ProxyManager.isIpnProxy(this.proxyId))
     }
 
     fun isLocallyAnswered(): Boolean {
