@@ -46,7 +46,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     override fun onReceive(context: Context, intent: Intent) {
         // TODO - Move the NOTIFICATION_ACTIONs value to enum
         val action: String? = intent.getStringExtra(Constants.NOTIFICATION_ACTION)
-        Logger.i(LOG_TAG_VPN, "Received notification action: $action")
+        Logger.i(LOG_TAG_VPN, "received notification action: $action")
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         when (action) {
             OrbotHelper.ORBOT_NOTIFICATION_ACTION_TEXT -> {
@@ -73,7 +73,10 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             }
             Constants.NOTIF_ACTION_NEW_APP_ALLOW -> {
                 val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, Int.MIN_VALUE)
-                if (uid < 0) return
+                if (uid < 0) {
+                    Logger.i(LOG_TAG_VPN, "Invalid uid: $uid, on new app allow, ignoring")
+                    return
+                }
 
                 manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, uid)
 
@@ -81,7 +84,10 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             }
             Constants.NOTIF_ACTION_NEW_APP_DENY -> {
                 val uid = intent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, Int.MIN_VALUE)
-                if (uid < 0) return
+                if (uid < 0) {
+                    Logger.i(LOG_TAG_VPN, "Invalid uid: $uid, on new app deny, ignoring")
+                    return
+                }
 
                 manager.cancel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, uid)
 
