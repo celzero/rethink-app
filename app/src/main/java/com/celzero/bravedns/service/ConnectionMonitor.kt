@@ -51,6 +51,9 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.system.measureNanoTime
+import kotlin.time.Duration
+import kotlin.time.TimeSource
 
 class ConnectionMonitor(private val networkListener: NetworkListener) :
     ConnectivityManager.NetworkCallback(), KoinComponent {
@@ -431,6 +434,12 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             dnsServers.putAll(dns6)
 
             if (sz > 0) {
+                trackedIpv4Networks.forEach {
+                    Logger.d(LOG_TAG_CONNECTION, "inform4: ${it.network}, ${it.networkType}, $sz")
+                }
+                trackedIpv6Networks.forEach {
+                    Logger.d(LOG_TAG_CONNECTION, "inform6: ${it.network}, ${it.networkType}, $sz")
+                }
                 val underlyingNetworks =
                     UnderlyingNetworks(
                         trackedIpv4Networks.map { it }, // map to produce shallow copy
@@ -440,15 +449,9 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                         determineMtu(useActiveNetwork),
                         isActiveNetworkMetered,
                         isActiveNetworkCellular,
-                        SystemClock.elapsedRealtime(),
+                        SystemClock.elapsedRealtimeNanos(),
                         Collections.unmodifiableMap(dnsServers)
                     )
-                trackedIpv4Networks.forEach {
-                    Logger.d(LOG_TAG_CONNECTION, "inform4: ${it.network}, ${it.networkType}, $sz")
-                }
-                trackedIpv6Networks.forEach {
-                    Logger.d(LOG_TAG_CONNECTION, "inform6: ${it.network}, ${it.networkType}, $sz")
-                }
                 listener.onNetworkConnected(underlyingNetworks)
             } else {
                 val underlyingNetworks =
@@ -460,7 +463,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                         DEFAULT_MTU,
                         isActiveNetworkMetered = false,
                         isActiveNetworkCellular = false,
-                        SystemClock.elapsedRealtime(),
+                        SystemClock.elapsedRealtimeNanos(),
                         LinkedHashMap()
                     )
                 listener.onNetworkDisconnected(underlyingNetworks)
