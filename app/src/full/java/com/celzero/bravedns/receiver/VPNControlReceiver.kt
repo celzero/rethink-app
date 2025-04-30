@@ -35,6 +35,8 @@ class VPNControlReceiver : BroadcastReceiver(), KoinComponent {
                     Logger.i(LOG_TAG_VPN, "Attempting to prepare VPN before starting")
                     VpnService.prepare(context)
                 } catch (e: NullPointerException) {
+                    // This shouldn't happen normally as Broadcast Intent sender apps like Tasker won't come up as early as Always-on VPNs
+                    // Context can be null in case of auto-restart VPNs: https://stackoverflow.com/questions/73147633/getting-null-in-context-while-auto-restart-with-broadcast-receiver-in-android-ap
                     Logger.w(LOG_TAG_VPN, "Device does not support system-wide VPN mode")
                     return
                 }
