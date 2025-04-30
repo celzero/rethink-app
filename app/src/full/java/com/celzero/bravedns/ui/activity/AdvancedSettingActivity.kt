@@ -110,9 +110,9 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         val valueMin = persistentState.dialTimeoutSec / 60
         Logger.d(LOG_TAG_UI, "$TAG; dialer timeout value: $valueMin, persistentState: ${persistentState.dialTimeoutSec}")
         val displayText = if (valueMin == 0) {
-            "Selected Value: (disabled)"
+            getString(R.string.dialer_timeout_desc, getString(R.string.lbl_disabled))
         } else {
-            "Selected Value: $valueMin mins"
+            getString(R.string.dialer_timeout_desc, "$valueMin ${getString(R.string.lbl_min)}")
         }
         b.dvTimeoutDesc.text = displayText
         Logger.d(LOG_TAG_UI, "$TAG; dialer timeout value: $valueMin, progress: ${b.dvTimeoutSeekbar.progress}")
@@ -210,9 +210,8 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
 
     private fun clearResidueAfterConfirmation() {
         val alertBuilder = MaterialAlertDialogBuilder(this)
-        alertBuilder.setTitle("Clear Residue")
-        val msg = "Are you sure you want to clear the residue?"
-        alertBuilder.setMessage(msg)
+        alertBuilder.setTitle(getString(R.string.clear_residue_dialog_heading))
+        alertBuilder.setMessage(getString(R.string.clear_residue_dialog_desc))
         alertBuilder.setCancelable(false)
         alertBuilder.setPositiveButton(getString(R.string.lbl_proceed)) { dialog, _ ->
             dialog.dismiss()
