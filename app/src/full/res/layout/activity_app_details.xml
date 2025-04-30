@@ -42,7 +42,9 @@
                     android:id="@+id/aad_app_detail_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="5dp"
+                    android:paddingStart="5dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="5dp"
                     android:textColor="?primaryTextColor"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
@@ -50,8 +52,10 @@
                     android:id="@+id/aad_pkg_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="5dp"
                     android:alpha="0.7"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:paddingBottom="5dp"
                     android:textColor="?primaryTextColor"
                     android:textSize="@dimen/default_font_text_view" />
 
@@ -59,8 +63,9 @@
                     android:id="@+id/aad_firewall_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="5dp"
                     android:alpha="0.7"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
                     android:textColor="?primaryTextColor"
                     android:textSize="@dimen/default_font_text_view" />
 
@@ -70,9 +75,11 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_marginEnd="10dp"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:paddingBottom="5dp"
                     android:layout_toStartOf="@id/aad_proxy_details"
                     android:alpha="0.7"
-                    android:padding="5dp"
                     android:textColor="?primaryTextColor"
                     android:textSize="@dimen/default_font_text_view" />
             </androidx.appcompat.widget.LinearLayoutCompat>

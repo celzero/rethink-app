@@ -30,10 +30,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -56,7 +53,6 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
@@ -274,12 +270,12 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
         b.aadAppInfoIcon.setOnClickListener {
             io {
-                val packages = FirewallManager.getAppNamesByUid(appInfo.uid)
+                val appNames = FirewallManager.getAppNamesByUid(appInfo.uid)
                 uiCtx {
-                    if (packages.count() == 1) {
+                    if (appNames.count() == 1) {
                         openAndroidAppInfo(this, appInfo.packageName)
-                    } else if (packages.count() > 1) {
-                        showAppInfoDialog(packages)
+                    } else if (appNames.count() > 1) {
+                        showAppInfoDialog(appNames)
                     } else {
                         showToastUiCentered(
                             this,
@@ -504,16 +500,15 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
     }
 
-    private fun showAppInfoDialog(packages: List<String>) {
+    private fun showAppInfoDialog(appNames: List<String>) {
         val builderSingle = MaterialAlertDialogBuilder(this)
-
         builderSingle.setTitle(this.getString(R.string.about_settings_app_info))
 
         val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1)
-        arrayAdapter.addAll(packages)
+        arrayAdapter.addAll(appNames)
         builderSingle.setCancelable(false)
 
-        builderSingle.setItems(packages.toTypedArray(), null)
+        builderSingle.setItems(appNames.toTypedArray(), null)
 
         builderSingle.setPositiveButton(getString(R.string.ada_noapp_dialog_positive)) {
             dialog: DialogInterface,
@@ -522,7 +517,16 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
 
         val alertDialog = builderSingle.create()
-        alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
+        val ctx = this.applicationContext
+        alertDialog.listView.setOnItemClickListener { _, _, position, _ ->
+            io {
+                val pkg = FirewallManager.getPackageNameByAppName(appNames[position])
+                uiCtx {
+                    Logger.i(Logger.LOG_TAG_UI, "AppInfoActivity, package name: $pkg")
+                    openAndroidAppInfo(ctx, pkg)
+                }
+            }
+        }
         alertDialog.show()
     }
 
@@ -551,7 +555,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                             FirewallManager.ConnectionStatus.METERED
                         }
                     }
-                updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat)
+                updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat, connStatus)
             }
         }
     }
@@ -582,20 +586,21 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                         }
                     }
 
-                updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat)
+                updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat, connStatus)
             }
         }
     }
 
     private fun updateFirewallStatus(
         aStat: FirewallManager.FirewallStatus,
-        cStat: FirewallManager.ConnectionStatus
+        cStat: FirewallManager.ConnectionStatus,
+        prevConnStat: FirewallManager.ConnectionStatus = FirewallManager.ConnectionStatus.ALLOW
     ) {
         io {
             val appNames = FirewallManager.getAppNamesByUid(appInfo.uid)
             uiCtx {
                 if (appNames.count() > 1) {
-                    showDialog(appNames, appInfo, aStat, cStat)
+                    showDialog(appNames, appInfo, aStat, cStat, prevConnStat)
                     return@uiCtx
                 }
 
@@ -759,7 +764,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         packageList: List<String>,
         appInfo: AppInfo,
         aStat: FirewallManager.FirewallStatus,
-        cStat: FirewallManager.ConnectionStatus
+        cStat: FirewallManager.ConnectionStatus,
+        prevConnStat: FirewallManager.ConnectionStatus
     ) {
 
         val builderSingle = MaterialAlertDialogBuilder(this)
@@ -777,7 +783,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         builderSingle.setItems(packageList.toTypedArray(), null)
 
         builderSingle
-            .setPositiveButton(getString(FirewallManager.getLabelForStatus(aStat, cStat))) {
+            .setPositiveButton(getString(FirewallManager.getLabelForStatus(aStat, cStat, prevConnStat))) {
                 di: DialogInterface,
                 _: Int ->
                 di.dismiss()

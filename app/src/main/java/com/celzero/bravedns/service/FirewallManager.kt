@@ -584,13 +584,23 @@ object FirewallManager : KoinComponent {
         return context.resources.getStringArray(R.array.firewall_rules)
     }
 
-    fun getLabelForStatus(firewallStatus: FirewallStatus, connectionStatus: ConnectionStatus): Int {
+    fun getLabelForStatus(firewallStatus: FirewallStatus, connectionStatus: ConnectionStatus, prevConnStatus: ConnectionStatus): Int {
         return when (firewallStatus) {
             FirewallStatus.NONE -> {
                 when (connectionStatus) {
                     ConnectionStatus.BOTH -> R.string.block
-                    ConnectionStatus.METERED -> R.string.block
-                    ConnectionStatus.UNMETERED -> R.string.block
+                    ConnectionStatus.METERED ->
+                        if (prevConnStatus == ConnectionStatus.UNMETERED || prevConnStatus == ConnectionStatus.ALLOW) {
+                            R.string.block
+                        } else {
+                            R.string.allow
+                        }
+                    ConnectionStatus.UNMETERED ->
+                        if (prevConnStatus == ConnectionStatus.METERED || prevConnStatus == ConnectionStatus.ALLOW) {
+                            R.string.block
+                        } else {
+                            R.string.allow
+                        }
                     ConnectionStatus.ALLOW -> R.string.allow
                 }
             }
