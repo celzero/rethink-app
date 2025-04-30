@@ -128,7 +128,7 @@ interface StatsSummaryDao {
               0 AS port, 
               SUM(count) AS count, 
               '' as flag, 
-              0 AS blocked, 
+              1 AS blocked, 
               appOrDnsName 
             FROM 
               (
@@ -168,7 +168,7 @@ interface StatsSummaryDao {
               0 AS port, 
               SUM(count) AS count, 
               '' as flag, 
-              0 AS blocked, 
+              1 AS blocked, 
               appOrDnsName 
             FROM 
               (
