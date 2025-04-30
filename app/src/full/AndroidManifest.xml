@@ -119,7 +119,7 @@
         <activity android:name=".ui.activity.ConsoleLogActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.NotificationHandlerDialog"
+            android:name=".ui.NotificationHandlerActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:taskAffinity=""
