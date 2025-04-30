@@ -17,9 +17,6 @@ package com.celzero.bravedns.ui.fragment
 
 import Logger
 import Logger.LOG_IAB
-import Logger.LOG_TAG_PROXY
-import Logger.LOG_TAG_UI
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
@@ -28,14 +25,12 @@ import android.text.Html
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.util.TypedValue
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -59,11 +54,10 @@ import com.celzero.bravedns.iab.Result.resultState
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
-import com.celzero.bravedns.ui.activity.RpnAvailabilityCheckActivity
 import com.celzero.bravedns.ui.activity.RethinkPlusDashboardActivity
-import com.celzero.bravedns.ui.activity.WelcomeActivity.MyPagerAdapter
+import com.celzero.bravedns.ui.activity.RpnAvailabilityCheckActivity
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
+import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.underline
 import com.celzero.bravedns.util.Utilities
@@ -83,7 +77,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
     private lateinit var errorDialog: AlertDialog
 
     companion object {
-        private const val TAG = "PR+Ui"
+        private const val TAG = "R+Ui"
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -286,8 +280,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
     private fun addBottomDots(currentPage: Int) {
         dots = arrayOfNulls(layouts.size)
 
-        val colorActive = resources.getIntArray(R.array.array_dot_active)
-        val colorInActive = resources.getIntArray(R.array.array_dot_inactive)
+        val colorActive = fetchColor(requireContext(), R.attr.primaryColor)
+        val colorInActive = fetchColor(requireContext(), R.attr.primaryDarkColor)
 
         b.layoutDots.removeAllViews()
 
@@ -295,12 +289,12 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
             dots[i] = TextView(requireContext())
             dots[i]?.text = updateHtmlEncodedText("&#8226;")
             dots[i]?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30F)
-            dots[i]?.setTextColor(colorInActive[currentPage])
+            dots[i]?.setTextColor(colorInActive)
             b.layoutDots.addView(dots[i])
         }
 
         if (dots.isNotEmpty()) {
-            dots[currentPage]?.setTextColor(colorActive[currentPage])
+            dots[currentPage]?.setTextColor(colorActive)
         }
     }
 
