@@ -89,10 +89,7 @@ import org.koin.android.ext.android.inject
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
-
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
-    private val b by viewBinding(ActivityHomeScreenBinding::bind)
-
     private val persistentState by inject<PersistentState>()
     private val appInfoDb by inject<AppInfoRepository>()
     private val appUpdateManager by inject<AppUpdater>()

@@ -24,10 +24,7 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppInfoActivity
@@ -36,11 +33,10 @@ import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class NotificationHandlerDialog : AppCompatActivity() {
+class NotificationHandlerActivity : AppCompatActivity() {
     enum class TrampolineType {
         ACCESSIBILITY_SERVICE_FAILURE_DIALOG,
         NEW_APP_INSTALL_DIALOG,
@@ -121,6 +117,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
     }
 
     private fun launchFirewallActivityAndFinish(recvIntent: Intent) {
+        // TODO: handle the app lock state then launch firewall activity
         val uid = recvIntent.getIntExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, Int.MIN_VALUE)
         Logger.d(LOG_TAG_VPN, "notification intent - new app installed, uid: $uid")
         if (uid > 0) {
