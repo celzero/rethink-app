@@ -46,7 +46,7 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.ui.NotificationHandlerDialog
+import com.celzero.bravedns.ui.NotificationHandlerActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants
@@ -519,7 +519,7 @@ internal constructor(
             ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         Logger.d(LOG_TAG_VPN, "Number of new apps: $appSize, show notification")
 
-        val intent = Intent(ctx, NotificationHandlerDialog::class.java)
+        val intent = Intent(ctx, NotificationHandlerActivity::class.java)
         intent.putExtra(
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE
@@ -593,7 +593,7 @@ internal constructor(
             ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         Logger.d(LOG_TAG_VPN, "New app installed: $appName, show notification")
 
-        val intent = Intent(ctx, NotificationHandlerDialog::class.java)
+        val intent = Intent(ctx, NotificationHandlerActivity::class.java)
         intent.putExtra(
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE

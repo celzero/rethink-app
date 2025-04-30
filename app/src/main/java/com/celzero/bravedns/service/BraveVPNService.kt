@@ -87,7 +87,7 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
-import com.celzero.bravedns.ui.NotificationHandlerDialog
+import com.celzero.bravedns.ui.NotificationHandlerActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.util.AndroidUidConfig
@@ -1002,7 +1002,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private fun showAccessibilityStoppedNotification() {
         Logger.i(LOG_TAG_VPN, "app not in use failure, show notification")
 
-        val intent = Intent(this, NotificationHandlerDialog::class.java)
+        val intent = Intent(this, NotificationHandlerActivity::class.java)
         intent.putExtra(
             NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME,
             NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
@@ -2406,6 +2406,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         setUnderlyingNetworks(getUnderlays())
         // always restart, because global var builderRoutes is set to only in builder, also
         // need to set routes as well based on the protos
+        // TODO: do we need to restart if the network is not changed?
         io("nwDisconnect") {
             restartVpnWithNewAppConfig(networks, reason = "nwDisconnect")
         }
