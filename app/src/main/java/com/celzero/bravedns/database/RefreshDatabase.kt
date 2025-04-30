@@ -147,8 +147,8 @@ internal constructor(
             val ipm = IpRulesManager.load()
             val dm = DomainRulesManager.load()
             val pxm = ProxyManager.load()
-            val wgm = WireguardManager.load()
-            val hm = WgHopManager.load()
+            val wgm = WireguardManager.load(forceRefresh = false)
+            val hm = WgHopManager.load(forceRefresh = false)
             val tm = TcpProxyHelper.load()
             val rm = RpnProxyManager.load()
 

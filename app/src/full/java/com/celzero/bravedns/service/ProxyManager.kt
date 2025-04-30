@@ -306,16 +306,6 @@ object ProxyManager : KoinComponent {
         return pamSet.count { it.proxyId == proxyId }
     }
 
-    suspend fun removeWgProxies() {
-        // remove all the wg proxies from the app config mappings, during restore process
-        val noProxy = ""
-        val m = pamSet.filter { it.proxyId.startsWith(ID_WG_BASE) }.toSet()
-        val n = m.map { ProxyAppMapTuple(it.uid, it.packageName, noProxy) }
-        pamSet.removeAll(m)
-        pamSet.addAll(n)
-        db.removeAllWgProxies()
-    }
-
     fun isIpnProxy(ipnProxyId: String): Boolean {
         if (ipnProxyId.isEmpty()) return false
         // check if the proxy id is not the base, block, exit, auto or ingress

@@ -72,17 +72,18 @@ object WireguardManager : KoinComponent {
     const val SEC_WARP_NAME = "SEC_WARP"
 
     init {
-        io { load() }
+        io { load(forceRefresh = false) }
     }
 
-    suspend fun load(): Int {
+    suspend fun load(forceRefresh: Boolean): Int {
+        if (!forceRefresh && configs.isNotEmpty()) {
+            Logger.i(LOG_TAG_PROXY, "configs already loaded; returning...")
+            return configs.size
+        }
         // go through all files in the wireguard directory and load them
         // parse the files as those are encrypted
         // increment the id by 1, as the first config id is 0
         lastAddedConfigId = db.getLastAddedConfigId()
-        if (configs.isNotEmpty()) {
-            Logger.i(LOG_TAG_PROXY, "configs already loaded; refreshing...")
-        }
         val m = db.getWgConfigs().map { it.toImmutable() }
         mappings = CopyOnWriteArraySet(m)
         mappings.forEach {
@@ -824,7 +825,7 @@ object WireguardManager : KoinComponent {
         Logger.i(LOG_TAG_PROXY, "restored wg entries count: $count")
         clearLoadedConfigs()
         performRestore()
-        load()
+        load(forceRefresh = true)
     }
 
     suspend fun performRestore() {

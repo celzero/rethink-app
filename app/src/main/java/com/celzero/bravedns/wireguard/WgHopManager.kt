@@ -23,12 +23,13 @@ object WgHopManager: KoinComponent {
     private const val TAG = "WgHopMgr"
 
     init {
-        io { load() }
+        io { load(forceRefresh = false) }
     }
 
-    suspend fun load(): Int {
-        if (maps.isNotEmpty()) {
-            Logger.i(LOG_TAG_PROXY, "$TAG reload hop: ${maps.size}")
+    suspend fun load(forceRefresh: Boolean): Int {
+        if (!forceRefresh && maps.isNotEmpty()) {
+            Logger.i(LOG_TAG_PROXY, "$TAG load: already loaded")
+            return maps.size
         }
         maps.clear()
         maps = CopyOnWriteArrayList(db.getAll())
