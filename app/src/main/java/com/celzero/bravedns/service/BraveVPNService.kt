@@ -191,11 +191,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         private const val NOTIF_ID_ACCESSIBILITY_FAILURE = 104
 
         // IPv4 VPN constants
+        // changing the below ip should require a changes in ConnectionTracer, RethinkLogAdapter
         private const val IPV4_TEMPLATE: String = "10.111.222.%d"
         private const val IPV4_PREFIX_LENGTH: Int = 24
 
         // IPv6 vpn constants
-        // Randomly generated unique local IPv6 unicast subnet prefix, as defined by RFC 4193.
+        // Randomly generated unique local IPv6 unicast subnet prefix, as defined by RFC 4193
+        // changing the below ip should require a changes in ConnectionTracer, RethinkLogAdapter
         private const val IPV6_TEMPLATE: String = "fd66:f83a:c650::%d"
         private const val IPV6_PREFIX_LENGTH: Int = 120
 
@@ -2399,7 +2401,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     // failing.
     override fun onNetworkDisconnected(networks: ConnectionMonitor.UnderlyingNetworks) {
         underlyingNetworks = networks
-        Logger.i(LOG_TAG_VPN, "onNetworkDisconnected: state: z, $networks")
+        Logger.i(LOG_TAG_VPN, "onNetworkDisconnected: state: z, $networks, updatedTs: ${networks.lastUpdated}")
         // TODO: if getUnderlays() is empty array, set empty routes on tun using vpn builder
         setUnderlyingNetworks(getUnderlays())
         // always restart, because global var builderRoutes is set to only in builder, also
@@ -2475,7 +2477,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         setUnderlyingNetworks(getUnderlays())
 
         logd(
-            "mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}), tun: ${tunMtu()}; routes? $isRoutesChanged, bound-nws? $isBoundNetworksChanged"
+            "mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}), tun: ${tunMtu()}; routes? $isRoutesChanged, bound-nws? $isBoundNetworksChanged, updatedTs: ${networks.lastUpdated}"
         )
 
         // restart vpn if the routes or when mtu changes
@@ -3536,7 +3538,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return Pair(appendDnsCacheIfNeeded(defaultTid), "")
             }
             if (FirewallManager.isAppExcludedFromProxy(uid)) {
-                Pair(appendDnsCacheIfNeeded(defaultTid), "")
+                return Pair(appendDnsCacheIfNeeded(defaultTid), "")
             }
             // take only the active nw into account as we do not know the dns server ip
             // which the domain is going to be resolved
