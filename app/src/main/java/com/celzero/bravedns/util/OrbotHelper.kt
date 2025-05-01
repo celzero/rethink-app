@@ -36,6 +36,7 @@ import androidx.core.net.toUri
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ProxyEndpoint
+import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
@@ -435,7 +436,7 @@ class OrbotHelper(
             id,
             ORBOT,
             proxyMode.value,
-            proxyType = "NONE",
+            proxyType = DEFAULT_PROXY_TYPE,
             ORBOT_PACKAGE_NAME,
             ip,
             port,

@@ -21,10 +21,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -41,7 +38,6 @@ import com.celzero.bravedns.ui.fragment.RethinkLogFragment
 import com.celzero.bravedns.ui.fragment.WgNwStatsFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
@@ -191,7 +187,7 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
         if (isWireGuardLogs) {
             return when(position) {
                 0 -> getString(R.string.firewall_act_network_monitor_tab)
-                1 -> "Stats"
+                1 -> getString(R.string.title_statistics)
                 else -> getString(R.string.firewall_act_network_monitor_tab)
             }
         }

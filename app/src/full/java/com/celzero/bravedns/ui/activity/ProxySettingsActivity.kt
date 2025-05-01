@@ -36,15 +36,13 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ProxyEndpoint
+import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
 import com.celzero.bravedns.databinding.DialogSetProxyBinding
 import com.celzero.bravedns.databinding.FragmentProxyConfigureBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
@@ -62,16 +60,15 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
-import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isValidPort
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configure) {
     private val b by viewBinding(FragmentProxyConfigureBinding::bind)
@@ -145,7 +142,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.rpnTitle.visibility = View.GONE
             b.settingsActivityRpnContainer.visibility = View.GONE
         }
-        observeCustomProxy()
         displayHttpProxyUi()
         displaySocks5Ui()
     }
@@ -275,16 +271,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.wgRefresh.clearAnimation()
             showToastUiCentered(this, getString(R.string.dc_refresh_toast), Toast.LENGTH_SHORT)
         }
-    }
-
-    private fun showTcpProxyErrorDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle("Rethink Proxy")
-        builder.setMessage(
-            "Issue checking for Rethink Proxy. There may be a problem with your network or the proxy server. Please try again later."
-        )
-        builder.setPositiveButton("Okay") { dialog, _ -> dialog.dismiss() }
-        builder.create().show()
     }
 
     /** Prompt user to download the Orbot app based on the current BUILDCONFIG flavor. */
@@ -504,22 +490,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 }
             }
         }
-    }
-
-    private fun observeCustomProxy() {
-        /*appConfig.connectedProxy.observe(this) {
-            proxyEndpoint = it
-            if (proxyEndpoint == null) return@observe
-
-            val m = ProxyManager.ProxyMode.get(proxyEndpoint!!.proxyMode) ?: return@observe
-            if (m.isCustomSocks5()) {
-                displaySocks5Ui()
-            } else if (m.isCustomHttp()) {
-                displayHttpProxyUi()
-            } else {
-                // no-op
-            }
-        }*/
     }
 
     private fun refreshOrbotUi() {
@@ -1003,7 +973,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             id,
             name,
             mode.value,
-            proxyType = "NONE",
+            proxyType = DEFAULT_PROXY_TYPE,
             appName,
             ip,
             port,

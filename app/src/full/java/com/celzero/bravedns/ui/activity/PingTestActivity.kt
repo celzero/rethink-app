@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
@@ -22,10 +23,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -34,7 +32,6 @@ import com.celzero.bravedns.databinding.ActivityPingTestBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -98,8 +95,8 @@ class PingTestActivity: AppCompatActivity(R.layout.activity_ping_test) {
 
     private fun showStartVpnDialog() {
         val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle("VPN not started")
-        builder.setMessage("VPN is not started. Please start the VPN to use this feature.")
+        builder.setTitle(getString(R.string.vpn_not_active_dialog_title))
+        builder.setMessage(getString(R.string.vpn_not_active_dialog_desc))
         builder.setCancelable(false)
         builder.setPositiveButton(getString(R.string.dns_info_positive)) { dialogInterface, _ ->
             dialogInterface.dismiss()
