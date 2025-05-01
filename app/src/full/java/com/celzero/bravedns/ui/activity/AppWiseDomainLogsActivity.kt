@@ -255,6 +255,7 @@ class AppWiseDomainLogsActivity :
 
     private fun showNoRulesUi() {
         b.awlNoRulesRl.visibility = View.VISIBLE
+        networkLogsViewModel.rinrDomainLogs.removeObservers(this)
     }
 
     private fun hideRulesUi() {

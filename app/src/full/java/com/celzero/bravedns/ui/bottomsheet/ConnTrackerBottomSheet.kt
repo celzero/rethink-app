@@ -465,13 +465,14 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                             return@io
                         }
 
-                        if (FirewallManager.isUnknownPackage(info!!.uid)) {
+                        // TODO: instead disable/remove exclude from the view if pkg is unknown?
+                        if (FirewallManager.isUnknownPackage(info!!.uid) && fStatus.isExclude()) {
                             uiCtx {
                                 // reset the spinner to previous selection
                                 updateFirewallRulesUi(a, c)
                                 showToastUiCentered(
                                     requireContext(),
-                                    "Exclude not possible for app with no package name",
+                                    requireContext().getString(R.string.exclude_no_package_err_toast),
                                     Toast.LENGTH_LONG
                                 )
                             }

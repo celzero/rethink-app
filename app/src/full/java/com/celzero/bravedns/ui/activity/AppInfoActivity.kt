@@ -347,17 +347,30 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 return@setOnClickListener
             }
 
-            // change the status to allowed if already app is excluded
-            if (appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.NONE,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
-            } else {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.EXCLUDE,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
+            io {
+                if (FirewallManager.isUnknownPackage(uid) && appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
+                    uiCtx {
+                        showToastUiCentered(
+                            this,
+                            getString(R.string.exclude_no_package_err_toast),
+                            Toast.LENGTH_LONG
+                        )
+                    }
+                    return@io
+                }
+
+                // change the status to allowed if already app is excluded
+                if (appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
+                    updateFirewallStatus(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                } else {
+                    updateFirewallStatus(
+                        FirewallManager.FirewallStatus.EXCLUDE,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                }
             }
         }
 
