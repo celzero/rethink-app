@@ -448,6 +448,7 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
                 dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
 
                 heading.text = title
+                okBtn.visibility = View.VISIBLE
                 okBtn.text = getString(R.string.about_bug_report_dialog_positive_btn)
                 heading.setCompoundDrawablesWithIntrinsicBounds(
                     ContextCompat.getDrawable(this, R.drawable.ic_rethink_plus),
