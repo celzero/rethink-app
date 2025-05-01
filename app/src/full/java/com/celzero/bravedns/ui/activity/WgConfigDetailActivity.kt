@@ -482,7 +482,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                         uiCtx {
                             Utilities.showToastUiCentered(
                                 this,
-                                "Cannot hop, already via",
+                                getString(R.string.hop_error_toast_msg_1),
                                 Toast.LENGTH_SHORT
                             )
                         }
@@ -496,7 +496,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                         if (hopables.isEmpty()) {
                             Utilities.showToastUiCentered(
                                 this,
-                                "No hopable WireGuard found",
+                                getString(R.string.hop_error_toast_msg_2),
                                 Toast.LENGTH_SHORT
                             )
                         } else {
@@ -505,7 +505,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                     }
                 }
             } else {
-                Utilities.showToastUiCentered(this, "WireGuard must be active", Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(this, getString(R.string.wireguard_not_active_toast), Toast.LENGTH_SHORT)
             }
         }
     }
@@ -514,7 +514,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         return try {
             val configId = id.substring(ID_WG_BASE.length)
             configId.toIntOrNull() ?: INVALID_CONF_ID
-        } catch (e: Exception) {
+        } catch (ignored: Exception) {
             Logger.i(LOG_TAG_PROXY, "err converting string id to int: $id")
             INVALID_CONF_ID
         }
@@ -625,7 +625,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         if (curr == null) {
             Utilities.showToastUiCentered(
                 this,
-                "Config not found",
+                getString(R.string.config_invalid_desc),
                 Toast.LENGTH_SHORT
             )
             return

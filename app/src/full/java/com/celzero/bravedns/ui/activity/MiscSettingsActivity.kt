@@ -44,12 +44,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.biometric.BiometricManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -68,7 +64,6 @@ import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
-import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastT
@@ -84,6 +79,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import androidx.core.net.toUri
 
 
 class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) {
@@ -161,8 +157,13 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) ==
             BiometricManager.BIOMETRIC_SUCCESS
         ) {
-            b.settingsBiometricDesc.text = getString(R.string.settings_biometric_desc) + "; " +
+            val txt =
+                getString(
+                    R.string.two_argument_colon,
+                    getString(R.string.settings_biometric_desc),
                     BioMetricType.fromValue(persistentState.biometricAuthType).name
+                )
+            b.settingsBiometricDesc.text = txt
         } else {
             b.settingsBiometricRl.visibility = View.GONE
         }
@@ -266,7 +267,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             // set the file descriptor instead of fd, need to close the file descriptor
             // after tunnel creation
             appConfig.setPcap(PcapMode.EXTERNAL_FILE.id, file.absolutePath)
-        } catch (e: Exception) {
+        } catch (ignored: Exception) {
             showFileCreationErrorToast()
         }
     }
@@ -313,7 +314,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 val uri = Uri.fromParts(SCHEME_PACKAGE, this.packageName, null)
                 intent.data = uri
                 storageActivityResultLauncher.launch(intent)
-            } catch (e: Exception) {
+            } catch (ignored: Exception) {
                 val intent = Intent()
                 intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
                 storageActivityResultLauncher.launch(intent)
@@ -409,6 +410,30 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     getString(
                         R.string.settings_selected_theme,
                         getString(R.string.settings_theme_dialog_themes_3)
+                    )
+            }
+
+            Themes.TRUE_BLACK.id -> {
+                b.genSettingsThemeDesc.text =
+                    getString(
+                        R.string.settings_selected_theme,
+                        getString(R.string.settings_theme_dialog_themes_4)
+                    )
+            }
+
+            Themes.LIGHT_PLUS.id -> {
+                b.genSettingsThemeDesc.text =
+                    getString(
+                        R.string.settings_selected_theme,
+                        getString(R.string.settings_theme_dialog_themes_5)
+                    )
+            }
+
+            Themes.DARK_PLUS.id -> {
+                b.genSettingsThemeDesc.text =
+                    getString(
+                        R.string.settings_selected_theme,
+                        getString(R.string.settings_theme_dialog_themes_6)
                     )
             }
 
@@ -582,25 +607,33 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
             when (BioMetricType.fromValue(which)) {
                 BioMetricType.OFF -> {
-                    b.settingsBiometricDesc.text = b.settingsBiometricDesc.text.toString() + "; Off"
+                    val txt = getString(R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_0))
+                    b.settingsBiometricDesc.text = txt
                     persistentState.biometricAuthType = BioMetricType.OFF.action
                     persistentState.biometricAuthTime = Constants.INIT_TIME_MS
                 }
 
                 BioMetricType.IMMEDIATE -> {
-                    b.settingsBiometricDesc.text =  b.settingsBiometricDesc.text.toString() + "; Immediate"
+                    val txt = getString(R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_1))
+                    b.settingsBiometricDesc.text = txt
                     persistentState.biometricAuthType = BioMetricType.IMMEDIATE.action
                     persistentState.biometricAuthTime = Constants.INIT_TIME_MS
                 }
 
                 BioMetricType.FIVE_MIN -> {
-                    b.settingsBiometricDesc.text =  b.settingsBiometricDesc.text.toString() + "; 5 min"
+                    val txt = getString(R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_2))
+                    b.settingsBiometricDesc.text = txt
                     persistentState.biometricAuthType = BioMetricType.FIVE_MIN.action
                     persistentState.biometricAuthTime = System.currentTimeMillis()
                 }
 
                 BioMetricType.FIFTEEN_MIN -> {
-                    b.settingsBiometricDesc.text =  b.settingsBiometricDesc.text.toString() + "; 15 min"
+                    val txt = getString(R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_3))
+                    b.settingsBiometricDesc.text = txt
                     persistentState.biometricAuthType = BioMetricType.FIFTEEN_MIN.action
                     persistentState.biometricAuthTime = System.currentTimeMillis()
                 }
@@ -783,8 +816,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 getString(R.string.settings_theme_dialog_themes_2),
                 getString(R.string.settings_theme_dialog_themes_3),
                 getString(R.string.settings_theme_dialog_themes_4),
-                "Light Plus",
-                "Dark Plus"
+                getString(R.string.settings_theme_dialog_themes_5),
+                getString(R.string.settings_theme_dialog_themes_6)
             )
         val checkedItem = persistentState.theme
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
@@ -930,7 +963,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             } else {
                 intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                 intent.addCategory(Intent.CATEGORY_DEFAULT)
-                intent.data = Uri.parse("package:$packageName")
+                intent.data = "$SCHEME_PACKAGE:$packageName".toUri()
             }
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {

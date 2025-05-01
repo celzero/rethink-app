@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -23,10 +24,7 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -36,20 +34,18 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import kotlin.getValue
 
 class RpnAvailabilityCheckActivity : AppCompatActivity() {
     private val b by viewBinding(ActivityRpnAvailabililtyBinding::bind)
     private val persistentState by inject<PersistentState>()
 
-    private val options = listOf("Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6")
+    private lateinit var options: Array<String>
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
     private fun Context.isDarkThemeOn(): Boolean {
@@ -71,12 +67,11 @@ class RpnAvailabilityCheckActivity : AppCompatActivity() {
             controller.isAppearanceLightNavigationBars = false
             window.isNavigationBarContrastEnforced = false
         }
+        options = resources.getStringArray(R.array.rpn_proxies_list)
         startChecks()
     }
 
     private fun startChecks() {
-        //b.statusContainer.removeAllViews()
-
         var strength = 0
         val ctx = this
         lifecycleScope.launch {
@@ -107,11 +102,11 @@ class RpnAvailabilityCheckActivity : AppCompatActivity() {
 
                     if (res) {
                         strength++
-                        resultText.text = "Active"
+                        resultText.text = getString(R.string.lbl_active)
                         resultText.setTextColor(UIUtils.fetchColor(ctx, R.attr.accentGood))
                         resultText.visibility = View.VISIBLE
                     } else {
-                        resultText.text = "Inactive"
+                        resultText.text = getString(R.string.lbl_inactive)
                         resultText.setTextColor(UIUtils.fetchColor(ctx, R.attr.accentBad))
                         resultText.visibility = View.VISIBLE
                     }

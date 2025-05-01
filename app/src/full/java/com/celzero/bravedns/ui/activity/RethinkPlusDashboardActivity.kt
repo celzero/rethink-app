@@ -20,6 +20,7 @@ import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.View
@@ -32,37 +33,40 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityRethinkPlusDashboardBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.scheduler.BugReportZipper.FILE_PROVIDER_NAME
+import com.celzero.bravedns.scheduler.BugReportZipper.getZipFileName
+import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.io.File
 
 class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink_plus_dashboard) {
     private val b by viewBinding(ActivityRethinkPlusDashboardBinding::bind)
 
     private val persistentState by inject<PersistentState>()
-    private val appConfig by inject<AppConfig>()
 
     private lateinit var animation: Animation
 
-    private val options = listOf("Option 1", "Option 2", "Option 3", "Option 4", "Option 5")
+    private lateinit var options: List<String>
 
     companion object {
         private const val ANIMATION_DURATION = 750L
@@ -85,6 +89,8 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
         theme.applyStyle(R.style.OptOutEdgeToEdgeEnforcement, false)
         super.onCreate(savedInstanceState)
 
+        // drop the last element as the last one is exit which is not used in the UI
+        options = resources.getStringArray(R.array.rpn_proxies_list).dropLast(1)
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
             controller.isAppearanceLightNavigationBars = false
@@ -331,15 +337,8 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
         Logger.i(LOG_TAG_UI, "$TAG Hide IP selected, state: ${persistentState.rpnMode}")
     }
 
-    private fun showInfoDialog(type: RpnProxyManager.RpnType,prop: RpnProxyManager.RpnProps?) {
+    private fun showInfoDialog(type: RpnProxyManager.RpnType,prop: RpnProxyManager.RpnProps) {
         io {
-            if (prop == null) {
-                Logger.e(LOG_TAG_UI, "$TAG rpnProps is null")
-                uiCtx {
-                    Utilities.showToastUiCentered(this, "Error fetching RpnProps", Toast.LENGTH_SHORT)
-                }
-                return@io
-            }
             val genStats = VpnController.vpnStats()
             uiCtx {
                 val title = type.name.uppercase()
@@ -374,7 +373,7 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
         val config = RpnProxyManager.getNewProtonConfig()
         if (config == null) {
             Logger.e(LOG_TAG_UI, "$TAG err creating proton config")
-            showConfigCreationError("Error creating Proton config")
+            showConfigCreationError(getString(R.string.err_proton_creation_toast))
             return
         }
         Logger.i(LOG_TAG_UI, "$TAG proton config created")
@@ -385,7 +384,7 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
         val isRegistered = VpnController.registerSEToTunnel()
         if (!isRegistered) {
             Logger.e(LOG_TAG_UI, "$TAG err registering SE to tunnel")
-            showConfigCreationError("Error registering SE to tunnel")
+            showConfigCreationError(getString(R.string.err_se_creation_toast))
         }
         Logger.i(LOG_TAG_UI, "$TAG SE registered to tunnel")
     }
@@ -406,7 +405,7 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
         val config = RpnProxyManager.getNewAmzConfig()
         if (config == null) {
             Logger.e(LOG_TAG_UI, "$TAG err creating amz config")
-            showConfigCreationError("Error creating Amnezia config")
+            showConfigCreationError(getString(R.string.err_amz_creation_toast))
             return false
         }
         return true
@@ -443,11 +442,13 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
                 dialog.window?.attributes = lp
 
                 val heading = dialogBinding.infoRulesDialogRulesTitle
-                val okBtn = dialogBinding.infoRulesDialogCancelImg
+                val cancelBtn = dialogBinding.infoRulesDialogCancelImg
+                val okBtn = dialogBinding.infoRulesDialogOkBtn
                 val descText = dialogBinding.infoRulesDialogRulesDesc
                 dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
 
                 heading.text = title
+                okBtn.text = getString(R.string.about_bug_report_dialog_positive_btn)
                 heading.setCompoundDrawablesWithIntrinsicBounds(
                     ContextCompat.getDrawable(this, R.drawable.ic_rethink_plus),
                     null,
@@ -458,18 +459,94 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
                 descText.movementMethod = LinkMovementMethod.getInstance()
                 descText.text = msg
 
-                okBtn.setOnClickListener { dialog.dismiss() }
+                cancelBtn.setOnClickListener { dialog.dismiss() }
+
+                okBtn.setOnClickListener { emailBugReport(msg) }
 
                 dialog.show()
             }
         }
     }
 
+    private fun getFileUri(file: File): Uri? {
+        if (file.isFile && file.exists()) {
+            return FileProvider.getUriForFile(
+                applicationContext,
+                FILE_PROVIDER_NAME,
+                file
+            )
+        }
+        return null
+    }
+
+    private fun emailBugReport(msg: String) {
+        try {
+            // get the rethink.tombstone file
+            val tombstoneFile: File? = EnhancedBugReport.getTombstoneZipFile(this)
+
+            // get the bug_report.zip file
+            val file = File(getZipFileName(filesDir))
+            val uri = getFileUri(file) ?: throw Exception("file uri is null")
+
+            // create an intent for sending email with or without multiple attachments
+            val emailIntent = if (tombstoneFile != null) {
+                Intent(Intent.ACTION_SEND_MULTIPLE)
+            } else {
+                Intent(Intent.ACTION_SEND)
+            }
+            emailIntent.type = "text/plain"
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.about_mail_to)))
+            emailIntent.putExtra(
+                Intent.EXTRA_SUBJECT,
+                getString(R.string.about_mail_bugreport_subject)
+            )
+            val bugReportText = getString(R.string.about_mail_bugreport_text) + "\n\n" + msg
+
+            // attach extra files (either as a list or single file based on availability)
+            if (tombstoneFile != null) {
+                val tombstoneUri =
+                    getFileUri(tombstoneFile) ?: throw Exception("tombstoneUri is null")
+                val bugReportTextList = arrayListOf<CharSequence>(bugReportText)
+                emailIntent.putCharSequenceArrayListExtra(Intent.EXTRA_TEXT, bugReportTextList)
+                val uriList = arrayListOf<Uri>(uri, tombstoneUri)
+                // send multiple attachments
+                emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriList)
+            } else {
+                // ensure EXTRA_TEXT is passed correctly as an ArrayList<CharSequence>
+                val bugReportTextList = arrayListOf<CharSequence>(bugReportText)
+                emailIntent.putCharSequenceArrayListExtra(Intent.EXTRA_TEXT, bugReportTextList)
+                emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
+            }
+            Logger.i(LOG_TAG_UI, "email with attachment: $uri, ${tombstoneFile?.path}")
+            emailIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            emailIntent.flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            startActivity(
+                Intent.createChooser(
+                    emailIntent,
+                    getString(R.string.about_mail_bugreport_share_title)
+                )
+            )
+        } catch (e: Exception) {
+            showToastUiCentered(
+                this,
+                getString(R.string.error_loading_log_file),
+                Toast.LENGTH_SHORT
+            )
+            Logger.e(LOG_TAG_UI, "error sending email: ${e.message}", e)
+        }
+    }
+
     private fun collectDataForTroubleshoot() {
-        val title = "Proxy Stats"
-        val msg =
-            "WARP \n" + warpProps?.toString() + "\n\n" + "Amz \n" + amzProps?.toString() + "\n\n" + "SE \n" + seProps?.toString() + "\n\n" + "Proton \n" + protonProps?.toString() + "\n\n" + "Exit64 \n" + exit64Props?.toString()
-        showTroubleshootDialog(title, msg)
+        io {
+            val title = "Proxy Stats"
+            val rpnStats =
+                "WARP \n" + warpProps?.toString() + "\n\n" + "Amz \n" + amzProps?.toString() + "\n\n" + "SE \n" + seProps?.toString() + "\n\n" + "Proton \n" + protonProps?.toString() + "\n\n" + "Exit64 \n" + exit64Props?.toString() + "\n\n"
+            val stats = rpnStats + VpnController.vpnStats()
+            uiCtx {
+                showTroubleshootDialog(title, stats)
+            }
+        }
+
         // get system info
         // get dns info
         // get protocol info
@@ -492,7 +569,7 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
     }
 
     private suspend fun showConfigCreationError(msg: String) {
-        uiCtx { Utilities.showToastUiCentered(this, msg, Toast.LENGTH_LONG) }
+        uiCtx { showToastUiCentered(this, msg, Toast.LENGTH_LONG) }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
