@@ -21,25 +21,19 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DomainConnectionsAdapter
 import com.celzero.bravedns.databinding.ActivityDomainConnectionsBinding
-import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
-import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.nio.charset.StandardCharsets
 
 class DomainConnectionsActivity : AppCompatActivity(R.layout.activity_domain_connections){
     private val b by viewBinding(ActivityDomainConnectionsBinding::bind)

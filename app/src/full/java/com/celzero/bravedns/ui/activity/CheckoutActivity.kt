@@ -56,9 +56,6 @@ import java.util.UUID
 class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
     private val b by viewBinding(ActivityCheckoutProxyBinding::bind)
     private val persistentState by inject<PersistentState>()
-    // lateinit var paymentSheet: PaymentSheet
-    // lateinit var customerConfig: PaymentSheet.CustomerConfiguration
-    lateinit var paymentIntentClientSecret: String
 
     companion object {
         private const val TOKEN_LENGTH = 32
