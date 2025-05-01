@@ -89,7 +89,7 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
                     uiCtx {
                         Utilities.showToastUiCentered(
                             ctx,
-                            "No active wireguard proxies found",
+                            getString(R.string.wireguard_no_config_msg),
                             Toast.LENGTH_SHORT
                         )
                     }
@@ -102,7 +102,7 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
             }
         }
 
-        b.chooseCountryCard.setOnClickListener {
+        /*b.chooseCountryCard.setOnClickListener {
             io {
                 val ctrys = RpnProxyManager.getProtonUniqueCC()
                 if (ctrys.isEmpty()) {
@@ -121,7 +121,7 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
                     showProxyCountriesBtmSheet(ctrys)
                 }
             }
-        }
+        }*/
     }
 
     private fun init() {

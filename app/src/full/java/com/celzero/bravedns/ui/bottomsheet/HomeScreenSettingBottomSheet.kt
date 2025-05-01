@@ -165,7 +165,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
             b.bsHsFirewallRl.alpha = 0.5f
             setRadioButtonsEnabled(false)
         } else if (isProxyEnabled) {
-            b.bsHomeScreenVpnLockdownDesc.text = getString(R.string.settings_lock_down_proxy_desc)
+            b.bsHomeScreenVpnLockdownDesc.text = getString(R.string.mode_change_error_proxy_enabled)
             b.bsHomeScreenVpnLockdownDesc.visibility = View.VISIBLE
             b.bsHsDnsRl.alpha = 0.5f
             b.bsHsFirewallRl.alpha = 0.5f

@@ -239,7 +239,7 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmS
                     uiCtx {
                         Utilities.showToastUiCentered(
                             ctx,
-                            "No active wireguard proxies found",
+                            getString(R.string.wireguard_no_config_msg),
                             Toast.LENGTH_SHORT
                         )
                     }

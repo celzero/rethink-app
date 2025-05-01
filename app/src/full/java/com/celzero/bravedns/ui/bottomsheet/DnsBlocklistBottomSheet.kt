@@ -134,7 +134,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         b.dnsBlockConnectionFlag.text = log!!.flag
         b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, log!!.latency.toString())
         b.dnsMessage.text = log!!.msg
-        b.dnsTtl.text = "${log!!.ttl} secs"
+        b.dnsTtl.text = getString(R.string.two_argument_space, log!!.ttl.toString(), getString(R.string.lbl_sec))
 
         displayFavIcon()
         displayDnsTransactionDetails()

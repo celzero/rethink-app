@@ -13,6 +13,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomIp
@@ -92,7 +93,7 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
     }
 
     private fun init() {
-        b.title.text = "Select Wireguard Endpoint"
+        b.title.text = getString(R.string.select_wireguard_proxy)
         when (type) {
             InputType.DOMAIN -> {
                 b.ipDomainInfo.visibility = View.VISIBLE
@@ -141,12 +142,12 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
                 DomainRulesManager.setProxyId(cd, id)
                 cd.proxyId = id
             }
-            val name = conf?.name ?: "None"
+            val name = conf?.name ?: getString(R.string.settings_app_list_default_app)
             Logger.v(LOG_TAG_UI, "$TAG: wg-endpoint set to $name for ${cd.domain}")
             uiCtx {
                 Utilities.showToastUiCentered(
                     requireContext(),
-                    "Wireguard endpoint set to $name",
+                    getString(R.string.config_add_success_toast),
                     Toast.LENGTH_SHORT
                 )
             }
@@ -167,12 +168,12 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
                 IpRulesManager.updateProxyId(ci, id)
                 ci.proxyId = id
             }
-            val name = conf?.name ?: "None"
+            val name = conf?.name ?: getString(R.string.settings_app_list_default_app)
             Logger.v(LOG_TAG_UI, "$TAG: wg-endpoint set to $name for ${ci.ipAddress}")
             uiCtx {
                 Utilities.showToastUiCentered(
                     requireContext(),
-                    "Wireguard endpoint set to $name",
+                    getString(R.string.config_add_success_toast),
                     Toast.LENGTH_SHORT
                 )
             }
@@ -201,8 +202,8 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
 
             fun bind(conf: WgConfigFilesImmutable?) {
                 if (conf == null) {
-                    bb.proxyNameCc.text = "None"
-                    bb.proxyDescCc.text = "None"
+                    bb.proxyNameCc.text = getString(R.string.settings_app_list_default_app)
+                    bb.proxyDescCc.text = getString(R.string.settings_app_list_default_app)
                     when (type) {
                         InputType.DOMAIN -> {
                             bb.proxyRadioCc.isChecked = cd?.proxyId?.isEmpty() == true
@@ -218,7 +219,7 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
                     }
                 } else {
                     bb.proxyNameCc.text = conf.name
-                    bb.proxyDescCc.text = if (conf.isActive) "Active" else "Inactive"
+                    bb.proxyDescCc.text = if (conf.isActive) getString(R.string.lbl_active) else getString(R.string.lbl_inactive)
 
                     val id = ID_WG_BASE + conf.id
                     when (type) {

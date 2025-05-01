@@ -323,7 +323,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
                 // TODO: prompt user for app update
                 Utilities.showToastUiCentered(
                     requireContext(),
-                    "Download latest version to update the blocklists",
+                    getString(R.string.blocklist_not_available_toast),
                     Toast.LENGTH_SHORT
                 )
             }

@@ -263,7 +263,7 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmSheet
                     uiCtx {
                         Utilities.showToastUiCentered(
                             ctx,
-                            "No ProtonVPN country codes found",
+                            getString(R.string.wireguard_no_config_msg),
                             Toast.LENGTH_SHORT
                         )
                     }
