@@ -57,7 +57,6 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
-import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openUrl
@@ -81,6 +80,7 @@ import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
+import androidx.core.net.toUri
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
@@ -88,6 +88,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private val persistentState by inject<PersistentState>()
     private var lastAppExitInfoDialogInvokeTime = INIT_TIME_MS
     private val workScheduler by inject<WorkScheduler>()
+
+    companion object {
+        private const val SCHEME_PACKAGE = "package"
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -267,10 +271,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 openUrl(requireContext(), getString(R.string.about_privacy_policy_link))
             }
             b.aboutTermsOfService -> {
-                openUrl(requireContext(), "https://rethinkdns.com/terms")
+                openUrl(requireContext(), getString(R.string.about_terms_link))
             }
             b.aboutLicense -> {
-                openUrl(requireContext(), "https://github.com/celzero/rethink-app/blob/main/LICENSE")
+                openUrl(requireContext(), getString(R.string.about_license_link))
             }
             b.aboutReddit -> {
                 openUrl(requireContext(), getString(R.string.about_reddit_handle))
@@ -311,7 +315,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 val descText = dialogBinding.infoRulesDialogRulesDesc
                 dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
 
-                heading.text = "Network Stats"
+                heading.text = getString(R.string.stats_title)
                 heading.setCompoundDrawablesWithIntrinsicBounds(
                     ContextCompat.getDrawable(requireContext(), R.drawable.ic_log_level),
                     null,
@@ -351,7 +355,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             } else {
                 intent.action = ACTION_APPLICATION_DETAILS_SETTINGS
                 intent.addCategory(Intent.CATEGORY_DEFAULT)
-                intent.data = Uri.parse("package:$packageName")
+                intent.data = "$SCHEME_PACKAGE:$packageName".toUri()
             }
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {

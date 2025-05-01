@@ -177,7 +177,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         }
 
         if (persistentState.enableDnsAlg) {
-            persistentState.splitDns = persistentState.splitDns
+            persistentState.splitDns = persistentState.splitDns // no-op, added for readability
         } else {
             persistentState.splitDns = false
         }

@@ -214,8 +214,8 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
     private fun showErrorDialog() {
         // Show error dialog
         val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Invalid WireGuard")
-            .setMessage("Invalid WireGuard configuration. Please go back and try again.")
+            .setTitle(getString(R.string.invalid_wireguard_dialog_title))
+            .setMessage(getString(R.string.invalid_wireguard_dialog_desc))
             .setPositiveButton(R.string.dns_info_positive) { _, _ ->
                 requireActivity().onBackPressedDispatcher
             }

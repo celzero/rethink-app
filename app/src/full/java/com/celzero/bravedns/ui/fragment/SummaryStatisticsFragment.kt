@@ -27,7 +27,6 @@ import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.DataUsageSummary
 import com.celzero.bravedns.databinding.FragmentSummaryStatisticsBinding
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.DetailedStatisticsActivity
 import com.celzero.bravedns.util.CustomLinearLayoutManager

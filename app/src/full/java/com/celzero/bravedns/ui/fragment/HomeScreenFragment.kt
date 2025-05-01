@@ -1559,7 +1559,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // Sets the UI DNS status on/off.
     private fun syncDnsStatus() {
         val status = VpnController.state()
-        val isEch = status.serverName?.contains(DnsLogTracker.ECH, true) ?: false
+        val isEch = status.serverName?.contains(DnsLogTracker.ECH, true) == true
 
         // Change status and explanation text
         var statusId: Int
@@ -1689,7 +1689,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         } else {
             if (isEch) {
                 val stat = getString(statusId)
-                val s  = stat.replaceFirst(getString(R.string.status_protected), "ultra secure", true)
+                val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.lbl_ultra_secure), true)
                 Logger.d(LOG_TAG_UI, "Ech status : $stat")
                 b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.color.accentGood))
                 b.fhsProtectionLevelTxt.text = s
