@@ -192,7 +192,8 @@ class AppWiseIpLogsActivity :
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
-        recyclerAdapter.addLoadStateListener {
+        // commenting for now, see if we can remove this later
+        /*recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
                     showNoRulesUi()
@@ -205,7 +206,7 @@ class AppWiseIpLogsActivity :
                 hideNoRulesUi()
                 showRulesUi()
             }
-        }
+        }*/
     }
 
     private fun setRethinkAdapter() {
@@ -219,7 +220,8 @@ class AppWiseIpLogsActivity :
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
-        recyclerAdapter.addLoadStateListener {
+        // commenting for now, see if we can remove this later
+        /*recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
                     showNoRulesUi()
@@ -232,7 +234,7 @@ class AppWiseIpLogsActivity :
                 hideNoRulesUi()
                 showRulesUi()
             }
-        }
+        }*/
     }
 
     private fun updateAppNameInSearchHint(appName: String) {
@@ -248,7 +250,8 @@ class AppWiseIpLogsActivity :
         return
     }
 
-    private fun showNoRulesUi() {
+    // commenting for now, see if we can remove this later
+    /*private fun showNoRulesUi() {
         b.awlNoRulesRl.visibility = View.VISIBLE
     }
 
@@ -264,7 +267,7 @@ class AppWiseIpLogsActivity :
     private fun showRulesUi() {
         b.awlCardViewTop.visibility = View.VISIBLE
         b.awlRecyclerConnection.visibility = View.VISIBLE
-    }
+    }*/
 
     override fun onQueryTextSubmit(query: String): Boolean {
         networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.IP)

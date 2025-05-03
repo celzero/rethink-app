@@ -210,7 +210,8 @@ class AppWiseDomainLogsActivity :
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
-        recyclerAdapter.addLoadStateListener {
+        // commenting for now, see if we can remove this later
+        /*recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
                     showNoRulesUi()
@@ -223,7 +224,7 @@ class AppWiseDomainLogsActivity :
                 hideNoRulesUi()
                 showRulesUi()
             }
-        }
+        }*/
     }
 
     private fun setRethinkAdapter() {
@@ -237,7 +238,8 @@ class AppWiseDomainLogsActivity :
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
-        recyclerAdapter.addLoadStateListener {
+        // commenting for now, see if we can remove this later
+        /*recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
                     showNoRulesUi()
@@ -250,10 +252,11 @@ class AppWiseDomainLogsActivity :
                 hideNoRulesUi()
                 showRulesUi()
             }
-        }
+        }*/
     }
 
-    private fun showNoRulesUi() {
+    // commenting for now, see if we can remove this later
+    /*private fun showNoRulesUi() {
         b.awlNoRulesRl.visibility = View.VISIBLE
         networkLogsViewModel.rinrDomainLogs.removeObservers(this)
     }
@@ -270,7 +273,7 @@ class AppWiseDomainLogsActivity :
     private fun showRulesUi() {
         b.awlCardViewTop.visibility = View.VISIBLE
         b.awlRecyclerConnection.visibility = View.VISIBLE
-    }
+    }*/
 
     override fun onQueryTextSubmit(query: String): Boolean {
         networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.DOMAIN)
