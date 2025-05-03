@@ -228,7 +228,7 @@ object UIUtils {
     fun sendEmailIntent(context: Context) {
         val intent =
             Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse(context.getString(R.string.about_mail_to_string))
+                data = context.getString(R.string.about_mail_to_string).toUri()
                 putExtra(Intent.EXTRA_EMAIL, arrayOf(context.getString(R.string.about_mail_to)))
                 putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.about_mail_subject))
             }
@@ -244,6 +244,7 @@ object UIUtils {
         try {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.data = Uri.fromParts("package", packageName, null)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(intent)
         } catch (e: Exception) { // ActivityNotFoundException | NullPointerException
             Logger.w(Logger.LOG_TAG_FIREWALL, "Failure calling app info: ${e.message}", e)
