@@ -32,10 +32,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -49,7 +46,6 @@ import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -113,6 +109,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             persistentState.protocolTranslationType = false
             b.settingsActivityPtransSwitch.isChecked = false
         }
+
+        b.settingsActivityMobileMeteredSwitch.isChecked = persistentState.treatOnlyMobileNetworkAsMetered
 
         displayInternetProtocolUi()
         displayRethinkInRethinkUi()
@@ -257,6 +255,15 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityPingIpsBtn.setOnClickListener {
             showPingIpsDialog()
         }
+
+        b.settingsActivityMobileMeteredSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.treatOnlyMobileNetworkAsMetered = isChecked
+        }
+
+        b.settingsActivityMobileMeteredRl.setOnClickListener {
+            b.settingsActivityMobileMeteredSwitch.isChecked =
+                !b.settingsActivityMobileMeteredSwitch.isChecked
+        }
     }
 
     private fun showDefaultDnsDialog() {
@@ -332,13 +339,13 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         if (protocols.contains("IPv4")) {
             proto4.setImageResource(R.drawable.ic_tick)
         } else {
-            proto4.setImageResource(R.drawable.ic_cross)
+            proto4.setImageResource(R.drawable.ic_cross_accent)
         }
 
         if (protocols.contains("IPv6")) {
             proto6.setImageResource(R.drawable.ic_tick)
         } else {
-            proto6.setImageResource(R.drawable.ic_cross)
+            proto6.setImageResource(R.drawable.ic_cross_accent)
         }
 
         ip41.setText(items4.getOrNull(0) ?: "")
@@ -479,7 +486,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     }
 
     private fun getImgRes(probeResult: ConnectionMonitor.ProbeResult?): Drawable? {
-        val failureDrawable = ContextCompat.getDrawable(this, R.drawable.ic_cross)
+        val failureDrawable = ContextCompat.getDrawable(this, R.drawable.ic_cross_accent)
 
         if (probeResult == null) return failureDrawable
 

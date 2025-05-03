@@ -346,6 +346,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     var dialTimeoutSec by intPref("dial_timeout_sec").withDefault<Int>(0)
 
+    // treat only mobile data as metered
+    var treatOnlyMobileNetworkAsMetered by booleanPref("treat_only_mobile_nw_as_metered").withDefault<Boolean>(false)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()

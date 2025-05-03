@@ -871,17 +871,27 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // assume active network until underlying networks are set by ConnectionMonitor
         // do not use persistentState.useMultipleNetworks
         val useActive = curnet == null || curnet.useActive
+        val treatMobileAsMetered = persistentState.treatOnlyMobileNetworkAsMetered
         if (!useActive || VpnController.isVpnLockdown()) {
-            return isIfaceMetered(dst)
+            return if (treatMobileAsMetered) {
+                // TODO: should this check be a combination of cellular & metered?
+                isIfaceCellular(dst)
+            } else {
+                isIfaceMetered(dst)
+            }
         }
-        return isActiveIfaceMetered()
+        return if (treatMobileAsMetered) {
+            isActiveIfaceCellular()
+        } else {
+            isActiveIfaceMetered()
+        }
     }
 
     private fun isIfaceCellular(dst: String): Boolean {
         val dest = IPAddressString(dst)
         if (dest.isEmpty) {
             Logger.e(LOG_TAG_VPN, "invalid destination IP: $dst")
-            return isActiveNwCellular()
+            return isActiveIfaceCellular()
         }
 
         val curnet = underlyingNetworks
@@ -889,20 +899,20 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             if (dest.isZero || dest.isIPv6) { // wildcard addrs(::80, ::443, etc.) are bound to ipv6
                 // if there are no network to be bound, fallback to active network
                 if (curnet?.ipv6Net?.isEmpty() == true) {
-                    return isActiveNwCellular()
+                    return isActiveIfaceCellular()
                 }
                 curnet?.ipv6Net?.firstOrNull()?.capabilities
             } else {
                 // if there are no network to be bound, fallback to active network
                 if (curnet?.ipv4Net?.isEmpty() == true) {
-                    return isActiveNwCellular()
+                    return isActiveIfaceCellular()
                 }
                 curnet?.ipv4Net?.firstOrNull()?.capabilities
             }
         // if there are no network to be bound given a destination IP, fallback to active network
         if (cap == null) {
             Logger.e(LOG_TAG_VPN, "no network to be bound for $dst, use active network")
-            return isActiveNwCellular()
+            return isActiveIfaceCellular()
         }
         return cap.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
     }
@@ -950,7 +960,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return curnet.isActiveNetworkMetered
     }
 
-    private fun isActiveNwCellular(): Boolean {
+    private fun isActiveIfaceCellular(): Boolean {
         val curnet = underlyingNetworks ?: return false // assume unmetered
         val now = elapsedRealtime()
         val ts = curnet.lastUpdated
@@ -2503,7 +2513,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // Workaround for WireGuard connection issues after network change
             // WireGuard may fail to connect to the server when the network changes.
             Logger.i(LOG_TAG_VPN, "$TAG routes/bound-nws changed, refresh wg")
-            refreshProxies()
+            refreshProxies() // takes care of adding the proxies if missing in tunnel
         }
 
         // no need to close the existing connections if the bound networks are changed
@@ -3543,7 +3553,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             }
             // take only the active nw into account as we do not know the dns server ip
             // which the domain is going to be resolved
-            val activeNwMetered = isActiveNwCellular()
+            val activeNwMetered = isActiveIfaceCellular()
             // only when there is an uid, we need to calculate wireguard ids
             val ids = WireguardManager.getAllPossibleConfigIdsForApp(uid, ip="", port = 0, domain, activeNwMetered)
             return if (ids.isNotEmpty()) {
@@ -3681,7 +3691,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         } else {
             // take only the active nw into account as we do not know the dns server ip
             // which the domain is going to be resolved
-            val activeNwMetered = isActiveNwCellular()
+            val activeNwMetered = isActiveIfaceCellular()
             // if the enabled wireguard is catchall-wireguard, then return wireguard id
             val ids = WireguardManager.getAllPossibleConfigIdsForApp(
                 uid,
