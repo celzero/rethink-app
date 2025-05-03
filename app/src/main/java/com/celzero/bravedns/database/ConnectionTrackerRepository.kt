@@ -36,7 +36,6 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
 
     suspend fun updateBatch(summary: List<ConnectionSummary>) {
         summary.forEach {
-            // update the flag and target ip if in debug mode
             if (!it.targetIp.isNullOrEmpty()) {
                 val flag = it.flag ?: ""
                 connectionTrackerDAO.updateSummary(

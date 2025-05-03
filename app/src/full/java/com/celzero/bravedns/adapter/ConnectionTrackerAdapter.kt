@@ -367,7 +367,8 @@ class ConnectionTrackerAdapter(private val context: Context) :
             if (ruleName == null) return false
             val rule = FirewallRuleset.getFirewallRule(ruleName) ?: return false
             val proxy = ProxyManager.isIpnProxy(proxyDetails)
-            return FirewallRuleset.isProxied(rule) || proxy
+            val res = FirewallRuleset.isProxied(rule) && proxyDetails.isNotEmpty() && proxy
+            return FirewallRuleset.isProxied(rule) && proxyDetails.isNotEmpty() && proxy
         }
 
         private fun isConnectionHeavier(ct: ConnectionTracker): Boolean {

@@ -34,8 +34,8 @@ import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
 import com.celzero.bravedns.data.ConnectionRules
@@ -48,6 +48,7 @@ import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.FirewallRuleset.Companion.getFirewallRule
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager.isIpnProxy
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.util.Constants
@@ -58,6 +59,7 @@ import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -106,6 +108,15 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        dialog?.window?.let { window ->
+            if (isAtleastQ()) {
+                val controller = WindowInsetsControllerCompat(window, window.decorView)
+                controller.isAppearanceLightNavigationBars = false
+                window.isNavigationBarContrastEnforced = false
+            }
+        }
+
         val data = arguments?.getString(INSTANCE_STATE_IPDETAILS)
         info = Gson().fromJson(data, ConnectionTracker::class.java)
         initView()
@@ -155,7 +166,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             return
         }
         // updates the ip rules button
-        updateIpRulesUi(info!!.uid, info!!.ipAddress, info!!.port)
+        updateIpRulesUi(info!!.uid, info!!.ipAddress)
         // updates the value from dns request cache if available
         updateDnsIfAvailable()
     }
@@ -227,17 +238,24 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         }
 
         val rule = info!!.blockedByRule
-        val skipProxyList = listOf(Backend.Base, Backend.Exit, Backend.Block)
+        val isIpnProxy = isIpnProxy(info?.proxyDetails ?: "")
         // TODO: below code is not required, remove it in future (20/03/2023)
         if (rule.contains(FirewallRuleset.RULE2G.id)) {
             b.bsConnTrackAppInfo.text =
                 getFirewallRule(FirewallRuleset.RULE2G.id)?.title?.let { getString(it) }
             return
-        } else if (!info?.proxyDetails.isNullOrEmpty() && !skipProxyList.contains(info?.proxyDetails)) {
+        } else if (!info?.proxyDetails.isNullOrEmpty() && isIpnProxy) {
             // add the proxy id to the chip text if available
             b.bsConnTrackAppInfo.text = getString(R.string.two_argument_colon, getFirewallRule(rule)?.title?.let { getString(it) }, info?.proxyDetails)
         } else {
-            b.bsConnTrackAppInfo.text = getFirewallRule(rule)?.title?.let { getString(it) }
+            val isRuleAddedAsProxy = getFirewallRule(rule)?.id == FirewallRuleset.RULE12.id
+            // when the conn is marked as proxied with id from flow, but the returned summary
+            // doesn't have the proxy details. change the rule from proxied to none
+            if (isRuleAddedAsProxy && (info?.proxyDetails.isNullOrEmpty() || !isIpnProxy)) {
+                b.bsConnTrackAppInfo.text = getString(getFirewallRule(FirewallRuleset.RULE0.id)?.title ?: R.string.firewall_rule_no_rule)
+            } else {
+                b.bsConnTrackAppInfo.text = getFirewallRule(rule)?.title?.let { getString(it) }
+            }
         }
     }
 
@@ -285,14 +303,12 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         if (Logger.LoggerType.fromId(persistentState.goLoggerLevel.toInt())
                 .isLessThan(Logger.LoggerType.DEBUG)
         ) {
-            b.connectionMessage.text =
-                requireContext().getString(R.string.two_argument_colon, info?.connId, info?.message)
+            b.connectionMessage.text = "${info?.connId}; ${info?.message}; ${info?.proxyDetails}; ${info?.rpid}; ${info?.synack}"
         } else {
             b.connectionMessage.text = info?.message
         }
 
         if (VpnController.hasCid(info!!.connId, info!!.uid)) {
-            b.connectionMessageLl.visibility = View.VISIBLE
             b.bsConnConnDuration.text =
                 getString(
                     R.string.two_argument_space,
@@ -331,7 +347,6 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                 info?.downloadBytes == 0L &&
                 info?.uploadBytes == 0L
         ) {
-            b.connectionMessageLl.visibility = View.GONE
             b.bsConnSummaryDetailLl.visibility = View.GONE
             b.bsConnConnTypeSecondary.visibility = View.VISIBLE
             b.bsConnConnTypeSecondary.text = b.bsConnConnType.text
@@ -598,7 +613,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         }
     }
 
-    private fun updateIpRulesUi(uid: Int, ipAddress: String, port: Int) {
+    private fun updateIpRulesUi(uid: Int, ipAddress: String) {
         io {
             val rule = IpRulesManager.getMostSpecificRuleMatch(uid, ipAddress)
             uiCtx { b.bsConnIpRuleSpinner.setSelection(rule.id) }
