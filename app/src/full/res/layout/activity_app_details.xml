@@ -97,9 +97,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="10dp"
                     android:minWidth="24dp"
                     android:minHeight="24dp"
                     android:src="@drawable/ic_info_white" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/aad_close_conn_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginTop="10dp"
+                    android:minWidth="24dp"
+                    android:minHeight="24dp"
+                    android:src="@drawable/ic_cross" />
 
 
             </androidx.appcompat.widget.LinearLayoutCompat>

@@ -404,6 +404,15 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         b.excludeProxyRl.setOnClickListener {
             b.excludeProxySwitch.isChecked = !b.excludeProxySwitch.isChecked
         }
+
+        b.aadCloseConnIcon.setOnClickListener {
+            VpnController.closeConnectionsIfNeeded(uid)
+            showToastUiCentered(
+                this,
+                getString(R.string.config_add_success_toast),
+                Toast.LENGTH_LONG
+            )
+        }
     }
 
     private fun updateExcludeProxyStatus(isExcluded: Boolean) {
