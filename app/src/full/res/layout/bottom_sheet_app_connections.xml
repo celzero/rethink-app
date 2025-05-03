@@ -147,7 +147,7 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Proxy"
+                    android:text="@string/cd_custom_dns_proxy_name_default"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
@@ -156,7 +156,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
-                    android:text="Select a proxy"
+                    android:text="@string/select_wg_proxy_desc"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>

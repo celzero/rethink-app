@@ -243,7 +243,7 @@
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Timeout"
+                            android:text="@string/adv_set_dial_timeout_title"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
@@ -251,7 +251,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
-                            android:text="Dial timeout in seconds"
+                            android:layout_marginEnd="10dp"
+                            android:text="@string/adv_set_dial_timeout_desc"
                             android:textSize="@dimen/default_font_text_view" />
 
                         <androidx.appcompat.widget.AppCompatSeekBar
@@ -359,7 +360,7 @@
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Experimental"
+                            android:text="@string/adv_set_experimental_title"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
@@ -367,7 +368,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
-                            android:text="Experimental features in network engine"
+                            android:text="@string/adv_set_experimental_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
@@ -557,14 +558,14 @@
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Slowdown"
+                            android:text="@string/adv_set_slowdown_title"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
-                            android:text="Single or multi threaded mode"
+                            android:text="@string/adv_set_slowdown_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
@@ -612,7 +613,7 @@
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Clear Residue"
+                            android:text="@string/clear_residue_dialog_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
@@ -620,7 +621,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
-                            android:text="Clear all the residue data"
+                            android:text="@string/clear_residue_setting_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
