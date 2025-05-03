@@ -76,6 +76,8 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
         private const val ANIMATION_END_DEGREE = 360.0f
 
         private const val TAG = "RPNDashboardActivity"
+
+        private const val DELAY = 1500L
     }
 
     private var warpProps: RpnProxyManager.RpnProps? = null
@@ -170,7 +172,7 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
     }
 
     private suspend fun keepUpdatingProxiesUi() {
-        // keep updating the UI every 5 seconds
+        // keep updating the UI every 1.5 seconds
         while (true) {
             for (i in 0 until options.size) {
                 val iv = b.proxyContainer.getChildAt(i).findViewById<AppCompatImageView>(R.id.icon)
@@ -182,7 +184,7 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
                 Logger.vv(LOG_TAG_UI, "$TAG updating proxies UI for ${options[i]}")
             }
             Logger.v(LOG_TAG_UI, "$TAG updating proxies UI every 5 seconds")
-            delay(5000)
+            delay(DELAY)
         }
     }
 
