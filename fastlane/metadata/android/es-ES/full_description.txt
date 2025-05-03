@@ -1,0 +1,31 @@
+Viva un Android más seguro, transparente y protegido.
+
+VPN: Conectese a múltiples VPN WireGuard de su elección.
+
+Seguro: Revela la actividad de red de las aplicaciones instaladas y le permite desactivarlas, desinstalarlas o aplicarles un cortafuegos.
+
+Seguro: Primera línea de defensa contra spyware, ransomware y malware que roba información personal y se apodera de cuentas. Protege de la manipulación de DNS que se suele emplear para censurar sitios web, redes sociales y aplicaciones de mensajería.
+
+Rápido: Servidores DNS desplegados en más de 300 ubicaciones en todo el mundo para garantizar que Internet sea lo más rápido y disponible posible.
+
+Abierto: Código abierto y libre de rastreadores.
+
+***Características***
+
+Cortafuegos: Evita que las aplicaciones se conecten a Internet. Bloquea spyware, malware, ransomware y más...
+
+Un cortafuegos bloquea cualquier aplicación que se conecte a Internet a través de WiFi o datos móviles. Dado que la mayoría de las formas de vigilancia requieren que los datos se envíen por la red a un servidor, el cortafuegos mitiga eficazmente la amenaza (los gestores de archivos, el reloj despertador y la calculadora son algunos ejemplos de aplicaciones que no requieren acceso a Internet para funcionar). La función de cortafuegos utiliza el Servicio de Accesibilidad para detectar y filtrar las aplicaciones en segundo plano.
+
+Supervisión: Controla el tráfico entrante y saliente de Internet. 
+
+Si se activa, se recopilan y analizan los registros de conectividad. Los informes automatizados señalan conexiones desconocidas o sospechosas, y revelan el alcance de los intentos de robo de datos por parte de las redes de spyware. En nuestras pruebas, alrededor del 60% del tráfico se marca y se notifica como iniciado por programas espía conocidos. Los registros generados se ponen a disposición del usuario en tiempo casi real para su propio análisisysis.
+
+WireGuard: Protege el tráfico saliente de Internet.
+
+La aplicación utiliza el protocolo rápido, moderno, ligero y seguro WireGuard para cifrar las conexiones salientes a cualquier proveedor VPN compatible de su elección.
+
+Anti-censura: 
+
+La aplicación cifra su conexión de Internet al Sistema de Nombres de Dominio (DNS) del servidor gestionado por Rethink con presencia en nuestras más de 300 ubicaciones en todo el mundo. Los servidores DNS son la libreta de direcciones de Internet: Un servidor DNS proporciona las direcciones exactas que necesitas para visitar un sitio web o abrir una aplicación.
+
+Monitor de datos: Rastrea el uso de datos por aplicación y por conexión móvil o WiFi.
