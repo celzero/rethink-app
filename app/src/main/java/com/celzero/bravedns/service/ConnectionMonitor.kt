@@ -51,9 +51,6 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.system.measureNanoTime
-import kotlin.time.Duration
-import kotlin.time.TimeSource
 
 class ConnectionMonitor(private val networkListener: NetworkListener) :
     ConnectivityManager.NetworkCallback(), KoinComponent {
