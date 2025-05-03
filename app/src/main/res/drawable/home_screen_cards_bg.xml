@@ -4,8 +4,8 @@
 
     <gradient
         android:angle="90"
-        android:endColor="?attr/colorPrimary"
-        android:startColor="?attr/colorPrimaryDark"
+        android:endColor="?attr/homeScreenBtnGradientEnd"
+        android:startColor="?attr/homeScreenBtnGradientStart"
         android:type="linear" />
 
     <corners android:radius="16dp" />

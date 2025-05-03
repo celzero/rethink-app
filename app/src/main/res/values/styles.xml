@@ -82,6 +82,9 @@
         <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBg</item>
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxt</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBg</item>
+
+        <item name="homeScreenBtnGradientEnd">@color/colorPrimary</item>
+        <item name="homeScreenBtnGradientStart">@color/colorPrimaryDark</item>
     </style>
 
     <style name="AppThemeWhite" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
@@ -151,6 +154,9 @@
         <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgLight</item>
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtLight</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgLight</item>
+
+        <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDarkLight</item>
+        <item name="homeScreenBtnGradientStart">@color/colorPrimaryLight</item>
     </style>
 
     <style name="AppThemeTrueBlack" parent="Theme.MaterialComponents.NoActionBar.Bridge">
@@ -221,6 +227,9 @@
         <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgBlack</item>
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtBlack</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlack</item>
+
+        <item name="homeScreenBtnGradientEnd">@color/colorPrimaryBlack</item>
+        <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkBlack</item>
     </style>
 
     <style name="AppThemeWhitePlus" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
@@ -290,6 +299,9 @@
         <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgLightPlus</item>
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtLightPlus</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgLightPlus</item>
+
+        <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDarkLightPlus</item>
+        <item name="homeScreenBtnGradientStart">@color/colorPrimaryLightPlus</item>
     </style>
 
     <style name="AppThemeTrueBlackPlus" parent="Theme.MaterialComponents.NoActionBar.Bridge">
@@ -360,6 +372,9 @@
         <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgBlackPlus</item>
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtBlackPlus</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlackPlus</item>
+
+        <item name="homeScreenBtnGradientEnd">@color/colorPrimaryBlackPlus</item>
+        <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkBlackPlus</item>
     </style>
 
     <style name="CustomWidget.MaterialComponents.CompoundButton.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
