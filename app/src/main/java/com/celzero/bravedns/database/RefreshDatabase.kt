@@ -175,7 +175,10 @@ internal constructor(
                     installedApps.add(FirewallManager.AppInfoTuple(appInfo.uid, it.packageName))
                 }
             }
-
+            Logger.i(
+                LOG_TAG_APP_DB,
+                "installed apps: ${installedApps.size}, tracked apps: ${trackedApps.size}"
+            )
             val packagesToAdd =
                 findPackagesToAdd(trackedApps, installedApps, action == ACTION_REFRESH_RESTORE)
             val packagesToDelete =
@@ -194,7 +197,7 @@ internal constructor(
             deletePackages(packagesToDelete)
             addMissingPackages(packagesToAdd)
             updateExistingPackagesIfNeeded(packagesToUpdate) // updated only for restore
-            removeWireGuardProfilesIfNeeded(action == ACTION_REFRESH_RESTORE)
+            restoreWireGuardProfilesIfNeeded(action == ACTION_REFRESH_RESTORE)
             refreshNonApps(trackedApps, installedApps)
             // packages to add and delete are calculated based on proxy mapping
             refreshProxyMapping(trackedApps, packagesToAdd, packagesToUpdate, packagesToDelete)
@@ -376,8 +379,7 @@ internal constructor(
         return null
     }
 
-    private suspend fun removeWireGuardProfilesIfNeeded(rmv: Boolean) {
-        // may already have been purged by RestoreAgent.startRestore() -> wireguardCleanup()
+    private suspend fun restoreWireGuardProfilesIfNeeded(rmv: Boolean) {
         if (rmv) {
             WireguardManager.restoreProcessRetrieveWireGuardConfigs()
         } else {
