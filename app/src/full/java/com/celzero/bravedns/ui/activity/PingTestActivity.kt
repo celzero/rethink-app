@@ -178,7 +178,7 @@ class PingTestActivity: AppCompatActivity(R.layout.activity_ping_test) {
     }
 
     private fun getImgRes(probeResult: Boolean): Drawable? {
-        val failureDrawable = ContextCompat.getDrawable(this, R.drawable.ic_cross)
+        val failureDrawable = ContextCompat.getDrawable(this, R.drawable.ic_cross_accent)
         val successDrawable = ContextCompat.getDrawable(this, R.drawable.ic_tick)
 
         return if (probeResult) {
