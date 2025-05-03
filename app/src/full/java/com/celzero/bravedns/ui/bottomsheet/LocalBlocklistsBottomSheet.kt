@@ -29,6 +29,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -51,6 +52,7 @@ import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.convertLongToTime
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -107,6 +109,13 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.let { window ->
+            if (isAtleastQ()) {
+                val controller = WindowInsetsControllerCompat(window, window.decorView)
+                controller.isAppearanceLightNavigationBars = false
+                window.isNavigationBarContrastEnforced = false
+            }
+        }
         updateLocalBlocklistUi()
         init()
         initializeObservers()
@@ -366,7 +375,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         b.lbbsEnable.text = getString(R.string.lbl_disabled)
         b.lbbsEnable.setTextColor(fetchToggleBtnColors(requireContext(), R.color.accentBad))
         b.lbbsHeading.text = getString(R.string.lbbs_heading)
-        setDrawable(R.drawable.ic_cross, b.lbbsEnable)
+        setDrawable(R.drawable.ic_cross_accent, b.lbbsEnable)
 
         b.lbbsConfigure.isEnabled = false
         b.lbbsCopy.isEnabled = false

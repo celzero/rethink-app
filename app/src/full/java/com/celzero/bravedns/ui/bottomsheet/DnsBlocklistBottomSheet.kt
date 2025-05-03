@@ -32,6 +32,7 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -58,6 +59,7 @@ import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
@@ -118,6 +120,13 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.let { window ->
+            if (isAtleastQ()) {
+                val controller = WindowInsetsControllerCompat(window, window.decorView)
+                controller.isAppearanceLightNavigationBars = false
+                window.isNavigationBarContrastEnforced = false
+            }
+        }
 
         val data = arguments?.getString(INSTANCE_STATE_DNSLOGS)
         log = Gson().fromJson(data, DnsLog::class.java)
@@ -133,7 +142,15 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         b.dnsBlockIpAddress.text = getResponseIp()
         b.dnsBlockConnectionFlag.text = log!!.flag
         b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, log!!.latency.toString())
-        b.dnsMessage.text = log!!.msg
+        if (Logger.LoggerType.fromId(persistentState.goLoggerLevel.toInt())
+                .isLessThan(Logger.LoggerType.DEBUG)
+        ) {
+            b.dnsMessage.text =
+                "${log?.msg}; ${log?.proxyId}; ${log?.relayIP}; ${log?.typeName}; ${log?.id}"
+        } else {
+            b.dnsMessage.text = log!!.msg
+        }
+
         b.dnsTtl.text = getString(R.string.two_argument_space, log!!.ttl.toString(), getString(R.string.lbl_sec))
 
         displayFavIcon()
