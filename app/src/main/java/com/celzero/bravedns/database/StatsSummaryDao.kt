@@ -595,6 +595,7 @@ interface StatsSummaryDao {
                             WHERE dnsQuery != ''  
                                 AND timeStamp > :to
                                 AND uid = :uid
+                                AND dnsQuery LIKE :input
                             GROUP BY dnsQuery
                                
                             UNION ALL 
@@ -608,10 +609,54 @@ interface StatsSummaryDao {
                                 AND time > :to 
                               AND status = 'COMPLETE' 
                               AND queryStr != '' 
+                              AND queryStr LIKE :input
                             GROUP BY queryStr
                           ) AS combined 
                         GROUP BY appOrDnsName 
                         ORDER BY count DESC
         """)
-        fun getAllDomainsByUid(uid: Int, to: Long): PagingSource<Int, AppConnection>
+        fun getAllDomainsByUid(uid: Int, to: Long, input: String): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+                SELECT :uid AS uid, 
+                              '' AS ipAddress, 
+                              0 AS port, 
+                              SUM(count) AS count, 
+                              flag AS flag, 
+                              0 AS blocked, 
+                              appOrDnsName, 
+                              0 AS uploadBytes, 
+                              0 AS downloadBytes, 
+                              0 AS totalBytes 
+                            FROM 
+                              (
+                                -- From ConnectionTracker
+                                SELECT dnsQuery AS appOrDnsName, 
+                                  COUNT(dnsQuery) AS count,
+                                  flag as flag
+                                FROM ConnectionTracker 
+                                WHERE dnsQuery != ''  
+                                    AND timeStamp > :to
+                                    AND uid = :uid
+                                GROUP BY dnsQuery
+                                   
+                                UNION ALL 
+                
+                                -- From DnsLogs
+                                SELECT queryStr AS appOrDnsName, 
+                                  COUNT(queryStr) AS count, 
+                                  flag as flag
+                                FROM DnsLogs 
+                                WHERE uid = :uid
+                                    AND time > :to 
+                                  AND status = 'COMPLETE' 
+                                  AND queryStr != ''
+                                GROUP BY queryStr
+                              ) AS combined 
+                            GROUP BY appOrDnsName 
+                            ORDER BY count DESC
+            """
+    )
+    fun getAllDomainsByUid(uid: Int, to: Long): PagingSource<Int, AppConnection>
 }

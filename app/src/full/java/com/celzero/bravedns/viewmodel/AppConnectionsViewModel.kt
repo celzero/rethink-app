@@ -102,7 +102,7 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
 
     val appIpLogs = ipFilter.switchMap { input -> fetchIpLogs(uid, input) }
     val appDomainLogs = domainFilter.switchMap {
-        input -> fetchAppDomainLogs(uid)
+        input -> fetchAppDomainLogs(uid, input)
     }
 
     val rinrIpLogs = ipFilter.switchMap { input -> fetchRinrIpLogs(input) }
@@ -141,10 +141,14 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
             .cachedIn(viewModelScope)
     }
 
-    private fun fetchAppDomainLogs(uid: Int): LiveData<PagingData<AppConnection>> {
+    private fun fetchAppDomainLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
         val to = getStartTime()
         return Pager(pagingConfig) {
-                statsDao.getAllDomainsByUid(uid, to)
+                if (input.isEmpty()) {
+                    statsDao.getAllDomainsByUid(uid, to)
+                } else {
+                    statsDao.getAllDomainsByUid(uid, to, "%$input%")
+                }
             }
             .liveData
             .cachedIn(viewModelScope)
