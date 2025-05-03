@@ -936,6 +936,16 @@ class GoVpnAdapter : KoinComponent {
         try {
             val res = getProxies()?.refreshProxies()
             Logger.i(LOG_TAG_VPN, "$TAG refresh proxies: $res")
+            // re-add the proxies if the its not available in the tunnel
+            val wgConfigs: List<Config> = WireguardManager.getActiveConfigs()
+            if (wgConfigs.isEmpty()) {
+                Logger.i(LOG_TAG_VPN, "$TAG no active wg-configs found")
+                return
+            }
+            wgConfigs.forEach {
+                val id = ID_WG_BASE + it.getId()
+                addWgProxy(id) // will not add if already present
+            }
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "$TAG err refreshing proxies: ${e.message}", e)
         }
