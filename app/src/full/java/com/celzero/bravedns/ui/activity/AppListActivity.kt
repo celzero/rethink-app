@@ -220,7 +220,6 @@ class AppListActivity :
         filters.observe(this) {
             // update the ui based on the filter
             resetFirewallIcons(BlockType.UNMETER)
-
             if (it == null) return@observe
 
             appInfoViewModel.setFilter(it)
@@ -251,7 +250,6 @@ class AppListActivity :
     }
 
     override fun onPause() {
-        filters.postValue(Filters())
         b.ffaSearch.clearFocus()
         b.ffaAppList.requestFocus()
         super.onPause()
@@ -489,7 +487,7 @@ class AppListActivity :
     }
 
     private fun showInfoDialog() {
-        val li = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val li = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view: View = li.inflate(R.layout.dialog_info_firewall_rules, null)
         val builder = MaterialAlertDialogBuilder(this).setView(view)
         builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialog, _ ->
