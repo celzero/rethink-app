@@ -141,17 +141,15 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         b.dnsBlockUrl.text = log!!.queryStr + "      ❯"
         b.dnsBlockIpAddress.text = getResponseIp()
         b.dnsBlockConnectionFlag.text = log!!.flag
-        b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, log!!.latency.toString())
+        b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, log!!.ttl.toString())
         if (Logger.LoggerType.fromId(persistentState.goLoggerLevel.toInt())
                 .isLessThan(Logger.LoggerType.DEBUG)
         ) {
             b.dnsMessage.text =
-                "${log?.msg}; ${log?.proxyId}; ${log?.relayIP}; ${log?.typeName}; ${log?.id}"
+                "${log?.msg}; ${log?.proxyId}; ${log?.relayIP}; ${log?.typeName}"
         } else {
             b.dnsMessage.text = log!!.msg
         }
-
-        b.dnsTtl.text = getString(R.string.two_argument_space, log!!.ttl.toString(), getString(R.string.lbl_sec))
 
         displayFavIcon()
         displayDnsTransactionDetails()
