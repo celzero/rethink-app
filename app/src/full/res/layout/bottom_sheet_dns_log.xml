@@ -228,24 +228,11 @@
             android:textSize="@dimen/default_font_text_view"
             android:visibility="visible" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/dns_ttl"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/dns_region"
-            android:layout_centerHorizontal="true"
-            android:fontFamily="sans-serif-smallcaps"
-            android:gravity="center"
-            android:padding="5dp"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/default_font_text_view"
-            android:visibility="visible" />
-
         <LinearLayout
             android:id="@+id/bsdl_domain_rule_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/dns_ttl"
+            android:layout_below="@id/dns_region"
             android:layout_marginLeft="2dp"
             android:layout_marginTop="5dp"
             android:layout_marginRight="2dp"
