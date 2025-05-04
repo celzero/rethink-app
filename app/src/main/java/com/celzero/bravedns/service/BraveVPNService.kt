@@ -4435,9 +4435,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         io("removeWg") { vpnAdapter?.removeWgProxy(id) }
     }
 
-    fun addWireGuardProxy(id: String) {
+    suspend fun addWireGuardProxy(id: String) {
         logd("add wg from tunnel: $id")
-        io("addWg") { vpnAdapter?.addWgProxy(id) }
+        vpnAdapter?.addWgProxy(id)
     }
 
     fun refreshProxies() {
@@ -4700,6 +4700,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     suspend fun hopStatus(src: String, via: String): Pair<Long?, String> {
         return vpnAdapter?.hopStatus(src, via) ?: Pair(null, "vpn not active")
+    }
+
+    suspend fun removeHop(src: String): Pair<Boolean, String> {
+        return vpnAdapter?.removeHop(src) ?: Pair(false, "vpn not active")
     }
 
     suspend fun getRpnProps(type: RpnProxyManager.RpnType): Pair<RpnProxyManager.RpnProps?, String?> {

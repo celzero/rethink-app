@@ -308,7 +308,7 @@ object VpnController : KoinComponent {
         braveVpnService?.removeWireGuardProxy(id)
     }
 
-    fun addWireGuardProxy(id: String) {
+    suspend fun addWireGuardProxy(id: String) {
         braveVpnService?.addWireGuardProxy(id)
     }
 
@@ -394,6 +394,10 @@ object VpnController : KoinComponent {
 
     suspend fun hopStatus(src: String, via: String): Pair<Long?, String> {
         return braveVpnService?.hopStatus(src, via) ?: Pair(null, "vpn service not available")
+    }
+
+    suspend fun removeHop(src: String): Pair<Boolean, String> {
+        return braveVpnService?.removeHop(src) ?: Pair(false, "vpn service not available")
     }
 
     suspend fun getRpnProps(type: RpnProxyManager.RpnType): Pair<RpnProxyManager.RpnProps?, String?> {

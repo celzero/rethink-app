@@ -194,7 +194,7 @@ object WireguardManager : KoinComponent {
         return false
     }
 
-    fun enableConfig(unmapped: WgConfigFilesImmutable) {
+    suspend fun enableConfig(unmapped: WgConfigFilesImmutable) {
         val map = mappings.find { it.id == unmapped.id }
         if (map == null) {
             Logger.e(
@@ -227,7 +227,7 @@ object WireguardManager : KoinComponent {
             )
         mappings.add(newMap)
         val dbMap = WgConfigFiles.fromImmutable(newMap)
-        io { db.update(dbMap) }
+        db.update(dbMap)
         val proxyType = AppConfig.ProxyType.WIREGUARD
         val proxyProvider = AppConfig.ProxyProvider.WIREGUARD
         appConfig.addProxy(proxyType, proxyProvider)

@@ -76,7 +76,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import settings.Settings
 import java.net.URI
-import kotlin.or
+import kotlin.text.substring
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -125,14 +125,14 @@ class GoVpnAdapter : KoinComponent {
         // no need to add default in init as it is already added in connect
         // addDefaultTransport(appConfig.getDefaultDns())
         setRoute(opts)
-        setWireguardTunnelModeIfNeeded(opts.tunProxyMode)
-        setSocks5TunnelModeIfNeeded(opts.tunProxyMode)
-        setHttpProxyIfNeeded(opts.tunProxyMode)
-        setPcapMode(appConfig.getPcapFilePath())
         // TODO: ideally the values required for transport, alg and rdns should be set in the
         // opts itself.
         setRDNS()
         addTransport()
+        setWireguardTunnelModeIfNeeded(opts.tunProxyMode)
+        setSocks5TunnelModeIfNeeded(opts.tunProxyMode)
+        setHttpProxyIfNeeded(opts.tunProxyMode)
+        setPcapMode(appConfig.getPcapFilePath())
         setDnsAlg()
         notifyLoopback()
         setDialStrategy()
@@ -672,7 +672,21 @@ class GoVpnAdapter : KoinComponent {
             Logger.i(LOG_TAG_VPN, "$TAG no active wg-configs found")
             return
         }
-        wgConfigs.forEach {
+        // re-order the configs so that hops are added first
+        val hops = WgHopManager.getAllVia()
+        Logger.d(LOG_TAG_VPN, "$TAG total active proxies: ${wgConfigs.size}")
+        // separate the id, hop has WG1 where id is 1
+        val hopIds = hops.map { it.substring(ID_WG_BASE.length).toIntOrNull() }
+        val hopConfigs = wgConfigs.filter { it.getId() in hopIds }
+        val nonHopConfigs = wgConfigs.filter { it.getId() !in hopIds }
+        Logger.i(LOG_TAG_VPN, "$TAG added wireguards with hops: ${hopConfigs.size}")
+        // add hop wireguard first
+        hopConfigs.forEach {
+            val id = ID_WG_BASE + it.getId()
+            addWgProxy(id)
+        }
+        Logger.i(LOG_TAG_VPN, "$TAG added wireguards without hops: ${nonHopConfigs.size}")
+        nonHopConfigs.forEach {
             val id = ID_WG_BASE + it.getId()
             addWgProxy(id)
         }
@@ -682,14 +696,14 @@ class GoVpnAdapter : KoinComponent {
         // assumption: by this time the add call should have happened
         val via = WgHopManager.getVia(origin)
         if (via.isEmpty()) {
-            Logger.i(LOG_TAG_VPN, "$TAG no via found for $origin")
+            Logger.i(LOG_TAG_VPN, "$TAG no hop found for $origin")
             return
         }
         try {
             tunnel.proxies.hop(via, origin)
-            Logger.i(LOG_TAG_VPN, "$TAG new via for $origin ($via)")
+            Logger.i(LOG_TAG_VPN, "$TAG new hop for $origin -> $via")
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_VPN, "$TAG err setting via for $origin; ${e.message}")
+            Logger.w(LOG_TAG_VPN, "$TAG err setting hop for $origin -> $via; ${e.message}")
             showHopFailureNotification(origin, via, err = e.message)
         }
     }
@@ -697,12 +711,26 @@ class GoVpnAdapter : KoinComponent {
     fun hopStatus(src: String, via: String): Pair<Long?, String> {
         return try {
             val status = tunnel.proxies.getProxy(src).router().via().status()
-            Logger.v(LOG_TAG_VPN, "$TAG via $src -> $via; status: $status")
+            Logger.v(LOG_TAG_VPN, "$TAG hop $src -> $via; status: $status")
             Pair(status, "")
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_VPN, "$TAG via failing for $src -> $via; ${e.message}")
+            Logger.w(LOG_TAG_VPN, "$TAG hop failing for $src -> $via; ${e.message}")
             Pair(null, e.message ?: "failure")
         }
+    }
+
+    fun removeHop(src: String): Pair<Boolean, String> {
+        var res = false
+        var err = ""
+        try {
+            tunnel.proxies.hop("", src)
+            Logger.i(LOG_TAG_VPN, "$TAG removed hop for $src -> empty")
+            return Pair(true, "")
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "$TAG err removing hop: $src -> empty; ${e.message}")
+            err = e.message ?: ""
+        }
+        return Pair(res, err)
     }
 
     fun testHop(src: String, via: String): Pair<Boolean, String> {
@@ -866,7 +894,7 @@ class GoVpnAdapter : KoinComponent {
                     Logger.i(LOG_TAG_VPN, "$TAG wg proxy already exists in tunnel $id")
                     return
                 }
-            } catch (e: Exception) {
+            } catch (ignored: Exception) {
                 Logger.i(LOG_TAG_VPN, "$TAG wg proxy not found in tunnel $id, proceed adding")
             }
 
@@ -906,7 +934,7 @@ class GoVpnAdapter : KoinComponent {
                 Logger.w(LOG_TAG_VPN, "$TAG no wireguard config found for id: $id, but via: $via")
                 return
             }
-            Logger.i(LOG_TAG_VPN, "$TAG start via config: $id")
+            Logger.i(LOG_TAG_VPN, "$TAG start via config: $via")
             // this will enable the config and initiate the add proxy to the tunnel
             WireguardManager.enableConfig(config)
         } catch (ignored: Exception) { }

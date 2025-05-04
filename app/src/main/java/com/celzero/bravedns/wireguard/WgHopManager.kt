@@ -2,7 +2,6 @@ package com.celzero.bravedns.wireguard
 
 import Logger
 import Logger.LOG_TAG_PROXY
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.WgHopMap
 import com.celzero.bravedns.database.WgHopMapRepository
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
@@ -31,6 +30,8 @@ object WgHopManager: KoinComponent {
             Logger.i(LOG_TAG_PROXY, "$TAG load: already loaded")
             return maps.size
         }
+
+        db.deleteAll()
         maps.clear()
         maps = CopyOnWriteArrayList(db.getAll())
         printMaps()
@@ -89,10 +90,11 @@ object WgHopManager: KoinComponent {
         val src = ID_WG_BASE + srcId
         val via = ID_WG_BASE + viaId
         var res = Pair(false, "Map not found")
-        val isAvailableInMap = maps.find { it.src == src && it.via == via }
+        val map = maps.find { it.src == src && it.via == via }
         Logger.v(LOG_TAG_PROXY, "$TAG removeHop: $src")
-        if (isAvailableInMap != null) {
-            res = delete(isAvailableInMap)
+        if (map != null) {
+            res = delete(map)
+            VpnController.removeHop(src)
         } else {
             Logger.i(LOG_TAG_PROXY, "$TAG delete: map not found")
         }
