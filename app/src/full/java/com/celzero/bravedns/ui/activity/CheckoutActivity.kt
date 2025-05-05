@@ -26,6 +26,10 @@ import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -38,6 +42,8 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -50,9 +56,6 @@ import java.util.UUID
 class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
     private val b by viewBinding(ActivityCheckoutProxyBinding::bind)
     private val persistentState by inject<PersistentState>()
-    // lateinit var paymentSheet: PaymentSheet
-    // lateinit var customerConfig: PaymentSheet.CustomerConfiguration
-    lateinit var paymentIntentClientSecret: String
 
     companion object {
         private const val TOKEN_LENGTH = 32
@@ -66,6 +69,12 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
         init()
         setupClickListeners()
 

@@ -22,6 +22,7 @@ import android.util.Patterns
 import androidx.lifecycle.LiveData
 import backend.Backend
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.util.Constants
@@ -48,6 +49,8 @@ object DomainRulesManager : KoinComponent {
     // valid wildcard domain: *.example.com, *.example.co.in, *.do-main.com
     // RFC 1035: https://tools.ietf.org/html/rfc1035#section-2.3.4
     private val wcRegex = Pattern.compile("^(\\*\\.)?([a-zA-Z0-9-]+\\.)+[a-zA-Z0-9-]+$")
+
+    private val selectedCCs: MutableSet<String> = mutableSetOf()
 
     enum class Status(val id: Int) {
         NONE(0),
@@ -94,17 +97,22 @@ object DomainRulesManager : KoinComponent {
         }
     }
 
+    suspend fun getObj(uid: Int, domain: String): CustomDomain? {
+        return db.getCustomDomain(uid, domain)
+    }
+
     // update the cache with the domain and its status based on the domain type
     fun updateTrie(cd: CustomDomain) {
         val key = mkTrieKey(cd.domain, cd.uid)
-        trie.set(key, cd.status.toString())
+        val value = mkTrieValue(cd.status.toString(), cd.proxyId, cd.proxyCC)
+        trie.set(key, value)
     }
 
     private fun mkTrieKey(d: String, uid: Int): String {
         // *.google.co.uk -> .google.co.uk,<uid>
         // not supported by IpTrie: google.* -> google.,<uid>
         val domain = d.removePrefix("*")
-        return domain.lowercase(Locale.ROOT) + "," + uid
+        return domain.lowercase(Locale.ROOT) + Backend.Ksep + uid
     }
 
     private fun mkTrieKey(d: String): String {
@@ -113,16 +121,27 @@ object DomainRulesManager : KoinComponent {
         return domain.lowercase(Locale.ROOT)
     }
 
+    private fun mkTrieValue(status: String, proxyId: String, proxyCC: String): String {
+        return "${status}${Backend.Vsep}${proxyId}${Backend.Vsep}${proxyCC}"
+    }
+
     suspend fun load(): Long {
         trie.clear()
         trustedTrie.clear()
         trustedMap.clear()
         db.getAllCustomDomains().forEach { cd ->
             val key = mkTrieKey(cd.domain, cd.uid)
-            trie.set(key, cd.status.toString())
+            val value = mkTrieValue(cd.status.toString(), cd.proxyId, cd.proxyCC)
+            trie.set(key, value)
             maybeAddToTrustedMap(cd)
+            if (cd.proxyCC.isNotEmpty()) selectedCCs.add(cd.proxyCC)
         }
         return trie.len()
+    }
+
+    fun getAllUniqueCCs(): List<String> {
+        Logger.v(LOG_TAG_DNS, "getAllUniqueCCs: $selectedCCs")
+        return selectedCCs.toList()
     }
 
     private fun maybeAddToTrustedMap(cd: CustomDomain) {
@@ -156,21 +175,57 @@ object DomainRulesManager : KoinComponent {
     private fun matchesWildcard(domain: String, uid: Int): Status {
         val key = mkTrieKey(domain, uid)
         val match = trie.getAny(key) // matches the longest prefix
-
-        if (match.isNullOrEmpty()) {
-            return Status.NONE
-        }
-
-        return Status.getStatus(match.toIntOrNull())
+        val status = match.split(Backend.Vsep)[0]
+        val res = Status.getStatus(status.toIntOrNull())
+        if (DEBUG) Logger.vv(LOG_TAG_DNS, "matchesWildcard: $domain($uid), res: $res")
+        return res
     }
 
     fun getDomainRule(domain: String, uid: Int): Status {
         val key = mkTrieKey(domain, uid)
         val match = trie.get(key)
-        if (match.isNullOrEmpty()) {
-            return Status.NONE
+        val status = match.split(Backend.Vsep)[0]
+        val res = Status.getStatus(status.toIntOrNull())
+        if (DEBUG) Logger.vv(LOG_TAG_DNS, "getDomainRule: $domain($uid), res: $res")
+        return res
+    }
+
+    fun getProxyForDomain(uid: Int, domain: String): Pair<String, String> {
+        try {
+            val key = mkTrieKey(domain, uid)
+            var proxyId = ""
+            var proxyCC = ""
+            val match = trie.get(key)
+            if (match.isEmpty()) {
+                return Pair("", "")
+            }
+            val parts = match.split(Backend.Vsep)
+
+            if (parts.size <= 2) return Pair("", "")
+
+            // not expecting index out of bounds here, as the value is constructed while inserting
+            // still adding try-catch to avoid any crashes
+            // status:proxyId:proxyCC
+            proxyId = parts[1]
+            proxyCC = parts[2]
+
+            // empty proxyId means no proxy rule for the domain, check for wildcard
+            if (proxyId.isNotEmpty() || proxyCC.isNotEmpty()) {
+                return Pair(proxyId, proxyCC)
+            } else {
+                val wild = trie.getAny(key)
+                if (wild.isEmpty()) return Pair("", "")
+
+                val wildParts = wild.split(Backend.Vsep)
+                if (wildParts.size <= 2) return Pair("", "")
+
+                proxyId = wildParts[1]
+                proxyCC = wildParts[2]
+                return Pair(proxyId, proxyCC)
+            }
+        } catch (ignored: Exception) {
+            return Pair("", "")
         }
-        return Status.getStatus(match.toIntOrNull())
     }
 
     fun isDomainTrusted(d: String?): Boolean {
@@ -312,6 +367,14 @@ object DomainRulesManager : KoinComponent {
         clearTrustedMap(uid)
     }
 
+    suspend fun deleteRules(list: List<CustomDomain>) {
+        list.forEach { cd ->
+            removeFromTrie(cd)
+            removeIfInTrustedMap(cd.uid, cd.domain)
+        }
+        db.deleteRules(list)
+    }
+
     suspend fun deleteAllRules() {
         db.deleteAllRules()
         trie.clear()
@@ -331,7 +394,7 @@ object DomainRulesManager : KoinComponent {
     fun isValidDomain(url: String): Boolean {
         return try {
             Patterns.WEB_URL.matcher(url).matches() || Patterns.DOMAIN_NAME.matcher(url).matches()
-        } catch (ignored: MalformedURLException) { // ignored
+        } catch (ignored: MalformedURLException) {
             false
         }
     }
@@ -364,7 +427,8 @@ object DomainRulesManager : KoinComponent {
         val desc = doms.sortedByDescending { selector(it.domain) }
         desc.forEach { cd ->
             val key = mkTrieKey(cd.domain, cd.uid)
-            trie.set(key, cd.status.toString())
+            val value = mkTrieValue(cd.status.toString(), cd.proxyId, cd.proxyCC)
+            trie.set(key, value)
             maybeAddToTrustedMap(cd)
         }
     }
@@ -373,8 +437,31 @@ object DomainRulesManager : KoinComponent {
         trie.delAll(uid.toString())
     }
 
+    suspend fun setCC(cd: CustomDomain, cc: String) {
+        cd.proxyCC = cc
+        val newCd = CustomDomain(cd.domain, cd.uid, cd.ips, cd.type, cd.status, cd.proxyId, cc, cd.modifiedTs, 0L, cd.version)
+        Logger.d(LOG_TAG_DNS, "setCC: updating domain: ${cd.domain} to cc: $cc")
+        db.update(cd, newCd)
+        Logger.i(LOG_TAG_DNS, "setCC: updated domain: ${cd.domain} to $cc")
+        rehydrateFromDB(cd.uid)
+    }
+
+    suspend fun setProxyId(cd: CustomDomain, proxyId: String) {
+        cd.proxyId = proxyId
+        val newCd = CustomDomain(cd.domain, cd.uid, cd.ips, cd.type, cd.status, proxyId, cd.proxyCC, cd.modifiedTs, 0L, cd.version)
+        db.update(cd, newCd)
+        Logger.i(LOG_TAG_DNS, "setProxyId: updated domain: ${cd.domain} to $proxyId")
+        rehydrateFromDB(cd.uid)
+    }
+
     fun isWildCardEntry(url: String): Boolean {
         return wcRegex.matcher(url).matches()
+    }
+
+    // this is to create a custom domain entry where user want to add proxy without any
+    // rules set, this is created for the new ui, should be made generic
+    fun makeCustomDomain(uid: Int, domain: String): CustomDomain {
+        return mkCustomDomain(domain, uid, "", DomainType.DOMAIN, Status.NONE.id)
     }
 
     private fun mkCustomDomain(
@@ -382,7 +469,9 @@ object DomainRulesManager : KoinComponent {
         uid: Int,
         ips: String = "",
         type: DomainType,
-        status: Int
+        status: Int,
+        proxyId: String = "",
+        proxyCC: String = ""
     ): CustomDomain {
         return CustomDomain(
             domain,
@@ -390,9 +479,20 @@ object DomainRulesManager : KoinComponent {
             ips,
             type.id,
             status,
+            proxyId,
+            proxyCC,
             Calendar.getInstance().timeInMillis,
             Constants.INIT_TIME_MS,
             CustomDomain.getCurrentVersion()
         )
+    }
+
+    suspend fun stats(): String {
+        val sb = StringBuilder()
+        sb.append("   Trie: ${trie.len()}\n")
+        sb.append("   Trusted: ${trustedTrie.len()}\n")
+        sb.append("   db: ${db.getCustomDomainCount()}\n")
+
+        return sb.toString()
     }
 }

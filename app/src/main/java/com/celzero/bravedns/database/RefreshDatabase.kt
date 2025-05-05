@@ -33,7 +33,9 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.receiver.NotificationActionReceiver
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
@@ -44,8 +46,8 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.ui.NotificationHandlerDialog
+import com.celzero.bravedns.ui.NotificationHandlerActivity
+import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.PlayStoreCategory
@@ -55,6 +57,7 @@ import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
+import com.celzero.bravedns.wireguard.WgHopManager
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 import kotlinx.coroutines.CoroutineName
@@ -68,6 +71,7 @@ internal constructor(
     private var ctx: Context,
     private val connTrackerRepository: ConnectionTrackerRepository,
     private val dnsLogRepository: DnsLogRepository,
+    private val rethinkLogRepository: RethinkLogRepository,
     private val persistentState: PersistentState
 ) {
 
@@ -138,16 +142,19 @@ internal constructor(
             latestRefreshTime = current
             val pm = ctx.packageManager ?: return
 
+            // make sure to maintain the order of the below calls
             val fm = FirewallManager.load()
             val ipm = IpRulesManager.load()
             val dm = DomainRulesManager.load()
             val pxm = ProxyManager.load()
-            val wgm = WireguardManager.load()
-            val tcpm = TcpProxyHelper.load()
+            val wgm = WireguardManager.load(forceRefresh = false)
+            val hm = WgHopManager.load(forceRefresh = false)
+            val tm = TcpProxyHelper.load()
+            val rm = RpnProxyManager.load()
 
             Logger.i(
                 LOG_TAG_APP_DB,
-                "reload: fm: ${fm}; ip: ${ipm}; dom: ${dm}; px: ${pxm}; wg: ${wgm}; t: ${tcpm}"
+                "reload: fm: $fm; ip: $ipm; dom: $dm; px: $pxm; wg: $wgm; hm: $hm t: $tm, rpn: $rm"
             )
 
             val trackedApps = FirewallManager.getAllApps()
@@ -161,11 +168,17 @@ internal constructor(
                     pm.getInstalledPackages(PackageManager.GET_META_DATA)
                 }
 
-            val installedApps =
-                installedPackages
-                    .map { FirewallManager.AppInfoTuple(it.applicationInfo.uid, it.packageName) }
-                    .toSet()
-
+            val installedApps: MutableSet<FirewallManager.AppInfoTuple> = mutableSetOf()
+            installedPackages.forEach {
+                val appInfo = it.applicationInfo
+                if (appInfo != null) {
+                    installedApps.add(FirewallManager.AppInfoTuple(appInfo.uid, it.packageName))
+                }
+            }
+            Logger.i(
+                LOG_TAG_APP_DB,
+                "installed apps: ${installedApps.size}, tracked apps: ${trackedApps.size}"
+            )
             val packagesToAdd =
                 findPackagesToAdd(trackedApps, installedApps, action == ACTION_REFRESH_RESTORE)
             val packagesToDelete =
@@ -184,12 +197,10 @@ internal constructor(
             deletePackages(packagesToDelete)
             addMissingPackages(packagesToAdd)
             updateExistingPackagesIfNeeded(packagesToUpdate) // updated only for restore
-            removeWireGuardProfilesIfNeeded(action == ACTION_REFRESH_RESTORE)
+            restoreWireGuardProfilesIfNeeded(action == ACTION_REFRESH_RESTORE)
             refreshNonApps(trackedApps, installedApps)
-            // for proxy mapping, restore is a special case, where we clear all proxy->app mappings
-            // and so, packagesToUpdate, even if not empty, is ignored. proxy mappings cannot be
-            // updated during restore.
-            refreshProxyMapping(trackedApps, action == ACTION_REFRESH_RESTORE)
+            // packages to add and delete are calculated based on proxy mapping
+            refreshProxyMapping(trackedApps, packagesToAdd, packagesToUpdate, packagesToDelete)
             // must be called after updateExistingPackagesIfNeeded
             refreshIPRules(packagesToUpdate)
             // must be called after updateExistingPackagesIfNeeded
@@ -312,7 +323,7 @@ internal constructor(
         val oldUids = mutableListOf<Int>()
         val newUids = mutableListOf<Int>()
         apps.forEach { old ->
-            // FirewallManager must have been udpated by now, so we can get the latest app info
+            // FirewallManager must have been updated by now, so we can get the latest app info
             // using the package-name (as uid have changed)
             val newinfo = FirewallManager.getAppInfoByPackage(old.packageName) ?: return@forEach
             oldUids.add(old.uid)
@@ -326,7 +337,7 @@ internal constructor(
         val oldUids = mutableListOf<Int>()
         val newUids = mutableListOf<Int>()
         apps.forEach { old ->
-            // FirewallManager must have been udpated by now, so we can get the latest app info
+            // FirewallManager must have been updated by now, so we can get the latest app info
             // using the package-name (as uid have changed)
             val newinfo = FirewallManager.getAppInfoByPackage(old.packageName) ?: return@forEach
             oldUids.add(old.uid)
@@ -343,7 +354,7 @@ internal constructor(
         }
         val ai = maybeFetchAppInfo(uid)
         val pkg = ai?.packageName ?: ""
-        Logger.i(LOG_TAG_APP_DB, "insert app; uid: $uid, pkg: ${pkg}")
+        Logger.i(LOG_TAG_APP_DB, "insert app; uid: $uid, pkg: $pkg")
         if (ai != null) {
             // uid may be different from the one in ai, if the app is installed in a different user
             insertApp(ai)
@@ -368,10 +379,9 @@ internal constructor(
         return null
     }
 
-    private suspend fun removeWireGuardProfilesIfNeeded(rmv: Boolean) {
-        // may already have been purged by RestoreAgent.startRestore() -> wireguardCleanup()
+    private suspend fun restoreWireGuardProfilesIfNeeded(rmv: Boolean) {
         if (rmv) {
-            WireguardManager.restoreProcessDeleteWireGuardEntries()
+            WireguardManager.restoreProcessRetrieveWireGuardConfigs()
         } else {
             Logger.d(LOG_TAG_APP_DB, "removeWireGuardProfilesIfNeeded: no-op")
         }
@@ -379,7 +389,9 @@ internal constructor(
 
     private suspend fun refreshProxyMapping(
         trackedApps: Set<FirewallManager.AppInfoTuple>,
-        emptyAll: Boolean
+        packageToAdd: Set<FirewallManager.AppInfoTuple>,
+        packagesToUpdate: Set<FirewallManager.AppInfoTuple>,
+        packagesToDelete: Set<FirewallManager.AppInfoTuple>
     ) {
         // trackedApps is empty, the installed apps are yet to be added to the database; and so,
         // there's no need to refresh these mappings as apps tracked by FirewallManager is empty
@@ -388,22 +400,10 @@ internal constructor(
             return
         }
 
-        // remove all apps from proxy mapping and add the apps from tracked apps
-        if (emptyAll) {
-            ProxyManager.clear()
-            trackedApps
-                .map { FirewallManager.getAppInfoByPackage(it.packageName) }
-                .forEach { ProxyManager.addNewApp(it) } // it may be null, esp for non-apps
-            Logger.i(
-                LOG_TAG_APP_DB,
-                "empty proxy mapping, trackedApps: ${trackedApps.size}, proxy mapping: ${ProxyManager.trackedApps().size}"
-            )
-            return
-        }
-
         ProxyManager.purgeDupsBeforeRefresh()
 
         // remove the apps from proxy mapping which are not tracked by app info repository
+        // this will just sync the proxy mapping with the app info repository
         val pxm = ProxyManager.trackedApps()
         val del = findPackagesToDelete(pxm, trackedApps)
         val add =
@@ -412,6 +412,23 @@ internal constructor(
             }
         ProxyManager.deleteApps(del)
         ProxyManager.addApps(add)
+
+        // proceed to add/update/delete the apps based on the package manager's installed apps
+        packageToAdd.forEach {
+            val appInfo = FirewallManager.getAppInfoByPackage(it.packageName)
+            if (appInfo != null) {
+                ProxyManager.addApp(appInfo)
+            }
+        }
+
+        packagesToUpdate.forEach {
+            ProxyManager.updateApp(it.uid, it.packageName)
+        }
+
+        packagesToDelete.forEach {
+            ProxyManager.deleteApp(it.uid, it.packageName)
+        }
+
         Logger.i(
             LOG_TAG_APP_DB,
             "refreshing proxy mapping, size: ${pxm.size}, trackedApps: ${trackedApps.size}"
@@ -430,7 +447,7 @@ internal constructor(
                 newAppInfo.isSystemApp = true
                 androidUidConfig.name
             }
-        newAppInfo.packageName = "no_package_$uid"
+        newAppInfo.packageName = "$NO_PACKAGE_PREFIX$uid"
         newAppInfo.appCategory = ctx.getString(FirewallManager.CategoryConstants.NON_APP.nameResId)
         newAppInfo.uid = uid
 
@@ -504,7 +521,7 @@ internal constructor(
             ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         Logger.d(LOG_TAG_VPN, "Number of new apps: $appSize, show notification")
 
-        val intent = Intent(ctx, NotificationHandlerDialog::class.java)
+        val intent = Intent(ctx, NotificationHandlerActivity::class.java)
         intent.putExtra(
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE
@@ -578,11 +595,12 @@ internal constructor(
             ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         Logger.d(LOG_TAG_VPN, "New app installed: $appName, show notification")
 
-        val intent = Intent(ctx, NotificationHandlerDialog::class.java)
+        val intent = Intent(ctx, NotificationHandlerActivity::class.java)
         intent.putExtra(
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
             Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE
         )
+        intent.putExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, app.uid)
 
         val pendingIntent =
             getActivityPendingIntent(
@@ -661,10 +679,10 @@ internal constructor(
             return
         }
 
-        val intent = Intent(ctx, HomeScreenActivity::class.java)
+        val intent = Intent(ctx, AppLockActivity::class.java)
         val nm = ctx.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         val pendingIntent =
-            Utilities.getActivityPendingIntent(
+            getActivityPendingIntent(
                 ctx,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT,
@@ -787,6 +805,7 @@ internal constructor(
         // purge logs older than specified date
         dnsLogRepository.purgeDnsLogsByDate(date)
         connTrackerRepository.purgeLogsByDate(date)
+        rethinkLogRepository.purgeLogsByDate(date)
     }
 
     private fun printAll(c: Collection<FirewallManager.AppInfoTuple>, tag: String) {

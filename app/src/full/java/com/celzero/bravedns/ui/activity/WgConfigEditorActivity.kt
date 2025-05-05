@@ -23,6 +23,10 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -34,6 +38,8 @@ import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgInterface
 import com.celzero.bravedns.wireguard.util.ErrorMessages
@@ -54,7 +60,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
     companion object {
         const val INTENT_EXTRA_WG_ID = "WIREGUARD_TUNNEL_ID"
         private const val CLIPBOARD_PUBLIC_KEY_LBL = "Public Key"
-        private const val DEFAULT_MTU = "1280"
+        private const val DEFAULT_MTU = "-1"
         // when dns is set to auto, the default dns is set to 1.1.1.1. this differs from official
         // wireguard for android, because rethink requires a dns to be set in "Simple" mode
         private const val DEFAULT_DNS = "1.1.1.1"
@@ -64,6 +70,13 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
+
         configId = intent.getIntExtra(INTENT_EXTRA_WG_ID, WireguardManager.INVALID_CONF_ID)
         wgType =
             WgConfigDetailActivity.WgType.fromInt(
@@ -109,17 +122,26 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
                         wgInterface?.getAddresses()?.joinToString { it.toString() }
                     )
                 }
-                if (
-                    wgInterface?.listenPort?.isPresent == true &&
-                        wgInterface?.listenPort?.get() != 1 && wgType.isOneWg()
-                ) {
+                if (showListenPort()) {
                     b.listenPortText.setText(wgInterface?.listenPort?.get().toString())
                 }
                 if (wgInterface?.mtu?.isPresent == true) {
                     b.mtuText.setText(wgInterface?.mtu?.get().toString())
                 }
+                if (wgInterface?.isAmnezia() == true) {
+                    b.amzProps.visibility = android.view.View.VISIBLE
+                    b.amzProps.text = wgInterface?.getAmzProps()
+                } else {
+                    b.amzProps.visibility = android.view.View.GONE
+                }
             }
         }
+    }
+
+    private fun showListenPort(): Boolean {
+        val isPresent = wgInterface?.listenPort?.isPresent == true && wgInterface?.listenPort?.get() != 1
+        val byType = wgType.isOneWg() || (!persistentState.randomizeListenPort && wgType.isDefault())
+        return isPresent && byType
     }
 
     private fun setupClickListeners() {

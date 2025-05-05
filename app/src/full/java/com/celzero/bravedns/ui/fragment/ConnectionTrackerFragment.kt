@@ -15,6 +15,8 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.fragment
 
+import Logger
+import Logger.LOG_TAG_UI
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
@@ -22,18 +24,18 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
 import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
+import com.celzero.bravedns.databinding.FragmentConnectionTrackerBinding
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity
+import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
 import com.celzero.bravedns.util.Utilities
@@ -48,8 +50,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /** Captures network logs and stores in ConnectionTracker, a room database. */
 class ConnectionTrackerFragment :
-    Fragment(R.layout.activity_connection_tracker), SearchView.OnQueryTextListener {
-    private val b by viewBinding(ActivityConnectionTrackerBinding::bind)
+    Fragment(R.layout.fragment_connection_tracker), SearchView.OnQueryTextListener {
+    private val b by viewBinding(FragmentConnectionTrackerBinding::bind)
 
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val viewModel: ConnectionTrackerViewModel by viewModel()
@@ -60,8 +62,13 @@ class ConnectionTrackerFragment :
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
     private val persistentState by inject<PersistentState>()
 
+    private var fromWireGuardScreen: Boolean = false
+    private var fromUniversalFirewallScreen: Boolean = false
+
     companion object {
+        private const val TAG = "ConnTrackFrag"
         const val PROTOCOL_FILTER_PREFIX = "P:"
+        private const val QUERY_TEXT_TIMEOUT: Long = 600
 
         fun newInstance(param: String): ConnectionTrackerFragment {
             val args = Bundle()
@@ -77,12 +84,28 @@ class ConnectionTrackerFragment :
         initView()
         if (arguments != null) {
             val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
-            b.connectionSearch.setQuery(query, true)
+            fromUniversalFirewallScreen = query.contains(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)
+            fromWireGuardScreen = query.contains(NetworkLogsActivity.RULES_SEARCH_ID_WIREGUARD)
+            if (fromUniversalFirewallScreen) {
+                val rule = query.split(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)[1]
+                filterCategories.add(rule)
+                filterType = TopLevelFilter.BLOCKED
+                viewModel.setFilter(filterQuery, filterCategories, filterType)
+                hideSearchLayout()
+            } else if (fromWireGuardScreen) {
+                val rule = query.split(NetworkLogsActivity.RULES_SEARCH_ID_WIREGUARD)[1]
+                filterQuery = rule
+                filterType = TopLevelFilter.ALL
+                viewModel.setFilter(filterQuery, filterCategories, filterType)
+                hideSearchLayout()
+            } else {
+                b.connectionSearch.setQuery(query, true)
+            }
         }
+        Logger.v(LOG_TAG_UI, "$TAG, view created from univ? $fromUniversalFirewallScreen, from wg? $fromWireGuardScreen")
     }
 
     private fun initView() {
-
         if (!persistentState.logsEnabled) {
             b.connectionListLogsDisabledTv.visibility = View.VISIBLE
             b.connectionCardViewTop.visibility = View.GONE
@@ -92,20 +115,7 @@ class ConnectionTrackerFragment :
         b.connectionListLogsDisabledTv.visibility = View.GONE
         b.connectionCardViewTop.visibility = View.VISIBLE
 
-        b.recyclerConnection.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(requireContext())
-        b.recyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.connectionTrackerList.observe(viewLifecycleOwner) { it ->
-                    recyclerAdapter.submitData(lifecycle, it)
-                }
-            }
-        }
-        b.recyclerConnection.adapter = recyclerAdapter
-
-        setupRecyclerScrollListener()
+        setupRecyclerView()
 
         b.connectionSearch.setOnQueryTextListener(this)
         b.connectionSearch.setOnClickListener {
@@ -123,6 +133,58 @@ class ConnectionTrackerFragment :
         remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
     }
 
+    private fun setupRecyclerView() {
+        b.recyclerConnection.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(requireContext())
+        layoutManager?.isItemPrefetchEnabled = true
+        b.recyclerConnection.layoutManager = layoutManager
+
+        val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
+        recyclerAdapter.stateRestorationPolicy =
+            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+
+        b.recyclerConnection.adapter = recyclerAdapter
+
+        viewModel.connectionTrackerList.observe(viewLifecycleOwner) { pagingData ->
+            recyclerAdapter.submitData(lifecycle, pagingData)
+        }
+
+        recyclerAdapter.addLoadStateListener { loadState ->
+            val isEmpty = recyclerAdapter.itemCount < 1
+            if (loadState.append.endOfPaginationReached && isEmpty) {
+                if (fromUniversalFirewallScreen || fromWireGuardScreen) {
+                    b.connectionListLogsDisabledTv.text = getString(R.string.ada_ip_no_connection)
+                    b.connectionListLogsDisabledTv.visibility = View.VISIBLE
+                    b.connectionCardViewTop.visibility = View.GONE
+                } else {
+                    b.connectionListLogsDisabledTv.visibility = View.GONE
+                    b.connectionCardViewTop.visibility = View.VISIBLE
+                }
+            } else {
+                b.connectionListLogsDisabledTv.visibility = View.GONE
+                b.connectionCardViewTop.visibility = View.VISIBLE
+            }
+        }
+
+        b.recyclerConnection.post {
+            try {
+                if (recyclerAdapter.itemCount > 0) {
+                    recyclerAdapter.stateRestorationPolicy =
+                        RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                }
+            } catch (ignored: Exception) {
+                Logger.e(LOG_TAG_UI, "$TAG; err in setting the recycler restoration policy")
+            }
+        }
+        b.recyclerConnection.layoutAnimation = null
+        setupRecyclerScrollListener()
+    }
+
+
+    private fun hideSearchLayout() {
+        b.connectionCardViewTop.visibility = View.GONE
+    }
+
     override fun onResume() {
         super.onResume()
         b.connectionListRl.requestFocus()
@@ -135,9 +197,17 @@ class ConnectionTrackerFragment :
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
 
-                    if (recyclerView.getChildAt(0)?.tag == null) return
+                    val firstChild = recyclerView.getChildAt(0)
+                    if (firstChild == null) {
+                        Logger.v(LOG_TAG_UI, "$TAG; err; no child views found in recyclerView")
+                        return
+                    }
 
-                    val tag: Long = recyclerView.getChildAt(0).tag as Long
+                    val tag = firstChild.tag as? Long
+                    if (tag == null) {
+                        Logger.v(LOG_TAG_UI, "$TAG; err; tag is null for first child, rv")
+                        return
+                    }
 
                     b.connectionListScrollHeader.text = formatToRelativeTime(requireContext(), tag)
                     b.connectionListScrollHeader.visibility = View.VISIBLE
@@ -253,7 +323,7 @@ class ConnectionTrackerFragment :
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(500, lifecycleScope) {
+        Utilities.delay(QUERY_TEXT_TIMEOUT, lifecycleScope) {
             if (this.isAdded) {
                 this.filterQuery = query
                 viewModel.setFilter(query, filterCategories, filterType)
@@ -320,7 +390,6 @@ class ConnectionTrackerFragment :
         b.filterChipParentGroup.visibility = View.GONE
     }
 
-    // fixme: move this to viewmodel scope
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
     }

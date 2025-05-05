@@ -27,7 +27,6 @@ import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.DataUsageSummary
 import com.celzero.bravedns.databinding.FragmentSummaryStatisticsBinding
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.DetailedStatisticsActivity
 import com.celzero.bravedns.util.CustomLinearLayoutManager
@@ -51,6 +50,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private var isVpnActive: Boolean = false
 
+    private var contactedDomainsAdapter: SummaryStatisticsAdapter? = null
+    private var contactedCountriesAdapter: SummaryStatisticsAdapter? = null
+
     enum class SummaryStatisticsType(val tid: Int) {
         MOST_CONNECTED_APPS(0),
         MOST_BLOCKED_APPS(1),
@@ -58,8 +60,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         MOST_CONTACTED_COUNTRIES(3),
         MOST_BLOCKED_DOMAINS(4),
         MOST_CONTACTED_IPS(5),
-        MOST_BLOCKED_IPS(6),
-        MOST_BLOCKED_COUNTRIES(7);
+        MOST_BLOCKED_IPS(6);
 
         companion object {
             fun getType(t: Int): SummaryStatisticsType {
@@ -69,7 +70,6 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                     MOST_CONTACTED_DOMAINS.tid -> MOST_CONTACTED_DOMAINS
                     MOST_BLOCKED_DOMAINS.tid -> MOST_BLOCKED_DOMAINS
                     MOST_CONTACTED_COUNTRIES.tid -> MOST_CONTACTED_COUNTRIES
-                    MOST_BLOCKED_COUNTRIES.tid -> MOST_BLOCKED_COUNTRIES
                     MOST_CONTACTED_IPS.tid -> MOST_CONTACTED_IPS
                     MOST_BLOCKED_IPS.tid -> MOST_BLOCKED_IPS
                     // make most contacted apps as default
@@ -100,7 +100,6 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         showMostContactedIps()
         showMostBlockedIps()
         showMostContactedCountries()
-        showMostBlockedCountries()
     }
 
     private fun setTabbedViewTxt() {
@@ -114,8 +113,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         // get the tabbed view from the view model and set the toggle button
         // to the selected one. in case of fragment resume, the recycler view
         // and the toggle button to be in sync
-        val timeCategory = viewModel.getTimeCategory().value.toString()
-        val btn = b.toggleGroup.findViewWithTag<MaterialButton>(timeCategory)
+        val tc = viewModel.getTimeCategory().value.toString()
+        val btn = b.toggleGroup.findViewWithTag<MaterialButton>(tc)
         btn.isChecked = true
         handleTotalUsagesUi()
     }
@@ -211,9 +210,6 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         b.fssCountriesLogsChip.setOnClickListener {
             openDetailedStatsUi(SummaryStatisticsType.MOST_CONTACTED_COUNTRIES)
         }
-        b.fssCountriesChipSecond.setOnClickListener {
-            openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_COUNTRIES)
-        }
     }
 
     private val listViewToggleListener =
@@ -225,11 +221,10 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 val timeCategory =
                     SummaryStatisticsViewModel.TimeCategory.fromValue(tcValue)
                         ?: SummaryStatisticsViewModel.TimeCategory.ONE_HOUR
-                io {
-                    val isAppBypassed = FirewallManager.isAnyAppBypassesDns()
-                    uiCtx { viewModel.timeCategoryChanged(timeCategory, isAppBypassed) }
-                    handleTotalUsagesUi()
-                }
+                viewModel.timeCategoryChanged(timeCategory)
+                handleTotalUsagesUi()
+                contactedDomainsAdapter?.setTimeCategory(timeCategory)
+                contactedCountriesAdapter?.setTimeCategory(timeCategory)
                 return@OnButtonCheckedListener
             }
 
@@ -282,8 +277,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 requireContext(),
                 persistentState,
                 appConfig,
-                SummaryStatisticsType.MOST_CONNECTED_APPS
-            )
+                SummaryStatisticsType.MOST_CONNECTED_APPS)
 
         viewModel.getAllowedAppNetworkActivity.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
@@ -294,7 +288,11 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             if (it.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
                     b.fssAppAllowedLl.visibility = View.GONE
+                } else {
+                    b.fssAppAllowedLl.visibility = View.VISIBLE
                 }
+            } else {
+                b.fssAppAllowedLl.visibility = View.VISIBLE
             }
         }
 
@@ -325,7 +323,11 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             if (it.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
                     b.fssAppBlockedLl.visibility = View.GONE
+                } else {
+                    b.fssAppBlockedLl.visibility = View.VISIBLE
                 }
+            } else {
+                b.fssAppBlockedLl.visibility = View.VISIBLE
             }
         }
 
@@ -346,7 +348,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.fssContactedDomainRecyclerView.layoutManager = layoutManager
 
-        val recyclerAdapter =
+        contactedDomainsAdapter =
             SummaryStatisticsAdapter(
                 requireContext(),
                 persistentState,
@@ -354,21 +356,29 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 SummaryStatisticsType.MOST_CONTACTED_DOMAINS
             )
 
-        viewModel.getMostContactedDomains.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+
+        val timeCategory = viewModel.getTimeCategory()
+        contactedDomainsAdapter?.setTimeCategory(timeCategory)
+
+        viewModel.mcd.observe(viewLifecycleOwner) {
+            contactedDomainsAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
         }
 
-        recyclerAdapter.addLoadStateListener {
+        contactedDomainsAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (recyclerAdapter.itemCount < 1) {
+                if (contactedDomainsAdapter!!.itemCount < 1) {
                     b.fssDomainAllowedLl.visibility = View.GONE
+                } else {
+                    b.fssDomainAllowedLl.visibility = View.VISIBLE
                 }
+            } else {
+                b.fssDomainAllowedLl.visibility = View.VISIBLE
             }
         }
         val scale = resources.displayMetrics.density
         val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
         b.fssContactedDomainRecyclerView.minimumHeight = pixels.toInt()
-        b.fssContactedDomainRecyclerView.adapter = recyclerAdapter
+        b.fssContactedDomainRecyclerView.adapter = contactedDomainsAdapter
     }
 
     private fun showMostBlockedDomains() {
@@ -389,7 +399,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 SummaryStatisticsType.MOST_BLOCKED_DOMAINS
             )
 
-        viewModel.getMostBlockedDomains.observe(viewLifecycleOwner) {
+        viewModel.mbd.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
 
@@ -397,7 +407,11 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             if (it.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
                     b.fssDomainBlockedLl.visibility = View.GONE
+                } else {
+                    b.fssDomainBlockedLl.visibility = View.VISIBLE
                 }
+            } else {
+                b.fssDomainBlockedLl.visibility = View.VISIBLE
             }
         }
         val scale = resources.displayMetrics.density
@@ -432,48 +446,17 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             if (it.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
                     b.fssIpAllowedLl.visibility = View.GONE
+                } else {
+                    b.fssIpAllowedLl.visibility = View.VISIBLE
                 }
+            } else {
+                b.fssIpAllowedLl.visibility = View.VISIBLE
             }
         }
         val scale = resources.displayMetrics.density
         val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
         b.fssContactedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedIpsRecyclerView.adapter = recyclerAdapter
-    }
-
-    private fun showMostContactedCountries() {
-        // if firewall is not active, hide the view
-        if (!appConfig.getBraveMode().isFirewallActive()) {
-            b.fssCountriesAllowedLl.visibility = View.GONE
-            return
-        }
-
-        b.fssContactedCountriesRecyclerView.setHasFixedSize(true)
-        val layoutManager = CustomLinearLayoutManager(requireContext())
-        b.fssContactedCountriesRecyclerView.layoutManager = layoutManager
-
-        val recyclerAdapter =
-            SummaryStatisticsAdapter(
-                requireContext(),
-                persistentState,
-                appConfig,
-                SummaryStatisticsType.MOST_CONTACTED_COUNTRIES
-            )
-        viewModel.getMostContactedCountries.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
-        }
-
-        recyclerAdapter.addLoadStateListener {
-            if (it.append.endOfPaginationReached) {
-                if (recyclerAdapter.itemCount < 1) {
-                    b.fssCountriesAllowedLl.visibility = View.GONE
-                }
-            }
-        }
-        val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
-        b.fssContactedCountriesRecyclerView.minimumHeight = pixels.toInt()
-        b.fssContactedCountriesRecyclerView.adapter = recyclerAdapter
     }
 
     private fun showMostBlockedIps() {
@@ -502,7 +485,11 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             if (it.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
                     b.fssIpBlockedLl.visibility = View.GONE
+                } else {
+                    b.fssIpBlockedLl.visibility = View.VISIBLE
                 }
+            } else {
+                b.fssIpBlockedLl.visibility = View.VISIBLE
             }
         }
         val scale = resources.displayMetrics.density
@@ -511,39 +498,43 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         b.fssBlockedIpsRecyclerView.adapter = recyclerAdapter
     }
 
-    private fun showMostBlockedCountries() {
+    private fun showMostContactedCountries() {
         // if firewall is not active, hide the view
         if (!appConfig.getBraveMode().isFirewallActive()) {
-            b.fssCountriesBlockedLl.visibility = View.GONE
+            b.fssCountriesAllowedLl.visibility = View.GONE
             return
         }
 
         b.fssContactedCountriesRecyclerView.setHasFixedSize(true)
         val layoutManager = CustomLinearLayoutManager(requireContext())
-        b.fssCountriesBlockedRecyclerView.layoutManager = layoutManager
+        b.fssContactedCountriesRecyclerView.layoutManager = layoutManager
 
-        val recyclerAdapter =
+        contactedCountriesAdapter =
             SummaryStatisticsAdapter(
                 requireContext(),
                 persistentState,
                 appConfig,
                 SummaryStatisticsType.MOST_CONTACTED_COUNTRIES
             )
-        viewModel.getMostBlockedCountries.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        viewModel.getMostContactedCountries.observe(viewLifecycleOwner) {
+            contactedCountriesAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
         }
 
-        recyclerAdapter.addLoadStateListener {
+        contactedCountriesAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (recyclerAdapter.itemCount < 1) {
-                    b.fssCountriesBlockedLl.visibility = View.GONE
+                if (contactedCountriesAdapter!!.itemCount < 1) {
+                    b.fssCountriesAllowedLl.visibility = View.GONE
+                } else {
+                    b.fssCountriesAllowedLl.visibility = View.VISIBLE
                 }
+            } else {
+                b.fssCountriesAllowedLl.visibility = View.VISIBLE
             }
         }
         val scale = resources.displayMetrics.density
         val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
-        b.fssCountriesBlockedRecyclerView.minimumHeight = pixels.toInt()
-        b.fssCountriesBlockedRecyclerView.adapter = recyclerAdapter
+        b.fssContactedCountriesRecyclerView.minimumHeight = pixels.toInt()
+        b.fssContactedCountriesRecyclerView.adapter = contactedCountriesAdapter
     }
 
     private fun io(f: suspend () -> Unit) {

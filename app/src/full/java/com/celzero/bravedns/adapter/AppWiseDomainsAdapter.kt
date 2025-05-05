@@ -40,7 +40,8 @@ import kotlin.math.log2
 class AppWiseDomainsAdapter(
     val context: Context,
     val lifecycleOwner: LifecycleOwner,
-    val uid: Int
+    val uid: Int,
+    val isRethink: Boolean
 ) :
     PagingDataAdapter<AppConnection, AppWiseDomainsAdapter.ConnectionDetailsViewHolder>(
         DIFF_CALLBACK
@@ -64,12 +65,11 @@ class AppWiseDomainsAdapter(
                     newConnection: AppConnection
                 ) = oldConnection == newConnection
             }
+
+        private const val TAG = "AppWiseDomainsAdapter"
     }
 
     private lateinit var adapter: AppWiseDomainsAdapter
-
-    // ui component to update/toggle the buttons
-    data class ToggleBtnUi(val txtColor: Int, val bgColor: Int)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -86,7 +86,7 @@ class AppWiseDomainsAdapter(
     }
 
     override fun onBindViewHolder(
-        holder: AppWiseDomainsAdapter.ConnectionDetailsViewHolder,
+        holder: ConnectionDetailsViewHolder,
         position: Int
     ) {
         val appConnection: AppConnection = getItem(position) ?: return
@@ -141,10 +141,15 @@ class AppWiseDomainsAdapter(
 
         private fun openBottomSheet(appConn: AppConnection) {
             if (context !is AppCompatActivity) {
-                Logger.w(LOG_TAG_UI, "Error opening the app conn bottom sheet")
+                Logger.w(LOG_TAG_UI, "$TAG err opening the app conn bottom sheet")
                 return
             }
 
+            if (isRethink) {
+                return
+            }
+
+            Logger.v(LOG_TAG_UI, "$TAG open bottom sheet for uid: $uid, ip: ${appConn.ipAddress}, domain: ${appConn.appOrDnsName}")
             val bottomSheetFragment = AppDomainRulesBottomSheet()
             // Fix: free-form window crash
             // all BottomSheetDialogFragment classes created must have a public, no-arg constructor.
