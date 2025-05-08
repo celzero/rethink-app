@@ -25,10 +25,7 @@ import android.text.format.DateUtils
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import backend.RouterStats
@@ -58,7 +55,6 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config
@@ -267,7 +263,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     ): String {
         if (status == null) {
             val txt = if (!errMsg.isNullOrEmpty()) {
-                getString(R.string.status_waiting) + "($errMsg)"
+                getString(R.string.status_waiting) + " ($errMsg)"
             } else {
                 getString(R.string.status_waiting)
             }
@@ -477,7 +473,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             if (mapping.isActive || mapping.isLockdown || mapping.isCatchAll) {
                 io {
                     val sid = ID_WG_BASE + configId
-                    val isVia = WgHopManager.isAlreadyVia(sid)
+                    val isVia = WgHopManager.isAlreadyHop(sid)
                     if (isVia) {
                         uiCtx {
                             Utilities.showToastUiCentered(
@@ -488,7 +484,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                         }
                         return@io
                     }
-                    val hopId = WgHopManager.getVia(configId)
+                    val hopId = WgHopManager.getHop(configId)
                     Logger.d(LOG_TAG_PROXY, "hop result: $hopId")
                     val iid = convertStringIdToId(hopId)
                     val hopables = WgHopManager.getHopableWgs(configId)

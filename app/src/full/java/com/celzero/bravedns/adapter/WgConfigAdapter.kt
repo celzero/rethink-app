@@ -120,9 +120,9 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             b.interfaceSwitch.isChecked = config.isActive && VpnController.hasTunnel()
             setupClickListeners(config)
             updateStatusJob(config)
-            updateHopChip(config.id)
+            updateHopSrcChip(config.id)
             updateAmneziaChip(config)
-            updateViaChip(config.id)
+            updateHoppingChip(config.id)
         }
 
         private fun updateStatusJob(config: WgConfigFiles) {
@@ -156,9 +156,9 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                     context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
                 updateProtocolChip(Pair(false, false))
                 updateSplitTunnelChip(false)
-                updateHopChip(config.id)
+                updateHopSrcChip(config.id)
                 updateAmneziaChip(config)
-                updateViaChip(config.id)
+                updateHoppingChip(config.id)
             }
         }
 
@@ -204,28 +204,28 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
         }
 
-        private fun updateHopChip(id: Int) {
+        private fun updateHopSrcChip(id: Int) {
             val sid = ID_WG_BASE + id
             val hop = WgHopManager.getMapBySrc(sid)
             if (hop.isNotEmpty()) {
                 b.protocolInfoChipGroup.visibility = View.VISIBLE
-                b.chipHop.visibility = View.VISIBLE
-                b.chipHop.text = context.getString(
+                b.chipHopSrc.visibility = View.VISIBLE
+                b.chipHopSrc.text = context.getString(
                     R.string.two_argument_colon, context.getString(R.string.hop_lbl),
-                    hop.joinToString { it.via })
+                    hop.joinToString { it.hop })
             } else {
-                b.chipHop.visibility = View.GONE
+                b.chipHopSrc.visibility = View.GONE
             }
         }
 
-        private fun updateViaChip(id: Int) {
+        private fun updateHoppingChip(id: Int) {
             val sid = ID_WG_BASE + id
-            val via = WgHopManager.isAlreadyVia(sid)
-            if (via) {
+            val hop = WgHopManager.isAlreadyHop(sid)
+            if (hop) {
                 b.protocolInfoChipGroup.visibility = View.VISIBLE
-                b.chipVia.visibility = View.VISIBLE
+                b.chipHopping.visibility = View.VISIBLE
             } else {
-                b.chipVia.visibility = View.GONE
+                b.chipHopping.visibility = View.GONE
             }
         }
 
@@ -397,7 +397,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         ): String {
             if (status == null) {
                 val txt = if (errMsg != null) {
-                    context.getString(R.string.status_waiting) + "($errMsg)"
+                    context.getString(R.string.status_waiting) + " ($errMsg)"
                 } else {
                     context.getString(R.string.status_waiting)
                 }

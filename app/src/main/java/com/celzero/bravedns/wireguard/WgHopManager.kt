@@ -30,8 +30,6 @@ object WgHopManager: KoinComponent {
             Logger.i(LOG_TAG_PROXY, "$TAG load: already loaded")
             return maps.size
         }
-
-        db.deleteAll()
         maps.clear()
         maps = CopyOnWriteArrayList(db.getAll())
         printMaps()
@@ -41,24 +39,29 @@ object WgHopManager: KoinComponent {
 
     private suspend fun add(map: WgHopMap): Pair<Boolean, String> {
         val srcConfig = WireguardManager.getConfigById(toId(map.src))
-        val viaConfig = WireguardManager.getConfigById(toId(map.via))
+        val hopConfig = WireguardManager.getConfigById(toId(map.hop))
 
-        val isAlreadyMapped = maps.any { it.src == map.src && it.via == map.via }
+        if (map.src.isBlank() || map.hop.isBlank()) {
+            Logger.e(LOG_TAG_PROXY, "$TAG add: invalid map with empty source and hop")
+            return Pair(false, "Invalid map configuration")
+        }
+
+        val isAlreadyMapped = maps.any { it.src == map.src && it.hop == map.hop }
         if (isAlreadyMapped) {
-            Logger.i(LOG_TAG_PROXY, "$TAG add: already mapped ${map.src} -> ${map.via}")
-            return Pair(false, "Already mapped ${map.src} -> ${map.via}")
+            Logger.i(LOG_TAG_PROXY, "$TAG add: already mapped ${map.src} -> ${map.hop}")
+            return Pair(false, "Already mapped ${map.src} -> ${map.hop}")
         }
 
         val canRoute = canRoute(map.src)
         if (!canRoute) {
-            Logger.i(LOG_TAG_PROXY, "$TAG add: Can't route $map.src -> $map.via")
-            return Pair(false, "Can't route ${map.src} -> ${map.via}")
+            Logger.i(LOG_TAG_PROXY, "$TAG add: cannot route ${map.src} -> ${map.hop}")
+            return Pair(false, "Can't route ${map.src} -> ${map.hop}")
         }
 
-        if (srcConfig != null && viaConfig != null) {
-            Logger.i(LOG_TAG_PROXY, "$TAG add: ${map.src}(${srcConfig.getName()}) -> ${map.via}(${viaConfig.getName()})")
-            val hop = VpnController.createWgHop(map.src, map.via)
-            Logger.i(LOG_TAG_PROXY, "$TAG add: ${map.src} -> ${map.via}, res: ${hop.first}, ${hop.second}")
+        if (srcConfig != null && hopConfig != null) {
+            Logger.i(LOG_TAG_PROXY, "$TAG add: ${map.src}(${srcConfig.getName()}) -> ${map.hop}(${hopConfig.getName()})")
+            val hop = VpnController.createWgHop(map.src, map.hop)
+            Logger.i(LOG_TAG_PROXY, "$TAG add: ${map.src} -> ${map.hop}, res: ${hop.first}, ${hop.second}")
             if (hop.first) {
                 map.isActive = true
                 db.insert(map)
@@ -80,114 +83,142 @@ object WgHopManager: KoinComponent {
             Logger.i(LOG_TAG_PROXY, "$TAG delete: map not found")
             return res
         }
-        res = VpnController.createWgHop(map.src, "")
         db.delete(map)
-        Logger.i(LOG_TAG_PROXY, "$TAG delete: ${map.src} -> ${map.via}, res: $res")
-        return Pair(rmv, "Removed ${map.src} -> ${map.via}")
+        res = VpnController.removeHop(map.src)
+        Logger.i(LOG_TAG_PROXY, "$TAG delete: ${map.src} -> ${map.hop}, res: $res")
+        return res
     }
 
-    suspend fun removeHop(srcId: Int, viaId: Int): Pair<Boolean, String> {
+    suspend fun removeHop(srcId: Int, hopId: Int): Pair<Boolean, String> {
         val src = ID_WG_BASE + srcId
-        val via = ID_WG_BASE + viaId
-        var res = Pair(false, "Map not found")
-        val map = maps.find { it.src == src && it.via == via }
-        Logger.v(LOG_TAG_PROXY, "$TAG removeHop: $src")
+        val hop = ID_WG_BASE + hopId
+        var res = Pair(false, "removeHop; Map not found")
+        val map = maps.find { it.src == src && it.hop == hop }
+        Logger.v(LOG_TAG_PROXY, "$TAG removeHop: $src, $hop, map: $map")
         if (map != null) {
             res = delete(map)
-            VpnController.removeHop(src)
-        } else {
-            Logger.i(LOG_TAG_PROXY, "$TAG delete: map not found")
         }
         return res
     }
 
-    suspend fun hop(src: Int, via: Int):  Pair<Boolean, String> {
+    suspend fun hop(src: Int, hop: Int):  Pair<Boolean, String> {
         val srcId = ID_WG_BASE + src
-        val viaId = ID_WG_BASE + via
-        // see if the src is mapped with some other via, if so remove it
+        val hopId = ID_WG_BASE + hop
+        // see if the src is mapped with some other hop, if so remove it
         val srcMaps = getMapBySrc(srcId)
         if (srcMaps.isNotEmpty()) {
             srcMaps.forEach {
-                if (it.via != viaId && it.via.isNotEmpty()) {
-                    removeHop(src, toId(it.via))
+                if (it.hop != hopId && it.hop.isNotEmpty()) {
+                    removeHop(src, toId(it.hop))
                 }
             }
         }
-        Logger.d(LOG_TAG_PROXY, "$TAG hop init: $srcId -> $viaId")
-        return if (srcId == viaId) {
+        Logger.d(LOG_TAG_PROXY, "$TAG hop init: $srcId -> $hopId")
+        return if (srcId == hopId) {
             Pair(false, "Can't hop to self")
         } else {
-            val map = getMap(srcId, viaId)
+            val map = getMap(srcId, hopId)
             if (map != null) {
-                Pair(true, "Already hopped")
+                Pair(true, "Already configured")
             } else {
-                add(WgHopMap(0, srcId, viaId, true, ""))
+                add(WgHopMap(0, srcId, hopId, true, ""))
             }
         }
     }
 
-    suspend fun getVia(src: Int): String {
+    suspend fun getHop(src: Int): String {
         val srcId = ID_WG_BASE + src
-        return getVia(srcId)
+        return getHop(srcId)
     }
 
-    suspend fun getVia(src: String): String {
+    suspend fun getHop(src: String): String {
+        if (src.isBlank()) return ""
         val map = maps.find { it.src == src && it.isActive }
-        return map?.via ?: ""
+        return map?.hop ?: ""
     }
 
     suspend fun getHopableWgs(src: Int): List<Config> {
         val srcId = ID_WG_BASE + src
         val possibleHops: MutableSet<Config> = mutableSetOf()
-        // add the via of this src to the list even if it is not active
-        val via = maps.find { it.src == srcId }
-        if (via != null) {
-            val viaConfig = WireguardManager.getConfigById(toId(via.via))
-            if (viaConfig != null) {
-                possibleHops.add(viaConfig)
+        // add the hop of this src to the list even if it is not active
+        val map = maps.find { it.src == srcId }
+        if (map != null) {
+            val hopConfig = WireguardManager.getConfigById(toId(map.hop))
+            if (hopConfig != null) {
+                possibleHops.add(hopConfig)
             }
         }
         // get the list of active wgs
         val activeWgs = WireguardManager.getActiveConfigs()
         Logger.d(LOG_TAG_PROXY, "$TAG getHopableWgs activeWgs: $activeWgs")
-        possibleHops.addAll(activeWgs.filter { wg ->
+        // remove the wireguards which are part of other hops
+        val filteredWgs = activeWgs.filter { wg ->
+            val wgId = wg.getId()
+            val isHop = maps.any { toId(it.src) == wgId }
+            !isHop
+        }
+        Logger.d(LOG_TAG_PROXY, "$TAG getHopableWgs filteredWgs: $filteredWgs")
+        possibleHops.addAll(filteredWgs.filter { wg ->
             wg.getId() != toId(srcId) && canRoute(srcId)
         })
         Logger.i(LOG_TAG_PROXY, "$TAG getHopableWgs possibleHops: ${possibleHops.map { it.getName() }}")
         return possibleHops.toList() // return the immutable list
     }
 
-    fun isAlreadyVia(id: String): Boolean {
-        return maps.any { it.via == id }
+    fun isAlreadyHop(id: String): Boolean {
+        return maps.any { it.hop == id }
     }
 
     fun getMaps(): List<WgHopMap> {
         return maps
     }
 
-    fun getMap(src: String, via: String): WgHopMap? {
-        return maps.find { it.src == src && it.via == via }
+    fun getMap(src: String, hop: String): WgHopMap? {
+        return maps.find { it.src == src && it.hop == hop }
     }
 
-    fun getAllVia(): List<String> {
-        // get all the via from the maps
-        return maps.map { it.via }
+    fun getAllHop(): List<String> {
+        // get all the hop from the maps
+        return maps.map { it.hop }
     }
 
     fun getMapBySrc(src: String): List<WgHopMap> {
         return maps.filter { it.src == src }
     }
 
-    fun getMapByVia(via: String): List<WgHopMap> {
-        return maps.filter { it.via == via }
+    fun getMapByHop(hop: String): List<WgHopMap> {
+        return maps.filter { it.hop == hop }
+    }
+
+    suspend fun handleWgDelete(id: Int) {
+        val idStr = ID_WG_BASE + id
+        // if the src is deleted, then remove all the maps which are using this src
+        val srcMap = getMapBySrc(idStr)
+        if (srcMap.isNotEmpty()) {
+            srcMap.forEach { map ->
+                Logger.i(LOG_TAG_PROXY, "$TAG handleWgDelete: deleting map $map")
+                delete(map)
+            }
+        }
+        // if the src is hop for any other map, then it can't route, remove all the maps
+        val hopMap = getMapByHop(idStr)
+        if (hopMap.isNotEmpty()) {
+            hopMap.forEach { map ->
+                Logger.i(LOG_TAG_PROXY, "$TAG handleWgDelete: deleting map $map")
+                delete(map)
+            }
+        }
     }
 
     fun canRoute(src: String): Boolean {
-        // if the src is via for any other map, then it can't route
-        val srcMaps = getMapBySrc(src)
-        val can = srcMaps.none { it.via == src }
-        Logger.d(LOG_TAG_PROXY, "$TAG canRoute srcMaps: $srcMaps, can: $can")
-        return can
+        // if the src is hop for any other map, then it can't route
+        val srcMap = getMapBySrc(src)
+        val can = srcMap.none { it.hop == src }
+        // or if the src is already part of any other map as src
+        val hopMap = getMapByHop(src)
+        val can2 = hopMap.none { it.src == src && it.isActive }
+        Logger.d(LOG_TAG_PROXY, "$TAG canRoute($src) srcMap: $srcMap, can: $can, hopMap: $hopMap, can2: $can2")
+        return can && can2
     }
 
     private fun toId(id: String): Int {

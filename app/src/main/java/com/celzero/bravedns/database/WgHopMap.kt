@@ -8,12 +8,12 @@ class WgHopMap {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
     var src: String = ""
-    var via: String = ""
+    var hop: String = ""
     var isActive: Boolean = false
     var status: String = "" // last known status from tunnel
 
     override fun toString(): String {
-        return "WgHopMap(id=$id, src='$src', via='$via', isActive=$isActive, status='$status')"
+        return "WgHopMap(id=$id, src='$src', hop='$hop', isActive=$isActive, status='$status')"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -22,7 +22,7 @@ class WgHopMap {
 
         if (id != other.id) return false
         if (src != other.src) return false
-        if (via != other.via) return false
+        if (hop != other.hop) return false
         if (isActive != other.isActive) return false
         if (status != other.status) return false
 
@@ -32,16 +32,16 @@ class WgHopMap {
     override fun hashCode(): Int {
         var result = id
         result = 31 * result + src.hashCode()
-        result = 31 * result + via.hashCode()
+        result = 31 * result + hop.hashCode()
         result = 31 * result + isActive.hashCode()
         result = 31 * result + status.hashCode()
         return result
     }
 
-    constructor(id: Int, src: String, via: String, isActive: Boolean, status: String) {
+    constructor(id: Int, src: String, hop: String, isActive: Boolean, status: String) {
         this.id = id
         this.src = src
-        this.via = via
+        this.hop = hop
         this.isActive = isActive
         this.status = status
     }
