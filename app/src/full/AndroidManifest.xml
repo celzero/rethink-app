@@ -167,6 +167,12 @@
             android:name=".receiver.NotificationActionReceiver"
             android:exported="false"
             android:label="@string/app_name" />
+        <receiver android:name=".receiver.UserPresentReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"

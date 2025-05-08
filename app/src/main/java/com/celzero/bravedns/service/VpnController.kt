@@ -32,7 +32,6 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.BraveVPNService.Companion.FAIL_OPEN_ON_NO_NETWORK
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.wireguard.Config
 import java.net.Socket
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -304,7 +303,7 @@ object VpnController : KoinComponent {
         return braveVpnService?.hasCid(cid, uid) ?: false
     }
 
-    fun removeWireGuardProxy(id: Int) {
+    suspend fun removeWireGuardProxy(id: Int) {
         braveVpnService?.removeWireGuardProxy(id)
     }
 
@@ -376,24 +375,24 @@ object VpnController : KoinComponent {
         return braveVpnService?.registerAndFetchProtonIfNeeded(prevBytes)
     }
 
-    suspend fun createWgHop(origin: String, via: String): Pair<Boolean, String> {
-        return (braveVpnService?.createWgHop(origin, via) ?: Pair(false, "vpn service not available"))
+    suspend fun createWgHop(origin: String, hop: String): Pair<Boolean, String> {
+        return (braveVpnService?.createWgHop(origin, hop) ?: Pair(false, "vpn service not available"))
     }
 
-    suspend fun via(proxyId: String): String {
-        return braveVpnService?.via(proxyId) ?: ""
+    suspend fun hop(proxyId: String): String {
+        return braveVpnService?.hop(proxyId) ?: ""
     }
 
     suspend fun testRpnProxy(type: RpnProxyManager.RpnType): Boolean {
         return braveVpnService?.testRpnProxy(type) == true
     }
 
-    suspend fun testHop(src: String, via: String): Pair<Boolean, String> {
-        return braveVpnService?.testHop(src, via) ?: Pair(false, "vpn service not available")
+    suspend fun testHop(src: String, hop: String): Pair<Boolean, String> {
+        return braveVpnService?.testHop(src, hop) ?: Pair(false, "vpn service not available")
     }
 
-    suspend fun hopStatus(src: String, via: String): Pair<Long?, String> {
-        return braveVpnService?.hopStatus(src, via) ?: Pair(null, "vpn service not available")
+    suspend fun hopStatus(src: String, hop: String): Pair<Long?, String> {
+        return braveVpnService?.hopStatus(src, hop) ?: Pair(null, "vpn service not available")
     }
 
     suspend fun removeHop(src: String): Pair<Boolean, String> {
@@ -410,5 +409,13 @@ object VpnController : KoinComponent {
 
     suspend fun vpnStats(): String? {
         return braveVpnService?.vpnStats()
+    }
+
+    fun screenLock() {
+        braveVpnService?.screenLock()
+    }
+
+    fun screenUnlock() {
+        braveVpnService?.screenUnlock()
     }
 }

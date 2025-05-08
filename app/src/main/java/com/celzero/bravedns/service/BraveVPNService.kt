@@ -34,6 +34,7 @@ import android.app.UiModeManager
 import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
@@ -83,6 +84,7 @@ import com.celzero.bravedns.iab.SubscriptionCheckWorker
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
+import com.celzero.bravedns.receiver.UserPresentReceiver
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
@@ -150,12 +152,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import kotlin.time.measureTime
 
 class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge, OnSharedPreferenceChangeListener {
 
     private val vpnScope = MainScope()
 
     private var connectionMonitor: ConnectionMonitor = ConnectionMonitor(this)
+
+    private var userPresentReceiver: UserPresentReceiver = UserPresentReceiver()
 
     // multiple coroutines call both signalStopService and makeOrUpdateVpnAdapter and so
     // set and unset this variable on the serializer thread
@@ -214,7 +219,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         const val ROUTE4IN6 = true
 
         // subscription check interval in milliseconds 4 hours
-        private const val PLUS_CHECK_INTERVAL = 4 * 60 *  60 * 1000L // changed to 4 min for testing
+        private const val PLUS_CHECK_INTERVAL = 4 * 60 * 60 * 1000L
     }
 
     private var lastSubscriptionCheckTime: Long = 0
@@ -1274,12 +1279,31 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         notificationManager = this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         activityManager = this.getSystemService(ACTIVITY_SERVICE) as ActivityManager
         accessibilityManager = this.getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager
-        keyguardManager = this.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        keyguardManager = this.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
         connectivityManager =
-            this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            this.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
 
         if (persistentState.getBlockAppWhenBackground()) {
             registerAccessibilityServiceState()
+        }
+        registerUserPresentReceiver()
+    }
+
+    private fun registerUserPresentReceiver() {
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_USER_PRESENT)
+            addAction(Intent.ACTION_SCREEN_OFF)
+        }
+        registerReceiver(userPresentReceiver, filter)
+        Logger.i(LOG_TAG_VPN, "user present receiver registered")
+    }
+
+    private fun unregisterUserPresentReceiver() {
+        try {
+            unregisterReceiver(userPresentReceiver)
+            Logger.i(LOG_TAG_VPN, "user present receiver unregistered")
+        } catch (ignored: IllegalArgumentException) {
+            Logger.w(LOG_TAG_VPN, "user present receiver not registered")
         }
     }
 
@@ -1646,6 +1670,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     workRequest
                 )
             }
+            // TOOD: write listener to check the subscription status, if worker fails
+            // reset the last check time
         } else {
             Logger.i(LOG_TAG_VPN, "checkForPlusSubscription: feature disabled")
         }
@@ -2806,6 +2832,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         try {
             unregisterAccessibilityServiceState()
             orbotHelper.unregisterReceiver()
+            unregisterUserPresentReceiver()
         } catch (e: IllegalArgumentException) {
             Logger.w(LOG_TAG_VPN, "Unregister receiver error: ${e.message}")
         }
@@ -3333,10 +3360,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // queryType: see ResourceRecordTypes.kt
         logd("onQuery: rcvd uid: $uid query: $fqdn, qtype: $qtype")
         if (fqdn == null) {
-            Logger.e(LOG_TAG_VPN, "onQuery: fqdn is null")
+            Logger.e(LOG_TAG_VPN, "onQuery: fqdn is null, uid: $uid, returning ${Backend.BlockAll}")
             // return block all, as it is not expected to reach here
-            val res = makeNsOpts(uid,  Pair(Backend.BlockAll, ""), fqdn ?: "")
-            return@go2kt res
+            return@go2kt makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn ?: "")
         }
 
         val appMode = appConfig.getBraveMode()
@@ -4430,9 +4456,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return trackedCids.contains(key)
     }
 
-    fun removeWireGuardProxy(id: Int) {
+    suspend fun removeWireGuardProxy(id: Int) {
         logd("remove wg from tunnel: $id")
-        io("removeWg") { vpnAdapter?.removeWgProxy(id) }
+        vpnAdapter?.removeWgProxy(id)
     }
 
     suspend fun addWireGuardProxy(id: String) {
@@ -4726,12 +4752,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return vpnAdapter?.registerAndFetchProtonIfNeeded(prevBytes)
     }
 
-    suspend fun createWgHop(origin: String, via: String): Pair<Boolean, String> {
-        return (vpnAdapter?.createHop(origin, via)) ?: Pair(false, "adapter is null")
+    suspend fun createWgHop(origin: String, hop: String): Pair<Boolean, String> {
+        return (vpnAdapter?.createHop(origin, hop)) ?: Pair(false, "adapter is null")
     }
 
-    suspend fun via(proxyId: String): String {
-        return vpnAdapter?.via(proxyId) ?: ""
+    suspend fun hop(proxyId: String): String {
+        return vpnAdapter?.hop(proxyId) ?: ""
     }
 
     suspend fun updateRpnProxy(type: RpnProxyManager.RpnType): ByteArray? {
@@ -4782,6 +4808,26 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     private suspend fun domainRulesStats(): String {
         return DomainRulesManager.stats()
+    }
+
+    fun screenLock() {
+        // no-op
+    }
+
+    fun screenUnlock() {
+        io("screenUnlock") {
+            // initiate wireguard ping for one wg and catch-all configs
+            val configs = WireguardManager.getActiveConfigs()
+            Logger.i(LOG_TAG_VPN, "screenUnlock: initiate wg ping for onewg/catchall configs")
+            configs.forEach { c ->
+                val isOneWg = WireguardManager.getOneWireGuardProxyId() == c.getId()
+                val isCatchAll = WireguardManager.getActiveCatchAllConfig().any { it.id == c.getId()}
+                if (isOneWg || isCatchAll) {
+                    val id = ID_WG_BASE + c.getId()
+                    vpnAdapter?.initiateWgPing(id)
+                }
+            }
+        }
     }
 
     private fun builderStats(): String {
