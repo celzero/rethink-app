@@ -27,10 +27,12 @@ import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.database.WgConfigFilesRepository
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_ID
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_NAME
+import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
+import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -255,7 +257,10 @@ object WireguardManager : KoinComponent {
 
     fun canDisableConfig(map: WgConfigFilesImmutable): Boolean {
         // do not allow to disable the proxy if it is catch-all
-        return !map.isCatchAll
+        val catchAll = !map.isCatchAll
+        // do not allow if the config is already hopping
+        val isVia = WgHopManager.isAlreadyHop(ID_WG_BASE+map.id)
+        return !catchAll || !isVia
     }
 
     fun canDisableAllActiveConfigs(): Boolean {
@@ -325,7 +330,7 @@ object WireguardManager : KoinComponent {
             appConfig.removeProxy(proxyType, proxyProvider)
         }
         // directly remove the proxy from the tunnel, instead of calling updateTun
-        VpnController.removeWireGuardProxy(newMap.id)
+        io { VpnController.removeWireGuardProxy(newMap.id) }
         Logger.i(LOG_TAG_PROXY, "disable wg config: ${newMap.id}, ${newMap.name}")
         return
     }
@@ -336,7 +341,7 @@ object WireguardManager : KoinComponent {
         if (oneWireGuardEnabled()) {
             val id = getOneWireGuardProxyId()
             if (checkMeteredEligibility(id, usesMeteredNw)) {
-                proxyIds.add(ProxyManager.ID_WG_BASE + id)
+                proxyIds.add(ID_WG_BASE + id)
                 // add default to the list, can route check is done in go-tun
                 if (default.isNotEmpty()) proxyIds.add(default)
                 Logger.i(LOG_TAG_PROXY, "one-wg enabled, return $proxyIds")
@@ -592,6 +597,7 @@ object WireguardManager : KoinComponent {
             ProxyManager.removeProxyId(proxyId)
             mappings.remove(mappings.find { it.id == id })
             configs.remove(config)
+            WgHopManager.handleWgDelete(id)
         }
     }
 
@@ -870,6 +876,10 @@ object WireguardManager : KoinComponent {
 
     fun getOneWireGuardProxyId(): Int? {
         return mappings.find { it.oneWireGuard && it.isActive }?.id
+    }
+
+    fun getActiveCatchAllConfig(): List<WgConfigFilesImmutable> {
+        return mappings.filter { it.isActive && it.isCatchAll }
     }
 
     private fun io(f: suspend () -> Unit) {
