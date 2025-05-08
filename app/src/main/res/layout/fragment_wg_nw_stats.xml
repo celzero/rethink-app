@@ -62,7 +62,21 @@
 
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
+        <TextView
+            android:id="@+id/tb_logs_disabled_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/background"
+            android:gravity="top|center"
+            android:paddingStart="10dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="10dp"
+            android:text="@string/no_stats_available"
+            android:textSize="@dimen/large_font_text_view"
+            android:visibility="visible" />
+
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tb_stats_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="true"

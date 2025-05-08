@@ -238,10 +238,12 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         // in play version so delete the local blocklists
         val path = blocklistCanonicalPath(this, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME)
         val dir = File(path)
-        deleteRecursive(dir)
+        val res = deleteRecursive(dir)
         // reset the local blocklists
-        persistentState.localBlocklistStamp = ""
-        persistentState.localBlocklistTimestamp = 0L
+        if (res) {
+            persistentState.localBlocklistStamp = ""
+            persistentState.localBlocklistTimestamp = 0L
+        }
         Logger.i(LOG_TAG_UI, "$TAG; local blocklists deleted, path: $path")
     }
 

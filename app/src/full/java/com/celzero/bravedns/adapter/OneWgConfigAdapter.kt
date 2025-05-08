@@ -273,7 +273,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         ): String {
             if (status == null) {
                 val txt = if (errMsg != null) {
-                    context.getString(R.string.status_waiting) + "($errMsg)"
+                    context.getString(R.string.status_waiting) + " ($errMsg)"
                 } else {
                     context.getString(R.string.status_waiting)
                 }

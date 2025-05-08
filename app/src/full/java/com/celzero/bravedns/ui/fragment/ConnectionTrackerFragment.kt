@@ -81,7 +81,6 @@ class ConnectionTrackerFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView()
         if (arguments != null) {
             val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
             fromUniversalFirewallScreen = query.contains(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)
@@ -102,6 +101,7 @@ class ConnectionTrackerFragment :
                 b.connectionSearch.setQuery(query, true)
             }
         }
+        initView()
         Logger.v(LOG_TAG_UI, "$TAG, view created from univ? $fromUniversalFirewallScreen, from wg? $fromWireGuardScreen")
     }
 
@@ -113,7 +113,12 @@ class ConnectionTrackerFragment :
         }
 
         b.connectionListLogsDisabledTv.visibility = View.GONE
-        b.connectionCardViewTop.visibility = View.VISIBLE
+
+        if (fromWireGuardScreen || fromUniversalFirewallScreen) {
+            hideSearchLayout()
+        } else {
+            b.connectionCardViewTop.visibility = View.VISIBLE
+        }
 
         setupRecyclerView()
 
@@ -160,6 +165,7 @@ class ConnectionTrackerFragment :
                     b.connectionListLogsDisabledTv.visibility = View.GONE
                     b.connectionCardViewTop.visibility = View.VISIBLE
                 }
+                viewModel.connectionTrackerList.removeObservers(this)
             } else {
                 b.connectionListLogsDisabledTv.visibility = View.GONE
                 b.connectionCardViewTop.visibility = View.VISIBLE

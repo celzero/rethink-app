@@ -61,109 +61,108 @@
                         android:alpha="0.7"
                         android:maxLength="5" />
 
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/protocol_info_chip_group"
+                </LinearLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/protocol_info_chip_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginEnd="5dp"
+                    android:paddingBottom="2dp"
+                    android:visibility="gone">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/protocol_info_chip_ipv4"
+                        style="@style/ThinnerChip.Action"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="3dp"
-                        android:layout_marginEnd="5dp"
-                        android:paddingBottom="2dp"
-                        android:visibility="gone">
+                        android:alpha="0.8"
+                        android:checked="true"
+                        android:text="@string/settings_ip_text_ipv4"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
+                        app:chipStrokeColor="?attr/accentGood"
+                        app:chipStrokeWidth="1.5dp" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/protocol_info_chip_ipv4"
-                            style="@style/ThinnerChip.Action"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.8"
-                            android:checked="true"
-                            android:text="@string/settings_ip_text_ipv4"
-                            android:visibility="gone"
-                            android:textAlignment="center"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/small_font_text_view"
-                            app:chipStrokeColor="?attr/accentGood"
-                            app:chipStrokeWidth="1.5dp" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/protocol_info_chip_ipv6"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.8"
+                        android:checked="true"
+                        android:text="@string/settings_ip_text_ipv6"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
+                        app:chipStrokeColor="?attr/accentGood"
+                        app:chipStrokeWidth="1.5dp" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/protocol_info_chip_ipv6"
-                            style="@style/ThinnerChip.Action"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.8"
-                            android:checked="true"
-                            android:text="@string/settings_ip_text_ipv6"
-                            android:visibility="gone"
-                            android:textAlignment="center"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/small_font_text_view"
-                            app:chipStrokeColor="?attr/accentGood"
-                            app:chipStrokeWidth="1.5dp" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_split_tunnel"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.8"
+                        android:checked="true"
+                        android:text="@string/lbl_split"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
+                        app:chipStrokeColor="?attr/accentGood"
+                        app:chipStrokeWidth="1.5dp" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_split_tunnel"
-                            style="@style/ThinnerChip.Action"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.8"
-                            android:checked="true"
-                            android:text="@string/lbl_split"
-                            android:visibility="gone"
-                            android:textAlignment="center"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/small_font_text_view"
-                            app:chipStrokeColor="?attr/accentGood"
-                            app:chipStrokeWidth="1.5dp" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_amnezia"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.8"
+                        android:checked="true"
+                        android:text="@string/lbl_amnezia"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
+                        app:chipStrokeColor="?attr/accentGood"
+                        app:chipStrokeWidth="1.5dp" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_amnezia"
-                            style="@style/ThinnerChip.Action"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.8"
-                            android:checked="true"
-                            android:text="Amnezia"
-                            android:textAlignment="center"
-                            android:visibility="gone"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/small_font_text_view"
-                            app:chipStrokeColor="?attr/accentGood"
-                            app:chipStrokeWidth="1.5dp" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_hop_src"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.8"
+                        android:checked="true"
+                        android:text="@string/hop_lbl"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
+                        app:chipStrokeColor="?attr/accentGood"
+                        app:chipStrokeWidth="1.5dp" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_hop"
-                            style="@style/ThinnerChip.Action"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.8"
-                            android:checked="true"
-                            android:visibility="gone"
-                            android:text="Hop"
-                            android:textAlignment="center"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/small_font_text_view"
-                            app:chipStrokeColor="?attr/accentGood"
-                            app:chipStrokeWidth="1.5dp" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_hopping"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.8"
+                        android:checked="true"
+                        android:text="@string/lbl_hopping"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
+                        app:chipStrokeColor="?attr/accentGood"
+                        app:chipStrokeWidth="1.5dp" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_via"
-                            style="@style/ThinnerChip.Action"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.8"
-                            android:checked="true"
-                            android:text="Via"
-                            android:visibility="gone"
-                            android:textAlignment="center"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/small_font_text_view"
-                            app:chipStrokeColor="?attr/accentGood"
-                            app:chipStrokeWidth="1.5dp" />
-
-                    </com.google.android.material.chip.ChipGroup>
-
-                </LinearLayout>
+                </com.google.android.material.chip.ChipGroup>
 
                 <TextView
                     android:id="@+id/interface_status"

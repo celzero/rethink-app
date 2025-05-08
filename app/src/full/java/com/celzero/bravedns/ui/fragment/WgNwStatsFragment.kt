@@ -111,6 +111,20 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
         viewModel.wgAppNwActivity.observe(viewLifecycleOwner) {
             adapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
+
+        adapter.addLoadStateListener { loadState ->
+            val isEmpty = adapter.itemCount < 1
+            if (loadState.append.endOfPaginationReached && isEmpty) {
+                b.tbStatsCard.visibility = View.GONE
+                //b.toggleGroup.visibility = View.GONE
+                b.tbLogsDisabledTv.visibility = View.VISIBLE
+                viewModel.wgAppNwActivity.removeObservers(this)
+            } else {
+                b.tbLogsDisabledTv.visibility = View.GONE
+                b.tbStatsCard.visibility = View.VISIBLE
+                //b.toggleGroup.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun highlightToggleBtn() {
