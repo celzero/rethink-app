@@ -80,12 +80,12 @@ object WgHopManager: KoinComponent {
         var res = Pair(false, "Map not found")
         val rmv = maps.remove(map)
         if (!rmv) {
-            Logger.i(LOG_TAG_PROXY, "$TAG delete: map not found")
+            Logger.i(LOG_TAG_PROXY, "$TAG delete: map not found in cache")
             return res
         }
-        db.delete(map)
+        val deleted = db.deleteBySrcAndHop(map.src, map.hop) > 0
         res = VpnController.removeHop(map.src)
-        Logger.i(LOG_TAG_PROXY, "$TAG delete: ${map.src} -> ${map.hop}, res: $res")
+        Logger.i(LOG_TAG_PROXY, "$TAG delete: ${map.src} -> ${map.hop}, res: $res, db? $deleted")
         return res
     }
 

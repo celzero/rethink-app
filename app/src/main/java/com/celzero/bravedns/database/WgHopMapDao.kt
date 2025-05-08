@@ -37,6 +37,8 @@ interface WgHopMapDao {
 
     @Query("delete from WgHopMap where id = :id") fun deleteById(id: Int)
 
+    @Query("delete from WgHopMap where src = :src and hop = :hop") fun deleteBySrcAndHop(src: String, hop: String): Int
+
     @Query("select * from WgHopMap where src = :src") fun getBySrc(src: String): WgHopMap?
 
     @Query("select * from WgHopMap") fun getAll(): List<WgHopMap>

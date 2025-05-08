@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.adapter
 
+import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
 import android.view.LayoutInflater
@@ -25,18 +26,17 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.ListItemWgHopBinding
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgHopManager
-import com.celzero.bravedns.wireguard.WgInterface
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -50,6 +50,8 @@ class WgHopAdapter(
     companion object {
         private const val TAG = "HopAdapter"
     }
+
+    private var isAttached = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HopViewHolder {
         val itemBinding =
@@ -65,12 +67,24 @@ class WgHopAdapter(
         holder.update(hopables[position])
     }
 
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        isAttached = true
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        isAttached = false
+    }
+
     inner class HopViewHolder(private val b: ListItemWgHopBinding) :
         RecyclerView.ViewHolder(b.root) {
 
+        private var processingDialog: androidx.appcompat.app.AlertDialog? = null
+
         fun update(config: Config) {
             val mapping = WireguardManager.getConfigFilesById(config.getId()) ?: return
-            b.wgHopListNameTv.text = config.getName() + "(" + config.getId() + ")"
+            b.wgHopListNameTv.text = config.getName() + " (" + config.getId() + ")"
             b.wgHopListCheckbox.isChecked = config.getId() == selectedId
             setCardStroke(config.getId() == selectedId, mapping.isActive)
             updateStatusUi(config)
@@ -80,26 +94,51 @@ class WgHopAdapter(
 
         private fun updateStatusUi(config: Config) {
             io {
-                val srcConfig = WireguardManager.getConfigById(srcId)
-                if (srcConfig == null) {
-                    Logger.i(LOG_TAG_UI, "$TAG; source config($srcId) not found to hop")
+                val map = WireguardManager.getConfigFilesById(config.getId())
+                if (map == null) {
                     uiCtx {
-                        b.wgHopListDescTv.text = context.getString(R.string.lbl_inactive)
+                        b.wgHopListDescTv.text = context.getString(R.string.config_invalid_desc)
                     }
                     return@io
                 }
-
-                val src = ID_WG_BASE + srcConfig.getId()
-                val via = ID_WG_BASE + config.getId()
-                val testHop = VpnController.hopStatus(src, via)
-                uiCtx {
-                    b.wgHopListDescTv.text = if (testHop.first != null) {
-                        val status = UIUtils.getProxyStatusStringRes(testHop.first)
-                        context.getString(status)
-                    } else {
-                        testHop.second
+                if (selectedId == config.getId()) {
+                    val srcConfig = WireguardManager.getConfigById(srcId)
+                    if (srcConfig == null) {
+                        Logger.i(LOG_TAG_UI, "$TAG; source config($srcId) not found to hop")
+                        uiCtx {
+                            b.wgHopListDescTv.text = context.getString(R.string.lbl_inactive)
+                        }
+                        return@io
+                    }
+                    val src = ID_WG_BASE + srcConfig.getId()
+                    val hop = ID_WG_BASE + config.getId()
+                    val testHop = VpnController.testHop(src, hop)
+                    uiCtx {
+                        b.wgHopListDescTv.text = if (testHop.first) {
+                            if (testHop.second.isEmpty()) {
+                                context.getString(R.string.lbl_active)
+                            } else {
+                                testHop.second
+                            }
+                        } else {
+                            testHop.second
+                        }
+                    }
+                    return@io
+                }
+                if (map.isActive) {
+                    uiCtx {
+                        b.wgHopListDescTv.text = context.getString(R.string.lbl_active)
+                    }
+                    return@io
+                } else {
+                    uiCtx {
+                        b.wgHopListDescTv.text = context.getString(R.string.lbl_inactive)
                     }
                 }
+                /*
+
+                */
             }
         }
 
@@ -116,8 +155,8 @@ class WgHopAdapter(
                     updateAmzChip(config)
                     updateProtocolChip(pair)
                     updateSplitTunnelChip(isSplitTunnel)
-                    updateHopChip(config)
-                    updateViaChip(config)
+                    updateHopSrcChip(config)
+                    updateHoppingChip(config)
                 }
             }
         }
@@ -166,23 +205,23 @@ class WgHopAdapter(
             }
         }
 
-        private fun updateHopChip(config: Config) {
+        private fun updateHopSrcChip(config: Config) {
             val id = ID_WG_BASE + config.getId()
             val hop = WgHopManager.getMapBySrc(id)
             if (hop.isNotEmpty()) {
-                b.chipHop.visibility = View.VISIBLE
+                b.chipHopSrc.visibility = View.VISIBLE
             } else {
-                b.chipHop.visibility = View.GONE
+                b.chipHopSrc.visibility = View.GONE
             }
         }
 
-        private fun updateViaChip(config: Config) {
+        private fun updateHoppingChip(config: Config) {
             val id = ID_WG_BASE + config.getId()
-            val via = WgHopManager.isAlreadyVia(id)
-            if (via) {
-                b.chipVia.visibility = View.VISIBLE
+            val hop = WgHopManager.isAlreadyHop(id)
+            if (hop) {
+                b.chipHopping.visibility = View.VISIBLE
             } else {
-                b.chipVia.visibility = View.GONE
+                b.chipHopping.visibility = View.GONE
             }
         }
 
@@ -203,14 +242,40 @@ class WgHopAdapter(
                 Logger.i(LOG_TAG_UI, "$TAG; source config($srcId) not found to hop")
                 return
             }
+            uiCtx {
+                showProcessingDialog(context)
+            }
             Logger.d(LOG_TAG_UI, "$TAG; init, hop: ${srcConfig.getId()} -> ${config.getId()}, isChecked? $isChecked")
             val src = ID_WG_BASE + srcConfig.getId()
-            val via = ID_WG_BASE + config.getId()
+            val hop = ID_WG_BASE + config.getId()
+            val currMap = WgHopManager.getMapBySrc(src)
+            if (currMap.isNotEmpty()) {
+                var res = false
+                currMap.forEach {
+                    if (it.hop != hop && it.hop.isNotEmpty()) {
+                        val id = it.hop.substring(ID_WG_BASE.length).toIntOrNull() ?: return@forEach
+                        res = WgHopManager.removeHop(srcConfig.getId(), id).first
+                    }
+                }
+                if (res) {
+                    selectedId = -1
+                    uiCtx {
+                        if (!isAttached) return@uiCtx
+                        notifyDataSetChanged()
+                    }
+                }
+            }
+            delay(2000)
             if (isChecked) {
-                val hopTestRes = VpnController.testHop(src, via)
+                val hopTestRes = VpnController.testHop(src, hop)
                 if (!hopTestRes.first) {
-                    b.wgHopListCheckbox.isChecked = false
-                    Utilities.showToastUiCentered(context, hopTestRes.second, Toast.LENGTH_LONG)
+                    uiCtx {
+                        if (!isAttached) return@uiCtx
+
+                        dismissProcessingDialog()
+                        b.wgHopListCheckbox.isChecked = false
+                        Utilities.showToastUiCentered(context, hopTestRes.second, Toast.LENGTH_LONG)
+                    }
                     return
                 }
             }
@@ -223,6 +288,9 @@ class WgHopAdapter(
                 WgHopManager.hop(srcConfig.getId(), config.getId())
             }
             uiCtx {
+                if (!isAttached) return@uiCtx
+
+                dismissProcessingDialog()
                 Utilities.showToastUiCentered(context, res.second, Toast.LENGTH_LONG)
                 if (!res.first) {
                     b.wgHopListCheckbox.isChecked = false
@@ -233,6 +301,24 @@ class WgHopAdapter(
                 }
                 notifyDataSetChanged()
             }
+        }
+
+        fun showProcessingDialog(context: Context) {
+            if (!isAttached) return
+
+            val dialogBuilder = MaterialAlertDialogBuilder(context)
+            dialogBuilder.setTitle("Processing...")
+            dialogBuilder.setMessage("Please wait...")
+            dialogBuilder.setCancelable(true)
+            processingDialog = dialogBuilder.create()
+            processingDialog?.show()
+        }
+
+        fun dismissProcessingDialog() {
+            if (!isAttached) return
+
+            processingDialog?.dismiss()
+            processingDialog = null
         }
 
         private fun setCardStroke(isSelected: Boolean, isActive: Boolean) {
@@ -252,10 +338,6 @@ class WgHopAdapter(
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
-    }
-
-    private fun ui(f: () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
     }
 
     private fun io(f: suspend () -> Unit) {

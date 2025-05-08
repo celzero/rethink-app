@@ -44,6 +44,10 @@ class WgHopMapRepository(private val dao: WgHopMapDao) {
         dao.delete(map)
     }
 
+    suspend fun deleteBySrcAndHop(src: String, hop: String): Int {
+        return dao.deleteBySrcAndHop(src, hop)
+    }
+
     suspend fun deleteById(id: Int) {
         dao.deleteById(id)
     }
