@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui.activity
 
 import Logger
 import Logger.LOG_TAG_UI
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -491,38 +492,39 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
             val file = File(getZipFileName(filesDir))
             val uri = getFileUri(file) ?: throw Exception("file uri is null")
 
-            // create an intent for sending email with or without multiple attachments
-            val emailIntent = if (tombstoneFile != null) {
-                Intent(Intent.ACTION_SEND_MULTIPLE)
-            } else {
-                Intent(Intent.ACTION_SEND)
-            }
+            // create an intent for sending email with multiple attachments
+            val emailIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
             emailIntent.type = "text/plain"
             emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.about_mail_to)))
             emailIntent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                getString(R.string.about_mail_bugreport_subject)
+                getString(R.string.about_mail_plus_bugreport_subject)
             )
             val bugReportText = getString(R.string.about_mail_bugreport_text) + "\n\n" + msg
 
-            // attach extra files (either as a list or single file based on availability)
+            val uriList = arrayListOf<Uri>()
+            uriList.add(uri)
+
+            // add the tombstone file if it exists
             if (tombstoneFile != null) {
                 val tombstoneUri =
                     getFileUri(tombstoneFile) ?: throw Exception("tombstoneUri is null")
-                val bugReportTextList = arrayListOf<CharSequence>(bugReportText)
-                emailIntent.putCharSequenceArrayListExtra(Intent.EXTRA_TEXT, bugReportTextList)
-                val uriList = arrayListOf<Uri>(uri, tombstoneUri)
-                // send multiple attachments
-                emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriList)
-            } else {
-                // ensure EXTRA_TEXT is passed correctly as an ArrayList<CharSequence>
-                val bugReportTextList = arrayListOf<CharSequence>(bugReportText)
-                emailIntent.putCharSequenceArrayListExtra(Intent.EXTRA_TEXT, bugReportTextList)
-                emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
+                uriList.add(tombstoneUri)
             }
+            // add the uri list to the email intent
+            emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriList)
+            emailIntent.putExtra(Intent.EXTRA_TEXT, bugReportText)
+
             Logger.i(LOG_TAG_UI, "email with attachment: $uri, ${tombstoneFile?.path}")
             emailIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            emailIntent.flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            if (uriList.isNotEmpty()) {
+                val clipData = ClipData.newUri(contentResolver, "Logs", uriList[0])
+                for (i in 1 until uriList.size) {
+                    clipData.addItem(ClipData.Item(uriList[i]))
+                }
+                emailIntent.clipData = clipData
+            }
+            Logger.i(LOG_TAG_UI, "email with attachment: $uri, ${tombstoneFile?.path}")
             startActivity(
                 Intent.createChooser(
                     emailIntent,
