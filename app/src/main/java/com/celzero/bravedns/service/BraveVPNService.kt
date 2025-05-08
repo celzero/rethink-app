@@ -120,6 +120,7 @@ import com.celzero.bravedns.util.Utilities.isNetworkSame
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.wireguard.WgHopManager
 import com.google.common.collect.Sets
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
@@ -4816,13 +4817,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     fun screenUnlock() {
         io("screenUnlock") {
-            // initiate wireguard ping for one wg and catch-all configs
+            // initiate wireguard ping for one wg, catch-all and hop configs
             val configs = WireguardManager.getActiveConfigs()
-            Logger.i(LOG_TAG_VPN, "screenUnlock: initiate wg ping for onewg/catchall configs")
+            Logger.i(LOG_TAG_VPN, "unlock: initiate ping for one-wg/catchall/hop configs")
             configs.forEach { c ->
                 val isOneWg = WireguardManager.getOneWireGuardProxyId() == c.getId()
                 val isCatchAll = WireguardManager.getActiveCatchAllConfig().any { it.id == c.getId()}
-                if (isOneWg || isCatchAll) {
+                val isPartOfHop = WgHopManager.isWgEitherHopOrSrc(c.getId())
+                if (isOneWg || isCatchAll || isPartOfHop) {
                     val id = ID_WG_BASE + c.getId()
                     vpnAdapter?.initiateWgPing(id)
                 }

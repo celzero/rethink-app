@@ -210,6 +210,13 @@ object WgHopManager: KoinComponent {
         }
     }
 
+    fun isWgEitherHopOrSrc(id: Int): Boolean {
+        val idStr = ID_WG_BASE + id
+        val srcMap = getMapBySrc(idStr)
+        val hopMap = getMapByHop(idStr)
+        return srcMap.isNotEmpty() || hopMap.isNotEmpty()
+    }
+
     fun canRoute(src: String): Boolean {
         // if the src is hop for any other map, then it can't route
         val srcMap = getMapBySrc(src)
