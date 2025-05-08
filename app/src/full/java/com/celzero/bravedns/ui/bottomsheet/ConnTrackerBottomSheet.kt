@@ -303,7 +303,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         if (Logger.LoggerType.fromId(persistentState.goLoggerLevel.toInt())
                 .isLessThan(Logger.LoggerType.DEBUG)
         ) {
-            b.connectionMessage.text = "${info?.connId}; ${info?.message}; ${info?.proxyDetails}; ${info?.rpid}; ${info?.synack}"
+            b.connectionMessage.text = "${info?.message}; ${info?.connId}; ${info?.proxyDetails}; ${info?.rpid}; ${info?.synack}"
         } else {
             b.connectionMessage.text = info?.message
         }

@@ -146,7 +146,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                 .isLessThan(Logger.LoggerType.DEBUG)
         ) {
             b.dnsMessage.text =
-                "${log?.msg}; ${log?.proxyId}; ${log?.relayIP}; ${log?.typeName}"
+                "${log?.msg}; ${log?.proxyId}; ${log?.relayIP}"
         } else {
             b.dnsMessage.text = log!!.msg
         }
