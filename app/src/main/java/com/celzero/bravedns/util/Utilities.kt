@@ -300,29 +300,22 @@ object Utilities {
                 context.runOnUiThread {
                     Toast.makeText(context, message, toastLength).show()
                 }
-                return
             } else if (context is androidx.fragment.app.FragmentActivity) {
                 context.runOnUiThread {
                     Toast.makeText(context, message, toastLength).show()
                 }
-                return
             } else if (context is android.app.Activity) {
                 context.runOnUiThread {
                     Toast.makeText(context, message, toastLength).show()
                 }
-                return
             } else if (context is android.app.Application) {
-                Logger.w(LOG_TAG_VPN, "toast err: context not found")
-                if (DEBUG) { // for testing purpose
-                    Toast.makeText(context, message, toastLength).show()
-                }
+                Toast.makeText(context, message, toastLength).show()
             } else {
                 Logger.w(LOG_TAG_VPN, "toast err: context not found")
                 if (DEBUG) { // for testing purpose
                     Toast.makeText(context, message, toastLength).show()
                 }
             }
-
         } catch (e: IllegalStateException) {
             Logger.w(LOG_TAG_VPN, "toast err: ${e.message}")
         } catch (e: IllegalAccessException) {
@@ -574,7 +567,7 @@ object Utilities {
         return now + TimeUnit.SECONDS.toMillis((ttl + DnsLogTracker.DNS_TTL_GRACE_SEC))
     }
 
-    fun deleteRecursive(fileOrDirectory: File) {
+    fun deleteRecursive(fileOrDirectory: File): Boolean {
         try {
             if (fileOrDirectory.isDirectory) {
                 fileOrDirectory.listFiles()?.forEach { child -> deleteRecursive(child) }
@@ -586,9 +579,11 @@ object Utilities {
                     fileOrDirectory.delete()
                 }
             Logger.d(LOG_TAG_DOWNLOAD, "deleteRecursive File : ${fileOrDirectory.path}, $isDeleted")
+            return isDeleted
         } catch (e: Exception) {
             Logger.w(LOG_TAG_DOWNLOAD, "err on file delete: ${e.message}", e)
         }
+        return false
     }
 
     fun localBlocklistFileDownloadPath(ctx: Context, which: String, timestamp: Long): String {

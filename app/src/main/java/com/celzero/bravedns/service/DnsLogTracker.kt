@@ -16,27 +16,24 @@
 
 package com.celzero.bravedns.service
 
+import Logger
 import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.os.SystemClock
-import androidx.paging.LOG_TAG
 import backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.util.AndroidUidConfig
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.EMPTY_PACKAGE_NAME
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Constants.Companion.UNKNOWN_APP
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.UIUtils.fetchFavIcon
 import com.celzero.bravedns.util.Utilities.getCountryCode
 import com.celzero.bravedns.util.Utilities.getFlag
-import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.makeAddressPair
 import com.celzero.bravedns.util.Utilities.normalizeIp
 import java.util.Calendar
