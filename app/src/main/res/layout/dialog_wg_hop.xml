@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:padding="5dp"
         android:layout_margin="10dp"
-        android:text="Add / Remove HOPs"
+        android:text="@string/hop_add_remove_title"
         android:textColor="?attr/accentGood"
         android:textSize="@dimen/extra_large_font_text_view" />
 

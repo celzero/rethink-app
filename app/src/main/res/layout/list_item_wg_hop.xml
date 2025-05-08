@@ -38,7 +38,6 @@
                     android:padding="5dp"
                     android:ellipsize="end"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Dummy Label"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
@@ -49,7 +48,6 @@
                     android:layout_marginStart="5dp"
                     android:ellipsize="end"
                     android:padding="5dp"
-                    android:text="Dummy Label"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
 
@@ -110,7 +108,7 @@
                         android:layout_height="wrap_content"
                         android:alpha="0.8"
                         android:checked="true"
-                        android:text="Amnezia"
+                        android:text="@string/lbl_amnezia"
                         android:textAlignment="center"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"
@@ -118,13 +116,13 @@
                         app:chipStrokeWidth="1.5dp" />
 
                     <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_hop"
+                        android:id="@+id/chip_hop_src"
                         style="@style/ThinnerChip.Action"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:alpha="0.8"
                         android:checked="true"
-                        android:text="Hop"
+                        android:text="@string/hop_lbl"
                         android:textAlignment="center"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"
@@ -132,13 +130,13 @@
                         app:chipStrokeWidth="1.5dp" />
 
                     <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_via"
+                        android:id="@+id/chip_hopping"
                         style="@style/ThinnerChip.Action"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:alpha="0.8"
                         android:checked="true"
-                        android:text="Via"
+                        android:text="@string/lbl_hopping"
                         android:textAlignment="center"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"

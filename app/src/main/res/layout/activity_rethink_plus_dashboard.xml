@@ -29,7 +29,7 @@
                 android:alpha="0.5"
                 android:paddingStart="7dp"
                 android:paddingEnd="7dp"
-                android:text="rethink+" />
+                android:text="@string/rethink_plus_title" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_title_rethink_desc"
@@ -39,7 +39,7 @@
                 android:alpha="0.5"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                android:text="Anti-censorship, and anti-survillance" />
+                android:text="@string/rethink_plus_title_desc" />
 
         </LinearLayout>
 
@@ -54,7 +54,7 @@
             android:fontFamily="sans-serif-smallcaps"
             android:lineSpacingExtra="5dp"
             android:padding="5dp"
-            android:text="configure"
+            android:text="@string/lbl_configure"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
@@ -112,7 +112,7 @@
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
                             android:paddingEnd="5dp"
-                            android:text="Anti-censorship"
+                            android:text="@string/anti_censorship_title"
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
@@ -121,7 +121,7 @@
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
                             android:paddingEnd="5dp"
-                            android:text="Anti-censorship mode info explanation"
+                            android:text="@string/anti_censorship_desc"
                             android:textColor="?attr/primaryLightColorText"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
@@ -183,7 +183,7 @@
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
                             android:paddingEnd="5dp"
-                            android:text="Hide your IP"
+                            android:text="@string/rethink_plus_hide_ip_title"
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
@@ -192,7 +192,7 @@
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
                             android:paddingEnd="5dp"
-                            android:text="Hide your IP mode info explanation"
+                            android:text="@string/rethink_plus_hide_ip_desc"
                             android:textColor="?attr/primaryLightColorText"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
@@ -226,7 +226,7 @@
             android:fontFamily="sans-serif-smallcaps"
             android:lineSpacingExtra="5dp"
             android:padding="5dp"
-            android:text="proxies"
+            android:text="@string/settings_proxy_header"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
@@ -258,7 +258,7 @@
             android:fontFamily="sans-serif-smallcaps"
             android:lineSpacingExtra="5dp"
             android:padding="5dp"
-            android:text="troubleshoot"
+            android:text="@string/rethink_plus_troubleshoot_title"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
@@ -310,7 +310,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="10dp"
-                            android:text="Test with custom IPs"
+                            android:text="@string/rethink_plus_perform_test"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
@@ -319,7 +319,7 @@
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
-                            android:text="@string/settings_pcap_dialog_option_1"
+                            android:text="@string/rethink_plus_test_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
@@ -369,7 +369,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="10dp"
-                            android:text="Report Issue"
+                            android:text="@string/rethink_plus_report_issue"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
@@ -378,7 +378,7 @@
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
-                            android:text="@string/settings_pcap_dialog_option_1"
+                            android:text="@string/rethink_plus_report_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 

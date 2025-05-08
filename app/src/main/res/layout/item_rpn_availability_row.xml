@@ -19,7 +19,6 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:layout_weight="0.7"
-            android:text="Option"
             android:textSize="16sp" />
 
         <RelativeLayout
@@ -45,7 +44,6 @@
                 android:layout_gravity="center"
                 android:layout_margin="8dp"
                 android:gravity="center"
-                android:text="Active"
                 android:textSize="16sp" />
         </RelativeLayout>
 

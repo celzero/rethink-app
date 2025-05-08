@@ -25,7 +25,6 @@
         android:ellipsize="end"
         android:fontFamily="sans-serif"
         android:gravity="center"
-        android:text="ssdfsdf"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/large_font_text_view" />
 
@@ -37,7 +36,6 @@
         android:ellipsize="end"
         android:fontFamily="sans-serif"
         android:gravity="center"
-        android:text="ssdfsdf"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/small_font_subheading_text" />
 
@@ -46,7 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:padding="16dp"
-        android:text="Firewall Rules"
+        android:text="@string/custom_rules_firewall_title"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view" />
 
@@ -218,7 +216,7 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Proxy"
+                    android:text="@string/custom_rules_proxy_title"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
@@ -227,7 +225,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="5dp"
-                    android:text="Select a proxy"
+                    android:text="@string/custom_rules_proxy_desc"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>

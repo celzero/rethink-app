@@ -75,7 +75,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:background="@drawable/rectangle_border_background"
-                        android:text="Purchase"
+                        android:text="@string/rplus_purchase"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/large_font_text_view"
                         android:visibility="visible"
@@ -111,7 +111,7 @@
                     android:fontFamily="serif-monospace"
                     android:gravity="center"
                     android:padding="16dp"
-                    android:text="See if it works"
+                    android:text="@string/rplus_see_if_works"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/large_font_text_view"
                     android:textStyle="bold"
@@ -143,7 +143,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:padding="16dp"
-                    android:text="Not available"
+                    android:text="@string/rplus_not_available"
                     android:textSize="14sp" />
 
             </LinearLayout>
@@ -163,7 +163,7 @@
                     android:layout_margin="10dp"
                     android:gravity="center"
                     android:padding="16dp"
-                    android:text="Already Rethink+ member"
+                    android:text="@string/rplus_already_member"
                     android:textSize="14sp" />
 
                 <com.google.android.material.card.MaterialCardView
@@ -188,7 +188,7 @@
                             android:drawablePadding="10dp"
                             android:gravity="center_vertical"
                             android:padding="10dp"
-                            android:text="Dashboard" />
+                            android:text="@string/dashboard_title" />
 
                         <View
                             android:layout_width="match_parent"
@@ -205,7 +205,7 @@
                             android:drawablePadding="10dp"
                             android:gravity="center_vertical"
                             android:padding="10dp"
-                            android:text="Payment History" />
+                            android:text="@string/payment_history_title" />
 
                         <View
                             android:layout_width="match_parent"
@@ -222,7 +222,7 @@
                             android:drawablePadding="10dp"
                             android:gravity="center_vertical"
                             android:padding="10dp"
-                            android:text="Manage Subscription" />
+                            android:text="@string/manage_subscription_title" />
 
                         <View
                             android:layout_width="match_parent"
@@ -239,7 +239,7 @@
                             android:drawablePadding="10dp"
                             android:gravity="center_vertical"
                             android:padding="10dp"
-                            android:text="Contact Support" />
+                            android:text="@string/contact_support_title" />
 
                         <View
                             android:layout_width="match_parent"
@@ -256,7 +256,7 @@
                             android:drawablePadding="10dp"
                             android:gravity="center_vertical"
                             android:padding="10dp"
-                            android:text="Pause R+" />
+                            android:text="@string/pause_rethink_plus_title" />
 
                     </LinearLayout>
 
@@ -295,7 +295,7 @@
                 android:layout_marginStart="30dp"
                 android:layout_marginEnd="30dp"
                 android:letterSpacing="0.2"
-                android:text="Subscribe"
+                android:text="@string/subscribe_title"
                 android:textColor="?attr/homeScreenHeaderTextColor"
                 android:textSize="18sp" />
         </LinearLayout>

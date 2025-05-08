@@ -28,7 +28,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:padding="10dp"
-                android:text="IP:Port"
+                android:text="@string/ping_ip_port_title"
                 android:textColor="?attr/secondaryTextColor"
                 android:textSize="18sp" />
 
@@ -147,7 +147,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:padding="10dp"
-                android:text="Host:Port"
+                android:text="@string/ping_host_port_title"
                 android:textColor="?attr/secondaryTextColor"
                 android:textSize="18sp" />
 
@@ -289,7 +289,8 @@
                 android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center"
                 android:padding="10dp"
-                android:text="Test"
+
+                android:text="@string/lbl_test"
                 android:textColor="?attr/accentGood" />
 
         </LinearLayout>
@@ -311,7 +312,7 @@
                 android:layout_weight="0.3"
                 android:gravity="center_vertical"
                 android:padding="10dp"
-                android:text="Strength" />
+                android:text="@string/ping_strength_title" />
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/strength_indicator"

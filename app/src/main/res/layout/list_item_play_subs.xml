@@ -38,7 +38,6 @@
                 android:layout_centerVertical="true"
                 android:fontFamily="serif-monospace"
                 android:maxLines="10"
-                android:text="1 Month"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/extra_large_font_text_view" />
 
@@ -53,7 +52,6 @@
                 android:ellipsize="end"
                 android:fontFamily="serif-monospace"
                 android:maxLines="10"
-                android:text="$0.99"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/extra_large_font_text_view" />
         </RelativeLayout>
