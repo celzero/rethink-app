@@ -1,8 +1,6 @@
 plugins {
     id 'com.android.application'
     id 'com.google.devtools.ksp'
-    // to download blocklists for the headless variant
-    id "de.undercouch.download" version "5.3.0"
     id 'kotlin-android'
 }
 
@@ -153,15 +151,6 @@ android {
         }
     }
 
-    variantFilter { variant ->
-        def releaseChannel = variant.getFlavors().get(0).name
-        def releaseType = variant.getFlavors().get(1).name
-
-        if (releaseType == 'headless' && releaseChannel != 'fdroid') {
-            variant.setIgnore(true)
-        }
-    }
-
     flavorDimensions = ["releaseChannel", "releaseType"]
     productFlavors {
         play {
@@ -172,12 +161,6 @@ android {
         }
         website {
             dimension "releaseChannel"
-        }
-        headless {
-            dimension "releaseType"
-            minSdkVersion 31
-            // stackoverflow.com/a/60560178
-            // buildConfigField 'string', 'timestamp', '1662384683026'
         }
         full {
             dimension "releaseType"
@@ -192,16 +175,6 @@ android {
     lint {
         abortOnError false
     }
-
-    tasks.configureEach { task ->
-        if (task.name.toLowerCase().contains('headless')) {
-            task.dependsOn downloadBlocklists
-            if (task.name.endsWith("BuildConfig")) {
-                task.enabled false
-            }
-        }
-    }
-
 }
 
 configurations {
@@ -286,11 +259,11 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:18e9d907b3@aar'
-    websiteImplementation 'com.github.celzero:firestack:18e9d907b3@aar'
-    fdroidImplementation 'com.github.celzero:firestack:18e9d907b3@aar'
+    download 'com.github.celzero:firestack:6b69b1edfa@aar'
+    websiteImplementation 'com.github.celzero:firestacf0cck:6b69b1edfa@aar'
+    fdroidImplementation 'com.github.celzero:firestack:6b69b1edfa@aar'
     // debug symbols
-    playImplementation 'com.github.celzero:firestack:18e9d907b3:debug@aar'
+    playImplementation 'com.github.celzero:firestack:6b69b1edfa:debug@aar'
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.10.0') {
@@ -335,38 +308,6 @@ dependencies {
     // for in-app purchases
     playImplementation 'com.android.billingclient:billing:7.1.1'
     // for stripe payment gateway
-    websiteImplementation 'com.stripe:stripe-android:21.10.0'
-    fdroidImplementation 'com.stripe:stripe-android:21.10.0'
-}
-
-// github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903
-tasks.register('downloadBlocklists', Download) {
-    // def assetsDir = new File(projectDir, 'src/main/assets'
-    def assetsDir = android.sourceSets.headless.assets.srcDirs[0]
-    // the filenames are ignored by dl, but acts as a hint for the output
-    // filename for the download-plugin, which does not respect the
-    // content-disposition http header, but rather guesses dest file names
-    // from the final segment of url's path
-    // github.com/michel-kraemer/gradle-download-task/blob/64d1ce32/src/main/java/de/undercouch/gradle/tasks/download/DownloadAction.java#L731
-    def sources = [
-            'https://dl.rethinkdns.com/blocklists/filetag.json',
-            'https://dl.rethinkdns.com/basicconfig/basicconfig.json',
-            'https://dl.rethinkdns.com/rank/rd.txt',
-            'https://dl.rethinkdns.com/trie/td.txt',
-    ]
-    src(sources)
-    dest assetsDir
-    // download files only if last-modified of the local file is less than
-    // the last-modified http header returned by the server
-    onlyIfModified true
-    // or if etag mismatches
-    useETag true
-    // overwrite older files as determined by last-modified, always
-    overwrite true
-}
-
-tasks.register('downloadDependencies', Copy) {
-    dependsOn downloadBlocklists
-    from configurations.download
-    into "libs"
+    websiteImplementation 'com.stripe:stripe-android:21.12.0'
+    fdroidImplementation 'com.stripe:stripe-android:21.12.0'
 }
