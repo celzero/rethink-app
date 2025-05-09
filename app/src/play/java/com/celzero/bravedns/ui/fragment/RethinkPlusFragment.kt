@@ -57,6 +57,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.RethinkPlusDashboardActivity
 import com.celzero.bravedns.ui.activity.RpnAvailabilityCheckActivity
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
+import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.underline
@@ -107,7 +108,14 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
                 return@io
             }
 
+            val playAvailable = isGooglePlayServicesAvailable()
+            if (!playAvailable) {
+                uiCtx { showRethinkNotAvailableUi("Google Play Services not available") }
+                return@io
+            }
+
             val works = isRethinkPlusAvailable()
+
 
             if (!works.first) {
                 uiCtx { showRethinkNotAvailableUi(works.second) }
@@ -573,10 +581,10 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
             val state = RpnProxyManager.RpnState.fromId(persistentState.rpnState)
             if (state.isPaused()) {
                 RpnProxyManager.activateRpn()
-                b.pausePlus.text = "Pause Rethink+"
+                b.pausePlus.text = getString(R.string.pause_rethink_plus_title)
             } else {
                 RpnProxyManager.pauseRpn()
-                b.pausePlus.text = "Resume Rethink+"
+                b.pausePlus.text = getString(R.string.resume_rethink_plus_title)
             }
         }
     }
@@ -599,6 +607,15 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
     private fun isRethinkPlusSubscribed(): Boolean {
         // check whether the user has already subscribed to Rethink+ or not in database
         return RpnProxyManager.isRpnActive() // for now
+    }
+
+    private fun isGooglePlayServicesAvailable(): Boolean {
+        // applicationInfo.enabled - When false, indicates that all components within
+        // this application are considered disabled, regardless of their individually set enabled
+        // status.
+        // TODO: prompt dialog to user that Playservice is disabled, so switch to update
+        // check for website
+        return Utilities.getApplicationInfo(requireContext(), PKG_NAME_PLAY_STORE)?.enabled == true
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
