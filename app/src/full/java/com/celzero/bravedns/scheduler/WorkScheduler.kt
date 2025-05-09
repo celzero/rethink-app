@@ -258,10 +258,11 @@ class WorkScheduler(val context: Context) {
             WorkManager.getInstance(context.applicationContext).cancelWorkById(it)
             rpnProxiesWorkMap.remove(type)
         }
-        val delay = expiryTimeMs - now
+        var delay = expiryTimeMs - now
         if (delay <= 0) {
             Logger.i(LOG_TAG_SCHEDULER, "rpn proxies update expired for ${type.name}")
-            return
+            // perform the update immediately as the expiry time is already passed
+            delay = 0
         }
 
         val inputData = Data.Builder().putInt(inputDataKey, type.id).build()

@@ -274,15 +274,11 @@ object RpnProxyManager : KoinComponent {
                 Logger.d(LOG_TAG_PROXY, "$TAG; proton config saved? $res")
                 if (res) {
                     protonConfig = p
+                    Logger.i(LOG_TAG_PROXY, "$TAG; proton config updated")
                     // asserting as protonConfig will not be null here
                     val expiry = getProxyExpiry(RpnType.PROTON) ?: 0
-                    if (expiry == 0L) {
-                        Logger.e(LOG_TAG_PROXY, "$TAG; err getting proton expiry, not scheduling update")
-                    } else {
-                        scheduledUpdateConfig(RpnType.PROTON, expiry)
-                        Logger.i(LOG_TAG_PROXY, "$TAG; scheduled proton, $expiry")
-                    }
-                    Logger.d(LOG_TAG_PROXY, "$TAG; proton config updated")
+                    scheduledUpdateConfig(RpnType.PROTON, expiry)
+                    Logger.i(LOG_TAG_PROXY, "$TAG; scheduled proton update, $expiry")
                 }
                 res
             } else {
@@ -320,14 +316,10 @@ object RpnProxyManager : KoinComponent {
                 Logger.i(LOG_TAG_PROXY, "$TAG; warp config saved? $res")
                 if (res) {
                     warpConfig = c
+                    Logger.i(LOG_TAG_PROXY, "$TAG; warp config updated")
                     val expiry = getProxyExpiry(RpnType.WARP) ?: 0
-                    if (expiry == 0L) {
-                        Logger.e(LOG_TAG_PROXY, "$TAG; err getting warp expiry, not scheduling update")
-                    } else {
-                        scheduledUpdateConfig(RpnType.WARP, expiry)
-                        Logger.i(LOG_TAG_PROXY, "$TAG; scheduled warp update, $expiry")
-                    }
-                    Logger.d(LOG_TAG_PROXY, "$TAG; warp config updated")
+                    scheduledUpdateConfig(RpnType.WARP, expiry)
+                    Logger.i(LOG_TAG_PROXY, "$TAG; scheduled warp update, $expiry")
                 }
                 res
             } else {
@@ -363,14 +355,10 @@ object RpnProxyManager : KoinComponent {
                 Logger.i(LOG_TAG_PROXY, "$TAG; amz config saved? $res")
                 if (res) {
                     amzConfig = c
+                    Logger.i(LOG_TAG_PROXY, "$TAG; amz config updated")
                     val expiry = getProxyExpiry(RpnType.AMZ) ?: 0
-                    if (expiry == 0L) {
-                        Logger.e(LOG_TAG_PROXY, "$TAG; err getting amz expiry, not scheduling update")
-                    } else {
-                        scheduledUpdateConfig(RpnType.AMZ, expiry)
-                        Logger.i(LOG_TAG_PROXY, "$TAG; scheduled amz update, $expiry")
-                    }
-                    Logger.d(LOG_TAG_PROXY, "$TAG; amz config updated")
+                    scheduledUpdateConfig(RpnType.AMZ, expiry)
+                    Logger.i(LOG_TAG_PROXY, "$TAG; scheduled amz update, $expiry")
                 }
                 res
             } else {
