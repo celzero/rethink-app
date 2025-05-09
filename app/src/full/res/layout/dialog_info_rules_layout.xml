@@ -14,12 +14,33 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/info_rules_dialog_cancel_img"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="end"
-            android:src="@android:drawable/ic_menu_close_clear_cancel" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/info_rules_dialog_cancel_img"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:src="@android:drawable/ic_menu_close_clear_cancel" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/info_rules_dialog_ok_btn"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/info_rules_dialog_cancel_img"
+                android:layout_marginEnd="10dp"
+                android:background="?attr/selectableItemBackground"
+                android:drawablePadding="10dp"
+                android:layout_centerVertical="true"
+                android:padding="10dp"
+                android:text="@string/about_bug_report_dialog_positive_btn"
+                android:visibility="gone" />
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -62,19 +83,6 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/large_font_text_view" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/info_rules_dialog_ok_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-            android:layout_gravity="end"
-            android:layout_marginTop="10dp"
-            android:background="?attr/selectableItemBackground"
-            android:drawablePadding="10dp"
-            android:padding="10dp"
-            android:visibility="gone"
-            android:text="@string/about_bug_report_dialog_positive_btn" />
 
         <androidx.appcompat.widget.AppCompatTextView
             style="@style/Widget.AppCompat.TextView.SpinnerItem"

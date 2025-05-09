@@ -1799,8 +1799,8 @@ class GoVpnAdapter : KoinComponent {
             Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip set rpn auto mode")
             return false
         }
-        if (RpnProxyManager.isRpnActive()) {
-            Logger.i(LOG_TAG_PROXY, "$TAG rpn is active, skip set rpn auto mode")
+        if (!RpnProxyManager.isRpnActive()) {
+            Logger.i(LOG_TAG_PROXY, "$TAG rpn is not active, skip set rpn auto mode")
             return false
         }
         return try {

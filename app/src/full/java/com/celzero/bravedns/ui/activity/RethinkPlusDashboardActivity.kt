@@ -36,7 +36,9 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -168,7 +170,11 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
                 }
 
             }
-            keepUpdatingProxiesUi()
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                // your repeating logic
+                keepUpdatingProxiesUi()
+                Logger.i(LOG_TAG_UI, "$TAG keepUpdatingProxiesUi started")
+            }
         }
     }
 
@@ -184,8 +190,12 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
                 updateProxiesUi(i, iv, title, infoIv, statusTv)
                 Logger.vv(LOG_TAG_UI, "$TAG updating proxies UI for ${options[i]}")
             }
-            Logger.v(LOG_TAG_UI, "$TAG updating proxies UI every 5 seconds")
+            Logger.v(LOG_TAG_UI, "$TAG updating proxies UI every $DELAY ms")
             delay(DELAY)
+            if (isFinishing || isDestroyed) {
+                Logger.v(LOG_TAG_UI, "$TAG activity is finishing, stopping update")
+                break
+            }
         }
     }
 
@@ -341,14 +351,9 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
     }
 
     private fun showInfoDialog(type: RpnProxyManager.RpnType,prop: RpnProxyManager.RpnProps) {
-        io {
-            val genStats = VpnController.vpnStats()
-            uiCtx {
-                val title = type.name.uppercase()
-                val msg = prop.toString() + "\n\n" + genStats.toString()
-                showTroubleshootDialog(title, msg)
-            }
-        }
+        val title = type.name.uppercase()
+        val msg = prop.toString()
+        showTroubleshootDialog(title, msg, isInfo = true)
     }
 
     private fun setStatus(status: Long?, txtView: AppCompatTextView) {
@@ -428,7 +433,7 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
         animation.duration = ANIMATION_DURATION
     }
 
-    private fun showTroubleshootDialog(title: String, msg: String) {
+    private fun showTroubleshootDialog(title: String, msg: String, isInfo: Boolean = false) {
         io {
             uiCtx {
                 val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
@@ -451,8 +456,10 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
                 dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
 
                 heading.text = title
-                okBtn.visibility = View.VISIBLE
-                okBtn.text = getString(R.string.about_bug_report_dialog_positive_btn)
+                if (!isInfo) {
+                    okBtn.visibility = View.VISIBLE
+                    okBtn.text = getString(R.string.about_bug_report_dialog_positive_btn)
+                }
                 heading.setCompoundDrawablesWithIntrinsicBounds(
                     ContextCompat.getDrawable(this, R.drawable.ic_rethink_plus),
                     null,
@@ -545,7 +552,7 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
         io {
             val title = "Proxy Stats"
             val rpnStats =
-                "WARP \n" + warpProps?.toString() + "\n\n" + "Amz \n" + amzProps?.toString() + "\n\n" + "SE \n" + seProps?.toString() + "\n\n" + "Proton \n" + protonProps?.toString() + "\n\n" + "Exit64 \n" + exit64Props?.toString() + "\n\n"
+                "WARP \n" + warpProps?.toString() + "\n\n" + "Amz \n" + amzProps?.toString() + "\n\n" + "Proton \n" + protonProps?.toString() + "\n\n" + "\n\n" + "SE \n" + seProps?.toString() + "Exit64 \n" + exit64Props?.toString() + "\n\n"
             val stats = rpnStats + VpnController.vpnStats()
             uiCtx {
                 showTroubleshootDialog(title, stats)
