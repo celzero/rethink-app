@@ -26,7 +26,7 @@ data class ConnectionSummary(
     val downloadBytes: Long,
     val uploadBytes: Long,
     val duration: Int,
-    val synack: Int, // treat it as rtt (round trip time)
+    val rtt: Long, // treat it as rtt (round trip time)
     val message: String,
     val targetIp: String?,
     var flag: String?

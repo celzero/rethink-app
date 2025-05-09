@@ -45,7 +45,7 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
                     it.downloadBytes,
                     it.uploadBytes,
                     it.duration,
-                    it.synack,
+                    it.rtt,
                     it.message,
                     it.targetIp,
                     flag
@@ -58,7 +58,7 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
                     it.downloadBytes,
                     it.uploadBytes,
                     it.duration,
-                    it.synack,
+                    it.rtt,
                     it.message
                 )
             }

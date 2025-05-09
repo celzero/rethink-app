@@ -49,7 +49,7 @@ interface ConnectionTrackerDAO {
         downloadBytes: Long,
         uploadBytes: Long,
         duration: Int,
-        synack: Int,
+        synack: Long,
         message: String
     )
 
@@ -63,7 +63,7 @@ interface ConnectionTrackerDAO {
         downloadBytes: Long,
         uploadBytes: Long,
         duration: Int,
-        synack: Int,
+        synack: Long,
         message: String,
         ipAddress: String,
         flag: String

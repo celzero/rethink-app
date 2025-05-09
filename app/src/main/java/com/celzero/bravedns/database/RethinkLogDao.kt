@@ -47,7 +47,7 @@ interface RethinkLogDao {
         downloadBytes: Long,
         uploadBytes: Long,
         duration: Int,
-        synack: Int,
+        synack: Long,
         message: String
     )
 

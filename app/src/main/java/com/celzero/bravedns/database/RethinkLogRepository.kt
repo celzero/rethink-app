@@ -38,7 +38,7 @@ class RethinkLogRepository(private val logDao: RethinkLogDao) {
                 it.downloadBytes,
                 it.uploadBytes,
                 it.duration,
-                it.synack,
+                it.rtt,
                 it.message
             )
         }

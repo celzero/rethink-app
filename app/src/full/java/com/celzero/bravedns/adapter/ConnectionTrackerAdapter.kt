@@ -355,7 +355,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
             }
         }
 
-        private fun isRoundTripShorter(rtt: Int, blocked: Boolean): Boolean {
+        private fun isRoundTripShorter(rtt: Long, blocked: Boolean): Boolean {
             return rtt in 1..20 && !blocked
         }
 
@@ -367,7 +367,6 @@ class ConnectionTrackerAdapter(private val context: Context) :
             if (ruleName == null) return false
             val rule = FirewallRuleset.getFirewallRule(ruleName) ?: return false
             val proxy = ProxyManager.isIpnProxy(proxyDetails)
-            val res = FirewallRuleset.isProxied(rule) && proxyDetails.isNotEmpty() && proxy
             return FirewallRuleset.isProxied(rule) && proxyDetails.isNotEmpty() && proxy
         }
 
