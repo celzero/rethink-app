@@ -147,25 +147,6 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             .into(mIconImageView)
     }
 
-    private fun changeIpStatus(id: IpRulesManager.IpRuleStatus, customIp: CustomIp) {
-        io {
-            when (id) {
-                IpRulesManager.IpRuleStatus.NONE -> {
-                    noRuleIp(customIp)
-                }
-                IpRulesManager.IpRuleStatus.BLOCK -> {
-                    blockIp(customIp)
-                }
-                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                    byPassUniversal(customIp)
-                }
-                IpRulesManager.IpRuleStatus.TRUST -> {
-                    byPassAppRule(customIp)
-                }
-            }
-        }
-    }
-
     private fun getToggleBtnUiParams(id: IpRulesManager.IpRuleStatus): ToggleBtnUi {
         return when (id) {
             IpRulesManager.IpRuleStatus.NONE -> {
@@ -213,26 +194,6 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                 null
             }
         }
-    }
-
-    private suspend fun byPassUniversal(customIp: CustomIp) {
-        Logger.i(LOG_TAG_UI, "$TAG by pass universal ip: ${customIp.ipAddress}")
-        IpRulesManager.updateBypass(customIp)
-    }
-
-    private suspend fun byPassAppRule(customIp: CustomIp) {
-        Logger.i(LOG_TAG_UI, "$TAG by pass app rule ip: ${customIp.ipAddress}")
-        IpRulesManager.updateTrust(customIp)
-    }
-
-    private suspend fun blockIp(customIp: CustomIp) {
-        Logger.i(LOG_TAG_UI, "$TAG block ip: ${customIp.ipAddress}")
-        IpRulesManager.updateBlock(customIp)
-    }
-
-    private suspend fun noRuleIp(customIp: CustomIp) {
-        Logger.i(LOG_TAG_UI, "$TAG no rule ip: ${customIp.ipAddress}")
-        IpRulesManager.updateNoRule(customIp)
     }
 
     inner class CustomIpsViewHolderWithHeader(private val b: ListItemCustomAllIpBinding) :
@@ -345,33 +306,6 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             } else {
                 appNames[0]
             }
-        }
-
-        // each button in the toggle group is associated with tag value.
-        // tag values are ids of the IpRulesManager.IpRuleStatus
-        private fun getTag(tag: Any): Int {
-            return tag.toString().toIntOrNull() ?: 0
-        }
-
-        private fun showDialogForDelete(customIp: CustomIp) {
-            val builder = MaterialAlertDialogBuilder(context)
-            builder.setTitle(R.string.univ_firewall_dialog_title)
-            builder.setMessage(R.string.univ_firewall_dialog_message)
-            builder.setCancelable(true)
-            builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
-                io { IpRulesManager.removeIpRule(customIp.uid, customIp.ipAddress, customIp.port) }
-                Utilities.showToastUiCentered(
-                    context,
-                    context.getString(R.string.univ_ip_delete_individual_toast, customIp.ipAddress),
-                    Toast.LENGTH_SHORT
-                )
-            }
-
-            builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ ->
-                updateStatusUi(IpRulesManager.IpRuleStatus.getStatus(customIp.status))
-            }
-
-            builder.create().show()
         }
 
         private fun updateFlagIfAvailable(ip: CustomIp) {

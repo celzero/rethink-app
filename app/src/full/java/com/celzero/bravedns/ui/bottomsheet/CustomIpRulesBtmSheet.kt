@@ -33,6 +33,7 @@ import com.celzero.bravedns.wireguard.Config
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -137,7 +138,7 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
         val uid = ci.uid
         Logger.v(LOG_TAG_UI, "$TAG: init for ${ci.ipAddress}, uid: $uid")
         val rules = IpRulesManager.IpRuleStatus.getStatus(ci.status)
-        b.customDomainTv.text = ci.ipAddress
+        b.customIpTv.text = ci.ipAddress
         showBypassUi(uid)
         b.customIpToggleGroup.tag = 1
         updateToggleGroup(rules)
@@ -155,6 +156,10 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
 
     private fun initClickListeners() {
         b.customIpToggleGroup.addOnButtonCheckedListener(ipRulesGroupListener)
+
+        b.customIpDeleteChip.setOnClickListener {
+            showDialogForDelete()
+        }
     }
 
     private val ipRulesGroupListener =
@@ -361,6 +366,29 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
             bottomSheetFragment.tag
         )
     }
+
+    private fun showDialogForDelete() {
+        val builder = MaterialAlertDialogBuilder(requireContext())
+        builder.setTitle(R.string.univ_firewall_dialog_title)
+        builder.setMessage(R.string.univ_firewall_dialog_message)
+        builder.setCancelable(true)
+        builder.setPositiveButton(requireContext().getString(R.string.lbl_delete)) { _, _ ->
+            io { IpRulesManager.removeIpRule(ci.uid, ci.ipAddress, ci.port) }
+            Utilities.showToastUiCentered(
+                requireContext(),
+                requireContext().getString(R.string.univ_ip_delete_individual_toast, ci.ipAddress),
+                Toast.LENGTH_SHORT
+            )
+            dismiss()
+        }
+
+        builder.setNegativeButton(requireContext().getString(R.string.lbl_cancel)) { _, _ ->
+            updateToggleGroup(IpRulesManager.IpRuleStatus.getStatus(ci.status))
+        }
+
+        builder.create().show()
+    }
+
 
     override fun onDismissCC(obj: Any?) {
         try {

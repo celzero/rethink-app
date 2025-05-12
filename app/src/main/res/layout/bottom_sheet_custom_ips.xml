@@ -17,19 +17,46 @@
         android:layout_marginBottom="10dp"
         android:background="?attr/border" />
 
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/custom_ip_delete_chip"
+            style="@style/ThinnerChip.Action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="15dp"
+            android:padding="5dp"
+            android:text="@string/lbl_delete"
+            android:textColor="?attr/chipTextNegative"
+            android:textSize="@dimen/large_font_text_view"
+            android:visibility="visible"
+            app:chipBackgroundColor="?attr/chipBgColorNegative"
+            app:chipEndPadding="5dp"
+            app:chipStartPadding="5dp"
+            app:chipSurfaceColor="@null"
+            app:shapeAppearance="@style/ShapeAppearance.LargeComponent" />
+
+    </RelativeLayout>
+
     <TextView
-        android:id="@+id/custom_domain_tv"
+        android:id="@+id/custom_ip_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:ellipsize="end"
         android:fontFamily="sans-serif"
+        android:textIsSelectable="true"
         android:gravity="center"
         android:textColor="?attr/primaryTextColor"
-        android:textSize="@dimen/large_font_text_view" />
+        android:textSize="@dimen/heading_font_text_view" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/custom_domain_last_updated"
+        android:id="@+id/custom_ip_last_updated"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
