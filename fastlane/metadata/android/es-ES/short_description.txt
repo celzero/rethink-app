@@ -1,0 +1,1 @@
+Cortafuegos, usa WireGuard VPN, monitoriza la red, bloquea malware, cambia DNS.
