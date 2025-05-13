@@ -84,19 +84,11 @@ public class Race {
 
     }
 
-    private static class Callback implements Prober.Callback {
-        private final int index;
-        private final Collector collector;
-
-
-        private Callback(int index, Collector collector) {
-            this.index = index;
-            this.collector = collector;
-        }
+    private record Callback(int index, Collector collector) implements Prober.Callback {
 
         @Override
-        public void onCompleted(boolean succeeded) {
-            collector.onCompleted(index, succeeded);
+            public void onCompleted(boolean succeeded) {
+                collector.onCompleted(index, succeeded);
+            }
         }
-    }
 }

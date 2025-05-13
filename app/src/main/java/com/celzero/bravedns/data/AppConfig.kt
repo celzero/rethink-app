@@ -135,7 +135,7 @@ internal constructor(
         }
     }
 
-    enum class TunFirewallMode(val mode: Long) {
+    enum class TunFirewallMode(val mode: Int) {
         FILTER_ANDROID9_ABOVE(Settings.BlockModeFilter),
         SINK(Settings.BlockModeSink),
         FILTER_ANDROID8_BELOW(Settings.BlockModeFilterProc),
@@ -195,9 +195,9 @@ internal constructor(
     }
 
     enum class TunDnsMode(val mode: Long) {
-        NONE(Settings.DNSModeNone),
-        DNS_IP(Settings.DNSModeIP),
-        DNS_PORT(Settings.DNSModePort)
+        NONE(Settings.DNSModeNone.toLong()),
+        DNS_IP(Settings.DNSModeIP.toLong()),
+        DNS_PORT(Settings.DNSModePort.toLong())
     }
 
     // TODO: untangle the mess of proxy modes and providers
@@ -335,10 +335,10 @@ internal constructor(
         }
     }
 
-    enum class ProtoTranslationMode(val id: Long) {
+    enum class ProtoTranslationMode(val id: Int) {
         PTMODEAUTO(Settings.PtModeAuto),
         PTMODEFORCE64(Settings.PtModeForce64),
-        PTMODEMAYBE46(Settings.PtModeNo46)
+        PTMODENO46(Settings.PtModeNo46)
     }
 
     fun getInternetProtocol(): InternetProtocol {
@@ -437,6 +437,10 @@ internal constructor(
 
     suspend fun getDOHDetails(): DoHEndpoint? {
         return doHEndpointRepository.getConnectedDoH()
+    }
+
+    suspend fun getAllDoHEndpoints(): List<DoHEndpoint> {
+        return doHEndpointRepository.getAllDoHEndpoints()
     }
 
     suspend fun getDOTDetails(): DoTEndpoint? {
@@ -1013,6 +1017,11 @@ internal constructor(
         return proxyProvider.isProxyProviderOrbot()
     }
 
+    fun isWgEnabled(): Boolean {
+        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
+        return proxyProvider.isProxyProviderWireguard()
+    }
+
     fun isProxyEnabled(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
         if (proxyProvider.isProxyProviderNone()) return false
@@ -1082,6 +1091,21 @@ internal constructor(
 
     suspend fun updateOrbotHttpProxy(proxyEndpoint: ProxyEndpoint) {
         proxyEndpointRepository.update(proxyEndpoint)
+    }
+
+    fun stats(): String {
+        val sb = StringBuilder()
+        sb.append("   Brave mode: ${getBraveMode()}\n")
+        sb.append("   DNS type: ${getDnsType()}\n")
+        sb.append("   Proxy type: ${ProxyType.of(getProxyType()).name}\n")
+        sb.append("   Proxy provider: ${getProxyProvider()}\n")
+        sb.append("   Pcap mode: ${getPcapFilePath()}\n")
+        sb.append("   Connected DNS: ${persistentState.connectedDnsName}\n")
+        sb.append("   Prevent DNS leaks: ${persistentState.preventDnsLeaks}\n")
+        sb.append("   Internet protocol: ${getInternetProtocol()}\n")
+        sb.append("   Protocol translation mode: ${getProtocolTranslationMode()}\n")
+
+        return sb.toString()
     }
 
     suspend fun getLeastLoggedNetworkLogs(): Long {

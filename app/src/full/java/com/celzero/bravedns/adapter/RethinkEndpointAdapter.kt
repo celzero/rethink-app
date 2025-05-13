@@ -58,6 +58,7 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
 
     companion object {
         private const val ONE_SEC = 1000L
+        private const val TAG = "RethinkEndpointAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<RethinkDnsEndpoint>() {
                 override fun areItemsTheSame(
@@ -190,7 +191,7 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
         private fun updateConnection(endpoint: RethinkDnsEndpoint) {
             Logger.d(
                 LOG_TAG_DNS,
-                "on rethink dns change - ${endpoint.name}, ${endpoint.url}, ${endpoint.isActive}"
+                "$TAG rdns update; ${endpoint.name}, ${endpoint.url}, ${endpoint.isActive}"
             )
 
             io {
@@ -205,18 +206,15 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
             builder.setMessage(endpoint.url + "\n\n" + endpoint.desc)
             builder.setCancelable(true)
             if (endpoint.isEditable(context)) {
-                builder.setPositiveButton(context.getString(R.string.rt_edit_dialog_positive)) { _,
-                                                                                                 _ ->
+                builder.setPositiveButton(context.getString(R.string.rt_edit_dialog_positive)) { _, _ ->
                     openEditConfiguration(endpoint)
                 }
             } else {
-                builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface,
-                                                                                           _ ->
+                builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
                     dialogInterface.dismiss()
                 }
             }
-            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface,
-                                                                                     _: Int ->
+            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
                 clipboardCopy(
                     context,
                     endpoint.url,

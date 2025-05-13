@@ -30,6 +30,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -38,11 +39,12 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.adapter.AppWiseIpsAdapter
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
@@ -51,6 +53,7 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
@@ -80,14 +83,24 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     private var showBypassToolTip: Boolean = true
 
+    private var isRethinkApp: Boolean = false
+
     companion object {
-        const val UID_INTENT_NAME = "UID"
+        const val INTENT_UID = "UID"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        uid = intent.getIntExtra(UID_INTENT_NAME, INVALID_UID)
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
+
+        uid = intent.getIntExtra(INTENT_UID, INVALID_UID)
+        Logger.d(Logger.LOG_TAG_UI, "AppInfoActivity, intent uid: $uid")
         ipRulesViewModel.setUid(uid)
         domainRulesViewModel.setUid(uid)
         networkLogsViewModel.setUid(uid)
@@ -121,8 +134,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 this.appInfo = appInfo
 
                 b.aadAppDetailName.text = appName(packages.count())
+                b.aadPkgName.text = appInfo.packageName
                 b.excludeProxySwitch.isChecked = appInfo.isProxyExcluded
-                updateDataUsage()
+                displayDataUsage()
+                displayProxyStatus()
                 displayIcon(
                     Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
                     b.aadAppDetailIcon
@@ -130,21 +145,48 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
                 // do not show the firewall status if the app is Rethink
                 if (appInfo.packageName == rethinkPkgName) {
+                    isRethinkApp = true
                     b.aadFirewallStatus.visibility = View.GONE
                     hideFirewallStatusUi()
                     hideDomainBlockUi()
                     hideIpBlockUi()
-                    return@uiCtx
+                    hideBypassProxyUi()
+                    setRethinkDomainLogsAdapter()
+                    setRethinkIpLogsAdapter()
+                } else {
+                    updateFirewallStatusUi(appStatus, connStatus)
+                    setDomainsAdapter()
+                    setIpAdapter()
                 }
-                updateFirewallStatusUi(appStatus, connStatus)
-                setDomainsAdapter()
-                setIpAdapter()
+
+                // disable exclude app option for apps with no package name
+                if (FirewallManager.isUnknownPackage(uid)) {
+                    b.aadAppSettingsExclude.alpha = 0.5f
+                    b.aadAppSettingsExclude.isEnabled = false
+                } else {
+                    b.aadAppSettingsExclude.alpha = 1.0f
+                    b.aadAppSettingsExclude.isEnabled = true
+                }
             }
         }
     }
 
+    private fun displayProxyStatus() {
+        val proxy = ProxyManager.getProxyIdForApp(appInfo.uid)
+        if (proxy.isEmpty() || proxy == ID_NONE) {
+            b.aadProxyDetails.visibility = View.GONE
+            return
+        }
+        b.aadProxyDetails.visibility = View.VISIBLE
+        b.aadProxyDetails.text = getString(R.string.wireguard_apps_proxy_map_desc, proxy)
+    }
+
     private fun hideFirewallStatusUi() {
         b.aadAppSettingsCard.visibility = View.GONE
+    }
+
+    private fun hideBypassProxyUi() {
+        b.excludeProxyRl.visibility = View.GONE
     }
 
     private fun hideDomainBlockUi() {
@@ -174,7 +216,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         startActivity(intent)
     }
 
-    private fun updateDataUsage() {
+    private fun displayDataUsage() {
         val u = Utilities.humanReadableByteCount(appInfo.uploadBytes, true)
         val uploadBytes = getString(R.string.symbol_upload, u)
         val d = Utilities.humanReadableByteCount(appInfo.downloadBytes, true)
@@ -228,12 +270,12 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
         b.aadAppInfoIcon.setOnClickListener {
             io {
-                val packages = FirewallManager.getAppNamesByUid(appInfo.uid)
+                val appNames = FirewallManager.getAppNamesByUid(appInfo.uid)
                 uiCtx {
-                    if (packages.count() == 1) {
+                    if (appNames.count() == 1) {
                         openAndroidAppInfo(this, appInfo.packageName)
-                    } else if (packages.count() > 1) {
-                        showAppInfoDialog(packages)
+                    } else if (appNames.count() > 1) {
+                        showAppInfoDialog(appNames)
                     } else {
                         showToastUiCentered(
                             this,
@@ -305,17 +347,30 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 return@setOnClickListener
             }
 
-            // change the status to allowed if already app is excluded
-            if (appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.NONE,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
-            } else {
-                updateFirewallStatus(
-                    FirewallManager.FirewallStatus.EXCLUDE,
-                    FirewallManager.ConnectionStatus.ALLOW
-                )
+            io {
+                if (FirewallManager.isUnknownPackage(uid) && appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
+                    uiCtx {
+                        showToastUiCentered(
+                            this,
+                            getString(R.string.exclude_no_package_err_toast),
+                            Toast.LENGTH_LONG
+                        )
+                    }
+                    return@io
+                }
+
+                // change the status to allowed if already app is excluded
+                if (appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
+                    updateFirewallStatus(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                } else {
+                    updateFirewallStatus(
+                        FirewallManager.FirewallStatus.EXCLUDE,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                }
             }
         }
 
@@ -349,6 +404,15 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         b.excludeProxyRl.setOnClickListener {
             b.excludeProxySwitch.isChecked = !b.excludeProxySwitch.isChecked
         }
+
+        b.aadCloseConnIcon.setOnClickListener {
+            VpnController.closeConnectionsIfNeeded(uid)
+            showToastUiCentered(
+                this,
+                getString(R.string.config_add_success_toast),
+                Toast.LENGTH_LONG
+            )
+        }
     }
 
     private fun updateExcludeProxyStatus(isExcluded: Boolean) {
@@ -359,20 +423,20 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     private fun openAppWiseDomainLogsActivity() {
         val intent = Intent(this, AppWiseDomainLogsActivity::class.java)
-        intent.putExtra(UID_INTENT_NAME, uid)
+        intent.putExtra(INTENT_UID, uid)
         startActivity(intent)
     }
 
     private fun openAppWiseIpLogsActivity() {
         val intent = Intent(this, AppWiseIpLogsActivity::class.java)
-        intent.putExtra(UID_INTENT_NAME, uid)
+        intent.putExtra(INTENT_UID, uid)
         startActivity(intent)
     }
 
     private fun setDomainsAdapter() {
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedDomainRv.layoutManager = layoutManager
-        val adapter = AppWiseDomainsAdapter(this, this, uid)
+        val adapter = AppWiseDomainsAdapter(this, this, uid, isRethinkApp)
         networkLogsViewModel.getDomainLogsLimited(uid).observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -384,8 +448,53 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                     b.aadMostContactedDomainRl.visibility = View.GONE
                 } else {
                     b.aadMostContactedDomainRl.visibility = View.VISIBLE
-
                 }
+            } else {
+                b.aadMostContactedDomainRl.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun setRethinkDomainLogsAdapter() {
+        val layoutManager = LinearLayoutManager(this)
+        b.aadMostContactedDomainRv.layoutManager = layoutManager
+        val adapter = AppWiseDomainsAdapter(this, this, uid, isRethinkApp)
+        networkLogsViewModel.getRethinkDomainLogsLimited().observe(this) {
+            adapter.submitData(this.lifecycle, it)
+        }
+        b.aadMostContactedDomainRv.adapter = adapter
+
+        adapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (adapter.itemCount < 1) {
+                    b.aadMostContactedDomainRl.visibility = View.GONE
+                } else {
+                    b.aadMostContactedDomainRl.visibility = View.VISIBLE
+                }
+            } else {
+                b.aadMostContactedDomainRl.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun setRethinkIpLogsAdapter() {
+        val layoutManager = LinearLayoutManager(this)
+        b.aadMostContactedIpsRv.layoutManager = layoutManager
+        val adapter = AppWiseIpsAdapter(this, this, uid, isRethinkApp)
+        networkLogsViewModel.getRethinkIpLogsLimited().observe(this) {
+            adapter.submitData(this.lifecycle, it)
+        }
+        b.aadMostContactedIpsRv.adapter = adapter
+
+        adapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (adapter.itemCount < 1) {
+                    b.aadMostContactedIpsRl.visibility = View.GONE
+                } else {
+                    b.aadMostContactedIpsRl.visibility = View.VISIBLE
+                }
+            } else {
+                b.aadMostContactedIpsRl.visibility = View.VISIBLE
             }
         }
     }
@@ -394,7 +503,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         b.aadMostContactedIpsRv.setHasFixedSize(true)
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedIpsRv.layoutManager = layoutManager
-        val adapter = AppWiseIpsAdapter(this, this, uid)
+        val adapter = AppWiseIpsAdapter(this, this, uid, isRethinkApp)
         networkLogsViewModel.getIpLogsLimited(uid).observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
@@ -407,20 +516,21 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 } else {
                     b.aadMostContactedIpsRl.visibility = View.VISIBLE
                 }
+            } else {
+                b.aadMostContactedIpsRl.visibility = View.VISIBLE
             }
         }
     }
 
-    private fun showAppInfoDialog(packages: List<String>) {
+    private fun showAppInfoDialog(appNames: List<String>) {
         val builderSingle = MaterialAlertDialogBuilder(this)
-
         builderSingle.setTitle(this.getString(R.string.about_settings_app_info))
 
         val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1)
-        arrayAdapter.addAll(packages)
+        arrayAdapter.addAll(appNames)
         builderSingle.setCancelable(false)
 
-        builderSingle.setItems(packages.toTypedArray(), null)
+        builderSingle.setItems(appNames.toTypedArray(), null)
 
         builderSingle.setPositiveButton(getString(R.string.ada_noapp_dialog_positive)) {
             dialog: DialogInterface,
@@ -429,7 +539,16 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
 
         val alertDialog = builderSingle.create()
-        alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
+        val ctx = this.applicationContext
+        alertDialog.listView.setOnItemClickListener { _, _, position, _ ->
+            io {
+                val pkg = FirewallManager.getPackageNameByAppName(appNames[position])
+                uiCtx {
+                    Logger.i(Logger.LOG_TAG_UI, "AppInfoActivity, package name: $pkg")
+                    openAndroidAppInfo(ctx, pkg)
+                }
+            }
+        }
         alertDialog.show()
     }
 
@@ -458,7 +577,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                             FirewallManager.ConnectionStatus.METERED
                         }
                     }
-                updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat)
+                updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat, connStatus)
             }
         }
     }
@@ -489,20 +608,21 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                         }
                     }
 
-                updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat)
+                updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat, connStatus)
             }
         }
     }
 
     private fun updateFirewallStatus(
         aStat: FirewallManager.FirewallStatus,
-        cStat: FirewallManager.ConnectionStatus
+        cStat: FirewallManager.ConnectionStatus,
+        prevConnStat: FirewallManager.ConnectionStatus = FirewallManager.ConnectionStatus.ALLOW
     ) {
         io {
             val appNames = FirewallManager.getAppNamesByUid(appInfo.uid)
             uiCtx {
                 if (appNames.count() > 1) {
-                    showDialog(appNames, appInfo, aStat, cStat)
+                    showDialog(appNames, appInfo, aStat, cStat, prevConnStat)
                     return@uiCtx
                 }
 
@@ -666,7 +786,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         packageList: List<String>,
         appInfo: AppInfo,
         aStat: FirewallManager.FirewallStatus,
-        cStat: FirewallManager.ConnectionStatus
+        cStat: FirewallManager.ConnectionStatus,
+        prevConnStat: FirewallManager.ConnectionStatus
     ) {
 
         val builderSingle = MaterialAlertDialogBuilder(this)
@@ -684,7 +805,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         builderSingle.setItems(packageList.toTypedArray(), null)
 
         builderSingle
-            .setPositiveButton(getString(FirewallManager.getLabelForStatus(aStat, cStat))) {
+            .setPositiveButton(getString(FirewallManager.getLabelForStatus(aStat, cStat, prevConnStat))) {
                 di: DialogInterface,
                 _: Int ->
                 di.dismiss()

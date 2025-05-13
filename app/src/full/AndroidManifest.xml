@@ -22,8 +22,11 @@
         <activity
             android:name=".ui.activity.FirewallActivity"
             android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.HomeScreenActivity"
+            android:clearTaskOnLaunch="true"
+            android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.HomeScreenActivity"
+            android:name=".ui.activity.AppLockActivity"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
@@ -113,8 +116,10 @@
         <activity
             android:name=".ui.activity.AppWiseDomainLogsActivity"
             android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.ConsoleLogActivity"
+            android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.NotificationHandlerDialog"
+            android:name=".ui.NotificationHandlerActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:taskAffinity=""
@@ -125,6 +130,25 @@
             tools:replace="screenOrientation" />
         <activity
             android:name=".ui.activity.AlertsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.AntiCensorshipActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.AdvancedSettingActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.DomainConnectionsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.PingTestActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.RethinkPlusDashboardActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.RpnCountriesActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.RpnAvailabilityCheckActivity"
             android:finishOnTaskLaunch="true" />
 
         <receiver
@@ -143,6 +167,12 @@
             android:name=".receiver.NotificationActionReceiver"
             android:exported="false"
             android:label="@string/app_name" />
+        <receiver android:name=".receiver.UserPresentReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
