@@ -22,7 +22,6 @@ import org.koin.dsl.module
 object ServiceModule {
     private val serviceModules = module {
         single { PersistentState(androidContext()) }
-        single { QueryTracker(get()) }
         single { NetLogTracker(androidContext(), get(), get(), get(), get(), get()) }
         single { RefreshDatabase(androidContext(), get(), get(), get(), get()) }
     }
