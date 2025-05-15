@@ -30,6 +30,7 @@ import com.celzero.bravedns.databinding.ListItemWgHopBinding
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Config
@@ -87,8 +88,8 @@ class WgHopAdapter(
             b.wgHopListNameTv.text = config.getName() + " (" + config.getId() + ")"
             b.wgHopListCheckbox.isChecked = config.getId() == selectedId
             setCardStroke(config.getId() == selectedId, mapping.isActive)
-            updateStatusUi(config)
             showChips(config)
+            updateStatusUi(config)
             setupClickListeners(config, mapping.isActive)
         }
 
@@ -112,16 +113,14 @@ class WgHopAdapter(
                     }
                     val src = ID_WG_BASE + srcConfig.getId()
                     val hop = ID_WG_BASE + config.getId()
-                    val testHop = VpnController.testHop(src, hop)
+                    val statusPair = VpnController.hopStatus(src, hop)
                     uiCtx {
-                        b.wgHopListDescTv.text = if (testHop.first) {
-                            if (testHop.second.isEmpty()) {
-                                context.getString(R.string.lbl_active)
-                            } else {
-                                testHop.second
-                            }
+                        val id = statusPair.first
+                        if (statusPair.first != null) {
+                            val txt = UIUtils.getProxyStatusStringRes(id)
+                            b.wgHopListDescTv.text = context.getString(txt)
                         } else {
-                            testHop.second
+                            b.wgHopListDescTv.text = statusPair.second
                         }
                     }
                     return@io
@@ -136,9 +135,6 @@ class WgHopAdapter(
                         b.wgHopListDescTv.text = context.getString(R.string.lbl_inactive)
                     }
                 }
-                /*
-
-                */
             }
         }
 
@@ -164,6 +160,7 @@ class WgHopAdapter(
         private fun updateAmzChip(config: Config) {
             config.getInterface()?.let {
                 if (it.isAmnezia()) {
+                    b.chipGroup.visibility = View.VISIBLE
                     b.chipAmnezia.visibility = View.VISIBLE
                 } else {
                     b.chipAmnezia.visibility = View.GONE
@@ -175,7 +172,6 @@ class WgHopAdapter(
             if (pair == null) return
 
             if (!pair.first && !pair.second) {
-                b.chipGroup.visibility = View.GONE
                 b.chipIpv4.visibility = View.GONE
                 b.chipIpv6.visibility = View.GONE
                 return
@@ -199,6 +195,7 @@ class WgHopAdapter(
 
         private fun updateSplitTunnelChip(isSplitTunnel: Boolean) {
             if (isSplitTunnel) {
+                b.chipGroup.visibility = View.VISIBLE
                 b.chipSplitTunnel.visibility = View.VISIBLE
             } else {
                 b.chipSplitTunnel.visibility = View.GONE
@@ -209,6 +206,7 @@ class WgHopAdapter(
             val id = ID_WG_BASE + config.getId()
             val hop = WgHopManager.getMapBySrc(id)
             if (hop.isNotEmpty()) {
+                b.chipGroup.visibility = View.VISIBLE
                 b.chipHopSrc.visibility = View.VISIBLE
             } else {
                 b.chipHopSrc.visibility = View.GONE
@@ -219,6 +217,7 @@ class WgHopAdapter(
             val id = ID_WG_BASE + config.getId()
             val hop = WgHopManager.isAlreadyHop(id)
             if (hop) {
+                b.chipGroup.visibility = View.VISIBLE
                 b.chipHopping.visibility = View.VISIBLE
             } else {
                 b.chipHopping.visibility = View.GONE
@@ -240,6 +239,10 @@ class WgHopAdapter(
 
             if (srcConfig == null) {
                 Logger.i(LOG_TAG_UI, "$TAG; source config($srcId) not found to hop")
+                uiCtx {
+                    if (!isAttached) return@uiCtx
+                    Utilities.showToastUiCentered(context, context.getString(R.string.config_invalid_desc), Toast.LENGTH_LONG)
+                }
                 return
             }
             uiCtx {
