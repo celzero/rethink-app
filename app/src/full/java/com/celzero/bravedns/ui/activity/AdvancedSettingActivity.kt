@@ -102,7 +102,7 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         b.settingsActivitySlowdownSwitch.isChecked = persistentState.slowdownMode
 
         b.dvExperimentalSwitch.isChecked = persistentState.nwEngExperimentalFeatures
-
+        b.dvAutoDialSwitch.isChecked = persistentState.autoDialsParallel
         updateDialerTimeOutUi()
     }
 
@@ -182,6 +182,14 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
 
         b.settingsClearResidueRl.setOnClickListener {
             clearResidueAfterConfirmation()
+        }
+
+        b.settingsAutoDialRl.setOnClickListener {
+            b.dvAutoDialSwitch.isChecked = !b.dvAutoDialSwitch.isChecked
+        }
+
+        b.dvAutoDialSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.autoDialsParallel = isChecked
         }
 
         b.dvTimeoutSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
