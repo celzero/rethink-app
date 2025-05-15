@@ -67,7 +67,7 @@ class FirewallAppListAdapter(
                     oldConnection: AppInfo,
                     newConnection: AppInfo
                 ): Boolean {
-                    return oldConnection.packageName == newConnection.packageName
+                    return oldConnection == newConnection
                 }
 
                 override fun areContentsTheSame(
