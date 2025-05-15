@@ -73,6 +73,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val USE_RPN = "rpn_state"
         const val RPN_MODE = "rpn_mode"
         const val DIAL_TIMEOUT_SEC = "dial_timeout_sec"
+        const val AUTO_DIALS_PARALLEL = "auto_dials_parallel"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -349,8 +350,11 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // treat only mobile data as metered
     var treatOnlyMobileNetworkAsMetered by booleanPref("treat_only_mobile_nw_as_metered").withDefault<Boolean>(false)
 
+    var showConfettiOnRPlus by booleanPref("show_confetti_on_rplus").withDefault<Boolean>(true)
+
+    var autoDialsParallel by booleanPref("auto_dials_parallel").withDefault<Boolean>(true)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
-    var median: MutableLiveData<Long> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
     var universalRulesCount: MutableLiveData<Int> = MutableLiveData()
     private var proxyStatus: MutableLiveData<Int> = MutableLiveData()
@@ -361,10 +365,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var dnsCryptRelays: MutableLiveData<DnsCryptRelayDetails> = MutableLiveData()
 
     var remoteBlocklistCount: MutableLiveData<Int> = MutableLiveData()
-
-    fun setMedianLatency(median: Long) {
-        this.median.postValue(median)
-    }
 
     fun setVpnEnabled(isOn: Boolean) {
         vpnEnabledLiveData.postValue(isOn)

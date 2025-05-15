@@ -55,8 +55,6 @@ internal constructor(
     private val persistentState: PersistentState
 ) : KoinComponent {
 
-    private val dnsLatencyTracker by inject<QueryTracker>()
-
     @Volatile private var scope: CoroutineScope? = null
 
     private var dnsdb: DnsLogTracker = DnsLogTracker(dnsLogRepository, persistentState, context)
@@ -207,8 +205,6 @@ internal constructor(
         val transaction = dnsdb.processOnResponse(summary, rethinkUid)
 
         transaction.responseCalendar = Calendar.getInstance()
-        // TODO: move this to generic Dispatcher.IO; serializer is not required
-        serializer("refreshDnsLatency", looper) { dnsLatencyTracker.refreshLatencyIfNeeded(transaction) }
 
         // TODO: This method should be part of BraveVPNService
         dnsdb.updateVpnConnectionState(transaction)

@@ -678,51 +678,55 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * are register to update the UI in the home screen
      */
     private fun observeDnsStates() {
-        persistentState.median.observe(viewLifecycleOwner) {
-            // if the dns cache is enabled, show the status as very fast as the latency is 0
-            if (persistentState.enableDnsCache) {
-                b.fhsCardDnsLatency.text = getString(
-                    R.string.ci_desc,
-                    getString(R.string.lbl_very),
-                    getString(R.string.lbl_fast)
-                )
-                    .replaceFirstChar(Char::titlecase)
-                b.fhsCardDnsLatency.isSelected = true
-                return@observe
+        io {
+            val dnsId = if (WireguardManager.oneWireGuardEnabled()) {
+                val id = WireguardManager.getOneWireGuardProxyId()
+                if (id == null) {
+                    Backend.Preferred
+                } else {
+                    "${ProxyManager.ID_WG_BASE}${id}"
+                }
+            } else {
+                Backend.Preferred
             }
-            // show status as very fast, fast, slow, and very slow based on the latency
-            when (it) {
-                in 0L..19L -> {
-                    val string =
-                        getString(
-                            R.string.ci_desc,
-                            getString(R.string.lbl_very),
-                            getString(R.string.lbl_fast)
-                        )
-                            .replaceFirstChar(Char::titlecase)
-                    b.fhsCardDnsLatency.text = string
-                }
-                in 20L..50L -> {
-                    b.fhsCardDnsLatency.text =
-                        getString(R.string.lbl_fast).replaceFirstChar(Char::titlecase)
-                }
-                in 50L..100L -> {
-                    b.fhsCardDnsLatency.text =
-                        getString(R.string.lbl_slow).replaceFirstChar(Char::titlecase)
-                }
-                else -> {
-                    val string =
-                        getString(
-                            R.string.ci_desc,
-                            getString(R.string.lbl_very),
-                            getString(R.string.lbl_slow)
-                        )
-                            .replaceFirstChar(Char::titlecase)
-                    b.fhsCardDnsLatency.text = string
-                }
-            }
+            val p50 = VpnController.p50(dnsId)
+            uiCtx {
+                when (p50) {
+                    in 0L..19L -> {
+                        val string =
+                            getString(
+                                R.string.ci_desc,
+                                getString(R.string.lbl_very),
+                                getString(R.string.lbl_fast)
+                            )
+                                .replaceFirstChar(Char::titlecase)
+                        b.fhsCardDnsLatency.text = string
+                    }
 
-            b.fhsCardDnsLatency.isSelected = true
+                    in 20L..50L -> {
+                        b.fhsCardDnsLatency.text =
+                            getString(R.string.lbl_fast).replaceFirstChar(Char::titlecase)
+                    }
+
+                    in 50L..100L -> {
+                        b.fhsCardDnsLatency.text =
+                            getString(R.string.lbl_slow).replaceFirstChar(Char::titlecase)
+                    }
+
+                    else -> {
+                        val string =
+                            getString(
+                                R.string.ci_desc,
+                                getString(R.string.lbl_very),
+                                getString(R.string.lbl_slow)
+                            )
+                                .replaceFirstChar(Char::titlecase)
+                        b.fhsCardDnsLatency.text = string
+                    }
+                }
+
+                b.fhsCardDnsLatency.isSelected = true
+            }
         }
 
         appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
@@ -835,7 +839,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     // unregister all dns related observers
     private fun unobserveDnsStates() {
-        persistentState.median.removeObservers(viewLifecycleOwner)
         appConfig.getConnectedDnsObservable().removeObservers(viewLifecycleOwner)
         VpnController.getRegionLiveData().removeObservers(viewLifecycleOwner)
     }
