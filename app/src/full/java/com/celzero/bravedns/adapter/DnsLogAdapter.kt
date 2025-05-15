@@ -208,6 +208,13 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                         b.dnsUnicodeHint.text,
                         context.getString(R.string.symbol_duck)
                     )
+            } else if (containsMultipleIPs(log)) {
+                b.dnsUnicodeHint.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.dnsUnicodeHint.text,
+                        context.getString(R.string.symbol_heavy)
+                    )
             }
 
             if (b.dnsUnicodeHint.text.isEmpty() && b.dnsQueryType.text.isEmpty()) {
@@ -229,6 +236,10 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
             if (proxy.isNullOrEmpty()) return false
 
             return !ProxyManager.isIpnProxy(proxy)
+        }
+
+        private fun containsMultipleIPs(log: DnsLog): Boolean {
+            return log.responseIps.split(",").size > 1
         }
 
         private fun isRethinkUsed(log: DnsLog): Boolean {
