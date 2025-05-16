@@ -43,6 +43,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
 
     companion object {
         const val REMOTE_DOWNLOAD_WORKER = "CUSTOM_DOWNLOAD_WORKER_REMOTE"
+        private const val TOTAL_RETRY_COUNT = 3
         private val BLOCKLIST_DOWNLOAD_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(10)
     }
 
@@ -94,7 +95,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
         Logger.i(LOG_TAG_DOWNLOAD, "Download remote blocklist: $timestamp")
         try {
             val retrofit =
-                RetrofitManager.getBlocklistBaseBuilder(retryCount)
+                RetrofitManager.getBlocklistBaseBuilder()
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
@@ -126,7 +127,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
     }
 
     private fun isRetryRequired(retryCount: Int): Boolean {
-        return retryCount < RetrofitManager.Companion.OkHttpDnsType.entries.size - 1
+        return retryCount < TOTAL_RETRY_COUNT
     }
 
     private suspend fun saveRemoteFile(jsonObject: JsonObject?, timestamp: Long): Boolean {

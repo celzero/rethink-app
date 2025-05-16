@@ -39,6 +39,7 @@ object TcpProxyHelper : KoinComponent {
     private var cfIpTrie: backend.IpTree = Backend.newIpTree()
 
     private const val DEFAULT_ID = 0
+    private const val MAX_RETRY_COUNT = 3
     const val PAYMENT_WORKER_TAG = "payment_worker_tag"
 
     private const val JSON_MIN_VERSION_CODE = "minvcode"
@@ -130,7 +131,7 @@ object TcpProxyHelper : KoinComponent {
         var works = false
         try {
             val retrofit =
-                RetrofitManager.getTcpProxyBaseBuilder(retryCount)
+                RetrofitManager.getTcpProxyBaseBuilder()
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(ITcpProxy::class.java)
@@ -175,7 +176,7 @@ object TcpProxyHelper : KoinComponent {
     }
 
     private fun isRetryRequired(retryCount: Int): Boolean {
-        return retryCount < RetrofitManager.Companion.OkHttpDnsType.entries.size - 1
+        return retryCount < MAX_RETRY_COUNT
     }
 
     suspend fun isPaymentInitiated(): Boolean {

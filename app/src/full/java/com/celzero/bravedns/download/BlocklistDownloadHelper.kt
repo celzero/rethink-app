@@ -39,6 +39,7 @@ class BlocklistDownloadHelper {
     )
 
     companion object {
+        private const val TOTAL_RETRY_COUNT = 3
         fun logd(message: String) {
             Logger.d(LOG_TAG_DOWNLOAD, message)
         }
@@ -135,7 +136,7 @@ class BlocklistDownloadHelper {
         ): BlocklistUpdateServerResponse? {
             try {
                 val retrofit =
-                    RetrofitManager.getBlocklistBaseBuilder(retryCount)
+                    RetrofitManager.getBlocklistBaseBuilder()
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()
                 val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
@@ -166,7 +167,7 @@ class BlocklistDownloadHelper {
         }
 
         private fun isRetryRequired(retryCount: Int): Boolean {
-            return retryCount < RetrofitManager.Companion.OkHttpDnsType.entries.size - 1
+            return retryCount < TOTAL_RETRY_COUNT
         }
 
         private fun processCheckDownloadResponse(

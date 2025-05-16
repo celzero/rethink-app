@@ -36,35 +36,41 @@ class RetrofitManager {
             FALLBACK_DNS
         }
 
-        fun getBlocklistBaseBuilder(dnsId: Int): Retrofit.Builder {
+        fun getBlocklistBaseBuilder(): Retrofit.Builder {
             return Retrofit.Builder()
                 .baseUrl(Constants.DOWNLOAD_BASE_URL)
-                .client(okHttpClient(dnsId))
+                .client(okHttpClient())
         }
 
-        fun getTcpProxyBaseBuilder(dnsId: Int): Retrofit.Builder {
+        fun getTcpProxyBaseBuilder(): Retrofit.Builder {
             return Retrofit.Builder()
                 .baseUrl(Constants.TCP_PROXY_BASE_URL)
-                .client(okHttpClient(dnsId))
+                .client(okHttpClient())
         }
 
-        fun okHttpClient(dnsId: Int = 0): OkHttpClient {
+        fun getIpInfoBaseBuilder(): Retrofit.Builder {
+            return Retrofit.Builder()
+                .baseUrl(Constants.IP_INFO_BASE_URL)
+                .client(okHttpClient())
+        }
+
+        fun okHttpClient(): OkHttpClient {
             val b = OkHttpClient.Builder()
             b.connectTimeout(1, TimeUnit.MINUTES)
             b.readTimeout(20, TimeUnit.MINUTES)
             b.writeTimeout(5, TimeUnit.MINUTES)
             b.retryOnConnectionFailure(true)
             // If unset, the system-wide default DNS will be used.
-            customDns(dnsId, b.build())?.let { b.dns(it) }
+            customDns(b.build())?.let { b.dns(it) }
             return b.build()
         }
 
         // As of now, quad9 is used as default dns in okhttp client.
-        private fun customDns(dnsId: Int, bootstrapClient: OkHttpClient): Dns? {
-            enumValues<OkHttpDnsType>().forEach { _ ->
+        private fun customDns(bootstrapClient: OkHttpClient): Dns? {
+            enumValues<OkHttpDnsType>().forEach { it ->
                 try {
-                    when (dnsId) {
-                        OkHttpDnsType.DEFAULT.ordinal -> {
+                    when (it) {
+                        OkHttpDnsType.DEFAULT -> {
                             return DnsOverHttps.Builder()
                                 .client(bootstrapClient)
                                 .url("https://dns.quad9.net/dns-query".toHttpUrl())
@@ -77,7 +83,7 @@ class RetrofitManager {
                                 .includeIPv6(true)
                                 .build()
                         }
-                        OkHttpDnsType.CLOUDFLARE.ordinal -> {
+                        OkHttpDnsType.CLOUDFLARE -> {
                             return DnsOverHttps.Builder()
                                 .client(bootstrapClient)
                                 .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
@@ -90,7 +96,7 @@ class RetrofitManager {
                                 .includeIPv6(true)
                                 .build()
                         }
-                        OkHttpDnsType.GOOGLE.ordinal -> {
+                        OkHttpDnsType.GOOGLE -> {
                             return DnsOverHttps.Builder()
                                 .client(bootstrapClient)
                                 .url("https://dns.google/dns-query".toHttpUrl())
@@ -103,20 +109,16 @@ class RetrofitManager {
                                 .includeIPv6(true)
                                 .build()
                         }
-                        OkHttpDnsType.SYSTEM_DNS.ordinal -> {
+                        OkHttpDnsType.SYSTEM_DNS -> {
                             return Dns.SYSTEM
                         }
-                        OkHttpDnsType.FALLBACK_DNS.ordinal -> {
+                        OkHttpDnsType.FALLBACK_DNS -> {
                             // todo: return retrieved system dns
                             return null
                         }
                     }
                 } catch (e: Exception) {
-                    Logger.crash(
-                        Logger.LOG_TAG_DOWNLOAD,
-                        "err while getting custom dns: ${e.message}",
-                        e
-                    )
+                    Logger.crash(Logger.LOG_TAG_DOWNLOAD, "err; custom dns: ${e.message}", e)
                 }
             }
             return null
