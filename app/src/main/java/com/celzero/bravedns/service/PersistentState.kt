@@ -354,6 +354,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     var autoDialsParallel by booleanPref("auto_dials_parallel").withDefault<Boolean>(true)
 
+    // user setting whether to download ip info for the ip addresses
+    var downloadIpInfo by booleanPref("download_ip_info").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
     var universalRulesCount: MutableLiveData<Int> = MutableLiveData()

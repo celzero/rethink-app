@@ -103,6 +103,7 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
 
         b.dvExperimentalSwitch.isChecked = persistentState.nwEngExperimentalFeatures
         b.dvAutoDialSwitch.isChecked = persistentState.autoDialsParallel
+        b.dvIpInfoSwitch.isChecked = persistentState.downloadIpInfo
         updateDialerTimeOutUi()
     }
 
@@ -190,6 +191,14 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
 
         b.dvAutoDialSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.autoDialsParallel = isChecked
+        }
+
+        b.settingsIpInfoRl.setOnClickListener {
+            b.dvIpInfoSwitch.isChecked = !b.dvIpInfoSwitch.isChecked
+        }
+
+        b.dvIpInfoSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.downloadIpInfo = isChecked
         }
 
         b.dvTimeoutSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
