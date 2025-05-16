@@ -80,6 +80,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
         private const val DOWNLOAD_NOTIFICATION_TAG = "DOWNLOAD_ALERTS"
         private const val DOWNLOAD_NOTIFICATION_ID = 110
+        private const val MAX_RETRY_COUNT = 3
     }
 
     override suspend fun doWork(): Result {
@@ -251,7 +252,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         try {
             // create okhttp client with base url
             val retrofit =
-                getBlocklistBaseBuilder(retryCount).build().create(IBlocklistDownload::class.java)
+                getBlocklistBaseBuilder().build().create(IBlocklistDownload::class.java)
             Logger.i(LOG_TAG_DOWNLOAD, "Downloading file: $fileName, url: $url")
             val response = retrofit.downloadLocalBlocklistFile(url, persistentState.appVersion, "")
             if (response?.isSuccessful == true) {
@@ -276,7 +277,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
     private fun isRetryRequired(retryCount: Int): Boolean {
         Logger.i(LOG_TAG_DOWNLOAD, "Retry count: $retryCount")
-        return retryCount < RetrofitManager.Companion.OkHttpDnsType.entries.size - 1
+        return retryCount < MAX_RETRY_COUNT
     }
 
     private fun downloadFile(context: Context, body: ResponseBody?, fileName: String): Boolean {
