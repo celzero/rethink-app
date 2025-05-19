@@ -190,6 +190,10 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
 
     private fun initClickListeners() {
         b.customDomainToggleGroup.addOnButtonCheckedListener(domainRulesGroupListener)
+
+        b.customDomainDeleteChip.setOnClickListener {
+            showDialogForDelete()
+        }
     }
 
     private val domainRulesGroupListener =
@@ -197,12 +201,6 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
             val b: MaterialButton = b.customDomainToggleGroup.findViewById(checkedId)
 
             val statusId = findSelectedRuleByTag(getTag(b.tag))
-            // delete button
-            if (statusId == null && isChecked) {
-                group.clearChecked()
-                showDialogForDelete(cd)
-                return@OnButtonCheckedListener
-            }
 
             // invalid selection
             if (statusId == null) {
@@ -273,18 +271,19 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
 
     data class ToggleBtnUi(val txtColor: Int, val bgColor: Int)
 
-    private fun showDialogForDelete(customDomain: CustomDomain) {
+    private fun showDialogForDelete() {
         val builder = MaterialAlertDialogBuilder(requireContext())
         builder.setTitle(R.string.cd_remove_dialog_title)
         builder.setMessage(R.string.cd_remove_dialog_message)
         builder.setCancelable(true)
         builder.setPositiveButton(requireContext().getString(R.string.lbl_delete)) { _, _ ->
-            io { DomainRulesManager.deleteDomain(customDomain) }
+            io { DomainRulesManager.deleteDomain(cd) }
             Utilities.showToastUiCentered(
                 requireContext(),
                 requireContext().getString(R.string.cd_toast_deleted),
                 Toast.LENGTH_SHORT
             )
+            dismiss()
         }
 
         builder.setNegativeButton(requireContext().getString(R.string.lbl_cancel)) { _, _ ->
