@@ -38,6 +38,7 @@ object IpInfoDownloader: KoinComponent {
     private var retryAfterTimestamp = 0L
     private var retryAttemptCount = 0
     private const val HTTP_TOO_MANY_REQUEST_CODE = 429
+    private const val COOL_DOWN_PERIOD_MILLIS: Long = 1 * 60 * 60 * 1000 // 1 hour
 
     suspend fun fetchIpInfoIfRequired(ipToLookup: String) {
         if (!persistentState.downloadIpInfo) {
@@ -99,7 +100,7 @@ object IpInfoDownloader: KoinComponent {
             } else {
                 if (downloadResponse.code() == HTTP_TOO_MANY_REQUEST_CODE) {
                     Logger.i(LOG_TAG_DOWNLOAD, "$TAG; download failed: ${downloadResponse.code()} ${downloadResponse.message()}")
-                    var coolDownPeriodMillis: Long = 5 * 60 * 1000
+                    var coolDownPeriodMillis: Long = COOL_DOWN_PERIOD_MILLIS
                     if (retryAttemptCount > 1) {
                         Logger.i(LOG_TAG_DOWNLOAD, "$TAG; download failed: too many attempts")
                         // increase the break time exponentially
