@@ -295,6 +295,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             )
         )
 
+        TooltipCompat.setTooltipText(b.aadCloseConnIcon, getString(R.string.close_conn_tool_tip))
+
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
             // show the tooltip only once when app is not bypassed (dns + firewall) earlier
             if (showBypassToolTip && appStatus == FirewallManager.FirewallStatus.NONE) {
