@@ -374,7 +374,7 @@
                     </RelativeLayout>
 
                     <RelativeLayout
-                        android:id="@+id/use_metered_rl"
+                        android:id="@+id/use_mobile_rl"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
@@ -388,28 +388,28 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentStart="true"
                             android:layout_centerVertical="true"
-                            android:layout_toStartOf="@id/use_metered_check"
+                            android:layout_toStartOf="@id/use_mobile_check"
                             android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/use_metered_title_tv"
+                                android:id="@+id/use_mobile_title_tv"
                                 style="@style/TextAppearance.AppCompat.Subhead"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/wg_setting_use_on_metered"
+                                android:text="@string/wg_setting_use_on_mobile"
                                 android:textSize="@dimen/large_font_text_view" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="5dp"
-                                android:text="@string/wg_setting_use_on_metered_desc"
+                                android:text="@string/wg_setting_use_on_mobile_desc"
                                 android:textColor="?attr/primaryLightColorText"
                                 android:textSize="@dimen/default_font_text_view" />
                         </LinearLayout>
 
                         <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/use_metered_check"
+                            android:id="@+id/use_mobile_check"
                             style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

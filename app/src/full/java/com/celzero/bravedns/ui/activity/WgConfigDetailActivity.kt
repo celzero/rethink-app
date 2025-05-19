@@ -156,7 +156,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.catchAllRl.visibility = View.VISIBLE
             b.oneWgInfoTv.visibility = View.GONE
             b.hopBtn.visibility = View.VISIBLE
-            b.useMeteredRl.visibility = View.VISIBLE
+            b.useMobileRl.visibility = View.VISIBLE
         } else if (wgType.isOneWg()) {
             b.wgHeaderTv.text =
                 getString(R.string.rt_list_simple_btn_txt).replaceFirstChar(Char::titlecase)
@@ -165,7 +165,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.hopBtn.visibility = View.GONE
             b.oneWgInfoTv.visibility = View.VISIBLE
             b.applicationsBtn.isEnabled = false
-            b.useMeteredRl.visibility = View.GONE
+            b.useMobileRl.visibility = View.GONE
             b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
         } else {
             // invalid wireguard type, finish the activity
@@ -189,6 +189,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
             }
             b.lockdownCheck.isChecked = mapping.isLockdown
+            b.useMobileCheck.isChecked = mapping.useOnlyOnMetered
         }
 
         if (shouldObserveAppsCount()) {
@@ -459,6 +460,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
         b.catchAllCheck.setOnClickListener { updateCatchAll(b.catchAllCheck.isChecked) }
 
+        b.useMobileCheck.setOnClickListener { updateUseOnMobileNetwork(b.useMobileCheck.isChecked) }
+
         b.logsBtn.setOnClickListener {
             startActivity(ID_WG_BASE + configId)
         }
@@ -526,6 +529,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun updateLockdown(enabled: Boolean) {
         io { WireguardManager.updateLockdownConfig(configId, enabled) }
+    }
+
+    private fun updateUseOnMobileNetwork(enabled: Boolean) {
+        io { WireguardManager.updateUseOnMobileNetworkConfig(configId, enabled) }
     }
 
     private fun updateCatchAll(enabled: Boolean) {
