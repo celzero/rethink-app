@@ -51,22 +51,28 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     private var isVpnActive: Boolean = false
 
     private var contactedDomainsAdapter: SummaryStatisticsAdapter? = null
+    private var contactedAsnAdapter: SummaryStatisticsAdapter? = null
+    private var blockedAsnAdapter: SummaryStatisticsAdapter? = null
     private var contactedCountriesAdapter: SummaryStatisticsAdapter? = null
 
     enum class SummaryStatisticsType(val tid: Int) {
         MOST_CONNECTED_APPS(0),
         MOST_BLOCKED_APPS(1),
-        MOST_CONTACTED_DOMAINS(2),
-        MOST_CONTACTED_COUNTRIES(3),
-        MOST_BLOCKED_DOMAINS(4),
-        MOST_CONTACTED_IPS(5),
-        MOST_BLOCKED_IPS(6);
+        MOST_CONNECTED_ASN(2),
+        MOST_BLOCKED_ASN(3),
+        MOST_CONTACTED_DOMAINS(4),
+        MOST_CONTACTED_COUNTRIES(5),
+        MOST_BLOCKED_DOMAINS(6),
+        MOST_CONTACTED_IPS(7),
+        MOST_BLOCKED_IPS(8);
 
         companion object {
             fun getType(t: Int): SummaryStatisticsType {
                 return when (t) {
                     MOST_CONNECTED_APPS.tid -> MOST_CONNECTED_APPS
                     MOST_BLOCKED_APPS.tid -> MOST_BLOCKED_APPS
+                    MOST_CONNECTED_ASN.tid -> MOST_CONNECTED_ASN
+                    MOST_BLOCKED_ASN.tid -> MOST_BLOCKED_ASN
                     MOST_CONTACTED_DOMAINS.tid -> MOST_CONTACTED_DOMAINS
                     MOST_BLOCKED_DOMAINS.tid -> MOST_BLOCKED_DOMAINS
                     MOST_CONTACTED_COUNTRIES.tid -> MOST_CONTACTED_COUNTRIES
@@ -95,6 +101,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         highlightToggleBtn()
         showAppNetworkActivity()
         showBlockedApps()
+        showMostConnectedASN()
+        showMostBlockedASN()
         showMostContactedDomain()
         showMostBlockedDomains()
         showMostContactedIps()
@@ -192,7 +200,12 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         b.fssAppInfoChipSecond.setOnClickListener {
             openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_APPS)
         }
-
+        b.fssAsnChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_CONNECTED_ASN)
+        }
+        b.fssAsnChipSecond.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_ASN)
+        }
         b.fssDnsLogsChip.setOnClickListener {
             openDetailedStatsUi(SummaryStatisticsType.MOST_CONTACTED_DOMAINS)
         }
@@ -225,6 +238,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 handleTotalUsagesUi()
                 contactedDomainsAdapter?.setTimeCategory(timeCategory)
                 contactedCountriesAdapter?.setTimeCategory(timeCategory)
+                contactedAsnAdapter?.setTimeCategory(timeCategory)
+                blockedAsnAdapter?.setTimeCategory(timeCategory)
                 return@OnButtonCheckedListener
             }
 
@@ -335,6 +350,81 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
         b.fssAppBlockedRecyclerView.minimumHeight = pixels.toInt()
         b.fssAppBlockedRecyclerView.adapter = recyclerAdapter
+    }
+
+    private fun showMostConnectedASN() {
+        b.fssAsnAllowedRecyclerView.setHasFixedSize(true)
+        val layoutManager = CustomLinearLayoutManager(requireContext())
+        b.fssAsnAllowedRecyclerView.layoutManager = layoutManager
+
+        contactedAsnAdapter =
+            SummaryStatisticsAdapter(
+                requireContext(),
+                persistentState,
+                appConfig,
+                SummaryStatisticsType.MOST_CONNECTED_ASN
+            )
+
+
+        val timeCategory = viewModel.getTimeCategory()
+        contactedAsnAdapter?.setTimeCategory(timeCategory)
+
+        viewModel.getMostConnectedASN.observe(viewLifecycleOwner) {
+            contactedAsnAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
+        }
+
+        contactedAsnAdapter?.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (contactedAsnAdapter!!.itemCount < 1) {
+                    b.fssAsnAllowedLl.visibility = View.GONE
+                } else {
+                    b.fssAsnAllowedLl.visibility = View.VISIBLE
+                }
+            } else {
+                b.fssAsnAllowedLl.visibility = View.VISIBLE
+            }
+        }
+        val scale = resources.displayMetrics.density
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
+        b.fssAsnAllowedRecyclerView.minimumHeight = pixels.toInt()
+        b.fssAsnAllowedRecyclerView.adapter = contactedAsnAdapter
+    }
+
+    private fun showMostBlockedASN() {
+        b.fssAsnBlockedRecyclerView.setHasFixedSize(true)
+        val layoutManager = CustomLinearLayoutManager(requireContext())
+        b.fssAsnBlockedRecyclerView.layoutManager = layoutManager
+
+        blockedAsnAdapter =
+            SummaryStatisticsAdapter(
+                requireContext(),
+                persistentState,
+                appConfig,
+                SummaryStatisticsType.MOST_BLOCKED_ASN
+            )
+
+        val timeCategory = viewModel.getTimeCategory()
+        blockedAsnAdapter?.setTimeCategory(timeCategory)
+
+        viewModel.getMostBlockedASN.observe(viewLifecycleOwner) {
+            blockedAsnAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
+        }
+
+        blockedAsnAdapter?.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (blockedAsnAdapter!!.itemCount < 1) {
+                    b.fssAsnBlockedLl.visibility = View.GONE
+                } else {
+                    b.fssAsnBlockedLl.visibility = View.VISIBLE
+                }
+            } else {
+                b.fssAsnBlockedLl.visibility = View.VISIBLE
+            }
+        }
+        val scale = resources.displayMetrics.density
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
+        b.fssAsnBlockedRecyclerView.minimumHeight = pixels.toInt()
+        b.fssAsnBlockedRecyclerView.adapter = blockedAsnAdapter
     }
 
     private fun showMostContactedDomain() {

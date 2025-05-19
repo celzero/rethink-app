@@ -28,9 +28,11 @@ import com.celzero.bravedns.util.Constants
 
 class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewModel() {
     private var domains: MutableLiveData<String> = MutableLiveData()
+    private var asn: MutableLiveData<String> = MutableLiveData()
     private var flag: MutableLiveData<String> = MutableLiveData()
     private var timeCategory: TimeCategory = TimeCategory.ONE_HOUR
     private var startTime: MutableLiveData<Long> = MutableLiveData()
+    private var isBlocked: Boolean = false
 
     companion object {
         private const val ONE_HOUR_MILLIS = 1 * 60 * 60 * 1000L
@@ -52,6 +54,8 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
         // set from and to time to current and 1 hr before
         startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
         domains.postValue("")
+        asn.postValue("")
+        flag.postValue("")
     }
 
     fun setDomain(domain: String) {
@@ -60,6 +64,11 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
 
     fun setFlag(flag: String) {
         this.flag.postValue(flag)
+    }
+
+    fun setAsn(asn: String, isBlocked: Boolean) {
+        this.asn.postValue(asn)
+        this.isBlocked = isBlocked
     }
 
     fun timeCategoryChanged(tc: TimeCategory) {
@@ -75,6 +84,9 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
                 startTime.value = System.currentTimeMillis() - ONE_WEEK_MILLIS
             }
         }
+        asn.value = ""
+        flag.value = ""
+        domains.value = ""
     }
 
     val domainConnectionList = domains.switchMap { input ->
@@ -85,6 +97,10 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
         fetchFlagConnections(input)
     }
 
+    val asnConnectionList = asn.switchMap { input ->
+        fetchAsnConnections(input)
+    }
+
     private fun fetchDomainConnections(input: String) =
         Pager(PagingConfig(pageSize = Constants.LIVEDATA_PAGE_SIZE)) {
             statsDao.getDomainDetails(input, startTime.value!!)
@@ -93,5 +109,14 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
     private fun fetchFlagConnections(input: String) =
         Pager(PagingConfig(pageSize = Constants.LIVEDATA_PAGE_SIZE)) {
             statsDao.getFlagDetails(input, startTime.value!!)
+        }.liveData.cachedIn(viewModelScope)
+
+    private fun fetchAsnConnections(input: String) =
+        Pager(PagingConfig(pageSize = Constants.LIVEDATA_PAGE_SIZE)) {
+            if (isBlocked) {
+                statsDao.getAsnBlockedDetails(input, startTime.value!!)
+            } else {
+                statsDao.getAsnDetails(input, startTime.value!!)
+            }
         }.liveData.cachedIn(viewModelScope)
 }

@@ -32,12 +32,15 @@ import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemStatisticsSummaryBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.AppInfoActivity
+import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
+import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.getFlag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DomainConnectionsAdapter(private val context: Context) :
+class DomainConnectionsAdapter(private val context: Context, private val type: DomainConnectionsActivity.InputType) :
     PagingDataAdapter<AppConnection, DomainConnectionsAdapter.DomainConnectionsViewHolder>(
         DIFF_CALLBACK
     ) {
@@ -83,6 +86,32 @@ class DomainConnectionsAdapter(private val context: Context) :
         RecyclerView.ViewHolder(b.root) {
 
         fun bind(dc: AppConnection) {
+            if (type == DomainConnectionsActivity.InputType.ASN) {
+                b.ssDataUsage.text = dc.ipAddress
+                b.ssIcon.visibility = View.GONE
+                b.ssFlag.visibility = View.VISIBLE
+                b.ssFlag.text = getFlag(dc.flag)
+                b.ssCount.text = dc.count.toString()
+                b.ssProgress.visibility = View.GONE
+                if (dc.downloadBytes == null || dc.uploadBytes == null) {
+                    return
+                }
+
+                val download =
+                    context.getString(
+                        R.string.symbol_download,
+                        Utilities.humanReadableByteCount(dc.downloadBytes, true)
+                    )
+                val upload =
+                    context.getString(
+                        R.string.symbol_upload,
+                        Utilities.humanReadableByteCount(dc.uploadBytes, true)
+                    )
+                val total = context.getString(R.string.two_argument, upload, download)
+                b.ssName.text = total
+                return
+            }
+
             io {
                 val appInfo = FirewallManager.getAppInfoByUid(dc.uid)
                 uiCtx {

@@ -435,9 +435,9 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun startDomainConnectionsActivity(domain: String) {
         val intent = Intent(requireContext(), DomainConnectionsActivity::class.java)
-        intent.putExtra(DomainConnectionsActivity.INTENT_TYPE, DomainConnectionsActivity.InputType.DOMAIN.type)
-        intent.putExtra(DomainConnectionsActivity.INTENT_DOMAIN, domain)
-        intent.putExtra(DomainConnectionsActivity.INTENT_TIME_CATEGORY, DomainConnectionsViewModel.TimeCategory.SEVEN_DAYS.value)
+        intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TYPE, DomainConnectionsActivity.InputType.DOMAIN.type)
+        intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_DOMAIN, domain)
+        intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TIME_CATEGORY, DomainConnectionsViewModel.TimeCategory.SEVEN_DAYS.value)
         requireContext().startActivity(intent)
     }
 

@@ -152,10 +152,7 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
     private fun handleStatType(
         type: SummaryStatisticsFragment.SummaryStatisticsType
     ): LiveData<PagingData<AppConnection>> {
-        io {
-            val isAppBypassed = FirewallManager.isAnyAppBypassesDns()
-            uiCtx { viewModel.setData(type, isAppBypassed) }
-        }
+        viewModel.setData(type)
         return when (type) {
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_APPS -> {
                 b.dsaTitle.text = getString(R.string.ssv_app_network_activity_heading)
@@ -164,6 +161,14 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_APPS -> {
                 b.dsaTitle.text = getString(R.string.ssv_app_blocked_heading)
                 viewModel.getAllBlockedAppNetworkActivity
+            }
+            SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_ASN -> {
+                b.dsaTitle.text = getString(R.string.most_contacted_asn)
+                viewModel.getAllAllowedAsn
+            }
+            SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_ASN -> {
+                b.dsaTitle.text = getString(R.string.most_blocked_asn)
+                viewModel.getAllBlockedAsn
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
                 b.dsaTitle.text = getString(R.string.ssv_most_contacted_domain_heading)

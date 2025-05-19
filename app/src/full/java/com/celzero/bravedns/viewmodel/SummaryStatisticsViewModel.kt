@@ -15,22 +15,17 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.data.DataUsageSummary
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
-import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.database.StatsSummaryDao
 import com.celzero.bravedns.util.Constants
 
@@ -39,6 +34,7 @@ class SummaryStatisticsViewModel(
     private val statsDao: StatsSummaryDao
 ) : ViewModel() {
     private var networkActivity: MutableLiveData<String> = MutableLiveData()
+    private var asn: MutableLiveData<String> = MutableLiveData()
     private var countryActivities: MutableLiveData<String> = MutableLiveData()
     private var domains: MutableLiveData<String> = MutableLiveData()
     private var ips: MutableLiveData<String> = MutableLiveData()
@@ -65,6 +61,7 @@ class SummaryStatisticsViewModel(
         // set from and to time to current and 1 hr before
         startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
         networkActivity.value = ""
+        asn.value = ""
         domains.value = ""
         countryActivities.value = ""
         ips.value = ""
@@ -88,6 +85,7 @@ class SummaryStatisticsViewModel(
             }
         }
         networkActivity.value = ""
+        asn.value = ""
         countryActivities.value = ""
         ips.value = ""
         domains.value = ""
@@ -110,6 +108,26 @@ class SummaryStatisticsViewModel(
                     // use dnsQuery as appName
                     val to = startTime.value ?: 0L
                     statsDao.getMostBlockedApps(to)
+                }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
+
+    val getMostConnectedASN =
+        asn.switchMap { _ ->
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    val to = startTime.value ?: 0L
+                    statsDao.getMostConnectedASN(to)
+                }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
+
+    val getMostBlockedASN =
+        asn.switchMap { _ ->
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    val to = startTime.value ?: 0L
+                    statsDao.getMostBlockedASN(to)
                 }
                 .liveData
                 .cachedIn(viewModelScope)

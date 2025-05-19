@@ -48,14 +48,16 @@ class DomainConnectionsActivity : AppCompatActivity(R.layout.activity_domain_con
         }
 
     companion object {
-        const val INTENT_TYPE = "TYPE"
-        const val INTENT_FLAG = "FLAG"
-        const val INTENT_DOMAIN = "DOMAIN"
-        const val INTENT_TIME_CATEGORY = "TIME_CATEGORY"
+        const val INTENT_EXTRA_TYPE = "TYPE"
+        const val INTENT_EXTRA_FLAG = "FLAG"
+        const val INTENT_EXTRA_DOMAIN = "DOMAIN"
+        const val INTENT_EXTRA_ASN = "ASN"
+        const val INTENT_EXTRA_IS_BLOCKED = "IS_BLOCKED"
+        const val INTENT_EXTRA_TIME_CATEGORY = "TIME_CATEGORY"
     }
 
     enum class InputType(val type: Int) {
-        DOMAIN(0), FLAG(1)
+        DOMAIN(0), FLAG(1), ASN(2);
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,23 +70,31 @@ class DomainConnectionsActivity : AppCompatActivity(R.layout.activity_domain_con
             window.isNavigationBarContrastEnforced = false
         }
 
-        val t = intent.getIntExtra(INTENT_TYPE, 0)
+        val t = intent.getIntExtra(INTENT_EXTRA_TYPE, 0)
         type = InputType.entries.toTypedArray()[t]
-        if (type == InputType.DOMAIN) {
-            val domain = intent.getStringExtra(INTENT_DOMAIN) ?: ""
-            viewModel.setDomain(domain)
-            b.dcTitle.text = domain
-        } else {
-            val flag = intent.getStringExtra(INTENT_FLAG) ?: ""
-            viewModel.setFlag(flag)
-            b.dcTitle.text = getString(R.string.two_argument_space, flag, getCountryNameFromFlag(flag))
+        when (type) {
+            InputType.DOMAIN -> {
+                val domain = intent.getStringExtra(INTENT_EXTRA_DOMAIN) ?: ""
+                viewModel.setDomain(domain)
+                b.dcTitle.text = domain
+            }
+            InputType.FLAG -> {
+                val flag = intent.getStringExtra(INTENT_EXTRA_FLAG) ?: ""
+                viewModel.setFlag(flag)
+                b.dcTitle.text = getString(R.string.two_argument_space, flag, getCountryNameFromFlag(flag))
+            }
+            InputType.ASN -> {
+                val asn = intent.getStringExtra(INTENT_EXTRA_ASN) ?: ""
+                val isBlocked = intent.getBooleanExtra(INTENT_EXTRA_IS_BLOCKED, false)
+                viewModel.setAsn(asn, isBlocked)
+                b.dcTitle.text = asn
+            }
         }
-        val tc = intent.getIntExtra(INTENT_TIME_CATEGORY, 0)
+        val tc = intent.getIntExtra(INTENT_EXTRA_TIME_CATEGORY, 0)
         val timeCategory =
             DomainConnectionsViewModel.TimeCategory.fromValue(tc)
                 ?: DomainConnectionsViewModel.TimeCategory.ONE_HOUR
         setSubTitle(timeCategory)
-
         viewModel.timeCategoryChanged(timeCategory)
         setRecyclerView()
     }
@@ -126,13 +136,21 @@ class DomainConnectionsActivity : AppCompatActivity(R.layout.activity_domain_con
         val layoutManager = CustomLinearLayoutManager(this)
         b.dcRecycler.layoutManager = layoutManager
 
-        val recyclerAdapter = DomainConnectionsAdapter(this)
+        val recyclerAdapter = DomainConnectionsAdapter(this, type)
 
-        if (type == InputType.DOMAIN) {
-            viewModel.domainConnectionList.observe(this) { recyclerAdapter.submitData(this.lifecycle, it) }
-        } else {
-            viewModel.flagConnectionList.observe(this) { recyclerAdapter.submitData(this.lifecycle, it) }
+        val liveData = when (type) {
+            InputType.DOMAIN -> {
+                viewModel.domainConnectionList
+            }
+            InputType.FLAG -> {
+                viewModel.flagConnectionList
+            }
+            InputType.ASN -> {
+                viewModel.asnConnectionList
+            }
         }
+
+        liveData.observe(this) { recyclerAdapter.submitData(this.lifecycle, it) }
 
         // remove the view if there is no data
         recyclerAdapter.addLoadStateListener {
@@ -140,6 +158,7 @@ class DomainConnectionsActivity : AppCompatActivity(R.layout.activity_domain_con
                 if (recyclerAdapter.itemCount < 1) {
                     b.dcRecycler.visibility = View.GONE
                     b.dcNoDataRl.visibility = View.VISIBLE
+                    liveData.removeObservers(this)
                 } else {
                     b.dcRecycler.visibility = View.VISIBLE
                     b.dcNoDataRl.visibility = View.GONE

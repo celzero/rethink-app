@@ -23,6 +23,148 @@ import com.celzero.bravedns.data.AppConnection
 @Dao
 interface StatsSummaryDao {
 
+    @Query(
+        """
+            SELECT -1 as uid, 
+             '' as ipAddress,
+             0 as port,
+             COUNT(*) as count,
+             0 as blocked, 
+             ipInfo.countryCode AS flag, 
+             ipInfo.asName AS appOrDnsName,
+             Sum(conn.downloadBytes) as downloadBytes,
+             Sum(conn.uploadBytes) as uploadBytes,
+             Sum(downloadBytes + uploadBytes) as totalBytes
+            FROM ConnectionTracker AS conn
+            INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
+            where conn.isBlocked = 0
+            and ipInfo.asName != ''
+            and conn.timeStamp > :to
+            GROUP BY ipInfo.asName
+            ORDER BY count DESC
+            LIMIT 7
+        """
+    )
+    fun getMostConnectedASN(to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+               SELECT -1 as uid, 
+                '' as ipAddress,
+                0 as port,
+                COUNT(*) as count,
+                0 as blocked, 
+                ipInfo.countryCode AS flag, 
+                ipInfo.asName AS appOrDnsName,
+                Sum(conn.downloadBytes) as downloadBytes,
+                Sum(conn.uploadBytes) as uploadBytes,
+                Sum(downloadBytes + uploadBytes) as totalBytes
+               FROM ConnectionTracker AS conn
+               INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
+               where conn.isBlocked = 0
+               and ipInfo.asName != ''
+               and conn.timeStamp > :to
+               GROUP BY ipInfo.asName
+               ORDER BY count DESC
+           """
+    )
+    fun getAllConnectedASN(to: Long): PagingSource<Int, AppConnection>
+
+
+    @Query(
+        """
+        SELECT -1 as uid, 
+              conn.ipAddress as ipAddress,
+              0 as port,
+              COUNT(*) as count,
+              0 as blocked, 
+              ipInfo.countryCode AS flag,
+              ipInfo.asName AS appOrDnsName,
+              Sum(conn.downloadBytes) as downloadBytes,
+              Sum(conn.uploadBytes) as uploadBytes,
+              Sum(downloadBytes + uploadBytes) as totalBytes
+            FROM ConnectionTracker AS conn
+            INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
+            where conn.isBlocked = 0
+            and ipInfo.asName != ''
+            and conn.timeStamp > :to
+            and ipInfo.asName = :asn
+            GROUP BY conn.ipAddress
+            ORDER BY count DESC
+    """
+    )
+    fun getAsnDetails(asn: String, to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+            SELECT -1 as uid, 
+              '' as ipAddress,
+              0 as port,
+              COUNT(*) as count,
+              1 as blocked, 
+              ipInfo.countryCode AS flag,
+              ipInfo.asName AS appOrDnsName,
+              0 as downloadBytes,
+              0 as uploadBytes,
+              0 as totalBytes
+            FROM ConnectionTracker AS conn
+            INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
+            where conn.isBlocked = 1
+            and ipInfo.asName != ''
+            and conn.timeStamp > :to
+            GROUP BY ipInfo.asName
+            ORDER BY count DESC
+            LIMIT 7
+        """
+    )
+    fun getMostBlockedASN(to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+                SELECT -1 as uid, 
+                  '' as ipAddress,
+                  0 as port,
+                  COUNT(*) as count,
+                  1 as blocked, 
+                  ipInfo.countryCode AS flag,
+                  ipInfo.asName AS appOrDnsName,
+                  0 as downloadBytes,
+                  0 as uploadBytes,
+                  0 as totalBytes
+                FROM ConnectionTracker AS conn
+                INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
+                where conn.isBlocked = 1
+                and ipInfo.asName != ''
+                and conn.timeStamp > :to
+                GROUP BY ipInfo.asName
+                ORDER BY count DESC
+            """
+    )
+    fun getAllBlockedASN(to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+           SELECT -1 as uid, 
+                 conn.ipAddress as ipAddress,
+                 0 as port,
+                 COUNT(*) as count,
+                 1 as blocked, 
+                 ipInfo.countryCode AS flag,
+                 ipInfo.asName AS appOrDnsName,
+                 0 as downloadBytes,
+                 0 as uploadBytes,
+                 0 as totalBytes
+               FROM ConnectionTracker AS conn
+               INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
+               where conn.isBlocked = 1
+               and ipInfo.asName != ''
+               and conn.timeStamp > :to
+               and ipInfo.asName = :asn
+               GROUP BY conn.ipAddress
+               ORDER BY count DESC
+       """
+    )
+    fun getAsnBlockedDetails(asn: String, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
         """
@@ -235,9 +377,9 @@ interface StatsSummaryDao {
           ORDER BY count DESC 
           LIMIT 7
         """
-        )
+    )
     fun getMostBlockedDomains(to: Long): PagingSource<Int, AppConnection>
-    
+
     @Query(
         """
             SELECT 0 AS uid, 
@@ -429,8 +571,8 @@ interface StatsSummaryDao {
             GROUP BY flag 
             ORDER BY count DESC 
         """
-        )
-        fun getAllContactedCountries(to: Long): PagingSource<Int, AppConnection>
+    )
+    fun getAllContactedCountries(to: Long): PagingSource<Int, AppConnection>
 
 
     @Query(
@@ -532,7 +674,8 @@ interface StatsSummaryDao {
     )
     fun getFlagDetails(flag: String, to: Long): PagingSource<Int, AppConnection>
 
-    @Query("""
+    @Query(
+        """
         SELECT :uid AS uid, 
                       '' AS ipAddress, 
                       0 AS port, 
@@ -571,10 +714,12 @@ interface StatsSummaryDao {
                     GROUP BY appOrDnsName 
                     ORDER BY count DESC
                     LIMIT 3
-    """)
+    """
+    )
     fun getMostDomainsByUid(uid: Int, to: Long): PagingSource<Int, AppConnection>
 
-    @Query("""
+    @Query(
+        """
             SELECT :uid AS uid, 
                           '' AS ipAddress, 
                           0 AS port, 
@@ -614,8 +759,9 @@ interface StatsSummaryDao {
                           ) AS combined 
                         GROUP BY appOrDnsName 
                         ORDER BY count DESC
-        """)
-        fun getAllDomainsByUid(uid: Int, to: Long, input: String): PagingSource<Int, AppConnection>
+        """
+    )
+    fun getAllDomainsByUid(uid: Int, to: Long, input: String): PagingSource<Int, AppConnection>
 
     @Query(
         """
