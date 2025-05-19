@@ -94,6 +94,7 @@ android {
     android.applicationVariants.configureEach { variant ->
         println("variant name: ${variant.name}")
         variant.outputs.configureEach { output ->
+            // def abi = output.filters.find { it.filterType.name == "ABI" }?.identifier
             def abi = variant.outputs.first().getFilter(com.android.build.OutputFile.ABI)
             def baseAbiVersionCode = project.ext.versionCodes.get(abi)
             println("base version code: $baseAbiVersionCode")
@@ -193,20 +194,20 @@ dependencies {
     // included to fix issues with Android 6 support, issue#563
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
-    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21'
+    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0'
     fullImplementation 'androidx.appcompat:appcompat:1.7.0'
-    fullImplementation 'androidx.core:core-ktx:1.15.0'
+    fullImplementation 'androidx.core:core-ktx:1.16.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
     fullImplementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     fullImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
-    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0'
-    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0'
+    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1'
+    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1'
 
     // LiveData
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.7'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.0'
 
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.google.code.gson:gson:2.11.0'
 
     implementation "androidx.room:room-runtime:$room_version"
     ksp "androidx.room:room-compiler:$room_version"
@@ -214,8 +215,8 @@ dependencies {
     implementation "androidx.room:room-paging:$room_version"
 
     fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7'
-    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.7'
+    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.0'
+    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.0'
 
     // Pagers Views
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
@@ -259,14 +260,14 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:6b69b1edfa@aar'
-    websiteImplementation 'com.github.celzero:firestacf0cck:6b69b1edfa@aar'
-    fdroidImplementation 'com.github.celzero:firestack:6b69b1edfa@aar'
+    download 'com.github.celzero:firestack:7dd4515d27@aar'
+    websiteImplementation 'com.github.celzero:firestack:7dd4515d27@aar'
+    fdroidImplementation 'com.github.celzero:firestack:7dd4515d27@aar'
     // debug symbols
-    playImplementation 'com.github.celzero:firestack:6b69b1edfa:debug@aar'
+    playImplementation 'com.github.celzero:firestack:7dd4515d27:debug@aar'
 
     // Work manager
-    implementation('androidx.work:work-runtime-ktx:2.10.0') {
+    implementation('androidx.work:work-runtime-ktx:2.10.1') {
         modules {
             module("com.google.guava:listenablefuture") {
                 replacedBy("com.google.guava:guava", "listenablefuture is part of guava")
@@ -286,8 +287,8 @@ dependencies {
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
 
-    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.8.9'
-    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.8.9'
+    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.9.0'
+    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.9.0'
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
@@ -308,6 +309,6 @@ dependencies {
     // for in-app purchases
     playImplementation 'com.android.billingclient:billing:7.1.1'
     // for stripe payment gateway
-    websiteImplementation 'com.stripe:stripe-android:21.12.0'
-    fdroidImplementation 'com.stripe:stripe-android:21.12.0'
+    websiteImplementation 'com.stripe:stripe-android:21.13.0'
+    fdroidImplementation 'com.stripe:stripe-android:21.13.0'
 }
