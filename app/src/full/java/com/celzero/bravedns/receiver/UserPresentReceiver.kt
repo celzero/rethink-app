@@ -21,16 +21,20 @@ import android.content.Context
 import android.content.Intent
 import com.celzero.bravedns.service.VpnController
 
+/**
+ * BroadcastReceiver to handle screen state changes (on/off) and user presence.
+ * Informs the VpnController about these events.
+ */
 class UserPresentReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (Intent.ACTION_SCREEN_OFF == intent.action) {
             VpnController.screenLock()
-            Logger.v(LOG_TAG_UI, "user present: action screen off, inform vpn service")
+            Logger.v(LOG_TAG_UI, "user-present: action screen off, inform vpn service")
         } else if (Intent.ACTION_SCREEN_ON == intent.action || Intent.ACTION_USER_PRESENT == intent.action) {
             VpnController.screenUnlock()
-            Logger.v(LOG_TAG_UI, "user present: action screen on, inform vpn service")
+            Logger.v(LOG_TAG_UI, "user-present: action screen on, inform vpn service")
         } else {
-            Logger.v(LOG_TAG_UI, "user present: action ${intent.action}, inform vpn service")
+            Logger.v(LOG_TAG_UI, "user-present: unknown action ${intent.action}, skipping")
         }
     }
 }

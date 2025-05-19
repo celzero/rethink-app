@@ -249,14 +249,12 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
 
             // now the rethink dns is added as preferred in the backend, instead of separate
             // id, so match it with Preferred and BlockFree
-            val isRdnsResolverUsed = if (isRethinkDns) {
+            return if (isRethinkDns) {
                 (log.resolverId.contains(Backend.Preferred) ||
                         log.resolverId.contains(Backend.BlockFree))
             } else {
                 false
             }
-
-            return isRdnsResolverUsed || log.relayIP.endsWith(Backend.RPN)
         }
 
         private fun isInternalResolverUsed(log: DnsLog): Boolean {
@@ -328,7 +326,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
             val type = Transaction.TransportType.fromOrdinal(log.dnsType)
             when (type) {
                 Transaction.TransportType.DOH -> {
-                    if (isRethinkDns) {
+                    if (isRethinkDns && isRethinkUsed(log)) {
                         b.dnsTypeName.text = context.getString(R.string.lbl_rdns)
                     } else {
                         b.dnsTypeName.text = context.getString(R.string.other_dns_list_tab1)

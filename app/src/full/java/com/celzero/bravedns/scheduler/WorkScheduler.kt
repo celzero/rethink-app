@@ -50,7 +50,6 @@ class WorkScheduler(val context: Context) {
         const val BLOCKLIST_UPDATE_CHECK_JOB_TAG = "ScheduledBlocklistUpdateCheckJob"
         const val DATA_USAGE_JOB_TAG = "ScheduledDataUsageJob"
         const val CONSOLE_LOG_SAVE_JOB_TAG = "ConsoleLogSaveJob"
-        const val RPN_PROXIES_UPDATE_JOB_TAG = "RpnProxiesUpdateJob"
 
         const val APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS: Long = 7
         const val PURGE_LOGS_TIME_INTERVAL_HOURS: Long = 4

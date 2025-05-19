@@ -631,13 +631,13 @@ object IpRulesManager : KoinComponent {
     // translated from go, net.SplitHostPort()
     class AddrError(val err: String, val addr: String) : Exception()
 
+    fun addrErr(addr: String, why: String): Triple<String, String, Exception?> {
+        return Triple("", "", AddrError(why, addr))
+    }
+
     fun splitHostPort(hostport: String): Triple<String, String, Exception?> {
         val missingPort = "missing port in address"
         val tooManyColons = "too many colons in address"
-
-        fun addrErr(addr: String, why: String): Triple<String, String, Exception?> {
-            return Triple("", "", AddrError(why, addr))
-        }
 
         var host = ""
         var port = ""
@@ -730,7 +730,6 @@ object IpRulesManager : KoinComponent {
         sb.append("   iptree len: ${iptree.len()}\n")
         sb.append("   db len: ${db.getRulesCount()}\n")
         sb.append("   cache len: ${resultsCache.size()}\n")
-        sb.append("   cache stats: ${resultsCache.stats()}\n")
 
         return sb.toString()
     }

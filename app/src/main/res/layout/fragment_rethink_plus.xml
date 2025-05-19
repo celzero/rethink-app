@@ -241,23 +241,6 @@
                             android:padding="10dp"
                             android:text="@string/contact_support_title" />
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="?attr/background" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/pause_plus"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="10dp"
-                            android:drawableStart="@drawable/ic_rethink_plus"
-                            android:drawableEnd="@drawable/ic_right_arrow_small"
-                            android:drawablePadding="10dp"
-                            android:gravity="center_vertical"
-                            android:padding="10dp"
-                            android:text="@string/pause_rethink_plus_title" />
-
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
@@ -276,6 +259,7 @@
         app:shimmer_auto_start="false"
         app:shimmer_base_alpha="1.85"
         app:shimmer_dropoff="1"
+        android:visibility="gone"
         app:shimmer_duration="1000"
         app:shimmer_highlight_alpha="0.75">
 

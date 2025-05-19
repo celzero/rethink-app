@@ -56,7 +56,6 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-
 class AppWiseDomainLogsActivity :
     AppCompatActivity(R.layout.activity_app_wise_domain_logs), SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityAppWiseDomainLogsBinding::bind)

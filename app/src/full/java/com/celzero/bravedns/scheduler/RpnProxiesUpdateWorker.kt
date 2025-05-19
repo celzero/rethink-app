@@ -25,7 +25,7 @@ class RpnProxiesUpdateWorker(context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params) {
 
     companion object {
-        private const val TAG = "RpnProxiesUpdateWorker"
+        private const val TAG = "RpnUpdateWorker(rpn)"
     }
 
     override suspend fun doWork(): Result {

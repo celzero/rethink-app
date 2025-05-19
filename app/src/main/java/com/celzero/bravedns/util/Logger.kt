@@ -154,7 +154,7 @@ object Logger : KoinComponent {
 
         val now = System.currentTimeMillis()
         val l = when (type) {
-            LoggerType.VERY_VERBOSE -> "VV"
+            LoggerType.VERY_VERBOSE -> "Y"
             LoggerType.VERBOSE -> "V"
             LoggerType.DEBUG -> "D"
             LoggerType.INFO -> "I"

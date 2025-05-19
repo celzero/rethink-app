@@ -74,7 +74,7 @@ class AppWiseDomainsAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): AppWiseDomainsAdapter.ConnectionDetailsViewHolder {
+    ): ConnectionDetailsViewHolder {
         val itemBinding =
             ListItemAppDomainDetailsBinding.inflate(
                 LayoutInflater.from(parent.context),
