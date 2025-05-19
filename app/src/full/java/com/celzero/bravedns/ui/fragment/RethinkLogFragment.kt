@@ -15,20 +15,20 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui.fragment
 
+import Logger
+import Logger.LOG_TAG_UI
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.RethinkLogAdapter
 import com.celzero.bravedns.database.RethinkLogRepository
-import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
+import com.celzero.bravedns.databinding.FragmentConnectionTrackerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
@@ -41,8 +41,8 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class RethinkLogFragment :
-    Fragment(R.layout.activity_connection_tracker), SearchView.OnQueryTextListener {
-    private val b by viewBinding(ActivityConnectionTrackerBinding::bind)
+    Fragment(R.layout.fragment_connection_tracker), SearchView.OnQueryTextListener {
+    private val b by viewBinding(FragmentConnectionTrackerBinding::bind)
 
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val viewModel: RethinkLogViewModel by viewModel()
@@ -87,14 +87,11 @@ class RethinkLogFragment :
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = RethinkLogAdapter(requireContext())
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.rlogList.observe(viewLifecycleOwner) { it ->
-                    recyclerAdapter.submitData(lifecycle, it)
-                }
-            }
+        viewModel.rlogList.observe(viewLifecycleOwner) {
+            recyclerAdapter.submitData(lifecycle, it)
         }
         b.recyclerConnection.adapter = recyclerAdapter
+        b.recyclerConnection.layoutAnimation = null
 
         setupRecyclerScrollListener()
 
@@ -110,9 +107,17 @@ class RethinkLogFragment :
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
 
-                    if (recyclerView.getChildAt(0)?.tag == null) return
+                    val firstChild = recyclerView.getChildAt(0)
+                    if (firstChild == null) {
+                        Logger.w(LOG_TAG_UI, "RinRLogs; err; no child views found in recyclerView")
+                        return
+                    }
 
-                    val tag: Long = recyclerView.getChildAt(0).tag as Long
+                    val tag = firstChild.tag as? Long
+                    if (tag == null) {
+                        Logger.w(LOG_TAG_UI, "RinRLogs; err; tag is null for first child, rv")
+                        return
+                    }
 
                     b.connectionListScrollHeader.text = formatToRelativeTime(requireContext(), tag)
                     b.connectionListScrollHeader.visibility = View.VISIBLE

@@ -17,6 +17,7 @@ package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
 import com.celzero.bravedns.data.ConnectionSummary
+import com.celzero.bravedns.data.DataUsage
 
 class RethinkLogRepository(private val logDao: RethinkLogDao) {
 
@@ -32,10 +33,12 @@ class RethinkLogRepository(private val logDao: RethinkLogDao) {
         summary.forEach {
             logDao.updateSummary(
                 it.connId,
+                it.pid,
+                it.rpid,
                 it.downloadBytes,
                 it.uploadBytes,
                 it.duration,
-                it.synack,
+                it.rtt,
                 it.message
             )
         }
@@ -51,5 +54,9 @@ class RethinkLogRepository(private val logDao: RethinkLogDao) {
 
     fun logsCount(): LiveData<Long> {
         return logDao.logsCount()
+    }
+
+    fun getDataUsage(from: Long, to: Long): DataUsage? {
+        return logDao.getDataUsage(from, to)
     }
 }

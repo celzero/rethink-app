@@ -20,9 +20,14 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,7 +36,6 @@ import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityAppWiseDomainLogsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
@@ -39,6 +43,8 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -57,10 +63,10 @@ class AppWiseDomainLogsActivity :
 
     private val persistentState by inject<PersistentState>()
     private val networkLogsViewModel: AppConnectionsViewModel by viewModel()
-    private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
     private var uid: Int = INVALID_UID
     private var layoutManager: RecyclerView.LayoutManager? = null
     private lateinit var appInfo: AppInfo
+    private var isRethink = false
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -70,14 +76,26 @@ class AppWiseDomainLogsActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        uid = intent.getIntExtra(AppInfoActivity.UID_INTENT_NAME, INVALID_UID)
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
+        uid = intent.getIntExtra(AppInfoActivity.INTENT_UID, INVALID_UID)
         if (uid == INVALID_UID) {
             finish()
         }
-        init()
-        setAdapter()
-        observeNetworkLogSize()
-        setClickListener()
+        if (Utilities.getApplicationInfo(this, this.packageName)?.uid == uid) {
+            isRethink = true
+            init()
+            setRethinkAdapter()
+            b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
+        } else {
+            init()
+            setAdapter()
+            setClickListener()
+        }
     }
 
     private fun setTabbedViewTxt() {
@@ -147,6 +165,7 @@ class AppWiseDomainLogsActivity :
         val appNameTruncated = appName.substring(0, appName.length.coerceAtMost(10))
         val hint = getString(R.string.two_argument_colon, appNameTruncated, getString(R.string.search_custom_domains))
         b.awlSearch.queryHint = hint
+        b.awlSearch.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text).textSize = 14f
         return
     }
 
@@ -185,45 +204,76 @@ class AppWiseDomainLogsActivity :
         b.awlRecyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(this)
         b.awlRecyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid)
+        val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid, isRethink)
         networkLogsViewModel.appDomainLogs.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
-    }
 
-    private fun observeNetworkLogSize() {
-        networkLogsViewModel.getConnectionsCount(uid).observe(this) {
-            if (it == null) return@observe
-
-            if (it <= 0) {
-                showNoRulesUi()
-                hideRulesUi()
-                return@observe
+        // commenting for now, see if we can remove this later
+        /*recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    showNoRulesUi()
+                    hideRulesUi()
+                } else {
+                    hideNoRulesUi()
+                    showRulesUi()
+                }
+            } else {
+                hideNoRulesUi()
+                showRulesUi()
             }
-
-            hideNoRulesUi()
-            showRulesUi()
-        }
+        }*/
     }
 
-    private fun showNoRulesUi() {
-        b.awlNoRulesRl.visibility = android.view.View.VISIBLE
+    private fun setRethinkAdapter() {
+        networkLogsViewModel.setUid(uid)
+        b.awlRecyclerConnection.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(this)
+        b.awlRecyclerConnection.layoutManager = layoutManager
+        val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid, isRethink)
+        networkLogsViewModel.rinrDomainLogs.observe(this) {
+            recyclerAdapter.submitData(this.lifecycle, it)
+        }
+        b.awlRecyclerConnection.adapter = recyclerAdapter
+
+        // commenting for now, see if we can remove this later
+        /*recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    showNoRulesUi()
+                    hideRulesUi()
+                } else {
+                    hideNoRulesUi()
+                    showRulesUi()
+                }
+            } else {
+                hideNoRulesUi()
+                showRulesUi()
+            }
+        }*/
+    }
+
+    // commenting for now, see if we can remove this later
+    /*private fun showNoRulesUi() {
+        b.awlNoRulesRl.visibility = View.VISIBLE
+        networkLogsViewModel.rinrDomainLogs.removeObservers(this)
     }
 
     private fun hideRulesUi() {
-        b.awlCardViewTop.visibility = android.view.View.GONE
-        b.awlRecyclerConnection.visibility = android.view.View.GONE
+        b.awlCardViewTop.visibility = View.GONE
+        b.awlRecyclerConnection.visibility = View.GONE
     }
 
     private fun hideNoRulesUi() {
-        b.awlNoRulesRl.visibility = android.view.View.GONE
+        b.awlNoRulesRl.visibility = View.GONE
     }
 
     private fun showRulesUi() {
-        b.awlCardViewTop.visibility = android.view.View.VISIBLE
-        b.awlRecyclerConnection.visibility = android.view.View.VISIBLE
-    }
+        b.awlCardViewTop.visibility = View.VISIBLE
+        b.awlRecyclerConnection.visibility = View.VISIBLE
+    }*/
 
     override fun onQueryTextSubmit(query: String): Boolean {
         networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.DOMAIN)
@@ -251,7 +301,7 @@ class AppWiseDomainLogsActivity :
     }
 
     private fun deleteAppLogs() {
-        io { connectionTrackerRepository.clearLogsByUid(uid) }
+        io { networkLogsViewModel.deleteLogs(uid) }
     }
 
     private fun io(f: suspend () -> Unit): Job {

@@ -83,4 +83,8 @@ class ProxyEndpoint {
         else this.modifiedDataTime = System.currentTimeMillis()
         this.latency = latency
     }
+
+    companion object {
+        const val DEFAULT_PROXY_TYPE = "NONE"
+    }
 }
