@@ -184,7 +184,7 @@ object WireguardManager : KoinComponent {
 
     fun isConfigActive(configId: String): Boolean {
         try {
-            val id = configId.split(ProxyManager.ID_WG_BASE).last().toIntOrNull() ?: return false
+            val id = configId.split(ID_WG_BASE).last().toIntOrNull() ?: return false
             val mapping = mappings.find { it.id == id }
             if (mapping != null) {
                 return mapping.isActive
@@ -233,7 +233,7 @@ object WireguardManager : KoinComponent {
         val proxyType = AppConfig.ProxyType.WIREGUARD
         val proxyProvider = AppConfig.ProxyProvider.WIREGUARD
         appConfig.addProxy(proxyType, proxyProvider)
-        VpnController.addWireGuardProxy(ProxyManager.ID_WG_BASE + map.id)
+        VpnController.addWireGuardProxy(ID_WG_BASE + map.id)
         Logger.i(LOG_TAG_PROXY, "enable wg config: ${map.id}, ${map.name}")
         return
     }
@@ -335,12 +335,57 @@ object WireguardManager : KoinComponent {
         return
     }
 
+    // pair - first: proxyId, second - can proceed for next check
+    private suspend fun canUseConfig(idStr: String, type: String, usesMtrdNw: Boolean): Pair<String, Boolean> {
+        val block = Backend.Block
+        if (idStr.isEmpty()) {
+            Logger.d(LOG_TAG_PROXY, "config id is empty, return empty")
+            return Pair("", true)
+        }
+        val id = convertStringIdToId(idStr)
+        val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
+
+        if (config == null) {
+            Logger.d(LOG_TAG_PROXY, "config null no need to proceed, return empty")
+            return Pair("", true)
+        }
+
+        if (config.isLockdown && checkEligibilityBasedOnNw(id, usesMtrdNw)) {
+            Logger.i(LOG_TAG_PROXY, "lockdown wg for $type => return $idStr")
+            return Pair(idStr, false) // no need to proceed further for lockdown
+        }
+
+        // in case of lockdown and not metered network, we need to return block as the
+        // lockdown should not leak the connections via WiFi
+        if (config.isLockdown) {
+            // add IpnBlock instead of the config id, let the connection be blocked in WiFi
+            // regardless of config is active or not
+            Logger.i(LOG_TAG_PROXY, "lockdown wg for $type => return $block")
+            return Pair(block, false) // no need to proceed further for lockdown
+        }
+
+        // check if the config is active and if it can be used on this network
+        if (config.isActive && checkEligibilityBasedOnNw(id, usesMtrdNw)) {
+            Logger.i(LOG_TAG_PROXY, "active wg for $type => add $idStr")
+            return Pair(idStr, true)
+        }
+
+        return Pair("", true)
+    }
+
     // no need to check for app excluded from proxy here, expected to call this fn after that
     suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMeteredNw: Boolean, default: String = ""): List<String> {
+        val block = Backend.Block
         val proxyIds: MutableList<String> = mutableListOf()
         if (oneWireGuardEnabled()) {
             val id = getOneWireGuardProxyId()
-            if (checkMeteredEligibility(id, usesMeteredNw)) {
+            if (id == null || id == INVALID_CONF_ID) {
+                Logger.e(LOG_TAG_PROXY, "canAdd: one-wg not found, id: $id, return $default")
+                proxyIds.add(default)
+                return proxyIds
+            }
+
+            if (checkEligibilityBasedOnNw(id, usesMeteredNw)) {
                 proxyIds.add(ID_WG_BASE + id)
                 // add default to the list, can route check is done in go-tun
                 if (default.isNotEmpty()) proxyIds.add(default)
@@ -351,106 +396,100 @@ object WireguardManager : KoinComponent {
             }
         }
 
-        // returns Pair(String,String) - first is ProxyId, second is CC
-        val ipConfig = IpRulesManager.hasProxy(uid, ip, port)
-        val domainConfig = DomainRulesManager.getProxyForDomain(uid, domain)
-
-        val univIpConfig = IpRulesManager.hasProxy(UID_EVERYBODY, ip, port)
-        val univDomainConfig = DomainRulesManager.getProxyForDomain(UID_EVERYBODY, domain)
-
-        if (ipConfig.first.isNotEmpty()) {
-            Logger.i(LOG_TAG_PROXY, "wg id for ip $ip:$port => ${ipConfig.first}")
-            // even after adding the ip specific config, check if any catch-all config is enabled
-            // there is a possibility that the ip specific config is disabled or not capable of
-            // routing
-            val id = if (ipConfig.first.isNotEmpty()) convertStringIdToId(ipConfig.first) else INVALID_CONF_ID
-            val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
-            if (config != null && config.isLockdown && checkMeteredEligibility(id, usesMeteredNw)) {
-                proxyIds.add(ipConfig.first)
-                Logger.i(LOG_TAG_PROXY, "lockdown enabled for ip: $ip:$port => return $proxyIds")
-                return proxyIds // no need to proceed further for lockdown
+        // check for ip-app specific config first
+        // returns Pair<String, String> - first is ProxyId, second is CC
+        val ipc = IpRulesManager.hasProxy(uid, ip, port)
+        // return Pair<String, Boolean> - first is ProxyId, second is can proceed for next check
+        val ipcProxyPair = canUseConfig(ipc.first, "ip $ip:$port", usesMeteredNw)
+        if (!ipcProxyPair.second) { // false denotes first is not empty
+            if (ipcProxyPair.first == block) {
+                proxyIds.clear()
+                proxyIds.add(block)
+            } else {
+                proxyIds.add(ipcProxyPair.first)
             }
-
-            if (config != null && config.isActive) {
-                proxyIds.add(ipConfig.first)
-                Logger.i(LOG_TAG_PROXY, "ip config is active: $ip:$port => add ${ipConfig.first}")
-            }
-        }
-
-        if (domainConfig.first.isNotEmpty()) {
-            Logger.i(LOG_TAG_PROXY, "wg id for domain $domain => add ${domainConfig.first}")
-            proxyIds.add(domainConfig.first)
-            val id =
-                if (domainConfig.first.isNotEmpty()) convertStringIdToId(domainConfig.first) else INVALID_CONF_ID
-            val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
-            if (config != null && config.isLockdown && checkMeteredEligibility(id, usesMeteredNw)) {
-                proxyIds.add(domainConfig.first)
-                Logger.i(LOG_TAG_PROXY, "lockdown enabled for domain: $domain => return $proxyIds")
-                return proxyIds // no need to proceed further for lockdown
-            }
-
-            if (config != null && config.isActive && checkMeteredEligibility(id, usesMeteredNw)) {
-                proxyIds.add(domainConfig.first)
-                Logger.i(LOG_TAG_PROXY, "domain config is active: $domain => add ${domainConfig.first}")
-            }
-        }
-
-        val configId = ProxyManager.getProxyIdForApp(uid)
-        val id = if (configId.isNotEmpty()) convertStringIdToId(configId) else INVALID_CONF_ID
-        val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
-        if (config != null && config.isLockdown && checkMeteredEligibility(id, usesMeteredNw)) {
-            proxyIds.add(configId) // already WG appended to it
-            // return the lockdown config, no need to check for other configs
-            // even if the lockdown config is disabled, we expect the connection to be blocked
-            Logger.i(LOG_TAG_PROXY, "lockdown enabled for app: $uid => return $proxyIds")
+            Logger.i(LOG_TAG_PROXY, "lockdown wg for ip: $ip:$port => return $proxyIds")
             return proxyIds
         }
-        if (config != null && config.isActive && checkMeteredEligibility(id, usesMeteredNw)) {
-            proxyIds.add(configId) // apps specific config
-            Logger.i(LOG_TAG_PROXY, "app config is active: $uid => add $configId")
+        // add the ip-app specific config to the list
+        if (ipc.first.isNotEmpty()) proxyIds.add(ipc.first) // ip-app specific
+
+        // check for domain-app specific config
+        val dc = DomainRulesManager.getProxyForDomain(uid, domain)
+        val dcProxyPair = canUseConfig(dc.first, "domain $domain", usesMeteredNw)
+        if (!dcProxyPair.second) {
+            if (ipcProxyPair.first == block) {
+                proxyIds.clear()
+                proxyIds.add(block)
+            } else {
+                proxyIds.add(ipcProxyPair.first)
+            }
+            Logger.i(LOG_TAG_PROXY, "lockdown wg for domain: $domain => return $proxyIds")
+            return proxyIds
+        }
+        // add the domain-app specific config to the list
+        if (dcProxyPair.first.isNotEmpty()) proxyIds.add(dcProxyPair.first) // domain-app specific
+
+        // check for app specific config
+        val ac = ProxyManager.getProxyIdForApp(uid)
+        val appProxyPair = canUseConfig(ac, "app $uid", usesMeteredNw)
+        if (!appProxyPair.second) {
+            if (ipcProxyPair.first == block) {
+                proxyIds.clear()
+                proxyIds.add(block)
+            } else {
+                proxyIds.add(ipcProxyPair.first)
+            }
+            Logger.i(LOG_TAG_PROXY, "lockdown wg for app: $uid => return $proxyIds")
+            return proxyIds
         }
 
-        if (univIpConfig.first.isNotEmpty()) {
-            val id =
-                if (univIpConfig.first.isNotEmpty()) convertStringIdToId(univIpConfig.first) else INVALID_CONF_ID
-            val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
-            if (config != null && config.isLockdown && checkMeteredEligibility(id, usesMeteredNw)) {
-                proxyIds.add(univIpConfig.first)
-                Logger.i(LOG_TAG_PROXY, "lockdown enabled for ip: $ip:$port => return $proxyIds")
-                return proxyIds // no need to proceed further for lockdown
-            }
+        // add the app specific config to the list
+        if (appProxyPair.first.isNotEmpty()) proxyIds.add(appProxyPair.first) // app specific config
 
-            if (config != null && config.isActive && checkMeteredEligibility(id, usesMeteredNw)) {
-                proxyIds.add(univIpConfig.first)
-                Logger.i(LOG_TAG_PROXY, "univ ip config is active: $ip:$port => add ${univIpConfig.first}")
+        // check for universal ip config
+        val uipc = IpRulesManager.hasProxy(UID_EVERYBODY, ip, port)
+        val uipcProxyPair = canUseConfig(uipc.first, "univ-ip $ip:$port", usesMeteredNw)
+        if (!uipcProxyPair.second) {
+            if (ipcProxyPair.first == block) {
+                proxyIds.clear()
+                proxyIds.add(block)
+            } else {
+                proxyIds.add(ipcProxyPair.first)
             }
+            Logger.i(LOG_TAG_PROXY, "lockdown wg for univ-ip: $ip:$port => return $proxyIds")
+            return proxyIds // no need to proceed further for lockdown
         }
 
-        if (univDomainConfig.first.isNotEmpty()) {
-            val id =
-                if (univDomainConfig.first.isNotEmpty()) convertStringIdToId(univIpConfig.first) else INVALID_CONF_ID
-            val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
-            if (config != null && config.isLockdown && checkMeteredEligibility(id, usesMeteredNw)) {
-                proxyIds.add(univDomainConfig.first)
-                Logger.i(LOG_TAG_PROXY, "lockdown enabled for domain: $domain => return $proxyIds")
-                return proxyIds
-            }
+        // add the universal ip config to the list
+        if (uipcProxyPair.first.isNotEmpty()) proxyIds.add(uipcProxyPair.first) // universal ip
 
-            if (config != null && config.isActive && checkMeteredEligibility(id, usesMeteredNw)) {
-                proxyIds.add(univDomainConfig.first)
-                Logger.i(LOG_TAG_PROXY, "univ domain config is active: $domain => add ${univDomainConfig.first}")
+        // check for universal domain config
+        val udc = DomainRulesManager.getProxyForDomain(UID_EVERYBODY, domain)
+        val udcProxyPair = canUseConfig(udc.first, "univ-dom $domain", usesMeteredNw)
+        if (!udcProxyPair.second) {
+            if (ipcProxyPair.first == block) {
+                proxyIds.clear()
+                proxyIds.add(block)
+            } else {
+                proxyIds.add(ipcProxyPair.first)
             }
+            Logger.i(LOG_TAG_PROXY, "lockdown wg for univ-dom: $domain => return $proxyIds")
+            return proxyIds // no need to proceed further for lockdown
         }
+
+        // add the universal domain config to the list
+        if (udcProxyPair.first.isNotEmpty()) proxyIds.add(udcProxyPair.first) // universal domain
 
         // once the app-specific config is added, check if any catch-all config is enabled
         // if catch-all config is enabled, then add the config id to the list
-        val catchAllConfig = mappings.filter { it.isActive && it.isCatchAll }
-        catchAllConfig.forEach {
-            if (checkMeteredEligibility(it.id, usesMeteredNw)) {
-                proxyIds.add(ProxyManager.ID_WG_BASE + it.id)
+        val cac = mappings.filter { it.isActive && it.isCatchAll }
+        cac.forEach {
+            if (checkEligibilityBasedOnNw(it.id, usesMeteredNw)) {
+                proxyIds.add(ID_WG_BASE + it.id)
                 Logger.i(
                     LOG_TAG_PROXY,
-                    "catch-all config is active: ${it.id}, ${it.name} => add ${ProxyManager.ID_WG_BASE + it.id}"
+                    "catch-all config is active: ${it.id}, ${it.name} => add ${ID_WG_BASE + it.id}"
                 )
             }
         }
@@ -461,28 +500,29 @@ object WireguardManager : KoinComponent {
         // the proxyIds list will contain the ip-app specific, domain-app specific, app specific,
         // universal ip, universal domain, catch-all and default configs in the order of priority
         // the go-tun will check the routing based on the order of the list
-        Logger.i(LOG_TAG_PROXY, "returning proxy ids for $uid, $ip, $port: $proxyIds")
+        Logger.i(LOG_TAG_PROXY, "returning proxy ids for $uid, $ip, $port, $domain: $proxyIds")
         return proxyIds
     }
 
-    private fun checkMeteredEligibility(id: Int?, usesMeteredNw: Boolean): Boolean {
-        if (id == null) return false
+    private fun checkEligibilityBasedOnNw(id: Int, usesMeteredNw: Boolean): Boolean {
         val config = mappings.find { it.id == id }
         if (config == null) {
             Logger.e(LOG_TAG_PROXY, "canAdd: wg not found, id: $id, ${mappings.size}")
             return false
         }
+
         if (config.useOnlyOnMetered && !usesMeteredNw) {
             Logger.i(LOG_TAG_PROXY, "canAdd: useOnlyOnMetered is true, but not metered nw")
             return false
         }
-        Logger.d(LOG_TAG_PROXY, "canAdd: useOnlyOnMetered is false, metered nw: $usesMeteredNw")
+
+        Logger.d(LOG_TAG_PROXY, "canAdd: eligible for metered nw: $usesMeteredNw")
         return true
     }
 
     private fun convertStringIdToId(id: String): Int {
         return try {
-            val configId = id.substring(ProxyManager.ID_WG_BASE.length)
+            val configId = id.substring(ID_WG_BASE.length)
             configId.toIntOrNull() ?: INVALID_CONF_ID
         } catch (ignored: Exception) {
             Logger.i(LOG_TAG_PROXY, "err converting string id to int: $id")
@@ -554,7 +594,7 @@ object WireguardManager : KoinComponent {
                 .addPeers(config.getPeers())
                 .build()
         Logger.i(LOG_TAG_PROXY, "updating interface for config: $configId, ${config.getName()}")
-        val cfgId = ProxyManager.ID_WG_BASE + configId
+        val cfgId = ID_WG_BASE + configId
         if (configName != config.getName()) {
             ProxyManager.updateProxyNameForProxyId(cfgId, configName)
         }
@@ -593,7 +633,7 @@ object WireguardManager : KoinComponent {
             }
             // delete the config from the database
             db.deleteConfig(id)
-            val proxyId = ProxyManager.ID_WG_BASE + id
+            val proxyId = ID_WG_BASE + id
             ProxyManager.removeProxyId(proxyId)
             mappings.remove(mappings.find { it.id == id })
             configs.remove(config)
@@ -627,7 +667,7 @@ object WireguardManager : KoinComponent {
             )
         )
         if (map?.isActive == true) {
-            VpnController.addWireGuardProxy(id = ProxyManager.ID_WG_BASE + config.getId())
+            VpnController.addWireGuardProxy(id = ID_WG_BASE + config.getId())
         }
     }
 
@@ -683,6 +723,34 @@ object WireguardManager : KoinComponent {
                 m.isDeletable
             )
         )
+    }
+
+    suspend fun updateUseOnMobileNetworkConfig(id: Int, useMobileNw: Boolean) {
+        val config = configs.find { it.getId() == id }
+        if (config == null) {
+            Logger.e(LOG_TAG_PROXY, "update useMobileNw: wg not found, id: $id, ${configs.size}")
+            return
+        }
+        Logger.i(LOG_TAG_PROXY, "updating useMobileNw as $useMobileNw for config: $id, ${config.getName()}")
+        db.updateCatchAllConfig(id, useMobileNw)
+        val m = mappings.find { it.id == id } ?: return
+        mappings.remove(m)
+        val newMap =
+            WgConfigFilesImmutable(
+                id,
+                config.getName(),
+                m.configPath,
+                m.serverResponse,
+                m.isActive,
+                m.isCatchAll, // just updating catch all field
+                m.isLockdown,
+                m.oneWireGuard,
+                useMobileNw,
+                m.isDeletable
+            )
+        mappings.add(newMap)
+
+        enableConfig(newMap) // catch all should be always enabled
     }
 
     suspend fun addPeer(id: Int, peer: Peer) {
@@ -773,7 +841,7 @@ object WireguardManager : KoinComponent {
         addOrUpdateConfigFileMapping(cfg, file?.toImmutable(), path, serverResponse)
         addOrUpdateConfig(cfg)
         if (file?.isActive == true) {
-            VpnController.addWireGuardProxy(id = ProxyManager.ID_WG_BASE + cfg.getId())
+            VpnController.addWireGuardProxy(id = ID_WG_BASE + cfg.getId())
         }
     }
 
