@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.9.23'
+    ext.kotlin_version = '2.1.0'
     repositories {
         google()
         // https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/
@@ -9,13 +9,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.9.2'
+        classpath 'com.android.tools.build:gradle:8.10.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 plugins {
-    id 'com.google.devtools.ksp' version '1.9.23-1.0.20' apply false
+    id 'com.google.devtools.ksp' version '2.1.0-1.0.28' apply false
 }
 
 allprojects {
