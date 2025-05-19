@@ -38,6 +38,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityTunnelSettingsBinding
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.ConnectionMonitor
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -47,6 +48,7 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import inet.ipaddr.IPAddress.IPVersion
@@ -228,7 +230,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                 persistentState.protocolTranslationType = isSelected
             } else {
                 b.settingsActivityPtransSwitch.isChecked = false
-                Utilities.showToastUiCentered(
+                showToastUiCentered(
                     this,
                     getString(R.string.settings_protocol_translation_dns_inactive),
                     Toast.LENGTH_SHORT
@@ -267,6 +269,15 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     }
 
     private fun showDefaultDnsDialog() {
+        if (RpnProxyManager.isRpnActive()) {
+            showToastUiCentered(
+                this,
+                getString(R.string.fallback_rplus_toast),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+
         val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_default_dns_heading))
         val items = Constants.DEFAULT_DNS_LIST.map { it.name }.toTypedArray()
