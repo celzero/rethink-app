@@ -53,6 +53,13 @@ android {
         minSdkVersion 23
         targetSdkVersion 35
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            // support for page sizes other than 4k, eg 2k, 8k, 16k
+            cmake {
+                cppFlags ""
+                arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+            }
+        }
     }
 
     signingConfigs {
@@ -260,11 +267,11 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:7dd4515d27@aar'
-    websiteImplementation 'com.github.celzero:firestack:7dd4515d27@aar'
-    fdroidImplementation 'com.github.celzero:firestack:7dd4515d27@aar'
+    download 'com.github.celzero:firestack:9064847790@aar'
+    websiteImplementation 'com.github.celzero:firestack:9064847790@aar'
+    fdroidImplementation 'com.github.celzero:firestack:9064847790@aar'
     // debug symbols
-    playImplementation 'com.github.celzero:firestack:7dd4515d27:debug@aar'
+    playImplementation 'com.github.celzero:firestack:9064847790:debug@aar'
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.10.1') {
