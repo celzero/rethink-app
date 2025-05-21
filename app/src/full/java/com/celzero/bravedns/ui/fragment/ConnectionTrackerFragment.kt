@@ -68,7 +68,7 @@ class ConnectionTrackerFragment :
     companion object {
         private const val TAG = "ConnTrackFrag"
         const val PROTOCOL_FILTER_PREFIX = "P:"
-        private const val QUERY_TEXT_TIMEOUT: Long = 600
+        private const val QUERY_TEXT_DELAY: Long = 1000
 
         fun newInstance(param: String): ConnectionTrackerFragment {
             val args = Bundle()
@@ -323,13 +323,17 @@ class ConnectionTrackerFragment :
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
-        this.filterQuery = query
-        viewModel.setFilter(query, filterCategories, filterType)
+        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
+            if (this.isAdded) {
+                this.filterQuery = query
+                viewModel.setFilter(query, filterCategories, filterType)
+            }
+        }
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_TIMEOUT, lifecycleScope) {
+        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
             if (this.isAdded) {
                 this.filterQuery = query
                 viewModel.setFilter(query, filterCategories, filterType)

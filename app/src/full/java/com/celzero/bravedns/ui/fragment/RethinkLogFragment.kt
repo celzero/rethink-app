@@ -51,6 +51,8 @@ class RethinkLogFragment :
     private val persistentState by inject<PersistentState>()
 
     companion object {
+        private const val QUERY_TEXT_DELAY: Long = 1000
+
         fun newInstance(param: String): RethinkLogFragment {
             val args = Bundle()
             args.putString(Constants.SEARCH_QUERY, param)
@@ -134,12 +136,16 @@ class RethinkLogFragment :
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
-        viewModel.setFilter(query)
+        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
+            if (this.isAdded) {
+                viewModel.setFilter(query)
+            }
+        }
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(500, lifecycleScope) {
+        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
             if (this.isAdded) {
                 viewModel.setFilter(query)
             }

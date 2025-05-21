@@ -67,6 +67,10 @@ class AppWiseDomainLogsActivity :
     private lateinit var appInfo: AppInfo
     private var isRethink = false
 
+    companion object {
+        private const val QUERY_TEXT_DELAY: Long = 1000
+    }
+
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
                 Configuration.UI_MODE_NIGHT_YES
@@ -275,12 +279,16 @@ class AppWiseDomainLogsActivity :
     }*/
 
     override fun onQueryTextSubmit(query: String): Boolean {
-        networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.DOMAIN)
+        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
+            if (!this.isFinishing) {
+                networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.DOMAIN)
+            }
+        }
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(500, lifecycleScope) {
+        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
             if (!this.isFinishing) {
                 networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.DOMAIN)
             }

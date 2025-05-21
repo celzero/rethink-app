@@ -60,6 +60,8 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     private val appConfig by inject<AppConfig>()
 
     companion object {
+        private const val QUERY_TEXT_DELAY: Long = 1000
+
         fun newInstance(param: String): DnsLogFragment {
             val args = Bundle()
             args.putString(Constants.SEARCH_QUERY, param)
@@ -269,13 +271,17 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
-        this.filterValue = query
-        viewModel.setFilter(filterValue, filterType)
+        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
+            if (this.isAdded) {
+                this.filterValue = query
+                viewModel.setFilter(filterValue, filterType)
+            }
+        }
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(500, lifecycleScope) {
+        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
             if (this.isAdded) {
                 this.filterValue = query
                 viewModel.setFilter(filterValue, filterType)
