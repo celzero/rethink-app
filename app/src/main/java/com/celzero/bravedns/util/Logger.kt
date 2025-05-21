@@ -15,7 +15,6 @@
  */
 import android.util.Log
 import com.celzero.bravedns.database.ConsoleLog
-import com.celzero.bravedns.database.ConsoleLogRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import org.koin.core.component.KoinComponent
@@ -24,6 +23,8 @@ import org.koin.core.component.inject
 object Logger : KoinComponent {
     private val persistentState by inject<PersistentState>()
     private var logLevel = persistentState.goLoggerLevel
+
+    var uiLogLevel = LoggerLevel.ERROR.id
 
     const val LOG_TAG_APP_UPDATE = "NonStoreAppUpdater"
     const val LOG_TAG_VPN = "RethinkDnsVpn"
@@ -45,7 +46,8 @@ object Logger : KoinComponent {
     const val LOG_IAB = "InAppBilling"
 
     // github.com/celzero/firestack/blob/bce8de917f/intra/log/logger.go#L76
-    enum class LoggerType(val id: Long) {
+    enum class LoggerLevel(val id: Long) {
+        // the order of the levels is important, do not change it, add new levels at the end
         VERY_VERBOSE(0),
         VERBOSE(1),
         DEBUG(2),
@@ -57,7 +59,7 @@ object Logger : KoinComponent {
         NONE(8);
 
         companion object {
-            fun fromId(id: Int): LoggerType {
+            fun fromId(id: Int): LoggerLevel {
                 return when (id) {
                     0 -> VERY_VERBOSE
                     1 -> VERBOSE
@@ -77,7 +79,7 @@ object Logger : KoinComponent {
             return this == STACKTRACE
         }
 
-        fun isLessThan(level: LoggerType): Boolean {
+        fun isLessThan(level: LoggerLevel): Boolean {
             return this.id < level.id
         }
 
@@ -87,31 +89,31 @@ object Logger : KoinComponent {
     }
 
     fun vv(tag: String, message: String) {
-        log(tag, message, LoggerType.VERY_VERBOSE)
+        log(tag, message, LoggerLevel.VERY_VERBOSE)
     }
 
     fun v(tag: String, message: String) {
-        log(tag, message, LoggerType.VERBOSE)
+        log(tag, message, LoggerLevel.VERBOSE)
     }
 
     fun d(tag: String, message: String) {
-        log(tag, message, LoggerType.DEBUG)
+        log(tag, message, LoggerLevel.DEBUG)
     }
 
     fun i(tag: String, message: String) {
-        log(tag, message, LoggerType.INFO)
+        log(tag, message, LoggerLevel.INFO)
     }
 
     fun w(tag: String, message: String, e: Exception? = null) {
-        log(tag, message, LoggerType.WARN, e)
+        log(tag, message, LoggerLevel.WARN, e)
     }
 
     fun e(tag: String, message: String, e: Exception? = null) {
-        log(tag, message, LoggerType.ERROR, e)
+        log(tag, message, LoggerLevel.ERROR, e)
     }
 
     fun crash(tag: String, message: String, e: Exception? = null) {
-        log(tag, message, LoggerType.ERROR, e)
+        log(tag, message, LoggerLevel.ERROR, e)
     }
 
     fun updateConfigLevel(level: Long) {
@@ -126,41 +128,44 @@ object Logger : KoinComponent {
         }
     }
 
-    fun goLog(message: String, type: LoggerType) {
+    fun goLog(message: String, type: LoggerLevel) {
         // no need to log the go logs, add it to the database
         dbWrite(LOG_GO_LOGGER, message, type)
     }
 
-    fun log(tag: String, msg: String, type: LoggerType, e: Exception? = null) {
+    fun log(tag: String, msg: String, type: LoggerLevel, e: Exception? = null) {
         when (type) {
-            LoggerType.VERY_VERBOSE -> if (logLevel <= LoggerType.VERY_VERBOSE.id) Log.v(tag, msg)
-            LoggerType.VERBOSE -> if (logLevel <= LoggerType.VERBOSE.id) Log.v(tag, msg)
-            LoggerType.DEBUG -> if (logLevel <= LoggerType.DEBUG.id) Log.d(tag, msg)
-            LoggerType.INFO -> if (logLevel <= LoggerType.INFO.id) Log.i(tag, msg)
-            LoggerType.WARN -> if (logLevel <= LoggerType.WARN.id) Log.w(tag, msg, e)
-            LoggerType.ERROR -> if (logLevel <= LoggerType.ERROR.id) Log.e(tag, msg, e)
-            LoggerType.STACKTRACE -> if (logLevel <= LoggerType.ERROR.id) Log.e(tag, msg, e)
-            LoggerType.USR -> {} // Do nothing
-            LoggerType.NONE -> {} // Do nothing
+            LoggerLevel.VERY_VERBOSE -> if (logLevel <= LoggerLevel.VERY_VERBOSE.id) Log.v(tag, msg)
+            LoggerLevel.VERBOSE -> if (logLevel <= LoggerLevel.VERBOSE.id) Log.v(tag, msg)
+            LoggerLevel.DEBUG -> if (logLevel <= LoggerLevel.DEBUG.id) Log.d(tag, msg)
+            LoggerLevel.INFO -> if (logLevel <= LoggerLevel.INFO.id) Log.i(tag, msg)
+            LoggerLevel.WARN -> if (logLevel <= LoggerLevel.WARN.id) Log.w(tag, msg, e)
+            LoggerLevel.ERROR -> if (logLevel <= LoggerLevel.ERROR.id) Log.e(tag, msg, e)
+            LoggerLevel.STACKTRACE -> if (logLevel <= LoggerLevel.ERROR.id) Log.e(tag, msg, e)
+            LoggerLevel.USR -> {} // Do nothing
+            LoggerLevel.NONE -> {} // Do nothing
         }
         dbWrite(tag, msg, type, e)
     }
 
-    private fun dbWrite(tag: String, msg: String, type: LoggerType, e: Exception? = null) {
+    private fun dbWrite(tag: String, msg: String, level: LoggerLevel, e: Exception? = null) {
         // write to the database only if console log is set to true
         if (!persistentState.consoleLogEnabled) return
 
-        if (type.id < logLevel) return
+        // uiLogLevel is user selected log level to display in the UI, so if the log level is less
+        // than the user selected log level, do not write to the database
+        // this is different from the logger level set in MiscSettings screen
+        if (uiLogLevel > level.id) return
 
         val now = System.currentTimeMillis()
-        val l = when (type) {
-            LoggerType.VERY_VERBOSE -> "Y"
-            LoggerType.VERBOSE -> "V"
-            LoggerType.DEBUG -> "D"
-            LoggerType.INFO -> "I"
-            LoggerType.WARN -> "W"
-            LoggerType.ERROR -> "E"
-            LoggerType.STACKTRACE -> "E"
+        val l = when (level) {
+            LoggerLevel.VERY_VERBOSE -> "Y"
+            LoggerLevel.VERBOSE -> "V"
+            LoggerLevel.DEBUG -> "D"
+            LoggerLevel.INFO -> "I"
+            LoggerLevel.WARN -> "W"
+            LoggerLevel.ERROR -> "E"
+            LoggerLevel.STACKTRACE -> "E"
             else -> "V"
         }
 
@@ -174,8 +179,9 @@ object Logger : KoinComponent {
             }
         }
 
+        // write to the database
         try {
-            val c = ConsoleLog(0, formattedMsg, now)
+            val c = ConsoleLog(0, formattedMsg, level.id, now)
             VpnController.writeConsoleLog(c)
         } catch (ignored: Exception) { }
     }

@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger
 import Logger.LOG_TAG_BUG_REPORT
 import android.Manifest
 import android.content.Context
@@ -25,8 +26,6 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import android.text.method.LinkMovementMethod
 import android.view.View
@@ -40,10 +39,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -62,25 +58,25 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.ConsoleLogViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.io.File
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.io.File
 
-class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
+class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), androidx.appcompat.widget.SearchView.OnQueryTextListener {
 
     private val b by viewBinding(ActivityConsoleLogBinding::bind)
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val persistentState by inject<PersistentState>()
 
-    private val consoleLogViewModel by inject<ConsoleLogViewModel>()
+    private val viewModel by inject<ConsoleLogViewModel>()
     private val consoleLogRepository by inject<ConsoleLogRepository>()
     private val workScheduler by inject<WorkScheduler>()
 
@@ -90,6 +86,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
         private const val FILE_NAME = "rethink_app_logs_"
         private const val FILE_EXTENSION = ".zip"
         private const val STORAGE_PERMISSION_CODE = 231 // request code for storage permission
+        private const val QUERY_TEXT_DELAY: Long = 1000
     }
 
     enum class SaveType {
@@ -119,6 +116,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
             controller.isAppearanceLightNavigationBars = false
             window.isNavigationBarContrastEnforced = false
         }
+        persistentState.consoleLogEnabled = true
         initView()
         setupClickListener()
         onBackPressedDispatcher.addCallback(
@@ -140,7 +138,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
         setAdapter()
         // update the text view with the time since logs are available
         io {
-            val sinceTime = consoleLogViewModel.sinceTime()
+            val sinceTime = viewModel.sinceTime()
             if (sinceTime == 0L) return@io
 
             val since = Utilities.convertLongToTime(sinceTime, Constants.TIME_FORMAT_3)
@@ -157,6 +155,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
             b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
             showStartDialog() // show dialog to user to start logging
         }
+        b.searchView.setOnQueryTextListener(this)
     }
 
     var recyclerAdapter: ConsoleLogAdapter? = null
@@ -167,6 +166,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
         b.consoleLogList.layoutManager = layoutManager
         recyclerAdapter = ConsoleLogAdapter(this)
         b.consoleLogList.adapter = recyclerAdapter
+        viewModel.setLogLevel(Logger.uiLogLevel)
         observeLog()
 
         /*lifecycleScope.launch {
@@ -179,15 +179,16 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
     }
 
     private fun observeLog() {
-        consoleLogViewModel.logs.observe(this) { l ->
+        viewModel.logs.observe(this) { l ->
             lifecycleScope.launch {
+                delay(500)
                 recyclerAdapter?.submitData(l)
             }
         }
     }
 
-    private fun unobserveLog1() {
-        consoleLogViewModel.logs.removeObservers(this)
+    private fun removeObserver() {
+        viewModel.logs.removeObservers(this)
     }
 
     private fun setupClickListener() {
@@ -208,6 +209,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
             }
             handleSaveOrShareLogs(filePath, SaveType.SHARE)
         }
+
         b.fabShareLog.setOnClickListener {
             val filePath = createFile(SaveType.SHARE)
             if (filePath == null) {
@@ -216,11 +218,14 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
             }
             handleSaveOrShareLogs(filePath, SaveType.SHARE)
         }
+
         b.consoleLogStartStop.setOnClickListener {
             persistentState.consoleLogEnabled = !persistentState.consoleLogEnabled
             if (persistentState.consoleLogEnabled) {
                 b.consoleLogStartStop.text = getString(R.string.hsf_stop_btn_state)
                 consoleLogRepository.consoleLogStartTimestamp = System.currentTimeMillis()
+                // reset the ui level to error which is default
+                Logger.uiLogLevel = Logger.LoggerLevel.ERROR.id
             } else {
                 b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
                 consoleLogRepository.consoleLogStartTimestamp = 0L
@@ -251,41 +256,63 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
                 }
                 .show()
         }
+
+        b.searchFilterIcon.setOnClickListener {
+            showFilterDialog()
+        }
+    }
+
+    private fun showFilterDialog() {
+        // show dialog with level filter
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setTitle(getString(R.string.logs_disclaimer))
+        val items = Logger.LoggerLevel.entries
+        val checkedItem = Logger.uiLogLevel.toInt()
+        builder.setSingleChoiceItems(
+            items.map { it.name }.toTypedArray(),
+            checkedItem
+        ) { _, which ->
+            Logger.uiLogLevel = items[which].id
+            viewModel.setLogLevel(which.toLong())
+        }
+        builder.setCancelable(true)
+        builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialogInterface, _ ->
+            dialogInterface.dismiss()
+        }
+        builder.setNeutralButton(getString(R.string.lbl_cancel)) { dialogInterface, _ ->
+            dialogInterface.dismiss()
+        }
+        builder.setOnCancelListener {
+            // unobserveLog()
+        }
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.setCancelable(true)
+        alertDialog.show()
     }
 
     private fun showStartDialog() {
         //unobserveLog()
-        val handler = Handler(Looper.getMainLooper())
         val builder = MaterialAlertDialogBuilder(this)
         val title = getString(R.string.console_log_title)
         builder.setTitle(title)
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.hsf_start_btn_state)) { dialogInterface, _ ->
-            handler.post {
-                persistentState.consoleLogEnabled = true
-                consoleLogRepository.consoleLogStartTimestamp = System.currentTimeMillis()
-                b.consoleLogStartStop.text = getString(R.string.hsf_stop_btn_state)
-                showToastUiCentered(
-                    this,
-                    getString(R.string.config_add_success_toast),
-                    Toast.LENGTH_SHORT
-                )
-                observeLog()
-            }
+            persistentState.consoleLogEnabled = true
+            consoleLogRepository.consoleLogStartTimestamp = System.currentTimeMillis()
+            b.consoleLogStartStop.text = getString(R.string.hsf_stop_btn_state)
+            showToastUiCentered(
+                this,
+                getString(R.string.config_add_success_toast),
+                Toast.LENGTH_SHORT
+            )
+            observeLog()
             dialogInterface.dismiss()
         }
 
         builder.setNeutralButton(getString(R.string.lbl_cancel)) { dialogInterface, _ ->
-            handler.post {
-                b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
-                observeLog()
-            }
+            b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
+            removeObserver()
             dialogInterface.dismiss()
-        }
-        builder.setOnCancelListener {
-            handler.post {
-                observeLog()
-            }
         }
         val alertDialog: AlertDialog = builder.create()
         alertDialog.setCancelable(true)
@@ -293,33 +320,29 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
     }
 
     private fun showStopDialog() {
-       // unobserveLog()
-        val handler = Handler(Looper.getMainLooper())
         val builder = MaterialAlertDialogBuilder(this)
         val title = getString(R.string.console_log_title)
         builder.setTitle(title)
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.hsf_stop_btn_state)) { dialogInterface, _ ->
-            handler.post {
-                persistentState.consoleLogEnabled = false
-                consoleLogRepository.consoleLogStartTimestamp = 0L
-                b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
-                showToastUiCentered(
-                    this,
-                    getString(R.string.config_add_success_toast),
-                    Toast.LENGTH_SHORT
-                )
-            }
+            persistentState.consoleLogEnabled = false
+            consoleLogRepository.consoleLogStartTimestamp = 0L
+            // reset the ui level to error which is default
+            Logger.uiLogLevel = Logger.LoggerLevel.ERROR.id
+            b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
+            removeObserver()
+            showToastUiCentered(
+                this,
+                getString(R.string.config_add_success_toast),
+                Toast.LENGTH_SHORT
+            )
             dialogInterface.dismiss()
-            handler.post { finish() }
+            finish()
         }
 
         builder.setNeutralButton(getString(R.string.lbl_cancel)) { dialogInterface, _ ->
             dialogInterface.dismiss()
-            handler.post { finish() }
-        }
-        builder.setOnCancelListener {
-            observeLog()
+            finish()
         }
         val alertDialog: AlertDialog = builder.create()
         alertDialog.setCancelable(true)
@@ -362,11 +385,6 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
 
                 okBtn.setOnClickListener {
                     dialog.dismiss()
-                    observeLog()
-                }
-
-                dialog.setOnCancelListener {
-                    observeLog()
                 }
 
                 dialog.show()
@@ -455,7 +473,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
                 return null
             }
             return filePath
-        } catch (e: Exception) {
+        } catch (ignored: Exception) {
             showFileCreationErrorToast()
         }
         return null
@@ -597,5 +615,19 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log) {
 
     private suspend fun uiCtx(f: () -> Unit) {
         withContext(Dispatchers.Main) { f() }
+    }
+
+    override fun onQueryTextSubmit(query: String): Boolean {
+        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
+            viewModel.setFilter(query)
+        }
+        return true
+    }
+
+    override fun onQueryTextChange(query: String): Boolean {
+        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
+            viewModel.setFilter(query)
+        }
+        return true
     }
 }

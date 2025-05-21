@@ -22,5 +22,6 @@ import androidx.room.PrimaryKey
 data class ConsoleLog(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
     val message: String,
+    val level: Long,
     val timestamp: Long
 )

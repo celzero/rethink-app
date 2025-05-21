@@ -39,17 +39,8 @@
             android:layout_marginEnd="20dp"
             android:layout_centerVertical="true"
             android:text="@string/hsf_start_btn_state"
-            android:layout_toStartOf="@id/console_log_delete"
-            android:textColor="?attr/secondaryTextColor" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/console_log_delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="20dp"
             android:layout_toStartOf="@id/console_log_save"
-            android:src="@drawable/ic_delete_accent" />
+            android:textColor="?attr/secondaryTextColor" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/console_log_save"
@@ -81,6 +72,50 @@
         app:indicatorColor="?attr/secondaryTextColor"
         android:layout_below="@id/console_log_header_container"/>
 
+    <RelativeLayout
+        android:id="@+id/search_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:layout_below="@id/console_log_progress_bar"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="start"
+            android:layout_toStartOf="@id/search_filter_icon"
+            android:fontFamily="sans-serif"
+            android:isScrollContainer="true"
+            app:iconifiedByDefault="false"
+            app:queryHint="@string/search_console_log_hint" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/search_filter_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/console_log_delete"
+            android:padding="7dp"
+            android:src="@drawable/ic_filter"
+            android:visibility="visible" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/console_log_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:padding="7dp"
+            android:src="@drawable/ic_delete"
+            android:visibility="visible" />
+
+    </RelativeLayout>
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/console_log_info_text"
         android:layout_width="match_parent"
@@ -91,7 +126,7 @@
         android:paddingEnd="10dp"
         android:textSize="@dimen/small_font_text_view"
         android:fontFamily="serif-monospace"
-        android:layout_below="@id/console_log_progress_bar"
+        android:layout_below="@id/search_ll"
         android:text="@string/console_log_desc" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

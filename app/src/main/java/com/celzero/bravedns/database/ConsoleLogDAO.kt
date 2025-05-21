@@ -36,8 +36,8 @@ interface ConsoleLogDAO {
     @RawQuery
     fun getLogsCursor(query: SimpleSQLiteQuery): Cursor
 
-    @Query("select * from ConsoleLog order by id desc LIMIT ${Constants.MAX_LOGS}")
-    fun getLogs(): PagingSource<Int, ConsoleLog>
+    @Query("select * from ConsoleLog where message like :input order by id desc LIMIT ${Constants.MAX_LOGS}")
+    fun getLogs(input: String): PagingSource<Int, ConsoleLog>
 
     @Query("DELETE FROM ConsoleLog WHERE timestamp < :to")
     suspend fun deleteOldLogs(to: Long)
@@ -47,9 +47,6 @@ interface ConsoleLogDAO {
 
     @Query("select count(*) from ConsoleLog")
     suspend fun getLogCount(): Int
-
-    @Query("SELECT * FROM ConsoleLog ORDER BY timestamp DESC LIMIT :limit OFFSET :offset")
-    suspend fun getLogs(offset: Int, limit: Int): List<ConsoleLog>
 
     @Query("DELETE FROM ConsoleLog")
     suspend fun deleteAllLogs()

@@ -300,8 +300,8 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     private fun displaySummaryDetails() {
         b.bsConnConnTypeSecondary.visibility = View.GONE
         // show connId and message if the log level is less than DEBUG
-        if (Logger.LoggerType.fromId(persistentState.goLoggerLevel.toInt())
-                .isLessThan(Logger.LoggerType.DEBUG)
+        if (Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())
+                .isLessThan(Logger.LoggerLevel.DEBUG)
         ) {
             b.connectionMessage.text = "${info?.proxyDetails}; ${info?.rpid}; ${info?.connId}; ${info?.message}; ${info?.synack}"
         } else {

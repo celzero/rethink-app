@@ -142,8 +142,8 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         b.dnsBlockIpAddress.text = getResponseIp()
         b.dnsBlockConnectionFlag.text = log!!.flag
         b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, log!!.ttl.toString())
-        if (Logger.LoggerType.fromId(persistentState.goLoggerLevel.toInt())
-                .isLessThan(Logger.LoggerType.DEBUG)
+        if (Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())
+                .isLessThan(Logger.LoggerLevel.DEBUG)
         ) {
             b.dnsMessage.text =
                 "${log?.msg}; ${log?.proxyId}; ${log?.relayIP}"

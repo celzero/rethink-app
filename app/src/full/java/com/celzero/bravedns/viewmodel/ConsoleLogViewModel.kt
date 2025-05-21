@@ -31,7 +31,7 @@ import com.celzero.bravedns.util.Constants
 
 class ConsoleLogViewModel(private val dao: ConsoleLogDAO) : ViewModel() {
     private var filter: MutableLiveData<String> = MutableLiveData()
-
+    private var logLevel: Long = Logger.LoggerLevel.INFO.id
     init {
         filter.postValue("")
     }
@@ -39,13 +39,21 @@ class ConsoleLogViewModel(private val dao: ConsoleLogDAO) : ViewModel() {
     val logs = filter.switchMap { input: String -> getLogs(input) }
 
     private fun getLogs(filter: String): LiveData<PagingData<ConsoleLog>> {
-        // filter is unused for now
-        return Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) { dao.getLogs() }
+        val query = "%$filter%"
+        return Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) { dao.getLogs(query) }
             .liveData
             .cachedIn(viewModelScope)
     }
 
     suspend fun sinceTime(): Long {
         return dao.sinceTime()
+    }
+
+    fun setLogLevel(level: Long) {
+        logLevel = level
+    }
+
+    fun setFilter(filter: String) {
+        this.filter.postValue(filter)
     }
 }
