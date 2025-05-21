@@ -16,8 +16,10 @@
 package com.celzero.bravedns.ui.fragment
 
 import Logger.LOG_TAG_UI
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
@@ -108,6 +110,15 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
 
     override fun onResume() {
         super.onResume()
+        // fix for #1939, OEM-specific bug, especially on heavily customized Android
+        // some ROMs kill or freeze the keyboard/IME process to save memory or battery,
+        // causing SearchView to stop receiving input events
+        // this is a workaround to restart the IME process
+        b.queryListSearch.setQuery("", false)
+        b.queryListSearch.clearFocus()
+
+        val imm = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.restartInput(b.queryListSearch)
         b.topRl.requestFocus()
     }
 

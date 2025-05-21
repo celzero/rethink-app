@@ -133,6 +133,14 @@ class FirewallAppListAdapter(
 
                     b.firewallAppToggleWifi.visibility = View.VISIBLE
                     b.firewallAppToggleMobileData.visibility = View.VISIBLE
+                    // strike through the app name if the app is tombstoned
+                    if (appInfo.tombstoneTs > 0) {
+                        b.firewallAppLabelTv.paint.isStrikeThruText = true
+                        b.firewallAppLabelTv.alpha = 0.4f
+                        b.firewallAppIconIv.alpha = 0.4f
+                    } else {
+                        b.firewallAppLabelTv.paint.isStrikeThruText = false
+                    }
                     displayConnectionStatus(appStatus, connStatus)
                     displayDataUsage(appInfo)
                     maybeDisplayProxyStatus(appInfo)

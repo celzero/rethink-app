@@ -17,8 +17,10 @@ package com.celzero.bravedns.ui.fragment
 
 import Logger
 import Logger.LOG_TAG_UI
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -69,6 +71,19 @@ class RethinkLogFragment :
             val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
             b.connectionSearch.setQuery(query, true)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // fix for #1939, OEM-specific bug, especially on heavily customized Android
+        // some ROMs kill or freeze the keyboard/IME process to save memory or battery,
+        // causing SearchView to stop receiving input events
+        // this is a workaround to restart the IME process
+        b.connectionSearch.setQuery("", false)
+        b.connectionSearch.clearFocus()
+
+        val imm = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.restartInput(b.connectionSearch)
     }
 
     private fun initView() {

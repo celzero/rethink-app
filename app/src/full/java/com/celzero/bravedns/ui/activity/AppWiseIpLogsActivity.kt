@@ -21,6 +21,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -95,6 +96,19 @@ class AppWiseIpLogsActivity :
             setAdapter()
             setClickListener()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // fix for #1939, OEM-specific bug, especially on heavily customized Android
+        // some ROMs kill or freeze the keyboard/IME process to save memory or battery,
+        // causing SearchView to stop receiving input events
+        // this is a workaround to restart the IME process
+        b.awlSearch.setQuery("", false)
+        b.awlSearch.clearFocus()
+
+        val imm = this.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.restartInput(b.awlSearch)
     }
 
     private fun init() {
