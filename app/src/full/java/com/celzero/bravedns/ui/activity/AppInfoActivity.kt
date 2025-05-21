@@ -446,13 +446,11 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
         adapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (adapter.itemCount < 1) {
-                    b.aadMostContactedDomainRl.visibility = View.GONE
-                } else {
+                if (adapter.itemCount >= 1) {
                     b.aadMostContactedDomainRl.visibility = View.VISIBLE
+                } else {
+                    b.aadMostContactedDomainRl.visibility = View.GONE
                 }
-            } else {
-                b.aadMostContactedDomainRl.visibility = View.VISIBLE
             }
         }
     }
@@ -468,13 +466,11 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
         adapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (adapter.itemCount < 1) {
-                    b.aadMostContactedDomainRl.visibility = View.GONE
-                } else {
+                if (adapter.itemCount >= 1) {
                     b.aadMostContactedDomainRl.visibility = View.VISIBLE
+                } else {
+                    b.aadMostContactedDomainRl.visibility = View.GONE
                 }
-            } else {
-                b.aadMostContactedDomainRl.visibility = View.VISIBLE
             }
         }
     }
@@ -490,13 +486,11 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
         adapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (adapter.itemCount < 1) {
-                    b.aadMostContactedIpsRl.visibility = View.GONE
-                } else {
+                if (adapter.itemCount >= 1) {
                     b.aadMostContactedIpsRl.visibility = View.VISIBLE
+                } else {
+                    b.aadMostContactedIpsRl.visibility = View.GONE
                 }
-            } else {
-                b.aadMostContactedIpsRl.visibility = View.VISIBLE
             }
         }
     }
@@ -513,13 +507,11 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
         adapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (adapter.itemCount < 1) {
-                    b.aadMostContactedIpsRl.visibility = View.GONE
-                } else {
+                if (adapter.itemCount >= 1) {
                     b.aadMostContactedIpsRl.visibility = View.VISIBLE
+                } else {
+                    b.aadMostContactedIpsRl.visibility = View.GONE
                 }
-            } else {
-                b.aadMostContactedIpsRl.visibility = View.VISIBLE
             }
         }
     }
