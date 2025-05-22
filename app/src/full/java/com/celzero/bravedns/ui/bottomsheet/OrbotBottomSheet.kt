@@ -555,7 +555,6 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
     private fun gotoDnsConfigureScreen() {
         this.dismiss()
         val intent = Intent(requireContext(), DnsDetailActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         intent.putExtra(
             Constants.VIEW_PAGER_SCREEN_TO_LOAD,
             DnsDetailActivity.Tabs.CONFIGURE.screen

@@ -521,7 +521,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun startActivity(searchParam: String?) {
         val intent = Intent(this, NetworkLogsActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         val query = RULES_SEARCH_ID_WIREGUARD + searchParam
         intent.putExtra(Constants.SEARCH_QUERY, query)
         startActivity(intent)

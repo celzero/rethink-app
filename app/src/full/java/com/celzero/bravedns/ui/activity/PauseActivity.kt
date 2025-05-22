@@ -168,8 +168,7 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
 
         lastStopActivityInvokeTime = SystemClock.elapsedRealtime()
         val intent = Intent(this, AppLockActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
     }

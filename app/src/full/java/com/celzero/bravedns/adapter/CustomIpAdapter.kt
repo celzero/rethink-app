@@ -276,7 +276,6 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
 
         private fun openAppWiseRulesActivity(uid: Int) {
             val intent = Intent(context, CustomRulesActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             intent.putExtra(
                 Constants.VIEW_PAGER_SCREEN_TO_LOAD,
                 CustomRulesActivity.Tabs.IP_RULES.screen

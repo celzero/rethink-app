@@ -199,10 +199,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     private fun openCustomIpScreen() {
         val intent = Intent(this, CustomRulesActivity::class.java)
-        // this activity is either being started in a new task or bringing to the top an
-        // existing task, then it will be launched as the front door of the task.
-        // This will result in the application to have that task in the proper state.
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         intent.putExtra(VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.IP_RULES.screen)
         intent.putExtra(Constants.INTENT_UID, uid)
         startActivity(intent)
@@ -210,7 +206,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     private fun openCustomDomainScreen() {
         val intent = Intent(this, CustomRulesActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         intent.putExtra(VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.DOMAIN_RULES.screen)
         intent.putExtra(Constants.INTENT_UID, uid)
         startActivity(intent)

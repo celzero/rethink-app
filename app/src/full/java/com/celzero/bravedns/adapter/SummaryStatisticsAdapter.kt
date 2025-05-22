@@ -550,7 +550,6 @@ class SummaryStatisticsAdapter(
 
         private fun startActivity(screenToLoad: Int, searchParam: String?) {
             val intent = Intent(context, NetworkLogsActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
             intent.putExtra(Constants.SEARCH_QUERY, searchParam ?: "")
             context.startActivity(intent)

@@ -511,7 +511,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
     private fun showCustomDns() {
         val intent = Intent(requireContext(), DnsListActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
     }
 

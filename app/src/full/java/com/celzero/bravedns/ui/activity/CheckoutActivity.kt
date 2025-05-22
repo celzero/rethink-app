@@ -209,21 +209,18 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
 
         b.paymentSuccessButton.setOnClickListener {
             val intent = Intent(this, TcpProxyMainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             startActivity(intent)
             finish()
         }
 
         b.restoreButton.setOnClickListener {
             val intent = Intent(this, TcpProxyMainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             startActivity(intent)
             finish()
         }
 
         b.paymentFailedButton.setOnClickListener {
             val intent = Intent(this, TcpProxyMainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             startActivity(intent)
             finish()
         }

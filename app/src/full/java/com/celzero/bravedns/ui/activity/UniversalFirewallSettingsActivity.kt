@@ -472,7 +472,6 @@ class UniversalFirewallSettingsActivity :
         if (size == 0) return
 
         val intent = Intent(this, NetworkLogsActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         val searchParam = RULES_SEARCH_ID + rule
         intent.putExtra(Constants.SEARCH_QUERY, searchParam)
         startActivity(intent)

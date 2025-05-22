@@ -1378,7 +1378,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // no need to check for app modes to open this activity
         // one use case: https://github.com/celzero/rethink-app/issues/611
         val intent = Intent(requireContext(), AppListActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
     }
 
@@ -1396,7 +1395,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                 ScreenType.PROXY_WIREGUARD -> Intent(requireContext(), WgMainActivity::class.java)
             }
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         if (type == ScreenType.RETHINK) {
             io {
                 val url = appConfig.getRemoteRethinkEndpoint()?.url

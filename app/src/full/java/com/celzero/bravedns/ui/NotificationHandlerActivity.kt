@@ -111,7 +111,7 @@ class NotificationHandlerActivity : AppCompatActivity() {
     private fun launchHomeScreenAndFinish() {
         // handle the app lock state then launch home screen
         val intent = Intent(this, AppLockActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
     }
