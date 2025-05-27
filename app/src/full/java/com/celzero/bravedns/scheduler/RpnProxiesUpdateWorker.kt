@@ -29,6 +29,11 @@ class RpnProxiesUpdateWorker(context: Context, params: WorkerParameters) :
     }
 
     override suspend fun doWork(): Result {
+        // perform the update only if RPN is active
+        if (!RpnProxyManager.isRpnActive()) {
+            Logger.i(LOG_TAG_SCHEDULER, "$TAG RPN is not active, skipping update")
+            return Result.success()
+        }
         var type = -1 // default value
         try {
             val now = System.currentTimeMillis()
