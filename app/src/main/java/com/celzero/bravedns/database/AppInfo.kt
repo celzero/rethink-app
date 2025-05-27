@@ -38,6 +38,7 @@ class AppInfo {
     var uploadBytes: Long = 0
     var downloadBytes: Long = 0
     var isProxyExcluded: Boolean = false
+    var tombstoneTs: Long = 0
 
     override fun equals(other: Any?): Boolean {
         if (other !is AppInfo) return false
@@ -72,6 +73,10 @@ class AppInfo {
                 "uploadBytes" -> uploadBytes = it.value as Long
                 "downloadBytes" -> downloadBytes = it.value as Long
                 "isProxyExcluded" -> isProxyExcluded = (it.value as Int == 1)
+                "tombstoneTs" -> tombstoneTs = it.value as Long
+                else -> {
+                    // ignore
+                }
             }
         }
     }
@@ -88,7 +93,8 @@ class AppInfo {
         connectionStatus: Int,
         isProxyExcluded: Boolean,
         screenOffAllowed: Boolean,
-        backgroundAllowed: Boolean
+        backgroundAllowed: Boolean,
+        tombstoneTs: Long = 0,
     ) {
         this.packageName = packageName
         this.appName = appName
@@ -102,6 +108,7 @@ class AppInfo {
         this.isProxyExcluded = isProxyExcluded
         this.screenOffAllowed = screenOffAllowed
         this.backgroundAllowed = backgroundAllowed
+        this.tombstoneTs = tombstoneTs
     }
 
     fun hasInternetPermission(packageManager: PackageManager): Boolean {

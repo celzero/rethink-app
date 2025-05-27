@@ -49,6 +49,9 @@ object FirewallManager : KoinComponent {
 
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
 
+    // max time to keep the tombstone entry in the database
+    const val TOMBSTONE_EXPIRY_TIME_MS = 7 * 24 * 60 * 60 * 1000L // 7 days
+
     // androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/os/UserHandle.java
     private const val PER_USER_RANGE = 100000
 
@@ -282,6 +285,29 @@ object FirewallManager : KoinComponent {
         packagesToDelete.forEach { tuple -> db.deletePackage(tuple.uid, tuple.packageName) }
     }
 
+    suspend fun tombstoneApp(uid: Int, packageName: String?) {
+        val currentTime = System.currentTimeMillis()
+        mutex.withLock {
+            appInfos
+                .values()
+                .filter { it.packageName == packageName && it.uid == uid }
+                .forEach { it.tombstoneTs = currentTime }
+        }
+        // delete the uninstalled apps from database
+        db.tombstoneApp(uid, packageName, currentTime)
+    }
+
+    suspend fun resetTombstoneTs(uid: Int, packageName: String?) {
+        mutex.withLock {
+            appInfos
+                .values()
+                .filter { it.packageName == packageName && it.uid == uid }
+                .forEach { it.tombstoneTs = 0 }
+        }
+        // delete the uninstalled apps from database
+        db.tombstoneApp(uid, packageName, 0)
+    }
+
     suspend fun deletePackage(uid: Int, packageName: String?) {
         mutex.withLock {
             appInfos
@@ -452,6 +478,7 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun updateUid(olduid: Int, uid: Int, pkg: String) {
+        // while updating the package reset the tombstone timestamp
         var cacheok = false
         // FIXME: review once again
         mutex.withLock {
@@ -459,6 +486,7 @@ object FirewallManager : KoinComponent {
                 if (ai.packageName == pkg) {
                     appInfos.remove(olduid, ai) // remove the old uid entry
                     ai.uid = uid // update the uid in-place
+                    ai.tombstoneTs = 0 // remove the tombstone timestamp
                     appInfos.put(uid, ai) // add the updated ai entry
                     cacheok = true
                     return@withLock

@@ -39,6 +39,7 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
+import com.celzero.bravedns.service.FirewallManager.TOMBSTONE_EXPIRY_TIME_MS
 import com.celzero.bravedns.service.FirewallManager.deletePackage
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
@@ -194,17 +195,18 @@ internal constructor(
                 LOG_TAG_APP_DB,
                 "sizes: rmv: ${packagesToDelete.size}; add: ${packagesToAdd.size}; update: ${packagesToUpdate.size}"
             )
-            deletePackages(packagesToDelete)
+            deletePackages(packagesToDelete, action == ACTION_REFRESH_RESTORE)
             addMissingPackages(packagesToAdd)
             updateExistingPackagesIfNeeded(packagesToUpdate) // updated only for restore
-            restoreWireGuardProfilesIfNeeded(action == ACTION_REFRESH_RESTORE)
             refreshNonApps(trackedApps, installedApps)
+            // must be called after updateExistingPackagesIfNeeded
             // packages to add and delete are calculated based on proxy mapping
-            refreshProxyMapping(trackedApps, packagesToAdd, packagesToUpdate, packagesToDelete)
+            refreshProxyMapping(trackedApps, packagesToAdd, packagesToUpdate, packagesToDelete, action == ACTION_REFRESH_RESTORE)
             // must be called after updateExistingPackagesIfNeeded
             refreshIPRules(packagesToUpdate)
             // must be called after updateExistingPackagesIfNeeded
             refreshDomainRules(packagesToUpdate)
+            restoreWireGuardProfilesIfNeeded(action == ACTION_REFRESH_RESTORE)
         } catch (e: RuntimeException) {
             Logger.crash(LOG_TAG_APP_DB, e.message ?: "refresh err", e)
             throw e
@@ -259,14 +261,39 @@ internal constructor(
         }
     }
 
-    private suspend fun deletePackages(packagesToDelete: Set<FirewallManager.AppInfoTuple>) {
-        // remove all the rules related to the packages
+    private suspend fun deletePackages(packagesToDelete: Set<FirewallManager.AppInfoTuple>, restore: Boolean) {
+        // decide whether the app need to be deleted or just need to be tombstoned
+        // if tombstone then just update the tombstoneTs to current time and return
+        // in case if the app is already tombstoned and the tombstoneTs is expired then delete it
+        // in case of restore no need to look for tombstoneTs expiry, just delete the app
+        val currentTime = System.currentTimeMillis()
         packagesToDelete.forEach {
-            IpRulesManager.deleteRulesByUid(it.uid)
-            DomainRulesManager.deleteRulesByUid(it.uid)
-            ProxyManager.deleteAppMappingsByUid(it.uid)
+            val appInfo = FirewallManager.getAppInfoByPackage(it.packageName)
+            Logger.d(LOG_TAG_APP_DB, "delete app: $it, tombstone: ${appInfo?.tombstoneTs}, restore: $restore, current: $currentTime, diff: ${currentTime - (appInfo?.tombstoneTs ?: 0L)}")
+            if (appInfo != null) {
+                if (appInfo.tombstoneTs == 0L && !restore) {
+                    // mark the app as tombstoned
+                    FirewallManager.tombstoneApp(it.uid, it.packageName)
+                    Logger.i(
+                        LOG_TAG_APP_DB,
+                        "tombstone app: ${it.packageName}, uid: ${it.uid}, ts: ${appInfo.tombstoneTs}"
+                    )
+                } else {
+                    // delete the app from the database
+                    if (currentTime - appInfo.tombstoneTs > TOMBSTONE_EXPIRY_TIME_MS) {
+                        // remove all the rules related to the packages
+                        IpRulesManager.deleteRulesByUid(it.uid)
+                        DomainRulesManager.deleteRulesByUid(it.uid)
+                        ProxyManager.deleteApp(it.uid, it.packageName)
+                        deletePackage(it.uid, it.packageName)
+                        Logger.i(
+                            LOG_TAG_APP_DB,
+                            "delete app: ${it.packageName}, uid: ${it.uid}, ts: ${appInfo.tombstoneTs}"
+                        )
+                    }
+                }
+            }
         }
-        FirewallManager.deletePackages(packagesToDelete)
     }
 
     private suspend fun refreshNonApps(
@@ -315,6 +342,7 @@ internal constructor(
             // get the latest app info from package manager against existing package name
             val newinfo = Utilities.getApplicationInfo(ctx, old.packageName) ?: return@forEach
             updateApp(old.uid, newinfo.uid, old.packageName)
+            // updating the ip/domain/proxy rules with the new uid are handled in caller methods
         }
     }
 
@@ -391,7 +419,8 @@ internal constructor(
         trackedApps: Set<FirewallManager.AppInfoTuple>,
         packageToAdd: Set<FirewallManager.AppInfoTuple>,
         packagesToUpdate: Set<FirewallManager.AppInfoTuple>,
-        packagesToDelete: Set<FirewallManager.AppInfoTuple>
+        packagesToDelete: Set<FirewallManager.AppInfoTuple>,
+        restore: Boolean = false
     ) {
         // trackedApps is empty, the installed apps are yet to be added to the database; and so,
         // there's no need to refresh these mappings as apps tracked by FirewallManager is empty
@@ -413,7 +442,7 @@ internal constructor(
         ProxyManager.deleteApps(del)
         ProxyManager.addApps(add)
 
-        // proceed to add/update/delete the apps based on the package manager's installed apps
+        // proceed to actual add/update/delete based on the package manager's installed apps
         packageToAdd.forEach {
             val appInfo = FirewallManager.getAppInfoByPackage(it.packageName)
             if (appInfo != null) {
@@ -426,7 +455,17 @@ internal constructor(
         }
 
         packagesToDelete.forEach {
-            ProxyManager.deleteApp(it.uid, it.packageName)
+            // the proxy manager will check if the app is already deleted from firewall manager
+            // if not then it will not delete the app from proxy mapping (tombstoned)
+            // if the app is already deleted from firewall manager then it will delete the app from
+            // proxy mapping
+            if (restore) {
+                // restore the app in proxy mapping
+                ProxyManager.deleteApp(it.uid, it.packageName)
+            } else {
+                ProxyManager.deleteAppIfNeeded(it.uid, it.packageName)
+            }
+
         }
 
         Logger.i(
@@ -462,7 +501,8 @@ internal constructor(
 
     private suspend fun updateApp(oldUid: Int, newUid: Int, pkg: String) {
         if (oldUid == newUid) {
-            Logger.i(LOG_TAG_APP_DB, "update app; uid: $oldUid == $newUid, no-op")
+            Logger.i(LOG_TAG_APP_DB, "update app; uid: $oldUid == $newUid, reset tombstone ts")
+            FirewallManager.resetTombstoneTs(oldUid, pkg)
             return
         }
         Logger.i(LOG_TAG_APP_DB, "update app; oldUid: $oldUid, newUid: $newUid, pkg: $pkg")
@@ -685,7 +725,7 @@ internal constructor(
             getActivityPendingIntent(
                 ctx,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                 mutable = false
             )
         if (isAtleastO()) {

@@ -17,7 +17,7 @@ package com.celzero.bravedns.service
 
 import Logger
 import Logger.LOG_TAG_PROXY
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ProxyAppMappingRepository
 import com.celzero.bravedns.database.ProxyApplicationMapping
@@ -272,15 +272,22 @@ object ProxyManager : KoinComponent {
         }
     }
 
-    suspend fun deleteAppMappingsByUid(uid: Int) {
-        val m = pamSet.filter { it.uid == uid }
-        m.forEach { deleteApp(it.uid, it.packageName) }
-    }
-
     suspend fun deleteApp(uid: Int, packageName: String) {
         deleteFromCache(uid, packageName)
         db.deleteApp(uid, packageName)
-        Logger.d(LOG_TAG_PROXY, "deleting app for mapping: $uid, $packageName")
+        Logger.i(LOG_TAG_PROXY, "deleting app for mapping: $uid, $packageName")
+    }
+
+    suspend fun deleteAppIfNeeded(uid: Int, packageName: String) {
+        val fm = FirewallManager.getAppInfoByPackage(packageName)
+        // if there is no app info for the package, then delete the app from the mapping
+        if (fm == null) {
+            deleteApp(uid, packageName)
+            return
+        } else {
+            // the app can be tombstoned, so do not delete the app from the mapping
+            Logger.i(LOG_TAG_PROXY, "deleteAppIfNeeded: app($uid, $packageName) is available in firewall manager, not deleting, tombstone: ${fm.tombstoneTs}")
+        }
     }
 
     suspend fun clear() {
