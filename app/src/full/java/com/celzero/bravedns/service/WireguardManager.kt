@@ -19,7 +19,7 @@ import Logger
 import Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.text.format.DateUtils
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.backup.BackupHelper.Companion.TEMP_WG_DIR
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.WgConfigFiles
@@ -30,6 +30,7 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_NAME
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgHopManager
@@ -380,12 +381,13 @@ object WireguardManager : KoinComponent {
         if (oneWireGuardEnabled()) {
             val id = getOneWireGuardProxyId()
             if (id == null || id == INVALID_CONF_ID) {
-                Logger.e(LOG_TAG_PROXY, "canAdd: one-wg not found, id: $id, return $default")
-                proxyIds.add(default)
-                return proxyIds
+                Logger.e(LOG_TAG_PROXY, "canAdd: one-wg not found, id: $id, return ${emptyList<String>()}")
+                return emptyList<String>()
             }
 
-            if (checkEligibilityBasedOnNw(id, usesMeteredNw)) {
+            // commenting this as the one-wg is enabled for all networks no need to check for
+            // mobile network, uncomment this when the one-wg can have mobile only option
+            /*if (checkEligibilityBasedOnNw(id, usesMeteredNw)) {
                 proxyIds.add(ID_WG_BASE + id)
                 // add default to the list, can route check is done in go-tun
                 if (default.isNotEmpty()) proxyIds.add(default)
@@ -393,13 +395,21 @@ object WireguardManager : KoinComponent {
                 return proxyIds
             } else {
                 // fall-through as one-wg is enabled only for metered networks
-            }
+                // for now the setting doesn't allow user to set the one-wg to mobile networks
+                // so this case is not expected
+            }*/
+            proxyIds.add(ID_WG_BASE + id)
+            // add default to the list, can route check is done in go-tun
+            if (default.isNotEmpty()) proxyIds.add(default)
+            Logger.i(LOG_TAG_PROXY, "one-wg enabled, return $proxyIds")
+            return proxyIds
         }
 
         // check for ip-app specific config first
         // returns Pair<String, String> - first is ProxyId, second is CC
         val ipc = IpRulesManager.hasProxy(uid, ip, port)
         // return Pair<String, Boolean> - first is ProxyId, second is can proceed for next check
+        // one case where second parameter is true when the config is in lockdown mode
         val ipcProxyPair = canUseConfig(ipc.first, "ip $ip:$port", usesMeteredNw)
         if (!ipcProxyPair.second) { // false denotes first is not empty
             if (ipcProxyPair.first == block) {
@@ -445,7 +455,7 @@ object WireguardManager : KoinComponent {
         }
 
         // add the app specific config to the list
-        if (appProxyPair.first.isNotEmpty()) proxyIds.add(appProxyPair.first) // app specific config
+        if (appProxyPair.first.isNotEmpty()) proxyIds.add(appProxyPair.first)
 
         // check for universal ip config
         val uipc = IpRulesManager.hasProxy(UID_EVERYBODY, ip, port)
@@ -479,7 +489,7 @@ object WireguardManager : KoinComponent {
         }
 
         // add the universal domain config to the list
-        if (udcProxyPair.first.isNotEmpty()) proxyIds.add(udcProxyPair.first) // universal domain
+        if (udcProxyPair.first.isNotEmpty()) proxyIds.add(udcProxyPair.first)
 
         // once the app-specific config is added, check if any catch-all config is enabled
         // if catch-all config is enabled, then add the config id to the list
@@ -494,7 +504,8 @@ object WireguardManager : KoinComponent {
             }
         }
 
-        // add the default proxy to the end, will not be true for lockdown
+        // add the default proxy to the end, will not be true for lockdown but lockdown is handled
+        // above, so no need to check here
         if (default.isNotEmpty()) proxyIds.add(default)
 
         // the proxyIds list will contain the ip-app specific, domain-app specific, app specific,
@@ -504,19 +515,21 @@ object WireguardManager : KoinComponent {
         return proxyIds
     }
 
-    private fun checkEligibilityBasedOnNw(id: Int, usesMeteredNw: Boolean): Boolean {
+    // only when config is set to use on mobile network and current network is not mobile
+    // then return false, all other cases return true
+    private fun checkEligibilityBasedOnNw(id: Int, usesMobileNw: Boolean): Boolean {
         val config = mappings.find { it.id == id }
         if (config == null) {
             Logger.e(LOG_TAG_PROXY, "canAdd: wg not found, id: $id, ${mappings.size}")
             return false
         }
 
-        if (config.useOnlyOnMetered && !usesMeteredNw) {
+        if (config.useOnlyOnMetered && !usesMobileNw) {
             Logger.i(LOG_TAG_PROXY, "canAdd: useOnlyOnMetered is true, but not metered nw")
             return false
         }
 
-        Logger.d(LOG_TAG_PROXY, "canAdd: eligible for metered nw: $usesMeteredNw")
+        Logger.d(LOG_TAG_PROXY, "canAdd: eligible for metered nw: $usesMobileNw")
         return true
     }
 
@@ -935,7 +948,14 @@ object WireguardManager : KoinComponent {
                 db.deleteConfig(c.id)
             }
         }
-        tempDir.deleteRecursively()
+
+        val isResidueDeleted = Utilities.deleteRecursive(tempDir)
+        if (isResidueDeleted) {
+            Logger.i(LOG_TAG_PROXY, "deleted residue temp wg files: ${tempDir.absolutePath}")
+        } else {
+            Logger.w(LOG_TAG_PROXY, "failed to delete residue temp wg files: ${tempDir.absolutePath}")
+            tempDir.deleteRecursively()
+        }
     }
 
     fun oneWireGuardEnabled(): Boolean {
