@@ -214,15 +214,6 @@ class AppListActivity :
     override fun onResume() {
         super.onResume()
         setFirewallFilter(filters.value?.firewallFilter)
-        // fix for #1939, OEM-specific bug, especially on heavily customized Android
-        // some ROMs kill or freeze the keyboard/IME process to save memory or battery,
-        // causing SearchView to stop receiving input events
-        // this is a workaround to restart the IME process
-        b.ffaSearch.setQuery("", false)
-        b.ffaSearch.clearFocus()
-
-        val imm = this.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.restartInput(b.ffaSearch)
         b.ffaAppList.requestFocus()
     }
 
