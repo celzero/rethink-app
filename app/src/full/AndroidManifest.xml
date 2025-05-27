@@ -164,7 +164,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".receiver.VPNControlReceiver"
+            android:name=".receiver.VpnControlReceiver"
             android:exported="true"
             android:label="@string/app_name">
             <intent-filter>
