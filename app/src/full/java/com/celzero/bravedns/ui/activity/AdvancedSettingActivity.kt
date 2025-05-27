@@ -23,28 +23,27 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.InputType
+import android.view.Gravity
 import android.view.View
 import android.widget.CompoundButton
+import android.widget.EditText
+import android.widget.ScrollView
 import android.widget.SeekBar
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityAdvancedSettingBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
-import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.blocklistCanonicalPath
-import com.celzero.bravedns.util.Utilities.blocklistDir
 import com.celzero.bravedns.util.Utilities.deleteRecursive
-import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
@@ -201,6 +200,12 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
             persistentState.downloadIpInfo = isChecked
         }
 
+        b.settingsTaskerRl.setOnClickListener {
+            showAppTriggerPackageDialog(this , onPackageSet = { packageName ->
+                persistentState.appTriggerPackages = packageName
+            })
+        }
+
         b.dvTimeoutSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 handler.removeCallbacks(updateRunnable ?: Runnable {})
@@ -280,6 +285,46 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
             Logger.e(LOG_TAG_UI, "$TAG; err opening console log activity ${e.message}", e)
         }
     }
+
+    fun showAppTriggerPackageDialog(context: Context, onPackageSet: (String) -> Unit) {
+        val editText = EditText(context).apply {
+            hint = context.getString(R.string.adv_tasker_dialog_edit_hint)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            setLines(6)
+            setHorizontallyScrolling(false)
+            if (persistentState.appTriggerPackages.isNotEmpty()) {
+                setText(persistentState.appTriggerPackages)
+            }
+            gravity = Gravity.TOP or Gravity.START
+        }
+
+        val selectableTextView = AppCompatTextView(context).apply {
+            text = context.getString(R.string.adv_tasker_dialog_msg)
+            setTextIsSelectable(true)
+            setPadding(50, 40, 50, 0) // optional: padding to make it look better
+            textSize = 16f
+        }
+
+        val scrollView = ScrollView(context).apply {
+            setPadding(40, 10, 40, 0)
+            addView(selectableTextView)
+            addView(editText)
+        }
+
+        AlertDialog.Builder(context)
+            .setTitle(context.getString(R.string.adv_tasker_dialog_title))
+            .setView(scrollView)
+            .setPositiveButton(context.getString(R.string.lbl_save)) { dialog, _ ->
+                val pkgName = editText.text.toString().trim()
+                if (pkgName.isNotEmpty()) {
+                    onPackageSet(pkgName)
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(context.getString(R.string.lbl_cancel)) { dialog, _ -> dialog.cancel() }
+            .show()
+    }
+
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }

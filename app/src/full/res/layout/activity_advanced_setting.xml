@@ -250,8 +250,8 @@
                             android:id="@+id/dv_timeout_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
                             android:layout_marginEnd="10dp"
+                            android:paddingTop="5dp"
                             android:text="@string/adv_set_dial_timeout_desc"
                             android:textSize="@dimen/default_font_text_view" />
 
@@ -416,7 +416,7 @@
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Set Auto Dial"
+                            android:text="@string/set_auto_dial_title"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
@@ -424,7 +424,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
-                            android:text="Use parallel dialing to connect to multiple servers at once"
+                            android:text="@string/set_auto_dial_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
@@ -472,7 +472,7 @@
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Download IP Info"
+                            android:text="@string/download_ip_info_title"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
@@ -480,7 +480,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
-                            android:text="Download and store IP information to know more about your connection"
+                            android:text="@string/download_ip_info_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
@@ -638,6 +638,64 @@
                 </RelativeLayout>
 
                 <RelativeLayout
+                    android:id="@+id/settings_tasker_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/settings_tasker_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:alpha="0.5"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_delete" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/settings_activity_tasker_img"
+                        android:layout_toEndOf="@id/settings_tasker_icon"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/gen_settings_tasker_txt"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/adv_taster_title"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                        <TextView
+                            android:id="@+id/gen_settings_tasker_desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="5dp"
+                            android:text="@string/adv_taster_desc"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/settings_activity_tasker_img"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="10dp"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_right_arrow_white" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
                     android:id="@+id/settings_activity_slowdown_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -703,12 +761,12 @@
                         android:id="@+id/settings_clear_residue_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:alpha="0.5"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
+                        android:alpha="0.5"
                         android:padding="10dp"
                         android:src="@drawable/ic_delete" />
 

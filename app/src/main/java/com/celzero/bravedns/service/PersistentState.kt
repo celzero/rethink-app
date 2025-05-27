@@ -357,6 +357,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // user setting whether to download ip info for the ip addresses
     var downloadIpInfo by booleanPref("download_ip_info").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
 
+    // user setting to allow only added packages can trigger the app
+    var appTriggerPackages by stringPref("app_trigger_packages").withDefault<String>("")
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
     var universalRulesCount: MutableLiveData<Int> = MutableLiveData()
