@@ -61,12 +61,16 @@ import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
-import com.google.common.base.CharMatcher
 import com.google.common.net.InternetDomainName
 import com.google.gson.JsonParser
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.launch
+import okio.HashingSink
+import okio.blackholeSink
+import okio.buffer
+import okio.source
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -79,15 +83,11 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.math.ln
-import kotlinx.coroutines.launch
-import okio.HashingSink
-import okio.blackholeSink
-import okio.buffer
-import okio.source
+import kotlin.math.pow
 
 object Utilities {
 
-    // Convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
+    // convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
     fun getETldPlus1(fqdn: String): String? {
         return try {
             val name: InternetDomainName = InternetDomainName.from(fqdn)
@@ -789,7 +789,7 @@ object Utilities {
         try {
             val exp = (ln(bytes.toDouble()) / ln(unit.toDouble())).toInt()
             val pre = ("KMGTPE")[exp - 1] + if (si) "" else "i"
-            val totalBytes = bytes / Math.pow(unit.toDouble(), exp.toDouble())
+            val totalBytes = bytes / unit.toDouble().pow(exp.toDouble())
             return String.format(Locale.ROOT, "%.1f %sB", totalBytes, pre)
         } catch (e: NumberFormatException) {
             Logger.e(LOG_TAG_DOWNLOAD, "err in humanReadableByteCount: ${e.message}", e)
