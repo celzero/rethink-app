@@ -29,7 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import backend.RouterStats
+import com.celzero.firestack.backend.RouterStats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.OneWgConfigAdapter.DnsStatusListener
 import com.celzero.bravedns.database.WgConfigFiles
@@ -358,9 +358,19 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                     if (isDnsError(dnsStatusId)) {
                         b.interfaceDetailCard.strokeColor =
                             fetchColor(context, R.attr.chipTextNegative)
-                        b.interfaceStatus.text =
-                            context.getString(R.string.status_failing)
-                                .replaceFirstChar(Char::titlecase)
+                        val humanReadableLastOk = getHumanReadableLastOk(stats).toString()
+                        // show last ok time if available
+                        if (humanReadableLastOk.isEmpty()) {
+                            b.interfaceStatus.text = context.getString(
+                                R.string.status_failing
+                            ).replaceFirstChar(Char::titlecase)
+                        } else {
+                            b.interfaceStatus.text = context.getString(
+                                R.string.about_version_install_source,
+                                context.getString(R.string.status_failing)
+                                    .replaceFirstChar(Char::titlecase), humanReadableLastOk
+                            )
+                        }
                     } else {
                         // if dns status is not failing, then update the proxy status
                         updateProxyStatusUi(statusPair, stats)
@@ -390,8 +400,9 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
         }
 
-        private fun getStatusText(status: UIUtils.ProxyStatus?,
-            handshakeTime: String? = null,
+        private fun getStatusText(
+            status: UIUtils.ProxyStatus?,
+            humanReadableLastOk: String? = null,
             stats: RouterStats?,
             errMsg: String? = null
         ): String {
@@ -414,8 +425,8 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             val baseText = context.getString(UIUtils.getProxyStatusStringRes(status.id))
                 .replaceFirstChar(Char::titlecase)
 
-            return if (stats?.lastOK != 0L && handshakeTime != null) {
-                context.getString(R.string.about_version_install_source, baseText, handshakeTime)
+            return if (stats?.lastOK != 0L && humanReadableLastOk != null) {
+                context.getString(R.string.about_version_install_source, baseText, humanReadableLastOk)
             } else {
                 baseText
             }
@@ -432,14 +443,14 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         private fun updateProxyStatusUi(statusPair: Pair<Long?, String>, stats: RouterStats?) {
             val status = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first } // Convert to enum
 
-            val handshakeTime = getHandshakeTime(stats).toString()
+            val humanReadableLastOk = getHumanReadableLastOk(stats).toString()
 
             val strokeColor = getStrokeColorForStatus(status, stats)
             b.interfaceDetailCard.strokeColor = fetchColor(context, strokeColor)
             val statusText = getIdleStatusText(status, stats).ifEmpty {
                 getStatusText(
                     status,
-                    handshakeTime,
+                    humanReadableLastOk,
                     stats,
                     statusPair.second
                 )
@@ -486,7 +497,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             )
         }
 
-        private fun getHandshakeTime(stats: RouterStats?): CharSequence {
+        private fun getHumanReadableLastOk(stats: RouterStats?): CharSequence {
             if (stats == null) {
                 return ""
             }
