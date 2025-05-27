@@ -16,7 +16,7 @@
  */
 package com.celzero.bravedns.net.doh
 
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import java.util.Calendar
 

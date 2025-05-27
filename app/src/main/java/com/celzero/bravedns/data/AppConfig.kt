@@ -48,8 +48,8 @@ import com.celzero.bravedns.util.InternetProtocol.Companion.getInternetProtocol
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import intra.Bridge
-import settings.Settings
+import com.celzero.firestack.intra.Bridge
+import com.celzero.firestack.settings.Settings
 
 class AppConfig
 internal constructor(

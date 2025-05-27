@@ -18,7 +18,7 @@
  */
 package com.celzero.bravedns.wireguard
 
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.wireguard.BadConfigException.*
 import java.net.InetAddress
 import java.util.*

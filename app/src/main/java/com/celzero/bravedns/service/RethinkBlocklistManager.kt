@@ -19,8 +19,8 @@ import Logger
 import Logger.LOG_TAG_DNS
 import Logger.LOG_TAG_VPN
 import android.content.Context
-import backend.Backend
-import backend.RDNS
+import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.backend.RDNS
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.data.FileTagDeserializer

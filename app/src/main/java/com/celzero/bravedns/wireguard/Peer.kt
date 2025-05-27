@@ -18,8 +18,8 @@
  */
 package com.celzero.bravedns.wireguard
 
-import backend.Backend
-import backend.WgKey
+import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.backend.WgKey
 import com.celzero.bravedns.RethinkDnsApplication
 import com.celzero.bravedns.wireguard.BadConfigException.*
 import inet.ipaddr.IPAddressString

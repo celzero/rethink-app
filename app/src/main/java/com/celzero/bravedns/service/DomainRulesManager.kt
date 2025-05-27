@@ -20,12 +20,13 @@ import Logger.LOG_TAG_DNS
 import android.content.Context
 import android.util.Patterns
 import androidx.lifecycle.LiveData
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.util.Constants
+import com.celzero.firestack.backend.RadixTree
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.MalformedURLException
@@ -38,12 +39,12 @@ object DomainRulesManager : KoinComponent {
 
     private val db by inject<CustomDomainRepository>()
 
-    private var trie: backend.RadixTree = Backend.newRadixTree()
+    private var trie: RadixTree = Backend.newRadixTree()
     // fixme: find a better way to handle trusted domains without using two data structures
     // map to store the trusted domains with set of uids
     private val trustedMap: MutableMap<String, Set<Int>> = ConcurrentHashMap()
     // even though we have trustedMap, we need to keep the trie for wildcard matching
-    private var trustedTrie: backend.RadixTree = Backend.newRadixTree()
+    private var trustedTrie: RadixTree = Backend.newRadixTree()
 
     // regex to check if url is valid wildcard domain
     // valid wildcard domain: *.example.com, *.example.co.in, *.do-main.com

@@ -20,7 +20,7 @@ import Logger
 import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.os.SystemClock
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
@@ -36,6 +36,7 @@ import com.celzero.bravedns.util.Utilities.getCountryCode
 import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.Utilities.makeAddressPair
 import com.celzero.bravedns.util.Utilities.normalizeIp
+import com.celzero.firestack.backend.DNSSummary
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -71,7 +72,7 @@ internal constructor(
         vpnStateMap[Transaction.Status.INTERNAL_ERROR] = BraveVPNService.State.APP_ERROR
     }
 
-    fun processOnResponse(summary: backend.DNSSummary, rethinkUid: Int): Transaction {
+    fun processOnResponse(summary: DNSSummary, rethinkUid: Int): Transaction {
         val latencyMs = (TimeUnit.SECONDS.toMillis(1L) * summary.latency).toLong()
         val nowMs = SystemClock.elapsedRealtime()
         val queryTimeMs = nowMs - latencyMs

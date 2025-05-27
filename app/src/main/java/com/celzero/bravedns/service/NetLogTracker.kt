@@ -19,7 +19,7 @@ package com.celzero.bravedns.service
 import Logger.LOG_BATCH_LOGGER
 import android.content.Context
 import android.util.Log
-import backend.DNSSummary
+import com.celzero.firestack.backend.DNSSummary
 import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.database.ConnectionTracker
@@ -70,7 +70,7 @@ internal constructor(
     // dispatch buffer to consumer if greater than batch size for dns, ip and rr logs
     private val logBatchSize = 20
     // dispatch buffer to consumer if greater than batch size, for console logs
-    private val consoleLogBatchSize = 256
+    private val consoleLogBatchSize = 512
 
     // a single thread to run sig and batch co-routines in;
     // to avoid use of mutex/semaphores over shared-state

@@ -18,8 +18,8 @@
  */
 package com.celzero.bravedns.wireguard
 
-import backend.Backend
-import backend.WgKey
+import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.backend.WgKey
 
 /**
  * Represents a Curve25519 key pair as used by WireGuard.

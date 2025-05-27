@@ -10,13 +10,14 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.customdownloader.ITcpProxy
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.TcpProxyEndpoint
 import com.celzero.bravedns.database.TcpProxyRepository
 import com.celzero.bravedns.scheduler.PaymentWorker
+import com.celzero.firestack.backend.IpTree
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,7 +37,7 @@ object TcpProxyHelper : KoinComponent {
 
     private val tcpProxies = mutableSetOf<TcpProxyEndpoint>()
 
-    private var cfIpTrie: backend.IpTree = Backend.newIpTree()
+    private var cfIpTrie: IpTree = Backend.newIpTree()
 
     private const val DEFAULT_ID = 0
     private const val MAX_RETRY_COUNT = 3
