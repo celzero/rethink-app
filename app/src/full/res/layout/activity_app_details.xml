@@ -53,6 +53,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:alpha="0.7"
+                    android:textIsSelectable="true"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
                     android:paddingBottom="5dp"
