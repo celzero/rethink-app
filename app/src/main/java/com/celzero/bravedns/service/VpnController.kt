@@ -20,18 +20,21 @@ import Logger
 import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.content.Intent
+import android.net.Network
 import android.os.SystemClock
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import backend.RDNS
-import backend.RouterStats
+import com.celzero.firestack.backend.RDNS
+import com.celzero.firestack.backend.RouterStats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.BraveVPNService.Companion.FAIL_OPEN_ON_NO_NETWORK
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
+import com.celzero.firestack.backend.NetStat
+import com.celzero.firestack.intra.Controller
 import java.net.Socket
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -239,8 +242,8 @@ object VpnController : KoinComponent {
         return braveVpnService?.isSplitTunnelProxy(id, pair) ?: false
     }
 
-    suspend fun syncP50Latency(id: String) {
-        braveVpnService?.syncP50Latency(id)
+    suspend fun p50(id: String): Long {
+        return braveVpnService?.p50(id) ?: -1L
     }
 
     fun getRegionLiveData(): LiveData<String> {
@@ -347,7 +350,7 @@ object VpnController : KoinComponent {
         return braveVpnService?.getSystemDns() ?: ""
     }
 
-    fun getNetStat(): backend.NetStat? {
+    fun getNetStat(): NetStat? {
         return braveVpnService?.getNetStat()
     }
 
@@ -409,6 +412,18 @@ object VpnController : KoinComponent {
 
     suspend fun vpnStats(): String? {
         return braveVpnService?.vpnStats()
+    }
+
+    fun performConnectivityCheck(controller: Controller, id: String, addrPort: String): Boolean {
+        return braveVpnService?.performConnectivityCheck(controller, id, addrPort) ?: false
+    }
+
+    fun bindToNwForConnectivityChecks(nw: Network, pfd: Long): Boolean {
+        return braveVpnService?.bindToNwForConnectivityChecks(nw, pfd) ?: false
+    }
+
+    fun protectFdForConnectivityChecks(fd: Long) {
+        this.braveVpnService?.protectFdForConnectivityChecks(fd)
     }
 
     fun screenLock() {

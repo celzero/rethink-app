@@ -31,6 +31,7 @@ import android.os.Message
 import android.os.SystemClock
 import android.system.ErrnoException
 import android.system.OsConstants.ECONNREFUSED
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
@@ -65,10 +66,15 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             .addTransportType(NetworkCapabilities.TRANSPORT_BLUETOOTH)
             .addTransportType(NetworkCapabilities.TRANSPORT_ETHERNET)
             .addTransportType(NetworkCapabilities.TRANSPORT_VPN)
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .apply { if (isAtleastS()) setIncludeOtherUidNetworks(true) }
             // api27: .addTransportType(NetworkCapabilities.TRANSPORT_WIFI_AWARE)
             // api26: .addTransportType(NetworkCapabilities.TRANSPORT_LOWPAN)
             .build()
+            
+    private val networkRequestAny = NetworkRequest.Builder()
+        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        .build()
 
     private var serviceHandler: NetworkRequestHandler? = null
     private val persistentState by inject<PersistentState>()
@@ -76,22 +82,25 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
     private lateinit var connectivityManager: ConnectivityManager
 
     companion object {
+        // should make a looser match for the network type, added for testing
+        private val LOOSE_MATCH = if (DEBUG) true else false
+
         // add active network as underlying vpn network
         const val MSG_ADD_ACTIVE_NETWORK = 1
 
         // add all available networks as underlying vpn networks
         const val MSG_ADD_ALL_NETWORKS = 2
 
-        fun networkType(newActiveNetworkCap: NetworkCapabilities?): String {
+        fun networkType(netCap: NetworkCapabilities?): String {
             val a =
-                if (newActiveNetworkCap?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true) {
+                if (netCap?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true) {
                     "VPN"
                 } else if (
-                    newActiveNetworkCap?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+                    netCap?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
                 ) {
                     "WiFi"
                 } else if (
-                    newActiveNetworkCap?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ==
+                    netCap?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ==
                     true
                 ) {
                     "Cellular"
@@ -186,7 +195,11 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
                     as ConnectivityManager
         try {
-            connectivityManager.registerNetworkCallback(networkRequest, this)
+            if (LOOSE_MATCH) {
+                connectivityManager.registerNetworkCallback(networkRequestAny, this)
+            } else {
+                connectivityManager.registerNetworkCallback(networkRequest, this)
+            }
         } catch (e: Exception) {
             Logger.w(LOG_TAG_CONNECTION, "Exception while registering network callback", e)
             networkListener.onNetworkRegistrationFailed()
@@ -213,7 +226,10 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             this.serviceHandler?.removeCallbacksAndMessages(null)
             serviceHandler?.looper?.quitSafely()
             this.serviceHandler = null
-            connectivityManager.unregisterNetworkCallback(this)
+            // check if connectivity manager is initialized as it is lazy initialized
+            if (::connectivityManager.isInitialized) {
+                connectivityManager.unregisterNetworkCallback(this)
+            }
         } catch (e: Exception) {
             Logger.w(LOG_TAG_CONNECTION, "ConnectionMonitor: err while unregistering", e)
         }
@@ -589,7 +605,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                     if (has4) trackedIpv4Networks.add(prop)
                     if (has6) trackedIpv6Networks.add(prop)
                     Logger.i(LOG_TAG_CONNECTION, "nw(${network.networkHandle}): has4? $has4, has6? $has6, $prop")
-                    if (has4 || has6) return@outer
+                    if (has4 && has6) return@outer
                     // else: fall-through to check reachability with network capabilities
                 }
 
@@ -782,13 +798,32 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             isActive: Boolean = false
         ): Boolean = runBlocking {
             var ok = false
+            val probeController = if (nw != null) {
+                ProbeController(nw.networkHandle, nw)
+            } else {
+                null
+            }
             probes.forEach { ip ->
                 if (isActive) {
                     ok = isReachable(ip)
                 }
                 if (!ok) {
+                    if (probeController != null) {
+                        val id = "Probe:${nw?.networkHandle}"
+                        ok = VpnController.performConnectivityCheck(probeController, id, ip)
+                        Logger.vv(LOG_TAG_CONNECTION, "probe from tun: $ip, $ok")
+                    }
+                } else {
+                    if (probeController != null) {
+                        val id = "Probe:${nw?.networkHandle}"
+                        val res = VpnController.performConnectivityCheck(probeController, id, ip)
+                        Logger.vv(LOG_TAG_CONNECTION, "probe from tun: $ip, $res, ok? $ok")
+                    }
+                }
+                if (!ok) {
                     ok = isReachableTcpUdp(nw, ip)
                 }
+
                 if (ok) {
                     return@forEach // break
                 }
