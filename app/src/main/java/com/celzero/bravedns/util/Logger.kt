@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import android.util.Log
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -150,7 +151,7 @@ object Logger : KoinComponent {
 
     private fun dbWrite(tag: String, msg: String, level: LoggerLevel, e: Exception? = null) {
         // write to the database only if console log is set to true
-        if (!persistentState.consoleLogEnabled) return
+        if (!persistentState.consoleLogEnabled && !DEBUG) return
 
         // uiLogLevel is user selected log level to display in the UI, so if the log level is less
         // than the user selected log level, do not write to the database
