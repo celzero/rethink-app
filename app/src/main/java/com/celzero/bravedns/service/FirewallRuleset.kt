@@ -217,8 +217,13 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
         R.string.firewall_rule_paused_app,
         R.string.firewall_rule_paused_app_desc,
         R.integer.allow
-    )
-    ;
+    ),
+    RULE17(
+        "Lockdown Proxy",
+        R.string.firewall_rule_lockdown_wg,
+        R.string.firewall_rule_lockdown_wg_desc,
+        R.integer.stall
+    );
 
     companion object {
         fun getFirewallRule(ruleId: String): FirewallRuleset? {
@@ -255,6 +260,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE13.id -> RULE13
                 RULE14.id -> RULE14
                 RULE15.id -> RULE15
+                RULE16.id -> RULE16
                 else -> null
             }
         }
@@ -294,6 +300,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE13.id -> R.drawable.ic_proxy_white
                 RULE14.id -> R.drawable.bs_dns_home_screen
                 RULE15.id -> R.drawable.ic_bypass
+                RULE16.id -> R.drawable.ic_proxy_white
                 else -> R.drawable.bs_dns_home_screen
             }
         }
