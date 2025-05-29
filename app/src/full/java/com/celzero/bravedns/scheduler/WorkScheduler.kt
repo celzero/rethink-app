@@ -25,13 +25,11 @@ import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import androidx.work.workDataOf
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.util.Utilities
 import com.google.common.util.concurrent.ListenableFuture
