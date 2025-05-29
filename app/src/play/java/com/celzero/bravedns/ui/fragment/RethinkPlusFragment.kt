@@ -314,6 +314,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
         builder.setCancelable(true)
         loadingDialog = builder.create()
         loadingDialog.show()
+
+        //findNavController().navigate(R.id.action_switch_to_homeScreenFragment)
     }
 
     private fun hideLoadingDialog() {
@@ -351,7 +353,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
         b.paymentContainer.visibility = View.GONE
         b.paymentButtonContainer.visibility = View.GONE
         b.shimmerViewContainer.visibility = View.GONE
-        b.topBanner.visibility = View.GONE
     }
 
     private fun hidePlusSubscribedUi() {
@@ -372,10 +373,9 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
     private fun showPlusSubscribedUi() {
         hideLoadingDialog()
         b.subscribedLayout.visibility = View.VISIBLE
+        b.topBanner.visibility = View.VISIBLE
         hidePaymentContainerUi()
         hideNotAvailableUi()
-        val state = RpnProxyManager.RpnState.fromId(persistentState.rpnState)
-        b.pausePlus.text = if (state.isPaused()) "Resume Rethink+" else "Pause Rethink+"
     }
 
     private suspend fun isTestOk(): Boolean {
@@ -520,7 +520,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
 
     private fun showErrorDialog(msg: String) {
         val builder = MaterialAlertDialogBuilder(requireContext())
-        builder.setTitle("Error")
+        builder.setTitle(getString(R.string.settings_gologger_dialog_option_5))
         builder.setMessage(msg)
         builder.setCancelable(false)
         builder.setPositiveButton(requireContext().getString(R.string.dns_info_positive)) { dialogInterface, _ ->
@@ -531,6 +531,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
     }
 
     private fun showConfettiEffect() {
+        if (!persistentState.showConfettiOnRPlus) return
         SubscriptionAnimDialog().show(childFragmentManager, "SubscriptionAnimDialog")
     }
 
@@ -575,17 +576,6 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
 
         b.contactSupport.setOnClickListener {
             // no-op
-        }
-
-        b.pausePlus.setOnClickListener {
-            val state = RpnProxyManager.RpnState.fromId(persistentState.rpnState)
-            if (state.isPaused()) {
-                RpnProxyManager.activateRpn()
-                b.pausePlus.text = getString(R.string.pause_rethink_plus_title)
-            } else {
-                RpnProxyManager.pauseRpn()
-                b.pausePlus.text = getString(R.string.resume_rethink_plus_title)
-            }
         }
     }
 

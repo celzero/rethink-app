@@ -16,6 +16,7 @@ class RpnProxy {
     var misc: String = "" // can be empty
     var tunId: String = "" // id assigned while adding the proxy to the tunnel, can be empty
     var latency: Int = 0
+    var lastRefreshTime: Long = 0L // last time the proxy was refreshed
 
     override fun equals(other: Any?): Boolean {
         if (other !is RpnProxy) return false
@@ -42,7 +43,8 @@ class RpnProxy {
             modifiedTs = this.modifiedTs,
             misc = this.misc,
             tunId = this.tunId,
-            latency = this.latency
+            latency = this.latency,
+            lastRefreshTime = System.currentTimeMillis()
         )
     }
 
@@ -57,7 +59,8 @@ class RpnProxy {
         modifiedTs: Long,
         misc: String,
         tunId: String,
-        latency: Int
+        latency: Int,
+        lastRefreshTime: Long
     ) {
         // Room auto-increments id when its set to zero.
         // A non-zero id overrides and sets caller-specified id instead.
@@ -72,5 +75,6 @@ class RpnProxy {
         this.misc = misc
         this.tunId = tunId
         this.latency = latency
+        this.lastRefreshTime = lastRefreshTime
     }
 }

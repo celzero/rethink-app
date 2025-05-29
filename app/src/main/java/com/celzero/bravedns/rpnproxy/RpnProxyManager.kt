@@ -18,7 +18,7 @@ package com.celzero.bravedns.rpnproxy
 import Logger
 import Logger.LOG_TAG_PROXY
 import android.content.Context
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.database.RpnProxy
 import com.celzero.bravedns.database.RpnProxyRepository
 import com.celzero.bravedns.scheduler.WorkScheduler
@@ -41,9 +41,11 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import com.celzero.firestack.settings.Settings
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.CopyOnWriteArraySet
 
 object RpnProxyManager : KoinComponent {
 
@@ -58,7 +60,7 @@ object RpnProxyManager : KoinComponent {
     // warp primary and secondary config names, ids and file names
     const val WARP_ID = 1
     const val WARP_NAME = "WARP"
-    const val WARP_FILE_NAME = "wg1.conf"
+    const val WARP_FILE_NAME = "warp.conf"
     private const val WARP_RESPONSE_FILE_NAME = "warp_response.json"
 
     private const val AMZ_ID = 2
@@ -67,7 +69,7 @@ object RpnProxyManager : KoinComponent {
     private const val AMZ_RESPONSE_FILE_NAME = "amz_response.json"
 
     private const val PROTON_ID = 3
-    private const val PROTON = "PROTON"
+    private const val PROTON_NAME = "PROTON"
     private const val PROTON_FILE_NAME = "proton.conf"
     private const val PROTON_RESPONSE_FILE_NAME = "proton_response.json"
 
@@ -75,11 +77,32 @@ object RpnProxyManager : KoinComponent {
     private var amzConfig: Config? = null
     private var protonConfig: ProtonConfig? = null
 
+    private val rpnProxies = CopyOnWriteArraySet<RpnProxy>()
+
     private val selectedCountries = mutableSetOf<String>()
+
+    enum class RpnTunMode(val id: Int) {
+        NONE(Settings.AutoModeLocal),
+        ANTI_CENSORSHIP(Settings.AutoModeHybrid),
+        HIDE_IP(Settings.AutoModeRemote);
+
+        companion object {
+            fun fromId(id: Int) = entries.first { it.id == id }
+
+            fun getTunModeForAuto(): Int {
+                return when (rpnMode()) {
+                    RpnMode.NONE -> NONE.id
+                    RpnMode.ANTI_CENSORSHIP -> ANTI_CENSORSHIP.id
+                    RpnMode.HIDE_IP -> HIDE_IP.id
+                }
+            }
+        }
+    }
 
     enum class RpnMode(val id: Int, val value: String) {
         ANTI_CENSORSHIP(1, Backend.Auto),
-        HIDE_IP(2, Backend.Auto);
+        HIDE_IP(2, Backend.Auto),
+        NONE(0, "");
 
         companion object {
             fun fromId(id: Int) = RpnMode.entries.first { it.id == id }
@@ -88,6 +111,8 @@ object RpnProxyManager : KoinComponent {
         fun isAntiCensorship() = this == ANTI_CENSORSHIP
 
         fun isHideIp() = this == HIDE_IP
+
+        fun isNone() = this == NONE
     }
 
     enum class RpnState(val id: Int) {
@@ -111,15 +136,23 @@ object RpnProxyManager : KoinComponent {
     fun rpnState() = RpnState.fromId(persistentState.rpnState)
 
     fun deactivateRpn() {
+        if (persistentState.rpnState == RpnState.INACTIVE.id) {
+            Logger.i(LOG_TAG_PROXY, "$TAG; rpn already deactivated, skipping")
+            return
+        }
         persistentState.rpnState = RpnState.INACTIVE.id
+        persistentState.showConfettiOnRPlus = true
+        Logger.i(LOG_TAG_PROXY, "$TAG; rpn deactivated")
     }
 
     fun activateRpn() {
+        if (persistentState.rpnState == RpnState.ACTIVE.id) {
+            Logger.i(LOG_TAG_PROXY, "$TAG; rpn already activated, skipping")
+            return
+        }
         persistentState.rpnState = RpnState.ACTIVE.id
-    }
-
-    fun pauseRpn() {
-        persistentState.rpnState = RpnState.PAUSED.id
+        persistentState.showConfettiOnRPlus = false
+        Logger.i(LOG_TAG_PROXY, "$TAG; rpn activated, mode: ${rpnMode().value}")
     }
 
     enum class RpnType(val id: Int) {
@@ -156,9 +189,10 @@ object RpnProxyManager : KoinComponent {
         // need to read the filepath from database and load the file
         // there will be an entry in the database for each RPN proxy
         selectedCountries.clear()
-        val rpnProxies = db.getAllProxies()
-        Logger.i(LOG_TAG_PROXY, "$TAG; init load, db size: ${rpnProxies.size}")
-        rpnProxies.forEach {
+        val rp = db.getAllProxies()
+        Logger.i(LOG_TAG_PROXY, "$TAG; init load, db size: ${rp.size}")
+        rpnProxies.addAll(rp)
+        rp.forEach {
             try {
                 val cfgFile = File(it.configPath)
                 if (!cfgFile.exists()) {
@@ -202,7 +236,22 @@ object RpnProxyManager : KoinComponent {
             LOG_TAG_PROXY,
             "$TAG; total selected countries: ${selectedCountries.size}, $selectedCountries"
         )
-        return rpnProxies.size
+        return rp.size
+    }
+
+    fun getProxy(type: RpnType): RpnProxy? {
+        return when (type) {
+            RpnType.WARP -> {
+                rpnProxies.find { it.name == WARP_NAME || it.name == WARP_NAME.lowercase() }
+            }
+            RpnType.AMZ -> {
+                rpnProxies.find { it.name == AMZ_NAME || it.name == AMZ_NAME.lowercase() }
+            }
+            RpnType.PROTON -> {
+                rpnProxies.find { it.name == PROTON_NAME || it.name == PROTON_NAME.lowercase()}
+            }
+            else -> null
+        }
     }
 
     suspend fun getNewProtonConfig(): ProtonConfig? {
@@ -451,7 +500,7 @@ object RpnProxyManager : KoinComponent {
             val rpnpro = db.getProxyById(PROTON_ID)
             val rpnProxy = RpnProxy(
                 id = PROTON_ID,
-                name = PROTON,
+                name = PROTON_NAME,
                 configPath = protonConfigFile.absolutePath,
                 serverResPath = serverResFile.absolutePath ?: "",
                 isActive = rpnpro?.isActive ?: false,
@@ -460,7 +509,8 @@ object RpnProxyManager : KoinComponent {
                 modifiedTs = System.currentTimeMillis(),
                 misc = rpnpro?.misc ?: "",
                 tunId = rpnpro?.tunId ?: "",
-                latency = rpnpro?.latency ?: 0
+                latency = rpnpro?.latency ?: 0,
+                lastRefreshTime = System.currentTimeMillis()
             )
             val l = db.insert(rpnProxy)
             Logger.d(LOG_TAG_PROXY, "$TAG; proton config saved in db? ${l > 0}")
@@ -501,7 +551,7 @@ object RpnProxyManager : KoinComponent {
                 File.separator +
                 RPN_PROXY_FOLDER_NAME +
                 File.separator +
-                PROTON.lowercase() +
+                PROTON_NAME.lowercase() +
                 File.separator
     }
 
@@ -576,7 +626,8 @@ object RpnProxyManager : KoinComponent {
                 modifiedTs = System.currentTimeMillis(),
                 misc = prev?.misc ?: "",
                 tunId = prev?.tunId ?: "",
-                latency = prev?.latency ?: 0
+                latency = prev?.latency ?: 0,
+                lastRefreshTime = System.currentTimeMillis()
             )
             val l = db.insert(rpnProxy)
             Logger.d(LOG_TAG_PROXY, "$TAG; config saved in db? ${l > 0}")

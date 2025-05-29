@@ -39,7 +39,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityRethinkPlusDashboardBinding
@@ -50,8 +50,10 @@ import com.celzero.bravedns.scheduler.BugReportZipper.getZipFileName
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -122,16 +124,25 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
             RpnProxyManager.RpnMode.ANTI_CENSORSHIP -> {
                 b.rsAntiCensorshipRadio.isChecked = true
                 b.rsHideIpRadio.isChecked = false
+                b.rsOffRadio.isChecked = false
             }
 
             RpnProxyManager.RpnMode.HIDE_IP -> {
                 b.rsAntiCensorshipRadio.isChecked = false
                 b.rsHideIpRadio.isChecked = true
+                b.rsOffRadio.isChecked = false
+            }
+
+            RpnProxyManager.RpnMode.NONE -> {
+                b.rsAntiCensorshipRadio.isChecked = false
+                b.rsHideIpRadio.isChecked = false
+                b.rsOffRadio.isChecked = true
             }
         }
     }
 
     private fun addProxiesToUi() {
+        val mode = RpnProxyManager.rpnMode()
         ui {
             for (option in options) {
                 val rowView =
@@ -142,9 +153,13 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
                     )
                 val iv = rowView.findViewById<AppCompatImageView>(R.id.icon)
                 val title = rowView.findViewById<AppCompatTextView>(R.id.title)
-                val refreshIv = rowView.findViewById<AppCompatImageView>(R.id.refresh)
+                // treat refreshTv as a button
+                val refreshTv = rowView.findViewById<AppCompatTextView>(R.id.last_refresh_time_tv)
+                val refreshIv = rowView.findViewById<AppCompatImageView>(R.id.refresh_icon)
+                val lastRefreshLabel = rowView.findViewById<AppCompatTextView>(R.id.last_refresh_time_label)
                 val infoIv = rowView.findViewById<AppCompatImageView>(R.id.info)
                 val statusTv = rowView.findViewById<AppCompatTextView>(R.id.status)
+                val whoTv = rowView.findViewById<AppCompatTextView>(R.id.who)
 
                 b.proxyContainer.addView(rowView)
                 val id = options.indexOf(option)
@@ -153,7 +168,9 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
                     iv,
                     title,
                     infoIv,
-                    statusTv
+                    statusTv,
+                    lastRefreshLabel,
+                    whoTv
                 )
 
                 val type = getType(id)
@@ -162,18 +179,52 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
                     return@ui
                 }
 
-                refreshIv.setOnClickListener {
-                    handleRefreshUi(type, refreshIv)
+                refreshTv.setOnClickListener {
+                    if (!canRefresh(type)) {
+                        Logger.w(LOG_TAG_UI, "$TAG refresh clicked but not allowed")
+                        showToastUiCentered(this, "Refresh can be done only once in 24 hours", Toast.LENGTH_SHORT)
+                        return@setOnClickListener
+                    }
+                    handleRefreshUi(type, refreshIv, refreshTv)
                     ui {
-                        updateProxiesUi(id, iv, title, infoIv, statusTv)
+                        updateProxiesUi(id, iv, title, infoIv, statusTv, lastRefreshLabel, whoTv)
                     }
                 }
-
             }
+            // do not update the UI if RPN is off
+            if (mode.isNone()) {
+                return@ui
+            }
+
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 // your repeating logic
                 keepUpdatingProxiesUi()
-                Logger.i(LOG_TAG_UI, "$TAG keepUpdatingProxiesUi started")
+            }
+        }
+    }
+
+    private fun canRefresh(type: RpnProxyManager.RpnType): Boolean {
+        val proxyDetail = RpnProxyManager.getProxy(type)
+        if (proxyDetail == null) {
+            Logger.w(LOG_TAG_UI, "$TAG proxy detail is null")
+            return true
+        }
+        val lastRefreshTime = proxyDetail.lastRefreshTime
+        val currentTime = System.currentTimeMillis()
+        val diff = currentTime - lastRefreshTime
+        val diffInHours = diff / (1000 * 60 * 60)
+        if (diffInHours < 24) {
+            Logger.w(LOG_TAG_UI, "$TAG refresh can be done only once in 24 hours")
+            return false
+        }
+        return true
+    }
+
+    private fun reinitiateProxiesUi() {
+        ui {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                // your repeating logic
+                keepUpdatingProxiesUi()
             }
         }
     }
@@ -186,14 +237,19 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
                 val title = b.proxyContainer.getChildAt(i).findViewById<AppCompatTextView>(R.id.title)
                 val infoIv = b.proxyContainer.getChildAt(i).findViewById<AppCompatImageView>(R.id.info)
                 val statusTv = b.proxyContainer.getChildAt(i).findViewById<AppCompatTextView>(R.id.status)
+                val whoTv = b.proxyContainer.getChildAt(i).findViewById<AppCompatTextView>(R.id.who)
+                val lastRefreshLabel = b.proxyContainer.getChildAt(i).findViewById<AppCompatTextView>(R.id.last_refresh_time_label)
 
-                updateProxiesUi(i, iv, title, infoIv, statusTv)
-                Logger.vv(LOG_TAG_UI, "$TAG updating proxies UI for ${options[i]}")
+                updateProxiesUi(i, iv, title, infoIv, statusTv, lastRefreshLabel, whoTv)
             }
             Logger.v(LOG_TAG_UI, "$TAG updating proxies UI every $DELAY ms")
             delay(DELAY)
             if (isFinishing || isDestroyed) {
                 Logger.v(LOG_TAG_UI, "$TAG activity is finishing, stopping update")
+                break
+            }
+            if (!RpnProxyManager.rpnState().isActive()) {
+                Logger.v(LOG_TAG_UI, "$TAG RPN is not active, stopping update")
                 break
             }
         }
@@ -204,12 +260,20 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
         iv: AppCompatImageView,
         title: AppCompatTextView,
         infoIv: AppCompatImageView,
-        statusTv: AppCompatTextView
+        statusTv: AppCompatTextView,
+        lastRefreshLabel: AppCompatTextView,
+        whoTv: AppCompatTextView
     ) {
         val type = getType(id) ?: return // should never happen
 
         title.text = options[id]
         iv.setImageDrawable(ContextCompat.getDrawable(this, getDrawable(type)))
+
+        if (RpnProxyManager.rpnMode().isNone()) {
+            statusTv.text = getString(R.string.lbl_disabled)
+            statusTv.setTextColor(this, false)
+            return
+        }
 
         var res: Pair<RpnProxyManager.RpnProps?, String?>? = null
         ioCtx {
@@ -224,15 +288,51 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
         if (props == null) {
             infoIv.visibility = View.GONE
             statusTv.text = errMsg
+            whoTv.text = "--"
+            lastRefreshLabel.text = "NA"
             return
         }
 
         setProps(type, props)
         setStatus(props.status, statusTv)
+        updateLastRefreshTime(type, lastRefreshLabel)
+        if (props.who.isEmpty()) {
+            whoTv.text = "--"
+        } else {
+            whoTv.text = props.who
+        }
 
         infoIv.setOnClickListener {
             showInfoDialog(type, props)
         }
+    }
+
+    private fun updateLastRefreshTime(type: RpnProxyManager.RpnType, lastRefreshTv: AppCompatTextView) {
+        when (type) {
+            RpnProxyManager.RpnType.WARP -> {
+                val warp = RpnProxyManager.getProxy(type)
+                lastRefreshTv.text = if (warp == null) "NA" else getTime(warp.lastRefreshTime)
+            }
+            RpnProxyManager.RpnType.AMZ -> {
+                val amz = RpnProxyManager.getProxy(type)
+                lastRefreshTv.text = if (amz == null) "NA" else getTime(amz.lastRefreshTime)
+            }
+            RpnProxyManager.RpnType.PROTON -> {
+                val proton = RpnProxyManager.getProxy(type)
+                lastRefreshTv.text = if (proton == null) "NA" else getTime(proton.lastRefreshTime)
+            }
+            RpnProxyManager.RpnType.SE -> {
+                lastRefreshTv.text = "NA"
+            }
+            RpnProxyManager.RpnType.EXIT_64 -> {
+                lastRefreshTv.text = "NA"
+            }
+            RpnProxyManager.RpnType.EXIT -> {} // not used in the UI
+        }
+    }
+
+    private fun getTime(time: Long): String {
+        return Utilities.convertLongToTime(time, Constants.TIME_FORMAT_4)
     }
 
     private fun setProps(type: RpnProxyManager.RpnType, props: RpnProxyManager.RpnProps) {
@@ -270,10 +370,12 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
         }
     }
 
-    private fun handleRefreshUi(type: RpnProxyManager.RpnType, refreshIv: AppCompatImageView) {
+    private fun handleRefreshUi(type: RpnProxyManager.RpnType, refreshIv: AppCompatImageView, refreshTv: AppCompatTextView) {
         Logger.v(LOG_TAG_UI, "$TAG ${type.name} refresh clicked")
         io {
             uiCtx {
+                refreshTv.visibility = View.GONE
+                refreshIv.visibility = View.VISIBLE
                 refreshIv.isEnabled = false
                 refreshIv.animation = animation
                 refreshIv.startAnimation(animation)
@@ -282,6 +384,8 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
             uiCtx {
                 refreshIv.clearAnimation()
                 refreshIv.isEnabled = true
+                refreshIv.visibility = View.GONE
+                refreshTv.visibility = View.VISIBLE
             }
         }
     }
@@ -297,6 +401,18 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
     }
 
     private fun setupClickListeners() {
+
+        b.rsOffRl.setOnClickListener {
+            val checked = b.rsOffRadio.isChecked
+            if (!checked) {
+                b.rsOffRadio.isChecked = true
+            }
+            handleRPlusOff(checked)
+        }
+
+        b.rsOffRadio.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
+            handleRPlusOff(checked)
+        }
 
         b.rsAntiCensorshipRl.setOnClickListener {
             val checked = b.rsAntiCensorshipRadio.isChecked
@@ -337,8 +453,10 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
         if (!checked) return
 
         b.rsHideIpRadio.isChecked = false
+        b.rsOffRadio.isChecked = false
         persistentState.rpnMode = RpnProxyManager.RpnMode.ANTI_CENSORSHIP.id
-        Logger.i(LOG_TAG_UI, "$TAG Anti-censorship selected, state: ${persistentState.rpnMode}")
+        reinitiateProxiesUi()
+        Logger.i(LOG_TAG_UI, "$TAG Anti-censorship selected, mode: ${persistentState.rpnMode}, state: ${persistentState.rpnState}")
     }
 
     private fun handleHideIpMode(checked: Boolean) {
@@ -346,8 +464,21 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
         if (!checked) return
 
         b.rsAntiCensorshipRadio.isChecked = false
+        b.rsOffRadio.isChecked = false
         persistentState.rpnMode = RpnProxyManager.RpnMode.HIDE_IP.id
-        Logger.i(LOG_TAG_UI, "$TAG Hide IP selected, state: ${persistentState.rpnMode}")
+        reinitiateProxiesUi()
+        Logger.i(LOG_TAG_UI, "$TAG Hide IP selected, mode: ${persistentState.rpnMode}, state: ${persistentState.rpnState}")
+    }
+
+    private fun handleRPlusOff(checked: Boolean) {
+        Logger.v(LOG_TAG_UI, "$TAG Off mode selected? $checked")
+        if (!checked) return
+
+        b.rsHideIpRadio.isChecked = false
+        b.rsAntiCensorshipRadio.isChecked = false
+        persistentState.rpnMode = RpnProxyManager.RpnMode.NONE.id
+        reinitiateProxiesUi()
+        Logger.i(LOG_TAG_UI, "$TAG off mode selected, mode: ${persistentState.rpnMode}, state: ${persistentState.rpnState}")
     }
 
     private fun showInfoDialog(type: RpnProxyManager.RpnType,prop: RpnProxyManager.RpnProps) {
@@ -558,19 +689,6 @@ class RethinkPlusDashboardActivity : AppCompatActivity(R.layout.activity_rethink
                 showTroubleshootDialog(title, stats)
             }
         }
-
-        // get system info
-        // get dns info
-        // get protocol info
-        // get builder info
-        // get rpn info
-        // val appMode = appConfig.getBraveMode()
-        // dns : appConfig.getDnsType().name
-        // selected ip version : appConfig.getInternetProtocol().name
-        // appConfig.getProxyProvider(), appConfig.getProxyType()
-        // dump shared pref?
-        // get info from vpn adapter
-        // get rpn info
     }
 
     private fun AppCompatTextView.setTextColor(context: Context, success: Boolean) {

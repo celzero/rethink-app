@@ -11,67 +11,108 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="10dp"
-        android:src="@drawable/ic_wireguard_icon" />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/ic_wireguard_icon" />
 
-    <LinearLayout
-        android:id="@+id/title_ll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_toEndOf="@id/icon"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        <LinearLayout
+            android:id="@+id/title_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_toEndOf="@id/icon"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/info"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_info"
+                app:tint="?attr/primaryTextColor" />
+        </LinearLayout>
+
+        <!-- Status Chip -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title_ll"
+            android:layout_toEndOf="@id/icon"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/small_font_subheading_text" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/title"
-            android:layout_width="0dp"
+            android:id="@+id/who"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="8dp"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/large_font_text_view"
-            android:textStyle="bold" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/refresh"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_below="@id/status"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_refresh_white"
-            android:visibility="visible" />
+            android:layout_toEndOf="@id/icon"
+            android:text="@string/ac_title"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/small_font_subheading_text" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/info"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/ic_info"
-            app:tint="?attr/primaryTextColor" />
-    </LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/who"
+            android:layout_toEndOf="@id/icon"
+            android:gravity="center">
 
-    <!-- Status Chip -->
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/title_ll"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_toEndOf="@id/icon"
-        android:background="@drawable/rectangle_border_background"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="4dp"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/small_font_subheading_text" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/last_refresh_time_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_toStartOf="@id/last_refresh_time_tv"
+                android:text="@string/refresh_complete"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/small_font_subheading_text" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/last_refresh_time_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/rectangle_border_background"
+                android:drawablePadding="5dp"
+                android:padding="5dp"
+                android:text="Refresh identity" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/refresh_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/last_refresh_time_tv"
+                android:src="@drawable/ic_refresh_white"
+                android:tint="?attr/primaryTextColor"
+                android:visibility="gone" />
+        </RelativeLayout>
 
     </RelativeLayout>
 
