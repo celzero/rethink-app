@@ -23,7 +23,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingData
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -31,7 +30,6 @@ import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ActivityDetailedStatisticsBinding
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
 import com.celzero.bravedns.util.CustomLinearLayoutManager
@@ -39,9 +37,6 @@ import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.viewmodel.DetailedStatisticsViewModel
 import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -82,11 +77,16 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
             SummaryStatisticsViewModel.TimeCategory.fromValue(tc)
                 ?: SummaryStatisticsViewModel.TimeCategory.ONE_HOUR
         val statType = SummaryStatisticsFragment.SummaryStatisticsType.getType(type)
-        setSubTitle(timeCategory)
+        setSubTitle(statType, timeCategory)
         setRecyclerView(statType, timeCategory)
     }
 
-    private fun setSubTitle(timeCategory: SummaryStatisticsViewModel.TimeCategory) {
+    private fun setSubTitle(type: SummaryStatisticsFragment.SummaryStatisticsType, timeCategory: SummaryStatisticsViewModel.TimeCategory) {
+        if (type == SummaryStatisticsFragment.SummaryStatisticsType.TOP_ACTIVE_CONNS) {
+            b.dsaSubtitle.visibility = View.GONE
+            return
+        }
+
         b.dsaSubtitle.text =
             when (timeCategory) {
                 SummaryStatisticsViewModel.TimeCategory.ONE_HOUR -> {
@@ -154,6 +154,10 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
     ): LiveData<PagingData<AppConnection>> {
         viewModel.setData(type)
         return when (type) {
+            SummaryStatisticsFragment.SummaryStatisticsType.TOP_ACTIVE_CONNS -> {
+                b.dsaTitle.text = getString(R.string.top_active_conns)
+                viewModel.getAllActiveConns
+            }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_APPS -> {
                 b.dsaTitle.text = getString(R.string.ssv_app_network_activity_heading)
                 viewModel.getAllAllowedAppNetworkActivity
@@ -191,13 +195,5 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
                 viewModel.getAllContactedCountries
             }
         }
-    }
-
-    private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch(Dispatchers.IO) { f() }
-    }
-
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
     }
 }

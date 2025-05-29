@@ -41,7 +41,8 @@ class AppWiseDomainsAdapter(
     val context: Context,
     val lifecycleOwner: LifecycleOwner,
     val uid: Int,
-    val isRethink: Boolean
+    val isRethink: Boolean,
+    val isActiveConn: Boolean = false
 ) :
     PagingDataAdapter<AppConnection, AppWiseDomainsAdapter.ConnectionDetailsViewHolder>(
         DIFF_CALLBACK
@@ -146,6 +147,12 @@ class AppWiseDomainsAdapter(
             }
 
             if (isRethink) {
+                Logger.i(LOG_TAG_UI, "$TAG rethink connection - no bottom sheet")
+                return
+            }
+
+            if (isActiveConn) {
+                Logger.i(LOG_TAG_UI, "$TAG active connection - no bottom sheet")
                 return
             }
 

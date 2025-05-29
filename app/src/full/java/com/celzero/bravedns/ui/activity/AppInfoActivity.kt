@@ -155,6 +155,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                     setRethinkIpLogsAdapter()
                 } else {
                     updateFirewallStatusUi(appStatus, connStatus)
+                    setActiveConnsAdapter()
                     setDomainsAdapter()
                     setIpAdapter()
                 }
@@ -430,6 +431,27 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         startActivity(intent)
     }
 
+    private fun setActiveConnsAdapter() {
+        val layoutManager = LinearLayoutManager(this)
+        b.aadActiveConnsRv.layoutManager = layoutManager
+        val adapter = AppWiseDomainsAdapter(this, this, uid, isRethinkApp, true)
+        val uptime = VpnController.uptimeMs()
+        networkLogsViewModel.fetchActiveConnections(uid, uptime).observe(this) {
+            adapter.submitData(this.lifecycle, it)
+        }
+        b.aadActiveConnsRv.adapter = adapter
+
+        adapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (adapter.itemCount >= 1) {
+                    b.aadActiveConnsRl.visibility = View.VISIBLE
+                } else {
+                    b.aadActiveConnsRl.visibility = View.GONE
+                }
+            }
+        }
+    }
+
     private fun setDomainsAdapter() {
         val layoutManager = LinearLayoutManager(this)
         b.aadMostContactedDomainRv.layoutManager = layoutManager
@@ -662,14 +684,6 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
         setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsIsolate)
         setDrawable(R.drawable.ic_bypass_dns_firewall_off, b.aadAppSettingsBypassDnsFirewall)
-    }
-
-    private fun disableFirewallStatusUi() {
-        setDrawable(R.drawable.ic_firewall_bypass_off, b.aadAppSettingsBypassUniv)
-        setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
-        setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsIsolate)
-        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
-        setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
     }
 
     private fun enableIsolateUi() {

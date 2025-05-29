@@ -170,6 +170,22 @@ class SummaryStatisticsAdapter(
         private suspend fun setIcon(appConnection: AppConnection) {
 
             when (type) {
+                SummaryStatisticsType.TOP_ACTIVE_CONNS -> {
+                    io {
+                        val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
+                        uiCtx {
+                            itemBinding.ssIcon.visibility = View.VISIBLE
+                            itemBinding.ssFlag.visibility = View.GONE
+                            loadAppIcon(
+                                Utilities.getIcon(
+                                    context,
+                                    appInfo?.packageName ?: "",
+                                    appInfo?.appName ?: ""
+                                )
+                            )
+                        }
+                    }
+                }
                 SummaryStatisticsType.MOST_CONNECTED_APPS -> {
                     io {
                         val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
@@ -283,6 +299,16 @@ class SummaryStatisticsAdapter(
 
         private fun setName(appConnection: AppConnection) {
             when (type) {
+                SummaryStatisticsType.TOP_ACTIVE_CONNS -> {
+                    io {
+                        val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
+                        uiCtx {
+                            val appName = getAppName(appConnection, appInfo)
+                            itemBinding.ssDataUsage.visibility = View.VISIBLE
+                            itemBinding.ssDataUsage.text = appName
+                        }
+                    }
+                }
                 SummaryStatisticsType.MOST_CONNECTED_APPS -> {
                     io {
                         val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
@@ -402,6 +428,9 @@ class SummaryStatisticsAdapter(
         private fun setupClickListeners(appConnection: AppConnection) {
             itemBinding.ssContainer.setOnClickListener {
                 when (type) {
+                    SummaryStatisticsType.TOP_ACTIVE_CONNS -> {
+                        startAppInfoActivity(appConnection)
+                    }
                     SummaryStatisticsType.MOST_CONNECTED_APPS -> {
                         startAppInfoActivity(appConnection)
                     }

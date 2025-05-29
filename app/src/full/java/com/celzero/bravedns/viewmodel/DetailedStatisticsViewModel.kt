@@ -25,6 +25,7 @@ import androidx.paging.cachedIn
 import androidx.paging.liveData
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.StatsSummaryDao
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
 import com.celzero.bravedns.util.Constants
 
@@ -32,6 +33,7 @@ class DetailedStatisticsViewModel(
     private val connectionTrackerDAO: ConnectionTrackerDAO,
     private val statsDao: StatsSummaryDao
 ) : ViewModel() {
+    private var allActiveConns: MutableLiveData<Long> = MutableLiveData()
     private var allowedNetworkActivity: MutableLiveData<String> = MutableLiveData()
     private var blockedNetworkActivity: MutableLiveData<String> = MutableLiveData()
     private var allowedAsn: MutableLiveData<String> = MutableLiveData()
@@ -51,6 +53,9 @@ class DetailedStatisticsViewModel(
 
     fun setData(type: SummaryStatisticsFragment.SummaryStatisticsType) {
         when (type) {
+            SummaryStatisticsFragment.SummaryStatisticsType.TOP_ACTIVE_CONNS -> {
+                allActiveConns.value = VpnController.uptimeMs()
+            }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_APPS -> {
                 allowedNetworkActivity.value = ""
             }
@@ -94,6 +99,16 @@ class DetailedStatisticsViewModel(
             }
         }
     }
+
+    val getAllActiveConns =
+        allActiveConns.switchMap { it ->
+            val to = System.currentTimeMillis() - it
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    statsDao.getAllActiveConns(to)
+                }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
 
     val getAllAllowedAppNetworkActivity =
         allowedNetworkActivity.switchMap { _ ->

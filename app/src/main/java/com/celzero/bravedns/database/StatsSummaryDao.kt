@@ -166,6 +166,88 @@ interface StatsSummaryDao {
     )
     fun getAsnBlockedDetails(asn: String, to: Long): PagingSource<Int, AppConnection>
 
+
+    @Query(
+        """
+            SELECT uid as uid, 
+              '' as ipAddress,
+              0 as port,
+              COUNT(*) as count,
+              0 as blocked, 
+              '' as flag,
+              appName as appOrDnsName,
+              0 as downloadBytes,
+              0 as uploadBytes,
+              0 as totalBytes
+            FROM ConnectionTracker
+            where downloadBytes = 0
+            and uploadBytes = 0
+            and isBlocked = 0
+            and duration = 0
+            and synack = 0
+            and message = ''
+            and timeStamp > :to
+            GROUP BY appName
+            ORDER BY count DESC
+            LIMIT 7
+        """
+    )
+    fun getTopActiveConns(to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+            """
+                SELECT uid as uid, 
+                  '' as ipAddress,
+                  0 as port,
+                  COUNT(*) as count,
+                  0 as blocked, 
+                  '' as flag,
+                  appName as appOrDnsName,
+                  0 as downloadBytes,
+                  0 as uploadBytes,
+                  0 as totalBytes
+                FROM ConnectionTracker
+                where downloadBytes = 0
+                and uploadBytes = 0
+                and isBlocked = 0
+                and duration = 0
+                and synack = 0
+                and message = ''
+                and timeStamp > :to
+                GROUP BY appName
+                ORDER BY count DESC
+            """
+        )
+        fun getAllActiveConns(to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+                SELECT uid as uid, 
+                  '' as ipAddress,
+                  0 as port,
+                  COUNT(*) as count,
+                  0 as blocked, 
+                  flag as flag,
+                  dnsQuery as appOrDnsName,
+                  0 as downloadBytes,
+                  0 as uploadBytes,
+                  0 as totalBytes
+                FROM ConnectionTracker
+                where downloadBytes = 0
+                and uploadBytes = 0
+                and isBlocked = 0
+                and duration = 0
+                and synack = 0
+                and message = ''
+                and uid = :uid
+                and timeStamp > :to
+                GROUP BY dnsQuery
+                ORDER BY count DESC
+                LIMIT 3
+            """
+    )
+    fun getTopActiveConns(uid: Int, to: Long): PagingSource<Int, AppConnection>
+
     @Query(
         """
             SELECT uid AS uid, 

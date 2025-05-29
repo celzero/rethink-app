@@ -19,6 +19,8 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -28,6 +30,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.DataUsageSummary
 import com.celzero.bravedns.databinding.FragmentSummaryStatisticsBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.ui.activity.DetailedStatisticsActivity
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.UIUtils
@@ -49,11 +52,14 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     private val persistentState by inject<PersistentState>()
 
     private var isVpnActive: Boolean = false
+    private var loadMoreClicked: Boolean = false
 
     private var contactedDomainsAdapter: SummaryStatisticsAdapter? = null
     private var contactedAsnAdapter: SummaryStatisticsAdapter? = null
     private var blockedAsnAdapter: SummaryStatisticsAdapter? = null
     private var contactedCountriesAdapter: SummaryStatisticsAdapter? = null
+
+    private lateinit var animation: Animation
 
     enum class SummaryStatisticsType(val tid: Int) {
         MOST_CONNECTED_APPS(0),
@@ -64,7 +70,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         MOST_CONTACTED_COUNTRIES(5),
         MOST_BLOCKED_DOMAINS(6),
         MOST_CONTACTED_IPS(7),
-        MOST_BLOCKED_IPS(8);
+        MOST_BLOCKED_IPS(8),
+        TOP_ACTIVE_CONNS(9);
 
         companion object {
             fun getType(t: Int): SummaryStatisticsType {
@@ -78,6 +85,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                     MOST_CONTACTED_COUNTRIES.tid -> MOST_CONTACTED_COUNTRIES
                     MOST_CONTACTED_IPS.tid -> MOST_CONTACTED_IPS
                     MOST_BLOCKED_IPS.tid -> MOST_BLOCKED_IPS
+                    TOP_ACTIVE_CONNS.tid -> TOP_ACTIVE_CONNS
                     // make most contacted apps as default
                     else -> MOST_CONNECTED_APPS
                 }
@@ -97,17 +105,14 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun initView() {
+        addAnimation()
         setTabbedViewTxt()
         highlightToggleBtn()
+        showTopActiveApps()
         showAppNetworkActivity()
         showBlockedApps()
         showMostConnectedASN()
         showMostBlockedASN()
-        showMostContactedDomain()
-        showMostBlockedDomains()
-        showMostContactedIps()
-        showMostBlockedIps()
-        showMostContactedCountries()
     }
 
     private fun setTabbedViewTxt() {
@@ -192,8 +197,14 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun initClickListeners() {
+        b.loadMoreTv.setOnClickListener {
+            showLoadMoreProgress(!loadMoreClicked)
+         }
         b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
 
+        b.fssActiveAppsChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.TOP_ACTIVE_CONNS)
+        }
         b.fssAppInfoChip.setOnClickListener {
             openDetailedStatsUi(SummaryStatisticsType.MOST_CONNECTED_APPS)
         }
@@ -262,6 +273,54 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             )
     }
 
+    private fun handleLoadMore(isClicked: Boolean) {
+        viewModel.setLoadMoreClicked(isClicked)
+        if (!isClicked) {
+            return
+        }
+        showMostContactedDomain()
+        showMostBlockedDomains()
+        showMostContactedIps()
+        showMostBlockedIps()
+        showMostContactedCountries()
+    }
+
+    private fun showLoadMoreProgress(isClicked: Boolean) {
+        if (isClicked) {
+            b.loadMoreTv.isEnabled = false
+            b.loadProgressBar.animation = animation
+            b.loadProgressBar.startAnimation(animation)
+            Utilities.delay(LOAD_MORE_TIMEOUT, lifecycleScope) {
+                if (this.isAdded) {
+                    b.loadProgressBar.clearAnimation()
+                    b.loadProgressBar.visibility = View.GONE
+                    b.loadMoreLl.visibility = View.GONE
+                }
+            }
+            b.loadProgressBar.visibility = View.VISIBLE
+            b.loadMoreTv.visibility = View.GONE
+        } else {
+            b.loadMoreLl.visibility = View.VISIBLE
+            b.loadMoreTv.visibility = View.VISIBLE
+            b.loadProgressBar.visibility = View.GONE
+        }
+        loadMoreClicked = isClicked
+        handleLoadMore(isClicked)
+    }
+
+    private fun addAnimation() {
+        animation =
+            RotateAnimation(ANIMATION_START_DEGREE,
+                ANIMATION_END_DEGREE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE
+            )
+        animation.repeatCount = ANIMATION_REPEAT_COUNT
+        animation.duration = ANIMATION_DURATION
+    }
+
     private fun openDetailedStatsUi(type: SummaryStatisticsType) {
         val mb = b.toggleGroup.checkedButtonId
         val timeCategory =
@@ -280,6 +339,48 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         fun newInstance() = SummaryStatisticsFragment()
 
         private const val RECYCLER_ITEM_VIEW_HEIGHT = 480
+        private const val ANIMATION_DURATION = 750L
+        private const val ANIMATION_REPEAT_COUNT = -1
+        private const val ANIMATION_PIVOT_VALUE = 0.5f
+        private const val ANIMATION_START_DEGREE = 0.0f
+        private const val ANIMATION_END_DEGREE = 360.0f
+
+        private const val LOAD_MORE_TIMEOUT: Long = 1000
+    }
+
+    private fun showTopActiveApps() {
+        b.fssActiveAppsRecyclerView.setHasFixedSize(true)
+        val layoutManager = CustomLinearLayoutManager(requireContext())
+        b.fssActiveAppsRecyclerView.layoutManager = layoutManager
+
+        val recyclerAdapter =
+            SummaryStatisticsAdapter(
+                requireContext(),
+                persistentState,
+                appConfig,
+                SummaryStatisticsType.TOP_ACTIVE_CONNS
+            )
+
+        viewModel.getTopActiveConns.observe(viewLifecycleOwner) {
+            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        }
+
+        recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    b.fssActiveAppsLl.visibility = View.GONE
+                } else {
+                    b.fssActiveAppsLl.visibility = View.VISIBLE
+                }
+            } else {
+                b.fssActiveAppsLl.visibility = View.VISIBLE
+            }
+        }
+
+        val scale = resources.displayMetrics.density
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
+        b.fssActiveAppsRecyclerView.minimumHeight = pixels.toInt()
+        b.fssActiveAppsRecyclerView.adapter = recyclerAdapter
     }
 
     private fun showAppNetworkActivity() {
@@ -347,7 +448,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
         b.fssAppBlockedRecyclerView.minimumHeight = pixels.toInt()
         b.fssAppBlockedRecyclerView.adapter = recyclerAdapter
     }
@@ -385,7 +486,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
         b.fssAsnAllowedRecyclerView.minimumHeight = pixels.toInt()
         b.fssAsnAllowedRecyclerView.adapter = contactedAsnAdapter
     }
@@ -422,7 +523,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
         b.fssAsnBlockedRecyclerView.minimumHeight = pixels.toInt()
         b.fssAsnBlockedRecyclerView.adapter = blockedAsnAdapter
     }
@@ -466,7 +567,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
         b.fssContactedDomainRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedDomainRecyclerView.adapter = contactedDomainsAdapter
     }
@@ -505,7 +606,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
         b.fssBlockedDomainRecyclerView.minimumHeight = pixels.toInt()
         b.fssBlockedDomainRecyclerView.adapter = recyclerAdapter
     }
@@ -544,7 +645,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
         b.fssContactedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedIpsRecyclerView.adapter = recyclerAdapter
     }
@@ -583,7 +684,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
         b.fssBlockedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssBlockedIpsRecyclerView.adapter = recyclerAdapter
     }
@@ -622,7 +723,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
         b.fssContactedCountriesRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedCountriesRecyclerView.adapter = contactedCountriesAdapter
     }

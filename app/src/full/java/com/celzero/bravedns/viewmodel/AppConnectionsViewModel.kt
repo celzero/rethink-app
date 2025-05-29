@@ -29,6 +29,7 @@ import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.RethinkLogDao
 import com.celzero.bravedns.database.StatsSummaryDao
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 
 class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, private val rinrDao: RethinkLogDao, private val statsDao: StatsSummaryDao) : ViewModel() {
@@ -150,6 +151,13 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
                     statsDao.getAllDomainsByUid(uid, to, "%$input%")
                 }
             }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    fun fetchActiveConnections(uid: Int, uptime: Long): LiveData<PagingData<AppConnection>> {
+        val to = System.currentTimeMillis() - uptime
+        return Pager(pagingConfig) { statsDao.getTopActiveConns(uid, to) }
             .liveData
             .cachedIn(viewModelScope)
     }

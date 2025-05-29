@@ -27,12 +27,14 @@ import com.celzero.bravedns.data.DataUsageSummary
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.StatsSummaryDao
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 
 class SummaryStatisticsViewModel(
     private val connectionTrackerDAO: ConnectionTrackerDAO,
     private val statsDao: StatsSummaryDao
 ) : ViewModel() {
+    private var topActiveConns: MutableLiveData<Long> = MutableLiveData()
     private var networkActivity: MutableLiveData<String> = MutableLiveData()
     private var asn: MutableLiveData<String> = MutableLiveData()
     private var countryActivities: MutableLiveData<String> = MutableLiveData()
@@ -40,6 +42,7 @@ class SummaryStatisticsViewModel(
     private var ips: MutableLiveData<String> = MutableLiveData()
     private var timeCategory: TimeCategory = TimeCategory.ONE_HOUR
     private var startTime: MutableLiveData<Long> = MutableLiveData()
+    private var loadMoreClicked: Boolean = false
 
     companion object {
         private const val ONE_HOUR_MILLIS = 1 * 60 * 60 * 1000L
@@ -60,15 +63,21 @@ class SummaryStatisticsViewModel(
     init {
         // set from and to time to current and 1 hr before
         startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
+        topActiveConns.value = VpnController.uptimeMs()
         networkActivity.value = ""
         asn.value = ""
-        domains.value = ""
-        countryActivities.value = ""
-        ips.value = ""
     }
 
     fun getTimeCategory(): TimeCategory {
         return timeCategory
+    }
+
+    fun setLoadMoreClicked(b: Boolean) {
+        loadMoreClicked = b
+        // initialise the live data to trigger the switchMap
+        domains.value = ""
+        countryActivities.value = ""
+        ips.value = ""
     }
 
     fun timeCategoryChanged(tc: TimeCategory) {
@@ -86,10 +95,22 @@ class SummaryStatisticsViewModel(
         }
         networkActivity.value = ""
         asn.value = ""
-        countryActivities.value = ""
-        ips.value = ""
-        domains.value = ""
+        if (loadMoreClicked) {
+            countryActivities.value = ""
+            ips.value = ""
+            domains.value = ""
+        }
     }
+
+    val getTopActiveConns =
+        topActiveConns.switchMap { it ->
+            val to = System.currentTimeMillis() - it
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                statsDao.getTopActiveConns(to)
+            }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
 
     val getAllowedAppNetworkActivity =
         networkActivity.switchMap { _ ->
