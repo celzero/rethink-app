@@ -56,6 +56,8 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.togs
+import com.celzero.bravedns.util.Utilities.tos
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
@@ -367,7 +369,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         } else {
             b.publicKeyLabel.visibility = View.VISIBLE
             b.publicKeyText.visibility = View.VISIBLE
-            b.publicKeyText.text = wgInterface?.getKeyPair()?.getPublicKey()?.base64()
+            b.publicKeyText.text = wgInterface?.getKeyPair()?.getPublicKey()?.base64().tos()
             b.dnsServersLabel.visibility = View.GONE
             b.dnsServersText.visibility = View.GONE
         }

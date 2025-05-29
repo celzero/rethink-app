@@ -44,6 +44,8 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.togs
+import com.celzero.bravedns.util.Utilities.tos
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -185,7 +187,7 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
             try {
                 val key = TcpProxyHelper.getPublicKey()
                 Logger.d(Logger.LOG_TAG_PROXY, "Public Key: $key")
-                val encryptedKey = Backend.newPipKey(key, "")
+                val encryptedKey = Backend.newPipKey(key.togs(), "".togs())
                 val blind = encryptedKey.blind()
                 Logger.d(Logger.LOG_TAG_PROXY, "Blind: $blind")
                 val path =
@@ -196,7 +198,7 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
                             File.separator +
                             TcpProxyHelper.PIP_KEY_FILE_NAME
                     )
-                EncryptedFileManager.writeTcpConfig(this, blind, TcpProxyHelper.PIP_KEY_FILE_NAME)
+                EncryptedFileManager.writeTcpConfig(this, blind.tos() ?: "", TcpProxyHelper.PIP_KEY_FILE_NAME)
                 val content = EncryptedFileManager.read(this, path)
                 Logger.d(Logger.LOG_TAG_PROXY, "Content: $content")
             } catch (e: Exception) {

@@ -116,10 +116,12 @@ import com.celzero.bravedns.util.Utilities.isNetworkSame
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.Utilities.tos
 import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.DNSOpts
 import com.celzero.firestack.backend.DNSSummary
+import com.celzero.firestack.backend.Gostr
 import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.backend.RDNS
 import com.celzero.firestack.backend.RouterStats
@@ -3857,46 +3859,58 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         logd("onProxiesStopped; clear the handshake times")
     }
 
-    override fun onProxyAdded(id: String) {
-        if (!id.contains(ID_WG_BASE, true)) {
+    override fun onProxyAdded(id: Gostr?) {
+        val iid = id.tos()
+        if (iid == null) {
+            Logger.e(LOG_TAG_VPN, "onProxyAdded: received null id")
+            return
+        }
+
+        if (!iid.contains(ID_WG_BASE, true)) {
             // only wireguard proxies are considered for overlay network
-            logd("onProxyAdded: no-op as it is not wireguard proxy, added $id")
+            logd("onProxyAdded: no-op as it is not wireguard proxy, added $iid")
             return
         }
         // new proxy added, refresh overlay network pair
         io("onProxyAdded") {
             val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
-            logd("onProxyAdded for proxy $id: $nw")
+            logd("onProxyAdded for proxy $iid: $nw")
             onOverlayNetworkChanged(nw ?: OverlayNetworks())
         }
     }
 
-    override fun onProxyRemoved(id: String) {
-        if (!id.contains(ID_WG_BASE)) {
+    override fun onProxyRemoved(id: Gostr?) {
+        val iid = id.tos()
+        if (iid == null) {
+            Logger.e(LOG_TAG_VPN, "onProxyAdded: received null id")
+            return
+        }
+
+        if (!iid.contains(ID_WG_BASE)) {
             // only wireguard proxies are considered for overlay network
-            logd("onProxyRemoved: proxy removed $id, not wireguard")
+            logd("onProxyRemoved: proxy removed $iid, not wireguard")
             return
         }
         // proxy removed, refresh overlay network pair
         io("onProxyRemoved") {
             val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
-            logd("onProxyRemoved for proxy $id: $nw")
+            logd("onProxyRemoved for proxy $iid: $nw")
             onOverlayNetworkChanged(nw ?: OverlayNetworks())
         }
     }
 
-    override fun onProxyStopped(id: String?) {
-        Logger.v(LOG_TAG_VPN, "onProxyStopped: $id")
+    override fun onProxyStopped(id: Gostr?) {
+        Logger.v(LOG_TAG_VPN, "onProxyStopped: ${id.tos()}")
     }
 
-    override fun onDNSAdded(id: String) {
+    override fun onDNSAdded(id: Gostr?) {
         // no-op
-        Logger.v(LOG_TAG_VPN, "onDNSAdded: $id")
+        Logger.v(LOG_TAG_VPN, "onDNSAdded: ${id.tos()}")
     }
 
-    override fun onDNSRemoved(id: String) {
+    override fun onDNSRemoved(id: Gostr?) {
         // no-op
-        Logger.v(LOG_TAG_VPN, "onDNSRemoved: $id")
+        Logger.v(LOG_TAG_VPN, "onDNSRemoved: ${id.tos()}")
     }
 
     override fun onDNSStopped() {
@@ -4038,12 +4052,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     override fun preflow(
         protocol: Int,
         uid: Int,
-        src: String,
-        dst: String,
-        domains: String
+        src: Gostr?,
+        dst: Gostr?,
+        domains: Gostr?
     ): PreMark = go2kt(preflowDispatcher) {
-        val first = HostName(src)
-        val second = HostName(dst)
+        val first = HostName(src.tos())
+        val second = HostName(dst.tos())
 
         val srcIp = if (first.asAddress() == null) "" else first.asAddress().toString()
         val srcPort = first.port ?: 0
@@ -4077,12 +4091,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     override fun flow(
         protocol: Int,
         _uid: Int,
-        src: String,
-        dest: String,
-        realIps: String,
-        d: String,
-        possibleDomains: String,
-        blocklists: String
+        src: Gostr?,
+        dest: Gostr?,
+        realIps: Gostr?,
+        d: Gostr?,
+        possibleDomains: Gostr?,
+        blocklists: Gostr?
     ): Mark = go2kt(flowDispatcher) {
         logd("flow: $_uid, $src, $dest, $realIps, $d, $blocklists")
         handleVpnLockdownStateAsync()
@@ -4091,15 +4105,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // own traffic. flip the doubleLoopback flag to true if we need that behavior
         val doubleLoopback = false
 
-        val first = HostName(src)
-        val second = HostName(dest)
+        val first = HostName(src.tos())
+        val second = HostName(dest.tos())
 
         val srcIp = if (first.asAddress() == null) "" else first.asAddress().toString()
         val srcPort = first.port ?: 0
         val dstIp = if (second.asAddress() == null) "" else second.asAddress().toString()
         val dstPort = second.port ?: 0
 
-        val ips = realIps.split(",")
+        val ips = realIps.tos()?.split(",") ?: emptyList()
         // take the first non-unspecified ip as the real destination ip
         val fip = ips.firstOrNull { !isUnspecifiedIp(it.trim()) }?.trim()
         // use realIps; as of now, netstack uses the first ip
@@ -4126,7 +4140,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val connId = Utilities.getRandomString(8)
 
         // TODO: handle multiple domains, for now, use the first domain
-        val domains = d.split(",")
+        val domains = d.tos()?.split(",") ?: emptyList()
 
         // if `d` is blocked, then at least one of the real ips is unspecified
         val anyRealIpBlocked = !ips.none { isUnspecifiedIp(it.trim()) }
@@ -4147,7 +4161,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 dstPort,
                 protocol,
                 proxyDetails = "", // set later
-                blocklists,
+                blocklists.tos() ?: "",
                 domains.firstOrNull(),
                 connId,
                 connType
@@ -4177,7 +4191,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 // possible domains only used for logging purposes, it may be available if
                 // the domains are empty. So, use the possibleDomains only if domains is empty
                 // no need to show the possible domains other than rethink
-                cm.query = possibleDomains.split(",").firstOrNull() ?: ""
+                cm.query = possibleDomains.tos()?.split(",")?.firstOrNull() ?: ""
             }
 
             // TODO: should handle the LanIp.GATEWAY, LanIp.ROUTER addresses as well
@@ -4220,7 +4234,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             return@go2kt persistAndConstructFlowResponse(null, Backend.Base, connId, uid)
         }
 
-        processFirewallRequest(cm, anyRealIpBlocked, blocklists, isSplApp)
+        processFirewallRequest(cm, anyRealIpBlocked, blocklists.tos() ?: "", isSplApp)
 
         if (cm.isBlocked) {
             // return Ipn.Block, no need to check for other rules
@@ -4236,10 +4250,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return@go2kt determineProxyDetails(cm, doubleLoopback)
     }
 
-    override fun inflow(protocol: Int, recvdUid: Int, src: String?, dst: String?): Mark =
+    override fun inflow(protocol: Int, recvdUid: Int, src: Gostr?, dst: Gostr?): Mark =
         go2kt(inflowDispatcher) {
-            val first = HostName(src)
-            val second = HostName(dst)
+            val first = HostName(src.tos())
+            val second = HostName(dst.tos())
 
             val srcIp = if (first.asAddress() == null) "" else first.asAddress().toString()
             val srcPort = first.port ?: 0
@@ -4787,7 +4801,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return vpnAdapter?.testRpnProxy(type) == true
     }
 
-    suspend fun testHop(src: String, hop: String): Pair<Boolean, String> {
+    suspend fun testHop(src: String, hop: String): Pair<Boolean, String?> {
         return vpnAdapter?.testHop(src, hop) ?: Pair(false, "vpn not active")
     }
 
@@ -4821,10 +4835,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     suspend fun createWgHop(origin: String, hop: String): Pair<Boolean, String> {
         return (vpnAdapter?.createHop(origin, hop)) ?: Pair(false, "adapter is null")
-    }
-
-    suspend fun hop(proxyId: String): String {
-        return vpnAdapter?.hop(proxyId) ?: ""
     }
 
     suspend fun updateRpnProxy(type: RpnProxyManager.RpnType): ByteArray? {

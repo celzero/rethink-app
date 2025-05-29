@@ -67,6 +67,10 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.Utilities.tob
+import com.celzero.bravedns.util.Utilities.togb
+import com.celzero.bravedns.util.Utilities.togs
+import com.celzero.bravedns.util.Utilities.tos
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.firestack.backend.DNSResolver
@@ -283,7 +287,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.i(LOG_TAG_VPN, "$TAG new doh: $id (${doh?.dohName}), url: $url, ips: $ips")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: doh failure, url: $url", e)
-            getResolver()?.remove(id)
+            getResolver()?.remove(id.togs())
             showDnsFailureToast(url ?: "")
         }
         Logger.v(LOG_TAG_VPN, "$TAG addDohTransport done")
@@ -308,7 +312,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.i(LOG_TAG_VPN, "$TAG new dot: $id (${dot?.name}), url: $url, ips: $ips")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: dot failure, url: $url", e)
-            getResolver()?.remove(id)
+            getResolver()?.remove(id.togs())
             showDnsFailureToast(url ?: "")
         }
         Logger.v(LOG_TAG_VPN, "$TAG addDotTransport done")
@@ -328,7 +332,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.i(LOG_TAG_VPN, "$TAG new odoh: $id (${odoh?.name}), p: $proxy, r: $resolver")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: odoh failure, res: $resolver", e)
-            getResolver()?.remove(id)
+            getResolver()?.remove(id.togs())
             showDnsFailureToast(resolver ?: "")
         }
         Logger.v(LOG_TAG_VPN, "$TAG addOdohTransport done")
@@ -346,7 +350,7 @@ class GoVpnAdapter : KoinComponent {
             setDnscryptRelaysIfAny() // is expected to catch exceptions
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: dns crypt failure for $id", e)
-            getResolver()?.remove(id)
+            getResolver()?.remove(id.togs())
             removeDnscryptRelaysIfAny()
             showDnscryptConnectionFailureToast()
         }
@@ -366,7 +370,7 @@ class GoVpnAdapter : KoinComponent {
             )
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: dns proxy failure", e)
-            getResolver()?.remove(id)
+            getResolver()?.remove(id.togs())
             showDnsProxyConnectionFailureToast()
         }
         Logger.v(LOG_TAG_VPN, "$TAG addDnsProxyTransport done")
@@ -387,7 +391,7 @@ class GoVpnAdapter : KoinComponent {
             }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: rdns failure, url: $url", e)
-            getResolver()?.remove(id)
+            getResolver()?.remove(id.togs())
             showDnsFailureToast(url)
         }
         Logger.v(LOG_TAG_VPN, "$TAG addRdnsTransport done")
@@ -461,8 +465,8 @@ class GoVpnAdapter : KoinComponent {
         var b32Stamp: String? = null
         try {
             val r = getRDNS(RethinkBlocklistManager.RethinkBlocklistType.REMOTE)
-            val flags = r?.stampToFlags(stamp)
-            b32Stamp = r?.flagsToStamp(flags, Backend.EB32)
+            val flags = r?.stampToFlags(stamp.togs())
+            b32Stamp = r?.flagsToStamp(flags, Backend.EB32).tos()
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "$TAG err get base32 stamp: ${e.message}")
         }
@@ -535,7 +539,7 @@ class GoVpnAdapter : KoinComponent {
             } catch (ex: Exception) {
                 Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: dnscrypt failure", ex)
                 appConfig.removeDnscryptRelay(it)
-                getResolver()?.remove(it)
+                getResolver()?.remove(it.togs())
             }
         }
     }
@@ -549,7 +553,7 @@ class GoVpnAdapter : KoinComponent {
             try {
                 // remove from appConfig, as this is not from ui, but from the tunnel start up
                 appConfig.removeDnscryptRelay(it)
-                getResolver()?.remove(it)
+                getResolver()?.remove(it.togs())
             } catch (ex: Exception) {
                 Logger.w(LOG_TAG_VPN, "$TAG connect-tunnel: dnscrypt rmv failure", ex)
             }
@@ -571,7 +575,7 @@ class GoVpnAdapter : KoinComponent {
                 e
             )
             appConfig.removeDnscryptRelay(relay.dnsCryptRelayURL)
-            getResolver()?.remove(relay.dnsCryptRelayURL)
+            getResolver()?.remove(relay.dnsCryptRelayURL.togs())
         }
     }
 
@@ -582,7 +586,7 @@ class GoVpnAdapter : KoinComponent {
         }
         try {
             // no need to remove from appConfig, as it is already removed
-            val rmv = getResolver()?.remove(relay.dnsCryptRelayURL)
+            val rmv = getResolver()?.remove(relay.dnsCryptRelayURL.togs())
             Logger.i(LOG_TAG_VPN, "$TAG rmv dnscrypt relay: ${relay.dnsCryptRelayURL}, success? $rmv")
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "$TAG connect-tunnel: dnscrypt rmv failure")
@@ -608,7 +612,7 @@ class GoVpnAdapter : KoinComponent {
                 } else {
                     ProxyManager.ID_S5_BASE
                 }
-            val res = getProxies()?.addProxy(id, url)
+            val res = getProxies()?.addProxy(id.togs(), url.togs())
             Logger.i(LOG_TAG_VPN, "$TAG socks5 set with url($id): $url, success? ${res != null}")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: err start proxy $userName@$ipAddress:$port", e)
@@ -711,7 +715,7 @@ class GoVpnAdapter : KoinComponent {
             return
         }
         try {
-            tunnel.proxies.hop(hop, origin)
+            tunnel.proxies.hop(hop.togs(), origin.togs())
             Logger.i(LOG_TAG_VPN, "$TAG new hop for $origin -> $hop")
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "$TAG err setting hop for $origin -> $hop; ${e.message}")
@@ -721,7 +725,7 @@ class GoVpnAdapter : KoinComponent {
 
     fun hopStatus(src: String, hop: String): Pair<Long?, String> {
         return try {
-            val status = tunnel.proxies.getProxy(src).router().via().status()
+            val status = tunnel.proxies.getProxy(src.togs()).router().via().status()
             Logger.v(LOG_TAG_VPN, "$TAG hop $src -> $hop; status: $status")
             Pair(status, "")
         } catch (e: Exception) {
@@ -733,7 +737,7 @@ class GoVpnAdapter : KoinComponent {
     fun removeHop(src: String): Pair<Boolean, String> {
         var err = ""
         try {
-            tunnel.proxies.hop("", src)
+            tunnel.proxies.hop("".togs(), src.togs())
             Logger.i(LOG_TAG_VPN, "$TAG removed hop for $src -> empty")
             return Pair(true, context.getString(R.string.config_add_success_toast))
         } catch (e: Exception) {
@@ -743,10 +747,10 @@ class GoVpnAdapter : KoinComponent {
         return Pair(false, err)
     }
 
-    fun testHop(src: String, hop: String): Pair<Boolean, String> {
+    fun testHop(src: String, hop: String): Pair<Boolean, String?> {
         // returns empty on success, err msg on failure
-        val s = tunnel.proxies.testHop(hop, src)
-        val res = s.isEmpty()
+        val s = tunnel.proxies.testHop(hop.togs(), src.togs()).tos()
+        val res = s.isNullOrEmpty()
         val err = s
         if (!res) {
             Logger.w(LOG_TAG_VPN, "$TAG err testing hop: $src -> $hop; $s")
@@ -790,7 +794,7 @@ class GoVpnAdapter : KoinComponent {
 
     private suspend fun setWireGuardDns(id: String) {
         try {
-            val p = getProxies()?.getProxy(id)
+            val p = getProxies()?.getProxy(id.togs())
             if (p == null) {
                 Logger.w(LOG_TAG_VPN, "$TAG wireguard proxy not found for id: $id")
                 return
@@ -798,7 +802,7 @@ class GoVpnAdapter : KoinComponent {
             Intra.addProxyDNS(tunnel, p) // dns transport has same id as the proxy (p)
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG wireguard dns failure($id)", e)
-            getResolver()?.remove(id)
+            getResolver()?.remove(id.togs())
             showDnsFailureToast(id)
         }
     }
@@ -834,7 +838,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun getProxyStatusById(id: String): Pair<Long?, String> {
         return try {
-            val status = getProxies()?.getProxy(id)?.status()
+            val status = getProxies()?.getProxy(id.togs())?.status()
             Logger.d(LOG_TAG_VPN, "$TAG proxy status($id): $status")
             Pair(status, "")
         } catch (ex: Exception) {
@@ -858,7 +862,7 @@ class GoVpnAdapter : KoinComponent {
                 }
             val httpProxyUrl = endpoint.proxyIP ?: return
 
-            val p = getProxies()?.addProxy(id, httpProxyUrl)
+            val p = getProxies()?.addProxy(id.togs(), httpProxyUrl.togs())
             Logger.i(LOG_TAG_VPN, "$TAG http proxy set, url: $httpProxyUrl, success? ${p != null}")
         } catch (e: Exception) {
             if (tunProxyMode.isTunProxyOrbot()) {
@@ -877,8 +881,8 @@ class GoVpnAdapter : KoinComponent {
         }
         try {
             val wgId = ID_WG_BASE + id
-            getProxies()?.removeProxy(wgId)
-            getResolver()?.remove(wgId)
+            getProxies()?.removeProxy(wgId.togs())
+            getResolver()?.remove(wgId.togs())
             Logger.i(LOG_TAG_VPN, "$TAG remove wireguard proxy with id: $id")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err removing wireguard proxy: ${e.message}", e)
@@ -897,7 +901,7 @@ class GoVpnAdapter : KoinComponent {
                 return
             }
             try {
-                if (getProxies()?.getProxy(id) != null) {
+                if (getProxies()?.getProxy(id.togs()) != null) {
                     Logger.i(LOG_TAG_VPN, "$TAG wg proxy already exists in tunnel $id")
                     return
                 }
@@ -910,7 +914,7 @@ class GoVpnAdapter : KoinComponent {
             if (!isOneWg) checkAndAddProxyForHopIfNeeded(id)
             val skipListenPort = !isOneWg && persistentState.randomizeListenPort
             val wgUserSpaceString = wgConfig?.toWgUserspaceString(skipListenPort)
-            val p = getProxies()?.addProxy(id, wgUserSpaceString)
+            val p = getProxies()?.addProxy(id.togs(), wgUserSpaceString.togs())
             //if (isOneWg) setWireGuardDns(id)
             setWireGuardDns(id)
             // initiate a ping request to the wg proxy
@@ -1003,7 +1007,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun getProxyStats(id: String): RouterStats? {
         return try {
-            val stats = getProxies()?.getProxy(id)?.router()?.stat()
+            val stats = getProxies()?.getProxy(id.togs())?.router()?.stat()
             stats
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "$TAG err getting proxy stats($id): ${e.message}")
@@ -1024,13 +1028,13 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun getDnsStatus(id: String): Long? {
         try {
-            val transport = getResolver()?.get(id)
+            val transport = getResolver()?.get(id.togs())
             val tid = transport?.id()
             val status = transport?.status()
             // some special transports like blockfree, preferred, alg etc are handled specially.
             // in those cases, if the transport id is not there, it will serve the default transport
             // so return null in those cases
-            if (tid != id) {
+            if (tid.tos() != id) {
                 Logger.d(LOG_TAG_VPN, "$TAG dns status; not desired transport($id), return null")
                 return null
             }
@@ -1098,7 +1102,7 @@ class GoVpnAdapter : KoinComponent {
             return
         }
         // if preferred is not available, then add explicitly
-        val isPrefAvailable = getResolver()?.get(Backend.Preferred)
+        val isPrefAvailable = getResolver()?.get(Backend.Preferred.togs())
         if (isPrefAvailable == null) {
             addTransport()
         }
@@ -1207,9 +1211,9 @@ class GoVpnAdapter : KoinComponent {
                 !Constants.DEFAULT_DNS_LIST.any { it.url == persistentState.defaultDnsUrl }
     }
 
-    suspend fun getSystemDns(): String {
+    suspend fun getSystemDns(): String? {
         return try {
-            val sysDns = getResolver()?.get(Backend.System)?.addr ?: ""
+            val sysDns = getResolver()?.get(Backend.System.togs())?.addr.tos()
             Logger.i(LOG_TAG_VPN, "$TAG get system dns: $sysDns")
             sysDns
         } catch (e: Exception) {
@@ -1248,7 +1252,7 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) { // this is not expected to happen
             Logger.e(LOG_TAG_VPN, "$TAG set system dns: could not parse: $systemDns", e)
             // remove the system dns, if it could not be set
-            getResolver()?.remove(Backend.System)
+            getResolver()?.remove(Backend.System.togs())
         }
     }
 
@@ -1309,7 +1313,7 @@ class GoVpnAdapter : KoinComponent {
             val rl = getRDNS(RethinkBlocklistManager.RethinkBlocklistType.LOCAL)
             if (rl != null) {
                 Logger.i(LOG_TAG_VPN, "$TAG set local stamp: ${persistentState.localBlocklistStamp}")
-                rl.stamp = persistentState.localBlocklistStamp
+                rl.stamp = persistentState.localBlocklistStamp.togs()
             } else {
                 Logger.w(LOG_TAG_VPN, "$TAG mode is not local, this should not happen")
             }
@@ -1330,7 +1334,7 @@ class GoVpnAdapter : KoinComponent {
                 return
             }
 
-            persistentState.localBlocklistStamp = rl.stamp // throws exception if stamp is invalid
+            persistentState.localBlocklistStamp = rl.stamp.tos() ?: "" // throws exception if stamp is invalid
             Logger.i(LOG_TAG_VPN, "$TAG reset local stamp: ${persistentState.localBlocklistStamp}")
         } catch (e: Exception) {
             persistentState.localBlocklistStamp = ""
@@ -1356,7 +1360,7 @@ class GoVpnAdapter : KoinComponent {
                 path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
                 path + ONDEVICE_BLOCKLIST_FILE_TAG
             )
-            rdns?.rdnsLocal?.stamp = stamp
+            rdns?.rdnsLocal?.stamp = stamp.togs()
             Logger.i(LOG_TAG_VPN, "$TAG local brave dns object is set with stamp: $stamp")
         } catch (ex: Exception) {
             // Set local blocklist enabled to false and reset the timestamp
@@ -1407,7 +1411,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun p50(id: String): Long {
         try {
-            val transport = getResolver()?.get(id)
+            val transport = getResolver()?.get(id.togs())
             return transport?.p50() ?: -1L
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "$TAG err p50($id): ${e.message}")
@@ -1457,7 +1461,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun getSupportedIpVersion(proxyId: String): Pair<Boolean, Boolean> {
         try {
-            val router = getProxies()?.getProxy(proxyId)?.router() ?: return Pair(false, false)
+            val router = getProxies()?.getProxy(proxyId.togs())?.router() ?: return Pair(false, false)
             val has4 = router.iP4()
             val has6 = router.iP6()
             Logger.d(LOG_TAG_VPN, "$TAG supported ip version($proxyId): has4? $has4, has6? $has6")
@@ -1470,17 +1474,17 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun isSplitTunnelProxy(proxyId: String, pair: Pair<Boolean, Boolean>): Boolean {
         return try {
-            val router = getProxies()?.getProxy(proxyId)?.router() ?: return false
+            val router = getProxies()?.getProxy(proxyId.togs())?.router() ?: return false
             // if the router contains 0.0.0.0, then it is not split tunnel for ipv4
             // if the router contains ::, then it is not split tunnel for ipv6
             val res: Boolean =
                 if (pair.first && pair.second) {
                     // if the pair is true, check for both ipv4 and ipv6
-                    !router.contains(UNSPECIFIED_IP_IPV4) || !router.contains(UNSPECIFIED_IP_IPV6)
+                    !router.contains(UNSPECIFIED_IP_IPV4.togs()) || !router.contains(UNSPECIFIED_IP_IPV6.togs())
                 } else if (pair.first) {
-                    !router.contains(UNSPECIFIED_IP_IPV4)
+                    !router.contains(UNSPECIFIED_IP_IPV4.togs())
                 } else if (pair.second) {
-                    !router.contains(UNSPECIFIED_IP_IPV6)
+                    !router.contains(UNSPECIFIED_IP_IPV6.togs())
                 } else {
                     false
                 }
@@ -1498,7 +1502,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun initiateWgPing(proxyId: String) {
         try {
-            val res = getProxies()?.getProxy(proxyId)?.ping()
+            val res = getProxies()?.getProxy(proxyId.togs())?.ping()
             Logger.i(LOG_TAG_VPN, "$TAG initiateWgPing($proxyId): $res")
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "$TAG err initiateWgPing($proxyId): ${e.message}")
@@ -1610,9 +1614,9 @@ class GoVpnAdapter : KoinComponent {
         }
         return try {
             Logger.i(LOG_TAG_PROXY, "$TAG start warp registration(rpn), ${prevBytes != null}")
-            val bytes = tunnel.proxies.rpn().registerWarp(prevBytes)
+            val bytes = tunnel.proxies.rpn().registerWarp(prevBytes.togb())
             Logger.i(LOG_TAG_PROXY, "$TAG registered warp(rpn)? ${bytes != null}")
-            bytes
+            bytes.tob()
         } catch (e: Exception) {
             Logger.e(LOG_TAG_PROXY, "$TAG err registering warp(rpn): ${e.message}", e)
             null
@@ -1658,14 +1662,14 @@ class GoVpnAdapter : KoinComponent {
                 return Pair(null, errMsg)
             }
 
-            val id = rpn.id()
+            val id = rpn.id().tos() ?: ""
             val status = rpn.status()
-            val type = rpn.type()
-            val kids = rpn.kids()
-            val addr = rpn.addr
+            val type = rpn.type().tos() ?: ""
+            val kids = rpn.kids().tos() ?: ""
+            val addr = rpn.addr.tos() ?: ""
             val created = rpn.created()
             val expires = rpn.expires()
-            val who = rpn.who()
+            val who = rpn.who().tos() ?: ""
             val prop = RpnProxyManager.RpnProps(id, status, type, kids, addr, created, expires, who)
             return Pair(prop, errMsg)
         } catch (e: Exception) {
@@ -1689,7 +1693,7 @@ class GoVpnAdapter : KoinComponent {
         }
         return try {
             Logger.v(LOG_TAG_PROXY, "$TAG start amz(rpn) reg, existing bytes size: ${prevBytes?.size}")
-            val bytes = tunnel.proxies.rpn().registerAmnezia(prevBytes)
+            val bytes = tunnel.proxies.rpn().registerAmnezia(prevBytes.togb()).tob()
             Logger.i(LOG_TAG_PROXY, "$TAG registered amz(rpn)")
             bytes
         } catch (e: Exception) {
@@ -1706,19 +1710,19 @@ class GoVpnAdapter : KoinComponent {
         try {
             val ippcsv = when (type) {
                 RpnProxyManager.RpnType.WARP -> {
-                    tunnel.proxies.rpn().testWarp()
+                    tunnel.proxies.rpn().testWarp().tos()
                 }
                 RpnProxyManager.RpnType.AMZ -> {
-                    tunnel.proxies.rpn().testAmnezia()
+                    tunnel.proxies.rpn().testAmnezia().tos()
                 }
                 RpnProxyManager.RpnType.PROTON -> {
-                    tunnel.proxies.rpn().testProton()
+                    tunnel.proxies.rpn().testProton().tos()
                 }
                 RpnProxyManager.RpnType.SE -> {
-                    tunnel.proxies.rpn().testSE()
+                    tunnel.proxies.rpn().testSE().tos()
                 }
                 RpnProxyManager.RpnType.EXIT_64 -> {
-                    tunnel.proxies.rpn().testExit64()
+                    tunnel.proxies.rpn().testExit64().tos()
                 }
                 RpnProxyManager.RpnType.EXIT -> {
                     // no need to test exit
@@ -1726,7 +1730,7 @@ class GoVpnAdapter : KoinComponent {
                 }
             }
             Logger.i(LOG_TAG_PROXY, "$TAG test rpn proxy($type): $ippcsv")
-            return ippcsv.isNotEmpty()
+            return !ippcsv.isNullOrEmpty()
         } catch (e: Exception) {
             Logger.w(LOG_TAG_PROXY, "$TAG err test rpn proxy($type): ${e.message}")
         }
@@ -1750,7 +1754,7 @@ class GoVpnAdapter : KoinComponent {
         }
         return try {
             Logger.i(LOG_TAG_PROXY, "$TAG start proton(rpn) reg, existing bytes size: ${prevBytes?.size}")
-            val bytes = tunnel.proxies.rpn().registerProton(prevBytes)
+            val bytes = tunnel.proxies.rpn().registerProton(prevBytes.togb()).tob()
             Logger.i(LOG_TAG_PROXY, "$TAG proton(rpn) registered, ${bytes?.size} bytes")
             bytes
         } catch (e: Exception) {
@@ -1855,7 +1859,7 @@ class GoVpnAdapter : KoinComponent {
             return false
         }
         return try {
-            val res = tunnel.proxies.getProxy(proxyId).router().reaches(csv)
+            val res = tunnel.proxies.getProxy(proxyId.togs()).router().reaches(csv.togs())
             Logger.i(LOG_TAG_PROXY, "$TAG ping $proxyId? ($csv) $res")
             res
         } catch (e: Exception) {
@@ -1927,22 +1931,11 @@ class GoVpnAdapter : KoinComponent {
         }
         return try {
             Logger.i(LOG_TAG_VPN, "$TAG create hop: $origin, hop: $hop")
-            tunnel.proxies.hop(hop, origin)
+            tunnel.proxies.hop(hop.togs(), origin.togs())
             Pair(true, context.getString(R.string.config_add_success_toast))
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err create hop: ${e.message}", e)
             Pair(false, e.message ?: "Hop creation failed")
-        }
-    }
-
-    suspend fun hop(proxyId: String): String {
-        return try {
-            val res = getProxies()?.getProxy(proxyId)?.router()?.via()?.id() ?: ""
-            Logger.i(LOG_TAG_VPN, "$TAG hop proxy($proxyId): $res")
-            res
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_VPN, "$TAG err hop proxy($proxyId): ${e.message}")
-            ""
         }
     }
 
@@ -1954,13 +1947,13 @@ class GoVpnAdapter : KoinComponent {
         return try {
             val res = when (type) {
                 RpnProxyManager.RpnType.WARP -> {
-                    tunnel.proxies.rpn().warp().update()
+                    tunnel.proxies.rpn().warp().update().tob()
                 }
                 RpnProxyManager.RpnType.AMZ -> {
-                    tunnel.proxies.rpn().amnezia().update()
+                    tunnel.proxies.rpn().amnezia().update().tob()
                 }
                 RpnProxyManager.RpnType.PROTON -> {
-                    tunnel.proxies.rpn().proton().update()
+                    tunnel.proxies.rpn().proton().update().tob()
                 }
                 RpnProxyManager.RpnType.SE -> {
                     // no need to update se
@@ -2026,7 +2019,7 @@ class GoVpnAdapter : KoinComponent {
         try {
             val dummyAddrPort = "10.111.222.10:53"
             val router = Intra.controlledRouter(controller, id, dummyAddrPort)
-            val res = router.reaches(addrPort)
+            val res = router.reaches(addrPort.togs())
             Logger.i(LOG_TAG_VPN, "$TAG perform connectivity check")
             return res
         } catch (e: Exception) {

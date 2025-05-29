@@ -30,6 +30,7 @@ import com.celzero.bravedns.databinding.DialogWgAddPeerBinding
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.tos
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.util.ErrorMessages
 import kotlinx.coroutines.Dispatchers
@@ -65,9 +66,9 @@ class WgAddPeerDialog(
 
         if (wgPeer != null) {
             isEditing = true
-            b.peerPublicKey.setText(wgPeer.getPublicKey().base64())
+            b.peerPublicKey.setText(wgPeer.getPublicKey().base64().tos())
             if (wgPeer.getPreSharedKey().isPresent) {
-                b.peerPresharedKey.setText(wgPeer.getPreSharedKey().get().base64())
+                b.peerPresharedKey.setText(wgPeer.getPreSharedKey().get().base64().tos())
             }
             b.peerAllowedIps.setText(wgPeer.getAllowedIps().joinToString { it.toString() })
             if (wgPeer.getEndpoint().isPresent) {

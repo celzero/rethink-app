@@ -17,6 +17,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.TcpProxyEndpoint
 import com.celzero.bravedns.database.TcpProxyRepository
 import com.celzero.bravedns.scheduler.PaymentWorker
+import com.celzero.bravedns.util.Utilities.togs
 import com.celzero.firestack.backend.IpTree
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -106,7 +107,7 @@ object TcpProxyHelper : KoinComponent {
 
     private fun loadTrie() {
         cfIpTrie = Backend.newIpTree()
-        cfIpAddresses.forEach { cfIpTrie.set(it, "") }
+        cfIpAddresses.forEach { cfIpTrie.set(it.togs(), "".togs()) }
         Logger.d(LOG_TAG_PROXY, "loadTrie: loading trie for cloudflare ips")
     }
 
@@ -114,7 +115,7 @@ object TcpProxyHelper : KoinComponent {
         // do not check for cloudflare ips for now
         // return false
         return try {
-            cfIpTrie.hasAny(ip)
+            cfIpTrie.hasAny(ip.togs())
         } catch (e: Exception) {
             Logger.w(LOG_TAG_PROXY, "isCloudflareIp: exception while checking ip: $ip")
             false

@@ -26,6 +26,9 @@ import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Utilities.togs
+import com.celzero.bravedns.util.Utilities.tos
+import com.celzero.firestack.backend.Gostr
 import com.celzero.firestack.backend.RadixTree
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -109,21 +112,21 @@ object DomainRulesManager : KoinComponent {
         trie.set(key, value)
     }
 
-    private fun mkTrieKey(d: String, uid: Int): String {
+    private fun mkTrieKey(d: String, uid: Int): Gostr? {
         // *.google.co.uk -> .google.co.uk,<uid>
         // not supported by IpTrie: google.* -> google.,<uid>
         val domain = d.removePrefix("*")
-        return domain.lowercase(Locale.ROOT) + Backend.Ksep + uid
+        return (domain.lowercase(Locale.ROOT) + Backend.Ksep + uid).togs()
     }
 
-    private fun mkTrieKey(d: String): String {
+    private fun mkTrieKey(d: String): Gostr? {
         // *.google.co.uk -> .google.co.uk
         val domain = d.removePrefix("*")
-        return domain.lowercase(Locale.ROOT)
+        return domain.lowercase(Locale.ROOT).togs()
     }
 
-    private fun mkTrieValue(status: String, proxyId: String, proxyCC: String): String {
-        return "${status}${Backend.Vsep}${proxyId}${Backend.Vsep}${proxyCC}"
+    private fun mkTrieValue(status: String, proxyId: String, proxyCC: String): Gostr? {
+        return ("${status}${Backend.Vsep}${proxyId}${Backend.Vsep}${proxyCC}").togs()
     }
 
     suspend fun load(): Long {
@@ -149,7 +152,7 @@ object DomainRulesManager : KoinComponent {
         if (cd.status == Status.TRUST.id) {
             val domain = cd.domain.lowercase(Locale.ROOT)
             val key = mkTrieKey(domain)
-            trustedTrie.set(key, cd.status.toString())
+            trustedTrie.set(key, cd.status.toString().togs())
             trustedMap[cd.domain] = trustedMap.getOrDefault(domain, emptySet()).plus(cd.uid)
         }
     }
@@ -175,7 +178,12 @@ object DomainRulesManager : KoinComponent {
 
     private fun matchesWildcard(domain: String, uid: Int): Status {
         val key = mkTrieKey(domain, uid)
-        val match = trie.getAny(key) // matches the longest prefix
+        val match = trie.getAny(key).tos() // matches the longest prefix
+        if (match.isNullOrEmpty()) {
+            // no match found, return NONE
+            if (DEBUG) Logger.vv(LOG_TAG_DNS, "matchesWildcard: $domain($uid), no match found")
+            return Status.NONE
+        }
         val status = match.split(Backend.Vsep)[0]
         val res = Status.getStatus(status.toIntOrNull())
         if (DEBUG) Logger.vv(LOG_TAG_DNS, "matchesWildcard: $domain($uid), res: $res")
@@ -184,7 +192,12 @@ object DomainRulesManager : KoinComponent {
 
     fun getDomainRule(domain: String, uid: Int): Status {
         val key = mkTrieKey(domain, uid)
-        val match = trie.get(key)
+        val match = trie.get(key).tos()
+        if (match.isNullOrEmpty()) {
+            // no match found, return NONE
+            if (DEBUG) Logger.vv(LOG_TAG_DNS, "getDomainRule: $domain($uid), no match found")
+            return Status.NONE
+        }
         val status = match.split(Backend.Vsep)[0]
         val res = Status.getStatus(status.toIntOrNull())
         if (DEBUG) Logger.vv(LOG_TAG_DNS, "getDomainRule: $domain($uid), res: $res")
@@ -196,8 +209,8 @@ object DomainRulesManager : KoinComponent {
             val key = mkTrieKey(domain, uid)
             var proxyId = ""
             var proxyCC = ""
-            val match = trie.get(key)
-            if (match.isEmpty()) {
+            val match = trie.get(key).tos()
+            if (match.isNullOrEmpty()) {
                 return Pair("", "")
             }
             val parts = match.split(Backend.Vsep)
@@ -214,8 +227,8 @@ object DomainRulesManager : KoinComponent {
             if (proxyId.isNotEmpty() || proxyCC.isNotEmpty()) {
                 return Pair(proxyId, proxyCC)
             } else {
-                val wild = trie.getAny(key)
-                if (wild.isEmpty()) return Pair("", "")
+                val wild = trie.getAny(key).tos()
+                if (wild.isNullOrEmpty()) return Pair("", "")
 
                 val wildParts = wild.split(Backend.Vsep)
                 if (wildParts.size <= 2) return Pair("", "")
@@ -233,7 +246,7 @@ object DomainRulesManager : KoinComponent {
         if (d.isNullOrEmpty()) {
             return false
         }
-        val domain = d.lowercase(Locale.ROOT)
+        val domain = d.lowercase(Locale.ROOT).togs()
         return trustedTrie.hasAny(domain)
     }
 
@@ -300,7 +313,7 @@ object DomainRulesManager : KoinComponent {
             trustedTrie.del(key)
         } else {
             val key = mkTrieKey(d)
-            trustedTrie.set(key, status.toString())
+            trustedTrie.set(key, status.id.toString().togs())
         }
     }
 
@@ -363,7 +376,7 @@ object DomainRulesManager : KoinComponent {
 
     suspend fun deleteRulesByUid(uid: Int) {
         db.deleteRulesByUid(uid)
-        val rulesDeleted = trie.delAll(uid.toString())
+        val rulesDeleted = trie.delAll(uid.toString().togs())
         Logger.i(LOG_TAG_DNS, "rules deleted from trie for $uid: $rulesDeleted")
         clearTrustedMap(uid)
     }
@@ -435,7 +448,7 @@ object DomainRulesManager : KoinComponent {
     }
 
     private fun clearTrie(uid: Int) {
-        trie.delAll(uid.toString())
+        trie.delAll(uid.toString().togs())
     }
 
     suspend fun setCC(cd: CustomDomain, cc: String) {

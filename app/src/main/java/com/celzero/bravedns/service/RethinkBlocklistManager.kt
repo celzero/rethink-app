@@ -36,6 +36,8 @@ import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FO
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.togs
+import com.celzero.bravedns.util.Utilities.tos
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
@@ -373,9 +375,9 @@ object RethinkBlocklistManager : KoinComponent {
     suspend fun getStamp(fileValues: Set<Int>, type: RethinkBlocklistType): String {
         return try {
             val flags = convertListToCsv(fileValues)
-            val flags2Stamp = getRDNS(type)?.flagsToStamp(flags, Backend.EB32)
+            val flags2Stamp = getRDNS(type)?.flagsToStamp(flags.togs(), Backend.EB32).tos() ?: ""
             Logger.d(LOG_TAG_VPN, "${type.name} flags: $flags; stamp: $flags2Stamp")
-            flags2Stamp ?: ""
+            flags2Stamp
         } catch (e: java.lang.Exception) {
             Logger.e(LOG_TAG_VPN, "err stamp2tags: ${e.message}, $e")
             ""
@@ -384,7 +386,7 @@ object RethinkBlocklistManager : KoinComponent {
 
     suspend fun getTagsFromStamp(stamp: String, type: RethinkBlocklistType): Set<Int> {
         return try {
-            val tags = convertCsvToList(getRDNS(type)?.stampToFlags(stamp))
+            val tags = convertCsvToList(getRDNS(type)?.stampToFlags(stamp.togs()).tos())
             Logger.d(LOG_TAG_VPN, "${type.name} stamp: $stamp; tags: $tags")
             tags
         } catch (e: Exception) {

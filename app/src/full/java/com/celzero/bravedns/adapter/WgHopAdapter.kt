@@ -277,7 +277,11 @@ class WgHopAdapter(
 
                         dismissProcessingDialog()
                         b.wgHopListCheckbox.isChecked = false
-                        Utilities.showToastUiCentered(context, hopTestRes.second, Toast.LENGTH_LONG)
+                        Utilities.showToastUiCentered(
+                            context,
+                            hopTestRes.second ?: context.getString(R.string.unknown_error),
+                            Toast.LENGTH_LONG
+                        )
                     }
                     return
                 }

@@ -61,6 +61,9 @@ import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
+import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.backend.Gobyte
+import com.celzero.firestack.backend.Gostr
 import com.google.common.net.InternetDomainName
 import com.google.gson.JsonParser
 import inet.ipaddr.HostName
@@ -868,4 +871,67 @@ object Utilities {
 
         return true // versions are equal
     }
+
+
+    /**
+     * Converts a nullable [String] to a [Gostr] object for use with the Backend engine.
+     *
+     * If the input is `null` or empty, logs a warning and returns an empty [Gostr].
+     * This ensures the Backend always receives a valid (non-null) object.
+     *
+     * @return a [Gostr] containing the string value, or an empty [Gostr] if the input is `null` or empty.
+     */
+    fun String?.togs(): Gostr? {
+        if (this.isNullOrEmpty()) {
+            Logger.w(LOG_TAG_VPN, "Input string is null or empty, returning empty Gostr")
+            return Backend.strOf("")
+        }
+        return Backend.strOf(this)
+    }
+
+    /**
+     * Converts a nullable [Gostr] to a [String].
+     *
+     * If the [Gostr] is `null`, logs a warning and returns an empty string.
+     *
+     * @return the string content of the [Gostr], or an empty string if `null`.
+     */
+    fun Gostr?.tos(): String? {
+        if (this == null) {
+            Logger.w(LOG_TAG_VPN, "Gostr is null, returning empty string")
+            return null
+        }
+        return this.v()
+    }
+
+    /**
+     * Converts a nullable [ByteArray] to a [Gobyte] object for the Backend engine.
+     *
+     * If the input is `null`, logs a warning and returns an empty [Gobyte].
+     *
+     * @return a [Gobyte] containing the bytes, or an empty [Gobyte] if the input is `null`.
+     */
+    fun ByteArray?.togb(): Gobyte? {
+        if (this == null) {
+            Logger.w(LOG_TAG_VPN, "ByteArray is null, returning empty Gobyte")
+            return Backend.bytesOf(byteArrayOf())
+        }
+        return Backend.bytesOf(this)
+    }
+
+    /**
+     * Converts a nullable [Gobyte] to a [ByteArray].
+     *
+     * If the [Gobyte] is `null`, logs a warning and returns an empty [ByteArray].
+     *
+     * @return the byte content of the [Gobyte], or an empty [ByteArray] if `null`.
+     */
+    fun Gobyte?.tob(): ByteArray? {
+        if (this == null) {
+            Logger.w(LOG_TAG_VPN, "Gobyte is null, returning empty ByteArray")
+            return null
+        }
+        return this.v()
+    }
+
 }
