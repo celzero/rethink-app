@@ -53,13 +53,6 @@ android {
         minSdkVersion 23
         targetSdkVersion 35
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        externalNativeBuild {
-            // support for page sizes other than 4k, eg 2k, 8k, 16k
-            cmake {
-                cppFlags ""
-                arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
-            }
-        }
     }
 
     signingConfigs {
@@ -174,7 +167,7 @@ android {
             dimension "releaseType"
             // getPackageInfo().versionCode not returning the correct value (in prod builds) when
             // value is set in AndroidManifest.xml so setting it here
-            // for buildtype alpha, versionCode is set in env overriding gradle.properties
+            // for build type alpha, versionCode is set in env overriding gradle.properties
             versionCode = getVersionCode()
             versionName = gitVersion
             vectorDrawables.useSupportLibrary = true
@@ -227,7 +220,7 @@ dependencies {
 
     // Pagers Views
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    fullImplementation 'androidx.fragment:fragment-ktx:1.8.6'
+    fullImplementation 'androidx.fragment:fragment-ktx:1.8.7'
     implementation 'com.google.android.material:material:1.12.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.1.0'
 
@@ -267,11 +260,11 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:9064847790@aar'
-    websiteImplementation 'com.github.celzero:firestack:9064847790@aar'
-    fdroidImplementation 'com.github.celzero:firestack:9064847790@aar'
+    download 'com.github.celzero:firestack:87a1c2a5b7@aar'
+    websiteImplementation 'com.github.celzero:firestack:87a1c2a5b7@aar'
+    fdroidImplementation 'com.github.celzero:firestack:87a1c2a5b7@aar'
     // debug symbols
-    playImplementation 'com.github.celzero:firestack:9064847790:debug@aar'
+    playImplementation 'com.github.celzero:firestack:87a1c2a5b7:debug@aar'
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.10.1') {
@@ -304,8 +297,8 @@ dependencies {
 
     // for encrypting wireguard configuration files
     implementation("androidx.security:security-crypto:1.1.0-alpha07")
-    implementation("androidx.security:security-app-authenticator:1.0.0-beta01")
-    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-beta01")
+    implementation("androidx.security:security-app-authenticator:1.0.0-rc01")
+    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-rc01")
 
     // barcode scanner for wireguard
     fullImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
@@ -316,6 +309,6 @@ dependencies {
     // for in-app purchases
     playImplementation 'com.android.billingclient:billing:7.1.1'
     // for stripe payment gateway
-    websiteImplementation 'com.stripe:stripe-android:21.13.0'
-    fdroidImplementation 'com.stripe:stripe-android:21.13.0'
+    websiteImplementation 'com.stripe:stripe-android:21.14.0'
+    fdroidImplementation 'com.stripe:stripe-android:21.14.0'
 }
