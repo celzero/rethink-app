@@ -167,6 +167,14 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
             .cachedIn(viewModelScope)
     }
 
+    fun fetchAllActiveConnections(uid: Int, uptime: Long): LiveData<PagingData<AppConnection>> {
+        val to = System.currentTimeMillis() - uptime
+        val queryInput = "%${activeConnsFilter.value ?: ""}%"
+        return Pager(pagingConfig) { statsDao.getAllActiveConns(uid, to, queryInput) }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
     fun deleteLogs(uid: Int) {
         // delete based on the time category
         when (timeCategory) {

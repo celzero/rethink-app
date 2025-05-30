@@ -236,8 +236,8 @@ class AppWiseDomainLogsActivity :
         layoutManager = LinearLayoutManager(this)
         b.awlRecyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid, isRethink, true)
-        val to = System.currentTimeMillis() - VpnController.uptimeMs()
-        networkLogsViewModel.fetchActiveConnections(uid, to).observe(this) {
+        val uptime = VpnController.uptimeMs()
+        networkLogsViewModel.fetchAllActiveConnections(uid, uptime).observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter

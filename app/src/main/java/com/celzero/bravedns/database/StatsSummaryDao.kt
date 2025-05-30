@@ -251,6 +251,34 @@ interface StatsSummaryDao {
 
     @Query(
         """
+                   SELECT uid as uid, 
+                     '' as ipAddress,
+                     0 as port,
+                     COUNT(*) as count,
+                     0 as blocked, 
+                     flag as flag,
+                     dnsQuery as appOrDnsName,
+                     0 as downloadBytes,
+                     0 as uploadBytes,
+                     0 as totalBytes
+                   FROM ConnectionTracker
+                   where downloadBytes = 0
+                   and uploadBytes = 0
+                   and isBlocked = 0
+                   and duration = 0
+                   and synack = 0
+                   and message = ''
+                   and dnsQuery like :queryInput
+                   and uid = :uid
+                   and timeStamp > :to
+                   GROUP BY dnsQuery
+                   ORDER BY count DESC
+               """
+    )
+    fun getAllActiveConns(uid: Int, to: Long, queryInput: String): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
             SELECT uid AS uid, 
               '' AS ipAddress, 
               0 AS port, 
