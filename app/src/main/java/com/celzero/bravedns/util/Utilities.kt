@@ -36,6 +36,7 @@ import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
 import android.os.Build
+import android.os.Looper
 import android.provider.Settings
 import android.text.TextUtils
 import android.text.TextUtils.SimpleStringSplitter
@@ -63,6 +64,7 @@ import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.Gobyte
+import com.celzero.firestack.backend.Gomsg
 import com.celzero.firestack.backend.Gostr
 import com.google.common.net.InternetDomainName
 import com.google.gson.JsonParser
@@ -228,19 +230,24 @@ object Utilities {
     fun normalizeIp(ipstr: String?): InetAddress? {
         if (ipstr.isNullOrEmpty()) return null
 
-        val ipAddress: IPAddress = HostName(ipstr).asAddress() ?: return null
-        val ip = ipAddress.toInetAddress()
+        try {
+            val ipAddress: IPAddress = HostName(ipstr).asAddress() ?: return null
+            val ip = ipAddress.toInetAddress()
 
-        // no need to check if IP is not of type IPv6
-        if (!IPUtil.isIpV6(ipAddress)) return ip
+            // no need to check if IP is not of type IPv6
+            if (!IPUtil.isIpV6(ipAddress)) return ip
 
-        val ipv4 = IPUtil.ip4in6(ipAddress)
+            val ipv4 = IPUtil.ip4in6(ipAddress)
 
-        return if (ipv4 != null) {
-            ipv4.toInetAddress()
-        } else {
-            ip
+            return if (ipv4 != null) {
+                ipv4.toInetAddress()
+            } else {
+                ip
+            }
+        } catch (e: Exception) { // not expected
+            Logger.e(LOG_TAG_VPN, "err normalizing ip $ipstr ${e.message}", e)
         }
+        return null
     }
 
     fun makeAddressPair(countryCode: String?, ipAddress: String?): String {
@@ -298,25 +305,45 @@ object Utilities {
 
     fun showToastUiCentered(context: Context, message: String, toastLength: Int) {
         try {
-            // check if the context is ui context or not
-            if (context is androidx.appcompat.app.AppCompatActivity) {
-                context.runOnUiThread {
-                    Toast.makeText(context, message, toastLength).show()
+            val isMainThread = Looper.myLooper() == Looper.getMainLooper()
+            // Handle based on context type and thread
+            when {
+                context is androidx.appcompat.app.AppCompatActivity -> {
+                    if (isMainThread) Toast.makeText(context, message, toastLength).show()
+                    else context.runOnUiThread {
+                        Toast.makeText(context, message, toastLength).show()
+                    }
                 }
-            } else if (context is androidx.fragment.app.FragmentActivity) {
-                context.runOnUiThread {
-                    Toast.makeText(context, message, toastLength).show()
+
+                context is androidx.fragment.app.FragmentActivity -> {
+                    if (isMainThread) Toast.makeText(context, message, toastLength).show()
+                    else context.runOnUiThread {
+                        Toast.makeText(context, message, toastLength).show()
+                    }
                 }
-            } else if (context is android.app.Activity) {
-                context.runOnUiThread {
-                    Toast.makeText(context, message, toastLength).show()
+
+                context is android.app.Activity -> {
+                    if (isMainThread) Toast.makeText(context, message, toastLength).show()
+                    else context.runOnUiThread {
+                        Toast.makeText(context, message, toastLength).show()
+                    }
                 }
-            } else if (context is android.app.Application) {
-                Toast.makeText(context, message, toastLength).show()
-            } else {
-                Logger.w(LOG_TAG_VPN, "toast err: context not found")
-                if (DEBUG) { // for testing purpose
-                    Toast.makeText(context, message, toastLength).show()
+
+                context is android.app.Application -> {
+                    if (isMainThread) {
+                        Toast.makeText(context, message, toastLength).show()
+                    } else {
+                        android.os.Handler(Looper.getMainLooper()).post {
+                            Toast.makeText(context, message, toastLength).show()
+                        }
+                    }
+                }
+
+                else -> {
+                    Logger.w(LOG_TAG_VPN, "toast err: unsuitable context type")
+                    if (DEBUG && isMainThread) { // for testing purpose
+                        Toast.makeText(context, message, toastLength).show()
+                    }
                 }
             }
         } catch (e: IllegalStateException) {
@@ -387,19 +414,20 @@ object Utilities {
         return true
     }
 
-    // ref: https://stackoverflow.com/a/41818556
     fun copyWithStream(readStream: InputStream, writeStream: OutputStream): Boolean {
         val length = 256
         val buffer = ByteArray(length)
         return try {
-            var bytesRead: Int = readStream.read(buffer, 0, length)
-            // write the required bytes
-            while (bytesRead > 0) {
-                writeStream.write(buffer, 0, bytesRead)
-                bytesRead = readStream.read(buffer, 0, length)
+            readStream.use { input ->
+                writeStream.use { output ->
+                    var bytesRead: Int = input.read(buffer, 0, length)
+                    // write the required bytes
+                    while (bytesRead > 0) {
+                        output.write(buffer, 0, bytesRead)
+                        bytesRead = input.read(buffer, 0, length)
+                    }
+                }
             }
-            readStream.close()
-            writeStream.close()
             true
         } catch (e: Exception) {
             Logger.w(LOG_TAG_DOWNLOAD, "err while copying files using streams: ${e.message}, $e")
@@ -849,23 +877,22 @@ object Utilities {
 
         // extract the version part without any additional details after a '-'
         val currentVersion =
-            osVersion.split("-").first()  // use only the part before '-' if present
+            osVersion.split("-").firstOrNull() ?: return false // use only the part before '-' if present
 
-        val version1Parts = currentVersion.split(".")
-        val version2Parts = targetVersion.split(".")
+        val version1Parts = currentVersion.split(".").mapNotNull { it.toIntOrNull() }
+        val version2Parts = targetVersion.split(".").mapNotNull { it.toIntOrNull() }
 
         // find the maximum length to compare up to the longest version component
         val maxLength = maxOf(version1Parts.size, version2Parts.size)
 
         for (i in 0 until maxLength) {
             // convert each part to an integer for numerical comparison, default to 0 if null
-            val part1 = version1Parts.getOrNull(i)?.toIntOrNull() ?: 0
-            val part2 = version2Parts.getOrNull(i)?.toIntOrNull() ?: 0
+            val part1 = version1Parts.getOrNull(i) ?: 0
+            val part2 = version2Parts.getOrNull(i) ?: 0
 
             // if parts differ, return comparison result
             if (part1 != part2) {
-                val c = part1.compareTo(part2)
-                return c >= 0
+                return part1 >= part2
             }
         }
 
@@ -902,6 +929,14 @@ object Utilities {
             return null
         }
         return this.v()
+    }
+
+    fun Gomsg?.tos(): String? {
+        if (this == null) {
+            Logger.w(LOG_TAG_VPN, "Gomsg is null, returning empty string")
+            return null
+        }
+        return this.s
     }
 
     /**
