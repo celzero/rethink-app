@@ -81,6 +81,10 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         return connectionTrackerDAO.getLeastLoggedTime()
     }
 
+    suspend fun getConnIdByUidDomain(uid: Int, domain: String, to: Long): List<String> {
+        return connectionTrackerDAO.getConnIdByUidDomain(uid, domain, to)
+    }
+
     suspend fun clearLogsByUid(uid: Int) {
         connectionTrackerDAO.clearLogsByUid(uid)
     }

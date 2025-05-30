@@ -15,11 +15,13 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +30,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.Visibility
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
@@ -36,6 +39,7 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.ActivityAppWiseDomainLogsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -62,6 +66,7 @@ class AppWiseDomainLogsActivity :
     private var layoutManager: RecyclerView.LayoutManager? = null
     private lateinit var appInfo: AppInfo
     private var isRethink = false
+    private var isActiveConns = false
 
     companion object {
         private const val QUERY_TEXT_DELAY: Long = 1000
@@ -82,6 +87,7 @@ class AppWiseDomainLogsActivity :
             window.isNavigationBarContrastEnforced = false
         }
         uid = intent.getIntExtra(AppInfoActivity.INTENT_UID, INVALID_UID)
+        isActiveConns = intent.getBooleanExtra(AppInfoActivity.INTENT_ACTIVE_CONNS, false)
         if (uid == INVALID_UID) {
             finish()
         }
@@ -92,7 +98,11 @@ class AppWiseDomainLogsActivity :
             b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
         } else {
             init()
-            setAdapter()
+            if (isActiveConns) {
+                setActiveConnsAdapter()
+            } else {
+                setAdapter()
+            }
             setClickListener()
         }
     }
@@ -150,8 +160,15 @@ class AppWiseDomainLogsActivity :
     }
 
     private fun init() {
-        setTabbedViewTxt()
-        highlightToggleBtn()
+        if (!isActiveConns) {
+            setTabbedViewTxt()
+            highlightToggleBtn()
+        } else {
+            // no need to show toggle button and delete button for active connections
+            b.toggleGroup.visibility = View.GONE
+            b.awlDelete.visibility = View.GONE
+        }
+
         io {
             val appInfo = FirewallManager.getAppInfoByUid(uid)
             // case: app is uninstalled but still available in RethinkDNS database
@@ -210,6 +227,36 @@ class AppWiseDomainLogsActivity :
 
     private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
         Glide.with(this).load(drawable).error(Utilities.getDefaultIcon(this)).into(mIconImageView)
+    }
+
+    private fun setActiveConnsAdapter() {
+        Logger.v(LOG_TAG_UI, "setActiveConnsAdapter: uid: $uid, isRethink: $isRethink")
+        networkLogsViewModel.setUid(uid)
+        b.awlRecyclerConnection.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(this)
+        b.awlRecyclerConnection.layoutManager = layoutManager
+        val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid, isRethink, true)
+        val to = System.currentTimeMillis() - VpnController.uptimeMs()
+        networkLogsViewModel.fetchActiveConnections(uid, to).observe(this) {
+            recyclerAdapter.submitData(this.lifecycle, it)
+        }
+        b.awlRecyclerConnection.adapter = recyclerAdapter
+
+        // commenting for now, see if we can remove this later
+        /*recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    showNoRulesUi()
+                    hideRulesUi()
+                } else {
+                    hideNoRulesUi()
+                    showRulesUi()
+                }
+            } else {
+                hideNoRulesUi()
+                showRulesUi()
+            }
+        }*/
     }
 
     private fun setAdapter() {

@@ -322,6 +322,10 @@ object VpnController : KoinComponent {
         braveVpnService?.closeConnectionsIfNeeded(uid)
     }
 
+    fun closeConnectionsByUidDomain(uid: Int, domain: String?) {
+        braveVpnService?.closeConnectionsByUidDomain(uid, domain)
+    }
+
     suspend fun getDnsStatus(id: String): Long? {
         return braveVpnService?.getDnsStatus(id)
     }

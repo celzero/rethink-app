@@ -87,6 +87,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
     companion object {
         const val INTENT_UID = "UID"
+        const val INTENT_ACTIVE_CONNS = "ACTIVE_CONNS"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -395,6 +396,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
         b.aadDomainsChip.setOnClickListener { openAppWiseDomainLogsActivity() }
 
+        b.aadActiveConnsChip.setOnClickListener { openAppWiseDomainLogsActivity(true) }
+
         b.excludeProxySwitch.setOnCheckedChangeListener { _, isChecked ->
             updateExcludeProxyStatus(isChecked)
         }
@@ -419,9 +422,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
     }
 
-    private fun openAppWiseDomainLogsActivity() {
+    private fun openAppWiseDomainLogsActivity(activeConns: Boolean = false) {
         val intent = Intent(this, AppWiseDomainLogsActivity::class.java)
         intent.putExtra(INTENT_UID, uid)
+        intent.putExtra(INTENT_ACTIVE_CONNS, activeConns)
         startActivity(intent)
     }
 

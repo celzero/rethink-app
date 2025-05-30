@@ -31,10 +31,12 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppDomainDetailsBinding
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.bottomsheet.AppDomainRulesBottomSheet
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.math.log2
 
 class AppWiseDomainsAdapter(
@@ -135,9 +137,42 @@ class AppWiseDomainsAdapter(
 
         private fun setupClickListeners(conn: AppConnection) {
             b.acdContainer.setOnClickListener {
+                if (isActiveConn) {
+                    showCloseConnectionDialog(conn)
+                    return@setOnClickListener
+                }
                 // open bottom sheet to apply domain/ip rules
                 openBottomSheet(conn)
             }
+        }
+
+        private fun showCloseConnectionDialog(appConn: AppConnection) {
+            if (context !is AppCompatActivity) {
+                Logger.w(LOG_TAG_UI, "$TAG err showing close connection dialog")
+                return
+            }
+
+            if (isRethink) {
+                Logger.i(LOG_TAG_UI, "$TAG rethink connection - no close connection dialog")
+                return
+            }
+            Logger.v(LOG_TAG_UI, "$TAG show close connection dialog for uid: $uid")
+            val dialog = MaterialAlertDialogBuilder(context)
+                .setTitle(context.getString(R.string.close_conns_dialog_title))
+                .setMessage(context.getString(R.string.close_conns_dialog_desc, appConn.appOrDnsName))
+                .setPositiveButton(R.string.lbl_proceed) { _, _ ->
+                    // close the connection
+                    VpnController.closeConnectionsByUidDomain(appConn.uid, appConn.appOrDnsName)
+                    Logger.i(
+                        LOG_TAG_UI,
+                        "$TAG closed connection for uid: ${appConn.uid}, domain: ${appConn.appOrDnsName}"
+                    )
+                }
+                .setNegativeButton(R.string.lbl_cancel, null)
+                .create()
+            dialog.setCancelable(true)
+            dialog.setCanceledOnTouchOutside(true)
+            dialog.show()
         }
 
         private fun openBottomSheet(appConn: AppConnection) {

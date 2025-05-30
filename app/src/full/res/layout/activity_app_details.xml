@@ -497,7 +497,7 @@
             android:id="@+id/aad_active_conns_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:visibility="gone">
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -543,7 +543,7 @@
             android:id="@+id/aad_most_contacted_domain_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:visibility="gone">
 
             <androidx.appcompat.widget.AppCompatTextView

@@ -74,6 +74,7 @@ import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ConnectionTracker
+import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.iab.SubscriptionCheckWorker
@@ -88,6 +89,7 @@ import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.ui.NotificationHandlerActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.CoFactory
@@ -121,6 +123,7 @@ import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.DNSOpts
 import com.celzero.firestack.backend.DNSSummary
+import com.celzero.firestack.backend.Gomsg
 import com.celzero.firestack.backend.Gostr
 import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.backend.RDNS
@@ -146,6 +149,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import org.koin.core.component.inject
 import java.io.IOException
 import java.net.InetAddress
 import java.net.Socket
@@ -167,6 +171,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private val vpnScope = MainScope()
 
     private var connectionMonitor: ConnectionMonitor = ConnectionMonitor(this)
+    private val connTrackRepository by inject<ConnectionTrackerRepository>()
 
     private var userPresentReceiver: UserPresentReceiver = UserPresentReceiver()
 
@@ -2205,6 +2210,24 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         io("closeConn") { vpnAdapter?.closeConnections(uid0) }
     }
 
+    fun closeConnectionsByUidDomain(uid: Int, domain: String?) {
+        // can be invalid uid, in which case, no-op
+        // no need to close all connections in case of empty domain, as it is not valid
+        if (uid == INVALID_UID || domain.isNullOrEmpty()) return
+
+        io("closeUidDmn") {
+            val to = System.currentTimeMillis() - VpnController.uptimeMs()
+            // can be empty when the conns already closed before ui calls this
+            val cids = connTrackRepository.getConnIdByUidDomain(uid, domain, to)
+            if (cids.isEmpty()) {
+                Logger.w(LOG_TAG_VPN, "no connections found for uid: $uid, domain: $domain")
+                return@io
+            }
+            vpnAdapter?.closeConnections(cids)
+            Logger.i(LOG_TAG_VPN, "close connections by uid: $uid, domain: $domain, cids: $cids")
+        }
+    }
+
     private suspend fun addTransport() {
         // TODO: no need to call addTransport in case of relay changes, which we are doing now
         logd("handle transport change")
@@ -3373,7 +3396,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return vpnScope.async(CoroutineName(s) + Dispatchers.IO) { f() }
     }
 
-    override fun onQuery(uidStr: String, fqdn: String?, qtype: Long): DNSOpts = go2kt(dnsQueryDispatcher) {
+    override fun onQuery(uidGostr: Gostr?, qdn: Gostr?, qtype: Long): DNSOpts = go2kt(dnsQueryDispatcher) {
+        val fqdn: String? = qdn?.tos() ?: ""
+        val uidStr = uidGostr?.tos() ?: ""
         var result: DNSOpts? = null
         val timeTaken = measureTime {
             // TODO: if uid is received, then make sure Rethink uid always returns Default as transport
@@ -3935,7 +3960,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     // should never run in seperate go-routine as msg is a bytearray in go and will be
     // released immediately
-    override fun log(level: Int, msg: String) {
+    override fun log(level: Int, m: Gomsg?) {
+        val msg = m?.tos() ?: return
+
         if (msg.isEmpty()) return
 
         val l = Logger.LoggerLevel.fromId(level)

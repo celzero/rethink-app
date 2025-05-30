@@ -35,6 +35,7 @@ import com.celzero.bravedns.util.Constants
 class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, private val rinrDao: RethinkLogDao, private val statsDao: StatsSummaryDao) : ViewModel() {
     private var ipFilter: MutableLiveData<String> = MutableLiveData()
     private var domainFilter: MutableLiveData<String> = MutableLiveData()
+    private var activeConnsFilter: MutableLiveData<String> = MutableLiveData()
     private var uid: Int = Constants.INVALID_UID
     private val pagingConfig: PagingConfig
     private var timeCategory: TimeCategory = TimeCategory.ONE_HOUR
@@ -59,7 +60,7 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
     init {
         ipFilter.value = ""
         domainFilter.value = ""
-
+        activeConnsFilter.value = ""
         pagingConfig =
             PagingConfig(
                 enablePlaceholders = true,
@@ -104,6 +105,9 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
     val appIpLogs = ipFilter.switchMap { input -> fetchIpLogs(uid, input) }
     val appDomainLogs = domainFilter.switchMap {
         input -> fetchAppDomainLogs(uid, input)
+    }
+    val activeConnections = activeConnsFilter.switchMap { input ->
+        fetchActiveConnections(uid, VpnController.uptimeMs())
     }
 
     val rinrIpLogs = ipFilter.switchMap { input -> fetchRinrIpLogs(input) }
@@ -157,7 +161,8 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
 
     fun fetchActiveConnections(uid: Int, uptime: Long): LiveData<PagingData<AppConnection>> {
         val to = System.currentTimeMillis() - uptime
-        return Pager(pagingConfig) { statsDao.getTopActiveConns(uid, to) }
+        val queryInput = "%${activeConnsFilter.value ?: ""}%"
+        return Pager(pagingConfig) { statsDao.getTopActiveConns(uid, to, queryInput) }
             .liveData
             .cachedIn(viewModelScope)
     }
@@ -219,6 +224,7 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
             this.ipFilter.postValue(input)
         } else {
             this.domainFilter.postValue(input)
+            this.activeConnsFilter.postValue(input)
         }
     }
 

@@ -239,6 +239,7 @@ interface StatsSummaryDao {
                 and duration = 0
                 and synack = 0
                 and message = ''
+                and dnsQuery like :queryInput
                 and uid = :uid
                 and timeStamp > :to
                 GROUP BY dnsQuery
@@ -246,7 +247,7 @@ interface StatsSummaryDao {
                 LIMIT 3
             """
     )
-    fun getTopActiveConns(uid: Int, to: Long): PagingSource<Int, AppConnection>
+    fun getTopActiveConns(uid: Int, to: Long, queryInput: String): PagingSource<Int, AppConnection>
 
     @Query(
         """
