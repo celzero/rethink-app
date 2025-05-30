@@ -195,7 +195,7 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
                 // Do the DNS Crypt setting there
                 if (mode == 0) {
                     insertDNSCryptServer(name, urlStamp, desc)
-                } else if (mode == 1) {
+                } else {
                     insertDNSCryptRelay(name, urlStamp, desc)
                 }
                 dialog.dismiss()

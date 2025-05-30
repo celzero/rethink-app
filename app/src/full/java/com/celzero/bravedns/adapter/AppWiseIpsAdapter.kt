@@ -37,7 +37,7 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
 import kotlin.math.log2
 
-class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner, val uid: Int) :
+class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner, val uid: Int, val isRethink: Boolean) :
     PagingDataAdapter<AppConnection, AppWiseIpsAdapter.ConnectionDetailsViewHolder>(DIFF_CALLBACK),
     AppIpRulesBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
@@ -51,6 +51,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
 
                 override fun areContentsTheSame(old: AppConnection, new: AppConnection) = old == new
             }
+        private const val TAG = "AppWiseIpsAdapter"
     }
 
     private lateinit var adapter: AppWiseIpsAdapter
@@ -108,10 +109,15 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
 
         private fun openBottomSheet(conn: AppConnection) {
             if (context !is AppCompatActivity) {
-                Logger.w(LOG_TAG_UI, "err opening the app conn bottom sheet")
+                Logger.w(LOG_TAG_UI, "$TAG err opening the app conn bottom sheet")
                 return
             }
 
+            if (isRethink) {
+                return
+            }
+
+            Logger.vv(LOG_TAG_UI, "$TAG open bottom sheet for uid: $uid, ip: ${conn.ipAddress}, domain: ${conn.appOrDnsName}")
             val bottomSheetFragment = AppIpRulesBottomSheet()
             // Fix: free-form window crash
             // all BottomSheetDialogFragment classes created must have a public, no-arg constructor.
