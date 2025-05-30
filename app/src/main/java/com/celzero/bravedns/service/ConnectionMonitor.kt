@@ -208,9 +208,10 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
 
         val handlerThread = HandlerThread(NetworkRequestHandler::class.simpleName)
         handlerThread.start()
+        // Filter out empty strings from probe IPs to avoid unnecessary probe attempts
         val ips = IpsToProbe(
-            persistentState.pingv4Ips.split(",").map { it.trim() },
-            persistentState.pingv6Ips.split(",").map { it.trim() }
+            persistentState.pingv4Ips.split(",").map { it.trim() }.filter { it.isNotEmpty() },
+            persistentState.pingv6Ips.split(",").map { it.trim() }.filter { it.isNotEmpty() }
         )
         this.serviceHandler =
             NetworkRequestHandler(connectivityManager, handlerThread.looper, networkListener, ips)
@@ -501,7 +502,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             var minMtu4: Int = -1
             var minMtu6: Int = -1
             if (!isAtleastQ()) {
-                return minMtu4
+                // If not at least Q, return MIN_MTU for safety
+                return MIN_MTU
             }
             if (useActiveNetwork) {
                 connectivityManager.activeNetwork?.let {
@@ -532,8 +534,13 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                     Logger.v(LOG_TAG_CONNECTION, "tracked network6 mtu: ${c?.mtu}, using $minMtu6")
                 }
             }
+            // If both are -1, return MIN_MTU explicitly
+            if (minMtu4 <= 0 && minMtu6 <= 0) {
+                Logger.i(LOG_TAG_CONNECTION, "Both MTUs are invalid, using MIN_MTU: $MIN_MTU")
+                return MIN_MTU
+            }
             // set mtu to MIN_MTU (1280) if mtu4/mtu6 are less than MIN_MTU
-            val mtu = max(min(minMtu4, minMtu6), MIN_MTU)
+            val mtu = max(min(minMtu4.takeIf { it > 0 } ?: Int.MAX_VALUE, minMtu6.takeIf { it > 0 } ?: Int.MAX_VALUE), MIN_MTU)
             Logger.i(LOG_TAG_CONNECTION, "mtu4: $minMtu4, mtu6: $minMtu6; final mtu: $mtu")
             return mtu
         }
@@ -804,21 +811,18 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 null
             }
             probes.forEach { ip ->
+                if (ip.isEmpty()) return@forEach // skip empty IPs
                 if (isActive) {
                     ok = isReachable(ip)
                 }
-                if (!ok) {
-                    if (probeController != null) {
-                        val id = "Probe:${nw?.networkHandle}"
-                        ok = VpnController.performConnectivityCheck(probeController, id, ip)
-                        Logger.vv(LOG_TAG_CONNECTION, "probe from tun: $ip, $ok")
-                    }
-                } else {
-                    if (probeController != null) {
-                        val id = "Probe:${nw?.networkHandle}"
-                        val res = VpnController.performConnectivityCheck(probeController, id, ip)
-                        Logger.vv(LOG_TAG_CONNECTION, "probe from tun: $ip, $res, ok? $ok")
-                    }
+                if (!ok && probeController != null) {
+                    val id = "Probe:${nw?.networkHandle}"
+                    ok = VpnController.performConnectivityCheck(probeController, id, ip)
+                    Logger.vv(LOG_TAG_CONNECTION, "probe from tun: $ip, $ok")
+                } else if (probeController != null) {
+                    val id = "Probe:${nw?.networkHandle}"
+                    val res = VpnController.performConnectivityCheck(probeController, id, ip)
+                    Logger.vv(LOG_TAG_CONNECTION, "probe from tun: $ip, $res, ok? $ok")
                 }
                 if (!ok) {
                     ok = isReachableTcpUdp(nw, ip)
