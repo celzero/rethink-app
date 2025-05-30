@@ -38,9 +38,14 @@ import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityAdvancedSettingBinding
+import com.celzero.bravedns.scheduler.BugReportZipper.BUG_REPORT_DIR_NAME
+import com.celzero.bravedns.scheduler.BugReportZipper.BUG_REPORT_ZIP_FILE_NAME
+import com.celzero.bravedns.scheduler.EnhancedBugReport.TOMBSTONE_DIR_NAME
+import com.celzero.bravedns.scheduler.EnhancedBugReport.TOMBSTONE_ZIP_FILE_NAME
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
+import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.blocklistCanonicalPath
 import com.celzero.bravedns.util.Utilities.deleteRecursive
@@ -270,11 +275,78 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
     }
 
     private fun deleteUnusedBlocklists() {
+        Logger.v(LOG_TAG_UI, "$TAG; deleting unused blocklists")
         // delete all the blocklists other than the one in the settings
+        val localTsDir = persistentState.localBlocklistTimestamp
+        val remoteTsDir = persistentState.remoteBlocklistTimestamp
+        val localBlocklistDir = File(blocklistCanonicalPath(this, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME))
+        val remoteBlocklistDir = File(blocklistCanonicalPath(this, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME))
+        // all the blocklists are named with their timestamp as directory name
+        if (localBlocklistDir.exists() && localBlocklistDir.isDirectory) {
+            localBlocklistDir.listFiles()?.forEach { file ->
+                if (file.isDirectory && file.name.toLongOrNull() != localTsDir) {
+                    if (deleteRecursive(file)) {
+                        Logger.i(LOG_TAG_UI, "$TAG; deleted unused local blocklist: ${file.name}")
+                    } else {
+                        Logger.w(LOG_TAG_UI, "$TAG; failed to delete unused local blocklist: ${file.name}")
+                    }
+                }
+            }
+        }
+        if (remoteBlocklistDir.exists() && remoteBlocklistDir.isDirectory) {
+            remoteBlocklistDir.listFiles()?.forEach { file ->
+                if (file.isDirectory && file.name.toLongOrNull() != remoteTsDir) {
+                    if (deleteRecursive(file)) {
+                        Logger.i(LOG_TAG_UI, "$TAG; deleted unused remote blocklist: ${file.name}")
+                    } else {
+                        Logger.w(LOG_TAG_UI, "$TAG; failed to delete unused remote blocklist: ${file.name}")
+                    }
+                }
+            }
+        }
     }
 
-    private fun deleteLogs() {
-        // delete the logs older than 7 days?
+    private fun deleteLogs(): Boolean {
+        Logger.v(LOG_TAG_UI, "$TAG; deleting all log files before backup")
+        try {
+            // delete tombstone logs
+            val tombstoneDir = File(filesDir.canonicalPath + File.separator + TOMBSTONE_DIR_NAME)
+            if (tombstoneDir.exists() && tombstoneDir.isDirectory) {
+                tombstoneDir.listFiles()?.forEach { file ->
+                    if (file.delete()) {
+                        Logger.i(LOG_TAG_UI, "$TAG; deleted log file: ${file.name}")
+                    } else {
+                        Logger.w(LOG_TAG_UI, "$TAG; failed to delete log file: ${file.name}")
+                    }
+                }
+            }
+
+            // delete bugreport logs
+            val bugreportDir = File(filesDir.canonicalPath + File.separator + BUG_REPORT_DIR_NAME)
+            if (bugreportDir.exists() && bugreportDir.isDirectory) {
+                deleteRecursive(bugreportDir)
+                Logger.i(LOG_TAG_UI, "$TAG; deleted bugreport logs from: ${bugreportDir.canonicalPath}")
+            }
+
+            // delete zip files
+            val tombstoneZip = File(filesDir.canonicalPath + File.separator + TOMBSTONE_ZIP_FILE_NAME)
+            if (tombstoneZip.exists()) {
+                tombstoneZip.delete()
+                Logger.i(LOG_TAG_UI, "$TAG; deleted tombstone zip file: ${tombstoneZip.canonicalPath}")
+            }
+
+            val bugreportZip = File(filesDir.canonicalPath + File.separator + BUG_REPORT_ZIP_FILE_NAME)
+            if (bugreportZip.exists()) {
+                bugreportZip.delete()
+                Logger.i(LOG_TAG_UI, "$TAG; deleted bugreport zip file: ${bugreportZip.canonicalPath}")
+            }
+
+            Logger.i(LOG_TAG_UI, "$TAG; deleted all log files successfully")
+            return true
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_UI, "$TAG; err while deleting log files: ${e.message}")
+            return false
+        }
     }
 
     private fun openConsoleLogActivity() {

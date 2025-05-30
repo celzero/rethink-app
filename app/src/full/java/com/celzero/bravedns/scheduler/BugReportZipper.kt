@@ -43,8 +43,8 @@ import kotlin.compareTo
 object BugReportZipper {
 
     // Bug report file and directory constants
-    private const val BUG_REPORT_DIR_NAME = "bugreport"
-    private const val BUG_REPORT_ZIP_FILE_NAME = "rethinkdns.bugreport.zip"
+    const val BUG_REPORT_DIR_NAME = "bugreport"
+    const val BUG_REPORT_ZIP_FILE_NAME = "rethinkdns.bugreport.zip"
     private const val BUG_REPORT_FILE_NAME = "bugreport_"
 
     // maximum number of files allowed as part of bugreport zip file

@@ -122,6 +122,7 @@ object WireguardManager : KoinComponent {
     suspend fun deleteResidueWgs() {
         val wgs = db.getWarpSecWarpConfig()
         if (wgs.isEmpty()) {
+            Logger.i(LOG_TAG_PROXY, "no residue wg configs to delete")
             return
         }
         wgs.forEach {

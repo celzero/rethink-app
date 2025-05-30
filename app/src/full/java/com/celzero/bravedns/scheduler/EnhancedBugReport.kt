@@ -30,17 +30,15 @@ import java.nio.charset.Charset
 import java.util.zip.ZipEntry
 import java.util.zip.ZipException
 import java.util.zip.ZipOutputStream
-import kotlin.text.compareTo
-import kotlin.times
 
 object EnhancedBugReport {
 
-    private const val TOMBSTONE_DIR_NAME = "tombstone"
+    const val TOMBSTONE_DIR_NAME = "tombstone"
     private const val TOMBSTONE_FILE_NAME = "tombstone_"
     private const val MAX_TOMBSTONE_FILES = 5 // maximum files allowed as part of tombstone zip file
     private const val MAX_FILE_SIZE = 1024 * 1024 // 1MB
     private const val FILE_EXTENSION = ".txt"
-    private const val ZIP_FILE_NAME = "rethinkdns.tombstone.zip"
+    const val TOMBSTONE_ZIP_FILE_NAME = "rethinkdns.tombstone.zip"
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun addLogsToZipFile(context: Context) {
@@ -48,7 +46,7 @@ object EnhancedBugReport {
             // create a new zip file named rethinkdns.tombstone.zip
             // add the logs to the zip file
             // close the zip file
-            val zipFilePath = File(context.filesDir.canonicalPath + File.separator + ZIP_FILE_NAME)
+            val zipFilePath = File(context.filesDir.canonicalPath + File.separator + TOMBSTONE_ZIP_FILE_NAME)
             Log.d(LOG_TAG_BUG_REPORT, "zip file path: $zipFilePath")
             ZipOutputStream(FileOutputStream(zipFilePath)).use { zipOutputStream ->
                 val folder = getFolderPath(context.filesDir) ?: return
@@ -142,7 +140,7 @@ object EnhancedBugReport {
 
     fun getTombstoneZipFile(context: Context): File? {
         try {
-            val zipFile = File(context.filesDir.canonicalPath + File.separator + ZIP_FILE_NAME)
+            val zipFile = File(context.filesDir.canonicalPath + File.separator + TOMBSTONE_ZIP_FILE_NAME)
             if (!zipFile.exists()) {
                 Log.w(LOG_TAG_BUG_REPORT, "zip file is null, cannot add logs to zip file")
                 return null
