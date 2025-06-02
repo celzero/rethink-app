@@ -438,4 +438,5 @@
     <string name="hsf_start_btn_state" translatable="true">آغاز</string>
     <string name="hsf_stop_btn_state" translatable="true">توقف</string>
     <string name="settings_notification_heading" translatable="true">اقدام اعلان را انتخاب کنید</string>
+    <string name="firewall_status_excluded" translatable="true">از dns و فایروال حذف شده است</string>
 </resources>
