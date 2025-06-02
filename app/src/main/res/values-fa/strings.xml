@@ -439,4 +439,85 @@
     <string name="hsf_stop_btn_state" translatable="true">توقف</string>
     <string name="settings_notification_heading" translatable="true">اقدام اعلان را انتخاب کنید</string>
     <string name="firewall_status_excluded" translatable="true">از dns و فایروال حذف شده است</string>
+    <string name="hs_biometeric_feature_not_supported" translatable="true">احراز هویت بیومتریک در این دستگاه پشتیبانی نمی‌شود یا غیرفعال است</string>
+    <string name="hsf_vpn_prepare_failure" translatable="true">یا مجوز وی پی ان وجود ندارد، یا برنامه دیگری در حالت وی پی ان همیشه روشن است.</string>
+    <string name="hsf_notification_permission_failure" translatable="true">فعال کردن مجوز اعلان از صفحه تنظیمات</string>
+    <string name="hsf_blocklist_updating_text" translatable="true">فعال کردن…</string>
+    <string name="hsf_chip_appearance" translatable="true">تم: %1$s</string>
+    <string name="dc_custom_dns_radio" translatable="true">Other DNS</string>
+    <string name="about_bug_no_log_dialog_positive_btn" translatable="true">ارسال ایمیل</string>
+    <string name="about_website" translatable="true">بازدید rethinkdns.com</string>
+    <string name="about_faq" translatable="true">مشاهده سوالات متداول</string>
+    <string name="about_docs" translatable="true">اسناد را بخوانید</string>
+    <string name="about_app_update_check" translatable="true">بررسی به‌روزرسانی‌های برنامه</string>
+    <string name="about_sponsor_link_text" translatable="true">اسپانسر</string>
+    <string name="about_connect" translatable="true">تماس</string>
+    <string name="settings_notification_dialog_title" translatable="true">انتخاب اقدام اعلان</string>
+    <string name="hs_biometeric_desc" translatable="true">برای باز کردن قفل Rethink از احراز هویت بیومتریک استفاده کنید</string>
+    <string name="hsf_whats_new_remove_text" translatable="true">بستن…</string>
+    <string name="dc_dns_website_heading" translatable="true">نمایش آیکون وب‌سایت در گزارش‌های دی ان اس (آزمایشی)</string>
+    <string name="dc_check_update_desc" translatable="true">هر <i>سه</i> روز یکبار، به‌روزرسانی‌های فهرست مسدودی‌ها را بررسی کنید</string>
+    <string name="about_bravedns_toreport_text" translatable="true">کمک و بازخورد</string>
+    <string name="about_privacy_policy" translatable="true">سیاست حفظ حریم خصوصی را بخوانید</string>
+    <string name="rules_card_domain_count" translatable="true">قانون(های) دامنه %1$s</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s queries</string>
+    <string name="dc_dns_leaks_desc" translatable="true">وقتی فعال باشد، Rethink تمام بسته‌های روی پورت ۵۳ را ضبط کرده و به یک نقطه پایانی دی ان اس تنظیم شده توسط کاربر ارسال می‌کند.</string>
+    <string name="dc_dns_leaks_heading" translatable="true">جلوگیری از نشت دی ان اس</string>
+    <string name="dc_proxy_dns_heading" translatable="true">هرگز دی ان اس را پروکسی نکنید</string>
+    <string name="dc_proxy_dns_desc" translatable="true">دی ان اس را روی پروکسی‌های همیشه روشن وایرگارد، ساکس۵ و HTTP پروکسی نکنید.</string>
+    <string name="about_bravedns_explantion" translatable="true">Rethink ساده‌ترین راه برای نظارت بر فعالیت برنامه‌ها، دور زدن سانسور اینترنت و برنامه‌های فایروال در دستگاه اندروید شماست.</string>
+    <string name="about_bug_no_log_dialog_message" translatable="true">نتوانستم گزارش‌های خرابی را دریافت کنم. آیا می‌خواهید اشکال خود را به صورت دستی گزارش دهید؟</string>
+    <string name="about_email" translatable="true">ایمیل به ما</string>
+    <string name="firewall_status_isolate" translatable="true">ایزوله</string>
+    <string name="about_bug_report_dialog_positive_btn" translatable="true">ارسال ایمیل</string>
+    <string name="about_app" translatable="true">برنامه</string>
+    <string name="about_web" translatable="true">لینک ها</string>
+    <string name="settings_notification_desc" translatable="true">دکمه‌های عملیاتی برای نمایش با اعلان Rethink: %1$s</string>
+    <string name="settings_pcap_heading" translatable="true">Packet capture</string>
+    <string name="firewall_status_block_metered" translatable="true">در شبکه‌های محدود شده (موبایل) مسدود شده است</string>
+    <string name="hs_biometeric_failed" translatable="true">احراز هویت بیومتریک ناموفق بود</string>
+    <string name="hs_biometeric_error" translatable="true">خطای احراز هویت بیومتریک</string>
+    <string name="firewall_card_text_active" translatable="true">%1$s مسدود شده\n%2$s دور زده شده\n%3$s مستثنی شده\n%4$s ایزوله</string>
+    <string name="hsf_start_dialog_header" translatable="true">استارت %1$s</string>
+    <string name="hsf_start_dialog_message" translatable="true">شما یک قدم با اندروید امن و مطمئن فاصله دارید: فوراً فعالیت شبکه را مشاهده کنید، وب‌سایت‌ها، آی پی ها و برنامه‌های دارای رفتار نامناسب را مسدود کنید.</string>
+    <string name="hsf_start_dialog_positive" translatable="true">شروع</string>
+    <string name="hsf_pause_vpn_failure" translatable="true">نمی‌توان مکث کرد: Rethink فعال نیست</string>
+    <string name="lbl_background_data" translatable="true">محدود کردن داده‌های پس‌زمینه</string>
+    <string name="lbl_battery_optimization" translatable="true">بهینه‌سازی باتری</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">غیرفعال کردن %1$s</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> ممکن است منجر به قطع اتصال شود. تنظیمات را تغییر دهید تا Rethink در پس‌زمینه از داده‌ها و سایر منابع استفاده کند.</string>
+    <string name="dc_block_heading" translatable="true">قوانین</string>
+    <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
+    <string name="dc_entries" translatable="true">%1$s entries »</string>
+    <string name="dc_local_block_heading" translatable="true">لیست‌های مسدود شده روی دستگاه</string>
+    <string name="dc_custom_block_heading" translatable="true">قوانین دامنه</string>
+    <string name="dc_check_update_heading" translatable="true">درخواست به‌روزرسانی‌های لیست مسدودیت</string>
+    <string name="about_bravedns_whoarewe" translatable="true">Rethink یک پروژه رایگان و متن‌باز است که توسط مهندسان سابق آمازون، IBM و Scientific Games رهبری می‌شود.</string>
+    <string name="about_bug_report_desc" translatable="true">ایمیل گزارش‌های خرابی</string>
+    <string name="about_join_telegram" translatable="true">تلگرام</string>
+    <string name="about_bug_report" translatable="true">گزارش اشکال</string>
+    <string name="about_bug_no_log_dialog_title" translatable="true">گزارش اشکال</string>
+    <string name="about_whats_new" translatable="true">چه چیزهایی در %1$s جدید است</string>
+    <string name="about_mozilla" translatable="true">Rethink is supported by Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
+    <string name="hsf_blocklist_chip_text_no_data" translatable="true">Enable RDNS+</string>
+    <string name="hsf_proxy_chip_removed_toast" translatable="true">پروکسی حذف شد</string>
+    <string name="pcap_failure_toast" translatable="true">خطا در ایجاد فایلpcap، دوباره امتحان کنید!</string>
+    <string name="dc_local_block_desc_1" translatable="true">از بین بیش از ۱۹۵ لیست مسدودکننده انتخاب کنید. برای دانلود یا پیکربندی لیست‌های مسدودکننده اینجا کلیک کنید.</string>
+    <string name="hsf_exclude_error" translatable="true">در حالت قفل وی پی ان، امکان حذف وجود ندارد</string>
+    <string name="dc_dns_website_desc" translatable="true">آیکون‌های وب‌سایت را از <i>nextdns.io</i> و <i>duckduckgo.com</i> دریافت می‌کند. تا ۳۵۰ مگابایت از فضای دیسک را اشغال می‌کند</string>
+    <string name="hsf_proxy_chip_text" translatable="true">پروکسی فعال است</string>
+    <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Packet capture disabled</string>
+    <string name="hsf_whats_new_chip_text" translatable="true">جدید چی هست</string>
+    <string name="hsf_proxy_chip_remove_text" translatable="true">متوقف کردن…</string>
+    <string name="hsf_packet_capture_chip_text" translatable="true">Packet capture active</string>
+    <string name="firewall_status_whitelisted" translatable="true">قوانین جهانی فایروال را دور می‌زند</string>
+    <string name="ct_bs_app_info_error" translatable="true">اطلاعات برنامه یافت نشد</string>
+    <string name="firewall_status_bypass_dns_firewall" translatable="true">قوانین دی ان اس و فایروال را دور می‌زند</string>
+    <string name="firewall_status_block_unmetered" translatable="true">مسدود شدن در شبکه‌های نامحدود (وای‌فای)</string>
+    <string name="apps_card_ips_count" translatable="true">%1$s قانون(های) آی‌پی و پورت</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">Rethink برای راه‌اندازی وی پی ان محلی جهت رمزگذاری درخواست‌های دی ان اس دستگاه، پیاده‌سازی مانیتور شبکه و اعمال قوانین فایروال به مجوز نیاز دارد..\n\nRethink به هیچ وجه هیچ اطلاعاتی را جمع‌آوری یا از شما جاسوسی نمی‌کند.</string>
+    <string name="dc_other_dns_heading" translatable="true">نوع</string>
+    <string name="about_github" translatable="true">مشارکت در گیت‌هاب</string>
+    <string name="about_twitter" translatable="true">ما را در توییتر دنبال کنید</string>
+    <string name="settings_pcap_dialog_option_3" translatable="true">خروجی به پوشه دانلودها</string>
 </resources>
