@@ -28,6 +28,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.SeekBar
 import androidx.appcompat.app.AlertDialog
@@ -373,14 +374,21 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         val selectableTextView = AppCompatTextView(context).apply {
             text = context.getString(R.string.adv_tasker_dialog_msg)
             setTextIsSelectable(true)
-            setPadding(50, 40, 50, 0) // optional: padding to make it look better
+            setPadding(50, 40, 50, 0)
             textSize = 16f
+        }
+
+        // add a LinearLayout as the single child of the ScrollView, then add the text view and
+        // edit text to the LinearLayout.
+        val linearLayout = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(selectableTextView)
+            addView(editText)
         }
 
         val scrollView = ScrollView(context).apply {
             setPadding(40, 10, 40, 0)
-            addView(selectableTextView)
-            addView(editText)
+            addView(linearLayout)
         }
 
         AlertDialog.Builder(context)
