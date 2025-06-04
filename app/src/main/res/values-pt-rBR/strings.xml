@@ -16,9 +16,7 @@
     <string name="settings_ip_dialog_ipv6">IPv6 (experimental)</string>
     <string name="settings_ip_dialog_ipv46">Automático (experimental)</string>
     <string name="settings_ip_text_ipv46">Automático</string>
-    <string name="settings_notification_dialog_option_2">"
-\nDNS / DNS + Firewall:
-\nMostrar dois botões para alternar rapidamente entre o modo DNS para economia de bateria e modo normal DNS + Firewall."</string>
+    <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall\nMostrar dois botões para alternar rapidamente entre o modo DNS para economia de bateria e modo normal DNS + Firewall.</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="about_twitter">Siga-nos no Twitter</string>
     <string name="about_app_update_check">Buscar atualizações</string>
@@ -427,13 +425,8 @@
     <string name="settings_notification_desc2">DNS / DNS + Firewall</string>
     <string name="settings_notification_desc3">Nenhum</string>
     <string name="settings_notification_dialog_title">Escolher ação de notificação</string>
-    <string name="settings_notification_dialog_option_1">"
-\nPausar/Encerrar (padrão):
-\nMostrar dois botões para rapidamente pausar e encerrar o Rethink."</string>
-    <string name="settings_notification_dialog_option_3">"
-\nNenhum:
-\nNão mostrar nenhum botão.
-\n"</string>
+    <string name="settings_notification_dialog_option_1">\nPausar/Encerrar (padrão):\nMostrar dois botões para rapidamente pausar e encerrar o Rethink.</string>
+    <string name="settings_notification_dialog_option_3">\nNenhum:\nNão mostrar nenhum botão.\n</string>
     <string name="settings_selected_theme">Tema atual: %1$s</string>
     <string name="settings_protocol_translation_dns_inactive">Mudar para o modo DNS/DNS+Firewall para ativar esta configuração</string>
     <string name="apps_icon_content_desc">Ícone do aplicativo</string>
