@@ -1,0 +1,1 @@
+DNS, Firewall, WireGuard VPN, Monitoramento de Rede, Bloqueador de Malware.
