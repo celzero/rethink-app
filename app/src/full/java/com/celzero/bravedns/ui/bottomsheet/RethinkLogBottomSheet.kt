@@ -29,6 +29,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
@@ -47,6 +48,7 @@ import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
@@ -93,6 +95,13 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.let { window ->
+            if (isAtleastQ()) {
+                val controller = WindowInsetsControllerCompat(window, window.decorView)
+                controller.isAppearanceLightNavigationBars = false
+                window.isNavigationBarContrastEnforced = false
+            }
+        }
         val data = arguments?.getString(INSTANCE_STATE_IPDETAILS)
         info = Gson().fromJson(data, RethinkLog::class.java)
         initView()
@@ -382,7 +391,7 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     private fun openAppDetailActivity(uid: Int) {
         this.dismiss()
         val intent = Intent(requireContext(), AppInfoActivity::class.java)
-        intent.putExtra(AppInfoActivity.UID_INTENT_NAME, uid)
+        intent.putExtra(AppInfoActivity.INTENT_UID, uid)
         requireContext().startActivity(intent)
     }
 

@@ -34,6 +34,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
 
     companion object {
         val MAX_RETRY_TIMEOUT = TimeUnit.MINUTES.toMillis(40)
+        private const val MAX_RETRY_COUNT = 3
 
         private const val JSON_PAYMENT_STATUS = "payment_status"
         private const val JSON_STATUS = "status"
@@ -74,7 +75,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
         var paymentStatus = TcpProxyHelper.PaymentStatus.INITIATED
         try {
             val retrofit =
-                RetrofitManager.getTcpProxyBaseBuilder(retryCount)
+                RetrofitManager.getTcpProxyBaseBuilder()
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(ITcpProxy::class.java)
@@ -126,6 +127,6 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
     }
 
     private fun isRetryRequired(retryCount: Int): Boolean {
-        return retryCount < RetrofitManager.Companion.OkHttpDnsType.entries.size - 1
+        return retryCount < MAX_RETRY_COUNT
     }
 }

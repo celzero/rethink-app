@@ -66,7 +66,7 @@
         android:text="@string/lbl_disabled"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
-        app:drawableEndCompat="@drawable/ic_cross"
+        app:drawableEndCompat="@drawable/ic_cross_accent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/hint1" />
