@@ -247,6 +247,22 @@
         app:layout_constraintTop_toBottomOf="@id/lbbs_search" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/lbbs_delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:fontFamily="sans-serif-medium"
+        android:padding="10dp"
+        android:text="@string/lbl_delete"
+        android:textColor="?attr/primaryTextColor"
+        android:textSize="@dimen/extra_large_font_text_view"
+        app:drawableEndCompat="@drawable/ic_delete_small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lbbs_copy" />
+
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/lbbs_version"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -260,7 +276,7 @@
         android:textSize="@dimen/small_font_text_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lbbs_copy" />
+        app:layout_constraintTop_toBottomOf="@id/lbbs_delete" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
