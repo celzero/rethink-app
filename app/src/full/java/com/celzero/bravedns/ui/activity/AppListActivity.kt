@@ -256,6 +256,12 @@ class AppListActivity :
         super.onPause()
     }
 
+    override fun onStop() {
+        super.onStop()
+        // clear the filters when the activity is stopped
+        filters.value = null
+    }
+
     override fun onQueryTextSubmit(query: String): Boolean {
         addQueryToFilters(query)
         b.ffaSearch.clearFocus()
