@@ -88,6 +88,7 @@ class AppWiseDomainLogsActivity :
         }
         uid = intent.getIntExtra(AppInfoActivity.INTENT_UID, INVALID_UID)
         isActiveConns = intent.getBooleanExtra(AppInfoActivity.INTENT_ACTIVE_CONNS, false)
+
         if (uid == INVALID_UID) {
             finish()
         }
@@ -132,10 +133,10 @@ class AppWiseDomainLogsActivity :
             val mb: MaterialButton = b.toggleGroup.findViewById(checkedId)
             if (isChecked) {
                 selectToggleBtnUi(mb)
-                val tcValue = (mb.tag as String).toIntOrNull() ?: 0
+                val tcValue = (mb.tag as String).toIntOrNull() ?: 2 // "2" tag is for 7 days
                 val timeCategory =
                     AppConnectionsViewModel.TimeCategory.fromValue(tcValue)
-                        ?: AppConnectionsViewModel.TimeCategory.ONE_HOUR
+                        ?: AppConnectionsViewModel.TimeCategory.SEVEN_DAYS
                 networkLogsViewModel.timeCategoryChanged(timeCategory, true)
                 return@OnButtonCheckedListener
             }
@@ -201,7 +202,7 @@ class AppWiseDomainLogsActivity :
 
 
     private fun highlightToggleBtn() {
-        val timeCategory = "0" // default is 1 hours, "0" tag is 1 hours
+        val timeCategory = "2" // default is 7 days, "2" tag is for 7 days
         val btn = b.toggleGroup.findViewWithTag<MaterialButton>(timeCategory)
         btn.isChecked = true
         selectToggleBtnUi(btn)
@@ -242,8 +243,7 @@ class AppWiseDomainLogsActivity :
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
-        // commenting for now, see if we can remove this later
-        /*recyclerAdapter.addLoadStateListener {
+        recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
                     showNoRulesUi()
@@ -256,7 +256,7 @@ class AppWiseDomainLogsActivity :
                 hideNoRulesUi()
                 showRulesUi()
             }
-        }*/
+        }
     }
 
     private fun setAdapter() {
@@ -271,7 +271,7 @@ class AppWiseDomainLogsActivity :
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
         // commenting for now, see if we can remove this later
-        /*recyclerAdapter.addLoadStateListener {
+        recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
                     showNoRulesUi()
@@ -284,7 +284,7 @@ class AppWiseDomainLogsActivity :
                 hideNoRulesUi()
                 showRulesUi()
             }
-        }*/
+        }
     }
 
     private fun setRethinkAdapter() {
@@ -299,7 +299,7 @@ class AppWiseDomainLogsActivity :
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
         // commenting for now, see if we can remove this later
-        /*recyclerAdapter.addLoadStateListener {
+        recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
                 if (recyclerAdapter.itemCount < 1) {
                     showNoRulesUi()
@@ -312,11 +312,11 @@ class AppWiseDomainLogsActivity :
                 hideNoRulesUi()
                 showRulesUi()
             }
-        }*/
+        }
     }
 
     // commenting for now, see if we can remove this later
-    /*private fun showNoRulesUi() {
+    private fun showNoRulesUi() {
         b.awlNoRulesRl.visibility = View.VISIBLE
         networkLogsViewModel.rinrDomainLogs.removeObservers(this)
     }
@@ -333,7 +333,7 @@ class AppWiseDomainLogsActivity :
     private fun showRulesUi() {
         b.awlCardViewTop.visibility = View.VISIBLE
         b.awlRecyclerConnection.visibility = View.VISIBLE
-    }*/
+    }
 
     override fun onQueryTextSubmit(query: String): Boolean {
         Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {

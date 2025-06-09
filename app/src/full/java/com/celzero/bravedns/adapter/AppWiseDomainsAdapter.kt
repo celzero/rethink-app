@@ -31,6 +31,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppDomainDetailsBinding
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.bottomsheet.AppDomainRulesBottomSheet
 import com.celzero.bravedns.util.UIUtils
@@ -123,6 +124,22 @@ class AppWiseDomainsAdapter(
         }
 
         private fun displayTransactionDetails(conn: AppConnection) {
+            // handle active connections specially, no need to show progress bar,
+            // asn info will be added in the appOrDnsName field
+            if (isActiveConn) {
+                b.progress.visibility = View.GONE
+                b.acdCount.text = conn.count.toString()
+                b.acdDomain.text = beautifyIpString(conn.ipAddress)
+                if (conn.appOrDnsName.isNullOrEmpty()) {
+                    b.acdIpAddress.text = ""
+                } else {
+                    b.acdIpAddress.text = conn.appOrDnsName
+                }
+                b.acdFlag.visibility = View.VISIBLE
+                b.acdFlag.text = conn.flag
+                return
+            }
+
             b.acdCount.text = conn.count.toString()
             b.acdDomain.text = conn.appOrDnsName
             b.acdFlag.text = conn.flag
@@ -159,10 +176,10 @@ class AppWiseDomainsAdapter(
             Logger.v(LOG_TAG_UI, "$TAG show close connection dialog for uid: $uid")
             val dialog = MaterialAlertDialogBuilder(context)
                 .setTitle(context.getString(R.string.close_conns_dialog_title))
-                .setMessage(context.getString(R.string.close_conns_dialog_desc, appConn.appOrDnsName))
+                .setMessage(context.getString(R.string.close_conns_dialog_desc, appConn.ipAddress, appConn.appOrDnsName))
                 .setPositiveButton(R.string.lbl_proceed) { _, _ ->
                     // close the connection
-                    VpnController.closeConnectionsByUidDomain(appConn.uid, appConn.appOrDnsName)
+                    VpnController.closeConnectionsByUidDomain(appConn.uid, appConn.ipAddress)
                     Logger.i(
                         LOG_TAG_UI,
                         "$TAG closed connection for uid: ${appConn.uid}, domain: ${appConn.appOrDnsName}"

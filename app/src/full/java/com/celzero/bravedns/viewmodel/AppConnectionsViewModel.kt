@@ -29,16 +29,16 @@ import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.RethinkLogDao
 import com.celzero.bravedns.database.StatsSummaryDao
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 
 class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, private val rinrDao: RethinkLogDao, private val statsDao: StatsSummaryDao) : ViewModel() {
     private var ipFilter: MutableLiveData<String> = MutableLiveData()
     private var domainFilter: MutableLiveData<String> = MutableLiveData()
-    private var activeConnsFilter: MutableLiveData<String> = MutableLiveData()
+    private var asnFilter: MutableLiveData<String> = MutableLiveData()
+
     private var uid: Int = Constants.INVALID_UID
     private val pagingConfig: PagingConfig
-    private var timeCategory: TimeCategory = TimeCategory.ONE_HOUR
+    private var timeCategory: TimeCategory = TimeCategory.SEVEN_DAYS
     private var startTime: MutableLiveData<Long> = MutableLiveData()
 
     companion object {
@@ -60,7 +60,7 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
     init {
         ipFilter.value = ""
         domainFilter.value = ""
-        activeConnsFilter.value = ""
+        asnFilter.value = ""
         pagingConfig =
             PagingConfig(
                 enablePlaceholders = true,
@@ -94,6 +94,7 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
             domainFilter.value = ""
         } else {
             ipFilter.value = ""
+            asnFilter.value = ""
         }
     }
 
@@ -106,8 +107,8 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
     val appDomainLogs = domainFilter.switchMap {
         input -> fetchAppDomainLogs(uid, input)
     }
-    val activeConnections = activeConnsFilter.switchMap { input ->
-        fetchActiveConnections(uid, VpnController.uptimeMs())
+    val asnLogs = asnFilter.switchMap { input ->
+        fetchAllAsnLogs(uid, input)
     }
 
     val rinrIpLogs = ipFilter.switchMap { input -> fetchRinrIpLogs(input) }
@@ -161,16 +162,22 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
 
     fun fetchActiveConnections(uid: Int, uptime: Long): LiveData<PagingData<AppConnection>> {
         val to = System.currentTimeMillis() - uptime
-        val queryInput = "%${activeConnsFilter.value ?: ""}%"
-        return Pager(pagingConfig) { statsDao.getTopActiveConns(uid, to, queryInput) }
+        return Pager(pagingConfig) { statsDao.getTopActiveConns(uid, to) }
             .liveData
             .cachedIn(viewModelScope)
     }
 
     fun fetchAllActiveConnections(uid: Int, uptime: Long): LiveData<PagingData<AppConnection>> {
         val to = System.currentTimeMillis() - uptime
-        val queryInput = "%${activeConnsFilter.value ?: ""}%"
-        return Pager(pagingConfig) { statsDao.getAllActiveConns(uid, to, queryInput) }
+        return Pager(pagingConfig) { statsDao.getAllActiveConns(uid, to) }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    fun fetchAllAsnLogs(uid: Int, input: String) : LiveData<PagingData<AppConnection>> {
+        val to = getStartTime()
+        val queryInput = "%$input%"
+        return Pager(pagingConfig) { statsDao.getAllAsnLogs(uid, to, queryInput) }
             .liveData
             .cachedIn(viewModelScope)
     }
@@ -193,7 +200,7 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
     }
 
     private fun getStartTime(): Long {
-        return startTime.value ?: (System.currentTimeMillis() - ONE_HOUR_MILLIS)
+        return startTime.value ?: (System.currentTimeMillis() - ONE_WEEK_MILLIS)
     }
 
     fun getDomainLogsLimited(uid: Int): LiveData<PagingData<AppConnection>> {
@@ -219,6 +226,12 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
             .cachedIn(viewModelScope)
     }
 
+    fun getAsnLogsLimited(uid: Int): LiveData<PagingData<AppConnection>> {
+        val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
+        return Pager(pagingConfig) { statsDao.getAsnLogsLimited(uid, to) }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
 
     fun getIpLogsLimited(uid: Int): LiveData<PagingData<AppConnection>> {
         val to = System.currentTimeMillis() - ONE_WEEK_MILLIS
@@ -232,7 +245,7 @@ class AppConnectionsViewModel(private val nwlogDao: ConnectionTrackerDAO, privat
             this.ipFilter.postValue(input)
         } else {
             this.domainFilter.postValue(input)
-            this.activeConnsFilter.postValue(input)
+            this.asnFilter.postValue(input)
         }
     }
 

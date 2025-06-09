@@ -86,32 +86,6 @@ class DomainConnectionsAdapter(private val context: Context, private val type: D
         RecyclerView.ViewHolder(b.root) {
 
         fun bind(dc: AppConnection) {
-            if (type == DomainConnectionsActivity.InputType.ASN) {
-                b.ssDataUsage.text = dc.ipAddress
-                b.ssIcon.visibility = View.GONE
-                b.ssFlag.visibility = View.VISIBLE
-                b.ssFlag.text = getFlag(dc.flag)
-                b.ssCount.text = dc.count.toString()
-                b.ssProgress.visibility = View.GONE
-                if (dc.downloadBytes == null || dc.uploadBytes == null) {
-                    return
-                }
-
-                val download =
-                    context.getString(
-                        R.string.symbol_download,
-                        Utilities.humanReadableByteCount(dc.downloadBytes, true)
-                    )
-                val upload =
-                    context.getString(
-                        R.string.symbol_upload,
-                        Utilities.humanReadableByteCount(dc.uploadBytes, true)
-                    )
-                val total = context.getString(R.string.two_argument, upload, download)
-                b.ssName.text = total
-                return
-            }
-
             io {
                 val appInfo = FirewallManager.getAppInfoByUid(dc.uid)
                 uiCtx {

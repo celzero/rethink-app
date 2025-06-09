@@ -540,6 +540,52 @@
             android:nestedScrollingEnabled="false" />
 
         <RelativeLayout
+            android:id="@+id/aad_asn_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="20dp"
+                android:layout_toStartOf="@id/aad_asn_chip"
+                android:fontFamily="sans-serif-smallcaps"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="top asn connections"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/extra_large_font_text_view" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/aad_asn_chip"
+                style="@style/ThinnerChip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:layout_gravity="end"
+                android:layout_marginEnd="14dp"
+                android:text="@string/ssv_see_more"
+                android:textColor="?attr/chipTextPositive"
+                android:textSize="@dimen/large_font_text_view"
+                android:visibility="visible"
+                app:chipBackgroundColor="?attr/chipBgColorPositive"
+                app:chipSurfaceColor="@null" />
+
+        </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/aad_asn_rv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
+
+        <RelativeLayout
             android:id="@+id/aad_most_contacted_domain_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

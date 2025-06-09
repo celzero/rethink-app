@@ -190,8 +190,8 @@ interface ConnectionTrackerDAO {
     )
     fun getLeastLoggedTime(): Long
 
-    @Query("select connId from ConnectionTracker where uid = :uid and dnsQuery = :domain and timeStamp >= :to and message = '' and uploadBytes = 0 and downloadBytes = 0 and synack = 0")
-    fun getConnIdByUidDomain(uid: Int, domain: String, to: Long): List<String>
+    @Query("select connId from ConnectionTracker where uid = :uid and ipAddress = :ipAddress and timeStamp >= :to and message = '' and uploadBytes = 0 and downloadBytes = 0 and synack = 0")
+    fun getConnIdByUidIpAddress(uid: Int, ipAddress: String, to: Long): List<String>
 
     @Query(
         "SELECT uid, SUM(uploadBytes) AS uploadBytes, SUM(downloadBytes) AS downloadBytes FROM ConnectionTracker where timeStamp >= :from and timeStamp <= :to GROUP BY uid"

@@ -25,257 +25,322 @@ interface StatsSummaryDao {
 
     @Query(
         """
-            SELECT -1 as uid, 
-             '' as ipAddress,
-             0 as port,
-             COUNT(*) as count,
-             0 as blocked, 
-             ipInfo.countryCode AS flag, 
-             ipInfo.asName AS appOrDnsName,
-             Sum(conn.downloadBytes) as downloadBytes,
-             Sum(conn.uploadBytes) as uploadBytes,
-             Sum(downloadBytes + uploadBytes) as totalBytes
-            FROM ConnectionTracker AS conn
-            INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
-            where conn.isBlocked = 0
-            and ipInfo.asName != ''
-            and conn.timeStamp > :to
-            GROUP BY ipInfo.asName
-            ORDER BY count DESC
-            LIMIT 7
+        SELECT -1 as uid, 
+            '' as ipAddress,
+            0 as port,
+            COUNT(*) as count,
+            0 as blocked, 
+            ipInfo.countryCode AS flag, 
+            ipInfo.asName AS appOrDnsName,
+            Sum(conn.downloadBytes) as downloadBytes,
+            Sum(conn.uploadBytes) as uploadBytes,
+            Sum(downloadBytes + uploadBytes) as totalBytes
+        FROM ConnectionTracker AS conn
+        INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
+        WHERE conn.isBlocked = 0
+            AND ipInfo.asName != ''
+            AND conn.timeStamp > :to
+        GROUP BY ipInfo.asName
+        ORDER BY count DESC
+        LIMIT 7
         """
     )
     fun getMostConnectedASN(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
         """
-               SELECT -1 as uid, 
-                '' as ipAddress,
-                0 as port,
-                COUNT(*) as count,
-                0 as blocked, 
-                ipInfo.countryCode AS flag, 
-                ipInfo.asName AS appOrDnsName,
-                Sum(conn.downloadBytes) as downloadBytes,
-                Sum(conn.uploadBytes) as uploadBytes,
-                Sum(downloadBytes + uploadBytes) as totalBytes
-               FROM ConnectionTracker AS conn
-               INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
-               where conn.isBlocked = 0
-               and ipInfo.asName != ''
-               and conn.timeStamp > :to
-               GROUP BY ipInfo.asName
-               ORDER BY count DESC
-           """
+        SELECT -1 as uid, 
+            '' as ipAddress,
+            0 as port,
+            COUNT(*) as count,
+            0 as blocked, 
+            ipInfo.countryCode AS flag, 
+            ipInfo.asName AS appOrDnsName,
+            Sum(conn.downloadBytes) as downloadBytes,
+            Sum(conn.uploadBytes) as uploadBytes,
+            Sum(downloadBytes + uploadBytes) as totalBytes
+        FROM ConnectionTracker AS conn
+        INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
+        WHERE conn.isBlocked = 0
+            AND ipInfo.asName != ''
+            AND conn.timeStamp > :to
+        GROUP BY ipInfo.asName
+        ORDER BY count DESC
+        """
     )
     fun getAllConnectedASN(to: Long): PagingSource<Int, AppConnection>
 
 
     @Query(
         """
-        SELECT -1 as uid, 
-              conn.ipAddress as ipAddress,
-              0 as port,
-              COUNT(*) as count,
-              0 as blocked, 
-              ipInfo.countryCode AS flag,
-              ipInfo.asName AS appOrDnsName,
-              Sum(conn.downloadBytes) as downloadBytes,
-              Sum(conn.uploadBytes) as uploadBytes,
-              Sum(downloadBytes + uploadBytes) as totalBytes
-            FROM ConnectionTracker AS conn
-            INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
-            where conn.isBlocked = 0
-            and ipInfo.asName != ''
-            and conn.timeStamp > :to
-            and ipInfo.asName = :asn
-            GROUP BY conn.ipAddress
-            ORDER BY count DESC
-    """
+        SELECT conn.uid as uid, 
+            ipInfo.asName as ipAddress,
+            0 as port,
+            COUNT(*) as count,
+            0 as blocked, 
+            ipInfo.countryCode AS flag,
+            conn.appName AS appOrDnsName,
+            Sum(conn.downloadBytes) as downloadBytes,
+            Sum(conn.uploadBytes) as uploadBytes,
+            Sum(downloadBytes + uploadBytes) as totalBytes
+        FROM ConnectionTracker AS conn
+        INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
+        WHERE conn.isBlocked = 0
+            AND ipInfo.asName != ''
+            AND conn.timeStamp > :to
+            AND ipInfo.asName = :asn
+        GROUP BY conn.uid
+        ORDER BY count DESC
+        """
     )
     fun getAsnDetails(asn: String, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
         """
-            SELECT -1 as uid, 
-              '' as ipAddress,
-              0 as port,
-              COUNT(*) as count,
-              1 as blocked, 
-              ipInfo.countryCode AS flag,
-              ipInfo.asName AS appOrDnsName,
-              0 as downloadBytes,
-              0 as uploadBytes,
-              0 as totalBytes
-            FROM ConnectionTracker AS conn
-            INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
-            where conn.isBlocked = 1
-            and ipInfo.asName != ''
-            and conn.timeStamp > :to
-            GROUP BY ipInfo.asName
-            ORDER BY count DESC
-            LIMIT 7
+        SELECT -1 as uid, 
+            '' as ipAddress,
+            0 as port,
+            COUNT(*) as count,
+            1 as blocked, 
+            ipInfo.countryCode AS flag,
+            ipInfo.asName AS appOrDnsName,
+            0 as downloadBytes,
+            0 as uploadBytes,
+            0 as totalBytes
+        FROM ConnectionTracker AS conn
+        INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
+        WHERE conn.isBlocked = 1
+            AND ipInfo.asName != ''
+            AND conn.timeStamp > :to
+        GROUP BY ipInfo.asName
+        ORDER BY count DESC
+        LIMIT 7
         """
     )
     fun getMostBlockedASN(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
         """
-                SELECT -1 as uid, 
-                  '' as ipAddress,
-                  0 as port,
-                  COUNT(*) as count,
-                  1 as blocked, 
-                  ipInfo.countryCode AS flag,
-                  ipInfo.asName AS appOrDnsName,
-                  0 as downloadBytes,
-                  0 as uploadBytes,
-                  0 as totalBytes
-                FROM ConnectionTracker AS conn
-                INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
-                where conn.isBlocked = 1
-                and ipInfo.asName != ''
-                and conn.timeStamp > :to
-                GROUP BY ipInfo.asName
-                ORDER BY count DESC
-            """
+        SELECT -1 as uid, 
+            '' as ipAddress,
+            0 as port,
+            COUNT(*) as count,
+            1 as blocked, 
+            ipInfo.countryCode AS flag,
+            ipInfo.asName AS appOrDnsName,
+            0 as downloadBytes,
+            0 as uploadBytes,
+            0 as totalBytes
+        FROM ConnectionTracker AS conn
+        INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
+        WHERE conn.isBlocked = 1
+            AND ipInfo.asName != ''
+            AND conn.timeStamp > :to
+        GROUP BY ipInfo.asName
+        ORDER BY count DESC
+        """
     )
     fun getAllBlockedASN(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
         """
-           SELECT -1 as uid, 
-                 conn.ipAddress as ipAddress,
-                 0 as port,
-                 COUNT(*) as count,
-                 1 as blocked, 
-                 ipInfo.countryCode AS flag,
-                 ipInfo.asName AS appOrDnsName,
-                 0 as downloadBytes,
-                 0 as uploadBytes,
-                 0 as totalBytes
-               FROM ConnectionTracker AS conn
-               INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
-               where conn.isBlocked = 1
-               and ipInfo.asName != ''
-               and conn.timeStamp > :to
-               and ipInfo.asName = :asn
-               GROUP BY conn.ipAddress
-               ORDER BY count DESC
-       """
+        SELECT conn.uid as uid, 
+            ipInfo.asName as ipAddress,
+            0 as port,
+            COUNT(*) as count,
+            1 as blocked, 
+            ipInfo.countryCode AS flag,
+            conn.appName AS appOrDnsName,
+            0 as downloadBytes,
+            0 as uploadBytes,
+            0 as totalBytes
+        FROM ConnectionTracker AS conn
+        INNER JOIN IpInfo AS ipInfo ON conn.ipAddress = ipInfo.ip
+        WHERE conn.isBlocked = 1
+            AND ipInfo.asName != ''
+            AND conn.timeStamp > :to
+            AND ipInfo.asName = :asn
+        GROUP BY conn.uid
+        ORDER BY count DESC
+        """
     )
     fun getAsnBlockedDetails(asn: String, to: Long): PagingSource<Int, AppConnection>
 
 
     @Query(
         """
-            SELECT uid as uid, 
-              '' as ipAddress,
-              0 as port,
-              COUNT(*) as count,
-              0 as blocked, 
-              '' as flag,
-              appName as appOrDnsName,
-              0 as downloadBytes,
-              0 as uploadBytes,
-              0 as totalBytes
-            FROM ConnectionTracker
-            where downloadBytes = 0
-            and uploadBytes = 0
-            and isBlocked = 0
-            and duration = 0
-            and synack = 0
-            and message = ''
-            and timeStamp > :to
-            GROUP BY appName
-            ORDER BY count DESC
-            LIMIT 7
+            SELECT 
+                conn.uid AS uid, 
+                GROUP_CONCAT(DISTINCT conn.ipAddress) AS ipAddress,
+                0 AS port,
+                COUNT(*) AS count,
+                0 AS blocked, 
+                ipInfo.countryCode AS flag,
+                ipInfo.asName AS appOrDnsName,
+                0 AS downloadBytes,
+                0 AS uploadBytes,
+                0 AS totalBytes
+            FROM 
+                ConnectionTracker AS conn
+            INNER JOIN 
+                IpInfo AS ipInfo 
+            ON 
+                conn.ipAddress = ipInfo.ip
+            WHERE 
+                ipInfo.asName != ''
+                AND conn.timeStamp > :to
+                AND conn.uid = :uid
+            GROUP BY 
+                ipInfo.asName
+            ORDER BY 
+                count DESC
+            LIMIT 3
         """
+    )
+    fun getAsnLogsLimited(uid: Int, to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+            SELECT 
+                conn.uid AS uid, 
+                GROUP_CONCAT(DISTINCT conn.ipAddress) AS ipAddress,
+                0 AS port,
+                COUNT(*) AS count,
+                0 AS blocked, 
+                ipInfo.countryCode AS flag,
+                ipInfo.asName AS appOrDnsName,
+                0 AS downloadBytes,
+                0 AS uploadBytes,
+                0 AS totalBytes
+            FROM 
+                ConnectionTracker AS conn
+            INNER JOIN 
+                IpInfo AS ipInfo 
+            ON 
+                conn.ipAddress = ipInfo.ip
+            WHERE
+                ipInfo.asName != ''
+                AND conn.ipAddress LIKE :input
+                AND conn.timeStamp > :to
+                AND conn.uid = :uid
+            GROUP BY 
+                ipInfo.asName
+            ORDER BY 
+                count DESC
+           """
+    )
+    fun getAllAsnLogs(uid: Int, to: Long, input: String): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+               SELECT uid as uid, 
+                   '' as ipAddress,
+                   0 as port,
+                   COUNT(*) as count,
+                   0 as blocked, 
+                   '' as flag,
+                   appName as appOrDnsName,
+                   0 as downloadBytes,
+                   0 as uploadBytes,
+                   0 as totalBytes
+               FROM ConnectionTracker
+               WHERE downloadBytes = 0
+                   AND uploadBytes = 0
+                   AND isBlocked = 0
+                   AND duration = 0
+                   AND synack = 0
+                   AND message = ''
+                   AND timeStamp > :to
+               GROUP BY appName
+               ORDER BY count DESC
+               LIMIT 7
+               """
     )
     fun getTopActiveConns(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-            """
-                SELECT uid as uid, 
-                  '' as ipAddress,
-                  0 as port,
-                  COUNT(*) as count,
-                  0 as blocked, 
-                  '' as flag,
-                  appName as appOrDnsName,
-                  0 as downloadBytes,
-                  0 as uploadBytes,
-                  0 as totalBytes
-                FROM ConnectionTracker
-                where downloadBytes = 0
-                and uploadBytes = 0
-                and isBlocked = 0
-                and duration = 0
-                and synack = 0
-                and message = ''
-                and timeStamp > :to
-                GROUP BY appName
-                ORDER BY count DESC
-            """
-        )
-        fun getAllActiveConns(to: Long): PagingSource<Int, AppConnection>
-
-    @Query(
         """
-                SELECT uid as uid, 
-                  '' as ipAddress,
-                  0 as port,
-                  COUNT(*) as count,
-                  0 as blocked, 
-                  flag as flag,
-                  dnsQuery as appOrDnsName,
-                  0 as downloadBytes,
-                  0 as uploadBytes,
-                  0 as totalBytes
-                FROM ConnectionTracker
-                where downloadBytes = 0
-                and uploadBytes = 0
-                and isBlocked = 0
-                and duration = 0
-                and synack = 0
-                and message = ''
-                and dnsQuery like :queryInput
-                and uid = :uid
-                and timeStamp > :to
-                GROUP BY dnsQuery
-                ORDER BY count DESC
-                LIMIT 3
+            SELECT uid as uid, 
+                '' as ipAddress,
+                0 as port,
+                COUNT(*) as count,
+                0 as blocked, 
+                '' as flag,
+                appName as appOrDnsName,
+                0 as downloadBytes,
+                0 as uploadBytes,
+                0 as totalBytes
+            FROM ConnectionTracker
+            WHERE downloadBytes = 0
+                AND uploadBytes = 0
+                AND isBlocked = 0
+                AND duration = 0
+                AND synack = 0
+                AND message = ''
+                AND timeStamp > :to
+            GROUP BY appName
+            ORDER BY count DESC
             """
     )
-    fun getTopActiveConns(uid: Int, to: Long, queryInput: String): PagingSource<Int, AppConnection>
+    fun getAllActiveConns(to: Long): PagingSource<Int, AppConnection>
+
 
     @Query(
         """
-                   SELECT uid as uid, 
-                     '' as ipAddress,
-                     0 as port,
-                     COUNT(*) as count,
-                     0 as blocked, 
-                     flag as flag,
-                     dnsQuery as appOrDnsName,
-                     0 as downloadBytes,
-                     0 as uploadBytes,
-                     0 as totalBytes
-                   FROM ConnectionTracker
-                   where downloadBytes = 0
-                   and uploadBytes = 0
-                   and isBlocked = 0
-                   and duration = 0
-                   and synack = 0
-                   and message = ''
-                   and dnsQuery like :queryInput
-                   and uid = :uid
-                   and timeStamp > :to
-                   GROUP BY dnsQuery
-                   ORDER BY count DESC
+                   SELECT ct.uid as uid, 
+                               ct.ipAddress as ipAddress,
+                               0 as port,
+                               COUNT(*) as count,
+                               0 as blocked, 
+                               ct.flag as flag,
+                               asn.asName as appOrDnsName,
+                               0 as downloadBytes,
+                               0 as uploadBytes,
+                               0 as totalBytes
+                           FROM ConnectionTracker as ct
+                           INNER JOIN IpInfo as asn ON ct.ipAddress = asn.ip
+                           WHERE downloadBytes = 0
+                               AND uploadBytes = 0
+                               AND isBlocked = 0
+                               AND duration = 0
+                               AND synack = 0
+                               AND message = ''
+                               AND uid = :uid
+                               AND timeStamp > :to
+                           GROUP BY ipAddress
+                           ORDER BY count DESC
+                   LIMIT 3
                """
     )
-    fun getAllActiveConns(uid: Int, to: Long, queryInput: String): PagingSource<Int, AppConnection>
+    fun getTopActiveConns(uid: Int, to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+        SELECT ct.uid as uid, 
+            ct.ipAddress as ipAddress,
+            0 as port,
+            COUNT(*) as count,
+            0 as blocked, 
+            ct.flag as flag,
+            asn.asName as appOrDnsName,
+            0 as downloadBytes,
+            0 as uploadBytes,
+            0 as totalBytes
+        FROM ConnectionTracker as ct
+        INNER JOIN IpInfo as asn ON ct.ipAddress = asn.ip
+        WHERE downloadBytes = 0
+            AND uploadBytes = 0
+            AND isBlocked = 0
+            AND duration = 0
+            AND synack = 0
+            AND message = ''
+            AND uid = :uid
+            AND timeStamp > :to
+        GROUP BY ipAddress
+        ORDER BY count DESC
+        """
+    )
+    fun getAllActiveConns(uid: Int, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
         """
@@ -788,132 +853,132 @@ interface StatsSummaryDao {
     @Query(
         """
         SELECT :uid AS uid, 
-                      '' AS ipAddress, 
-                      0 AS port, 
-                      SUM(count) AS count, 
-                      flag AS flag, 
-                      0 AS blocked, 
-                      appOrDnsName, 
-                      0 AS uploadBytes, 
-                      0 AS downloadBytes, 
-                      0 AS totalBytes 
-                    FROM 
-                      (
-                        -- From ConnectionTracker
-                        SELECT dnsQuery AS appOrDnsName, 
-                          COUNT(dnsQuery) AS count,
-                          flag as flag
-                        FROM ConnectionTracker 
-                        WHERE dnsQuery != ''  
-                            AND timeStamp > :to
-                            AND uid = :uid
-                        GROUP BY dnsQuery
-                           
-                        UNION ALL 
+            '' AS ipAddress, 
+            0 AS port, 
+            SUM(count) AS count, 
+            flag AS flag, 
+            0 AS blocked, 
+            appOrDnsName, 
+            0 AS uploadBytes, 
+            0 AS downloadBytes, 
+            0 AS totalBytes 
+        FROM 
+            (
+                -- From ConnectionTracker
+                SELECT dnsQuery AS appOrDnsName, 
+                    COUNT(dnsQuery) AS count,
+                    flag as flag
+                FROM ConnectionTracker 
+                WHERE dnsQuery != ''  
+                    AND timeStamp > :to
+                    AND uid = :uid
+                GROUP BY dnsQuery
+                   
+                UNION ALL 
         
-                        -- From DnsLogs
-                        SELECT queryStr AS appOrDnsName, 
-                          COUNT(queryStr) AS count,
-                          flag as flag
-                        FROM DnsLogs 
-                        WHERE uid = :uid
-                            AND time > :to 
-                          AND status = 'COMPLETE' 
-                          AND queryStr != '' 
-                        GROUP BY queryStr
-                      ) AS combined 
-                    GROUP BY appOrDnsName 
-                    ORDER BY count DESC
-                    LIMIT 3
-    """
+                -- From DnsLogs
+                SELECT queryStr AS appOrDnsName, 
+                    COUNT(queryStr) AS count,
+                    flag as flag
+                FROM DnsLogs 
+                WHERE uid = :uid
+                    AND time > :to 
+                    AND status = 'COMPLETE' 
+                    AND queryStr != '' 
+                GROUP BY queryStr
+            ) AS combined 
+        GROUP BY appOrDnsName 
+        ORDER BY count DESC
+        LIMIT 3
+        """
     )
     fun getMostDomainsByUid(uid: Int, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
         """
-            SELECT :uid AS uid, 
-                          '' AS ipAddress, 
-                          0 AS port, 
-                          SUM(count) AS count, 
-                          flag AS flag, 
-                          0 AS blocked, 
-                          appOrDnsName, 
-                          0 AS uploadBytes, 
-                          0 AS downloadBytes, 
-                          0 AS totalBytes 
-                        FROM 
-                          (
-                            -- From ConnectionTracker
-                            SELECT dnsQuery AS appOrDnsName, 
-                              COUNT(dnsQuery) AS count,
-                              flag as flag
-                            FROM ConnectionTracker 
-                            WHERE dnsQuery != ''  
-                                AND timeStamp > :to
-                                AND uid = :uid
-                                AND dnsQuery LIKE :input
-                            GROUP BY dnsQuery
-                               
-                            UNION ALL 
+        SELECT :uid AS uid, 
+            '' AS ipAddress, 
+            0 AS port, 
+            SUM(count) AS count, 
+            flag AS flag, 
+            0 AS blocked, 
+            appOrDnsName, 
+            0 AS uploadBytes, 
+            0 AS downloadBytes, 
+            0 AS totalBytes 
+        FROM 
+            (
+                -- From ConnectionTracker
+                SELECT dnsQuery AS appOrDnsName, 
+                    COUNT(dnsQuery) AS count,
+                    flag as flag
+                FROM ConnectionTracker 
+                WHERE dnsQuery != ''  
+                    AND timeStamp > :to
+                    AND uid = :uid
+                    AND dnsQuery LIKE :input
+                GROUP BY dnsQuery
+                   
+                UNION ALL 
             
-                            -- From DnsLogs
-                            SELECT queryStr AS appOrDnsName, 
-                              COUNT(queryStr) AS count, 
-                              flag as flag
-                            FROM DnsLogs 
-                            WHERE uid = :uid
-                                AND time > :to 
-                              AND status = 'COMPLETE' 
-                              AND queryStr != '' 
-                              AND queryStr LIKE :input
-                            GROUP BY queryStr
-                          ) AS combined 
-                        GROUP BY appOrDnsName 
-                        ORDER BY count DESC
+                -- From DnsLogs
+                SELECT queryStr AS appOrDnsName, 
+                    COUNT(queryStr) AS count, 
+                    flag as flag
+                FROM DnsLogs 
+                WHERE uid = :uid
+                    AND time > :to 
+                    AND status = 'COMPLETE' 
+                    AND queryStr != '' 
+                    AND queryStr LIKE :input
+                GROUP BY queryStr
+            ) AS combined 
+        GROUP BY appOrDnsName 
+        ORDER BY count DESC
         """
     )
     fun getAllDomainsByUid(uid: Int, to: Long, input: String): PagingSource<Int, AppConnection>
 
     @Query(
         """
-                SELECT :uid AS uid, 
-                              '' AS ipAddress, 
-                              0 AS port, 
-                              SUM(count) AS count, 
-                              flag AS flag, 
-                              0 AS blocked, 
-                              appOrDnsName, 
-                              0 AS uploadBytes, 
-                              0 AS downloadBytes, 
-                              0 AS totalBytes 
-                            FROM 
-                              (
-                                -- From ConnectionTracker
-                                SELECT dnsQuery AS appOrDnsName, 
-                                  COUNT(dnsQuery) AS count,
-                                  flag as flag
-                                FROM ConnectionTracker 
-                                WHERE dnsQuery != ''  
-                                    AND timeStamp > :to
-                                    AND uid = :uid
-                                GROUP BY dnsQuery
-                                   
-                                UNION ALL 
+        SELECT :uid AS uid, 
+            '' AS ipAddress, 
+            0 AS port, 
+            SUM(count) AS count, 
+            flag AS flag, 
+            0 AS blocked, 
+            appOrDnsName, 
+            0 AS uploadBytes, 
+            0 AS downloadBytes, 
+            0 AS totalBytes 
+        FROM 
+            (
+                -- From ConnectionTracker
+                SELECT dnsQuery AS appOrDnsName, 
+                    COUNT(dnsQuery) AS count,
+                    flag as flag
+                FROM ConnectionTracker 
+                WHERE dnsQuery != ''  
+                    AND timeStamp > :to
+                    AND uid = :uid
+                GROUP BY dnsQuery
+                   
+                UNION ALL 
                 
-                                -- From DnsLogs
-                                SELECT queryStr AS appOrDnsName, 
-                                  COUNT(queryStr) AS count, 
-                                  flag as flag
-                                FROM DnsLogs 
-                                WHERE uid = :uid
-                                    AND time > :to 
-                                  AND status = 'COMPLETE' 
-                                  AND queryStr != ''
-                                GROUP BY queryStr
-                              ) AS combined 
-                            GROUP BY appOrDnsName 
-                            ORDER BY count DESC
-            """
+                -- From DnsLogs
+                SELECT queryStr AS appOrDnsName, 
+                    COUNT(queryStr) AS count, 
+                    flag as flag
+                FROM DnsLogs 
+                WHERE uid = :uid
+                    AND time > :to 
+                    AND status = 'COMPLETE' 
+                    AND queryStr != ''
+                GROUP BY queryStr
+            ) AS combined 
+        GROUP BY appOrDnsName 
+        ORDER BY count DESC
+        """
     )
     fun getAllDomainsByUid(uid: Int, to: Long): PagingSource<Int, AppConnection>
 }

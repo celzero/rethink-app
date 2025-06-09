@@ -88,6 +88,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     companion object {
         const val INTENT_UID = "UID"
         const val INTENT_ACTIVE_CONNS = "ACTIVE_CONNS"
+        const val INTENT_ASN = "ASN"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -157,6 +158,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 } else {
                     updateFirewallStatusUi(appStatus, connStatus)
                     setActiveConnsAdapter()
+                    setASNAdapter()
                     setDomainsAdapter()
                     setIpAdapter()
                 }
@@ -396,7 +398,9 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
 
         b.aadDomainsChip.setOnClickListener { openAppWiseDomainLogsActivity() }
 
-        b.aadActiveConnsChip.setOnClickListener { openAppWiseDomainLogsActivity(true) }
+        b.aadActiveConnsChip.setOnClickListener { openAppWiseDomainLogsActivity(activeConns = true) }
+
+        b.aadAsnChip.setOnClickListener { openAppWiseIpLogsActivity(asn = true) }
 
         b.excludeProxySwitch.setOnCheckedChangeListener { _, isChecked ->
             updateExcludeProxyStatus(isChecked)
@@ -429,16 +433,17 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         startActivity(intent)
     }
 
-    private fun openAppWiseIpLogsActivity() {
+    private fun openAppWiseIpLogsActivity(asn: Boolean = false) {
         val intent = Intent(this, AppWiseIpLogsActivity::class.java)
         intent.putExtra(INTENT_UID, uid)
+        intent.putExtra(INTENT_ASN, asn)
         startActivity(intent)
     }
 
     private fun setActiveConnsAdapter() {
         val layoutManager = LinearLayoutManager(this)
         b.aadActiveConnsRv.layoutManager = layoutManager
-        val adapter = AppWiseDomainsAdapter(this, this, uid, isRethinkApp, true)
+        val adapter = AppWiseDomainsAdapter(this, this, uid, isRethinkApp, isActiveConn = true)
         val uptime = VpnController.uptimeMs()
         networkLogsViewModel.fetchActiveConnections(uid, uptime).observe(this) {
             adapter.submitData(this.lifecycle, it)
@@ -451,6 +456,26 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                     b.aadActiveConnsRl.visibility = View.VISIBLE
                 } else {
                     b.aadActiveConnsRl.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    private fun setASNAdapter() {
+        val layoutManager = LinearLayoutManager(this)
+        b.aadAsnRv.layoutManager = layoutManager
+        val adapter = AppWiseIpsAdapter(this, this, uid, isRethinkApp, isAsn = true)
+        networkLogsViewModel.getAsnLogsLimited(uid).observe(this) {
+            adapter.submitData(this.lifecycle, it)
+        }
+        b.aadAsnRv.adapter = adapter
+
+        adapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (adapter.itemCount >= 1) {
+                    b.aadAsnRl.visibility = View.VISIBLE
+                } else {
+                    b.aadAsnRl.visibility = View.GONE
                 }
             }
         }

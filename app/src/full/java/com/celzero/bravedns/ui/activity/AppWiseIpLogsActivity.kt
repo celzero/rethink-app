@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -23,6 +24,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.WindowInsetsControllerCompat
@@ -63,6 +65,7 @@ class AppWiseIpLogsActivity :
     private var layoutManager: RecyclerView.LayoutManager? = null
     private lateinit var appInfo: AppInfo
     private var isRethink = false
+    private var isAsn = false
 
     companion object {
         private const val QUERY_TEXT_DELAY: Long = 1000
@@ -83,6 +86,7 @@ class AppWiseIpLogsActivity :
             window.isNavigationBarContrastEnforced = false
         }
         uid = intent.getIntExtra(AppInfoActivity.INTENT_UID, INVALID_UID)
+        isAsn = intent.getBooleanExtra(AppInfoActivity.INTENT_ASN, false)
         if (uid == INVALID_UID) {
             finish()
         }
@@ -93,7 +97,15 @@ class AppWiseIpLogsActivity :
             b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
         } else {
             init()
-            setAdapter()
+            if (isAsn) {
+                // ASN view
+                // disable search view for ASN view, visibility should be there as the icon is used
+                b.awlSearch.isEnabled = false
+                b.awlDelete.visibility = View.GONE
+                setAsnAdapter()
+            } else {
+                setAdapter()
+            }
             setClickListener()
         }
     }
@@ -147,10 +159,10 @@ class AppWiseIpLogsActivity :
             val mb: MaterialButton = b.toggleGroup.findViewById(checkedId)
             if (isChecked) {
                 selectToggleBtnUi(mb)
-                val tcValue = (mb.tag as String).toIntOrNull() ?: 0
+                val tcValue = (mb.tag as String).toIntOrNull() ?: 2 // "2" tag is for 7 days
                 val timeCategory =
                     AppConnectionsViewModel.TimeCategory.fromValue(tcValue)
-                        ?: AppConnectionsViewModel.TimeCategory.ONE_HOUR
+                        ?: AppConnectionsViewModel.TimeCategory.SEVEN_DAYS
                 networkLogsViewModel.timeCategoryChanged(timeCategory, isDomain = false)
                 return@OnButtonCheckedListener
             }
@@ -171,7 +183,7 @@ class AppWiseIpLogsActivity :
     }
 
     private fun highlightToggleBtn() {
-        val timeCategory = "0" // default is 1 hours, "0" tag is 1 hours
+        val timeCategory = "2" // default is 7 days, "2" tag is for 7 days
         val btn = b.toggleGroup.findViewWithTag<MaterialButton>(timeCategory)
         btn.isChecked = true
         selectToggleBtnUi(btn)
@@ -227,13 +239,14 @@ class AppWiseIpLogsActivity :
         }*/
     }
 
-    private fun setRethinkAdapter() {
+    private fun setAsnAdapter() {
+        Logger.v(LOG_TAG_UI, "setAsnAdapter: uid: $uid, isRethink: $isRethink")
         networkLogsViewModel.setUid(uid)
         b.awlRecyclerConnection.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(this)
         b.awlRecyclerConnection.layoutManager = layoutManager
-        val recyclerAdapter = AppWiseIpsAdapter(this, this, uid, isRethink)
-        networkLogsViewModel.rinrIpLogs.observe(this) {
+        val recyclerAdapter = AppWiseIpsAdapter(this, this, uid, isRethink, isAsn = true)
+        networkLogsViewModel.asnLogs.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
@@ -253,6 +266,18 @@ class AppWiseIpLogsActivity :
                 showRulesUi()
             }
         }*/
+    }
+
+    private fun setRethinkAdapter() {
+        networkLogsViewModel.setUid(uid)
+        b.awlRecyclerConnection.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(this)
+        b.awlRecyclerConnection.layoutManager = layoutManager
+        val recyclerAdapter = AppWiseIpsAdapter(this, this, uid, isRethink)
+        networkLogsViewModel.rinrIpLogs.observe(this) {
+            recyclerAdapter.submitData(this.lifecycle, it)
+        }
+        b.awlRecyclerConnection.adapter = recyclerAdapter
     }
 
     private fun updateAppNameInSearchHint(appName: String) {
@@ -288,6 +313,12 @@ class AppWiseIpLogsActivity :
     }*/
 
     override fun onQueryTextSubmit(query: String): Boolean {
+        if (isAsn) {
+            // ASN view does not support search
+            Utilities.showToastUiCentered(this, "Search is not supported in ASN view",
+                Toast.LENGTH_SHORT)
+            return false
+        }
         Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
             if (!this.isFinishing) {
                 networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.IP)
@@ -297,6 +328,11 @@ class AppWiseIpLogsActivity :
     }
 
     override fun onQueryTextChange(query: String): Boolean {
+        if (isAsn) {
+            // ASN view does not support search
+            return false
+        }
+
         Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
             if (!this.isFinishing) {
                 networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.IP)
