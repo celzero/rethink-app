@@ -56,7 +56,6 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.togs
 import com.celzero.bravedns.util.Utilities.tos
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config

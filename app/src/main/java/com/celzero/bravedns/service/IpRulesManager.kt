@@ -23,7 +23,6 @@ import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpRepository
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.celzero.bravedns.util.Utilities.togs
 import com.celzero.bravedns.util.Utilities.tos

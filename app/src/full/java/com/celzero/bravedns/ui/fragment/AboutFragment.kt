@@ -82,7 +82,6 @@ import java.util.zip.ZipFile
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
 
-    private val persistentState by inject<PersistentState>()
     private var lastAppExitInfoDialogInvokeTime = INIT_TIME_MS
     private val workScheduler by inject<WorkScheduler>()
 
