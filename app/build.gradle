@@ -195,7 +195,7 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0'
-    fullImplementation 'androidx.appcompat:appcompat:1.7.0'
+    fullImplementation 'androidx.appcompat:appcompat:1.7.1'
     fullImplementation 'androidx.core:core-ktx:1.16.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
     fullImplementation 'androidx.constraintlayout:constraintlayout:2.2.1'
@@ -205,7 +205,7 @@ dependencies {
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1'
 
     // LiveData
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.1'
 
     implementation 'com.google.code.gson:gson:2.11.0'
 
@@ -215,12 +215,12 @@ dependencies {
     implementation "androidx.room:room-paging:$room_version"
 
     fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.0'
-    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.0'
+    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.1'
+    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.1'
 
     // Pagers Views
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    fullImplementation 'androidx.fragment:fragment-ktx:1.8.7'
+    fullImplementation 'androidx.fragment:fragment-ktx:1.8.8'
     implementation 'com.google.android.material:material:1.12.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.1.0'
 
@@ -260,11 +260,11 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:87a1c2a5b7@aar'
-    websiteImplementation 'com.github.celzero:firestack:87a1c2a5b7@aar'
-    fdroidImplementation 'com.github.celzero:firestack:87a1c2a5b7@aar'
+    download 'com.github.celzero:firestack:72a648fd02@aar'
+    websiteImplementation 'com.github.celzero:firestack:72a648fd02@aar'
+    fdroidImplementation 'com.github.celzero:firestack:72a648fd02@aar'
     // debug symbols
-    playImplementation 'com.github.celzero:firestack:87a1c2a5b7:debug@aar'
+    playImplementation 'com.github.celzero:firestack:72a648fd02:debug@aar'
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.10.1') {
@@ -296,7 +296,7 @@ dependencies {
     playImplementation 'com.google.android.play:app-update-ktx:2.1.0'
 
     // for encrypting wireguard configuration files
-    implementation("androidx.security:security-crypto:1.1.0-alpha07")
+    implementation("androidx.security:security-crypto:1.1.0-beta01")
     implementation("androidx.security:security-app-authenticator:1.0.0-rc01")
     androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-rc01")
 
@@ -308,7 +308,8 @@ dependencies {
     fullImplementation 'nl.dionsegijn:konfetti-xml:2.0.4'
     // for in-app purchases
     playImplementation 'com.android.billingclient:billing:7.1.1'
+    websiteImplementation 'com.android.billingclient:billing:7.1.1'
     // for stripe payment gateway
-    websiteImplementation 'com.stripe:stripe-android:21.14.0'
-    fdroidImplementation 'com.stripe:stripe-android:21.14.0'
+    websiteImplementation 'com.stripe:stripe-android:21.15.1'
+    fdroidImplementation 'com.stripe:stripe-android:21.15.1'
 }
