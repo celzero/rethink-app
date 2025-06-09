@@ -16,11 +16,14 @@
 package com.celzero.bravedns.customdownloader
 
 import Logger
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import okhttp3.Dns
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import retrofit2.Retrofit
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit
@@ -36,32 +39,36 @@ class RetrofitManager {
             FALLBACK_DNS
         }
 
-        fun getBlocklistBaseBuilder(): Retrofit.Builder {
+        fun getBlocklistBaseBuilder(isRinRActive: Boolean): Retrofit.Builder {
             return Retrofit.Builder()
                 .baseUrl(Constants.DOWNLOAD_BASE_URL)
-                .client(okHttpClient())
+                .client(okHttpClient(isRinRActive))
         }
 
-        fun getTcpProxyBaseBuilder(): Retrofit.Builder {
+        fun getTcpProxyBaseBuilder(isRinRActive: Boolean): Retrofit.Builder {
             return Retrofit.Builder()
                 .baseUrl(Constants.TCP_PROXY_BASE_URL)
-                .client(okHttpClient())
+                .client(okHttpClient(isRinRActive))
         }
 
-        fun getIpInfoBaseBuilder(): Retrofit.Builder {
+        fun getIpInfoBaseBuilder(isRinRActive: Boolean): Retrofit.Builder {
             return Retrofit.Builder()
                 .baseUrl(Constants.IP_INFO_BASE_URL)
-                .client(okHttpClient())
+                .client(okHttpClient(isRinRActive))
         }
 
-        fun okHttpClient(): OkHttpClient {
+        fun okHttpClient(isRinRActive: Boolean): OkHttpClient {
             val b = OkHttpClient.Builder()
             b.connectTimeout(1, TimeUnit.MINUTES)
             b.readTimeout(20, TimeUnit.MINUTES)
             b.writeTimeout(5, TimeUnit.MINUTES)
             b.retryOnConnectionFailure(true)
             // If unset, the system-wide default DNS will be used.
-            customDns(b.build())?.let { b.dns(it) }
+            // no need to add custom dns if rinr is not active, as the connections will be routed
+            // through the default dns
+            if (isRinRActive) {
+                customDns(b.build())?.let { b.dns(it) }
+            }
             return b.build()
         }
 

@@ -23,9 +23,11 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.customdownloader.ITcpProxy
 import com.celzero.bravedns.customdownloader.RetrofitManager
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
@@ -39,6 +41,8 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
         private const val JSON_PAYMENT_STATUS = "payment_status"
         private const val JSON_STATUS = "status"
     }
+
+    private val persistentState by inject<PersistentState>()
 
     override suspend fun doWork(): Result {
 
@@ -75,7 +79,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
         var paymentStatus = TcpProxyHelper.PaymentStatus.INITIATED
         try {
             val retrofit =
-                RetrofitManager.getTcpProxyBaseBuilder()
+                RetrofitManager.getTcpProxyBaseBuilder(persistentState.routeRethinkInRethink)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(ITcpProxy::class.java)

@@ -252,7 +252,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         try {
             // create okhttp client with base url
             val retrofit =
-                getBlocklistBaseBuilder().build().create(IBlocklistDownload::class.java)
+                getBlocklistBaseBuilder(persistentState.routeRethinkInRethink).build().create(IBlocklistDownload::class.java)
             Logger.i(LOG_TAG_DOWNLOAD, "Downloading file: $fileName, url: $url")
             val response = retrofit.downloadLocalBlocklistFile(url, persistentState.appVersion, "")
             if (response?.isSuccessful == true) {

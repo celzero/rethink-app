@@ -132,11 +132,12 @@ class BlocklistDownloadHelper {
         suspend fun checkBlocklistUpdate(
             timestamp: Long,
             vcode: Int,
-            retryCount: Int
+            retryCount: Int,
+            isRinRActive: Boolean
         ): BlocklistUpdateServerResponse? {
             try {
                 val retrofit =
-                    RetrofitManager.getBlocklistBaseBuilder()
+                    RetrofitManager.getBlocklistBaseBuilder(isRinRActive)
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()
                 val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
@@ -159,7 +160,7 @@ class BlocklistDownloadHelper {
             logi("downloadAvailabilityCheck: failed, returning null, $retryCount")
             return if (isRetryRequired(retryCount)) {
                 logi("retrying the downloadAvailabilityCheck")
-                checkBlocklistUpdate(timestamp, vcode, retryCount + 1)
+                checkBlocklistUpdate(timestamp, vcode, retryCount + 1, isRinRActive)
             } else {
                 logi("retry count exceeded, returning null")
                 null

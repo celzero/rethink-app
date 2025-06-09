@@ -68,7 +68,7 @@ object IpInfoDownloader: KoinComponent {
             return false
         }
 
-        val retrofitInstance = RetrofitManager.getIpInfoBaseBuilder()
+        val retrofitInstance = RetrofitManager.getIpInfoBaseBuilder(persistentState.routeRethinkInRethink)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

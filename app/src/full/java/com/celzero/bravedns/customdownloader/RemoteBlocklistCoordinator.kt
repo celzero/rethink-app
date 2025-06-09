@@ -95,7 +95,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
         Logger.i(LOG_TAG_DOWNLOAD, "Download remote blocklist: $timestamp")
         try {
             val retrofit =
-                RetrofitManager.getBlocklistBaseBuilder()
+                RetrofitManager.getBlocklistBaseBuilder(persistentState.routeRethinkInRethink)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
