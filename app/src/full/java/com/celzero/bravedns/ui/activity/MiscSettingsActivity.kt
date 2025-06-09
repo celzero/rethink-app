@@ -80,6 +80,9 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import androidx.core.net.toUri
+import com.celzero.bravedns.ui.LauncherSwitcher
+import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
+import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
 
 
 class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) {
@@ -604,8 +607,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             if (persistentState.biometricAuthType == which) {
                 return@setSingleChoiceItems
             }
-
-            when (BioMetricType.fromValue(which)) {
+            val bioMetricType = BioMetricType.fromValue(which)
+            when (bioMetricType) {
                 BioMetricType.OFF -> {
                     val txt = getString(R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
                         getString(R.string.settings_biometric_dialog_option_0))
@@ -637,6 +640,13 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     persistentState.biometricAuthType = BioMetricType.FIFTEEN_MIN.action
                     persistentState.biometricAuthTime = System.currentTimeMillis()
                 }
+            }
+            if (bioMetricType.enabled()) {
+                Logger.i(LOG_TAG_UI, "biometric auth enabled, switching to app lock alias")
+                LauncherSwitcher.switchLauncherAlias(applicationContext, APP_LOCK_ALIAS, HOME_ALIAS)
+            } else {
+                Logger.i(LOG_TAG_UI, "biometric auth disabled, switching to home alias")
+                LauncherSwitcher.switchLauncherAlias(applicationContext, HOME_ALIAS, APP_LOCK_ALIAS)
             }
         }
         alertBuilder.create().show()

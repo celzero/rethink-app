@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui.activity
 
 import Logger
 import Logger.LOG_TAG_UI
+import android.app.ComponentCaller
 import android.app.UiModeManager
 import android.content.Context
 import android.content.Intent
@@ -30,14 +31,12 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivityAppLockBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.LauncherSwitcher
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import org.koin.android.ext.android.inject
 import java.util.concurrent.Executor
@@ -52,6 +51,8 @@ class AppLockActivity : AppCompatActivity(R.layout.activity_app_lock) {
 
     companion object {
         private const val TAG = "AppLockUi"
+        const val APP_LOCK_ALIAS = ".ui.activity.LauncherAliasAppLock"
+        const val HOME_ALIAS = ".ui.LauncherAliasHome"
     }
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
@@ -71,6 +72,17 @@ class AppLockActivity : AppCompatActivity(R.layout.activity_app_lock) {
 
         if (!isBiometricEnabled() || isAppRunningOnTv()) {
             Logger.v(LOG_TAG_UI, "$TAG biometric authentication disabled or running on TV")
+
+            // if the app lock alias is enabled, switch to home alias
+            if (!LauncherSwitcher.isAliasEnabled(applicationContext, APP_LOCK_ALIAS)) {
+                Logger.v(LOG_TAG_UI, "$TAG switching launcher alias to home")
+                startHomeActivity()
+                return
+            }
+
+            // if the app lock alias is not enabled, switch to home alias
+            LauncherSwitcher.switchLauncherAlias(applicationContext, HOME_ALIAS, APP_LOCK_ALIAS)
+
             startHomeActivity()
             return
         }
@@ -97,6 +109,11 @@ class AppLockActivity : AppCompatActivity(R.layout.activity_app_lock) {
         }
 
         showBiometricPrompt()
+    }
+
+    override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
+        super.onNewIntent(intent, caller)
+        setIntent(intent)
     }
 
     private fun showBiometricPrompt() {
@@ -141,10 +158,8 @@ class AppLockActivity : AppCompatActivity(R.layout.activity_app_lock) {
     private fun startHomeActivity() {
         Logger.v(LOG_TAG_UI, "$TAG starting home activity")
         val intent = Intent(this, HomeScreenActivity::class.java)
+        // Use a specific combination of flags that will maintain the proper back stack
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        if (isAtleastR()) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_REQUIRE_DEFAULT)
-        }
         intent.putExtras(this.intent)
         startActivity(intent)
         finish()

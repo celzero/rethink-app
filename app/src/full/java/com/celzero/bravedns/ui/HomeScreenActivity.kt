@@ -88,12 +88,17 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
+import androidx.core.net.toUri
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val persistentState by inject<PersistentState>()
     private val appInfoDb by inject<AppInfoRepository>()
     private val appUpdateManager by inject<AppUpdater>()
     private val rdb by inject<RefreshDatabase>()
+
+    // TODO: see if this can be replaced with a more robust solution
+    // keep track of when app went to background
+    private var appInBackground = false
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
     private fun Context.isDarkThemeOn(): Boolean {
@@ -136,6 +141,23 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         initUpdateCheck()
 
         observeAppState()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        // by simply receiving and setting the new intent, we ensure that when the activity
+        // is brought back to the foreground, it uses the latest intent state
+        Logger.v(LOG_TAG_UI, "home screen activity received new intent")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // if app is coming from background, don't reset the activity stack
+        if (appInBackground) {
+            appInBackground = false
+            Logger.d(LOG_TAG_UI, "app restored from background, maintaining activity stack")
+        }
     }
 
     // check if app running on TV
@@ -565,7 +587,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun initiateDownload() {
         try {
             val url = Constants.RETHINK_APP_DOWNLOAD_LINK
-            val uri = Uri.parse(url)
+            val uri = url.toUri()
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = uri
             intent.addCategory(Intent.CATEGORY_BROWSABLE)
@@ -584,7 +606,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         } catch (e: IllegalArgumentException) {
             Logger.w(LOG_TAG_DOWNLOAD, "Unregister receiver exception")
         }
-        Logger.d(LOG_TAG_UI, "HomeScreenActivity is stopped")
+        // mark that app is going to background
+        appInBackground = true
+        Logger.v(LOG_TAG_UI, "home screen activity is stopped, app going to background")
     }
 
     private fun setupNavigationItemSelectedListener() {
