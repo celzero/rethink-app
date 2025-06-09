@@ -114,6 +114,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.settingsActivityMobileMeteredSwitch.isChecked = persistentState.treatOnlyMobileNetworkAsMetered
 
+        b.settingsFailOpenSwitch.isChecked = persistentState.failOpenOnNoNetwork
+
         displayInternetProtocolUi()
         displayRethinkInRethinkUi()
     }
@@ -265,6 +267,14 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityMobileMeteredRl.setOnClickListener {
             b.settingsActivityMobileMeteredSwitch.isChecked =
                 !b.settingsActivityMobileMeteredSwitch.isChecked
+        }
+
+        b.settingsFailOpenSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.failOpenOnNoNetwork = isChecked
+        }
+
+        b.settingsFailOpenRl.setOnClickListener {
+            b.settingsFailOpenSwitch.isChecked = !b.settingsFailOpenSwitch.isChecked
         }
     }
 

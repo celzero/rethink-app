@@ -117,7 +117,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         val msgType: Int,
         val networkSet: Set<Network>,
         val isForceUpdate: Boolean,
-        val testReachability: Boolean
+        val testReachability: Boolean,
+        val failOpenOnNoNetwork: Boolean
     )
 
     data class ProbeResult(val ip: String, val ok: Boolean, val capabilities: NetworkCapabilities?)
@@ -243,12 +244,14 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         val dualStack =
             InternetProtocol.getInternetProtocol(persistentState.internetProtocolType).isIPv46()
         val testReachability = dualStack && persistentState.connectivityChecks
+        val failOpenOnNoNetwork = persistentState.failOpenOnNoNetwork
         val msg =
             constructNetworkMessage(
                 if (persistentState.useMultipleNetworks) MSG_ADD_ALL_NETWORKS
                 else MSG_ADD_ACTIVE_NETWORK,
                 isForceUpdate,
-                testReachability
+                testReachability,
+                failOpenOnNoNetwork
             )
         serviceHandler?.removeMessages(MSG_ADD_ACTIVE_NETWORK, null)
         serviceHandler?.removeMessages(MSG_ADD_ALL_NETWORKS, null)
@@ -263,9 +266,10 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
     private fun constructNetworkMessage(
         what: Int,
         isForceUpdate: Boolean,
-        testReachability: Boolean
+        testReachability: Boolean,
+        failOpenOnNoNetwork: Boolean
     ): Message {
-        val opPrefs = OpPrefs(what, networkSet, isForceUpdate, testReachability)
+        val opPrefs = OpPrefs(what, networkSet, isForceUpdate, testReachability, failOpenOnNoNetwork)
         val message = Message.obtain()
         message.what = what
         message.obj = opPrefs
@@ -288,7 +292,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         var isActiveNetworkMetered: Boolean, // may be updated by client listener
         var isActiveNetworkCellular: Boolean,
         var lastUpdated: Long, // may be updated by client listener
-        val dnsServers: Map<InetAddress, Network>
+        val dnsServers: Map<InetAddress, Network>,
     )
 
     data class IpsToProbe(
@@ -617,7 +621,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 }
 
                 // treat captive portal as having internet, if client code is not going to fail-open
-                val failOpen = maybeCaptiveActive || BraveVPNService.FAIL_OPEN_ON_NO_NETWORK
+                val failOpen = maybeCaptiveActive || opPrefs.failOpenOnNoNetwork
 
                 // see #createNetworksSet for why we are using hasInternet
                 // if no network has been validated, then fail open
