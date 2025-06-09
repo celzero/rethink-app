@@ -457,22 +457,6 @@
                 android:text="@string/about_terms_of_service"
                 android:textSize="@dimen/large_font_text_view" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/about_license"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:drawableStart="@drawable/ic_privacy_policy"
-                android:drawablePadding="20dp"
-                android:gravity="start|center_vertical"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
-                android:text="@string/about_license"
-                android:textSize="@dimen/large_font_text_view" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -704,6 +688,19 @@
             android:layout_marginEnd="10dp"
             android:gravity="center"
             android:text="@string/about_mozilla"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/about_license"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:gravity="center"
+            android:text="@string/about_license"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/default_font_text_view" />
 
