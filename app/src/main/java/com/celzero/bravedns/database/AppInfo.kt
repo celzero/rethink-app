@@ -19,6 +19,7 @@ import android.Manifest
 import android.content.ContentValues
 import android.content.pm.PackageManager
 import androidx.room.Entity
+import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.service.FirewallManager
 
 @Entity(primaryKeys = ["uid", "packageName"], tableName = "AppInfo")
@@ -37,15 +38,21 @@ class AppInfo {
     var uploadBytes: Long = 0
     var downloadBytes: Long = 0
     var isProxyExcluded: Boolean = false
+    var tombstoneTs: Long = 0
 
     override fun equals(other: Any?): Boolean {
         if (other !is AppInfo) return false
         if (packageName != other.packageName) return false
+        if (firewallStatus != other.firewallStatus) return false
+        if (connectionStatus != other.connectionStatus) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.packageName.hashCode()
+        var result = this.packageName.hashCode()
+        result += result * 31 + this.firewallStatus
+        result += result * 31 + this.connectionStatus
+        return result
     }
 
     constructor(values: ContentValues?) {
@@ -66,6 +73,10 @@ class AppInfo {
                 "uploadBytes" -> uploadBytes = it.value as Long
                 "downloadBytes" -> downloadBytes = it.value as Long
                 "isProxyExcluded" -> isProxyExcluded = (it.value as Int == 1)
+                "tombstoneTs" -> tombstoneTs = it.value as Long
+                else -> {
+                    // ignore
+                }
             }
         }
     }
@@ -82,7 +93,8 @@ class AppInfo {
         connectionStatus: Int,
         isProxyExcluded: Boolean,
         screenOffAllowed: Boolean,
-        backgroundAllowed: Boolean
+        backgroundAllowed: Boolean,
+        tombstoneTs: Long = 0,
     ) {
         this.packageName = packageName
         this.appName = appName
@@ -96,9 +108,12 @@ class AppInfo {
         this.isProxyExcluded = isProxyExcluded
         this.screenOffAllowed = screenOffAllowed
         this.backgroundAllowed = backgroundAllowed
+        this.tombstoneTs = tombstoneTs
     }
 
     fun hasInternetPermission(packageManager: PackageManager): Boolean {
+        if (packageName.startsWith(NO_PACKAGE_PREFIX)) return true
+
         // INTERNET permission if defined, can not be denied so this is safe to use
         return packageManager.checkPermission(Manifest.permission.INTERNET, packageName) == PackageManager.PERMISSION_GRANTED
     }

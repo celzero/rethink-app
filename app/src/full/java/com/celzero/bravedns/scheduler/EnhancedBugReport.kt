@@ -15,11 +15,13 @@
  */
 package com.celzero.bravedns.scheduler
 
-import Logger
 import Logger.LOG_TAG_BUG_REPORT
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Utilities
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -31,12 +33,12 @@ import java.util.zip.ZipOutputStream
 
 object EnhancedBugReport {
 
-    private const val TOMBSTONE_DIR_NAME = "tombstone"
+    const val TOMBSTONE_DIR_NAME = "tombstone"
     private const val TOMBSTONE_FILE_NAME = "tombstone_"
     private const val MAX_TOMBSTONE_FILES = 5 // maximum files allowed as part of tombstone zip file
     private const val MAX_FILE_SIZE = 1024 * 1024 // 1MB
     private const val FILE_EXTENSION = ".txt"
-    private const val ZIP_FILE_NAME = "rethinkdns.tombstone.zip"
+    const val TOMBSTONE_ZIP_FILE_NAME = "rethinkdns.tombstone.zip"
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun addLogsToZipFile(context: Context) {
@@ -44,47 +46,60 @@ object EnhancedBugReport {
             // create a new zip file named rethinkdns.tombstone.zip
             // add the logs to the zip file
             // close the zip file
-            val zipFilePath = File(context.filesDir.canonicalPath + File.separator + ZIP_FILE_NAME)
-            Logger.d(LOG_TAG_BUG_REPORT, "zip file path: $zipFilePath")
-            val zipOutputStream = ZipOutputStream(FileOutputStream(zipFilePath))
-            val folder = getFolderPath(context.filesDir) ?: return
-            val files = File(folder).listFiles()
-            Logger.d(LOG_TAG_BUG_REPORT, "files to add to zip: ${files?.size}")
-            files?.forEach { file ->
-                val inputStream = FileInputStream(file)
-                val zipEntry = ZipEntry(file.name)
-                zipOutputStream.putNextEntry(zipEntry)
-                inputStream.copyTo(zipOutputStream)
-                inputStream.close()
+            val zipFilePath = File(context.filesDir.canonicalPath + File.separator + TOMBSTONE_ZIP_FILE_NAME)
+            Log.d(LOG_TAG_BUG_REPORT, "zip file path: $zipFilePath")
+            ZipOutputStream(FileOutputStream(zipFilePath)).use { zipOutputStream ->
+                val folder = getFolderPath(context.filesDir) ?: return
+                val files = File(folder).listFiles() ?: return
+
+                Log.d(LOG_TAG_BUG_REPORT, "files to add to zip: ${files.size}")
+                files.forEach { file ->
+                    try {
+                        FileInputStream(file).use { inputStream ->
+                            Log.v(LOG_TAG_BUG_REPORT, "adding file to zip: ${file.name}, size: ${file.length()}")
+                            val zipEntry = ZipEntry(file.name)
+                            zipOutputStream.putNextEntry(zipEntry)
+                            inputStream.copyTo(zipOutputStream)
+                        }
+                    } catch (e: FileNotFoundException) {
+                        Log.e(LOG_TAG_BUG_REPORT, "file not found: ${file.name}, ${e.message}", e)
+                    } catch (e: Exception) {
+                        Log.e(LOG_TAG_BUG_REPORT, "err adding file to zip: ${file.name}, ${e.message}", e)
+                    }
+                }
             }
-            zipOutputStream.close()
+            Log.i(LOG_TAG_BUG_REPORT, "zip file created: ${zipFilePath.absolutePath}")
         } catch (e: FileNotFoundException) {
-            Logger.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}", e)
         } catch (e: ZipException) {
-            Logger.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}", e)
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}", e)
+        } finally {
+
         }
-        Logger.i(LOG_TAG_BUG_REPORT, "logs added to zip file")
+        Log.i(LOG_TAG_BUG_REPORT, "logs added to zip file")
     }
 
     fun writeLogsToFile(context: Context, logs: String) {
         try {
             val file = getFileToWrite(context)
             if (file == null) {
-                Logger.e(LOG_TAG_BUG_REPORT, "file name is null, cannot write logs to file")
+                Log.e(LOG_TAG_BUG_REPORT, "file name is null, cannot write logs to file")
                 return
             }
-            val l = logs + "\n" // append a new line character
+            val time = Utilities.convertLongToTime(System.currentTimeMillis(), Constants.TIME_FORMAT_3)
+            val l = "\n$time: $logs"
             file.appendText(l, Charset.defaultCharset())
+            Log.v(LOG_TAG_BUG_REPORT, "logs written to file: ${file.absolutePath}")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "err writing logs to file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err writing logs to file: ${e.message}", e)
         }
     }
 
     private fun getFileToWrite(context: Context): File? {
         val file = getTombstoneFile(context)
-        Logger.d(LOG_TAG_BUG_REPORT, "file to write logs: ${file?.name}")
+        Log.d(LOG_TAG_BUG_REPORT, "file to write logs: ${file?.name}")
         return file
     }
 
@@ -92,20 +107,20 @@ object EnhancedBugReport {
         try {
             val folderPath = getFolderPath(context.filesDir)
             if (folderPath == null) {
-                Logger.e(LOG_TAG_BUG_REPORT, "folder path is null, cannot get tombstone file")
+                Log.e(LOG_TAG_BUG_REPORT, "folder path is null, cannot get tombstone file")
                 return null
             }
             val folder = File(folderPath)
             val files = folder.listFiles()
             if (files.isNullOrEmpty()) {
-                Logger.d(LOG_TAG_BUG_REPORT, "no files found in the tombstone folder")
+                Log.d(LOG_TAG_BUG_REPORT, "no files found in the tombstone folder")
                 return createTombstoneFile(folderPath)
             } else {
-                Logger.d(LOG_TAG_BUG_REPORT, "files found in the tombstone folder")
+                Log.d(LOG_TAG_BUG_REPORT, "files found in the tombstone folder")
                 return getLatestFile(files) ?: createTombstoneFile(folderPath)
             }
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "err getting tombstone file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err getting tombstone file: ${e.message}", e)
             return null
         }
     }
@@ -114,52 +129,25 @@ object EnhancedBugReport {
         if (files.isEmpty()) {
             return null
         }
-        files.sortByDescending { it.name }
-        var latestFile = files[0]
-        var latestTimestamp = latestFile.lastModified()
-        Logger.vv(LOG_TAG_BUG_REPORT, "latest timestamp: $latestTimestamp, ${latestFile.name}")
-        for (file in files) {
-            Logger.vv(LOG_TAG_BUG_REPORT, "file timestamp: ${file.lastModified()}, ${file.name}")
-            if (file.lastModified() > latestTimestamp) {
-                latestFile = file
-                latestTimestamp = file.lastModified()
-                Logger.vv(LOG_TAG_BUG_REPORT, "updated timestamp: $latestTimestamp, ${latestFile.name}")
-            }
-        }
 
-        return latestFile
-    }
-
-    private fun findOldestFile(files: Array<File>): File? {
-        if (files.isEmpty()) {
-            return null
+        return files.maxByOrNull { it.lastModified() }?.also {
+            Log.v(LOG_TAG_BUG_REPORT, "latest file: ${it.name}, timestamp: ${it.lastModified()}")
+        } ?: run {
+            Log.w(LOG_TAG_BUG_REPORT, "no files found to determine latest file")
+            null
         }
-        files.sortBy { it.name }
-        var oldestFile = files[0]
-        var oldestTimestamp = oldestFile.lastModified()
-        Logger.vv(LOG_TAG_BUG_REPORT, "oldest timestamp: $oldestTimestamp, ${oldestFile.name}")
-        for (file in files) {
-            Logger.vv(LOG_TAG_BUG_REPORT, "file timestamp: ${file.lastModified()}, ${file.name}")
-            if (file.lastModified() < oldestTimestamp) {
-                oldestFile = file
-                oldestTimestamp = file.lastModified()
-                Logger.vv(LOG_TAG_BUG_REPORT, "updated timestamp: $oldestTimestamp, ${oldestFile.name}")
-            }
-        }
-
-        return oldestFile
     }
 
     fun getTombstoneZipFile(context: Context): File? {
         try {
-            val zipFile = File(context.filesDir.canonicalPath + File.separator + ZIP_FILE_NAME)
+            val zipFile = File(context.filesDir.canonicalPath + File.separator + TOMBSTONE_ZIP_FILE_NAME)
             if (!zipFile.exists()) {
-                Logger.w(LOG_TAG_BUG_REPORT, "zip file is null, cannot add logs to zip file")
+                Log.w(LOG_TAG_BUG_REPORT, "zip file is null, cannot add logs to zip file")
                 return null
             }
             return zipFile
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "err getting tombstone zip file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err getting tombstone zip file: ${e.message}", e)
         }
         return null
     }
@@ -167,25 +155,34 @@ object EnhancedBugReport {
     private fun getLatestFile(files: Array<File>): File? {
         try {
             if (files.isEmpty()) {
-                Logger.w(LOG_TAG_BUG_REPORT, "no files found in the tombstone folder")
+                Log.w(LOG_TAG_BUG_REPORT, "no files found in the tombstone folder")
                 return null
+            }
+
+            // if the file count is more than MAX_TOMBSTONE_FILES, delete the oldest file
+            val totalSize = files.sumOf { it.length() }
+            val maxDirSize = MAX_FILE_SIZE * MAX_TOMBSTONE_FILES
+            if (totalSize > maxDirSize) {
+                files.sortedByDescending { it.lastModified() }
+                    .drop(MAX_TOMBSTONE_FILES)
+                    .forEach { file ->
+                        if (!file.delete()) {
+                            Log.w(LOG_TAG_BUG_REPORT, "failed to delete file: ${file.name}")
+                        } else {
+                            Log.i(LOG_TAG_BUG_REPORT, "deleted old file: ${file.name}")
+                        }
+                    }
             }
             val latestFile = findLatestFile(files) ?: return null
             if (latestFile.length() > MAX_FILE_SIZE) {
-                Logger.d(LOG_TAG_BUG_REPORT, "file size is more than 1MB, ${latestFile.name}")
+                Log.d(LOG_TAG_BUG_REPORT, "file size is more than 1MB, ${latestFile.name}")
                 // create a new file
                 val parent = latestFile.parent ?: return null
                 return createTombstoneFile(parent)
             }
-            // if the file count is more than MAX_TOMBSTONE_FILES, delete the oldest file
-            if (files.size > MAX_TOMBSTONE_FILES) {
-                val fileToDelete = findOldestFile(files) ?: return null
-                Logger.i(LOG_TAG_BUG_REPORT, "deleted the oldest file ${fileToDelete.name}, file count: ${files.size}")
-                fileToDelete.delete()
-            }
             return latestFile
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "err getting latest file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err getting latest file: ${e.message}", e)
         }
         return null
     }
@@ -196,11 +193,15 @@ object EnhancedBugReport {
             val ts = System.currentTimeMillis()
             val file =
                 File(folderPath + File.separator + TOMBSTONE_FILE_NAME + ts + FILE_EXTENSION)
-            file.createNewFile()
-            Logger.d(LOG_TAG_BUG_REPORT, "created tombstone file: ${file.name}")
+            val created = file.createNewFile()
+            if (!created) {
+                Log.e(LOG_TAG_BUG_REPORT, "failed to create tombstone file: ${file.name}, $folderPath")
+                return null
+            }
+            Log.i(LOG_TAG_BUG_REPORT, "tombstone file created: ${file.absolutePath}")
             return file
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "err creating tombstone file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err creating tombstone file: ${e.message}", e)
         }
         return null
     }
@@ -212,14 +213,27 @@ object EnhancedBugReport {
             val path = file.canonicalPath + File.separator + TOMBSTONE_DIR_NAME
             val folder = File(path)
             if (folder.exists()) {
-                Logger.vv(LOG_TAG_BUG_REPORT, "folder exists: $path")
+                Log.v(LOG_TAG_BUG_REPORT, "folder exists: $path")
             } else {
-                folder.mkdir()
-                Logger.vv(LOG_TAG_BUG_REPORT, "folder created: $path")
+                val created = folder.mkdir()
+                if (!created) {
+                    Log.e(LOG_TAG_BUG_REPORT, "failed to create folder: $path")
+                    return null
+                }
+                Log.v(LOG_TAG_BUG_REPORT, "folder created: $path")
             }
+            if (!folder.isDirectory) {
+                Log.e(LOG_TAG_BUG_REPORT, "path is not a directory: $path")
+                return null
+            }
+            if (!folder.canWrite()) {
+                Log.e(LOG_TAG_BUG_REPORT, "folder is not writable: $path")
+                return null
+            }
+
             return path
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "err getting folder path: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err getting folder path: ${e.message}", e)
         }
         return null
     }

@@ -67,7 +67,9 @@ private constructor(
         PERSISTENT_KEEPALIVE("PersistentKeepalive"),
         PRE_SHARED_KEY("PresharedKey"),
         PRIVATE_KEY("PrivateKey"),
-        PUBLIC_KEY("PublicKey")
+        PUBLIC_KEY("PublicKey"),
+        CLIENT_ID("ClientID"),
+        AMNEZIA("Amnezia")
     }
 
     enum class Reason {

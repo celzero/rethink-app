@@ -20,11 +20,15 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.isAtleastR
 import hu.autsoft.krate.SimpleKrate
 import hu.autsoft.krate.booleanPref
 import hu.autsoft.krate.default.withDefault
@@ -59,6 +63,17 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val NOTIFICATION_PERMISSION = "notification_permission_request"
         const val EXCLUDE_APPS_IN_PROXY = "exclude_apps_in_proxy"
         const val BIOMETRIC_AUTH = "biometric_authentication"
+        const val ANTI_CENSORSHIP_TYPE = "dial_strategy"
+        const val RETRY_STRATEGY = "retry_strategy"
+        const val ENDPOINT_INDEPENDENCE = "endpoint_independence"
+        const val TCP_KEEP_ALIVE = "tcp_keep_alive"
+        const val USE_SYSTEM_DNS_FOR_UNDELEGATED_DOMAINS = "use_system_dns_for_undelegated_domains"
+        const val SLOWDOWN_MODE = "slowdown_mode"
+        const val NETWORK_ENGINE_EXPERIMENTAL = "network_engine_experimental"
+        const val USE_RPN = "rpn_state"
+        const val RPN_MODE = "rpn_mode"
+        const val DIAL_TIMEOUT_SEC = "dial_timeout_sec"
+        const val AUTO_DIALS_PARALLEL = "auto_dials_parallel"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -121,9 +136,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         stringPref("http_proxy_ipaddress").withDefault<String>("http://127.0.0.1:8118")
 
     // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
-    // default: false for fdroid flavour
-    var allowBypass by
-        booleanPref("allow_bypass").withDefault<Boolean>(!Utilities.isFdroidFlavour())
+    // default: false
+    var allowBypass by booleanPref("allow_bypass").withDefault<Boolean>(false)
 
     // user set among AppConfig.DnsType enum; RETHINK_REMOTE is default which is Rethink-DoH
     var dnsType by
@@ -190,9 +204,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     private var _blockNewlyInstalledApp by booleanPref("block_new_app").withDefault<Boolean>(false)
 
     // user setting to use custom download manager or android's default download manager
-    // default: false, i.e., use android's default download manager
+    // default: true, i.e., use in-build download manager, as we see lot of failures with
+    // android's download manager because of the blocking nature of the app
     var useCustomDownloadManager by
-        booleanPref("use_custom_download_managet").withDefault<Boolean>(false)
+        booleanPref("use_custom_download_managet").withDefault<Boolean>(true)
 
     // custom download manager's last generated id
     var customDownloaderLastGeneratedId by
@@ -242,14 +257,17 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // make notification persistent (Android 13 and above), default false
     var persistentNotification by booleanPref("persistent_notification").withDefault<Boolean>(false)
 
-    // biometric authentication
+    // biometric authentication TODO: remove this
     var biometricAuth by booleanPref("biometric_authentication").withDefault<Boolean>(false)
+
+    // bio-metric authentication type
+    var biometricAuthType by intPref("biometric_authentication_type").withDefault<Int>(0)
 
     // enable dns alg
     var enableDnsAlg by booleanPref("dns_alg").withDefault<Boolean>(false)
 
     // default dns url
-    var defaultDnsUrl by stringPref("default_dns_query").withDefault<String>("")
+    var defaultDnsUrl by stringPref("default_dns_query").withDefault<String>(Constants.DEFAULT_DNS_LIST[1].url)
 
     // packet capture type
     var pcapMode by intPref("pcap_mode").withDefault<Int>(PcapMode.NONE.id)
@@ -282,8 +300,67 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // exclude apps which are configured in proxy (socks5, http, dns proxy)
     var excludeAppsInProxy by booleanPref("exclude_apps_in_proxy").withDefault<Boolean>(true)
 
+    var pingv4Ips by stringPref("ping_ipv4_ips").withDefault<String>(Constants.ip4probes.joinToString(","))
+
+    var pingv6Ips by stringPref("ping_ipv6_ips").withDefault<String>(Constants.ip6probes.joinToString(","))
+
+    // TODO: do we need this? instead use in-memory variable
+    var consoleLogEnabled by booleanPref("console_log_enabled").withDefault<Boolean>(false)
+
+    // camera and mic access
+    var micCamAccess by booleanPref("mic_camera_access").withDefault<Boolean>(false)
+
+    // anti-censorship type (auto, split_tls, split_tcp, desync)
+    var dialStrategy by intPref("dial_strategy").withDefault<Int>(AntiCensorshipActivity.DialStrategies.SPLIT_AUTO.mode)
+
+    // retry strategy type (before split, after split, never)
+    var retryStrategy by intPref("retry_strategy").withDefault<Int>(AntiCensorshipActivity.RetryStrategies.RETRY_AFTER_SPLIT.mode)
+
+    // bypass blocking in dns level, decision is made in flow() (see BraveVPNService#flow)
+    var bypassBlockInDns by booleanPref("bypass_block_in_dns").withDefault<Boolean>(false)
+
+    // randomize listen port for advanced wireguard configuration, default false
+    // restart of tunnel when wireguard is enabled is required to randomize the port to work properly
+    // this is not a user facing option, but a developer option
+    var randomizeListenPort by booleanPref("randomize_listen_port").withDefault<Boolean>(true)
+
+    // endpoint independent mapping/filtering
+    var endpointIndependence by booleanPref("endpoint_independence").withDefault<Boolean>(false)
+
+    var tcpKeepAlive by booleanPref("tcp_keep_alive").withDefault<Boolean>(false)
+
+    // enable split dns, default on Android R and above, as we can identify app which is sending dns
+    var splitDns by booleanPref("split_dns").withDefault<Boolean>(isAtleastR())
+
+    // use system dns for undelegatedDomains
+    var useSystemDnsForUndelegatedDomains by booleanPref("use_system_dns_for_undelegated_domains").withDefault<Boolean>(false)
+
+    var slowdownMode by booleanPref("slowdown_mode").withDefault<Boolean>(false)
+
+    // different modes the rpn proxy can function, see enum RpnMode
+    var rpnMode by intPref("rpn_mode").withDefault<Int>(RpnProxyManager.RpnMode.ANTI_CENSORSHIP.id)
+
+    // current rpn state, see enum RpnState
+    var rpnState by intPref("rpn_state").withDefault<Int>(RpnProxyManager.RpnState.INACTIVE.id)
+
+    var nwEngExperimentalFeatures by booleanPref("network_engine_experimental").withDefault<Boolean>(false)
+
+    var dialTimeoutSec by intPref("dial_timeout_sec").withDefault<Int>(0)
+
+    // treat only mobile data as metered
+    var treatOnlyMobileNetworkAsMetered by booleanPref("treat_only_mobile_nw_as_metered").withDefault<Boolean>(false)
+
+    var showConfettiOnRPlus by booleanPref("show_confetti_on_rplus").withDefault<Boolean>(true)
+
+    var autoDialsParallel by booleanPref("auto_dials_parallel").withDefault<Boolean>(true)
+
+    // user setting whether to download ip info for the ip addresses
+    var downloadIpInfo by booleanPref("download_ip_info").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
+
+    // user setting to allow only added packages can trigger the app
+    var appTriggerPackages by stringPref("app_trigger_packages").withDefault<String>("")
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
-    var median: MutableLiveData<Long> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
     var universalRulesCount: MutableLiveData<Int> = MutableLiveData()
     private var proxyStatus: MutableLiveData<Int> = MutableLiveData()
@@ -294,10 +371,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var dnsCryptRelays: MutableLiveData<DnsCryptRelayDetails> = MutableLiveData()
 
     var remoteBlocklistCount: MutableLiveData<Int> = MutableLiveData()
-
-    fun setMedianLatency(median: Long) {
-        this.median.postValue(median)
-    }
 
     fun setVpnEnabled(isOn: Boolean) {
         vpnEnabledLiveData.postValue(isOn)
@@ -420,11 +493,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     }
 
     fun getProxyStatus(): MutableLiveData<Int> {
-        if (proxyStatus.value == null) updateProxyStatus()
-        return proxyStatus
+        return updateProxyStatus()
     }
 
-    fun updateProxyStatus() {
+    fun updateProxyStatus(): MutableLiveData<Int> {
         val status =
             when (AppConfig.ProxyProvider.getProxyProvider(proxyProvider)) {
                 AppConfig.ProxyProvider.WIREGUARD -> {
@@ -438,12 +510,16 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
                 }
                 AppConfig.ProxyProvider.CUSTOM -> {
                     val type = AppConfig.ProxyType.of(proxyType)
-                    if (type == AppConfig.ProxyType.SOCKS5) {
-                        R.string.lbl_socks5
-                    } else if (type == AppConfig.ProxyType.HTTP) {
-                        R.string.lbl_http
-                    } else {
-                        R.string.lbl_http_socks5
+                    when (type) {
+                        AppConfig.ProxyType.SOCKS5 -> {
+                            R.string.lbl_socks5
+                        }
+                        AppConfig.ProxyType.HTTP -> {
+                            R.string.lbl_http
+                        }
+                        else -> {
+                            R.string.lbl_http_socks5
+                        }
                     }
                 }
                 else -> {
@@ -451,5 +527,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
                 }
             }
         proxyStatus.postValue(status)
+        return proxyStatus
     }
 }

@@ -54,8 +54,7 @@ class LocalAdvancedViewAdapter(val context: Context) :
                     oldConnection: RethinkLocalFileTag,
                     newConnection: RethinkLocalFileTag
                 ): Boolean {
-                    return (oldConnection.value == newConnection.value &&
-                        oldConnection.isSelected == newConnection.isSelected)
+                    return oldConnection == newConnection
                 }
             }
     }

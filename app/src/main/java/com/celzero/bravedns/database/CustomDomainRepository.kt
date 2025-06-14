@@ -43,6 +43,10 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
         return customDomainDAO.getAllDomains()
     }
 
+    fun getCustomDomain(uid: Int, domain: String): CustomDomain? {
+        return customDomainDAO.getCustomDomain(uid, domain)
+    }
+
     fun getDomainsByUID(uid: Int): List<CustomDomain> {
         return customDomainDAO.getDomainsByUID(uid)
     }
@@ -83,5 +87,13 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
 
     fun getRulesCursor(): Cursor {
         return customDomainDAO.getRulesCursor()
+    }
+
+    suspend fun deleteRules(list: List<CustomDomain>) {
+        return customDomainDAO.deleteAll(list)
+    }
+
+    suspend fun getCustomDomainCount() : Int {
+        return customDomainDAO.getCustomDomainCount()
     }
 }

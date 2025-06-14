@@ -14,12 +14,33 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <ImageView
-            android:id="@+id/info_rules_dialog_cancel_img"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="end"
-            android:src="@android:drawable/ic_menu_close_clear_cancel" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/info_rules_dialog_cancel_img"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:src="@android:drawable/ic_menu_close_clear_cancel" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/info_rules_dialog_ok_btn"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/info_rules_dialog_cancel_img"
+                android:layout_marginEnd="10dp"
+                android:background="?attr/selectableItemBackground"
+                android:drawablePadding="10dp"
+                android:layout_centerVertical="true"
+                android:padding="10dp"
+                android:text="@string/about_bug_report_dialog_positive_btn"
+                android:visibility="gone" />
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -27,7 +48,7 @@
             android:layout_gravity="center"
             android:orientation="horizontal">
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/info_rules_dialog_rules_icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -36,7 +57,7 @@
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
                 android:visibility="gone" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/info_rules_dialog_rules_title"
                 style="@style/Widget.AppCompat.TextView.SpinnerItem"
                 android:layout_width="wrap_content"
@@ -49,20 +70,21 @@
                 android:textSize="@dimen/heading_font_text_view" />
         </LinearLayout>
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/info_rules_dialog_rules_desc"
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:lineSpacingExtra="5dp"
+            android:textIsSelectable="true"
             android:padding="5dp"
             android:text="@string/bsct_conn_rule_explanation"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/large_font_text_view" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

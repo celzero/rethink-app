@@ -46,7 +46,7 @@ class NonStoreAppUpdater(
         Logger.i(LOG_TAG_APP_UPDATE, "Beginning update check")
         val url = baseUrl + BuildConfig.VERSION_CODE
 
-        val client = RetrofitManager.okHttpClient()
+        val client = RetrofitManager.okHttpClient(persistentState.routeRethinkInRethink)
         val request = Request.Builder().url(url).build()
 
         client
@@ -65,14 +65,20 @@ class NonStoreAppUpdater(
                     override fun onResponse(call: Call, response: Response) {
                         try {
                             val res = response.body?.string()
-                            if (res?.isBlank() == true) {
+                            if (res == null) {
                                 listener.onUpdateCheckFailed(
                                     AppUpdater.InstallSource.OTHER,
                                     isInteractive
                                 )
                                 return
                             }
-
+                            if (res.isBlank() == true) {
+                                listener.onUpdateCheckFailed(
+                                    AppUpdater.InstallSource.OTHER,
+                                    isInteractive
+                                )
+                                return
+                            }
                             val json = JSONObject(res)
                             val version = json.optInt(JSON_VERSION, 0)
                             val shouldUpdate = json.optBoolean(JSON_UPDATE, false)
