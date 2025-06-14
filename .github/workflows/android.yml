@@ -1,4 +1,4 @@
-name: Android CI
+name: 🫣 Android CI
 
 on:
   push:
@@ -12,17 +12,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
+    - name: 🥏 Checkout
       uses: actions/checkout@v4
-    - name: set up JDK
+    - name: ☕️ JDKv17
       uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
-
-    - name: Grant execute permission for gradlew
+    - name: ⚡️ +x gradlew
       run: chmod +x gradlew
-    - name: Build with Gradle
+    - name: 🎪 Secrets
+      if: success()
+      # TODO: override iff doesn't exist
+      # developers.google.com/android/guides/google-services-plugin#adding_the_json_file
+      run: |
+        mkdir -p app/debug
+        echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > app/debug/google-services.json
+    - name: 🚂 Build
       if: success()
       run: ./gradlew assembleWebsiteFullDebug --info --warning-mode all
+
