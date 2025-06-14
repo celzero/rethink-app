@@ -30,7 +30,6 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.DataUsageSummary
 import com.celzero.bravedns.databinding.FragmentSummaryStatisticsBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.ui.activity.DetailedStatisticsActivity
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.UIUtils
@@ -111,8 +110,13 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         showTopActiveApps()
         showAppNetworkActivity()
         showBlockedApps()
-        showMostConnectedASN()
-        showMostBlockedASN()
+        if (persistentState.downloadIpInfo) {
+            showMostConnectedASN()
+            showMostBlockedASN()
+        } else {
+            b.fssAsnAllowedLl.visibility = View.GONE
+            b.fssAsnBlockedLl.visibility = View.GONE
+        }
     }
 
     private fun setTabbedViewTxt() {
