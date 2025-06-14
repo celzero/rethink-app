@@ -1,0 +1,1 @@
+Pare-feu puissant, WireGuard, moniteur de réseau, bloquez les logiciels malveillants, changez le DNS.
