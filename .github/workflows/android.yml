@@ -24,11 +24,11 @@ jobs:
       run: chmod +x gradlew
     - name: 🎪 Secrets
       if: success()
-      # TODO: override iff doesn't exist
+      # TODO: override iff it doesn't exist
       # developers.google.com/android/guides/google-services-plugin#adding_the_json_file
       run: |
-        mkdir -p app/debug
-        echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > app/debug/google-services.json
+        mkdir -p app/src/debug
+        echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > app/src/debug/google-services.json
     - name: 🚂 Build
       if: success()
       run: ./gradlew assembleWebsiteFullDebug --info --warning-mode all
