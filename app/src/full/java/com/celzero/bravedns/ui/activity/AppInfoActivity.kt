@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -89,6 +91,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         const val INTENT_UID = "UID"
         const val INTENT_ACTIVE_CONNS = "ACTIVE_CONNS"
         const val INTENT_ASN = "ASN"
+        private const val TAG = "AppInfoActivity"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -158,7 +161,9 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 } else {
                     updateFirewallStatusUi(appStatus, connStatus)
                     setActiveConnsAdapter()
-                    setASNAdapter()
+                    if (persistentState.downloadIpInfo) {
+                        setASNAdapter()
+                    }
                     setDomainsAdapter()
                     setIpAdapter()
                 }
@@ -294,7 +299,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             )
         )
 
-        TooltipCompat.setTooltipText(b.aadCloseConnIcon, getString(R.string.close_conn_tool_tip))
+        TooltipCompat.setTooltipText(b.aadCloseConnsChip, getString(R.string.close_conn_tool_tip))
 
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
             // show the tooltip only once when app is not bypassed (dns + firewall) earlier
@@ -410,13 +415,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             b.excludeProxySwitch.isChecked = !b.excludeProxySwitch.isChecked
         }
 
-        b.aadCloseConnIcon.setOnClickListener {
-            VpnController.closeConnectionsIfNeeded(uid)
-            showToastUiCentered(
-                this,
-                getString(R.string.config_add_success_toast),
-                Toast.LENGTH_LONG
-            )
+        b.aadCloseConnsChip.setOnClickListener {
+            showCloseConnectionDialog(uid, appInfo.appName)
         }
     }
 
@@ -851,6 +851,28 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         val alertDialog: AlertDialog = builderSingle.create()
         alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
         alertDialog.show()
+    }
+
+    private fun showCloseConnectionDialog(uid: Int, appName: String) {
+        if (isRethinkApp) {
+            Logger.i(LOG_TAG_UI, "$TAG rethink connection - no close connection dialog")
+            return
+        }
+        Logger.v(LOG_TAG_UI, "$TAG show close connection dialog for uid: $uid")
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(this.getString(R.string.close_conns_dialog_title))
+            .setMessage(getString(R.string.close_conns_dialog_desc, appName))
+            .setPositiveButton(R.string.lbl_proceed) { _, _ ->
+                // close the connection
+                VpnController.closeConnectionsIfNeeded(uid)
+                Logger.i(LOG_TAG_UI, "$TAG closed connection for uid: $uid")
+                showToastUiCentered(this, getString(R.string.config_add_success_toast), Toast.LENGTH_LONG)
+            }
+            .setNegativeButton(R.string.lbl_cancel, null)
+            .create()
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.show()
     }
 
     private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
