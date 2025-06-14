@@ -324,7 +324,15 @@ class ConnectionTrackerAdapter(private val context: Context) :
             }
             // bunny in case rpid as present, key in case of proxy
             // bunny and key indicate conn is proxied, so its enough to show one of them
-            if (containsRelayProxy(ct.rpid)) {
+            if (isRpnProxy(ct.rpid)) {
+                b.connectionSummaryLl.visibility = View.VISIBLE
+                b.connectionDelay.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.connectionDelay.text,
+                        context.getString(R.string.symbol_sparkle)
+                    )
+            } else if (containsRelayProxy(ct.rpid)) {
                 b.connectionDelay.text =
                     context.getString(
                         R.string.ci_desc,
@@ -368,6 +376,10 @@ class ConnectionTrackerAdapter(private val context: Context) :
             val rule = FirewallRuleset.getFirewallRule(ruleName) ?: return false
             val proxy = ProxyManager.isIpnProxy(proxyDetails)
             return FirewallRuleset.isProxied(rule) && proxyDetails.isNotEmpty() && proxy
+        }
+
+        private fun isRpnProxy(pid: String): Boolean {
+            return pid.isNotEmpty() && ProxyManager.isIpnProxy(pid)
         }
 
         private fun isConnectionHeavier(ct: ConnectionTracker): Boolean {
