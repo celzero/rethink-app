@@ -259,7 +259,7 @@ class AppListActivity :
     override fun onStop() {
         super.onStop()
         // clear the filters when the activity is stopped
-        filters.value = null
+        filters.value = Filters()
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
