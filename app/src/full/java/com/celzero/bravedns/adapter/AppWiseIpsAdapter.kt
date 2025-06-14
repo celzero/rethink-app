@@ -56,20 +56,14 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
 
     private lateinit var adapter: AppWiseIpsAdapter
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): AppWiseIpsAdapter.ConnectionDetailsViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionDetailsViewHolder {
         val itemBinding =
             ListItemAppIpDetailsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         adapter = this
         return ConnectionDetailsViewHolder(itemBinding)
     }
 
-    override fun onBindViewHolder(
-        holder: AppWiseIpsAdapter.ConnectionDetailsViewHolder,
-        position: Int
-    ) {
+    override fun onBindViewHolder(holder: ConnectionDetailsViewHolder, position: Int) {
         val appConnection: AppConnection = getItem(position) ?: return
         // updates the app-wise connections from network log to AppInfo screen
         holder.update(appConnection)
@@ -147,6 +141,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
                 } else {
                     b.acdFlag.text = cc
                 }
+                b.acdDownArrowIv.visibility = View.INVISIBLE
             } else {
                 b.acdFlag.text = conn.flag
                 b.acdIpAddress.text = conn.ipAddress
@@ -156,6 +151,7 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
                 } else {
                     b.acdDomainName.visibility = View.GONE
                 }
+                b.acdDownArrowIv.visibility = View.VISIBLE
             }
             updateStatusUi(conn)
         }
