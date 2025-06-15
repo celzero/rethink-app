@@ -18,14 +18,17 @@ package com.celzero.bravedns.service
 
 import Logger
 import android.app.PendingIntent
+import android.app.UiModeManager
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.VpnService
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.PrepareVpnActivity
+import com.celzero.bravedns.ui.activity.AppLockActivity
+import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.util.Utilities
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -73,13 +76,30 @@ class BraveTileService : TileService(), KoinComponent {
         }
     }
 
+    private fun isAppRunningOnTv(): Boolean {
+        return try {
+            val uiModeManager: UiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
+            uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
+        } catch (ignored: Exception) {
+            false
+        }
+    }
+
+    private fun isAppLockEnabled(): Boolean {
+        if (isAppRunningOnTv()) return false
+
+        // TODO: should we check for last unlock time here?
+        MiscSettingsActivity.BioMetricType.fromValue(persistentState.biometricAuthType).let {
+            return it.enabled()
+        }
+    }
+
     override fun onClick() {
         super.onClick()
-        val isAppLockEnabled = persistentState.biometricAuth
         // do not start or stop VPN if app lock is enabled
-        if (VpnController.state().activationRequested && !isAppLockEnabled) {
-            VpnController.stop(this)
-        } else if (VpnService.prepare(this) == null && !isAppLockEnabled) {
+        if (VpnController.state().activationRequested && !isAppLockEnabled()) {
+            VpnController.stop("tile",this)
+        } else if (VpnService.prepare(this) == null && !isAppLockEnabled()) {
             // Start VPN service when VPN permission has been granted
             VpnController.start(this)
         } else {
@@ -88,7 +108,7 @@ class BraveTileService : TileService(), KoinComponent {
                 if (Utilities.isHeadlessFlavour()) {
                     Intent(this, PrepareVpnActivity::class.java)
                 } else {
-                    Intent(this, HomeScreenActivity::class.java)
+                    Intent(this, AppLockActivity::class.java)
                 }
             val pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)

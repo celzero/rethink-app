@@ -45,13 +45,16 @@ import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.AppInfoActivity
+import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment.SummaryStatisticsType
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.Utilities.isAtleastN
+import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -68,22 +71,17 @@ class SummaryStatisticsAdapter(
     ) {
 
     private var maxValue: Int = 0
+    private var timeCategory = SummaryStatisticsViewModel.TimeCategory.ONE_HOUR
 
     companion object {
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<AppConnection>() {
-                override fun areItemsTheSame(
-                    oldConnection: AppConnection,
-                    newConnection: AppConnection
-                ): Boolean {
-                    return (oldConnection == newConnection)
+                override fun areItemsTheSame(old: AppConnection, new: AppConnection): Boolean {
+                    return (old == new)
                 }
 
-                override fun areContentsTheSame(
-                    oldConnection: AppConnection,
-                    newConnection: AppConnection
-                ): Boolean {
-                    return (oldConnection == newConnection)
+                override fun areContentsTheSame(old: AppConnection, new: AppConnection): Boolean {
+                    return (old == new)
                 }
             }
     }
@@ -102,8 +100,8 @@ class SummaryStatisticsAdapter(
     }
 
     override fun onBindViewHolder(holder: AppNetworkActivityViewHolder, position: Int) {
-        val appNetworkActivity = getItem(position) ?: return
-        holder.bind(appNetworkActivity)
+        val conn = getItem(position) ?: return
+        holder.bind(conn)
     }
 
     private fun calculatePercentage(c: Double): Int {
@@ -117,6 +115,10 @@ class SummaryStatisticsAdapter(
         } else {
             (value * 100 / maxValue)
         }
+    }
+
+    fun setTimeCategory(timeCategory: SummaryStatisticsViewModel.TimeCategory) {
+        this.timeCategory = timeCategory
     }
 
     inner class AppNetworkActivityViewHolder(
@@ -160,7 +162,7 @@ class SummaryStatisticsAdapter(
                     R.string.symbol_upload,
                     Utilities.humanReadableByteCount(appConnection.uploadBytes, true)
                 )
-            val total = context.getString(R.string.two_argument, download, upload)
+            val total = context.getString(R.string.two_argument, upload, download)
             itemBinding.ssDataUsage.text = total
             itemBinding.ssCount.text = appConnection.count.toString()
         }
@@ -168,6 +170,22 @@ class SummaryStatisticsAdapter(
         private suspend fun setIcon(appConnection: AppConnection) {
 
             when (type) {
+                SummaryStatisticsType.TOP_ACTIVE_CONNS -> {
+                    io {
+                        val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
+                        uiCtx {
+                            itemBinding.ssIcon.visibility = View.VISIBLE
+                            itemBinding.ssFlag.visibility = View.GONE
+                            loadAppIcon(
+                                Utilities.getIcon(
+                                    context,
+                                    appInfo?.packageName ?: "",
+                                    appInfo?.appName ?: ""
+                                )
+                            )
+                        }
+                    }
+                }
                 SummaryStatisticsType.MOST_CONNECTED_APPS -> {
                     io {
                         val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
@@ -198,6 +216,30 @@ class SummaryStatisticsAdapter(
                                 )
                             )
                         }
+                    }
+                }
+                SummaryStatisticsType.MOST_CONNECTED_ASN -> {
+                    uiCtx {
+                        if (appConnection.flag.isNotEmpty()) {
+                            val flag = getFlag(appConnection.flag)
+                            itemBinding.ssFlag.text = flag
+                        } else {
+                            itemBinding.ssFlag.text = "--"
+                        }
+                        itemBinding.ssIcon.visibility = View.GONE
+                        itemBinding.ssFlag.visibility = View.VISIBLE
+                    }
+                }
+                SummaryStatisticsType.MOST_BLOCKED_ASN -> {
+                    uiCtx {
+                        if (appConnection.flag.isNotEmpty()) {
+                            val flag = getFlag(appConnection.flag)
+                            itemBinding.ssFlag.text = flag
+                        } else {
+                            itemBinding.ssFlag.text = "--"
+                        }
+                        itemBinding.ssIcon.visibility = View.GONE
+                        itemBinding.ssFlag.visibility = View.VISIBLE
                     }
                 }
                 SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
@@ -252,18 +294,21 @@ class SummaryStatisticsAdapter(
                         itemBinding.ssFlag.text = appConnection.flag
                     }
                 }
-                SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
-                    uiCtx {
-                        itemBinding.ssIcon.visibility = View.GONE
-                        itemBinding.ssFlag.visibility = View.VISIBLE
-                        itemBinding.ssFlag.text = appConnection.flag
-                    }
-                }
             }
         }
 
         private fun setName(appConnection: AppConnection) {
             when (type) {
+                SummaryStatisticsType.TOP_ACTIVE_CONNS -> {
+                    io {
+                        val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
+                        uiCtx {
+                            val appName = getAppName(appConnection, appInfo)
+                            itemBinding.ssDataUsage.visibility = View.VISIBLE
+                            itemBinding.ssDataUsage.text = appName
+                        }
+                    }
+                }
                 SummaryStatisticsType.MOST_CONNECTED_APPS -> {
                     io {
                         val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
@@ -284,15 +329,27 @@ class SummaryStatisticsAdapter(
                         }
                     }
                 }
+                SummaryStatisticsType.MOST_CONNECTED_ASN -> {
+                    itemBinding.ssDataUsage.visibility = View.VISIBLE
+                    itemBinding.ssDataUsage.text = appConnection.appOrDnsName
+                }
+                SummaryStatisticsType.MOST_BLOCKED_ASN -> {
+                    itemBinding.ssDataUsage.visibility = View.VISIBLE
+                    itemBinding.ssDataUsage.text = appConnection.appOrDnsName
+                }
                 SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
                     itemBinding.ssContainer.visibility = View.VISIBLE
                     itemBinding.ssDataUsage.visibility = View.VISIBLE
+                    // now there won't be any trailing '.' in the domain name, from v0.5.5o
+                    // TODO: remove this in later versions
                     itemBinding.ssDataUsage.text =
                         appConnection.appOrDnsName?.dropLastWhile { it == '.' }
                 }
                 SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
                     itemBinding.ssContainer.visibility = View.VISIBLE
                     itemBinding.ssDataUsage.visibility = View.VISIBLE
+                    // now there won't be any trailing '.' in the domain name, from v0.5.5o
+                    // TODO: remove this in later versions
                     itemBinding.ssDataUsage.text =
                         appConnection.appOrDnsName?.dropLastWhile { it == '.' }
                 }
@@ -306,11 +363,16 @@ class SummaryStatisticsAdapter(
                 }
                 SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
                     itemBinding.ssDataUsage.visibility = View.VISIBLE
-                    itemBinding.ssDataUsage.text = getCountryNameFromFlag(appConnection.flag)
-                }
-                SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
-                    itemBinding.ssDataUsage.visibility = View.VISIBLE
-                    itemBinding.ssDataUsage.text = getCountryNameFromFlag(appConnection.flag)
+                    val flag = getCountryNameFromFlag(appConnection.flag)
+                    if (flag.isNotEmpty() && flag != "--") {
+                        itemBinding.ssDataUsage.text = getCountryNameFromFlag(appConnection.flag)
+                    } else {
+                        itemBinding.ssDataUsage.text = context.getString(
+                            R.string.two_argument_space,
+                            context.getString(R.string.network_log_app_name_unknown),
+                            appConnection.flag
+                        )
+                    }
                 }
             }
         }
@@ -320,7 +382,7 @@ class SummaryStatisticsAdapter(
                 if (appInfo?.appName.isNullOrEmpty()) {
                     context.getString(R.string.network_log_app_name_unnamed, "($appConnection.uid)")
                 } else {
-                    appInfo?.appName
+                    appInfo?.appName ?: context.getString(R.string.network_log_app_name_unnamed, "(${appConnection.uid})")
                 }
             } else {
                 appConnection.appOrDnsName
@@ -366,21 +428,23 @@ class SummaryStatisticsAdapter(
         private fun setupClickListeners(appConnection: AppConnection) {
             itemBinding.ssContainer.setOnClickListener {
                 when (type) {
+                    SummaryStatisticsType.TOP_ACTIVE_CONNS -> {
+                        startAppInfoActivity(appConnection)
+                    }
                     SummaryStatisticsType.MOST_CONNECTED_APPS -> {
                         startAppInfoActivity(appConnection)
                     }
                     SummaryStatisticsType.MOST_BLOCKED_APPS -> {
                         startAppInfoActivity(appConnection)
                     }
+                    SummaryStatisticsType.MOST_CONNECTED_ASN -> {
+                        startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.ASN)
+                    }
+                    SummaryStatisticsType.MOST_BLOCKED_ASN -> {
+                        startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.ASN, true)
+                    }
                     SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
-                        if (appConfig.getBraveMode().isDnsMode()) {
-                            showDnsLogs(appConnection)
-                        } else {
-                            showNetworkLogs(
-                                appConnection,
-                                SummaryStatisticsType.MOST_CONTACTED_DOMAINS
-                            )
-                        }
+                        startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.DOMAIN)
                     }
                     SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
                         io {
@@ -409,21 +473,34 @@ class SummaryStatisticsAdapter(
                         showNetworkLogs(appConnection, SummaryStatisticsType.MOST_BLOCKED_IPS)
                     }
                     SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
-                        showNetworkLogs(
-                            appConnection,
-                            SummaryStatisticsType.MOST_CONTACTED_COUNTRIES
-                        )
-                    }
-                    SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
-                        showNetworkLogs(appConnection, SummaryStatisticsType.MOST_BLOCKED_COUNTRIES)
+                        startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.FLAG)
                     }
                 }
             }
         }
 
+        private fun startDomainConnectionsActivity(appConnection: AppConnection, input: DomainConnectionsActivity.InputType, isBlocked: Boolean = false) {
+            val intent = Intent(context, DomainConnectionsActivity::class.java)
+            intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TYPE, input.type)
+            when (input) {
+                DomainConnectionsActivity.InputType.DOMAIN -> {
+                    intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_DOMAIN, appConnection.appOrDnsName)
+                }
+                DomainConnectionsActivity.InputType.ASN -> {
+                    intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_ASN, appConnection.appOrDnsName)
+                    intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, isBlocked)
+                }
+                DomainConnectionsActivity.InputType.FLAG -> {
+                    intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_FLAG, appConnection.flag)
+                }
+            }
+            intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TIME_CATEGORY, timeCategory.value)
+            context.startActivity(intent)
+        }
+
         private fun startAppInfoActivity(appConnection: AppConnection) {
             val intent = Intent(context, AppInfoActivity::class.java)
-            intent.putExtra(AppInfoActivity.UID_INTENT_NAME, appConnection.uid)
+            intent.putExtra(AppInfoActivity.INTENT_UID, appConnection.uid)
             context.startActivity(intent)
         }
 
@@ -481,9 +558,6 @@ class SummaryStatisticsAdapter(
                 SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
                     startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.flag)
                 }
-                SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
-                    startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.flag)
-                }
                 else -> {
                     // should never happen, but just in case we'll show all logs
                     startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, "")
@@ -505,7 +579,6 @@ class SummaryStatisticsAdapter(
 
         private fun startActivity(screenToLoad: Int, searchParam: String?) {
             val intent = Intent(context, NetworkLogsActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
             intent.putExtra(Constants.SEARCH_QUERY, searchParam ?: "")
             context.startActivity(intent)
@@ -550,8 +623,8 @@ class SummaryStatisticsAdapter(
                             }
                         }
                     )
-            } catch (e: Exception) {
-                Logger.d(LOG_TAG_DNS, "Error loading icon, load flag instead")
+            } catch (ignored: Exception) {
+                Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
                 displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)
             }
         }
@@ -597,7 +670,7 @@ class SummaryStatisticsAdapter(
                             }
                         }
                     )
-            } catch (e: Exception) {
+            } catch (ignored: Exception) {
                 Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
                 showFlag()
                 hideFavIcon()

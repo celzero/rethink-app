@@ -19,18 +19,6 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
-data class WgConfigFilesImmutable(
-    val id: Int,
-    val name: String,
-    val configPath: String,
-    val serverResponse: String,
-    val isActive: Boolean,
-    val isCatchAll: Boolean,
-    val isLockdown: Boolean,
-    val oneWireGuard: Boolean,
-    val isDeletable: Boolean
-)
-
 @Entity(tableName = "WgConfigFiles")
 class WgConfigFiles {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
@@ -41,16 +29,30 @@ class WgConfigFiles {
     var isCatchAll: Boolean = false
     var isLockdown: Boolean = false
     var oneWireGuard: Boolean = false
+    var useOnlyOnMetered: Boolean = false
     var isDeletable: Boolean = true
 
     override fun equals(other: Any?): Boolean {
         if (other !is WgConfigFiles) return false
         if (id != other.id) return false
+        if (name != other.name) return false
+        if (isActive != other.isActive) return false
+        if (isCatchAll != other.isCatchAll) return false
+        if (oneWireGuard != other.oneWireGuard) return false
+        if (isLockdown != other.isLockdown) return false
+        if (useOnlyOnMetered != other.useOnlyOnMetered) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.id.hashCode()
+        var result = this.id.hashCode()
+        result += result * 31 + this.name.hashCode()
+        result += result * 31 + this.isActive.hashCode()
+        result += result * 31 + this.isCatchAll.hashCode()
+        result += result * 31 + this.oneWireGuard.hashCode()
+        result += result * 31 + this.isLockdown.hashCode()
+        result += result * 31 + this.useOnlyOnMetered.hashCode()
+        return result
     }
 
     @Ignore
@@ -62,7 +64,9 @@ class WgConfigFiles {
         isActive: Boolean,
         isCatchAll: Boolean,
         isLockdown: Boolean,
-        oneWireGuard: Boolean
+        oneWireGuard: Boolean,
+        useOnlyOnMetered: Boolean,
+        isDeletable: Boolean = true
     ) {
         this.id = id
         this.name = name
@@ -72,6 +76,8 @@ class WgConfigFiles {
         this.isCatchAll = isCatchAll
         this.isLockdown = isLockdown
         this.oneWireGuard = oneWireGuard
+        this.useOnlyOnMetered = useOnlyOnMetered
+        this.isDeletable = isDeletable
     }
 
     constructor(
@@ -82,6 +88,7 @@ class WgConfigFiles {
         isCatchAll: Boolean,
         isLockdown: Boolean,
         oneWireGuard: Boolean,
+        useOnlyOnMetered: Boolean,
         isDeletable: Boolean
     ) {
         this.name = name
@@ -91,6 +98,7 @@ class WgConfigFiles {
         this.isCatchAll = isCatchAll
         this.isLockdown = isLockdown
         this.oneWireGuard = oneWireGuard
+        this.useOnlyOnMetered = useOnlyOnMetered
         this.isDeletable = isDeletable
     }
 
@@ -104,6 +112,7 @@ class WgConfigFiles {
             isCatchAll,
             isLockdown,
             oneWireGuard,
+            useOnlyOnMetered,
             isDeletable
         )
     }
@@ -118,8 +127,22 @@ class WgConfigFiles {
                 data.isActive,
                 data.isCatchAll,
                 data.isLockdown,
-                data.oneWireGuard
+                data.oneWireGuard,
+                data.useOnlyOnMetered
             )
         }
     }
 }
+
+data class WgConfigFilesImmutable(
+    val id: Int,
+    val name: String,
+    val configPath: String,
+    val serverResponse: String,
+    val isActive: Boolean,
+    val isCatchAll: Boolean,
+    val isLockdown: Boolean,
+    val oneWireGuard: Boolean,
+    val useOnlyOnMetered: Boolean,
+    val isDeletable: Boolean
+)
