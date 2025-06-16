@@ -749,7 +749,7 @@
     <string name="blocklist_update_check_not_required" translatable="true">பிளாக்லிச்ட்கள் ஏற்கனவே அண்மைக் கால பதிப்பில் உள்ளன.</string>
     <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast -->பயன்பாட்டு பட்டியல் மறு ஒத்திசைவு முடிந்தது.</string>
     <string name="show_logs_disabled_network_message" translatable="true">இணைப்புப் பதிவு முடக்கப்பட்டுள்ளது. மீண்டும் இயக்க, கோட்டோ <i> அமைப்புகள் </i> மற்றும் இயக்கத்தில் <i>பதிவை இயக்கவும்.</i></string>
-    <string name="show_logs_disabled_dns_message" translatable="true">டிஎன்எச் கோரிக்கை பதிவு முடக்கப்பட்டுள்ளது. மீண்டும் இயக்க, கோட்டோ <i> அமைப்புகள் </i> மற்றும் \u0020இயக்கத்தில் <i>பதிவை இயக்கவும்.</i></string>
+    <string name="show_logs_disabled_dns_message" translatable="true">டிஎன்எச் கோரிக்கை பதிவு முடக்கப்பட்டுள்ளது. மீண்டும் இயக்க, <i> அமைப்புகள் </i> சென்று <i>இயக்கத்தில் பதிவை</i> இயக்கவும்.</string>
     <string name="configure_dns_connected_doh_status" translatable="true">Https க்கு மேல் dns</string>
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">Dnscrypt</string>
     <string name="configure_dns_connected_dns_proxy_status" translatable="true">டி.என்.எச் பதிலாள்</string>
