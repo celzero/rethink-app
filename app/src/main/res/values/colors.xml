@@ -274,7 +274,7 @@
     <color name="primaryTextLightPlus">#000000</color>
     <color name="primaryLightColorTextLightPlus">#8c000000</color>
     <color name="primaryDarkColorTextLightPlus">#FFFFFF</color>
-    <color name="chipTextColorLightPlus">#000000</color>
+    <color name="chipTextColorLightPlus">#FFFFFF</color>
     <color name="invertedPrimaryTextLightPlus">#FFFFFF</color>
     <color name="secondaryTextLightPlus">#183531</color>
     <color name="textColorAccentBadLightPlus">#ff5e61</color>
