@@ -33,7 +33,9 @@ jobs:
         wc -lwm app/src/debug/google-services.json
       env:
         GSCV_TEST_JSON: ${{ secrets.GOOGLE_SERVICES_TEST_JSON }}
-    - name: 🚂 Build
+    - name: 🚂 Assemble
       if: success()
-      run: ./gradlew assembleWebsiteFullDebug --info --warning-mode all
+      run: |
+        ./gradlew lint
+        ./gradlew assembleWebsiteFullDebug --info --warning-mode all
 
