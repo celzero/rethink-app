@@ -103,17 +103,6 @@
                     android:minHeight="24dp"
                     android:src="@drawable/ic_info_white" />
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/aad_close_conn_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginTop="10dp"
-                    android:minWidth="24dp"
-                    android:minHeight="24dp"
-                    android:src="@drawable/ic_cross" />
-
-
             </androidx.appcompat.widget.LinearLayoutCompat>
 
         </RelativeLayout>
@@ -498,22 +487,39 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/aad_active_conns_title"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="20dp"
-                android:layout_toStartOf="@id/aad_active_conns_chip"
+                android:layout_toStartOf="@id/aad_close_conns_chip"
                 android:fontFamily="sans-serif-smallcaps"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/top_active_conns"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/extra_large_font_text_view" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/aad_close_conns_chip"
+                style="@style/ThinnerChip.Action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/aad_active_conns_chip"
+                android:layout_centerInParent="true"
+                android:layout_gravity="end"
+                android:layout_marginEnd="5dp"
+                android:text="@string/close_all"
+                android:textColor="?attr/chipTextPositive"
+                android:textSize="@dimen/large_font_text_view"
+                android:visibility="visible"
+                app:chipBackgroundColor="?attr/chipBgColorPositive"
+                app:chipSurfaceColor="@null" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/aad_active_conns_chip"
@@ -523,7 +529,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
                 android:layout_gravity="end"
-                android:layout_marginEnd="14dp"
+                android:layout_marginEnd="10dp"
                 android:text="@string/ssv_see_more"
                 android:textColor="?attr/chipTextPositive"
                 android:textSize="@dimen/large_font_text_view"
@@ -557,7 +563,7 @@
                 android:fontFamily="sans-serif-smallcaps"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:text="top asn connections"
+                android:text="@string/most_contacted_asn"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/extra_large_font_text_view" />
 

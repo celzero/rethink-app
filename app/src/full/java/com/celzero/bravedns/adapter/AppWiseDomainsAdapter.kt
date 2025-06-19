@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.paging.PagingDataAdapter
@@ -37,6 +38,7 @@ import com.celzero.bravedns.ui.bottomsheet.AppDomainRulesBottomSheet
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.math.log2
 
@@ -176,13 +178,18 @@ class AppWiseDomainsAdapter(
             Logger.v(LOG_TAG_UI, "$TAG show close connection dialog for uid: $uid")
             val dialog = MaterialAlertDialogBuilder(context)
                 .setTitle(context.getString(R.string.close_conns_dialog_title))
-                .setMessage(context.getString(R.string.close_conns_dialog_desc, appConn.ipAddress, appConn.appOrDnsName))
+                .setMessage(context.getString(R.string.close_conns_dialog_desc, appConn.ipAddress))
                 .setPositiveButton(R.string.lbl_proceed) { _, _ ->
                     // close the connection
                     VpnController.closeConnectionsByUidDomain(appConn.uid, appConn.ipAddress)
                     Logger.i(
                         LOG_TAG_UI,
                         "$TAG closed connection for uid: ${appConn.uid}, domain: ${appConn.appOrDnsName}"
+                    )
+                    showToastUiCentered(
+                        context,
+                        context.getString(R.string.config_add_success_toast),
+                        Toast.LENGTH_LONG
                     )
                 }
                 .setNegativeButton(R.string.lbl_cancel, null)

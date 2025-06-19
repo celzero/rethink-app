@@ -105,7 +105,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
 
         uid = intent.getIntExtra(INTENT_UID, INVALID_UID)
-        Logger.d(Logger.LOG_TAG_UI, "AppInfoActivity, intent uid: $uid")
+        Logger.d(LOG_TAG_UI, "AppInfoActivity, intent uid: $uid")
         ipRulesViewModel.setUid(uid)
         domainRulesViewModel.setUid(uid)
         networkLogsViewModel.setUid(uid)
@@ -445,7 +445,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         b.aadActiveConnsRv.layoutManager = layoutManager
         val adapter = AppWiseDomainsAdapter(this, this, uid, isRethinkApp, isActiveConn = true)
         val uptime = VpnController.uptimeMs()
-        networkLogsViewModel.fetchActiveConnections(uid, uptime).observe(this) {
+        networkLogsViewModel.fetchTopActiveConnections(uid, uptime).observe(this) {
             adapter.submitData(this.lifecycle, it)
         }
         b.aadActiveConnsRv.adapter = adapter

@@ -96,4 +96,12 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
     suspend fun getBlockedUniversalRulesCount(): List<ConnectionTracker> {
         return connectionTrackerDAO.getBlockedUniversalRulesCount()
     }
+
+    suspend fun closeConnections( connIds: List<String>) {
+        connectionTrackerDAO.closeConnections(connIds)
+    }
+
+    suspend fun closeConnectionForUids( uids: List<Int> ) {
+        connectionTrackerDAO.closeConnectionForUids(uids)
+    }
 }

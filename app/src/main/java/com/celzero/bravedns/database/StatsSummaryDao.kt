@@ -220,9 +220,9 @@ interface StatsSummaryDao {
                 conn.ipAddress = ipInfo.ip
             WHERE
                 ipInfo.asName != ''
-                AND conn.ipAddress LIKE :input
                 AND conn.timeStamp > :to
                 AND conn.uid = :uid
+                AND ipInfo.asName LIKE :input
             GROUP BY 
                 ipInfo.asName
             ORDER BY 
@@ -336,11 +336,12 @@ interface StatsSummaryDao {
             AND message = ''
             AND uid = :uid
             AND timeStamp > :to
+            AND ct.ipAddress LIKE :query
         GROUP BY ipAddress
         ORDER BY count DESC
         """
     )
-    fun getAllActiveConns(uid: Int, to: Long): PagingSource<Int, AppConnection>
+    fun getAllActiveConns(uid: Int, to: Long, query: String): PagingSource<Int, AppConnection>
 
     @Query(
         """
@@ -389,7 +390,6 @@ interface StatsSummaryDao {
         """
     )
     fun getMostAllowedApps(to: Long): PagingSource<Int, AppConnection>
-
 
     @Query(
         """

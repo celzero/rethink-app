@@ -24,7 +24,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.WindowInsetsControllerCompat
@@ -222,9 +221,11 @@ class AppWiseIpLogsActivity :
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
-        // commenting for now, see if we can remove this later
         /*recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
+                if (networkLogsViewModel.filterQuery.isNotEmpty()) {
+                    return@addLoadStateListener
+                }
                 if (recyclerAdapter.itemCount < 1) {
                     showNoRulesUi()
                     hideRulesUi()
@@ -251,9 +252,11 @@ class AppWiseIpLogsActivity :
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
-        // commenting for now, see if we can remove this later
         /*recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
+                if (networkLogsViewModel.filterQuery.isNotEmpty()) {
+                    return@addLoadStateListener
+                }
                 if (recyclerAdapter.itemCount < 1) {
                     showNoRulesUi()
                     hideRulesUi()
@@ -278,15 +281,41 @@ class AppWiseIpLogsActivity :
             recyclerAdapter.submitData(this.lifecycle, it)
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
+
+        /*recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (networkLogsViewModel.filterQuery.isNotEmpty()) {
+                    return@addLoadStateListener
+                }
+                if (recyclerAdapter.itemCount < 1) {
+                    showNoRulesUi()
+                    hideRulesUi()
+                } else {
+                    hideNoRulesUi()
+                    showRulesUi()
+                }
+            } else {
+                hideNoRulesUi()
+                showRulesUi()
+            }
+        }*/
     }
 
     private fun updateAppNameInSearchHint(appName: String) {
         val appNameTruncated = appName.substring(0, appName.length.coerceAtMost(10))
-        val hint = getString(
-            R.string.two_argument_colon,
-            appNameTruncated,
-            getString(R.string.search_universal_ips)
-        )
+        val hint = if (isAsn) {
+            getString(
+                R.string.two_argument_colon,
+                appNameTruncated,
+                getString(R.string.search_universal_asn)
+            )
+        } else {
+            getString(
+                R.string.two_argument_colon,
+                appNameTruncated,
+                getString(R.string.search_universal_ips)
+            )
+        }
         b.awlSearch.queryHint = hint
         b.awlSearch.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text).textSize =
             14f
@@ -313,29 +342,28 @@ class AppWiseIpLogsActivity :
     }*/
 
     override fun onQueryTextSubmit(query: String): Boolean {
-        if (isAsn) {
-            // ASN view does not support search
-            Utilities.showToastUiCentered(this, "Search is not supported in ASN view",
-                Toast.LENGTH_SHORT)
-            return false
-        }
         Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
             if (!this.isFinishing) {
-                networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.IP)
+                val type = if (isAsn) {
+                    AppConnectionsViewModel.FilterType.ASN
+                } else {
+                    AppConnectionsViewModel.FilterType.IP
+                }
+                networkLogsViewModel.setFilter(query, type)
             }
         }
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        if (isAsn) {
-            // ASN view does not support search
-            return false
-        }
-
         Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
             if (!this.isFinishing) {
-                networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.IP)
+                val type = if (isAsn) {
+                    AppConnectionsViewModel.FilterType.ASN
+                } else {
+                    AppConnectionsViewModel.FilterType.IP
+                }
+                networkLogsViewModel.setFilter(query, type)
             }
         }
         return true

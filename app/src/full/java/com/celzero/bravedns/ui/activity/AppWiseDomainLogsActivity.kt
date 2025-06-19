@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.ColorStateList
@@ -30,7 +31,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.Visibility
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
@@ -39,7 +39,6 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.ActivityAppWiseDomainLogsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -194,7 +193,19 @@ class AppWiseDomainLogsActivity :
 
     private fun updateAppNameInSearchHint(appName: String) {
         val appNameTruncated = appName.substring(0, appName.length.coerceAtMost(10))
-        val hint = getString(R.string.two_argument_colon, appNameTruncated, getString(R.string.search_custom_domains))
+        val hint = if (isActiveConns) {
+            getString(
+                R.string.two_argument_colon,
+                appNameTruncated,
+                getString(R.string.search_universal_ips)
+            )
+        } else {
+            getString(
+                R.string.two_argument_colon,
+                appNameTruncated,
+                getString(R.string.search_custom_domains)
+            )
+        }
         b.awlSearch.queryHint = hint
         b.awlSearch.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text).textSize = 14f
         return
@@ -237,14 +248,16 @@ class AppWiseDomainLogsActivity :
         layoutManager = LinearLayoutManager(this)
         b.awlRecyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = AppWiseDomainsAdapter(this, this, uid, isRethink, true)
-        val uptime = VpnController.uptimeMs()
-        networkLogsViewModel.fetchAllActiveConnections(uid, uptime).observe(this) {
+        networkLogsViewModel.activeConnections.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
-        recyclerAdapter.addLoadStateListener {
+        /*recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
+                if (networkLogsViewModel.filterQuery.isNotEmpty()) {
+                    return@addLoadStateListener
+                }
                 if (recyclerAdapter.itemCount < 1) {
                     showNoRulesUi()
                     hideRulesUi()
@@ -256,7 +269,7 @@ class AppWiseDomainLogsActivity :
                 hideNoRulesUi()
                 showRulesUi()
             }
-        }
+        }*/
     }
 
     private fun setAdapter() {
@@ -270,9 +283,11 @@ class AppWiseDomainLogsActivity :
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
-        // commenting for now, see if we can remove this later
-        recyclerAdapter.addLoadStateListener {
+        /*recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
+                if (networkLogsViewModel.filterQuery.isNotEmpty()) {
+                    return@addLoadStateListener
+                }
                 if (recyclerAdapter.itemCount < 1) {
                     showNoRulesUi()
                     hideRulesUi()
@@ -284,7 +299,7 @@ class AppWiseDomainLogsActivity :
                 hideNoRulesUi()
                 showRulesUi()
             }
-        }
+        }*/
     }
 
     private fun setRethinkAdapter() {
@@ -298,9 +313,11 @@ class AppWiseDomainLogsActivity :
         }
         b.awlRecyclerConnection.adapter = recyclerAdapter
 
-        // commenting for now, see if we can remove this later
-        recyclerAdapter.addLoadStateListener {
+        /*recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
+                if (networkLogsViewModel.filterQuery.isNotEmpty()) {
+                    return@addLoadStateListener
+                }
                 if (recyclerAdapter.itemCount < 1) {
                     showNoRulesUi()
                     hideRulesUi()
@@ -312,11 +329,11 @@ class AppWiseDomainLogsActivity :
                 hideNoRulesUi()
                 showRulesUi()
             }
-        }
+        }*/
     }
 
     // commenting for now, see if we can remove this later
-    private fun showNoRulesUi() {
+    /*private fun showNoRulesUi() {
         b.awlNoRulesRl.visibility = View.VISIBLE
         networkLogsViewModel.rinrDomainLogs.removeObservers(this)
     }
@@ -333,12 +350,17 @@ class AppWiseDomainLogsActivity :
     private fun showRulesUi() {
         b.awlCardViewTop.visibility = View.VISIBLE
         b.awlRecyclerConnection.visibility = View.VISIBLE
-    }
+    }*/
 
     override fun onQueryTextSubmit(query: String): Boolean {
         Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
             if (!this.isFinishing) {
-                networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.DOMAIN)
+                val type = if (isActiveConns) {
+                    AppConnectionsViewModel.FilterType.ACTIVE_CONNECTIONS
+                } else {
+                    AppConnectionsViewModel.FilterType.DOMAIN
+                }
+                networkLogsViewModel.setFilter(query, type)
             }
         }
         return true
@@ -347,7 +369,12 @@ class AppWiseDomainLogsActivity :
     override fun onQueryTextChange(query: String): Boolean {
         Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
             if (!this.isFinishing) {
-                networkLogsViewModel.setFilter(query, AppConnectionsViewModel.FilterType.DOMAIN)
+                val type = if (isActiveConns) {
+                    AppConnectionsViewModel.FilterType.ACTIVE_CONNECTIONS
+                } else {
+                    AppConnectionsViewModel.FilterType.DOMAIN
+                }
+                networkLogsViewModel.setFilter(query, type)
             }
         }
         return true
