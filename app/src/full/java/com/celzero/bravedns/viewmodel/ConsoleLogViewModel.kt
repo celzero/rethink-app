@@ -31,7 +31,7 @@ import com.celzero.bravedns.util.Constants
 
 class ConsoleLogViewModel(private val dao: ConsoleLogDAO) : ViewModel() {
     private var filter: MutableLiveData<String> = MutableLiveData()
-    private var logLevel: Long = Logger.LoggerLevel.INFO.id
+    private var logLevel: Long = Logger.LoggerLevel.ERROR.id
     init {
         filter.postValue("")
     }
@@ -50,6 +50,7 @@ class ConsoleLogViewModel(private val dao: ConsoleLogDAO) : ViewModel() {
     }
 
     fun setLogLevel(level: Long) {
+
         logLevel = level
     }
 

@@ -38,4 +38,8 @@ class ConsoleLogRepository(private val consoleLogDAO: ConsoleLogDAO) {
     suspend fun deleteAllLogs() {
         consoleLogDAO.deleteAllLogs()
     }
+
+    fun setStartTimestamp(timestamp: Long) {
+        consoleLogStartTimestamp = timestamp
+    }
 }

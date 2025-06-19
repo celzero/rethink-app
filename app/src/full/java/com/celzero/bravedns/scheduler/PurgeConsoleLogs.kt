@@ -1,6 +1,8 @@
 package com.celzero.bravedns.scheduler
 
+import Logger.LOG_BATCH_LOGGER
 import android.content.Context
+import androidx.paging.LOG_TAG
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.database.ConsoleLogRepository
@@ -13,10 +15,9 @@ class PurgeConsoleLogs(val context: Context, workerParameters: WorkerParameters)
     CoroutineWorker(context, workerParameters), KoinComponent {
 
     private val consoleLogRepository by inject<ConsoleLogRepository>()
-    private val persistentState by inject<PersistentState>()
 
     companion object {
-        const val MAX_TIME: Long = 3
+        const val MAX_TIME: Long = 3 // max time in hours to keep the console logs
     }
     override suspend fun doWork(): Result {
         // delete logs which are older than MAX_TIME hrs
@@ -25,14 +26,17 @@ class PurgeConsoleLogs(val context: Context, workerParameters: WorkerParameters)
         val time = currTime - threshold
 
         consoleLogRepository.deleteOldLogs(time)
-        if (persistentState.consoleLogEnabled) {
-            val startTime = consoleLogRepository.consoleLogStartTimestamp
-            // stop the console log if it exceeds max time
-            if (currTime - startTime > TimeUnit.HOURS.toMillis(MAX_TIME)) {
-                consoleLogRepository.consoleLogStartTimestamp = 0
-                persistentState.consoleLogEnabled = false
-            }
+        val startTime = consoleLogRepository.consoleLogStartTimestamp
+        val lapsedTime = currTime - startTime
+        // stop the console log if it exceeds max time and set the log level to ERROR
+        // this is to avoid the console log from growing indefinitely
+        // no need to reset the start timestamp/logger level if it is already set to ERROR or above
+        if (lapsedTime > TimeUnit.MINUTES.toMillis(MAX_TIME) && Logger.uiLogLevel < Logger.LoggerLevel.ERROR.id) {
+            consoleLogRepository.consoleLogStartTimestamp = 0
+            Logger.uiLogLevel = Logger.LoggerLevel.ERROR.id
+            Logger.i(LOG_BATCH_LOGGER, "console log purged, disabled as it exceeded max time of $MAX_TIME hrs")
         }
+        Logger.v(LOG_BATCH_LOGGER, "purged console logs older than $MAX_TIME hrs, current time: $currTime, start time: $startTime, lapsed time: $lapsedTime")
         return Result.success()
     }
 

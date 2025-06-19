@@ -150,9 +150,6 @@ object Logger : KoinComponent {
     }
 
     private fun dbWrite(tag: String, msg: String, level: LoggerLevel, e: Exception? = null) {
-        // write to the database only if console log is set to true
-        if (!persistentState.consoleLogEnabled && !DEBUG) return
-
         // uiLogLevel is user selected log level to display in the UI, so if the log level is less
         // than the user selected log level, do not write to the database
         // this is different from the logger level set in MiscSettings screen

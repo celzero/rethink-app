@@ -17,28 +17,17 @@ package com.celzero.bravedns.ui.activity
 
 import Logger
 import Logger.LOG_TAG_BUG_REPORT
-import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.provider.Settings
-import android.text.method.LinkMovementMethod
 import android.view.View
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
@@ -51,16 +40,12 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConsoleLogAdapter
 import com.celzero.bravedns.database.ConsoleLogRepository
 import com.celzero.bravedns.databinding.ActivityConsoleLogBinding
-import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.ConsoleLogViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -82,25 +67,9 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
     private val workScheduler by inject<WorkScheduler>()
 
     companion object {
-        private const val FOLDER_NAME = "Rethink"
-        private const val SCHEME_PACKAGE = "package"
         private const val FILE_NAME = "rethink_app_logs_"
         private const val FILE_EXTENSION = ".zip"
-        private const val STORAGE_PERMISSION_CODE = 231 // request code for storage permission
         private const val QUERY_TEXT_DELAY: Long = 1000
-    }
-
-    enum class SaveType {
-        SAVE,
-        SHARE;
-
-        fun isSave(): Boolean {
-            return this == SAVE
-        }
-
-        fun isShare(): Boolean {
-            return this == SHARE
-        }
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -117,22 +86,8 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
             controller.isAppearanceLightNavigationBars = false
             window.isNavigationBarContrastEnforced = false
         }
-        persistentState.consoleLogEnabled = true
         initView()
         setupClickListener()
-        onBackPressedDispatcher.addCallback(
-            this,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    if (persistentState.consoleLogEnabled) {
-                        showStopDialog()
-                    } else {
-                        finish()
-                    }
-                    return
-                }
-            }
-        )
     }
 
     override fun onResume() {
@@ -163,12 +118,6 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
                 b.consoleLogInfoText.text = descWithTime
             }
         }
-        if (persistentState.consoleLogEnabled) {
-            b.consoleLogStartStop.text = getString(R.string.hsf_stop_btn_state)
-        } else {
-            b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
-            showStartDialog() // show dialog to user to start logging
-        }
         b.searchView.setOnQueryTextListener(this)
     }
 
@@ -182,14 +131,6 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
         b.consoleLogList.adapter = recyclerAdapter
         viewModel.setLogLevel(Logger.uiLogLevel)
         observeLog()
-
-        /*lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                consoleLogViewModel.logs.collectLatest { pagingData ->
-                    recyclerAdapter.submitData(pagingData)
-                }
-            }
-        }*/
     }
 
     private fun observeLog() {
@@ -201,52 +142,25 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
         }
     }
 
-    private fun removeObserver() {
-        viewModel.logs.removeObservers(this)
-    }
-
     private fun setupClickListener() {
-        b.consoleLogSave.setOnClickListener {
-            val filePath = createFile(SaveType.SAVE)
-            if (filePath == null) {
-                showFileCreationErrorToast()
-                return@setOnClickListener
-            }
-            handleSaveOrShareLogs(filePath, SaveType.SAVE)
-        }
 
         b.consoleLogShare.setOnClickListener {
-            val filePath = createFile(SaveType.SHARE)
+            val filePath = makeConsoleLogFile()
             if (filePath == null) {
                 showFileCreationErrorToast()
                 return@setOnClickListener
             }
-            handleSaveOrShareLogs(filePath, SaveType.SHARE)
+            handleShareLogs(filePath)
         }
 
         b.fabShareLog.setOnClickListener {
-            val filePath = createFile(SaveType.SHARE)
+            val filePath = makeConsoleLogFile()
             if (filePath == null) {
                 showFileCreationErrorToast()
                 return@setOnClickListener
             }
-            handleSaveOrShareLogs(filePath, SaveType.SHARE)
+            handleShareLogs(filePath)
         }
-
-        b.consoleLogStartStop.setOnClickListener {
-            persistentState.consoleLogEnabled = !persistentState.consoleLogEnabled
-            if (persistentState.consoleLogEnabled) {
-                b.consoleLogStartStop.text = getString(R.string.hsf_stop_btn_state)
-                consoleLogRepository.consoleLogStartTimestamp = System.currentTimeMillis()
-                // reset the ui level to error which is default
-                Logger.uiLogLevel = Logger.LoggerLevel.ERROR.id
-            } else {
-                b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
-                consoleLogRepository.consoleLogStartTimestamp = 0L
-            }
-        }
-
-        b.consoleStatInfo.setOnClickListener { showStatsDialog() }
 
         b.consoleLogDelete.setOnClickListener {
             MaterialAlertDialogBuilder(this)
@@ -254,6 +168,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
                 .setMessage(getString(R.string.console_log_delete_desc))
                 .setPositiveButton(getString(R.string.lbl_delete)) { _, _ ->
                     io {
+                        Logger.i(LOG_TAG_BUG_REPORT, "deleting all console logs")
                         consoleLogRepository.deleteAllLogs()
                         uiCtx {
                             showToastUiCentered(
@@ -279,7 +194,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
     private fun showFilterDialog() {
         // show dialog with level filter
         val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle(getString(R.string.logs_disclaimer))
+        builder.setTitle(getString(R.string.console_log_title))
         val items = Logger.LoggerLevel.entries
         val checkedItem = Logger.uiLogLevel.toInt()
         builder.setSingleChoiceItems(
@@ -288,6 +203,10 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
         ) { _, which ->
             Logger.uiLogLevel = items[which].id
             viewModel.setLogLevel(which.toLong())
+            if (which < Logger.LoggerLevel.ERROR.id) {
+                consoleLogRepository.setStartTimestamp(System.currentTimeMillis())
+            }
+            Logger.i(LOG_TAG_BUG_REPORT, "Log level set to ${items[which].name}")
         }
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialogInterface, _ ->
@@ -296,117 +215,12 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
         builder.setNeutralButton(getString(R.string.lbl_cancel)) { dialogInterface, _ ->
             dialogInterface.dismiss()
         }
-        builder.setOnCancelListener {
-            // unobserveLog()
-        }
         val alertDialog: AlertDialog = builder.create()
         alertDialog.setCancelable(true)
         alertDialog.show()
     }
 
-    private fun showStartDialog() {
-        //unobserveLog()
-        val builder = MaterialAlertDialogBuilder(this)
-        val title = getString(R.string.console_log_title)
-        builder.setTitle(title)
-        builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.hsf_start_btn_state)) { dialogInterface, _ ->
-            persistentState.consoleLogEnabled = true
-            consoleLogRepository.consoleLogStartTimestamp = System.currentTimeMillis()
-            b.consoleLogStartStop.text = getString(R.string.hsf_stop_btn_state)
-            showToastUiCentered(
-                this,
-                getString(R.string.config_add_success_toast),
-                Toast.LENGTH_SHORT
-            )
-            observeLog()
-            dialogInterface.dismiss()
-        }
-
-        builder.setNeutralButton(getString(R.string.lbl_cancel)) { dialogInterface, _ ->
-            b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
-            removeObserver()
-            dialogInterface.dismiss()
-        }
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.setCancelable(true)
-        alertDialog.show()
-    }
-
-    private fun showStopDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
-        val title = getString(R.string.console_log_title)
-        builder.setTitle(title)
-        builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.hsf_stop_btn_state)) { dialogInterface, _ ->
-            persistentState.consoleLogEnabled = false
-            consoleLogRepository.consoleLogStartTimestamp = 0L
-            // reset the ui level to error which is default
-            Logger.uiLogLevel = Logger.LoggerLevel.ERROR.id
-            b.consoleLogStartStop.text = getString(R.string.hsf_start_btn_state)
-            removeObserver()
-            showToastUiCentered(
-                this,
-                getString(R.string.config_add_success_toast),
-                Toast.LENGTH_SHORT
-            )
-            dialogInterface.dismiss()
-            finish()
-        }
-
-        builder.setNeutralButton(getString(R.string.lbl_cancel)) { dialogInterface, _ ->
-            dialogInterface.dismiss()
-            finish()
-        }
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.setCancelable(true)
-        alertDialog.show()
-    }
-
-    private fun showStatsDialog() {
-        //unobserveLog()
-        io {
-            val stat = VpnController.getNetStat()
-            val formatedStat = UIUtils.formatNetStat(stat)
-            uiCtx {
-                val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-                val builder = MaterialAlertDialogBuilder(this).setView(dialogBinding.root)
-                val lp = WindowManager.LayoutParams()
-                val dialog = builder.create()
-                dialog.show()
-                lp.copyFrom(dialog.window?.attributes)
-                lp.width = WindowManager.LayoutParams.MATCH_PARENT
-                lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-                dialog.setCancelable(true)
-                dialog.window?.attributes = lp
-
-                val heading = dialogBinding.infoRulesDialogRulesTitle
-                val okBtn = dialogBinding.infoRulesDialogCancelImg
-                val descText = dialogBinding.infoRulesDialogRulesDesc
-                dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
-
-                heading.text = "Network Stats"
-                heading.setCompoundDrawablesWithIntrinsicBounds(
-                    ContextCompat.getDrawable(this, R.drawable.ic_info_white),
-                    null,
-                    null,
-                    null
-                )
-
-                descText.movementMethod = LinkMovementMethod.getInstance()
-                descText.text = formatedStat
-
-                okBtn.setOnClickListener {
-                    dialog.dismiss()
-                }
-
-                dialog.show()
-            }
-        }
-    }
-
-    private fun handleSaveOrShareLogs(filePath: String, type: SaveType) {
+    private fun handleShareLogs(filePath: String) {
         if (WorkScheduler.isWorkRunning(this, WorkScheduler.CONSOLE_LOG_SAVE_JOB_TAG)) return
 
         workScheduler.scheduleConsoleLogSaveJob(filePath)
@@ -423,9 +237,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
             )
             if (WorkInfo.State.SUCCEEDED == workInfo.state) {
                 onSuccess()
-                if (type.isShare()) {
-                    shareZipFileViaEmail(filePath)
-                }
+                shareZipFileViaEmail(filePath)
                 workManager.pruneWork()
             } else if (
                 WorkInfo.State.CANCELLED == workInfo.state ||
@@ -442,14 +254,14 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
 
     private fun onSuccess() {
         // show success message
-        Logger.i(LOG_TAG_BUG_REPORT, "Logs saved successfully")
+        Logger.i(LOG_TAG_BUG_REPORT, "created logs successfully")
         b.consoleLogProgressBar.visibility = View.GONE
         Toast.makeText(this, getString(R.string.config_add_success_toast), Toast.LENGTH_LONG).show()
     }
 
     private fun onFailure() {
         // show failure message
-        Logger.i(LOG_TAG_BUG_REPORT, "Logs save failed")
+        Logger.i(LOG_TAG_BUG_REPORT, "failed to create logs")
         b.consoleLogProgressBar.visibility = View.GONE
         Toast.makeText(
             this,
@@ -461,36 +273,8 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
 
     private fun showLogGenerationProgressUi() {
         // show progress dialog or progress bar
-        Logger.i(LOG_TAG_BUG_REPORT, "Logs generation in progress")
+        Logger.i(LOG_TAG_BUG_REPORT, "showing log generation progress UI")
         b.consoleLogProgressBar.visibility = View.VISIBLE
-    }
-
-    private fun createFile(type: SaveType): String? {
-        if (type.isShare()) {
-            // create file in localdir and share, no need to check for permissions
-            return makeConsoleLogFile(type)
-        }
-
-        // check for storage permissions
-        if (!checkStoragePermissions()) {
-            // request for storage permissions
-            Logger.i(LOG_TAG_BUG_REPORT, "requesting for storage permissions")
-            requestForStoragePermissions()
-            return null
-        }
-
-        Logger.i(LOG_TAG_BUG_REPORT, "storage permission granted, creating pcap file")
-        try {
-            val filePath = makeConsoleLogFile(type)
-            if (filePath == null) {
-                showFileCreationErrorToast()
-                return null
-            }
-            return filePath
-        } catch (ignored: Exception) {
-            showFileCreationErrorToast()
-        }
-        return null
     }
 
     private fun shareZipFileViaEmail(filePath: String) {
@@ -503,58 +287,28 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
             Intent(Intent.ACTION_SEND).apply {
                 type = "application/zip"
                 putExtra(Intent.EXTRA_SUBJECT, "Log File")
-                putExtra(Intent.EXTRA_TEXT, "Please find the attached log file.")
+                putExtra(Intent.EXTRA_TEXT, "Attached is the log file for RethinkDNS.")
                 putExtra(Intent.EXTRA_STREAM, uri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
-        // Start the email app
+        // start the email app
         startActivity(Intent.createChooser(intent, "Send email..."))
     }
 
-    private fun makeConsoleLogFile(type: SaveType): String? {
+    private fun makeConsoleLogFile(): String? {
         return try {
             val appVersion = getVersionName() + "_" + System.currentTimeMillis()
-            return if (type.isShare()) {
-                // create file in filesdir, no need to check for permissions
-                val dir = filesDir.canonicalPath + File.separator
-                val fileName: String = FILE_NAME + appVersion + FILE_EXTENSION
-                val file = File(dir, fileName)
-                if (!file.exists()) {
-                    file.createNewFile()
-                }
-                file.absolutePath
-            } else {
-                // create folder in DOWNLOADS
-                val dir =
-                    if (isAtleastR()) {
-                        val downloadsDir =
-                            Environment.getExternalStoragePublicDirectory(
-                                Environment.DIRECTORY_DOWNLOADS
-                            )
-                        // create folder in DOWNLOADS/Rethink
-                        File(downloadsDir, FOLDER_NAME)
-                    } else {
-                        val downloadsDir = Environment.getExternalStorageDirectory()
-                        // create folder in DOWNLOADS/Rethink
-                        File(downloadsDir, FOLDER_NAME)
-                    }
-                if (!dir.exists()) {
-                    dir.mkdirs()
-                }
-                // filename format (rethink_app_logs_<version>.txt)
-                val logFileName: String = FILE_NAME + appVersion + FILE_EXTENSION
-                val file = File(dir, logFileName)
-                // just in case, create the parent dir if it doesn't exist
-                if (file.parentFile?.exists() != true) file.parentFile?.mkdirs()
-                // create the file if it doesn't exist
-                if (!file.exists()) {
-                    file.createNewFile()
-                }
-                file.absolutePath
+            // create file in filesdir, no need to check for permissions
+            val dir = filesDir.canonicalPath + File.separator
+            val fileName: String = FILE_NAME + appVersion + FILE_EXTENSION
+            val file = File(dir, fileName)
+            if (!file.exists()) {
+                file.createNewFile()
             }
+            return file.absolutePath
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_BUG_REPORT, "error creating log file", e)
+            Logger.w(LOG_TAG_BUG_REPORT, "error creating log file, ${e.message}")
             null
         }
     }
@@ -567,60 +321,11 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
 
     private fun showFileCreationErrorToast() {
         // show toast message
-    }
-
-    private fun requestForStoragePermissions() {
-        // version 11 (R) or above
-        if (isAtleastR()) {
-            try {
-                val intent = Intent()
-                intent.action = Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
-                val uri = Uri.fromParts(SCHEME_PACKAGE, this.packageName, null)
-                intent.data = uri
-                storageActivityResultLauncher.launch(intent)
-            } catch (e: Exception) {
-                val intent = Intent()
-                intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-                storageActivityResultLauncher.launch(intent)
-            }
-        } else {
-            // below version 11
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ),
-                STORAGE_PERMISSION_CODE
-            )
-        }
-    }
-
-    private val storageActivityResultLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (isAtleastR()) {
-                // version 11 (R) or above
-                if (Environment.isExternalStorageManager()) {
-                    createFile(SaveType.SAVE)
-                } else {
-                    showFileCreationErrorToast()
-                }
-            } else {
-                // below ver 11 (R), the permission is handled via onRequestPermissionsResult
-            }
-        }
-
-    private fun checkStoragePermissions(): Boolean {
-        return if (isAtleastR()) {
-            // version 11 (R) or above
-            Environment.isExternalStorageManager()
-        } else {
-            // below version 11
-            val write = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            val read =
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-            read == PackageManager.PERMISSION_GRANTED && write == PackageManager.PERMISSION_GRANTED
-        }
+        showToastUiCentered(
+            this,
+            getString(R.string.error_loading_log_file),
+            Toast.LENGTH_SHORT
+        )
     }
 
     private fun io(f: suspend () -> Unit) {

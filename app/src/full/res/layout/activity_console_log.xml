@@ -6,78 +6,13 @@
     android:background="?attr/background"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <RelativeLayout
-        android:id="@+id/console_log_header_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/console_log_header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:padding="10dp"
-            android:text="@string/console_log_title"
-            android:layout_toStartOf="@id/console_stat_info"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="16sp" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/console_stat_info"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="10dp"
-            android:layout_toStartOf="@id/console_log_start_stop"
-            android:src="@drawable/ic_info" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/console_log_start_stop"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:layout_centerVertical="true"
-            android:text="@string/hsf_start_btn_state"
-            android:layout_toStartOf="@id/console_log_save"
-            android:textColor="?attr/secondaryTextColor" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/console_log_save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:layout_centerVertical="true"
-            android:layout_toStartOf="@id/console_log_share"
-            android:src="@drawable/ic_save" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/console_log_share"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="15dp"
-            android:src="@drawable/ic_share" />
-
-    </RelativeLayout>
-
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/console_log_progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:visibility="gone"
-        app:indicatorColor="?attr/secondaryTextColor"
-        android:layout_below="@id/console_log_header_container"/>
 
     <RelativeLayout
         android:id="@+id/search_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="start"
-        android:layout_below="@id/console_log_progress_bar"
+        android:layout_marginTop="5dp"
         android:orientation="horizontal"
         android:weightSum="1">
 
@@ -99,10 +34,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toStartOf="@id/console_log_delete"
+            android:layout_toStartOf="@id/console_log_share"
             android:padding="7dp"
+            android:layout_marginEnd="7dp"
             android:src="@drawable/ic_filter"
             android:visibility="visible" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/console_log_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="7dp"
+            android:layout_toStartOf="@id/console_log_delete"
+            android:src="@drawable/ic_share" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/console_log_delete"
@@ -116,6 +61,16 @@
 
     </RelativeLayout>
 
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/console_log_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:layout_margin="2dp"
+        android:visibility="gone"
+        android:layout_below="@id/search_ll"
+        app:indicatorColor="?attr/secondaryTextColor" />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/console_log_info_text"
         android:layout_width="match_parent"
@@ -126,7 +81,7 @@
         android:paddingEnd="10dp"
         android:textSize="@dimen/small_font_text_view"
         android:fontFamily="serif-monospace"
-        android:layout_below="@id/search_ll"
+        android:layout_below="@id/console_log_progress_bar"
         android:text="@string/console_log_desc" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
