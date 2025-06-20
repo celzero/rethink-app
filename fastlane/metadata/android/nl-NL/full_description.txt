@@ -1,0 +1,31 @@
+Maak kennis met een veiliger, transparanter en veiliger Android.
+
+VPN: Maakt verbinding met meerdere WireGuard VPN's naar keuze.
+
+Veilig: Geeft de netwerkactiviteit van geïnstalleerde apps weer en laat je deze uitschakelen, verwijderen of firewallen.
+
+Beveiligd: Eerste verdedigingslinie tegen spyware, ransomware en malware die persoonlijke informatie stelen en accounts overnemen. Beschermt tegen DNS-manipulatie die doorgaans wordt gebruikt om websites, sociale media en berichten-apps te censureren.
+
+Snel: DNS-servers zijn wereldwijd op meer dan 300 locaties geïmplementeerd om ervoor te zorgen dat je internet zo snel en beschikbaar mogelijk is.
+
+Open: Open source en vrij van trackers.
+
+***Functies***
+
+Firewall: Voorkom dat apps verbinding maken met internet. Blokkeer spyware, malware, ransomware en meer.
+
+Een firewall blokkeert elke app die verbinding maakt met internet via wifi of mobiele data. Omdat de meeste vormen van surveillance vereisen dat de gegevens via het netwerk naar een server worden verzonden, kan een firewall de dreiging effectief beperken (bestandsbeheerders, wekkers en rekenmachines zijn enkele voorbeelden van apps die geen internettoegang nodig hebben om te functioneren). De firewallfunctie maakt gebruik van de toegankelijkheidsservice om achtergrondapplicaties te detecteren en te firewallen.
+
+Monitoring: Houd het inkomende en uitgaande internetverkeer in de gaten.
+
+Indien ingeschakeld, worden de verbindingslogs verzameld en geanalyseerd. Geautomatiseerde rapporten markeren voorheen onbekende of verdachte verbindingen en onthullen de omvang van pogingen tot gegevensdiefstal door spywarenetwerken. In onze tests wordt ongeveer 60% van het verkeer gemarkeerd en gerapporteerd als afkomstig van bekende spyware. De gegenereerde logs worden bijna realtime beschikbaar gesteld aan de gebruiker voor eigen analyse.
+
+WireGuard: Beveilig uitgaand internetverkeer.
+
+De app maakt gebruik van het snelle, moderne, lichtgewicht en veilige WireGuard-protocol om uitgaande verbindingen naar elke compatibele VPN-provider van uw keuze te versleutelen.
+
+Anticensuur:
+
+De app versleutelt je internetverbinding met een Domain Name System (DNS)-server die wordt beheerd door Rethink en die aanwezig is op meer dan 300 locaties wereldwijd. DNS-servers zijn het adresboek van het internet: een DNS-server geeft je de exacte adressen die je nodig hebt om een website te bezoeken of een app te openen.
+
+Data Monitor: Volg het mobiele of wifi-dataverbruik per app en per verbinding.
