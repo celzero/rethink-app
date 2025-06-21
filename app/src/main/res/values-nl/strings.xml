@@ -72,7 +72,7 @@
     <string name="connection_http3">HTTP3</string>
     <string name="always_on_dialog_heading">VPN altijd aan uitschakelen</string>
     <string name="always_on_dialog_stop_heading">Altijd VPN</string>
-    <string name="always_on_dialog_lockdown_stop_message">RethinkDNS draait VPN in <i>Lockdown</i> mode. Stoppen zou resulteren in verlies van internet connectiviteit op dit gebruikers profiel. Wil je toch doorgaan\?</string>
+    <string name="always_on_dialog_lockdown_stop_message">RethinkDNS draait VPN in <i>Lockdown</i> mode. Stoppen zou resulteren in verlies van internet connectiviteit op dit gebruikers profiel. Wil je toch doorgaan?</string>
     <string name="always_on_dialog_positive">Stop</string>
     <string name="always_on_dialog_neutral">Instellingen</string>
     <string name="univ_firewall_dialog_title">IP-regel verwijderen\?</string>
@@ -364,7 +364,7 @@
     <string name="dns_crypt_url_remove_dialog_message">Verwijder de DNSCrypt-oplosser uit de opgeslagen configuratie.</string>
     <string name="dns_crypt_url_remove_success">DNSCrypt-resolver verwijderd.</string>
     <string name="local_blocklist_download">Bloklijsten downloaden</string>
-    <string name="refresh_complete">App list re-sync compleet.</string>
+    <string name="refresh_complete"><!-- use dc_refresh_toast --> App-lijst opnieuw gesynchroniseerd.</string>
     <string name="show_logs_disabled_network_message">Het loggen van verbindingen is uitgeschakeld. Om dit opnieuw in te schakelen, gaat u naar <i>Instellingen</i> en schakelt u <i>Inschakelen van on-device logging in.</i></string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s resolvers</string>
@@ -375,7 +375,7 @@
     <string name="slide_1_desc">RethinkDNS is een open source software ondersteund door het Mozilla Builders MVP programma.</string>
     <string name="allow">laat toe</string>
     <string name="untracked">ongetraceerd</string>
-    <string name="isolate">lockdown</string>
+    <string name="isolate">isoleren</string>
     <string name="pause_mode_notification_title">Gepauzeerd! Geblokkeerde apps blijven geblokkeerd.</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">wachtend op</string>
     <string name="status_protected_with_tor">beschermd met tor</string>
@@ -710,4 +710,15 @@
     <string name="lbl_peer" translatable="true">Peer</string>
     <string name="lbl_unselected" translatable="true">Ongeselecteerd</string>
     <string name="bsct_block_domain" translatable="true">Blokkeer, vertrouw &lt;u&gt;domein(en)&lt;/u&gt; voor &lt;u&gt;deze app&lt;u/&gt;</string>
+    <string name="lbl_overall" translatable="true">Totaal</string>
+    <string name="lbl_listen_port" translatable="true">Luisterpoort</string>
+    <string name="lbl_include" translatable="true">Toevoegen</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Aanhoudende keepalive</string>
+    <string name="lbl_notification" translatable="true">melding</string>
+    <string name="memory_notification_text">Rethink heeft te weinig geheugen. Systeemacties kunnen beperkt zijn.</string>
+    <string name="http_proxy_dialog_desc" translatable="true">URL van formulier instellen, &lt;protocol&gt;://&lt;gebruikersnaam&gt;:&lt;wachtwoord&gt;@&lt;domein-of-ip&gt;:&lt;poort&gt;&lt;pad&gt;. Voorbeeld: http://proxy.example.com:8080/</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback proxy-forwarder-apps</string>
+    <string name="whats_new_version_update" translatable="true">&lt;b&gt;Don\'t Panic 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. New: Capture network engine errors in user bug reports.&lt;br/&gt; 2. New: use System DNS for undelegated domain names iff Prevent DNS leaks is ON.&lt;br/&gt; 3. Improvement: Dual-stack (IPv4 + IPv6) WireGuard connectivity.&lt;br/&gt; 4. Improvement: Avoid blocking the UI elements when the network engine is unresponsive.&lt;br/&gt; 5. Fix: Connection timeouts with Advanced DNS filtering turned ON.&lt;br/&gt; 6. Fix: WireGuard peer endpoints with domain names hang on network changes.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Help translate this app&lt;/a&gt;</string>
+    <string name="lbl_split" translatable="true">Splitsen</string>
+    <string name="lbl_on_device" translatable="true">op-apparaat</string>
 </resources>
