@@ -27,7 +27,6 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities
 import com.google.common.io.Files
-import intra.Intra
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -39,12 +38,13 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
+import kotlin.compareTo
 
 object BugReportZipper {
 
     // Bug report file and directory constants
-    private const val BUG_REPORT_DIR_NAME = "bugreport"
-    private const val BUG_REPORT_ZIP_FILE_NAME = "rethinkdns.bugreport.zip"
+    const val BUG_REPORT_DIR_NAME = "bugreport"
+    const val BUG_REPORT_ZIP_FILE_NAME = "rethinkdns.bugreport.zip"
     private const val BUG_REPORT_FILE_NAME = "bugreport_"
 
     // maximum number of files allowed as part of bugreport zip file
@@ -57,12 +57,14 @@ object BugReportZipper {
     fun prepare(dir: File): String {
         val filePath = dir.canonicalPath + File.separator + BUG_REPORT_DIR_NAME
         val file = File(filePath)
-
-        if (file.exists()) {
-            Utilities.deleteRecursive(file)
-            file.mkdir()
-        } else {
-            file.mkdir()
+        // Use atomic operation pattern with proper error handling
+        val isDeleted = if (file.exists()) Utilities.deleteRecursive(file) else true
+        if (!isDeleted) {
+            Logger.w(LOG_TAG_BUG_REPORT, "failed to delete directory: ${file.absolutePath}")
+        }
+        // Use mkdirs() instead of mkdir() to handle parent directories too
+        if (!file.mkdirs()) {
+            Logger.w(LOG_TAG_BUG_REPORT, "failed to create directory: ${file.absolutePath}")
         }
 
         val zipFile = getZipFile(dir) ?: return constructFileName(filePath, null)
@@ -79,15 +81,46 @@ object BugReportZipper {
     }
 
     private fun getZipFile(dir: File): ZipFile? {
-        return try {
-            ZipFile(getZipFileName(dir))
-        } catch (e: FileNotFoundException) {
-            Logger.w(LOG_TAG_BUG_REPORT, "File not found exception while creating zip file", e)
-            null
-        } catch (e: ZipException) {
-            Logger.w(LOG_TAG_BUG_REPORT, "Zip exception while creating zip file", e)
-            null
+        val file = File(getZipFileName(dir))
+
+        if (!file.exists()) {
+            Logger.w(LOG_TAG_BUG_REPORT, "zip file does not exist: ${file.absolutePath}")
+            return null
         }
+
+        if (file.length() == 0L) {
+            Logger.w(LOG_TAG_BUG_REPORT, "zip file is empty: ${file.absolutePath}")
+            return null
+        }
+
+        // check for ZIP magic bytes (PK\x03\x04)
+        try {
+            FileInputStream(file).use { fis ->
+                val header = ByteArray(4)
+                val bytesRead = fis.read(header)
+                if (bytesRead < 4 ||
+                    header[0] != 'P'.code.toByte() ||
+                    header[1] != 'K'.code.toByte()
+                ) {
+                    Logger.w(
+                        LOG_TAG_BUG_REPORT,
+                        "zip file has invalid header: ${file.absolutePath}"
+                    )
+                    Utilities.deleteRecursive(file)
+                    return null
+                }
+            }
+
+            return ZipFile(file)
+        } catch (e: FileNotFoundException) {
+            Logger.w(LOG_TAG_BUG_REPORT, "file not found exception while creating zip file", e)
+        } catch (e: ZipException) {
+            Logger.w(LOG_TAG_BUG_REPORT, "err while creating zip file", e)
+            Utilities.deleteRecursive(file) // delete corrupted zip file
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BUG_REPORT, "err while creating zip file", e)
+        }
+        return null
     }
 
     private fun constructFileName(filePath: String, fileName: String?): String {
@@ -102,7 +135,8 @@ object BugReportZipper {
         if (directory?.entries() == null) return ""
 
         val entries = directory.entries().toList().sortedBy { it.lastModifiedTime.toMillis() }
-        return entries[0].name ?: ""
+        if (entries.isEmpty()) return ""
+        return entries.firstOrNull()?.name.orEmpty()
     }
 
     fun getZipFileName(dir: File): String {
@@ -115,34 +149,102 @@ object BugReportZipper {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun rezipAll(dir: File, file: File) {
-        if (!file.exists() || file.length() <= 0) return
+        if (!file.exists()) {
+            Logger.w(LOG_TAG_BUG_REPORT, "file to zip does not exist: ${file.absolutePath}")
+            return
+        }
+
+        if (file.length() <= 0) {
+            Logger.w(LOG_TAG_BUG_REPORT, "empty file, skipping: ${file.absolutePath}")
+            return
+        }
 
         val curZip = getZipFile(dir)
-        if (curZip == null) {
-            val zip = getZipFileName(dir)
-            FileOutputStream(zip, true).use { zf ->
-                ZipOutputStream(zf).use { zo ->
-                    // Add new file to zip
-                    addNewZipEntry(zo, file)
-                }
-            }
-        } else {
-            // cannot append to existing zip file, copy over and then append
-            // ref=(https://stackoverflow.com/a/2265206)
-            val tempZipFile = getTempZipFileName(dir)
-            curZip.use { czf ->
-                FileOutputStream(tempZipFile, true).use { tmp ->
-                    ZipOutputStream(tmp).use { tzo ->
-                        handleOlderFiles(tzo, czf, file.name)
-                        addNewZipEntry(tzo, file)
+        val zipFile = File(getZipFileName(dir))
+        val tempFile = File(getTempZipFileName(dir))
+
+        try {
+            if (curZip == null) {
+                // create new zip file
+                FileOutputStream(zipFile).use { fos ->
+                    ZipOutputStream(fos).use { zos ->
+                        addNewZipEntry(zos, file)
                     }
                 }
-            }
+            } else {
+                // create temp zip with existing content + new file
+                FileOutputStream(tempFile).use { fos ->
+                    ZipOutputStream(fos).use { zos ->
+                        curZip.use { czf ->
+                            // Check total size before adding files
+                            val currentSize = zipFile.length()
+                            val maxZipSize = 10 * 1024 * 1024L // 10MB limit
 
-            // delete the old zip file and rename the temp file to zip file
-            val zipFile = File(getZipFileName(dir))
-            zipFile.delete()
-            File(tempZipFile).renameTo(zipFile)
+                            if (currentSize > maxZipSize) {
+                                // If zip is too large, keep only recent entries
+                                val recentEntries = czf.entries().toList()
+                                    .sortedByDescending { it.lastModifiedTime.toMillis() }
+                                    .take(10) // Keep 10 most recent entries
+                                    .map { it.name }
+
+                                czf.entries().toList().forEach { entry ->
+                                    if (entry.name in recentEntries && entry.name != file.name) {
+                                        copyEntryToZip(czf, entry, zos)
+                                    }
+                                }
+                            } else {
+                                handleOlderFiles(zos, czf, file.name)
+                            }
+
+                            addNewZipEntry(zos, file)
+                        }
+                    }
+                }
+
+                // Atomic replacement using file rename
+                if (zipFile.exists() && !zipFile.delete()) {
+                    Logger.e(LOG_TAG_BUG_REPORT, "failed to delete old zip file")
+                    return
+                }
+
+                if (!tempFile.renameTo(zipFile)) {
+                    Logger.e(LOG_TAG_BUG_REPORT, "failed to rename temp zip file")
+                    // Try to recover by copying instead
+                    tempFile.inputStream().use { input ->
+                        zipFile.outputStream().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    tempFile.delete()
+                }
+            }
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_BUG_REPORT, "err while updating zip file", e)
+        } finally {
+            // Clean up temp file if it exists
+            if (tempFile.exists()) {
+                tempFile.delete()
+            }
+        }
+    }
+
+    // copy entry from one zip to another
+    private fun copyEntryToZip(sourceZip: ZipFile, entry: ZipEntry, targetZip: ZipOutputStream) {
+        if (entry.isDirectory) {
+            val zipEntry = ZipEntry(entry.name)
+            targetZip.putNextEntry(zipEntry)
+            targetZip.closeEntry()
+        } else {
+            try {
+                val zipEntry = ZipEntry(entry.name)
+                targetZip.putNextEntry(zipEntry)
+                sourceZip.getInputStream(entry).use { input ->
+                    input.copyTo(targetZip)
+                }
+                targetZip.closeEntry()
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_BUG_REPORT, "err while copying entry ${entry.name}", e)
+            }
         }
     }
 
@@ -153,24 +255,76 @@ object BugReportZipper {
     }
 
     private fun addNewZipEntry(zo: ZipOutputStream, file: File) {
-        if (file.isDirectory) return
+        if (!file.exists()) {
+            Logger.w(LOG_TAG_BUG_REPORT, "file does not exist: ${file.absolutePath}")
+            return
+        }
 
-        Logger.i(LOG_TAG_BUG_REPORT, "Add new file: ${file.name} to bug_report.zip")
-        val entry = ZipEntry(file.name)
-        zo.putNextEntry(entry)
-        FileInputStream(file).use { inStream -> copy(inStream, zo) }
-        zo.closeEntry()
+        if (file.isDirectory) {
+            Logger.w(LOG_TAG_BUG_REPORT, "dir cannot be added: ${file.absolutePath}")
+            return
+        }
+
+        // skip empty files or files that exceed reasonable size
+        val maxSizeBytes = 10 * 1024 * 1024L // 10MB limit
+        if (file.length() == 0L) {
+            Logger.w(LOG_TAG_BUG_REPORT, "empty file skipped: ${file.name}")
+            return
+        } else if (file.length() > maxSizeBytes) {
+            Logger.w(LOG_TAG_BUG_REPORT, "file too large (${file.length()} bytes): ${file.name}")
+            return
+        }
+
+        try {
+            val entry = ZipEntry(file.name)
+            zo.putNextEntry(entry)
+            FileInputStream(file).use { input ->
+                val buffer = ByteArray(8192)
+                var bytesRead: Int
+                while (input.read(buffer).also { bytesRead = it } != -1) {
+                    zo.write(buffer, 0, bytesRead)
+                }
+            }
+            zo.closeEntry()
+            Logger.i(LOG_TAG_BUG_REPORT, "added new file to zip: ${file.name}")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_BUG_REPORT, "err adding file to zip: ${file.name}", e)
+        }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleOlderFiles(zo: ZipOutputStream, zipFile: ZipFile?, ignoreFileName: String) {
         if (zipFile == null) return
 
         val entries: Enumeration<out ZipEntry> = zipFile.entries()
 
+        // get file size by checking the actual file (more reliable than internal zip size)
+        val zipFilePath = zipFile.name
+        val zipFileSize = File(zipFilePath).length()
+        val maxZipSize = 10 * 1024 * 1024L // 10MB limit
+
+        // if zip file is more than 10 MB, only keep recent entries
+        if (zipFileSize > maxZipSize) {
+            Logger.i(LOG_TAG_BUG_REPORT, "Zip file size exceeds 10MB, keeping only recent entries")
+
+            val entryList = zipFile.entries().toList().sortedByDescending {
+                it.lastModifiedTime.toMillis()
+            }
+            // keep only the last 5 entries or less if there are not enough entries
+            val keepEntries = entryList.take(5).map { it.name }
+
+            entryList.forEach { entry ->
+                if (entry.name in keepEntries && entry.name != ignoreFileName) {
+                    copyEntryToZip(zipFile, entry, zo)
+                }
+            }
+            return
+        }
+
         while (entries.hasMoreElements()) {
             val e = entries.nextElement()
             if (ignoreFileName == e.name) {
-                Logger.i(LOG_TAG_BUG_REPORT, "Ignoring file to be replaced: ${e.name}")
+                Logger.i(LOG_TAG_BUG_REPORT, "ignoring file to be replaced: ${e.name}")
                 continue
             }
 
@@ -192,7 +346,13 @@ object BugReportZipper {
     fun fileWrite(inputStream: InputStream?, file: File) {
         if (inputStream == null) return
 
-        FileOutputStream(file, true).use { outputStream -> copy(inputStream, outputStream) }
+        try {
+            FileOutputStream(file, true).use { outputStream ->
+                copy(inputStream, outputStream)
+            }
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BUG_REPORT, "err writing to file: ${file.name}", e)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -222,14 +382,26 @@ object BugReportZipper {
         file.appendText(prefsDetails.toString())
         val separator = "--------------------------------------------\n"
         file.appendText(separator)
-        val build = VpnController.goBuildVersion()
+        val build = VpnController.goBuildVersion(true)
         file.appendText(build)
         file.appendText(separator)
     }
 
     private fun copy(input: InputStream, output: OutputStream) {
-        while (input.read() != -1) {
-            output.write(input.readBytes())
+        try {
+            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+            var bytesRead: Int
+
+            while (input.read(buffer).also { bytesRead = it } != -1) {
+                output.write(buffer, 0, bytesRead)
+            }
+            output.flush()
+        } catch (e: OutOfMemoryError) {
+            Logger.e(LOG_TAG_BUG_REPORT, "out of memory while copying file, ${e.message}")
+        } catch (e: SecurityException) {
+            Logger.e(LOG_TAG_BUG_REPORT, "security exception while copying file", e)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BUG_REPORT, "err while copying file", e)
         }
     }
 }

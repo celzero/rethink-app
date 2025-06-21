@@ -79,7 +79,7 @@ class AppDownloadManager(
     suspend fun isDownloadRequired(type: DownloadType) {
         downloadRequired.postValue(DownloadManagerStatus.IN_PROGRESS)
         val ts = getCurrentBlocklistTimestamp(type)
-        val response = checkBlocklistUpdate(ts, persistentState.appVersion, retryCount = 0)
+        val response = checkBlocklistUpdate(ts, persistentState.appVersion, retryCount = 0, persistentState.routeRethinkInRethink)
         // if received response for update is null
         if (response == null) {
             Logger.w(
@@ -166,7 +166,7 @@ class AppDownloadManager(
             return DownloadManagerStatus.FAILURE
         }
 
-        val response = checkBlocklistUpdate(currentTs, persistentState.appVersion, retryCount = 0)
+        val response = checkBlocklistUpdate(currentTs, persistentState.appVersion, retryCount = 0, persistentState.routeRethinkInRethink)
         // if received response for update is null
         if (response == null) {
             Logger.w(
@@ -237,7 +237,7 @@ class AppDownloadManager(
 
     suspend fun downloadRemoteBlocklist(currentTs: Long, isRedownload: Boolean): Boolean {
 
-        val response = checkBlocklistUpdate(currentTs, persistentState.appVersion, retryCount = 0)
+        val response = checkBlocklistUpdate(currentTs, persistentState.appVersion, retryCount = 0, persistentState.routeRethinkInRethink)
         // if received response for update is null
         if (response == null) {
             Logger.w(LOG_TAG_DNS, "remote blocklist update check is null")

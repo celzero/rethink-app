@@ -28,6 +28,8 @@ class CustomDomain {
     var ips: String = ""
     var status: Int = 0
     var type: Int = 0
+    var proxyId: String = ""
+    var proxyCC: String = ""
     var modifiedTs: Long = SystemClock.elapsedRealtime()
     var deletedTs: Long = SystemClock.elapsedRealtime()
     var version: Long = getCurrentVersion()
@@ -35,11 +37,16 @@ class CustomDomain {
     override fun equals(other: Any?): Boolean {
         if (other !is CustomDomain) return false
         if (domain != other.domain) return false
+        if (status != other.status) return false
+        if (modifiedTs != other.modifiedTs) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.domain.hashCode()
+        var result = this.domain.hashCode()
+        result += result * 31 + this.status
+        result += result * 31 + this.modifiedTs.hashCode()
+        return result
     }
 
     constructor(values: ContentValues?) {
@@ -52,6 +59,8 @@ class CustomDomain {
                     "ips" -> ips = it.value as String
                     "status" -> status = it.value as Int
                     "type" -> type = it.value as Int
+                    "proxyId" -> proxyId = it.value as String
+                    "proxyCC" -> proxyCC = it.value as String
                     "modifiedTs" -> modifiedTs = it.value as Long
                     "deletedTs" -> deletedTs = it.value as Long
                     "version" -> version = it.value as Long
@@ -66,6 +75,8 @@ class CustomDomain {
         ips: String,
         type: Int,
         status: Int,
+        proxyId: String,
+        proxyCC: String,
         modifiedTs: Long,
         deletedTs: Long,
         version: Long
@@ -75,16 +86,18 @@ class CustomDomain {
         this.ips = ips
         this.status = status
         this.type = type
+        this.proxyId = proxyId
+        this.proxyCC = proxyCC
         this.modifiedTs = modifiedTs
         this.deletedTs = deletedTs
         this.version = version
     }
 
     companion object {
-        private const val currentVersion: Long = 1L
+        private const val CURRENT_VERSION: Long = 1L
 
         fun getCurrentVersion(): Long {
-            return currentVersion
+            return CURRENT_VERSION
         }
     }
 

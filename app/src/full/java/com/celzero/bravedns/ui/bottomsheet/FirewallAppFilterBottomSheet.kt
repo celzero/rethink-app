@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.BottomSheetFirewallSortFilterBinding
@@ -31,6 +32,7 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +49,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         get() = _binding!!
 
     private val persistentState by inject<PersistentState>()
-    private val sortValues = AppListActivity.Filters()
+    private val filters = AppListActivity.Filters()
 
     override fun getTheme(): Int =
         Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
@@ -63,28 +65,35 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.let { window ->
+            if (isAtleastQ()) {
+                val controller = WindowInsetsControllerCompat(window, window.decorView)
+                controller.isAppearanceLightNavigationBars = false
+                window.isNavigationBarContrastEnforced = false
+            }
+        }
         initView()
         initClickListeners()
     }
 
     private fun initView() {
-        val filters = AppListActivity.filters.value
+        val f = AppListActivity.filters.value
 
         remakeParentFilterChipsUi()
-        if (filters == null) {
+        if (f == null) {
             applyParentFilter(AppListActivity.TopLevelFilter.ALL.id)
             return
         } else {
-            sortValues.firewallFilter = filters.firewallFilter
+            this.filters.firewallFilter = f.firewallFilter
         }
 
-        applyParentFilter(filters.topLevelFilter.id)
-        setFilter(filters.topLevelFilter, filters.categoryFilters)
+        applyParentFilter(f.topLevelFilter.id)
+        setFilter(f.topLevelFilter, f.categoryFilters)
     }
 
     private fun initClickListeners() {
         b.fsApply.setOnClickListener {
-            AppListActivity.filters.postValue(sortValues)
+            AppListActivity.filters.postValue(filters)
             this.dismiss()
         }
 
@@ -173,24 +182,24 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
     private fun applyParentFilter(tag: Any) {
         when (tag) {
             AppListActivity.TopLevelFilter.ALL.id -> {
-                sortValues.topLevelFilter = AppListActivity.TopLevelFilter.ALL
-                sortValues.categoryFilters.clear()
+                filters.topLevelFilter = AppListActivity.TopLevelFilter.ALL
+                filters.categoryFilters.clear()
                 io {
                     val categories = FirewallManager.getAllCategories()
                     uiCtx { remakeChildFilterChipsUi(categories) }
                 }
             }
             AppListActivity.TopLevelFilter.INSTALLED.id -> {
-                sortValues.topLevelFilter = AppListActivity.TopLevelFilter.INSTALLED
-                sortValues.categoryFilters.clear()
+                filters.topLevelFilter = AppListActivity.TopLevelFilter.INSTALLED
+                filters.categoryFilters.clear()
                 io {
                     val categories = FirewallManager.getCategoriesForInstalledApps()
                     uiCtx { remakeChildFilterChipsUi(categories) }
                 }
             }
             AppListActivity.TopLevelFilter.SYSTEM.id -> {
-                sortValues.topLevelFilter = AppListActivity.TopLevelFilter.SYSTEM
-                sortValues.categoryFilters.clear()
+                filters.topLevelFilter = AppListActivity.TopLevelFilter.SYSTEM
+                filters.categoryFilters.clear()
                 io {
                     val categories = FirewallManager.getCategoriesForSystemApps()
                     uiCtx { remakeChildFilterChipsUi(categories) }
@@ -220,9 +229,9 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
     private fun applyChildFilter(tag: Any, show: Boolean) {
         if (show) {
-            sortValues.categoryFilters.add(tag.toString())
+            filters.categoryFilters.add(tag.toString())
         } else {
-            sortValues.categoryFilters.remove(tag.toString())
+            filters.categoryFilters.remove(tag.toString())
         }
     }
 

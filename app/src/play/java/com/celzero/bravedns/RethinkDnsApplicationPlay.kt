@@ -63,5 +63,6 @@ class RethinkDnsApplicationPlay : Application() {
         get<ScheduleManager>().scheduleDatabaseRefreshJob()
         get<WorkScheduler>().scheduleDataUsageJob()
         get<WorkScheduler>().schedulePurgeConnectionsLog()
+        get<WorkScheduler>().schedulePurgeConsoleLogs()
     }
 }

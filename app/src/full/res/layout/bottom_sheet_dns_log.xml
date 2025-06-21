@@ -8,7 +8,7 @@
     android:focusable="true"
     android:orientation="vertical">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="60dp"
         android:layout_height="3dp"
         android:layout_gravity="center"
@@ -22,7 +22,7 @@
         android:layout_marginBottom="20dp"
         android:orientation="horizontal">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/dns_record_type_chip"
             style="@style/ThinnerChip.Action"
             android:layout_width="wrap_content"
@@ -88,63 +88,92 @@
             android:gravity="center"
             android:orientation="horizontal"
             android:paddingStart="20dp"
-            android:paddingEnd="20dp">
+            android:paddingTop="5dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="5dp">
 
-            <LinearLayout
-                android:layout_width="0dp"
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/dns_block_fav_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@android:color/transparent"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/dns_block_url"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.8"
-                android:gravity="center">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/dns_block_fav_icon"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@android:color/transparent"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:id="@+id/dns_block_url"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="2dp"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textIsSelectable="true"
-                    android:textSize="@dimen/heading_font_text_view" />
-            </LinearLayout>
+                android:layout_margin="2dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/heading_font_text_view" />
         </LinearLayout>
 
+        <RelativeLayout
+            android:id="@+id/dns_app_name_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginBottom="10dp"
+            android:layout_below="@id/dns_block_header_container"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/dns_app_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:alpha="0.7"
+                android:layout_marginEnd="10dp"
+                android:contentDescription="@string/apps_icon_content_desc"
+                android:src="@drawable/default_app_icon" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/dns_app_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_toEndOf="@id/dns_app_icon"
+                android:gravity="center"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/large_font_text_view" />
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/dns_block_ip_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/dns_block_header_container"
+            android:layout_below="@id/dns_app_name_header"
             android:layout_centerHorizontal="true"
             android:gravity="center"
             android:orientation="horizontal"
             android:weightSum="1">
 
-
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/dns_block_connection_flag"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_gravity="center"
                 android:layout_weight="0.15"
                 android:ellipsize="none"
                 android:gravity="center"
-                android:minWidth="30dp"
+                android:minWidth="24dp"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                 android:textSize="26sp" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/dns_block_ip_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -159,7 +188,7 @@
                 android:textSize="@dimen/large_font_text_view"
                 android:typeface="monospace" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/dns_block_ip_latency"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -173,46 +202,7 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/bsdl_domain_rule_ll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/dns_block_blocked_desc"
-            android:layout_marginLeft="2dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginBottom="5dp"
-            android:orientation="horizontal"
-            android:padding="10dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:weightSum="1">
-
-            <TextView
-                android:id="@+id/bsdl_domain_rule_desc"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.6"
-                android:padding="5dp"
-                android:text="@string/bsdl_block_desc"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/large_font_text_view" />
-
-            <Spinner
-                android:id="@+id/bsdl_domain_rule_spinner"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.4"
-                android:background="@drawable/spinner_outline"
-                android:popupBackground="@drawable/spinner_outline_with_bg"
-                android:spinnerMode="dropdown"
-                tools:listitem="@layout/spinner_item_firewall_status" />
-
-        </LinearLayout>
-
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/dns_block_blocked_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -225,6 +215,57 @@
             android:textSize="@dimen/default_font_text_view"
             android:visibility="visible" />
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/dns_region"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/dns_block_blocked_desc"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:padding="5dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/bsdl_domain_rule_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/dns_region"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:weightSum="1">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/bsdl_domain_rule_desc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.6"
+                android:padding="5dp"
+                android:text="@string/bsdl_block_desc"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/bsdl_domain_rule_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.4"
+                android:background="@drawable/spinner_outline"
+                android:popupBackground="@drawable/spinner_outline_with_bg"
+                android:spinnerMode="dropdown"
+                tools:listitem="@layout/spinner_item_firewall_status" />
+
+        </LinearLayout>
     </RelativeLayout>
 
     <LinearLayout
@@ -238,11 +279,12 @@
         android:padding="10dp"
         android:weightSum="1">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/dns_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:alpha="0.8"
             android:ellipsize="start"
             android:fontFamily="sans-serif-light"
             android:gravity="center"

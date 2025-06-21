@@ -26,34 +26,39 @@ class ConnectionTracer(ctx: Context) {
         private const val SEPARATOR = "|"
     }
 
-    private val cm: ConnectivityManager
-    private val uidCache: Cache<String, Int>
-
-    init {
-        cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        // Cache the UID for the next 60 seconds.
-        // the UID will expire after 60 seconds of the write.
-        // Key for the cache is protocol, local, remote
-        uidCache =
-            CacheBuilder.newBuilder()
-                .maximumSize(CACHE_BUILDER_MAX_SIZE)
-                .expireAfterWrite(CACHE_BUILDER_WRITE_EXPIRE_SEC, TimeUnit.SECONDS)
-                .build()
-    }
+    private val cm: ConnectivityManager = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    // Cache the UID for the next 60 seconds.
+    // the UID will expire after 60 seconds of the write.
+    // Key for the cache is protocol, local, remote
+    private val uidCache: Cache<String, Int> = CacheBuilder.newBuilder()
+        .maximumSize(CACHE_BUILDER_MAX_SIZE)
+        .expireAfterWrite(CACHE_BUILDER_WRITE_EXPIRE_SEC, TimeUnit.SECONDS)
+        .build()
 
     @TargetApi(Build.VERSION_CODES.Q)
     suspend fun getUidQ(
-        protocol: Int,
+        proto: Int,
         sourceIp: String,
-        sourcePort: Int,
+        sport: Int,
         destIp: String,
-        destPort: Int
+        dport: Int
     ): Int {
         var uid = Constants.INVALID_UID
-        // android.googlesource.com/platform/development/+/da84168fb/ndk/platforms/android-21/include/linux/in.h
-        if (protocol != Protocol.TCP.protocolType && protocol != Protocol.UDP.protocolType) {
+        var sourcePort = sport
+        var destPort = dport
+        var protocol = proto
+
+        // in-case of ICMP, change the protocol to UDP and source/dest port to 0
+        // ref: github.com/Gedsh/InviZible/blob/82a0618662ed2fec0fcb6ec55d030d1b76155924/tordnscrypt/src/main/java/pan/alexander/tordnscrypt/vpn/service/ServiceVPN.java#L540C26-L540C30
+        if (protocol == Protocol.ICMP.protocolType || protocol == Protocol.ICMPV6.protocolType) {
+            sourcePort = 0
+            destPort = 0
+            protocol = Protocol.UDP.protocolType
+        } else if (protocol != Protocol.TCP.protocolType && protocol != Protocol.UDP.protocolType) {
+            // android.googlesource.com/platform/development/+/da84168fb/ndk/platforms/android-21/include/linux/in.h
             return uid
         }
+
         val local: InetSocketAddress
         val remote: InetSocketAddress
         try {
