@@ -353,7 +353,7 @@ object WireguardManager : KoinComponent {
         }
 
         if (config.isLockdown && checkEligibilityBasedOnNw(id, usesMtrdNw)) {
-            Logger.i(LOG_TAG_PROXY, "lockdown wg for $type => return $idStr")
+            Logger.d(LOG_TAG_PROXY, "lockdown wg for $type => return $idStr")
             return Pair(idStr, false) // no need to proceed further for lockdown
         }
 
@@ -362,13 +362,13 @@ object WireguardManager : KoinComponent {
         if (config.isLockdown) {
             // add IpnBlock instead of the config id, let the connection be blocked in WiFi
             // regardless of config is active or not
-            Logger.i(LOG_TAG_PROXY, "lockdown wg for $type => return $block")
+            Logger.d(LOG_TAG_PROXY, "lockdown wg for $type => return $block")
             return Pair(block, false) // no need to proceed further for lockdown
         }
 
         // check if the config is active and if it can be used on this network
         if (config.isActive && checkEligibilityBasedOnNw(id, usesMtrdNw)) {
-            Logger.i(LOG_TAG_PROXY, "active wg for $type => add $idStr")
+            Logger.d(LOG_TAG_PROXY, "active wg for $type => add $idStr")
             return Pair(idStr, true)
         }
 
@@ -411,7 +411,7 @@ object WireguardManager : KoinComponent {
         val ipc = IpRulesManager.hasProxy(uid, ip, port)
         // return Pair<String, Boolean> - first is ProxyId, second is can proceed for next check
         // one case where second parameter is true when the config is in lockdown mode
-        val ipcProxyPair = canUseConfig(ipc.first, "ip $ip:$port", usesMeteredNw)
+        val ipcProxyPair = canUseConfig(ipc.first, "ip($ip:$port)", usesMeteredNw)
         if (!ipcProxyPair.second) { // false denotes first is not empty
             if (ipcProxyPair.first == block) {
                 proxyIds.clear()
@@ -419,7 +419,7 @@ object WireguardManager : KoinComponent {
             } else {
                 proxyIds.add(ipcProxyPair.first)
             }
-            Logger.i(LOG_TAG_PROXY, "lockdown wg for ip: $ip:$port => return $proxyIds")
+            Logger.i(LOG_TAG_PROXY, "lockdown wg for ip($ip:$port) => return $proxyIds")
             return proxyIds
         }
         // add the ip-app specific config to the list
@@ -427,7 +427,7 @@ object WireguardManager : KoinComponent {
 
         // check for domain-app specific config
         val dc = DomainRulesManager.getProxyForDomain(uid, domain)
-        val dcProxyPair = canUseConfig(dc.first, "domain $domain", usesMeteredNw)
+        val dcProxyPair = canUseConfig(dc.first, "domain($domain)", usesMeteredNw)
         if (!dcProxyPair.second) {
             if (ipcProxyPair.first == block) {
                 proxyIds.clear()
@@ -435,7 +435,7 @@ object WireguardManager : KoinComponent {
             } else {
                 proxyIds.add(ipcProxyPair.first)
             }
-            Logger.i(LOG_TAG_PROXY, "lockdown wg for domain: $domain => return $proxyIds")
+            Logger.i(LOG_TAG_PROXY, "lockdown wg for domain($domain) => return $proxyIds")
             return proxyIds
         }
         // add the domain-app specific config to the list
@@ -443,15 +443,15 @@ object WireguardManager : KoinComponent {
 
         // check for app specific config
         val ac = ProxyManager.getProxyIdForApp(uid)
-        val appProxyPair = canUseConfig(ac, "app $uid", usesMeteredNw)
+        val appProxyPair = canUseConfig(ac, "app($uid)", usesMeteredNw)
         if (!appProxyPair.second) {
-            if (ipcProxyPair.first == block) {
+            if (appProxyPair.first == block) {
                 proxyIds.clear()
                 proxyIds.add(block)
             } else {
-                proxyIds.add(ipcProxyPair.first)
+                proxyIds.add(appProxyPair.first)
             }
-            Logger.i(LOG_TAG_PROXY, "lockdown wg for app: $uid => return $proxyIds")
+            Logger.i(LOG_TAG_PROXY, "lockdown wg for app($uid) => return $proxyIds")
             return proxyIds
         }
 
@@ -460,7 +460,7 @@ object WireguardManager : KoinComponent {
 
         // check for universal ip config
         val uipc = IpRulesManager.hasProxy(UID_EVERYBODY, ip, port)
-        val uipcProxyPair = canUseConfig(uipc.first, "univ-ip $ip:$port", usesMeteredNw)
+        val uipcProxyPair = canUseConfig(uipc.first, "univ-ip($ip:$port)", usesMeteredNw)
         if (!uipcProxyPair.second) {
             if (ipcProxyPair.first == block) {
                 proxyIds.clear()
@@ -468,7 +468,7 @@ object WireguardManager : KoinComponent {
             } else {
                 proxyIds.add(ipcProxyPair.first)
             }
-            Logger.i(LOG_TAG_PROXY, "lockdown wg for univ-ip: $ip:$port => return $proxyIds")
+            Logger.i(LOG_TAG_PROXY, "lockdown wg for univ-ip($ip:$port) => return $proxyIds")
             return proxyIds // no need to proceed further for lockdown
         }
 
@@ -477,7 +477,7 @@ object WireguardManager : KoinComponent {
 
         // check for universal domain config
         val udc = DomainRulesManager.getProxyForDomain(UID_EVERYBODY, domain)
-        val udcProxyPair = canUseConfig(udc.first, "univ-dom $domain", usesMeteredNw)
+        val udcProxyPair = canUseConfig(udc.first, "univ-dom($domain)", usesMeteredNw)
         if (!udcProxyPair.second) {
             if (ipcProxyPair.first == block) {
                 proxyIds.clear()
@@ -485,7 +485,7 @@ object WireguardManager : KoinComponent {
             } else {
                 proxyIds.add(ipcProxyPair.first)
             }
-            Logger.i(LOG_TAG_PROXY, "lockdown wg for univ-dom: $domain => return $proxyIds")
+            Logger.i(LOG_TAG_PROXY, "lockdown wg for univ-dom($domain) => return $proxyIds")
             return proxyIds // no need to proceed further for lockdown
         }
 
