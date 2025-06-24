@@ -20,12 +20,8 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
-import com.celzero.firestack.backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
@@ -36,8 +32,8 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.firestack.backend.Backend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
