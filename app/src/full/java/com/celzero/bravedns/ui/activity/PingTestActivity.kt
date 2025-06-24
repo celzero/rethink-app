@@ -189,32 +189,34 @@ class PingTestActivity: AppCompatActivity(R.layout.activity_ping_test) {
     }
 
     private fun setStrengthLevel(strength: Int) {
+        val max = 5
         // Ensure the strength is between 1 and 5
         val validStrength = when {
             strength < 1 -> 1
-            strength > 5 -> 5
+            strength > max -> max
             else -> strength
         }
 
         b.strengthLayout.visibility = View.VISIBLE
         // Update the progress of the ProgressBar
-        b.strengthIndicator.max = 5
+        b.strengthIndicator.max = max
         b.strengthIndicator.progress = validStrength
+        b.pingResult.text = getString(R.string.two_argument, validStrength.toString(), max.toString())
     }
 
     private suspend fun isReachable(csv: String): Boolean {
-        val (wg, pr, se, w64, exit) = if (proxiesStatus.isEmpty()) {
+        val (warp, pr, se, w64, exit) = if (proxiesStatus.isEmpty()) {
             getProxiesStatus(csv)
         } else {
             proxiesStatus
         }
-        Logger.d(Logger.LOG_IAB, "$TAG ip $csv reachable: $wg, $pr, $se, $w64, $exit")
-        Logger.i(Logger.LOG_IAB, "$TAG ip $csv reachable: ${wg || pr || se || w64 || exit}")
-        return wg || se || w64 || exit
+        Logger.d(Logger.LOG_IAB, "$TAG ip $csv reachable: $warp, $pr, $se, $w64, $exit")
+        Logger.i(Logger.LOG_IAB, "$TAG ip $csv reachable: ${warp || pr || se || w64 || exit}")
+        return warp || se || w64 || exit
     }
 
     private suspend fun calculateStrength(csv: String): Int {
-        val (wg, proton, se, w64, exit) = if (proxiesStatus.isEmpty()) {
+        val (wg, amz, proton, se, w64) = if (proxiesStatus.isEmpty()) {
             getProxiesStatus(csv)
         } else {
             proxiesStatus
@@ -224,31 +226,31 @@ class PingTestActivity: AppCompatActivity(R.layout.activity_ping_test) {
         // 1 - 5
         var strength = 0
         if (wg) strength++
+        if (amz) strength++
         if (proton) strength++
         if (se) strength++
         if (w64) strength++
-        if (exit) strength++
 
-        Logger.i(Logger.LOG_IAB, "$TAG strength: $strength ($wg, $se, $w64, $exit)")
+        Logger.i(Logger.LOG_IAB, "$TAG strength: $strength ($wg, $amz, $se, $w64 )")
         return strength
     }
 
     private suspend fun getProxiesStatus(csv: String): List<Boolean> {
         if (proxiesStatus.isNotEmpty()) return proxiesStatus
 
-        val wg = VpnController.isProxyReachable(Backend.RpnWg, csv)
+        val warp = VpnController.isProxyReachable(Backend.RpnWg, csv)
+        val amz = VpnController.isProxyReachable(Backend.RpnAmz, csv)
         val proton = VpnController.isProxyReachable(Backend.RpnPro, csv)
         val se = VpnController.isProxyReachable(Backend.RpnSE, csv)
         val w64 = VpnController.isProxyReachable(Backend.Rpn64, csv)
-        val exit = VpnController.isProxyReachable(Backend.Exit, csv)
-        Logger.d(Logger.LOG_IAB, "$TAG proxies reachable: $wg, $proton, $se, $w64, $exit")
+        Logger.d(Logger.LOG_IAB, "$TAG proxies reachable: $warp, $amz $proton, $se, $w64")
         return proxiesStatus.apply {
             clear()
-            add(wg)
+            add(warp)
+            add(amz)
             add(proton)
             add(se)
             add(w64)
-            add(exit)
         }
     }
 
