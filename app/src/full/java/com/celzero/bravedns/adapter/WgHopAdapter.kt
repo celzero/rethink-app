@@ -314,8 +314,8 @@ class WgHopAdapter(
             if (!isAttached) return
 
             val dialogBuilder = MaterialAlertDialogBuilder(context)
-            dialogBuilder.setTitle("Processing...")
-            dialogBuilder.setMessage("Please wait...")
+            dialogBuilder.setTitle(context.getString(R.string.processing_dialog_title))
+            dialogBuilder.setMessage(context.getString(R.string.processing_dialog_desc))
             dialogBuilder.setCancelable(true)
             processingDialog = dialogBuilder.create()
             processingDialog?.show()
