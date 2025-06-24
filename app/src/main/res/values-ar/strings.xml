@@ -431,7 +431,7 @@
     <string name="bsac_title_desc">تنطبق القواعد على هذا التطبيق فقط.</string>
     <string name="dc_dns_proxy">وكيل DNS</string>
     <string name="lbbs_search">البحث في المجالات في قوائم الحظر</string>
-    <string name="slide_1_title">مجاني ومفتوح المصدر</string>
+    <string name="slide_1_title">حر ومفتوح المصدر</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">محمي</string>
     <string name="bsct_conn_desc_blocked">محظور على %1$s %2$s</string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
@@ -808,7 +808,7 @@
     <string name="lbl_dns_servers" translatable="true">خوادم DNS</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
     <string name="lbl_applications" translatable="true">التطبيقات</string>
-    <string name="lbl_delete" translatable="true">حذف</string>
+    <string name="lbl_delete" translatable="true">احذف</string>
     <string name="lbl_random" translatable="true">(عشوائي)</string>
     <string name="lbl_select_all" translatable="true">حدد الكل</string>
     <string name="lbl_mtu" translatable="true">MTU</string>
@@ -833,7 +833,7 @@
     <string name="hs_biometeric_desc" translatable="true">استخدم المصادقة البيومترية لإلغاء قفل Rethink</string>
     <string name="logs_disclaimer" translatable="true">عرض أول 20,000 حرف</string>
     <string name="lbl_status" translatable="true">الحالة</string>
-    <string name="lbl_remove" translatable="true">إزالة</string>
+    <string name="lbl_remove" translatable="true">أزِل</string>
     <string name="lbl_last" translatable="true">الأخير</string>
     <string name="lbl_maybe_blocked" translatable="true">ربما محظور</string>
     <string name="crypt_relay_singapore" translatable="true">مرحل DNS مجهول الهوية مستضاف في سنغافورة.</string>
