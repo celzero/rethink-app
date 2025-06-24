@@ -666,18 +666,21 @@ object UIUtils {
         return result.toString().trim()
     }
 
-    fun formatNetStat(stat: NetStat?): String {
-        val ip = stat?.ip()?.toString()
-        val udp = stat?.udp()?.toString()
-        val tcp = stat?.tcp()?.toString()
-        val fwd = stat?.fwd()?.toString()
-        val icmp = stat?.icmp()?.toString()
-        val nic = stat?.nic()?.toString()
-        val rdnsInfo = stat?.rdnsinfo()?.toString()
-        val nicInfo = stat?.nicinfo()?.toString()
-        val go = stat?.go()?.toString()
+    fun formatNetStat(stat: NetStat?): String? {
+        if (stat == null) return null
 
-        var stats = nic + nicInfo + fwd + ip + icmp + tcp + udp + rdnsInfo + go
+        val ip = stat.ip()?.toString()
+        val udp = stat.udp()?.toString()
+        val tcp = stat.tcp()?.toString()
+        val fwd = stat.fwd()?.toString()
+        val icmp = stat.icmp()?.toString()
+        val nic = stat.nic()?.toString()
+        val rdnsInfo = stat.rdnsinfo()?.toString()
+        val nicInfo = stat.nicinfo()?.toString()
+        val go = stat.go()?.toString()
+        val tun = stat.tun()?.toString()
+
+        var stats = nic + nicInfo + fwd + ip + icmp + tcp + udp + rdnsInfo + go + tun
         stats = stats.replace("{", "\n")
         stats = stats.replace("}", "\n\n")
         stats = stats.replace(",", "\n")
