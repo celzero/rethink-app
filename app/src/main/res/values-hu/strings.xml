@@ -414,4 +414,5 @@
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL másolva</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Törli a DNSCrypt Relay-t a mentett konfigurációból.</string>
     <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast --> Alkalmazáslista újraszinkronizálása befejeződött.</string>
+    <string name="orbot_explanation" translatable="true">Az Orbot egy ingyenes proxy alkalmazás, amely lehetővé teszi más alkalmazások számára, hogy <u>biztonságosabban</u> használják az internetet.\n\nAz Orbot a <u>Tor</u> szolgáltatást használja az internetes forgalom titkosításához, ami segít <u>megkerülni a cenzúrát</u> és védekezni a személyes szabadság és a magánéletet fenyegető \u0020oldalak<u> és a hálózati megfigyelés</u> formái ellen.\n<u>TCP Proxy</u>: A Rethink csak a <i>mellékelt</i> alkalmazások TCP-kapcsolatait továbbítja az Orbotnak.\n<u>HTTP Proxy</u>: A Rethink <i>létrehoz</i> egy HTTP \u0020KAPCSOLAT, alagut az Orbot felé, és csak a <i>mellékelt</i> alkalmazások TCP-kapcsolatait továbbítja.</string>
 </resources>
