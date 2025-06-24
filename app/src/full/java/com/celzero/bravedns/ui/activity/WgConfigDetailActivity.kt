@@ -470,7 +470,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         b.hopBtn.setOnClickListener {
             val mapping = WireguardManager.getConfigFilesById(configId)
             if (mapping == null) {
-                Utilities.showToastUiCentered(this, "Mapping not found", Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(this, getString(R.string.mapping_not_available), Toast.LENGTH_SHORT)
                 return@setOnClickListener
             }
 
