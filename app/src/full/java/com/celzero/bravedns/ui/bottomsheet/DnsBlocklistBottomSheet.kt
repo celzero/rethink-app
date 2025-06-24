@@ -145,8 +145,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         if (Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())
                 .isLessThan(Logger.LoggerLevel.DEBUG)
         ) {
-            b.dnsMessage.text =
-                "${log?.msg}; ${log?.proxyId}; ${log?.relayIP}"
+            b.dnsMessage.text = "${log?.msg}; ${log?.proxyId}; ${log?.relayIP}"
         } else {
             b.dnsMessage.text = log!!.msg
         }
@@ -531,19 +530,24 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         if (log!!.isBlocked) {
             showBlockedState(uptime)
         } else {
-            showResolvedState(uptime, log!!.latency, log!!.groundedQuery())
+            showResolvedState(uptime)
         }
     }
 
-    private fun showResolvedState(uptime: String, latency: Long, isGrounded: Boolean) {
+    private fun showResolvedState(uptime: String) {
         if (log == null) {
             Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update ui")
             return
         }
 
-        if (latency == 0L && !isGrounded) {
-            b.dnsBlockBlockedDesc.text =
+        if (log!!.isCached) {
+            val txt = if (log!!.serverIP.isEmpty()) {
                 getString(R.string.dns_btm_resolved_doh, uptime, getString(R.string.lbl_cache))
+            } else {
+                val concat = "${getString(R.string.lbl_cache)} (${log!!.resolverId}:${log!!.serverIP})"
+                getString(R.string.dns_btm_resolved_doh, uptime, concat)
+            }
+            b.dnsBlockBlockedDesc.text = txt
             return
         }
 
