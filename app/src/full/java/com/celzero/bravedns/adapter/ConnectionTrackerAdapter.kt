@@ -266,7 +266,15 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     b.connectionDelay.text = ""
                 }
 
-                if (isConnectionProxied(ct.blockedByRule, ct.proxyDetails)) {
+                if (isRpnProxy(ct.rpid)) {
+                    b.connectionSummaryLl.visibility = View.VISIBLE
+                    b.connectionDelay.text =
+                        context.getString(
+                            R.string.ci_desc,
+                            b.connectionDelay.text,
+                            context.getString(R.string.symbol_sparkle)
+                        )
+                } else if (isConnectionProxied(ct.blockedByRule, ct.proxyDetails)) {
                     b.connectionSummaryLl.visibility = View.VISIBLE
                     b.connectionDelay.text =
                         context.getString(
@@ -379,7 +387,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
         }
 
         private fun isRpnProxy(pid: String): Boolean {
-            return pid.isNotEmpty() && ProxyManager.isIpnProxy(pid)
+            return pid.isNotEmpty() && ProxyManager.isRpnProxy(pid)
         }
 
         private fun isConnectionHeavier(ct: ConnectionTracker): Boolean {
