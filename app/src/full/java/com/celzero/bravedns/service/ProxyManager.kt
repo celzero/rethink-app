@@ -326,6 +326,13 @@ object ProxyManager : KoinComponent {
             !ipnProxyId.endsWith(Backend.RPN)
     }
 
+    fun isRpnProxy(ipnProxyId: String): Boolean {
+        if (ipnProxyId.isEmpty()) return false
+        // check if the proxy id is not the base, block, exit, auto or ingress
+        // all these are special cases and should not be considered as proxied traffic
+        return ipnProxyId.endsWith(Backend.RPN) || ipnProxyId == Backend.Auto
+    }
+
     fun stats(): String {
         val sb = StringBuilder()
         sb.append("   apps: ${pamSet.size}\n")
