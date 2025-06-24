@@ -151,7 +151,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun updateSponsorInfo() {
-        if (RpnProxyManager.isRpnActive()) {
+        if (RpnProxyManager.isRpnEnabled()) {
             b.sponsorInfoUsage.visibility = View.GONE
             b.aboutSponsor.visibility = View.GONE
             return
@@ -313,7 +313,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 )
 
                 descText.movementMethod = LinkMovementMethod.getInstance()
-                descText.text = formatedStat + vpnStats
+                if (formatedStat == null) {
+                    descText.text = "Stats not available"
+                } else {
+                    descText.text = formatedStat + vpnStats
+                }
 
                 okBtn.setOnClickListener { dialog.dismiss() }
 
