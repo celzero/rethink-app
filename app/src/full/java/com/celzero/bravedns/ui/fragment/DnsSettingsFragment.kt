@@ -16,6 +16,7 @@
 package com.celzero.bravedns.ui.fragment
 
 import Logger
+import Logger.LOG_TAG_DNS
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -30,7 +31,10 @@ import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.AppConfig.Companion.DOH_INDEX
+import com.celzero.bravedns.data.AppConfig.Companion.DOT_INDEX
 import com.celzero.bravedns.databinding.FragmentDnsConfigureBinding
+import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.scheduler.WorkScheduler.Companion.BLOCKLIST_UPDATE_CHECK_JOB_TAG
 import com.celzero.bravedns.service.BraveVPNService
@@ -46,6 +50,8 @@ import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
+import com.celzero.bravedns.util.Utilities.tos
+import com.celzero.firestack.backend.Backend
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -173,6 +179,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             // as split dns option is shown to user regardless of dns alg
             b.dcSplitDnsRl.visibility = View.VISIBLE
             b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
+            updateConnectedStatus(persistentState.connectedDnsName)
             return
         }
 
@@ -182,6 +189,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             persistentState.splitDns = false
         }
         showSplitDnsUi()
+        updateConnectedStatus(persistentState.connectedDnsName)
     }
 
     private fun updateConnectedStatus(connectedDns: String) {
@@ -231,11 +239,19 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
                 b.connectedStatusTitleUrl.text = resources.getString(R.string.lbl_odoh)
                 b.connectedStatusTitle.text = dns
             }
+            AppConfig.DnsType.SMART_DNS -> {
+                b.connectedStatusTitleUrl.text = resources.getString(R.string.smart_dns)
+                b.connectedStatusTitle.text = dns
+            }
         }
     }
 
     private fun isSystemDns(): Boolean {
         return appConfig.isSystemDns()
+    }
+
+    private fun isSmartDns(): Boolean {
+        return appConfig.isSmartDnsEnabled()
     }
 
     private fun isRethinkDns(): Boolean {
@@ -253,21 +269,30 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         }
 
         b.wireguardRb.visibility = View.GONE
-        if (isSystemDns()) {
+        if (isSmartDns()) {
+            b.smartDnsRb.isChecked = true
+            b.rethinkPlusDnsRb.isChecked = false
+            b.customDnsRb.isChecked = false
+            b.networkDnsRb.isChecked = false
+            b.smartDnsRb.isChecked = true
+        } else if (isSystemDns()) {
             b.networkDnsRb.isChecked = true
             b.rethinkPlusDnsRb.isChecked = false
             b.customDnsRb.isChecked = false
+            b.smartDnsRb.isChecked = false
             b.networkDnsRb.isChecked = true
         } else if (isRethinkDns()) {
             b.rethinkPlusDnsRb.isChecked = true
             b.customDnsRb.isChecked = false
             b.networkDnsRb.isChecked = false
+            b.smartDnsRb.isChecked = false
             b.rethinkPlusDnsRb.isChecked = true
         } else {
             // connected to custom dns, update the dns details
             b.customDnsRb.isChecked = true
             b.rethinkPlusDnsRb.isChecked = false
             b.networkDnsRb.isChecked = false
+            b.smartDnsRb.isChecked = false
             b.customDnsRb.isChecked = true
         }
     }
@@ -276,12 +301,17 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.rethinkPlusDnsRb.isChecked = false
         b.customDnsRb.isChecked = false
         b.networkDnsRb.isChecked = false
+        b.smartDnsRb.isChecked = false
+
         b.rethinkPlusDnsRb.isEnabled = false
         b.customDnsRb.isEnabled = false
         b.networkDnsRb.isEnabled = false
+        b.smartDnsRb.isEnabled = false
+
         b.rethinkPlusDnsRb.isClickable = false
         b.customDnsRb.isClickable = false
         b.networkDnsRb.isClickable = false
+        b.smartDnsRb.isClickable = false
     }
 
     private fun getConnectedDnsType(): String {
@@ -300,6 +330,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             }
             AppConfig.DnsType.SYSTEM_DNS -> {
                 resources.getString(R.string.dc_dns_proxy)
+            }
+            AppConfig.DnsType.SMART_DNS -> {
+                // for now, the plus has multiple doh endpoints, so use the doh label
+                resources.getString(R.string.dc_doh)
             }
             AppConfig.DnsType.DOT -> {
                 resources.getString(R.string.lbl_dot)
@@ -386,6 +420,11 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             setNetworkDns()
         }
 
+        b.smartDnsRb.setOnCheckedChangeListener(null)
+        b.smartDnsRb.setOnClickListener {
+            setSmartDns()
+        }
+
         b.dcDownloaderRl.setOnClickListener {
             b.dcDownloaderSwitch.isChecked = !b.dcDownloaderSwitch.isChecked
         }
@@ -436,6 +475,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
         b.dcSplitDnsSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.splitDns = isChecked
+            updateConnectedStatus(persistentState.connectedDnsName)
         }
 
         b.dcSplitDnsRl.setOnClickListener {
@@ -449,12 +489,72 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             }
         }
 
+        b.smartDnsInfo.setOnClickListener {
+            showSmartDnsInfoDialog()
+        }
+
         b.dcUndelegatedDomainsRl.setOnClickListener {
             b.dcUndelegatedDomainsSwitch.isChecked = !b.dcUndelegatedDomainsSwitch.isChecked
         }
 
         b.dcUndelegatedDomainsSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.useSystemDnsForUndelegatedDomains = isChecked
+        }
+    }
+
+    private fun showSmartDnsInfoDialog() {
+        io {
+            val ids = VpnController.getPlusResolvers()
+            val dnsList: MutableList<String> = mutableListOf()
+            ids.forEach {
+                val index = it.substringAfter(Backend.Plus).getOrNull(0)
+                if (index == null) {
+                    Logger.w(LOG_TAG_DNS, "smart(plus) dns resolver id is empty: $it")
+                    return@forEach
+                }
+                // for now, only doh and dot are supported
+                if (index != DOH_INDEX && index != DOT_INDEX) {
+                    Logger.w(LOG_TAG_DNS, "smart(plus) dns resolver id is not doh or dot: $it")
+                    return@forEach
+                }
+                val transport = VpnController.getPlusTransportById(it)
+                val address = transport?.addr?.tos() ?: ""
+                if (address.isNotEmpty()) dnsList.add(address)
+            }
+
+            Logger.i(LOG_TAG_DNS, "smart(plus) dns list size: ${dnsList.size}")
+            uiCtx {
+                val stringBuilder = StringBuilder()
+                val desc = getString(R.string.smart_dns_desc)
+                stringBuilder.append(desc).append("\n\n")
+                dnsList.forEach {
+                    val txt = getString(R.string.symbol_star) + " " + it
+                    stringBuilder.append(txt).append("\n")
+                }
+                val list = stringBuilder.toString()
+                val builder = MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.smart_dns)
+                    .setMessage(list)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.ada_noapp_dialog_positive) { di, _ ->
+                        di.dismiss()
+                    }.setNeutralButton(
+                        requireContext().getString(R.string.dns_info_neutral)
+                    ) { _: DialogInterface, _: Int ->
+                        UIUtils.clipboardCopy(
+                            requireContext(),
+                            list,
+                            requireContext().getString(R.string.copy_clipboard_label)
+                        )
+                        Utilities.showToastUiCentered(
+                            requireContext(),
+                            requireContext().getString(R.string.info_dialog_url_copy_toast_msg),
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                val dialog = builder.create()
+                dialog.show()
+            }
         }
     }
 
@@ -517,6 +617,11 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     private fun setNetworkDns() {
         // set network dns
         io { appConfig.enableSystemDns() }
+    }
+
+    private fun setSmartDns() {
+        // set smart dns
+        io { appConfig.enableSmartDns() }
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {

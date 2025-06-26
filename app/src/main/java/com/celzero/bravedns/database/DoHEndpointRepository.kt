@@ -50,7 +50,7 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
         return doHEndpointDAO.getCount()
     }
 
-    suspend fun getAllDoHEndpoints(): List<DoHEndpoint> {
-        return doHEndpointDAO.getAllDoHEndpoints()
+    suspend fun getAllDefaultDoHEndpoints(): List<DoHEndpoint> {
+        return doHEndpointDAO.getAllDefaultDoHEndpoints()
     }
 }

@@ -60,4 +60,7 @@ interface DoTEndpointDAO {
     fun getConnectedDoT(): DoTEndpoint?
 
     @Query("select count(*) from DoTEndpoint") fun getCount(): Int
+
+    @Query("select * from DoTEndpoint where isCustom = 0")
+    fun getAllDefaultDoTEndpoints(): List<DoTEndpoint>
 }

@@ -78,6 +78,13 @@ internal constructor(
         private const val ORBOT_DNS = "Orbot"
 
         const val FALLBACK_DNS = "8.8.4.4,2001:4860:4860::8844"
+
+        // used to add index to the transport ids added as part of Plus transport
+        // for now only DOH, DoT are supported
+        const val DOH_INDEX = '1'
+        const val DOT_INDEX = '2'
+        const val ODOH_INDEX = '3'
+        const val DNS_CRYPT_INDEX = '4'
     }
 
     init {
@@ -154,7 +161,8 @@ internal constructor(
         RETHINK_REMOTE(4),
         SYSTEM_DNS(5),
         DOT(6),
-        ODOH(7);
+        ODOH(7),
+        SMART_DNS(8); // // treat Plus as SMART
 
         fun isDnsProxy(): Boolean {
             return this == DNS_PROXY
@@ -168,6 +176,10 @@ internal constructor(
             return this == SYSTEM_DNS
         }
 
+        fun isSmartDns(): Boolean {
+            return this == SMART_DNS
+        }
+
         fun isValidDnsType(): Boolean {
             return this == DOH ||
                 this == DNSCRYPT ||
@@ -175,7 +187,8 @@ internal constructor(
                 this == RETHINK_REMOTE ||
                 this == SYSTEM_DNS ||
                 this == DOT ||
-                this == ODOH
+                this == ODOH ||
+                this == SMART_DNS
         }
 
         companion object {
@@ -188,6 +201,7 @@ internal constructor(
                     SYSTEM_DNS.type -> SYSTEM_DNS
                     DOT.type -> DOT
                     ODOH.type -> ODOH
+                    SMART_DNS.type -> SMART_DNS
                     else -> DOH
                 }
             }
@@ -382,6 +396,7 @@ internal constructor(
             DnsType.SYSTEM_DNS.type -> DnsType.SYSTEM_DNS
             DnsType.DOT.type -> DnsType.DOT
             DnsType.ODOH.type -> DnsType.ODOH
+            DnsType.SMART_DNS.type -> DnsType.SMART_DNS
             else -> {
                 Logger.w(LOG_TAG_VPN, "Invalid dns type mode: ${persistentState.dnsType}")
                 DnsType.DOH
@@ -439,8 +454,12 @@ internal constructor(
         return doHEndpointRepository.getConnectedDoH()
     }
 
-    suspend fun getAllDoHEndpoints(): List<DoHEndpoint> {
-        return doHEndpointRepository.getAllDoHEndpoints()
+    suspend fun getAllDefaultDoHEndpoints(): List<DoHEndpoint> {
+        return doHEndpointRepository.getAllDefaultDoHEndpoints()
+    }
+
+    suspend fun getAllDefaultDoTEndpoints(): List<DoTEndpoint> {
+        return doTEndpointRepository.getAllDefaultDoTEndpoints()
     }
 
     suspend fun getDOTDetails(): DoTEndpoint? {
@@ -532,12 +551,19 @@ internal constructor(
             DnsType.SYSTEM_DNS -> {
                 postConnectedDnsName(context.getString(R.string.network_dns))
             }
+            DnsType.SMART_DNS -> {
+                postConnectedDnsName(context.getString(R.string.smart_dns))
+            }
         }
     }
 
     private fun postConnectedDnsName(name: String, url: String = "") {
         connectedDns.postValue(name)
-        persistentState.connectedDnsName = "$name,$url"
+        if (url.isEmpty()) {
+            persistentState.connectedDnsName = name
+        } else {
+            persistentState.connectedDnsName = "$name,$url"
+        }
     }
 
     private fun isValidDnsType(dt: DnsType): Boolean {
@@ -547,7 +573,8 @@ internal constructor(
             dt == DnsType.RETHINK_REMOTE ||
             dt == DnsType.SYSTEM_DNS ||
             dt == DnsType.DOT ||
-            dt == DnsType.ODOH)
+            dt == DnsType.ODOH ||
+            dt == DnsType.SMART_DNS)
     }
 
     suspend fun switchRethinkDnsToMax() {
@@ -770,8 +797,20 @@ internal constructor(
         onDnsChange(DnsType.SYSTEM_DNS)
     }
 
+    suspend fun enableSmartDns() {
+        if (getDnsType() != DnsType.SMART_DNS) {
+            removeConnectionStatus()
+        }
+
+        onDnsChange(DnsType.SMART_DNS)
+    }
+
     fun isSystemDns(): Boolean {
         return getDnsType().isSystemDns()
+    }
+
+    fun isSmartDnsEnabled(): Boolean {
+        return getDnsType().isSmartDns()
     }
 
     suspend fun isDnscryptRelaySelectable(): Boolean {
@@ -804,6 +843,9 @@ internal constructor(
                 rethinkDnsEndpointRepository.removeConnectionStatus()
             }
             DnsType.SYSTEM_DNS -> {
+                // no-op, no need to remove connection status
+            }
+            DnsType.SMART_DNS -> {
                 // no-op, no need to remove connection status
             }
         }

@@ -59,8 +59,8 @@ interface DoHEndpointDAO {
     @Query("select * from DoHEndpoint where isSelected = 1")
     fun getConnectedDoH(): DoHEndpoint?
 
-    @Query("select * from DoHEndpoint")
-    fun getAllDoHEndpoints(): List<DoHEndpoint>
+    @Query("select * from DoHEndpoint where isCustom = 0")
+    fun getAllDefaultDoHEndpoints(): List<DoHEndpoint>
 
     @Query("select count(*) from DoHEndpoint") fun getCount(): Int
 }

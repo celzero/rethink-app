@@ -60,80 +60,113 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/wireguard_rb"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:enabled="false"
+                    android:minHeight="48dp"
+                    android:padding="10dp"
+                    android:text="@string/lbl_wireguard"
+                    android:visibility="gone" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp">
+
                     <com.google.android.material.radiobutton.MaterialRadioButton
-                        android:id="@+id/wireguard_rb"
-                        android:layout_width="match_parent"
+                        android:id="@+id/network_dns_rb"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
                         android:layout_gravity="center"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:enabled="false"
+                        android:layout_toStartOf="@id/network_dns_info"
+                        android:enabled="true"
                         android:minHeight="48dp"
                         android:padding="10dp"
-                        android:text="@string/lbl_wireguard"
-                        android:visibility="gone" />
+                        android:text="@string/network_dns" />
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/network_dns_info"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
                         android:layout_gravity="center"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:layout_marginBottom="10dp">
+                        android:padding="10dp"
+                        android:src="@drawable/ic_info_white_16" />
 
-                        <com.google.android.material.radiobutton.MaterialRadioButton
-                            android:id="@+id/network_dns_rb"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_alignParentStart="true"
-                            android:layout_centerVertical="true"
-                            android:layout_gravity="center"
-                            android:layout_toStartOf="@id/network_dns_info"
-                            android:enabled="true"
-                            android:minHeight="48dp"
-                            android:padding="10dp"
-                            android:text="@string/network_dns" />
+                </RelativeLayout>
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/network_dns_info"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:layout_gravity="center"
-                            android:padding="10dp"
-                            android:src="@drawable/ic_info_white_16" />
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/custom_dns_rb"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:drawableEnd="@drawable/ic_right_arrow_white"
+                    android:drawablePadding="10dp"
+                    android:enabled="true"
+                    android:minHeight="48dp"
+                    android:padding="10dp"
+                    android:text="@string/dc_custom_dns_radio" />
 
-                    </RelativeLayout>
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/rethink_plus_dns_rb"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:drawableEnd="@drawable/ic_right_arrow_white"
+                    android:enabled="true"
+                    android:minHeight="48dp"
+                    android:padding="10dp"
+                    android:text="@string/dc_rethink_dns_radio" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp">
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
-                        android:id="@+id/custom_dns_rb"
-                        android:layout_width="match_parent"
+                        android:id="@+id/smart_dns_rb"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
                         android:layout_gravity="center"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:drawableEnd="@drawable/ic_right_arrow_white"
-                        android:drawablePadding="10dp"
+                        android:layout_toStartOf="@id/smart_dns_info"
                         android:enabled="true"
                         android:minHeight="48dp"
                         android:padding="10dp"
-                        android:text="@string/dc_custom_dns_radio" />
+                        android:text="@string/smart_dns" />
 
-                    <com.google.android.material.radiobutton.MaterialRadioButton
-                        android:id="@+id/rethink_plus_dns_rb"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/smart_dns_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
                         android:layout_gravity="center"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:drawableEnd="@drawable/ic_right_arrow_white"
-                        android:enabled="true"
-                        android:minHeight="48dp"
                         android:padding="10dp"
-                        android:text="@string/dc_rethink_dns_radio" />
+                        android:src="@drawable/ic_info_white_16" />
+
+                </RelativeLayout>
 
                 <LinearLayout
                     android:id="@+id/query_card_view_top"
