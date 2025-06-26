@@ -112,6 +112,7 @@ internal constructor(
         transaction.msg = summary.msg ?: ""
         transaction.upstreamBlock = summary.upstreamBlocks
         transaction.region = summary.region
+        transaction.isCached = summary.cached
         return transaction
     }
 
@@ -134,6 +135,7 @@ internal constructor(
         dnsLog.msg = transaction.msg
         dnsLog.upstreamBlock = transaction.upstreamBlock
         dnsLog.region = transaction.region
+        dnsLog.isCached = transaction.isCached
         val typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt())
         if (typeName == ResourceRecordTypes.UNKNOWN) {
             dnsLog.typeName = transaction.type.toString()
@@ -258,7 +260,12 @@ internal constructor(
         // transaction status will be set as complete. So introduced check while
         // setting the connection state.
         if (transaction.status === Transaction.Status.COMPLETE) {
+            // skip updating the connection state if the transaction was resolved locally.
+            // locally resolved transaction has no server name, indicating it was blocked
+            // by a local rule—either a firewall rule or the local DNS blocklist.
+
             if (isLocallyResolved(transaction)) return
+
             VpnController.onConnectionStateChanged(BraveVPNService.State.WORKING)
             // only update the server name if it is not empty as its only used to show ech
             VpnController.onServerNameUpdated(transaction.serverName)

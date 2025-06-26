@@ -41,6 +41,7 @@ class Transaction {
     var msg: String = ""
     var upstreamBlock: Boolean = false
     var region: String = ""
+    var isCached: Boolean = false
 
     enum class Status(val id: Long) {
         START(Backend.Start),
