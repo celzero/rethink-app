@@ -18,6 +18,7 @@ package com.celzero.bravedns.adapter
 import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.format.DateUtils
@@ -25,13 +26,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.CheckedTextView
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
@@ -44,22 +48,31 @@ import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
 import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
+import com.celzero.bravedns.ui.bottomsheet.CustomDomainRulesBtmSheet
+import com.celzero.bravedns.ui.bottomsheet.CustomDomainRulesBtmSheet.ToggleBtnUi
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.URI
 
-class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RULES) :
+class CustomDomainAdapter(
+    val context: Context,
+    val fragment: Fragment,
+    val rule: CustomRulesActivity.RULES
+) :
     PagingDataAdapter<CustomDomain, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
 
-    companion object {
+    private val selectedItems = mutableSetOf<CustomDomain>()
+    private var isSelectionMode = false
+    private lateinit var adapter: CustomDomainAdapter
 
+    companion object {
+        private const val TAG = "CustomDomainAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<CustomDomain>() {
                 override fun areItemsTheSame(
@@ -67,22 +80,23 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
                     newConnection: CustomDomain
                 ): Boolean {
                     return (oldConnection.domain == newConnection.domain &&
-                        oldConnection.status == newConnection.status)
+                            oldConnection.status == newConnection.status &&
+                            oldConnection.proxyId == newConnection.proxyId &&
+                            oldConnection.proxyCC == newConnection.proxyCC)
                 }
 
                 override fun areContentsTheSame(
                     oldConnection: CustomDomain,
                     newConnection: CustomDomain
                 ): Boolean {
-                    return (oldConnection.domain == newConnection.domain &&
-                        oldConnection.status != newConnection.status)
+                    return oldConnection == newConnection
                 }
             }
     }
 
-    data class ToggleBtnUi(val txtColor: Int, val bgColor: Int)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        adapter = this
         if (viewType == R.layout.list_item_custom_all_domain) {
             val itemBinding =
                 ListItemCustomAllDomainBinding.inflate(
@@ -104,14 +118,28 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val customDomain: CustomDomain = getItem(position) ?: return
-        if (holder is CustomDomainViewHolderWithHeader) {
-            holder.update(customDomain)
-        } else if (holder is CustomDomainViewHolderWithoutHeader) {
-            holder.update(customDomain)
-        } else {
-            Logger.w(LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
-            return
+        when (holder) {
+            is CustomDomainViewHolderWithHeader -> {
+                holder.update(customDomain)
+            }
+
+            is CustomDomainViewHolderWithoutHeader -> {
+                holder.update(customDomain)
+            }
+
+            else -> {
+                Logger.w(LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
+                return
+            }
         }
+    }
+
+    fun getSelectedItems(): List<CustomDomain> = selectedItems.toList()
+
+    fun clearSelection() {
+        selectedItems.clear()
+        isSelectionMode = false
+        notifyDataSetChanged()
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -135,105 +163,6 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
             .into(mIconImageView)
     }
 
-    private fun changeDomainStatus(id: DomainRulesManager.Status, cd: CustomDomain) {
-        io {
-            when (id) {
-                DomainRulesManager.Status.NONE -> {
-                    noRule(cd)
-                }
-                DomainRulesManager.Status.BLOCK -> {
-                    block(cd)
-                }
-                DomainRulesManager.Status.TRUST -> {
-                    whitelist(cd)
-                }
-            }
-        }
-    }
-
-    private suspend fun whitelist(cd: CustomDomain) {
-        DomainRulesManager.trust(cd)
-    }
-
-    private suspend fun block(cd: CustomDomain) {
-        DomainRulesManager.block(cd)
-    }
-
-    private suspend fun noRule(cd: CustomDomain) {
-        DomainRulesManager.noRule(cd)
-    }
-
-    private fun findSelectedRuleByTag(ruleId: Int): DomainRulesManager.Status? {
-        return when (ruleId) {
-            DomainRulesManager.Status.NONE.id -> {
-                DomainRulesManager.Status.NONE
-            }
-            DomainRulesManager.Status.TRUST.id -> {
-                DomainRulesManager.Status.TRUST
-            }
-            DomainRulesManager.Status.BLOCK.id -> {
-                DomainRulesManager.Status.BLOCK
-            }
-            else -> {
-                null
-            }
-        }
-    }
-
-    private fun toggleBtnUi(id: DomainRulesManager.Status): ToggleBtnUi {
-        return when (id) {
-            DomainRulesManager.Status.NONE -> {
-                ToggleBtnUi(
-                    fetchColor(context, R.attr.chipTextNeutral),
-                    fetchColor(context, R.attr.chipBgColorNeutral)
-                )
-            }
-            DomainRulesManager.Status.BLOCK -> {
-                ToggleBtnUi(
-                    fetchColor(context, R.attr.chipTextNegative),
-                    fetchColor(context, R.attr.chipBgColorNegative)
-                )
-            }
-            DomainRulesManager.Status.TRUST -> {
-                ToggleBtnUi(
-                    fetchColor(context, R.attr.chipTextPositive),
-                    fetchColor(context, R.attr.chipBgColorPositive)
-                )
-            }
-        }
-    }
-
-    private fun selectToggleBtnUi(b: MaterialButton, toggleBtnUi: ToggleBtnUi) {
-        b.setTextColor(toggleBtnUi.txtColor)
-        b.backgroundTintList = ColorStateList.valueOf(toggleBtnUi.bgColor)
-    }
-
-    private fun unselectToggleBtnUi(b: MaterialButton) {
-        b.setTextColor(fetchToggleBtnColors(context, R.color.defaultToggleBtnTxt))
-        b.backgroundTintList =
-            ColorStateList.valueOf(fetchToggleBtnColors(context, R.color.defaultToggleBtnBg))
-    }
-
-    private fun showDialogForDelete(customDomain: CustomDomain) {
-        val builder = MaterialAlertDialogBuilder(context)
-        builder.setTitle(R.string.cd_remove_dialog_title)
-        builder.setMessage(R.string.cd_remove_dialog_message)
-        builder.setCancelable(true)
-        builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
-            io { DomainRulesManager.deleteDomain(customDomain) }
-            Utilities.showToastUiCentered(
-                context,
-                context.getString(R.string.cd_toast_deleted),
-                Toast.LENGTH_SHORT
-            )
-        }
-
-        builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ ->
-            // no-op
-        }
-        builder.create().show()
-    }
-
     private fun showEditDomainDialog(customDomain: CustomDomain) {
         val dBind =
             DialogAddCustomDomainBinding.inflate((context as CustomRulesActivity).layoutInflater)
@@ -251,24 +180,24 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         var selectedType: DomainRulesManager.DomainType =
             DomainRulesManager.DomainType.getType(customDomain.type)
 
-        when (selectedType) {
-            DomainRulesManager.DomainType.DOMAIN -> {
-                dBind.dacdDomainChip.isChecked = true
-            }
-            DomainRulesManager.DomainType.WILDCARD -> {
-                dBind.dacdWildcardChip.isChecked = true
-            }
+        if (customDomain.domain.startsWith("*") || customDomain.domain.startsWith(".")) {
+            dBind.dacdWildcardChip.isChecked = true
+        } else {
+            dBind.dacdDomainChip.isChecked = true
         }
 
         dBind.dacdDomainEditText.setText(customDomain.domain)
 
         dBind.dacdDomainEditText.addTextChangedListener {
-            if (it?.contains("*") == true) {
+            if (it?.startsWith("*") == true || it?.startsWith(".") == true) {
                 dBind.dacdWildcardChip.isChecked = true
+            } else {
+                dBind.dacdDomainChip.isChecked = true
             }
         }
 
         dBind.dacdDomainChip.setOnCheckedChangeListener { _, isSelected ->
+            Logger.vv(LOG_TAG_UI, "$TAG domain chip selected: $isSelected")
             if (isSelected) {
                 selectedType = DomainRulesManager.DomainType.DOMAIN
                 dBind.dacdDomainEditText.hint =
@@ -285,6 +214,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         }
 
         dBind.dacdWildcardChip.setOnCheckedChangeListener { _, isSelected ->
+            Logger.vv(LOG_TAG_UI, "$TAG wildcard chip selected: $isSelected")
             if (isSelected) {
                 selectedType = DomainRulesManager.DomainType.WILDCARD
                 dBind.dacdDomainEditText.hint =
@@ -332,32 +262,78 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
     ) {
         dBind.dacdFailureText.visibility = View.GONE
         val url = dBind.dacdDomainEditText.text.toString().trim()
+        val extractedHost = extractHost(url) ?: run {
+            dBind.dacdFailureText.text =
+                context.getString(R.string.cd_dialog_error_invalid_domain)
+            dBind.dacdFailureText.visibility = View.VISIBLE
+            Logger.vv(LOG_TAG_UI, "$TAG invalid domain: $url")
+            return
+        }
         when (selectedType) {
             DomainRulesManager.DomainType.WILDCARD -> {
-                if (!isWildCardEntry(url)) {
+                if (!isWildCardEntry(extractedHost)) {
                     dBind.dacdFailureText.text =
                         context.getString(R.string.cd_dialog_error_invalid_wildcard)
                     dBind.dacdFailureText.visibility = View.VISIBLE
+                    Logger.vv(LOG_TAG_UI, "$TAG invalid wildcard domain: $url")
                     return
                 }
             }
+
             DomainRulesManager.DomainType.DOMAIN -> {
-                if (!isValidDomain(url)) {
+                if (!isValidDomain(extractedHost)) {
                     dBind.dacdFailureText.text =
                         context.getString(R.string.cd_dialog_error_invalid_domain)
                     dBind.dacdFailureText.visibility = View.VISIBLE
+                    Logger.vv(LOG_TAG_UI, "$TAG invalid domain: $url")
                     return
                 }
             }
         }
 
         io {
+            Logger.vv(LOG_TAG_UI, "$TAG domain: $extractedHost, type: $selectedType")
             insertDomain(
-                Utilities.removeLeadingAndTrailingDots(url),
+                Utilities.removeLeadingAndTrailingDots(extractedHost),
                 selectedType,
                 prevDomain,
                 status
             )
+        }
+    }
+
+    // fixme: same as extractHost in CustomDomainFragment, should be moved to a common place
+    private fun extractHost(input: String): String? {
+        val trimmedInput = input.trim()
+
+        return when {
+            // case: valid wildcard input without schema, eg., *.example.com
+            trimmedInput.startsWith("*.") && !trimmedInput.contains("://") -> {
+                trimmedInput
+            }
+
+            // case: invalid wildcard with schema, eg., https://*.example.com
+            trimmedInput.contains("://") && trimmedInput.contains("*") -> {
+                null // Invalid: Wildcards shouldn't appear in URLs
+            }
+
+            // case: standard URL input, eg., https://www.example.com
+            trimmedInput.contains("://") -> {
+                try {
+                    // return the host part of the URL
+                    // only www. is the common prefix you'd want to strip for cosmetic or
+                    // standardization reasons (like www.google.com → google.com). Other subdomains
+                    // (e.g., mail., api., m.) are actually part of the valid hostname and
+                    // should not be removed
+                    val uri = URI(trimmedInput)
+                    uri.host?.removePrefix("www.") // remove 'www.' prefix if present
+                } catch (e: Exception) {
+                    null
+                }
+            }
+
+            // case: plain domain (no schema, no wildcard), eg., example.com
+            else -> trimmedInput
         }
     }
 
@@ -367,6 +343,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         prevDomain: CustomDomain,
         status: DomainRulesManager.Status
     ) {
+        Logger.i(LOG_TAG_UI, "$TAG insert/update domain: $domain, type: $type")
         DomainRulesManager.updateDomainRule(domain, status, type, prevDomain)
         uiCtx {
             Utilities.showToastUiCentered(
@@ -383,6 +360,10 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         private lateinit var customDomain: CustomDomain
 
         fun update(cd: CustomDomain) {
+            this.customDomain = cd
+
+            b.customDomainCheckbox.isChecked = selectedItems.contains(cd)
+            b.customDomainCheckbox.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
             io {
                 val appInfo = FirewallManager.getAppInfoByUid(cd.uid)
                 val appNames = FirewallManager.getAppNamesByUid(cd.uid)
@@ -399,29 +380,60 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
                         b.customDomainAppIconIv
                     )
 
-                    this.customDomain = cd
-                    b.customDomainLabelTv.text = customDomain.domain
-                    b.customDomainToggleGroup.tag = 1
 
-                    // update toggle group button based on the status
-                    updateToggleGroup(customDomain.status)
-                    // whether to show the toggle group or not
-                    toggleActionsUi()
+                    b.customDomainLabelTv.text = customDomain.domain
+
                     // update status in desc and status flag (N/B/W)
                     updateStatusUi(
-                        DomainRulesManager.Status.getStatus(customDomain.status),
-                        customDomain.modifiedTs
+                        DomainRulesManager.Status.getStatus(cd.status),
+                        cd.modifiedTs
                     )
 
-                    b.customDomainToggleGroup.addOnButtonCheckedListener(domainRulesGroupListener)
+                    b.customDomainEditIcon.setOnClickListener { showEditDomainDialog(cd) }
 
-                    b.customDomainEditIcon.setOnClickListener { showEditDomainDialog(customDomain) }
+                    b.customDomainExpandIcon.setOnClickListener {
+                        showButtonsBottomSheet(customDomain)
+                        //toggleActionsUi()
+                    }
 
-                    b.customDomainExpandIcon.setOnClickListener { toggleActionsUi() }
+                    b.customDomainContainer.setOnClickListener {
+                        if (isSelectionMode) {
+                            toggleSelection(cd)
+                        } else {
+                            showButtonsBottomSheet(customDomain)
+                        }
+                    }
 
-                    b.customDomainContainer.setOnClickListener { toggleActionsUi() }
+                    b.customDomainSeeMoreChip.setOnClickListener { openAppWiseRulesActivity(cd.uid) }
+
+                    b.customDomainContainer.setOnLongClickListener {
+                        isSelectionMode = true
+                        selectedItems.add(cd)
+                        notifyDataSetChanged()
+                        true
+                    }
                 }
             }
+        }
+
+        private fun toggleSelection(item: CustomDomain) {
+            if (selectedItems.contains(item)) {
+                selectedItems.remove(item)
+                b.customDomainCheckbox.isChecked = false
+            } else {
+                selectedItems.add(item)
+                b.customDomainCheckbox.isChecked = true
+            }
+        }
+
+        private fun openAppWiseRulesActivity(uid: Int) {
+            val intent = Intent(context, CustomRulesActivity::class.java)
+            intent.putExtra(
+                Constants.VIEW_PAGER_SCREEN_TO_LOAD,
+                CustomRulesActivity.Tabs.DOMAIN_RULES.screen
+            )
+            intent.putExtra(Constants.INTENT_UID, uid)
+            context.startActivity(intent)
         }
 
         private fun getAppName(uid: Int, appNames: List<String>): String {
@@ -447,85 +459,6 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
             }
         }
 
-        private fun updateToggleGroup(id: Int) {
-            val fid = findSelectedRuleByTag(id) ?: return
-
-            val t = toggleBtnUi(fid)
-
-            when (id) {
-                DomainRulesManager.Status.NONE.id -> {
-                    b.customDomainToggleGroup.check(b.customDomainTgNoRule.id)
-                    selectToggleBtnUi(b.customDomainTgNoRule, t)
-                    unselectToggleBtnUi(b.customDomainTgBlock)
-                    unselectToggleBtnUi(b.customDomainTgWhitelist)
-                }
-                DomainRulesManager.Status.BLOCK.id -> {
-                    b.customDomainToggleGroup.check(b.customDomainTgBlock.id)
-                    selectToggleBtnUi(b.customDomainTgBlock, t)
-                    unselectToggleBtnUi(b.customDomainTgNoRule)
-                    unselectToggleBtnUi(b.customDomainTgWhitelist)
-                }
-                DomainRulesManager.Status.TRUST.id -> {
-                    b.customDomainToggleGroup.check(b.customDomainTgWhitelist.id)
-                    selectToggleBtnUi(b.customDomainTgWhitelist, t)
-                    unselectToggleBtnUi(b.customDomainTgBlock)
-                    unselectToggleBtnUi(b.customDomainTgNoRule)
-                }
-            }
-        }
-
-        private val domainRulesGroupListener =
-            MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
-                val b: MaterialButton = b.customDomainToggleGroup.findViewById(checkedId)
-
-                val statusId = findSelectedRuleByTag(getTag(b.tag))
-                // delete button
-                if (statusId == null && isChecked) {
-                    group.clearChecked()
-                    showDialogForDelete(customDomain)
-                    return@OnButtonCheckedListener
-                }
-
-                // invalid selection
-                if (statusId == null) {
-                    return@OnButtonCheckedListener
-                }
-
-                if (isChecked) {
-                    // See CustomIpAdapter.kt for the same code (ipRulesGroupListener)
-                    val hasStatusChanged = customDomain.status != statusId.id
-                    if (!hasStatusChanged) {
-                        return@OnButtonCheckedListener
-                    }
-                    val t = toggleBtnUi(statusId)
-                    // update toggle button
-                    selectToggleBtnUi(b, t)
-                    // update status in desc and status flag (N/B/W)
-                    updateStatusUi(statusId, customDomain.modifiedTs)
-                    // change status based on selected btn
-                    changeDomainStatus(statusId, customDomain)
-                } else {
-                    unselectToggleBtnUi(b)
-                }
-            }
-
-        // each button in the toggle group is associated with tag value.
-        // tag values are ids of DomainRulesManager.DomainStatus
-        private fun getTag(tag: Any): Int {
-            return tag.toString().toIntOrNull() ?: 0
-        }
-
-        private fun toggleActionsUi() {
-            if (b.customDomainToggleGroup.tag == 0) {
-                b.customDomainToggleGroup.tag = 1
-                b.customDomainToggleGroup.visibility = View.VISIBLE
-                return
-            }
-
-            b.customDomainToggleGroup.tag = 0
-            b.customDomainToggleGroup.visibility = View.GONE
-        }
-
         private fun updateStatusUi(status: DomainRulesManager.Status, modifiedTs: Long) {
             val now = System.currentTimeMillis()
             val uptime = System.currentTimeMillis() - modifiedTs
@@ -547,6 +480,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
                             time
                         )
                 }
+
                 DomainRulesManager.Status.BLOCK -> {
                     b.customDomainStatusIcon.text = context.getString(R.string.cd_blocked_initial)
                     b.customDomainStatusTv.text =
@@ -556,6 +490,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
                             time
                         )
                 }
+
                 DomainRulesManager.Status.NONE -> {
                     b.customDomainStatusIcon.text = context.getString(R.string.cd_no_rule_initial)
                     b.customDomainStatusTv.text =
@@ -581,105 +516,47 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
 
         fun update(cd: CustomDomain) {
             this.customDomain = cd
+            b.customDomainCheckbox.isChecked = selectedItems.contains(cd)
+            b.customDomainCheckbox.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
             b.customDomainLabelTv.text = customDomain.domain
-            b.customDomainToggleGroup.tag = 1
 
-            // update toggle group button based on the status
-            updateToggleGroup(customDomain.status)
-            // whether to show the toggle group or not
-            toggleActionsUi()
             // update status in desc and status flag (N/B/W)
             updateStatusUi(
                 DomainRulesManager.Status.getStatus(customDomain.status),
                 customDomain.modifiedTs
             )
 
-            b.customDomainToggleGroup.addOnButtonCheckedListener(domainRulesGroupListener)
-
             b.customDomainEditIcon.setOnClickListener { showEditDomainDialog(customDomain) }
 
-            b.customDomainExpandIcon.setOnClickListener { toggleActionsUi() }
-
-            b.customDomainContainer.setOnClickListener { toggleActionsUi() }
-        }
-
-        private fun updateToggleGroup(id: Int) {
-            val fid = findSelectedRuleByTag(id) ?: return
-
-            val t = toggleBtnUi(fid)
-
-            when (id) {
-                DomainRulesManager.Status.NONE.id -> {
-                    b.customDomainToggleGroup.check(b.customDomainTgNoRule.id)
-                    selectToggleBtnUi(b.customDomainTgNoRule, t)
-                    unselectToggleBtnUi(b.customDomainTgBlock)
-                    unselectToggleBtnUi(b.customDomainTgWhitelist)
-                }
-                DomainRulesManager.Status.BLOCK.id -> {
-                    b.customDomainToggleGroup.check(b.customDomainTgBlock.id)
-                    selectToggleBtnUi(b.customDomainTgBlock, t)
-                    unselectToggleBtnUi(b.customDomainTgNoRule)
-                    unselectToggleBtnUi(b.customDomainTgWhitelist)
-                }
-                DomainRulesManager.Status.TRUST.id -> {
-                    b.customDomainToggleGroup.check(b.customDomainTgWhitelist.id)
-                    selectToggleBtnUi(b.customDomainTgWhitelist, t)
-                    unselectToggleBtnUi(b.customDomainTgBlock)
-                    unselectToggleBtnUi(b.customDomainTgNoRule)
-                }
+            b.customDomainExpandIcon.setOnClickListener {
+                showButtonsBottomSheet(customDomain)
+                //toggleActionsUi()
             }
-        }
 
-        private val domainRulesGroupListener =
-            MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
-                val b: MaterialButton = b.customDomainToggleGroup.findViewById(checkedId)
-
-                val statusId = findSelectedRuleByTag(getTag(b.tag))
-                // delete button
-                if (statusId == null && isChecked) {
-                    group.clearChecked()
-                    showDialogForDelete(customDomain)
-                    return@OnButtonCheckedListener
-                }
-
-                // invalid selection
-                if (statusId == null) {
-                    return@OnButtonCheckedListener
-                }
-
-                if (isChecked) {
-                    // See CustomIpAdapter.kt for the same code (ipRulesGroupListener)
-                    val hasStatusChanged = customDomain.status != statusId.id
-                    if (!hasStatusChanged) {
-                        return@OnButtonCheckedListener
-                    }
-                    val t = toggleBtnUi(statusId)
-                    // update toggle button
-                    selectToggleBtnUi(b, t)
-                    // update status in desc and status flag (N/B/W)
-                    updateStatusUi(statusId, customDomain.modifiedTs)
-                    // change status based on selected btn
-                    changeDomainStatus(statusId, customDomain)
+            b.customDomainContainer.setOnClickListener {
+                if (isSelectionMode) {
+                    toggleSelection(cd)
                 } else {
-                    unselectToggleBtnUi(b)
+                    showButtonsBottomSheet(customDomain)
                 }
             }
 
-        // each button in the toggle group is associated with tag value.
-        // tag values are ids of DomainRulesManager.DomainStatus
-        private fun getTag(tag: Any): Int {
-            return tag.toString().toIntOrNull() ?: 0
+            b.customDomainContainer.setOnLongClickListener {
+                isSelectionMode = true
+                selectedItems.add(cd)
+                notifyDataSetChanged()
+                true
+            }
         }
 
-        private fun toggleActionsUi() {
-            if (b.customDomainToggleGroup.tag == 0) {
-                b.customDomainToggleGroup.tag = 1
-                b.customDomainToggleGroup.visibility = View.VISIBLE
-                return
+        private fun toggleSelection(item: CustomDomain) {
+            if (selectedItems.contains(item)) {
+                selectedItems.remove(item)
+                b.customDomainCheckbox.isChecked = false
+            } else {
+                selectedItems.add(item)
+                b.customDomainCheckbox.isChecked = true
             }
-
-            b.customDomainToggleGroup.tag = 0
-            b.customDomainToggleGroup.visibility = View.GONE
         }
 
         private fun updateStatusUi(status: DomainRulesManager.Status, modifiedTs: Long) {
@@ -703,6 +580,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
                             time
                         )
                 }
+
                 DomainRulesManager.Status.BLOCK -> {
                     b.customDomainStatusIcon.text = context.getString(R.string.cd_blocked_initial)
                     b.customDomainStatusTv.text =
@@ -712,6 +590,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
                             time
                         )
                 }
+
                 DomainRulesManager.Status.NONE -> {
                     b.customDomainStatusIcon.text = context.getString(R.string.cd_no_rule_initial)
                     b.customDomainStatusTv.text =
@@ -730,6 +609,36 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         }
     }
 
+    private fun toggleBtnUi(id: DomainRulesManager.Status): ToggleBtnUi {
+        return when (id) {
+            DomainRulesManager.Status.NONE -> {
+                ToggleBtnUi(
+                    fetchColor(context, R.attr.chipTextNeutral),
+                    fetchColor(context, R.attr.chipBgColorNeutral)
+                )
+            }
+
+            DomainRulesManager.Status.BLOCK -> {
+                ToggleBtnUi(
+                    fetchColor(context, R.attr.chipTextNegative),
+                    fetchColor(context, R.attr.chipBgColorNegative)
+                )
+            }
+
+            DomainRulesManager.Status.TRUST -> {
+                ToggleBtnUi(
+                    fetchColor(context, R.attr.chipTextPositive),
+                    fetchColor(context, R.attr.chipBgColorPositive)
+                )
+            }
+        }
+    }
+
+    private fun showButtonsBottomSheet(customDomain: CustomDomain) {
+        val bottomSheetFragment = CustomDomainRulesBtmSheet(customDomain)
+        bottomSheetFragment.show(fragment.parentFragmentManager, bottomSheetFragment.tag)
+    }
+
     private fun io(f: suspend () -> Unit) {
         (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
     }
@@ -738,3 +647,4 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         withContext(Dispatchers.Main) { f() }
     }
 }
+

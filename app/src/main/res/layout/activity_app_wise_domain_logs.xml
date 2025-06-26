@@ -11,7 +11,7 @@
         style="@style/toggleButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:checkedButton="@id/tb_recent_toggle_btn"
+        app:checkedButton="@id/tb_weekly_toggle_btn"
         app:selectionRequired="true"
         app:singleSelection="true">
 

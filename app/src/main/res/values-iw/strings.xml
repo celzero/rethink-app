@@ -199,9 +199,9 @@
     <string name="hsf_start_btn_state" translatable="true">התחל</string>
     <string name="hsf_whats_new_chip_text" translatable="true">מה חדש</string>
     <string name="hsf_proxy_chip_text" translatable="true">פרוקסי פעיל</string>
-    <string name="about_twitter" translatable="true">עקבו אחרינו בטוויטר</string>
     <string name="univ_ip_delete_dialog_positive" translatable="true">למחוק הכל</string>
-    <string name="about_mozilla" translatable="true">Rethink נתמכת על ידי Mozilla Builders, FOSS United Foundation וOSOM Products Inc.</string>
+    <string name="about_twitter" translatable="true">עקבו אחרינו בטוויטר</string>
+    <string name="about_mozilla" translatable="true">RethinkDNS היא חלק מתוכנית ה-MVP של Mozilla Builders.</string>
     <string name="vpn_profile_error" translatable="true">לא ניתן היה להפעיל את פרופיל VPN.</string>
     <string name="cd_dns_proxy_mode_external" translatable="true">חיצוני</string>
     <string name="ctbs_dialog_negative_btn" translatable="true">חזור</string>

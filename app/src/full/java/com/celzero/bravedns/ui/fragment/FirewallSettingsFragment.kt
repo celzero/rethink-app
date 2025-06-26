@@ -50,10 +50,6 @@ class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings) {
 
     private fun openCustomIpScreen() {
         val intent = Intent(requireContext(), CustomRulesActivity::class.java)
-        // this activity is either being started in a new task or bringing to the top an
-        // existing task, then it will be launched as the front door of the task.
-        // This will result in the application to have that task in the proper state.
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         intent.putExtra(
             Constants.VIEW_PAGER_SCREEN_TO_LOAD,
             CustomRulesActivity.Tabs.IP_RULES.screen
@@ -68,7 +64,6 @@ class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings) {
 
     private fun openAppWiseIpScreen() {
         val intent = Intent(requireContext(), CustomRulesActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         intent.putExtra(
             Constants.VIEW_PAGER_SCREEN_TO_LOAD,
             CustomRulesActivity.Tabs.IP_RULES.screen
@@ -80,7 +75,6 @@ class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings) {
 
     private fun openUniversalFirewallScreen() {
         val intent = Intent(requireContext(), UniversalFirewallSettingsActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
     }
 }

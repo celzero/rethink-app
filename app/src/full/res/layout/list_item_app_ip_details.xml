@@ -86,7 +86,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toStartOf="@id/acd_status_button"
+            android:layout_toStartOf="@id/acd_down_arrow_iv"
             android:background="@drawable/drawable_purple_gradient"
             android:fontFamily="sans-serif-light"
             android:gravity="center"
@@ -99,7 +99,7 @@
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/acd_status_button"
+            android:id="@+id/acd_down_arrow_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"

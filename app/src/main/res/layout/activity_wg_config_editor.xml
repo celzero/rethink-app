@@ -22,6 +22,7 @@
             android:paddingEnd="5dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/wg_config_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -235,6 +236,15 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/amz_props"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:layout_below="@id/wg_config_layout"
+                android:textColor="?attr/primaryLightColorText"/>
+
 
             <View
                 android:layout_width="match_parent"

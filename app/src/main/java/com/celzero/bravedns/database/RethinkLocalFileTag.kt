@@ -41,6 +41,7 @@ class RethinkLocalFileTag {
     override fun equals(other: Any?): Boolean {
         if (other !is RethinkLocalFileTag) return false
         if (value != other.value) return false
+        if (isSelected != other.isSelected) return false
         return true
     }
 

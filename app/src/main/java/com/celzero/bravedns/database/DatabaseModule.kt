@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.database
 
+import com.celzero.bravedns.data.AppConnection
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -22,6 +23,7 @@ object DatabaseModule {
     private val databaseModule = module {
         single { AppDatabase.buildDatabase(androidContext()) }
         single { LogDatabase.buildDatabase(androidContext()) }
+        single { ConsoleLogDatabase.buildDatabase(androidContext()) }
     }
     private val daoModule = module {
         single { get<AppDatabase>().appInfoDAO() }
@@ -44,7 +46,12 @@ object DatabaseModule {
         single { get<AppDatabase>().tcpProxyEndpointDao() }
         single { get<AppDatabase>().dotEndpointDao() }
         single { get<AppDatabase>().odohEndpointDao() }
+        single { get<AppDatabase>().rpnProxyDao() }
+        single { get<AppDatabase>().wgHopMapDao() }
+
         single { get<LogDatabase>().rethinkConnectionLogDAO() }
+        single { get<ConsoleLogDatabase>().consoleLogDAO() }
+        single { get<LogDatabase>().statsSummaryDAO() }
     }
     private val repositoryModule = module {
         single { get<AppDatabase>().appInfoRepository() }
@@ -67,7 +74,12 @@ object DatabaseModule {
         single { get<AppDatabase>().tcpProxyEndpointRepository() }
         single { get<AppDatabase>().dotEndpointRepository() }
         single { get<AppDatabase>().odohEndpointRepository() }
+        single { get<AppDatabase>().rpnProxyRepository() }
+        single { get<AppDatabase>().wgHopMapRepository()}
+
         single { get<LogDatabase>().rethinkConnectionLogRepository() }
+
+        single { get<ConsoleLogDatabase>().consoleLogRepository() }
     }
 
     val modules = listOf(databaseModule, daoModule, repositoryModule)
