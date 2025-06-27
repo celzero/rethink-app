@@ -638,7 +638,7 @@
     <string name="cd_dialog_title">Aggiungi dominio</string>
     <string name="cd_dialog_desc">Consenti o blocca uno specifico URL (dominio) o un insieme di questi utilizzando una wild-card. es. *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Scrivi %1$s</string>
-    <string name="cd_dialog_error_invalid_domain">URL (dominio) non valido.</string>
+    <string name="cd_dialog_error_invalid_domain">URL o nome di dominio non valido.</string>
     <string name="cd_dialog_error_invalid_wildcard">Wildcard non valida.</string>
     <string name="cd_blocked_initial">B</string>
     <string name="cd_no_rule_initial">N</string>
@@ -825,12 +825,12 @@
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Dominio affidabile (Univ)</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">aggirerà le regole universali DNS e firewall</string>
     <string name="bypass_dns_firewall_tooltip">%1$s funziona solo con il DNS di Rethink</string>
-    <string name="dc_refresh_toast" translatable="true">Aggiornamento DNS completato</string>
+    <string name="dc_refresh_toast" translatable="true">Aggiornamento completato</string>
     <string name="settings_default_dns_desc" translatable="true">Nei rari casi in cui non sia possibile accertare il DNS preferito dall\'utente, viene utilizzato il DNS di riserva.</string>
     <string name="lbl_logs" translatable="true">Registri</string>
     <string name="logs_card_dns_count" translatable="true">%1$s interrogazioni</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS bloccato</string>
-    <string name="dc_setting_dns_cache_heading" translatable="true">Booster DNS (sperimentale)</string>
+    <string name="dc_setting_dns_cache_heading" translatable="true">Booster DNS</string>
     <string name="ada_app_firewall" translatable="true">Firewall</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">Off (predefinito)</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
@@ -938,5 +938,8 @@
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s è disabilitato perché i proxy sono attivi</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> potrebbe causare una perdita di connettività. Modificare l\'impostazione per consentire a Rethink di utilizzare dati e altre risorse quando è in background.</string>
     <string name="dc_proxy_dns_desc" translatable="true">Non fare mai proxy di DNS su proxy come Always-on WireGuard, SOCKS5, HTTP.</string>
-    <string name="lbl_notification" translatable="true">notifica</string>
+    <string name="lbl_notification" translatable="true">notifiche</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">Questa connessione è stata inoltrata al Proxy preferito dall\'utente.<br/><br/> Per cambiare, andare su <i>Proxy</i> dalla schermata <i>Configura</i>.</string>
+    <string name="cd_deleted_toast" translatable="true">Cancellate tutte le regole di dominio</string>
+    <string name="cd_toast_edit" translatable="true">Modificato</string>
 </resources>
