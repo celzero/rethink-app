@@ -74,6 +74,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val RPN_MODE = "rpn_mode"
         const val DIAL_TIMEOUT_SEC = "dial_timeout_sec"
         const val AUTO_DIALS_PARALLEL = "auto_dials_parallel"
+        const val FAIL_OPEN_ON_NO_NETWORK = "fail_open_on_no_network"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -304,8 +305,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     var pingv6Ips by stringPref("ping_ipv6_ips").withDefault<String>(Constants.ip6probes.joinToString(","))
 
-    // TODO: do we need this? instead use in-memory variable
-    var consoleLogEnabled by booleanPref("console_log_enabled").withDefault<Boolean>(false)
+    var pingv4Url by stringPref("ping_ipv4_url").withDefault<String>(Constants.urlV4probe)
+
+    var pingv6Url by stringPref("ping_ipv6_url").withDefault<String>(Constants.urlV6probe)
 
     // camera and mic access
     var micCamAccess by booleanPref("mic_camera_access").withDefault<Boolean>(false)
@@ -338,10 +340,13 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var slowdownMode by booleanPref("slowdown_mode").withDefault<Boolean>(false)
 
     // different modes the rpn proxy can function, see enum RpnMode
-    var rpnMode by intPref("rpn_mode").withDefault<Int>(RpnProxyManager.RpnMode.ANTI_CENSORSHIP.id)
+    var rpnMode by intPref("rpn_mode").withDefault<Int>(1)
 
     // current rpn state, see enum RpnState
-    var rpnState by intPref("rpn_state").withDefault<Int>(RpnProxyManager.RpnState.INACTIVE.id)
+    var rpnState by intPref("rpn_state").withDefault<Int>(RpnProxyManager.RpnState.DISABLED.id)
+
+    // subscribe product id for the current user, empty string if not subscribed
+    var rpnProductId by stringPref("rpn_product_id").withDefault<String>("")
 
     var nwEngExperimentalFeatures by booleanPref("network_engine_experimental").withDefault<Boolean>(false)
 
@@ -352,13 +357,25 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     var showConfettiOnRPlus by booleanPref("show_confetti_on_rplus").withDefault<Boolean>(true)
 
-    var autoDialsParallel by booleanPref("auto_dials_parallel").withDefault<Boolean>(true)
+    var autoDialsParallel by booleanPref("auto_dials_parallel").withDefault<Boolean>(false)
 
-    // user setting whether to download ip info for the ip addresses
+    // user setting whether to download ip info for the given ip address
     var downloadIpInfo by booleanPref("download_ip_info").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
 
     // user setting to allow only added packages can trigger the app
     var appTriggerPackages by stringPref("app_trigger_packages").withDefault<String>("")
+
+    // last key rotation time
+    var pipKeyRotationTime by longPref("pip_key_rotation_time").withDefault<Long>(INIT_TIME_MS)
+
+    // fail-open on no network
+    // TODO: add routes as normal but do not send fd to netstack
+    // repopulateTrackedNetworks also fails open see isAnyNwValidated
+    var failOpenOnNoNetwork by booleanPref("fail_open_on_no_network").withDefault<Boolean>(false)
+
+    // last grace period reminder time, when rethinkdns+ is enabled and user is cancelled/expired
+    // this is used to show a reminder to the user to renew the subscription with grace period
+    var lastGracePeriodReminderTime by longPref("last_grace_period_reminder_time").withDefault<Long>(INIT_TIME_MS)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
