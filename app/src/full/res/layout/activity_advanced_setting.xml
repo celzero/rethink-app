@@ -225,10 +225,11 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
+                        android:alpha="0.5"
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
                         android:padding="10dp"
-                        android:src="@drawable/ic_ip_address" />
+                        android:src="@drawable/ic_timeout" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -400,8 +401,9 @@
                         android:layout_marginTop="5dp"
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
+                        android:alpha="0.5"
                         android:padding="10dp"
-                        android:src="@drawable/ic_experimental" />
+                        android:src="@drawable/ic_auto_dial" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -455,9 +457,10 @@
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
                         android:layout_marginEnd="5dp"
+                        android:alpha="0.5"
                         android:layout_marginBottom="5dp"
                         android:padding="10dp"
-                        android:src="@drawable/ic_experimental" />
+                        android:src="@drawable/ic_ip_info" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -656,7 +659,7 @@
                         android:layout_marginBottom="5dp"
                         android:alpha="0.5"
                         android:padding="10dp"
-                        android:src="@drawable/ic_delete" />
+                        android:src="@drawable/ic_tasker" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
