@@ -35,4 +35,7 @@
     <string name="status_app_error">ایپ کی خرابی</string>
     <string name="status_no_internet">انٹرنیٹ نہیں</string>
     <string name="status_protected_with_private_dns">‍</string>
+    <string name="lbl_apply" translatable="true">لاگو کرو</string>
+    <string name="lbl_dismiss" translatable="true">رد کرو</string>
+    <string name="lbl_all" translatable="true">تمام</string>
 </resources>
