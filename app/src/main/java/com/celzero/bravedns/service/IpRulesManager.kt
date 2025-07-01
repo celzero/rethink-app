@@ -95,8 +95,8 @@ object IpRulesManager : KoinComponent {
         }
     }
 
-    private fun logd(msg: String) {
-        Logger.d(LOG_TAG_FIREWALL, msg)
+    private fun logv(msg: String) {
+        Logger.v(LOG_TAG_FIREWALL, msg)
     }
 
     suspend fun load(): Long {
@@ -109,7 +109,7 @@ object IpRulesManager : KoinComponent {
             val v = treeVal(it.uid, port, it.status, it.proxyId, it.proxyCC)
             if (k != null) {
                 try {
-                    logd("iptree.add($k, $v)")
+                    Logger.i(LOG_TAG_FIREWALL, "iptree.add($k, $v)")
                     iptree.add(k.togs(), v)
                     if (it.proxyCC.isNotEmpty()) selectedCCs.add(it.proxyCC)
                 } catch (e: Exception) {
@@ -270,40 +270,40 @@ object IpRulesManager : KoinComponent {
 
         resultsCache.getIfPresent(ck)?.let {
             // return only if both ip and app(uid) matches
-            logd("match in cache $uid $ipstr: $it")
+            Logger.i(LOG_TAG_FIREWALL, "match in cache $uid $ipstr: $it")
             return it
         }
 
         getMostSpecificRuleMatch(uid, ipstr, port).let {
-            logd("ip rule for $uid $ipstr $port => ${it.name} ??")
+            logv("ip rule for $uid $ipstr $port => ${it.name} ??")
             if (it != IpRuleStatus.NONE) {
                 resultsCache.put(ck, it)
                 return it
             }
         }
         getMostSpecificRuleMatch(uid, ipstr).let {
-            logd("ip rule for $uid $ipstr => ${it.name} ??")
+            logv("ip rule for $uid $ipstr => ${it.name} ??")
             if (it != IpRuleStatus.NONE) {
                 resultsCache.put(ck, it)
                 return it
             }
         }
         getMostSpecificRouteMatch(uid, ipstr, port).let {
-            logd("route rule for $uid $ipstr $port => ${it.name} ??")
+            logv("route rule for $uid $ipstr $port => ${it.name} ??")
             if (it != IpRuleStatus.NONE) {
                 resultsCache.put(ck, it)
                 return it
             }
         }
         getMostSpecificRouteMatch(uid, ipstr).let {
-            logd("route rule for $uid $ipstr => ${it.name} ??")
+            logv("route rule for $uid $ipstr => ${it.name} ??")
             if (it != IpRuleStatus.NONE) {
                 resultsCache.put(ck, it)
                 return it
             }
         }
 
-        logd("hasRule? NO $uid, $ipstr, $port")
+        Logger.i(LOG_TAG_FIREWALL, "hasRule? NO $uid, $ipstr, $port")
         resultsCache.put(ck, IpRuleStatus.NONE)
         return IpRuleStatus.NONE
     }
@@ -311,31 +311,31 @@ object IpRulesManager : KoinComponent {
 
     fun hasProxy(uid: Int, ipstr: String, port: Int): Pair<String, String> {
         getMostSpecificMatchProxies(uid, ipstr, port).let {
-            logd("proxy for $uid $ipstr $port => ${it.first}, ${it.second}")
+            logv("proxy for $uid $ipstr $port => ${it.first}, ${it.second}")
             if (it.first.isNotEmpty() && it.second.isNotEmpty()) {
                 return it
             }
         }
         getMostSpecificMatchProxies(uid, ipstr).let {
-            logd("proxy for $uid $ipstr => ${it.first}, ${it.second}")
+            logv("proxy for $uid $ipstr => ${it.first}, ${it.second}")
             if (it.first.isNotEmpty() && it.second.isNotEmpty()) {
                 return it
             }
         }
         getMostSpecificRouteProxies(uid, ipstr, port).let {
-            logd("route rule for $uid $ipstr $port => ${it.first}, ${it.second}")
+            logv("route rule for $uid $ipstr $port => ${it.first}, ${it.second}")
             if (it.first.isNotEmpty() && it.second.isNotEmpty()) {
                 return it
             }
         }
         getMostSpecificRouteProxies(uid, ipstr).let {
-            logd("route rule for $uid $ipstr => ${it.first}, ${it.second}")
+            logv("route rule for $uid $ipstr => ${it.first}, ${it.second}")
             if (it.first.isNotEmpty() && it.second.isNotEmpty()) {
                 return it
             }
         }
 
-        logd("hasProxy? NO $uid, $ipstr, $port")
+        Logger.i(LOG_TAG_FIREWALL, "hasProxy? NO $uid, $ipstr, $port")
         return Pair("","")
     }
 
@@ -361,7 +361,7 @@ object IpRulesManager : KoinComponent {
             // rules at the end of the list have higher precedence as they're more specific
             // (think: 0.0.0.0/0 vs 1.1.1.1/32)
             val x = iptree.getLike(k.togs(), vlike).tos()
-            logd("getMostSpecificRuleMatch: $uid, $k, $vlike => $x")
+            logv("getMostSpecificRuleMatch: $uid, $k, $vlike => $x")
             return treeValsFromCsv(x)
                 .map { treeValStatus(it) }
                 .lastOrNull { it != IpRuleStatus.NONE } ?: IpRuleStatus.NONE
@@ -376,7 +376,7 @@ object IpRulesManager : KoinComponent {
             // rules at the end of the list have higher precedence as they're more specific
             // (think: 0.0.0.0/0 vs 1.1.1.1/32)
             val x = iptree.getLike(k.togs(), vlike).tos()
-            logd("getMostSpecificRuleMatch: $uid, $k, $vlike => $x")
+            logv("getMostSpecificRuleMatch: $uid, $k, $vlike => $x")
             return treeValsFromCsv(x)
                 .map { treeValProxies(it) }.lastOrNull { it.first.isNotEmpty() } ?: Pair("","")
         }
@@ -392,7 +392,7 @@ object IpRulesManager : KoinComponent {
             val x = iptree.valuesLike(k.togs(), vlike).tos()
             // ex: uid: 10169, k: 142.250.67.78, vlike: 10169:443 => x: 10169:443:0
             // (10169:443:0) => (uid : port : rule[0->none, 1-> block, 2 -> trust, 3 -> bypass])
-            logd("getMostSpecificRouteMatch: $uid, $k, $vlike => $x")
+            logv("getMostSpecificRouteMatch: $uid, $k, $vlike => $x")
             return treeValsFromCsv(x)
                 .map { treeValStatus(it) }
                 .lastOrNull { it != IpRuleStatus.NONE } ?: IpRuleStatus.NONE
@@ -409,7 +409,7 @@ object IpRulesManager : KoinComponent {
             val x = iptree.valuesLike(k.togs(), vlike).tos()
             // ex: uid: 10169, k: 142.250.67.78, vlike: 10169:443 => x: 10169:443:0
             // (10169:443:0) => (uid : port : rule[0->none, 1-> block, 2 -> trust, 3 -> bypass])
-            logd("getMostSpecificRouteMatch: $uid, $k, $vlike => $x")
+            logv("getMostSpecificRouteMatch: $uid, $k, $vlike => $x")
             return treeValsFromCsv(x)
                 .map { treeValProxies(it) }.lastOrNull { it.first.isNotEmpty() } ?: Pair("","")
         }
