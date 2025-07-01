@@ -261,6 +261,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE14.id -> RULE14
                 RULE15.id -> RULE15
                 RULE16.id -> RULE16
+                RULE17.id -> RULE17
                 else -> null
             }
         }
@@ -301,6 +302,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE14.id -> R.drawable.bs_dns_home_screen
                 RULE15.id -> R.drawable.ic_bypass
                 RULE16.id -> R.drawable.ic_proxy_white
+                RULE17.id -> R.drawable.ic_proxy_white
                 else -> R.drawable.bs_dns_home_screen
             }
         }
