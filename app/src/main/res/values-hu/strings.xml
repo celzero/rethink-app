@@ -610,4 +610,5 @@
     <string name="fapps_metered_block_dialog_message" translatable="true">A <i>listán szereplő</i> alkalmazások kapcsolatainak blokkolása a mért (mobil) hálózaton?</string>
     <string name="fapps_metered_unblock_dialog_title" translatable="true">Engedélyezés mért hálózaton</string>
     <string name="fapps_metered_unblock_dialog_message" translatable="true">Engedélyezi a(z) felsorolt alkalmazások internetkapcsolatát mért (mobil) hálózaton?</string>
+    <string name="lbl_battery_optimization" translatable="true">Akkumulátor optimalizálása</string>
 </resources>
