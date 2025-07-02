@@ -1,0 +1,31 @@
+Köszöntjük egy biztonságosabb, átláthatóbb és védettebb Android világában.
+
+VPN: Csatlakozhat több, Ön által választott WireGuard VPN-hez.
+
+Biztonság: Megjeleníti a telepített alkalmazások hálózati tevékenységét, és lehetővé teszi azok letiltását, eltávolítását vagy tűzfalazását.
+
+Védelem: Az első védelmi vonal a kémprogramok, zsarolóvírusok és egyéb kártékony szoftverek ellen, amelyek személyes adatokat lopnak, vagy fiókokat vesznek át. Védelmet nyújt a DNS-manipuláció ellen is, amelyet gyakran alkalmaznak weboldalak, közösségi oldalak és üzenetküldő alkalmazások cenzúrázására.
+
+Gyorsaság: DNS-szervereink több mint 300 helyszínen érhetők el világszerte, hogy az internetkapcsolata a lehető leggyorsabb és legmegbízhatóbb legyen.
+
+Nyitottság: Nyílt forráskódú, és nem tartalmaz semmilyen követőt.
+
+Funkciók
+
+Tűzfal: Megakadályozza, hogy az alkalmazások csatlakozzanak az internethez. Blokkolja a kémprogramokat, kártékony szoftvereket, zsarolóvírusokat és még sok mást.
+
+A tűzfal megakadályozza, hogy bármely alkalmazás WiFi-n vagy mobilhálózaton keresztül csatlakozzon az internethez. Mivel a legtöbb megfigyelési forma adatküldést igényel egy szerver felé, a tűzfal hatékonyan csökkenti a fenyegetést (például: fájlkezelők, ébresztőóra, számológép – ezek működéséhez nincs szükség internetkapcsolatra). A tűzfal funkció az akadálymentesítési szolgáltatást használja a háttérben futó alkalmazások felismeréséhez és szűréséhez.
+
+Monitorozás: Kövesse nyomon a bejövő és kimenő internetes forgalmat.
+
+Ha engedélyezi, a kapcsolati naplók gyűjtésre és elemzésre kerülnek. Az automatikus jelentések ismeretlen vagy gyanús kapcsolatokat jelölnek meg, és feltárják, milyen mértékben próbálják kémprogram-hálózatok ellopni az adatokat. Tesztjeink szerint a forgalom mintegy 60%-a ismert kémprogramokhoz köthető. A naplók szinte valós időben elérhetők a felhasználó számára saját elemzés céljából.
+
+WireGuard: Titkosítja a kimenő internetes forgalmat.
+
+Az alkalmazás gyors, modern, könnyű és biztonságos WireGuard protokollt használ a kimenő kapcsolatok titkosítására, bármely kompatibilis VPN-szolgáltatóval.
+
+Cenzúra elleni védelem:
+
+Az alkalmazás titkosítja az internetkapcsolatot a Rethink által üzemeltetett Domain Name System (DNS) szerver felé, amely több mint 300 helyszínen érhető el világszerte. A DNS-szerver az internet címjegyzéke: pontos címeket biztosít weboldalak vagy alkalmazások eléréséhez.
+
+Adatfigyelő: Kövesse nyomon alkalmazásonként és kapcsolatonként a mobil- vagy WiFi-adathasználatot.
