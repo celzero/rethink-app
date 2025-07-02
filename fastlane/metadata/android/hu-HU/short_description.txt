@@ -1,1 +1,1 @@
-Tűzfalalkalmazás, a WireGuard VPN használata, a hálózat figyelése, a rosszindulatú programok blokkolása, a DNS módosítása.
+Tűzfal, WireGuard VPN, hálózatfigyelés, kártevőblokkolás, DNS-csere.
