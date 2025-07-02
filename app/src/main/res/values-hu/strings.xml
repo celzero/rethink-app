@@ -43,7 +43,7 @@
     <string name="lbl_generated" translatable="true">(generált)</string>
     <string name="lbl_random" translatable="true">(véletlenszerű)</string>
     <string name="lbl_status" translatable="true">Állapot</string>
-    <string name="lbl_remove" translatable="true">Törlés</string>
+    <string name="lbl_remove" translatable="true">Eltávolítás</string>
     <string name="lbl_last" translatable="true">Utolsó</string>
     <string name="lbl_starting" translatable="true">Indítás</string>
     <string name="lbl_overall" translatable="true">Teljes eredmény</string>
@@ -591,7 +591,7 @@
     <string name="fapps_filter_clear_btn" translatable="true">Töröl</string>
     <string name="fapps_filter_parent_installed" translatable="true">Telepítve</string>
     <string name="fapps_filter_parent_system" translatable="true">Rendszer</string>
-    <string name="fapps_firewall_filter_bypass_universal" translatable="true">Bypassed</string>
+    <string name="fapps_firewall_filter_bypass_universal" translatable="true">Bypassed ( megkerülés )</string>
     <string name="fapps_firewall_filter_excluded" translatable="true">Kizárt</string>
     <string name="fapps_firewall_filter_isolate" translatable="true">Elszigetelt</string>
     <string name="fapps_info_dialog_message" translatable="true">Az alkalmazások internetkapcsolatának blokkolása. Az internet-hozzáférés korlátozása segít megelőzni a nem kívánt adatforgalmat, valamint hozzájárul az akkumulátor kíméléséhez.</string>
@@ -601,7 +601,7 @@
     <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Bypass DNS &amp; tűzfal szabályok.</string>
     <string name="fapps_info_exclude_msg" translatable="true">Kizárás mind a DNS-, mind a tűzfal-szabályok alól.</string>
     <string name="fapps_info_isolate_msg" translatable="true">Minden IP-cím blokkolása, kivéve a megbízható (trusted) IP-címeket. Ez azt jelenti, hogy az összes hálózati forgalmat letiltja, kivéve azokat az IP-címeket, amelyeket előzetesen engedélyezett.</string>
-    <string name="fapps_info_dialog_positive_btn" translatable="true">OK</string>
+    <string name="fapps_info_dialog_positive_btn" translatable="true">Rendben</string>
     <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Engedélyezés a nem mért hálózaton</string>
     <string name="fapps_unmetered_block_dialog_title" translatable="true">Blokkolás nem mért hálózaton</string>
     <string name="fapps_unmetered_block_dialog_message" translatable="true">Blokkolja a(z) <i>felsorolt</i> alkalmazások internetkapcsolatát, nem mért (WiFi) hálózaton?</string>
@@ -609,6 +609,7 @@
     <string name="fapps_metered_block_dialog_title" translatable="true">Blokkolás mért hálózaton</string>
     <string name="fapps_metered_block_dialog_message" translatable="true">A <i>listán szereplő</i> alkalmazások kapcsolatainak blokkolása a mért (mobil) hálózaton?</string>
     <string name="fapps_metered_unblock_dialog_title" translatable="true">Engedélyezés mért hálózaton</string>
-    <string name="fapps_metered_unblock_dialog_message" translatable="true">Engedélyezi a(z) felsorolt alkalmazások internetkapcsolatát mért (mobil) hálózaton?</string>
+    <string name="fapps_metered_unblock_dialog_message" translatable="true">Engedélyezi a(z) <i>felsorolt</i> alkalmazások internetkapcsolatát mért (mobil) hálózaton?</string>
     <string name="lbl_battery_optimization" translatable="true">Akkumulátor optimalizálása</string>
+    <string name="fapps_bypass_block_dialog_title" translatable="true">Alkalmazások megkerülése</string>
 </resources>
