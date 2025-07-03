@@ -78,12 +78,12 @@
     <string name="show_logs_disabled_dns_message" translatable="true">A DNS-kérés naplózás le van tiltva. Az újbóli engedélyezéshez lépjen a <i>Beállítások</i> menübe, és kapcsolja be a <i>Helyi naplózás engedélyezése opciót.</i></string>
     <string name="settings_lock_down_mode_desc" translatable="true">Bizonyos opciók le vannak tiltva, amikor a VPN zárolt módba van. <u>Tekintse meg a VPN beállításokat</u>.</string>
     <string name="orbot_none_desc" translatable="true">A fentiek közül egyik sem.</string>
-    <string name="orbot_install_dialog_message" translatable="true">Az Orbot elhozza a Tor szolgáltatásait és funkcionalitását Androidra.</string>
-    <string name="orbot_no_app_toast" translatable="true">Adjon hozzá legalább egy alkalmazást az Orbot számára</string>
+    <string name="orbot_install_dialog_message" translatable="true">Az Orbot a Tor funkcióit és funkcionalitását hozza el az Androidra.</string>
+    <string name="orbot_no_app_toast" translatable="true">Adjon hozzá legalább egy alkalmazást az Orbot engedélyezéséhez</string>
     <string name="settings_general_customize" translatable="true">testreszabás</string>
     <string name="settings_autostart_bootup_heading" translatable="true">Automatikus indítás bekapcsoláskor (kísérleti)</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Állandó értesítés</string>
-    <string name="settings_app_notification_persistent_desc" translatable="true">Készítse el az értesítést tartósan</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Állandó (nem eltüntethető) értesítés beállítása</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (kísérleti)</string>
     <string name="settings_rinr_desc_enabled" translatable="true">A Rethink saját forgalmának átirányítása az alagúton. Ha nem tudja, mit csinál, kapcsolja ki.</string>
     <string name="settings_rinr_dialog_desc" translatable="true">Engedélyezi a<!--settings_network_all_networks--> %1$s beállítást is. Folytatni szeretnéd?</string>
@@ -104,15 +104,15 @@
     <string name="connection_http3" translatable="true">HTTP3</string>
     <string name="settings_connectivity_checks_desc" translatable="true">Kapcsolódási ellenőrzések elküldésre kerülnek a hozzáférhetőség megállapítására.</string>
     <string name="settings_allow_bypass_desc" translatable="true">Engedélyezze a kérelmező alkalmazásoknak, hogy hozzáférjenek az összes elérhető hálózathoz. Ezek az alkalmazások szükség szerint kikerülhetik a Rethink VPN alagútját. Néhány audio/video konferencia alkalmazás, mint a Zoom és a Meet, szükségelheti ezt a megfelelő működéshez.</string>
-    <string name="settings_allow_lan_desc" translatable="true">A LAN, loopback, link-local útvonalak kizárása a Rethink VPN-alagútjából.</string>
+    <string name="settings_allow_lan_desc" translatable="true">Zárja ki a helyi hálózati (LAN), visszacsatolási (loopback), multicast és helyi (link-local) útvonalakat a Rethink VPN-alagútjából.</string>
     <string name="orbot_bs_status_1" translatable="true">A %1$s kapcsolatok továbbítása az Orbot-hoz.</string>
     <string name="orbot_bs_status_4" translatable="true">Egy-kattintásos \"Tor, mint Proxy\" (Orbot) beállítás.</string>
     <string name="orbot_status_arg_2" translatable="true">TCP</string>
     <string name="settings_protocol_translation_dns_inactive" translatable="true">Váltson DNS/DNS+Tűzfal módra a beállítás engedélyezéséhez</string>
     <string name="settings_orbot_notification_content" translatable="true">Hiba a \"Tor, mint Proxy\" indításakor. Nyissa meg az Orbot alkalmazást a kézi indításhoz.</string>
-    <string name="settings_custom_downloader_desc" translatable="true">Ha letiltja, az Android beépített <i>Letöltéskezelő</i> letöltését használja</string>
+    <string name="settings_custom_downloader_desc" translatable="true">Ha letiltja, az Android beépített <i>Letöltéskezelő</i> letöltését használja.</string>
     <string name="settings_app_notification_a13_heading" translatable="true">Alkalmazás értesítés</string>
-    <string name="settings_app_notification_a13_desc" translatable="true">Engedélyezze az értesítéseket az alkalmazás számára</string>
+    <string name="settings_app_notification_a13_desc" translatable="true">Értesítési engedély engedélyezése az alkalmazáshoz</string>
     <string name="settings_dns_proxy_dialog_password" translatable="true">Jelszó</string>
     <string name="settings_socks_forwarding_default_desc" translatable="true">Kapcsolatok továbbítása a SOCKS5 végpontra.</string>
     <string name="settings_notification_dialog_title" translatable="true">Értesítési művelet kiválasztása</string>
@@ -132,7 +132,7 @@
     <string name="status_dns_error" translatable="true">dns hiba</string>
     <string name="private_dns_dialog_heading" translatable="true">Privát DNS kikapcsolása</string>
     <string name="orbot_http_desc" translatable="true">HTTP CONNECT alagutat hoz létre az Orbot-hoz.</string>
-    <string name="orbot_install_dialog_title" translatable="true">Orbot telepítése?</string>
+    <string name="orbot_install_dialog_title" translatable="true">Telepítse az Orbot-ot?</string>
     <string name="status_dns_server_down" translatable="true">dns szerver leállt</string>
     <string name="apps_info_title" translatable="true">Alkalmazások</string>
     <string name="hybrid_mode_info_title" translatable="true">DNS + tűzfal</string>
@@ -146,7 +146,7 @@
     <string name="relative_time_yesterday" translatable="true">Tegnap</string>
     <string name="settings_ip_network_desc" translatable="true">Válasszon az Internetes Protocol verziók között.</string>
     <string name="settings_orbot_desc" translatable="true">Orbot nem-VPN üzemmódban van HTTPS/SOCKS5 használatával.</string>
-    <string name="settings_go_log_desc" translatable="true">Hibakeresési célokra</string>
+    <string name="settings_go_log_desc" translatable="true">Debugging célokra</string>
     <string name="settings_ip_dialog_title" translatable="true">IP verzió kiválasztása</string>
     <string name="settings_theme_dialog_themes_4" translatable="true">Valódi Fekete</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s általános szabály(ok)</string>
@@ -165,21 +165,21 @@
     <string name="download_update_dialog_message_ok" translatable="true">Ön már a legújabb verziót használja.</string>
     <string name="download_update_dialog_failure_title" translatable="true">Valami hiba történt!</string>
     <string name="search_firewall_network_log" translatable="true"><font size="12">Alkalmazások, IP-k, domainek keresése</font></string>
-    <string name="settings_https_desc" translatable="true">Továbbítsa a kapcsolatokat HTTP(S) CONNECT végponthoz.</string>
+    <string name="settings_https_desc" translatable="true">A kapcsolatokat továbbítsa a HTTP(S) CONNECT végpontra.</string>
     <string name="orbot_socks5_desc" translatable="true">Minden TCP kapcsolatot továbbít az Orbot-hoz.</string>
-    <string name="orbot_both" translatable="true">TCP + HTTP Proxy</string>
-    <string name="orbot_bs_status_2" translatable="true">HTTP Proxy be van állítva.</string>
+    <string name="orbot_both" translatable="true">TCP + HTTP proxy</string>
+    <string name="orbot_bs_status_2" translatable="true">HTTP Proxy be van állítva (az alkalmazások figyelmen kívül hagyhatják).</string>
     <string name="orbot_app_issue" translatable="true">Nem sikerült elindítani az Orbot-ot. Telepítve van?</string>
     <string name="orbot_bs_status_trying_connect" translatable="true">Orbot beállítása…</string>
-    <string name="orbot_stop_dialog_dns_message" translatable="true">A RethinkDNS úgy van beállítva, hogy továbbítsa a DNS-lekérdezéseket az Orbot-nak. Módosítsa szükség szerint.</string>
+    <string name="orbot_stop_dialog_dns_message" translatable="true">A RethinkDNS úgy van beállítva, hogy továbbítja a DNS-lekérdezéseket az Orbotnak. Módosítsa szükség szerint.</string>
     <string name="orbot_stop_dialog_negative" translatable="true">Orbot leállítása</string>
     <string name="orbot_stop_dialog_neutral" translatable="true">DNS módosítása</string>
-    <string name="orbot_title" translatable="true">Orbot és Proxy-k</string>
+    <string name="orbot_title" translatable="true">Orbot és proxyk</string>
     <string name="settings_orbot_install_desc" translatable="true">Koppintson ide az Orbot telepítéséhez</string>
     <string name="settings_socks5_disabled_error" translatable="true">Csatlakozva a következőhöz: %1$s. A folytatáshoz kapcsolja ki.</string>
-    <string name="settings_orbot_disabled_error" translatable="true">A \"Tor, mint proxy\" beállításának folytatásához kapcsolja ki a HTTP(S) és/vagy SOCKS5 proxy-t.</string>
+    <string name="settings_orbot_disabled_error" translatable="true">Kapcsolja ki a HTTP(S) és/vagy SOCKS5 proxyt, hogy folytathassa a Tor mint proxy beállítását.</string>
     <string name="settings_https_disabled_error" translatable="true">Csatlakozva a következőhöz: %1$s. A folytatáshoz kapcsolja ki.</string>
-    <string name="settings_check_update_heading" translatable="true">Frissítések keresése</string>
+    <string name="settings_check_update_heading" translatable="true">Frissítések keresése az alkalmazáshoz</string>
     <string name="settings_custom_downloader_heading" translatable="true">Alkalmazáson belüli letöltő használata</string>
     <string name="settings_import_export_desc" translatable="true">Kézi biztonsági mentés vagy az alkalmazás adatainak és beállításainak visszaállítása.</string>
     <string name="settings_import_export_heading" translatable="true">Biztonsági mentés és visszaállítás</string>
@@ -255,7 +255,7 @@
     <string name="app_mode_wireguard" translatable="true">VPN</string>
     <string name="settings_enable_logs" translatable="true">Az eszközön belüli naplózás engedélyezése</string>
     <string name="app_mode_choose" translatable="true">Válasszon módot</string>
-    <string name="settings_autostart_bootup_desc" translatable="true">Az eszköz bekapcsolásakor indítsa el a Rethink alkalmazást, ha a leállítás előtt futott.</string>
+    <string name="settings_autostart_bootup_desc" translatable="true">A készülék bekapcsolásakor, indítsa el a Rethink alkalmazást, ha a leállítás előtt futott.</string>
     <string name="settings_http_proxy_error_text3" translatable="true">A kiszolgálónév üres</string>
     <string name="lbl_notification" translatable="true">értesítés</string>
     <string name="memory_notification_text">A Rethink alacsony memóriát észlel. Előfordulhat, hogy a rendszer műveletei korlátozottak lesznek.</string>
@@ -325,32 +325,32 @@
     <string name="settings_ptrans_heading" translatable="true">IPv4 kimenő forgalom kényszerítése</string>
     <string name="settings_connectivity_checks" translatable="true">Kapcsolódási ellenőrzések végrehajtása</string>
     <string name="settings_allow_lan_heading" translatable="true">Ne irányítson privát IP-ket (kísérleti)</string>
-    <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback proxy előrejelző alkalmazások</string>
-    <string name="settings_exclude_proxy_apps_desc" translatable="true">Ha fogyatékkal élő, kizárja a proxy (SOCKS5, HTTP, DNS) előadói alkalmazásokat a Rethink VPN alagútjából.</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Visszacsatolási (loopback) proxy továbbító alkalmazások</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Ha le van tiltva, kizárja a proxy (SOCKS5, HTTP, DNS) továbbító alkalmazásokat a Rethink VPN alagútjából.</string>
     <string name="settings_allow_bypass_heading" translatable="true">Hálózati láthatóság engedélyezése</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Nem lehet proxykat beállítani, amikor a VPN csak DNS módba van állítva.</string>
     <string name="settings_proxy_header" translatable="true">proxy</string>
-    <string name="settings_socks5_heading" translatable="true">SOCKS5 Proxy beállítása</string>
+    <string name="settings_socks5_heading" translatable="true">SOCKS5 proxy beállítása</string>
     <string name="settings_socks5_desc" translatable="true">Kapcsolatok továbbítása a SOCKS5 végpontra.</string>
     <string name="settings_https_heading" translatable="true">HTTP(S) CONNECT Proxy beállítása</string>
     <string name="orbot" translatable="true">Orbot</string>
     <string name="orbot_socks5" translatable="true">Csak TCP-proxy</string>
     <string name="orbot_both_desc" translatable="true">A fentiek mindegyike.</string>
     <string name="orbot_none" translatable="true">Nincs (alapértelmezett)</string>
-    <string name="orbot_bs_status_3" translatable="true">A(z) %1$s továbbítva az Orbot-hoz, HTTP Proxy is be van állítva.</string>
+    <string name="orbot_bs_status_3" translatable="true">Továbbítás %1$s Orbotnak, HTTP Proxy is beállítva.</string>
     <string name="orbot_status_arg_3" translatable="true">DNS és TCP</string>
     <string name="orbot_stop_dialog_title" translatable="true">Kézi beavatkozás szükséges</string>
-    <string name="orbot_stop_dialog_message" translatable="true">A Rethink leállította a kapcsolatok továbbítását az Orbot-hoz, de az Orbot előfordulhat, hogy a háttérben fut.</string>
+    <string name="orbot_stop_dialog_message" translatable="true">A RethinkDNS leállította a kapcsolatok továbbítását az Orbothoz, de az Orbot talán fut a háttérben.</string>
     <string name="orbot_install_dialog_positive" translatable="true">Telepítés</string>
     <string name="orbot_install_dialog_neutral" translatable="true">weboldal</string>
     <string name="settings_orbot_heading" translatable="true">Orbot beállítása</string>
     <string name="settings_orbot_header" translatable="true">Orbot ❯</string>
-    <string name="settings_socks5_vpn_disabled_error" translatable="true">A folytatáshoz indítsa el a Rethink-t.</string>
+    <string name="settings_socks5_vpn_disabled_error" translatable="true">A folytatáshoz indítsa el a RethinkDNS-t.</string>
     <string name="settings_orbot_notification_action" translatable="true">Orbot megnyitása</string>
     <string name="settings_general_header" translatable="true">általános</string>
     <string name="settings_network_all_networks" translatable="true">Az összes elérhető hálózat használata (kísérleti)</string>
-    <string name="settings_network_all_networks_desc" translatable="true">Ha engedélyezve van, a Rethink az összes elérhető hálózatot felhasználja az internethez való csatlakozáshoz. Ha nem, akkor azt a hálózatot használja, amelyet az Android <i>aktívnak</i> ítél.</string>
-    <string name="settings_check_update_desc" translatable="true">Automatikusan keressen frissítéseket hetente egyszer.</string>
+    <string name="settings_network_all_networks_desc" translatable="true">Ha engedélyezve van, a RethinkDNS az összes elérhető hálózatot használja az internethez való csatlakozáshoz. Ha nem, akkor azt a hálózatot használja, amelyet az Android a <i>aktívnak ítél</i>.</string>
+    <string name="settings_check_update_desc" translatable="true">Hetente egyszer automatikusan ellenőrizze az alkalmazásfrissítéseket.</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Irányítsa vissza a Rethink saját forgalmát, például a tiltólista letöltéseit, a csatlakozási ellenőrzéseket, a DNS-kapcsolatokat az alagútba.</string>
     <string name="settings_rinr_dialog_title" translatable="true">Loopback (kísérleti)</string>
     <string name="settings_http_proxy_dialog_title" translatable="true">Egyéni kiszolgáló URL</string>
