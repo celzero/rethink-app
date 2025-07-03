@@ -258,7 +258,7 @@
     <string name="settings_autostart_bootup_desc" translatable="true">Az eszköz bekapcsolásakor indítsa el a Rethink alkalmazást, ha a leállítás előtt futott.</string>
     <string name="settings_http_proxy_error_text3" translatable="true">A kiszolgálónév üres</string>
     <string name="lbl_notification" translatable="true">Értesítés</string>
-    <string name="memory_notification_text">A Rethink alacsony memória használatot tapasztal. A rendszer műveletei korlátozottak lehetnek.</string>
+    <string name="memory_notification_text">A Rethink alacsony memóriát tapasztal. A rendszerintézkedések korlátozottak lehetnek.</string>
     <string name="slide_2_title" translatable="true">Üdvözlünk</string>
     <string name="slide_2_desc" translatable="true">A Rethink a legkönnyebb módja a hálózati aktivitás figyelésének, az internetes cenzúra megkerülésének és az alkalmazások tűzfalának kezelésére Android eszközön.</string>
     <string name="slide_1_desc" translatable="true">A Rethink egy nyílt forráskódú szoftver, amelyet a Mozilla Builders MVP programja támogat.</string>
