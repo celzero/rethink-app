@@ -267,7 +267,7 @@
     <string name="bypass_universal" translatable="true">univerzális megkerülés(bypass)</string>
     <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">várakozás</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">hibás</string>
-    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">védett</string>
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">protected</string>
     <string name="failed_using_default" translatable="true">Sikertelen: tartalék DNS használata</string>
     <string name="status_app_error" translatable="true">alkalmazás hiba</string>
     <string name="status_no_internet" translatable="true">nincs internet</string>
@@ -408,8 +408,8 @@
     <string name="lbl_split" translatable="true">Felosztás</string>
     <string name="lbl_on_device" translatable="true">helyi</string>
     <string name="status_protected_with_tor_private_dns" translatable="true">Tor és privát DNS segítségével védett</string>
-    <string name="hybrid_mode_notification_title" translatable="true">Védve! Csatlakoztatva a DNS + tűzfalhoz.</string>
-    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Védett! DNS + Firewall + Proxy.</string>
+    <string name="hybrid_mode_notification_title" translatable="true">Védett! Csatlakozva a DNS-hez és a tűzfalhoz.</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Védett! Csatlakozva a DNS-hez, tűzfalhoz és proxyhoz.</string>
     <string name="pause_mode_notification_title" translatable="true">Szüneteltetve! A blokkolt alkalmazások továbbra is tűzfallal védettek maradnak.</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL másolva</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Törli a DNSCrypt Relay-t a mentett konfigurációból.</string>
