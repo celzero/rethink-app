@@ -431,9 +431,9 @@
     <string name="hsf_blocklist_updating_text" translatable="true">Engedélyezés…</string>
     <string name="hsf_chip_appearance" translatable="true">Téma: %1$s</string>
     <string name="hsf_pause_vpn_failure" translatable="true">Nem lehet szünetet tartani: RethinkDNS nem aktív</string>
-    <string name="lbl_background_data" translatable="true">Háttéradat-forgalom korlátozása</string>
-    <string name="battery_optimization_dialog_heading" translatable="true">%1$s letiltása</string>
-    <string name="restrict_dialog_message" translatable="true">A(z) <i>%1$s</i> kapcsolatvesztést okozhat. Módosítsa a beállítást, hogy a Rethink a háttérben is használhassa az adatforgalmat és egyéb erőforrásokat.</string>
+    <string name="lbl_background_data" translatable="true">Korlátozza a háttér adatait</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">Disable %1$s</string>
+    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> a kapcsolódási veszteséget eredményezheti. Változtassa meg a Rethink használati adatokat és más erőforrásokat háttérben.</string>
     <string name="dc_block_heading" translatable="true">szabályok</string>
     <string name="dc_other_dns_heading" translatable="true">típus</string>
     <string name="dc_custom_dns_radio" translatable="true">Egyéb DNS</string>
@@ -448,7 +448,7 @@
     <string name="dc_dns_leaks_desc" translatable="true">Amikor ez a funkció engedélyezve van, a Rethink minden, 53-as porton érkező csomagot rögzít, és azokat az Ön által beállított DNS-végpontra továbbítja</string>
     <string name="dc_check_update_heading" translatable="true">Értesítés tiltólista-frissítésekről</string>
     <string name="dc_check_update_desc" translatable="true">Ellenőrizze a blokklisták frissítését <i>három</i> naponként egyszer</string>
-    <string name="dc_proxy_dns_heading" translatable="true">DNS ne menjen át proxy-n</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Soha ne proxy DNS</string>
     <string name="dc_proxy_dns_desc" translatable="true">Ne továbbítsa a DNS-forgalmat proxy-n keresztül folyamatosan aktív WireGuard, SOCKS5 vagy HTTP proxy használata esetén.</string>
     <string name="about_bravedns_explantion" translatable="true">A Rethink a legegyszerűbb módja annak, hogy figyelje az alkalmazások tevékenységét, megkerülje az internetes cenzúrát, és tűzfalat állítson be alkalmazásaihoz Android készülékén.</string>
     <string name="about_bravedns_whoarewe" translatable="true">A Rethink egy ingyenes és nyílt forráskódú projekt, amelyet az Amazon, az IBM és a Scientific Games korábbi mérnökei vezetnek.</string>
