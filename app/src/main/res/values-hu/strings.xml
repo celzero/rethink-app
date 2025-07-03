@@ -409,7 +409,7 @@
     <string name="lbl_on_device" translatable="true">helyi</string>
     <string name="status_protected_with_tor_private_dns" translatable="true">Tor és privát DNS segítségével védett</string>
     <string name="hybrid_mode_notification_title" translatable="true">Védve! Csatlakoztatva a DNS + tűzfalhoz.</string>
-    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Védve! Csatlakozva a DNS-hez, tűzfalhoz és proxyhoz.</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Védett! DNS + Firewall + Proxy.</string>
     <string name="pause_mode_notification_title" translatable="true">Szüneteltetve! A blokkolt alkalmazások továbbra is tűzfallal védettek maradnak.</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL másolva</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Törli a DNSCrypt Relay-t a mentett konfigurációból.</string>
