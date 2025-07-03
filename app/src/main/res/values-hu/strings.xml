@@ -46,11 +46,11 @@
     <string name="lbl_remove" translatable="true">Eltávolítás</string>
     <string name="lbl_last" translatable="true">Utolsó</string>
     <string name="lbl_starting" translatable="true">Indítás</string>
-    <string name="lbl_overall" translatable="true">Teljes eredmény</string>
+    <string name="lbl_overall" translatable="true">Összességében</string>
     <string name="lbl_stopped" translatable="true">Leállított</string>
     <string name="lbl_private" translatable="true">privát</string>
     <string name="lbl_secure" translatable="true">védett</string>
-    <string name="lbl_anonymous" translatable="true">névtelen</string>
+    <string name="lbl_anonymous" translatable="true">anonim</string>
     <string name="lbl_peer" translatable="true">Partner</string>
     <string name="firewall_mode_notification_title" translatable="true">Védett! Csatlakozva a tűzfalhoz.</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Figyelmeztetés: a Rethink deaktiválva lett</string>
@@ -402,11 +402,11 @@
     <string name="hsf_vpn_dialog_header" translatable="true">Figyelem!</string>
     <string name="lbl_cache" translatable="true">Gyorsítótár</string>
     <string name="universal_firewall_explanation" translatable="true">Alkalmazza a tűzfal szabályokat minden alkalmazásra az eszközhöz kapcsolódó események alapján, például tűzfal alkalmazása, amikor az eszköz zárva van, vagy amikor egy adott alkalmazás nincs használatban.</string>
-    <string name="lbl_unselected" translatable="true">Nem kijelölt</string>
+    <string name="lbl_unselected" translatable="true">Elválasztott</string>
     <string name="apps_icon_content_desc" translatable="true">Alkalmazásikon</string>
     <string name="lbl_idle" translatable="true">Tétlen</string>
     <string name="lbl_split" translatable="true">Felosztás</string>
-    <string name="lbl_on_device" translatable="true">helyi</string>
+    <string name="lbl_on_device" translatable="true">on-device</string>
     <string name="status_protected_with_tor_private_dns" translatable="true">Tor és privát DNS segítségével védett</string>
     <string name="hybrid_mode_notification_title" translatable="true">Védve! Csatlakozva a DNS-hez és a tűzfalhoz.</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Védve! Csatlakozva a DNS-hez, tűzfalhoz és proxyhoz.</string>
@@ -944,4 +944,9 @@
     <string name="wireguard_no_config_msg" translatable="true">Nincsenek WireGuard VPN konfigurációk. Adjon hozzá néhányat a kezdéshez.</string>
     <string name="wireguard_connection_error" translatable="true">A WireGuard VPN csatlakozása sikertelen</string>
     <string name="wireguard_disclaimer" translatable="true">Ez WireGuard, mint TCP és UDP proxy. Míg a DNS forgalmat %1$s továbbítják, az ICMP forgalmat (ex: ping) az alapul szolgáló hálózatba küldik.</string>
+    <string name="wireguard_disable_title" translatable="true">Stop WireGuard</string>
+    <string name="wireguard_disable_message" translatable="true">Állítsa le az összes aktív WireGuard VPN-t?</string>
+    <string name="lbl_remaining_apps" translatable="true">Remaining alkalmazások</string>
+    <string name="remaining_apps_dialog_title" translatable="true">Tartalmazza a maradék alkalmazásokat</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Tartsa be az összes fennmaradó alkalmazást, amelyet semmilyen más Proxy nem irányít</string>
 </resources>
