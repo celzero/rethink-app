@@ -918,4 +918,11 @@
     <string name="wireguard_description" translatable="true">WireGuard mint proxy.</string>
     <string name="new_warp_config_desc" translatable="true">Fetch WARP konfiguráció a szerverről</string>
     <string name="new_warp_error_toast" translatable="true">Képtelen a WARP konfigurációra</string>
+    <string name="one_wg_apps_added" translatable="true">Az összes alkalmazás útmutatása</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">Lockdown</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">A kiválasztott alkalmazásokat csak a WireGuard VPN-en keresztül fogják vezetni, függetlenül attól, hogy nem sikerült-e vagy összekapcsolódik-e.</string>
+    <string name="one_wg_dialog_desc" translatable="true">Az összes alkalmazásból származó összes kapcsolat, beleértve a DNS-t is, egyetlen, aktív WireGuard VPN-re irányul. Egyéb aktív WireGuard VPN-ek, ha van, leállítják.</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">Mindig</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">Az egyéb WireGuard VPN-ek által nem vezetett összes kapcsolatot és alkalmazást ez vezeti.</string>
+    <string name="one_wg_error_toast" translatable="true">Állítsa meg a \"Mono WireGuard\"-t a Mutli WireGuard funkció használatához</string>
 </resources>
