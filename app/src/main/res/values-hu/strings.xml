@@ -53,7 +53,7 @@
     <string name="lbl_anonymous" translatable="true">névtelen</string>
     <string name="lbl_peer" translatable="true">Partner</string>
     <string name="firewall_mode_notification_title" translatable="true">Védett! Csatlakozva a tűzfalhoz.</string>
-    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Figyelmeztetés: A RethinkDNS-t kikapcsolták.</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Figyelmeztetés: A RethinkDNS-t kikapcsolták</string>
     <string name="status_protected_with_private_dns" translatable="true">privát DNS segítségével védett</string>
     <string name="status_protected_with_http" translatable="true">HTTP proxy segítségével védett</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">a privát DNS engedélyezve</string>
@@ -84,17 +84,17 @@
     <string name="settings_autostart_bootup_heading" translatable="true">Automatikus indítás bekapcsoláskor (kísérleti)</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Állandó értesítés</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Állandó (nem eltüntethető) értesítés beállítása</string>
-    <string name="settings_rinr_heading" translatable="true">Loopback (tapasztalat)</string>
-    <string name="settings_rinr_desc_enabled" translatable="true">Route Rethink saját forgalma, mint a blokklista letöltések, összekapcsoltsági ellenőrzések, DNS kapcsolatok, vissza az alagútba.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Lehetővé teszi <!--settings_network_all_networks--> %1$s beállítást. Szeretnéd folytatni?</string>
-    <string name="settings_dns_proxy_dialog_port_number" translatable="true">Port szám</string>
+    <string name="settings_rinr_heading" translatable="true">Visszacsatolási (loopback) mód (kísérleti)</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">A Rethink saját forgalmának átirányítása az alagúton. Ha nem tudja, mit csinál, kapcsolja ki.</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">Ez a művelet engedélyezi a <!--settings_network_all_networks--> %1$s beállítást is. Szeretné folytatni?</string>
+    <string name="settings_dns_proxy_dialog_port_number" translatable="true">Portszám</string>
     <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (kísérleti)</string>
-    <string name="settings_ip_text_ipv46" translatable="true">Auto</string>
+    <string name="settings_ip_text_ipv46" translatable="true">Automatikus</string>
     <string name="settings_notification_desc1" translatable="true">Szünet / Leállítás (alapértelmezett)</string>
     <string name="settings_locale_heading" translatable="true">Nyelvválasztás</string>
     <string name="settings_biometeric_heading" translatable="true">Alkalmazászár engedélyezése</string>
     <string name="logs_card_duration" translatable="true">%1$s óta</string>
-    <string name="hsf_vpn_dialog_message" translatable="true">A Rethink engedélyt kér egy helyi VPN beállításához, hogy titkosítsa az eszköz DNS lekérdezéseit, hálózati figyelőt hajtson végre, és tűzfal szabályokat alkalmazzon.\n\nA Rethink nem gyűjt semmilyen információt és nem kémkedik utánad semmilyen módon.</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">A RethinkDNS-nek engedélyre van szüksége egy helyi VPN beállításához, hogy titkosíthassa az eszköz DNS-kérelmeit, hálózati monitorozást hajtson végre, és tűzfalszabályokat érvényesítsen.\n\nA RethinkDNS semmilyen információt nem gyűjt, és semmilyen módon nem kémkedik Ön után.</string>
     <string name="show_logs_disabled_network_message" translatable="true">A kapcsolati naplózás le lett tiltva. Ha újra szeretné engedélyezni, lépjen a <i>Beállítások</i> menübe, és kapcsolja be az <i>Eszközön történő naplózás engedélyezése opciót.</i></string>
     <string name="dns_query_clear_logs_title" translatable="true">Törli az összes DNS naplót?</string>
     <string name="bsct_app_info" translatable="true">Alkalmazás információ</string>
@@ -110,19 +110,19 @@
     <string name="orbot_status_arg_2" translatable="true">TCP</string>
     <string name="settings_protocol_translation_dns_inactive" translatable="true">Váltson DNS/DNS+Tűzfal módra a beállítás engedélyezéséhez</string>
     <string name="settings_orbot_notification_content" translatable="true">Hiba a \"Tor, mint Proxy\" indításakor. Nyissa meg az Orbot alkalmazást a kézi indításhoz.</string>
-    <string name="settings_custom_downloader_desc" translatable="true">Ha letiltja, az Android beépített <i>Letöltéskezelő</i> letöltését használja.</string>
+    <string name="settings_custom_downloader_desc" translatable="true">Ha letiltja, az Android beépített <i>Letöltéskezelő</i> letöltését használja</string>
     <string name="settings_app_notification_a13_heading" translatable="true">Alkalmazás értesítés</string>
     <string name="settings_app_notification_a13_desc" translatable="true">Értesítési engedély engedélyezése az alkalmazáshoz</string>
     <string name="settings_dns_proxy_dialog_password" translatable="true">Jelszó</string>
     <string name="settings_socks_forwarding_default_desc" translatable="true">Kapcsolatok továbbítása a SOCKS5 végpontra.</string>
     <string name="settings_notification_dialog_title" translatable="true">Értesítési művelet kiválasztása</string>
-    <string name="settings_notification_dialog_option_3" translatable="true">\nEgyik sem:\nNem jelenít meg gombot.\n</string>
+    <string name="settings_notification_dialog_option_3" translatable="true">\nNincs:\nNem jelenít meg gombot.\n</string>
     <string name="download_update_dialog_trylater_message" translatable="true">A frissítés most nem hajtható végre, kérjük, próbálja meg később újra.</string>
     <string name="search_dns_logs" translatable="true"><font size="12">Domain nevek vagy IP-címek keresése</font></string>
     <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Blokkoló listák keresése</font></string>
     <string name="info_dialog_copy_toast_msg" translatable="true">IP-cím másolva.</string>
     <string name="firewall_status_allow" translatable="true">engedélyezett</string>
-    <string name="firewall_status_excluded" translatable="true">kizárva a DNS és tűzfal alól</string>
+    <string name="firewall_status_excluded" translatable="true">kizárva a dns és tűzfal alól</string>
     <string name="hs_biometeric_error" translatable="true">Biometrikus hitelesítési hiba</string>
     <string name="firewall_card_status_active" translatable="true">%1$s alkalmazások</string>
     <string name="dns_mode_info_title" translatable="true">DNS</string>
@@ -146,10 +146,10 @@
     <string name="relative_time_yesterday" translatable="true">Tegnap</string>
     <string name="settings_ip_network_desc" translatable="true">Válasszon az Internetes Protocol verziók között.</string>
     <string name="settings_orbot_desc" translatable="true">Orbot nem-VPN üzemmódban van HTTPS/SOCKS5 használatával.</string>
-    <string name="settings_go_log_desc" translatable="true">Debugging célokra</string>
+    <string name="settings_go_log_desc" translatable="true">Hibakeresési célokra</string>
     <string name="settings_ip_dialog_title" translatable="true">IP verzió kiválasztása</string>
-    <string name="settings_theme_dialog_themes_4" translatable="true">Valódi Fekete</string>
-    <string name="firewall_card_universal_rules" translatable="true">%1$s általános szabály(ok)</string>
+    <string name="settings_theme_dialog_themes_4" translatable="true">Igazi fekete</string>
+    <string name="firewall_card_universal_rules" translatable="true">%1$sáltalános szabály(ok)</string>
     <string name="search_firewall_all_apps" translatable="true"><font size="12">Alkalmazások keresése uid, név alapján</font></string>
     <string name="search_universal_ips" translatable="true"><font size="12">IP-címek keresése</font></string>
     <string name="always_on_dialog_positive" translatable="true">Leállítás</string>
@@ -189,7 +189,7 @@
     <string name="settings_http_proxy_desc" translatable="true">Továbbítás ide: %1$s</string>
     <string name="settings_http_proxy_toast_success" translatable="true">HTTP proxy van beállítva</string>
     <string name="settings_dns_proxy_dialog_app" translatable="true">Alkalmazás</string>
-    <string name="settings_dns_proxy_dialog_header" translatable="true">SOCKS5 Proxy beállítása</string>
+    <string name="settings_dns_proxy_dialog_header" translatable="true">SOCKS5 proxy beállítás</string>
     <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">beállítás</string>
     <string name="settings_socks5_dialog_hint_ip" translatable="true">IP-cím</string>
     <string name="settings_socks5_dialog_hint_port" translatable="true">Port</string>
@@ -197,20 +197,20 @@
     <string name="settings_theme_dialog_themes_2" translatable="true">Világos</string>
     <string name="settings_notification_desc3" translatable="true">Egyik sem</string>
     <string name="settings_selected_theme" translatable="true">Jelenlegi téma: %1$s</string>
-    <string name="settings_default_dns_heading" translatable="true">Válassz tartalék DNS-t</string>
-    <string name="settings_default_dns_desc" translatable="true">Ritka esetekben, amikor a felhasználó által preferált DNS nem állapítható meg, úgy a tartalék DNS kerül használatra.</string>
+    <string name="settings_default_dns_heading" translatable="true">Válasszon tartalék DNS-t</string>
+    <string name="settings_default_dns_desc" translatable="true">Ritka esetekben, amikor a felhasználó által preferált DNS nem állapítható meg, tartalék (fallback) DNS kerül használatra.</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">Kimenet a Logcat-be</string>
     <string name="firewall_status_bypass_dns_firewall" translatable="true">megkerüli a dns és tűzfal szabályokat</string>
     <string name="firewall_status_blocked" translatable="true">blokkolt</string>
     <string name="firewall_status_unknown" translatable="true">ismeretlen</string>
     <string name="ct_bs_app_info_error" translatable="true">Alkalmazás információ nem található</string>
-    <string name="rules_card_domain_count" translatable="true">%1$s domain szabály(ok)</string>
-    <string name="apps_card_ips_count" translatable="true">%1$s IP és Port szabály(ok)</string>
+    <string name="rules_card_domain_count" translatable="true">%1$s domain szabályok</string>
+    <string name="apps_card_ips_count" translatable="true">%1$s IP és Port szabályok</string>
     <string name="logs_card_network_count" translatable="true">%1$s kapcsolatok</string>
     <string name="slide_1_title" translatable="true">Ingyenes és nyílt forráskódú</string>
     <string name="firewall_rules" translatable="true">Hálózati szabályok</string>
     <string name="dns_firewall_mode_info_explanation_new" translatable="true">Az összes fent említett + internetes cenzúra megkerülése.</string>
-    <string name="dns_crypt_relay_remove_success" translatable="true">A DNSCryptátjáró törölve.</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">A DNSCrypt átjátszó törölve.</string>
     <string name="notification_action_dns_firewall_mode" translatable="true">DNS + tűzfal</string>
     <string name="status_protected_with_tor" translatable="true">Tor segítségével védett</string>
     <string name="status_protected_with_wg" translatable="true">WireGuard segítségével védett</string>
@@ -256,7 +256,7 @@
     <string name="settings_enable_logs" translatable="true">Az eszközön belüli naplózás engedélyezése</string>
     <string name="app_mode_choose" translatable="true">Válasszon módot</string>
     <string name="settings_autostart_bootup_desc" translatable="true">A készülék bekapcsolásakor, indítsa el a Rethink alkalmazást, ha a leállítás előtt futott.</string>
-    <string name="settings_http_proxy_error_text3" translatable="true">A kiszolgálónév üres</string>
+    <string name="settings_http_proxy_error_text3" translatable="true">Hostnév üres</string>
     <string name="lbl_notification" translatable="true">értesítés</string>
     <string name="memory_notification_text">A Rethink alacsony memóriát észlel. Előfordulhat, hogy a rendszer műveletei korlátozottak lesznek.</string>
     <string name="slide_2_title" translatable="true">Üdvözöljük</string>
@@ -310,7 +310,7 @@
     <string name="local_blocklist_download_desc" translatable="true">Blokkolólisták letöltése (kb. 60MB) a funkció használatához?</string>
     <string name="local_blocklist_redownload" translatable="true">Naprakész!</string>
     <string name="blocklist_update_check_not_required" translatable="true">A blokkoló listák már a legfrissebb verzióból származnak.</string>
-    <string name="http_proxy_dialog_desc" translatable="true">A HTTP(S) Proxy beállítások csak egy tipp az alkalmazások számára, de azok használhatják vagy nem használhatják; azonban az olyan böngészők, mint a Chrome és a Firefox, használják ezeket. A HTTP(S) proxyt használó alkalmazások megkerülik a tűzfal és a DNS szabályokat.</string>
+    <string name="http_proxy_dialog_desc" translatable="true">Állítson be egy URL-t a következő formátumban:&lt;protocol&gt;://&lt;felhasználónév&gt;:&lt;jelszó&gt;@&lt;domain-vagy-ip&gt;:&lt;port&gt;&lt;elérési út&gt;Példa: http://proxy.example.com:8080/</string>
     <string name="download_update_dialog_message_ok_title" translatable="true">Naprakész!</string>
     <string name="download_update_dialog_message_success" translatable="true">A blokklista letöltése sikerült.</string>
     <string name="download_update_dialog_trylater_title" translatable="true">Jelenleg nem frissíthető</string>
@@ -351,18 +351,18 @@
     <string name="settings_network_all_networks" translatable="true">Az összes elérhető hálózat használata (kísérleti)</string>
     <string name="settings_network_all_networks_desc" translatable="true">Ha engedélyezve van, a RethinkDNS az összes elérhető hálózatot használja az internethez való csatlakozáshoz. Ha nem, akkor azt a hálózatot használja, amelyet az Android a <i>aktívnak ítél</i>.</string>
     <string name="settings_check_update_desc" translatable="true">Hetente egyszer automatikusan ellenőrizze az alkalmazásfrissítéseket.</string>
-    <string name="settings_rinr_desc_disabled" translatable="true">Routing Rethink saját forgalma az alagúton keresztül. Hacsak nem tudod, mit csinálsz, kapcsold ki.</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (tapasztalat)</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Irányítsa vissza a Rethink saját forgalmát – például a tiltólista letöltéseket, kapcsolatellenőrzéseket, DNS-kapcsolatokat – az alagúton (VPN-en) keresztül.</string>
+    <string name="settings_rinr_dialog_title" translatable="true">Visszacsatolási (loopback) mód (kísérleti)</string>
     <string name="settings_http_proxy_dialog_title" translatable="true">Egyéni kiszolgáló URL</string>
-    <string name="settings_http_proxy_error_text1" translatable="true">A port tartománynak 1024 és 65535 között kell lennie</string>
-    <string name="settings_http_proxy_error_text2" translatable="true">Érvénytelen port</string>
-    <string name="settings_http_proxy_error_text4" translatable="true">Sikertelen kapcsolódás a kiszolgálóhoz. Próbáld újra.</string>
-    <string name="settings_dns_proxy_dialog_hostname" translatable="true">Kiszolgálónév</string>
+    <string name="settings_http_proxy_error_text1" translatable="true">A porttartománynak 1024-65535 között kell lennie</string>
+    <string name="settings_http_proxy_error_text2" translatable="true">Érvénytelen Port</string>
+    <string name="settings_http_proxy_error_text4" translatable="true">Sikertelen kapcsolódás a kiszolgálóhoz. Próbálja újra.</string>
+    <string name="settings_dns_proxy_dialog_hostname" translatable="true">Gépnév</string>
     <string name="settings_dns_proxy_dialog_username" translatable="true">Felhasználónév</string>
     <string name="settings_socks_forwarding_desc" translatable="true">Továbbítás ide: %1$s:%2$s, %3$s</string>
     <string name="settings_socks_forwarding_desc_no_app" translatable="true">Továbbítás ide: %1$s:%2$s</string>
-    <string name="settings_socks5_dialog_hint_username" translatable="true">Felhasználónév (opcionális)</string>
-    <string name="settings_socks5_dialog_hint_password" translatable="true">Jelszó (opcionális)</string>
+    <string name="settings_socks5_dialog_hint_username" translatable="true">Felhasználónév (nem kötelező)</string>
+    <string name="settings_socks5_dialog_hint_password" translatable="true">Jelszó (nem kötelező)</string>
     <string name="settings_theme_dialog_title" translatable="true">Megjelenés</string>
     <string name="settings_theme_dialog_themes_3" translatable="true">Sötét</string>
     <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (alapértelmezett)</string>
@@ -370,14 +370,14 @@
     <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
     <string name="settings_ip_text_ipv6" translatable="true">IPv6</string>
     <string name="settings_notification_heading" translatable="true">Értesítési művelet kiválasztása</string>
-    <string name="settings_notification_desc" translatable="true">Műveletgombok a Rethink értesítésnél: %1$s</string>
+    <string name="settings_notification_desc" translatable="true">A Rethink értesítésnél megjelenítendő műveleti gombok: %1$s</string>
     <string name="settings_notification_desc2" translatable="true">DNS / DNS + Tűzfal</string>
-    <string name="settings_notification_dialog_option_1" translatable="true">\nSzünet / Leállítás (alapértelmezett):\nKét gombot jelenít meg, amelyekkel gyorsan szüneteltethető vagy leállítható a Rethink.</string>
-    <string name="settings_notification_dialog_option_2" translatable="true">\nDNS / DNS + Tűzfal:\nKét gombot jelenít meg, amelyekkel gyorsan válthat az energiatakarékos DNS mód és a normál DNS + Tűzfal mód között.</string>
+    <string name="settings_notification_dialog_option_1" translatable="true">\nSzünet / Leállítás (alapértelmezett):\nKét gomb jelenik meg, amelyekkel gyorsan szüneteltetheti vagy leállíthatja a Rethink-et.</string>
+    <string name="settings_notification_dialog_option_2" translatable="true">\nDNS / DNS + Tűzfal:\nKét gomb jelenik meg, amelyekkel gyorsan válthat az akkumulátorkímélő DNS mód és a hagyományos DNS + tűzfal mód között.</string>
     <string name="settings_locale_desc" translatable="true">Válassza ki a kívánt nyelvet</string>
     <string name="settings_locale_dialog_title" translatable="true">Válassza ki a kívánt nyelvet</string>
     <string name="settings_locale_dialog_neutral" translatable="true">Segíts lefordítani ezt az alkalmazást</string>
-    <string name="settings_biometric_desc" translatable="true">Védje az alkalmazást a képernyőzár használatával</string>
+    <string name="settings_biometric_desc" translatable="true">Védje ezt az alkalmazást a képernyőzár használatával</string>
     <string name="settings_pcap_heading" translatable="true">Csomagok rögzítése</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">Ki (alapértelmezett)</string>
@@ -387,7 +387,7 @@
     <string name="firewall_status_block_unmetered" translatable="true">blokkolva a nem mért (wifi) hálózatokon</string>
     <string name="firewall_status_block_metered" translatable="true">blokkolva a díjköteles (mobil) hálózatokon</string>
     <string name="hs_biometeric_title" translatable="true">Rethink feloldása</string>
-    <string name="hs_biometeric_desc" translatable="true">Használja a biometrikus hitelesítést a Rethink feloldásához</string>
+    <string name="hs_biometeric_desc" translatable="true">Használja a biometrikus hitelesítést a RethinkDNS feloldásához</string>
     <string name="hs_biometeric_feature_not_supported" translatable="true">A biometrikus hitelesítés nem támogatott vagy le van tiltva ezen az eszközön</string>
     <string name="hs_biometeric_failed" translatable="true">A biometrikus hitelesítés sikertelen</string>
     <string name="firewall_card_text_active" translatable="true">%1$s blokkolva\n%2$s megkerülve\n%3$s kizárva\n%4$s elkülönítve</string>
@@ -398,7 +398,7 @@
     <string name="hsf_start_btn_state" translatable="true">indítás</string>
     <string name="hsf_stop_btn_state" translatable="true">leállítás</string>
     <string name="hsf_downtime" translatable="true">(inaktív %1$s óta)</string>
-    <string name="hsf_vpn_prepare_failure" translatable="true">Vagy hiányzik a VPN engedély, vagy egy másik alkalmazás van Always-On VPN módban.</string>
+    <string name="hsf_vpn_prepare_failure" translatable="true">Hiányzik a VPN engedély, vagy egy másik alkalmazás „Mindig bekapcsolt VPN” (Always-on VPN) módban fut.</string>
     <string name="hsf_vpn_dialog_header" translatable="true">Figyelem!</string>
     <string name="lbl_cache" translatable="true">Gyorsítótár</string>
     <string name="universal_firewall_explanation" translatable="true">Tűzfalszabályok alkalmazása az összes alkalmazáson az eszköz eseményei alapján, például tűzfal alkalmazása, ha az eszköz le van zárva, vagy ha egy adott alkalmazás nincs használatban.</string>
@@ -415,22 +415,22 @@
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">A DNSCrypt átjáró törlése a mentett konfigurációból.</string>
     <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast --> Alkalmazáslista újraszinkronizálása befejeződött.</string>
     <string name="orbot_explanation" translatable="true">Az Orbot egy ingyenes proxyalkalmazás, amely lehetővé teszi más alkalmazások számára, hogy az internetet <u>biztonságosabban</u> használják.\nAz Orbot a <u>Tor</u> segítségével titkosítja az internetes forgalmat, ami segít <u>megkerülni a cenzúrát</u>, és megvédi a személyes szabadságát és magánéletét a <u>hálózati felügyelet</u> különböző formáitól.\n<u>TCP Proxy</u>: A Rethink csak a <i>kiválasztott</i> alkalmazások TCP-kapcsolatait továbbítja az Orbotnak.\n<u>HTTP Proxy</u>: A Rethink <i>HTTP CONNECT alagutat hoz létre</i> az Orbot felé, és csak a <i>kiválasztott</i> alkalmazások TCP-kapcsolatait továbbítja.</string>
-    <string name="hsf_notification_permission_failure" translatable="true">Engedélyezze az értesítésekhez való hozzáférést a Beállítások képernyőn</string>
-    <string name="hsf_start_dialog_header" translatable="true">Indítsa el a oldalt. %1$s</string>
+    <string name="hsf_notification_permission_failure" translatable="true">Értesítési engedély engedélyezése a Beállítások képernyőn</string>
+    <string name="hsf_start_dialog_header" translatable="true">Indítsa el: %1$s</string>
     <string name="hsf_start_dialog_message" translatable="true">Már csak egy lépés választja el attól, hogy biztonságosan és védetten használja Android készülékét: azonnal megtekintheti a hálózati tevékenységet, letilthatja a weboldalakat, IP-címeket és a nem megfelelően működő alkalmazásokat.</string>
-    <string name="hsf_start_dialog_positive" translatable="true">Kezdés</string>
+    <string name="hsf_start_dialog_positive" translatable="true">Indítás</string>
     <string name="hsf_whats_new_chip_text" translatable="true">Újdonságok</string>
     <string name="hsf_proxy_chip_text" translatable="true">Proxy aktív</string>
-    <string name="hsf_packet_capture_chip_text" translatable="true">Csomagrögzítés aktív</string>
+    <string name="hsf_packet_capture_chip_text" translatable="true">Csomagfelvétel aktív</string>
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">RDNS+ engedélyezése</string>
-    <string name="hsf_exclude_error" translatable="true">VPN zárolt módban nem lehetséges a kizárás</string>
+    <string name="hsf_exclude_error" translatable="true">Zárolt VPN módban, a kizárás nem lehetséges</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Proxy eltávolítva</string>
     <string name="hsf_proxy_chip_remove_text" translatable="true">Leállítás…</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Csomagrögzítés letiltva</string>
     <string name="hsf_whats_new_remove_text" translatable="true">Bezárás…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">Engedélyezés…</string>
     <string name="hsf_chip_appearance" translatable="true">Téma: %1$s</string>
-    <string name="hsf_pause_vpn_failure" translatable="true">Nem lehet szüneteltetni: a Rethink nem aktív</string>
+    <string name="hsf_pause_vpn_failure" translatable="true">Nem lehet szünetet tartani: RethinkDNS nem aktív</string>
     <string name="lbl_background_data" translatable="true">Háttéradat-forgalom korlátozása</string>
     <string name="battery_optimization_dialog_heading" translatable="true">%1$s letiltása</string>
     <string name="restrict_dialog_message" translatable="true">A(z) <i>%1$s</i> kapcsolatvesztést okozhat. Módosítsa a beállítást, hogy a Rethink a háttérben is használhassa az adatforgalmat és egyéb erőforrásokat.</string>
@@ -712,11 +712,11 @@
     <string name="new_app_bulk_notification_title" translatable="true">Figyelem</string>
     <string name="new_app_bulk_notification_content" translatable="true">A Rethink blokkolt %1$s új alkalmazást. Koppintson a megtekintéshez vagy módosításhoz.</string>
     <string name="new_app_notification_content" translatable="true">A RethinkDNS blokkolta a nemrég telepített alkalmazást, %1$s.</string>
-    <string name="new_app_notification_action_deny" translatable="true">Blokkolás folytatása</string>
+    <string name="new_app_notification_action_deny" translatable="true">Tartsa blokkolva</string>
     <string name="new_app_notification_action_toast_allow" translatable="true">Az alkalmazás számára engedélyezve lett a hálózati kapcsolat</string>
-    <string name="new_app_notification_action_toast_deny" translatable="true">Az alkalmazás számára megtagadva lett a hálózati kapcsolat</string>
-    <string name="notif_dialog_pause_dialog_title" translatable="true">Az alkalmazás szüneteltetve!</string>
-    <string name="notif_dialog_pause_dialog_message" translatable="true">Az alkalmazás szüneteltetett állapotban van, a folytatáshoz indítsa el újra</string>
+    <string name="new_app_notification_action_toast_deny" translatable="true">Hálózati kapcsolat megtagadva az alkalmazáshoz</string>
+    <string name="notif_dialog_pause_dialog_title" translatable="true">Alkalmazás szünetel!</string>
+    <string name="notif_dialog_pause_dialog_message" translatable="true">Alkalmazás szünetelteti az alkalmazást, folytassa a folytatáshoz</string>
     <string name="notif_dialog_pause_dialog_positive" translatable="true">Folytatás</string>
     <string name="notif_dialog_pause_dialog_negative" translatable="true">Elvetés</string>
     <string name="notif_dialog_pause_dialog_neutral" translatable="true">Megjelenítés</string>
@@ -739,12 +739,12 @@
     <string name="build__flavor_play_store" translatable="true">Play Áruház</string>
     <string name="build__flavor_fdroid" translatable="true">fdroid</string>
     <string name="cd_toast_deleted" translatable="true">Domain eltávolítva az egyéni listáról</string>
-    <string name="cd_toast_added" translatable="true">Domain hozzáadása sikerült</string>
+    <string name="cd_toast_added" translatable="true">Domain sikeresen hozzáadva</string>
     <string name="cd_remove_dialog_title" translatable="true">Domain törlése?</string>
-    <string name="cd_remove_dialog_message" translatable="true">Domain törlése a mentett konfigurációból.</string>
-    <string name="cd_deleted_toast" translatable="true">Minden domain szabály törölve</string>
-    <string name="cd_no_rules_text" translatable="true">Nincsenek domain szabályok.</string>
-    <string name="cd_dialog_edit_title" translatable="true">Edit domain szabály</string>
+    <string name="cd_remove_dialog_message" translatable="true">A Domain törlése a mentett konfigurációból.</string>
+    <string name="cd_deleted_toast" translatable="true">Az összes domain szabály törlésre került</string>
+    <string name="cd_no_rules_text" translatable="true">Nem találtunk domain szabályokat.</string>
+    <string name="cd_dialog_edit_title" translatable="true">Domain szabály szerkesztése</string>
     <string name="cd_dialog_title" translatable="true">Domain szabály hozzáadása</string>
     <string name="cd_dialog_desc" translatable="true">Egy URL vagy egy domain név opcionális helyettesítő karakterrel: *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint" translatable="true">Adja meg: %1$s</string>
@@ -758,7 +758,7 @@
     <string name="ci_dialog_edittext_hint" translatable="true">IP-cím, alhálózat vagy port</string>
     <string name="ci_dialog_error_invalid_ip" translatable="true">Érvénytelen IP-cím, alhálózat vagy port.</string>
     <string name="ci_dialog_added_success" translatable="true">IP hozzáadva a listához</string>
-    <string name="ci_no_rules_text" translatable="true">Nincsenek IP- vagy portszabályok.</string>
+    <string name="ci_no_rules_text" translatable="true">IP- vagy portszabályok nem találhatók.</string>
     <string name="ci_bypass_universal_initial" translatable="true">BU</string>
     <string name="ci_bypass_universal_txt" translatable="true">Univerzális megkerülés(Bypass)</string>
     <string name="ci_trust_initial" translatable="true">T</string>
@@ -767,7 +767,7 @@
     <string name="ci_no_rule_initial" translatable="true">N</string>
     <string name="ci_no_rule_txt" translatable="true">Nincs szabály</string>
     <string name="ci_no_rule" translatable="true">nincs szabály</string>
-    <string name="ci_block" translatable="true">Letiltás</string>
+    <string name="ci_block" translatable="true">Blokk</string>
     <string name="ci_bypass_universal" translatable="true">Univerzális megkerülés(Bypass)</string>
     <string name="ci_trust_rule" translatable="true">Megbízható</string>
     <string name="ci_delete" translatable="true">Törlés</string>
