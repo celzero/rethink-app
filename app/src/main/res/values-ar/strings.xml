@@ -525,10 +525,7 @@
     <string name="hsf_start_dialog_message">أنت على بعد خطوة واحدة من نظام Android الآمن: شاهد نشاط الشبكة على الفور وحظر مواقع الويب وعناوين IP والتطبيقات التي تعمل بشكل سيء.</string>
     <string name="hsf_pause_vpn_failure">لا يمكن التوقف مؤقتاً: Rethink غير نشط</string>
     <string name="dc_entries">%1$s مداخل »</string>
-    <string name="settings_notification_dialog_option_3">"
-\nلا أحد:
-\nلا يظهر أي زر.
-\n"</string>
+    <string name="settings_notification_dialog_option_3">\nلا شيء:\nلا يظهر أي زر.\n</string>
     <string name="about_web">الروابط</string>
     <string name="about_dialog_neutral_button">اقترح الميزات</string>
     <string name="vpn_profile_error">يتعذر تشغيل ملف تعريف VPN.</string>
@@ -682,12 +679,10 @@
     <string name="settings_import_export_desc">قم بعمل نسخة احتياطية من بيانات وإعدادات التطبيق أو استعادتها يدويًا.</string>
     <string name="settings_custom_downloader_desc">إذا تم تعطيله، سيتم استخدام <i>مدير التنزيل</i> المدمج في الأندرويد</string>
     <string name="settings_theme_desc">موضوع داكن / فاتح</string>
-    <string name="settings_notification_dialog_option_2">"
-\nDNS / DNS + جدار الحماية:
-\nيعرض زرين للتبديل بسرعة بين وضع DNS الموفر للبطارية ووضع DNS + Firewall العادي."</string>
+    <string name="settings_notification_dialog_option_2">\nDNS / DNS + جدار الحماية:\nيعرض زرين للتبديل بسرعة بين وضع DNS الموفر للبطارية ووضع DNS + Firewall العادي.</string>
     <string name="dc_dns_leaks_desc">عند التمكين ، تلتقط Rethink جميع الحزم الموجودة على المنفذ 53 وتعيد توجيهها إلى نقطة نهاية DNS التي يحددها المستخدم</string>
     <string name="cd_dns_crypt_dialog_desc">وصف (اختياري)</string>
-    <string name="settings_notification_dialog_option_1">\nإيقاف مؤقت / إيقاف (افتراضي):\n\nيظهر زرين، للإيقاف المؤقت بسرعة وإيقاف Rethink.</string>
+    <string name="settings_notification_dialog_option_1">\nإيقاف مؤقت / إيقاف (افتراضي):\nيظهر زرين، للإيقاف المؤقت بسرعة وإيقاف Rethink.</string>
     <string name="hsf_downtime">(غير نشط منذ %1$s)</string>
     <string name="firewall_status_excluded">مستبعد من نظام dns وجدار الحماية</string>
     <string name="firewall_status_whitelisted">يتجاوز قواعد جدار الحماية العالمية</string>
@@ -908,7 +903,7 @@
     <string name="cd_dialog_edit_title" translatable="true">تعديل قاعدة النطاق</string>
     <string name="cd_toast_edit" translatable="true">تم التعديل</string>
     <string name="lbl_public_key" translatable="true">المفتاح العمومي</string>
-    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">محمي!، متصل ب DNS + الجدار الناري + البروكسي</string>
+    <string name="hybrid_mode_with_proxy_notification_title" translatable="true">محمي! متصل ب DNS + الجدار الناري + البروكسي.</string>
     <string name="lbl_stopped" translatable="true">متوقف</string>
     <string name="lbl_private_key" translatable="true">المفتاح الخاص</string>
     <string name="lbl_generated" translatable="true">(وُلّد)</string>
@@ -931,7 +926,7 @@
     <string name="lbl_preshared_key" translatable="true">مفتاح مشترك مسبق</string>
     <string name="lbl_persistent_keepalive" translatable="true">الحفاظ على الاتصال يعمل</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">محمي بواسطه wireguard و اتصال dns خاص</string>
-    <string name="dot_custom_url_remove_dialog_title" translatable="true">احذف نقطه النهايه لDot</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">حذف نقطة نهاية DoT؟</string>
     <string name="lbl_cache" translatable="true">الذاكره المؤقتة</string>
     <string name="lbl_unselected" translatable="true">الغاء تحديد</string>
     <string name="lbl_idle" translatable="true">خامل</string>

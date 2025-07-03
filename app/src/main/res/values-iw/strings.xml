@@ -783,4 +783,49 @@
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">חיבור זה הותר משום ש<i>הדומיין</i> נקבע כמהימן בכללי הדומיין האוניברסליים.<br/><br/> כדי לשנות את ההתנהגות הזאת יש לעבור ללשונית <i>הגדרת הDNS</i>.</string>
     <string name="firewall_rule_proxied_desc" translatable="true">חיבור זה תווך לפרוקסי המועדף על ידי המשתמש.<br/><br/> כדי לשנות יש לעבור ל<i>פרוקסי</i> ממסך ה<i>הגדרה</i>.</string>
     <string name="new_app_bulk_notification_title" translatable="true">שימו לב</string>
+    <string name="new_app_bulk_notification_content" translatable="true">Rethink חסם %1$s אפליקציות חדשות.יש להקיש כדי לצפות או לשנות.</string>
+    <string name="new_app_notification_content" translatable="true">Rethink חסם אפליקציה שהותקנה לאחרונה, %1$s.</string>
+    <string name="new_app_notification_action_deny" translatable="true">המשך לחסום</string>
+    <string name="new_app_notification_action_toast_allow" translatable="true">חיבור רשת מותר לאפליקציה</string>
+    <string name="new_app_notification_action_toast_deny" translatable="true">חיבור הרשת נדחה עבור האפליקציה</string>
+    <string name="notif_dialog_pause_dialog_title" translatable="true">היישום מושהה!</string>
+    <string name="notif_dialog_pause_dialog_message" translatable="true">יישום במצב השהייה, יש ללחוץ על המשך כדי להמשיך</string>
+    <string name="notif_dialog_pause_dialog_positive" translatable="true">המשך</string>
+    <string name="notif_channel_vpn_notification" translatable="true">VPN פעיל</string>
+    <string name="notif_channel_vpn_failure" translatable="true">VPN לא פעיל</string>
+    <string name="notif_channel_firewall_alerts" translatable="true">התראות חומת אש</string>
+    <string name="notif_channel_proxy_failure" translatable="true">התראות פרוקסי</string>
+    <string name="notif_channel_download" translatable="true">התראות הורדה</string>
+    <string name="notif_dialog_pause_dialog_negative" translatable="true">מחיקה</string>
+    <string name="notif_dialog_pause_dialog_neutral" translatable="true">הצגה</string>
+    <string name="notif_channel_desc_vpn_notification" translatable="true">הודעה כאשר Rethink פעיל ופועל ברקע</string>
+    <string name="notif_channel_desc_vpn_failure" translatable="true">הודעה כאשר Rethink נעצר על ידי אנדרואיד או על ידי אפליקציית VPN אחרת</string>
+    <string name="notif_channel_desc_firewall_alerts" translatable="true">התראה על שגיאות ואנומליות בחומת האש</string>
+    <string name="notif_channel_desc_proxy_failure" translatable="true">התראה על שגיאות ואנומליות ב-Proxy</string>
+    <string name="notif_channed_desc_download" translatable="true">התראה על התקדמות ההורדה עבור רשימות חסימה במכשיר</string>
+    <string name="category_name_sys_components" translatable="true">רכיבי מערכת</string>
+    <string name="category_name_sys_apps" translatable="true">אפליקציות מערכת</string>
+    <string name="category_name_others" translatable="true">אחר</string>
+    <string name="category_name_non_app_sys" translatable="true">שירותי מערכת</string>
+    <string name="category_name_installed" translatable="true">אפליקציות מותקנות</string>
+    <string name="build__flavor_website" translatable="true">אתר</string>
+    <string name="build__flavor_play_store" translatable="true">גוגל Play</string>
+    <string name="build__flavor_fdroid" translatable="true">F-Droid</string>
+    <string name="cd_toast_deleted" translatable="true">דומיין הוסר מרשימה מותאמת אישית</string>
+    <string name="cd_toast_added" translatable="true">דומיין נוסף בהצלחה</string>
+    <string name="cd_remove_dialog_title" translatable="true">למחוק דומיין?</string>
+    <string name="cd_remove_dialog_message" translatable="true">מחיקת הדומיין מהתצורה השמורה.</string>
+    <string name="cd_deleted_toast" translatable="true">נמחקו כל כללי הדומיינים</string>
+    <string name="cd_no_rules_text" translatable="true">אין כללי דומיין.</string>
+    <string name="cd_dialog_edit_title" translatable="true">עריכת כלל דומיין</string>
+    <string name="cd_toast_edit" translatable="true">נערך</string>
+    <string name="cd_dialog_title" translatable="true">הספת כלל דומיין</string>
+    <string name="cd_dialog_desc" translatable="true">כתובת URL או דומיין מותאמים אישית עם תווים כלליים. למשל, *.test.com, test.com/test</string>
+    <string name="cd_dialog_edittext_hint" translatable="true">יש להזין %1$s</string>
+    <string name="cd_dialog_error_invalid_domain" translatable="true">כתובת URL או דומיין לא חוקיים.</string>
+    <string name="cd_dialog_error_invalid_wildcard" translatable="true">כתובת URL או שם דומיין עם תו כללי לא חוקיים</string>
+    <string name="cd_blocked_initial" translatable="true">ח</string>
+    <string name="cd_no_rule_initial" translatable="true">ל</string>
+    <string name="cd_no_rule_txt" translatable="true">ללא כלל</string>
+    <string name="ci_dialog_title" translatable="true">הוספת כלל IP / יציאה</string>
 </resources>
