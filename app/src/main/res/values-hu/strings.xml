@@ -936,9 +936,12 @@
     <string name="include_all_app_wg_dialog_desc" translatable="true">Szeretné, hogy ez a WireGuard VPN legyen használva minden alkalmazáshoz?</string>
     <string name="exclude_all_app_wg_dialog_title" translatable="true">Az összes alkalmazás kizárása</string>
     <string name="exclude_all_app_wg_dialog_desc" translatable="true">Az összes alkalmazás kizárása ebből a WireGuard VPN-ből?</string>
-    <string name="wireguard_enabled_failure" translatable="true">Állítsd le a többi aktív proxyt, hogy engedélyezni tudja a WireGuardot.</string>
-    <string name="wireguard_disable_failure" translatable="true">\"Always-on WireGuard\" nem kapcsolható ki</string>
+    <string name="wireguard_enabled_failure" translatable="true">Állítsd le a többi aktív proxyt, hogy engedélyezni tudja a WireGuardot</string>
+    <string name="wireguard_disable_failure" translatable="true">A \"Mindig bekapcsolt WireGuard” (Always-on WireGuard) nem kapcsolható ki</string>
     <string name="wireguard_apps_proxy_map_desc" translatable="true">%1$s része</string>
-    <string name="wg_apps_dialog_title_include" translatable="true">%1$s alkalmazások</string>
-    <string name="wg_apps_dialog_title_exclude" translatable="true">Kizárja %1$s alkalmazásokat</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">%1$s db alkalmazás bevonása</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">%1$s db alkalmazás kizárása</string>
+    <string name="wireguard_no_config_msg" translatable="true">Nincsenek WireGuard VPN konfigurációk. Adjon hozzá néhányat a kezdéshez.</string>
+    <string name="wireguard_connection_error" translatable="true">A WireGuard VPN csatlakozása sikertelen</string>
+    <string name="wireguard_disclaimer" translatable="true">Ez WireGuard, mint TCP és UDP proxy. Míg a DNS forgalmat %1$s továbbítják, az ICMP forgalmat (ex: ping) az alapul szolgáló hálózatba küldik.</string>
 </resources>
