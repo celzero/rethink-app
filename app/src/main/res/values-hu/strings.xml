@@ -79,11 +79,11 @@
     <string name="settings_lock_down_mode_desc" translatable="true">Bizonyos opciók le vannak tiltva, amikor a VPN zárolt módba van. <u>Tekintse meg a VPN beállításokat</u>.</string>
     <string name="orbot_none_desc" translatable="true">A fentiek közül egyik sem.</string>
     <string name="orbot_install_dialog_message" translatable="true">Az Orbot elhozza a Tor szolgáltatásait és funkcionalitását Androidra.</string>
-    <string name="orbot_no_app_toast" translatable="true">Adjon hozzá legalább egy alkalmazást az Orbot engedélyezéséhez</string>
+    <string name="orbot_no_app_toast" translatable="true">Adjon hozzá legalább egy alkalmazást az Orbot számára</string>
     <string name="settings_general_customize" translatable="true">testreszabás</string>
     <string name="settings_autostart_bootup_heading" translatable="true">Automatikus indítás bekapcsoláskor (kísérleti)</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Állandó értesítés</string>
-    <string name="settings_app_notification_persistent_desc" translatable="true">Tegye állandóvá az értesítést</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Készítse el az értesítést tartósan</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (kísérleti)</string>
     <string name="settings_rinr_desc_enabled" translatable="true">A Rethink saját forgalmának átirányítása az alagúton. Ha nem tudja, mit csinál, kapcsolja ki.</string>
     <string name="settings_rinr_dialog_desc" translatable="true">Engedélyezi a<!--settings_network_all_networks--> %1$s beállítást is. Folytatni szeretnéd?</string>
@@ -325,8 +325,8 @@
     <string name="settings_ptrans_heading" translatable="true">IPv4 kimenő forgalom kényszerítése</string>
     <string name="settings_connectivity_checks" translatable="true">Kapcsolódási ellenőrzések végrehajtása</string>
     <string name="settings_allow_lan_heading" translatable="true">Ne irányítson privát IP-ket (kísérleti)</string>
-    <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback proxy továbbító alkalmazások</string>
-    <string name="settings_exclude_proxy_apps_desc" translatable="true">Ha le van tiltva, kizárja a proxy (SOCKS5, HTTP, DNS) továbbító alkalmazásokat a Rethink VPN alagútjából.</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback proxy előrejelző alkalmazások</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">Ha fogyatékkal élő, kizárja a proxy (SOCKS5, HTTP, DNS) előadói alkalmazásokat a Rethink VPN alagútjából.</string>
     <string name="settings_allow_bypass_heading" translatable="true">Hálózati láthatóság engedélyezése</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Nem lehet proxykat beállítani, amikor a VPN csak DNS módba van állítva.</string>
     <string name="settings_proxy_header" translatable="true">proxy</string>
