@@ -84,9 +84,9 @@
     <string name="settings_autostart_bootup_heading" translatable="true">Automatikus indítás bekapcsoláskor (kísérleti)</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Állandó értesítés</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Állandó (nem eltüntethető) értesítés beállítása</string>
-    <string name="settings_rinr_heading" translatable="true">Loopback (kísérleti)</string>
-    <string name="settings_rinr_desc_enabled" translatable="true">A Rethink saját forgalmának átirányítása az alagúton. Ha nem tudja, mit csinál, kapcsolja ki.</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">Engedélyezi a<!--settings_network_all_networks--> %1$s beállítást is. Folytatni szeretnéd?</string>
+    <string name="settings_rinr_heading" translatable="true">Loopback (tapasztalat)</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">Route Rethink saját forgalma, mint a blokklista letöltések, összekapcsoltsági ellenőrzések, DNS kapcsolatok, vissza az alagútba.</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">Lehetővé teszi <!--settings_network_all_networks--> %1$s beállítást. Szeretnéd folytatni?</string>
     <string name="settings_dns_proxy_dialog_port_number" translatable="true">Port szám</string>
     <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (kísérleti)</string>
     <string name="settings_ip_text_ipv46" translatable="true">Auto</string>
@@ -351,8 +351,8 @@
     <string name="settings_network_all_networks" translatable="true">Az összes elérhető hálózat használata (kísérleti)</string>
     <string name="settings_network_all_networks_desc" translatable="true">Ha engedélyezve van, a RethinkDNS az összes elérhető hálózatot használja az internethez való csatlakozáshoz. Ha nem, akkor azt a hálózatot használja, amelyet az Android a <i>aktívnak ítél</i>.</string>
     <string name="settings_check_update_desc" translatable="true">Hetente egyszer automatikusan ellenőrizze az alkalmazásfrissítéseket.</string>
-    <string name="settings_rinr_desc_disabled" translatable="true">Irányítsa vissza a Rethink saját forgalmát, például a tiltólista letöltéseit, a csatlakozási ellenőrzéseket, a DNS-kapcsolatokat az alagútba.</string>
-    <string name="settings_rinr_dialog_title" translatable="true">Loopback (kísérleti)</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Routing Rethink saját forgalma az alagúton keresztül. Hacsak nem tudod, mit csinálsz, kapcsold ki.</string>
+    <string name="settings_rinr_dialog_title" translatable="true">Loopback (tapasztalat)</string>
     <string name="settings_http_proxy_dialog_title" translatable="true">Egyéni kiszolgáló URL</string>
     <string name="settings_http_proxy_error_text1" translatable="true">A port tartománynak 1024 és 65535 között kell lennie</string>
     <string name="settings_http_proxy_error_text2" translatable="true">Érvénytelen port</string>
@@ -744,7 +744,7 @@
     <string name="cd_remove_dialog_message" translatable="true">Domain törlése a mentett konfigurációból.</string>
     <string name="cd_deleted_toast" translatable="true">Minden domain szabály törölve</string>
     <string name="cd_no_rules_text" translatable="true">Nincsenek domain szabályok.</string>
-    <string name="cd_dialog_edit_title" translatable="true">Domain szabály szerkesztése</string>
+    <string name="cd_dialog_edit_title" translatable="true">Edit domain szabály</string>
     <string name="cd_dialog_title" translatable="true">Domain szabály hozzáadása</string>
     <string name="cd_dialog_desc" translatable="true">Egy URL vagy egy domain név opcionális helyettesítő karakterrel: *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint" translatable="true">Adja meg: %1$s</string>
