@@ -67,7 +67,7 @@
     <string name="firewall_act_universal_tab" translatable="true">univerzális</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Hálózat</string>
     <string name="dns_act_configure_tab" translatable="true">Konfigurálás</string>
-    <string name="dot_custom_url_remove_dialog_title" translatable="true">Törli a DoT végpontot?</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Törölje a DoT végpontját?</string>
     <string name="always_on_dialog_neutral" translatable="true">Beállítások</string>
     <string name="dns_crypt_url_remove_dialog_message" translatable="true">A DNSCrypt feloldó törlése a mentett konfigurációból.</string>
     <string name="dns_proxy_remove_dialog_title" translatable="true">DNS-proxy törlése?</string>
@@ -102,7 +102,7 @@
     <string name="download_update_dialog_failure_message" translatable="true">Vagy a szervereink nem elérhetők, vagy a kapcsolat nem jött létre. Kérjük, próbálja meg később.</string>
     <string name="whats_new_version_update" translatable="true"><b>Ne pánikoljon 2</b><b>Új:</b> A hálózati motor hibáinak rögzítése a felhasználói hibajelentésekben.<b>Új:</b> A rendszer DNS használata nem delegált domain nevekhez, <b>ha</b> a „DNS-szivárgás megelőzése” <b>be van kapcsolva</b>.<b>Fejlesztés:</b> Dual-stack (IPv4 + IPv6) WireGuard kapcsolat.<b>Fejlesztés:</b> A felhasználói felület elemei nem blokkolódnak, ha a hálózati motor nem válaszol.<b>Javítás:</b> Kapcsolati időtúllépés, ha az „Advanced DNS filtering” be van kapcsolva.<b>Javítás:</b> A WireGuard partner végpontok, amelyek domain nevet használnak, lefagynak hálózati váltáskor.<a href="https://svc.rethinkdns.com/r/translate">Segítsen az alkalmazás fordításában</a></string>
     <string name="connection_http3" translatable="true">HTTP3</string>
-    <string name="settings_connectivity_checks_desc" translatable="true">Kapcsolódási ellenőrzések elküldésre kerülnek a hozzáférhetőség megállapítására.</string>
+    <string name="settings_connectivity_checks_desc" translatable="true">A Connectivity-ellenőrzéseket az elérhetőség megállapítására küldik.</string>
     <string name="settings_allow_bypass_desc" translatable="true">Engedélyezze a kérelmező alkalmazásoknak, hogy hozzáférjenek az összes elérhető hálózathoz. Ezek az alkalmazások szükség szerint kikerülhetik a Rethink VPN alagútját. Néhány audio/video konferencia alkalmazás, mint a Zoom és a Meet, szükségelheti ezt a megfelelő működéshez.</string>
     <string name="settings_allow_lan_desc" translatable="true">Zárja ki a LAN, loopback, multicast és link-local útvonalakat a Rethink VPN alagútjából.</string>
     <string name="orbot_bs_status_1" translatable="true">A %1$s kapcsolatok továbbítása az Orbot-hoz.</string>
@@ -306,7 +306,7 @@
     <string name="univ_firewall_dialog_message" translatable="true">A szabály törlése lehetővé tenné, hogy bármely alkalmazás csatlakozzon ehhez az IP-címhez. Biztosan folytatni szeretné?</string>
     <string name="doh_custom_url_remove_dialog_title" translatable="true">DoH végpont törlése?</string>
     <string name="doh_custom_url_remove_dialog_message" translatable="true">A DNS over Https végpont törlése a mentett konfigurációból.</string>
-    <string name="dot_custom_url_remove_dialog_message" translatable="true">Törli a DNS-over-TLS (DoT) végpontot a mentett konfigurációból.</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Törölje a DNS-t a TLS végpontján a mentett konfigurációtól.</string>
     <string name="local_blocklist_download_desc" translatable="true">Blokkolólisták letöltése (kb. 60MB) a funkció használatához?</string>
     <string name="local_blocklist_redownload" translatable="true">Naprakész!</string>
     <string name="blocklist_update_check_not_required" translatable="true">A blokkoló listák már a legfrissebb verzióból származnak.</string>
@@ -323,7 +323,7 @@
     <string name="settings_enable_logs_desc" translatable="true">A DNS- és tűzfal-naplók helyi tárolása az eszközön.</string>
     <string name="settings_ip_network_heading" translatable="true">IP verzió kiválasztása</string>
     <string name="settings_ptrans_heading" translatable="true">IPv4 kilépés kikényszerítése</string>
-    <string name="settings_connectivity_checks" translatable="true">Kapcsolódási ellenőrzések végrehajtása</string>
+    <string name="settings_connectivity_checks" translatable="true">Perform connectivity ellenőrzések</string>
     <string name="settings_allow_lan_heading" translatable="true">Ne irányítson Privát IP-ket (kísérleti)</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback proxy továbbító alkalmazások</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Ha le van tiltva, kizárja a proxy (SOCKS5, HTTP, DNS) továbbító alkalmazásokat a Rethink VPN alagútjából.</string>
