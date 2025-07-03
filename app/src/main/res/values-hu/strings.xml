@@ -449,7 +449,7 @@
     <string name="dc_check_update_heading" translatable="true">Prompt a blokklista frissítésekre</string>
     <string name="dc_check_update_desc" translatable="true">Ellenőrizze a blokklisták frissítését <i>három</i> naponként egyszer</string>
     <string name="dc_proxy_dns_heading" translatable="true">Soha ne használd proxyként a DNS-t.</string>
-    <string name="dc_proxy_dns_desc" translatable="true">Ne továbbítsa a DNS-forgalmat proxy-n keresztül folyamatosan aktív WireGuard, SOCKS5 vagy HTTP proxy használata esetén.</string>
+    <string name="dc_proxy_dns_desc" translatable="true">Ne proxy DNS Over Always-on WireGuard, SOCKS5, HTTP proxis.</string>
     <string name="about_bravedns_explantion" translatable="true">A Rethink a legegyszerűbb módja annak, hogy figyelje az alkalmazások tevékenységét, megkerülje az internetes cenzúrát, és tűzfalat állítson be alkalmazásaihoz Android készülékén.</string>
     <string name="about_bravedns_whoarewe" translatable="true">A Rethink egy ingyenes és nyílt forráskódú projekt, amelyet az Amazon, az IBM és a Scientific Games korábbi mérnökei vezetnek.</string>
     <string name="about_bravedns_toreport_text" translatable="true">segítség és visszajelzés</string>
@@ -645,7 +645,7 @@
     <string name="accessibility_notification_content" translatable="true">A Rethink akadálymentességi (kisegítő) szolgáltatása leállt vagy összeomlott. A háttérben futó alkalmazások többé nem lesznek blokkolva. Koppints ide az újbóli engedélyezéshez.</string>
     <string name="accessibility_failure_toast" translatable="true">A Rethink akadálymentességi (kisegítő) szolgáltatása leállt vagy összeomlott. A háttérben futó alkalmazások már nincsenek blokkolva.</string>
     <string name="coming_soon_toast" translatable="true">hamarosan</string>
-    <string name="toast_allow_bypass_disabled" translatable="true">A(z) %1$s nem érhető el, amíg a proxyk aktívak</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s fogyatékkal élő, mivel a proxis aktív</string>
     <string name="pause_text" translatable="true">szüneteltetve</string>
     <string name="pause_desc" translatable="true">Megjegyzés: a(z) %1$s által blokkolt alkalmazások továbbra is tűzfal mögött maradnak.</string>
     <string name="other_dns_list_tab1" translatable="true">DoH</string>
