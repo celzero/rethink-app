@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -32,9 +33,9 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PauseTimer.PAUSE_VPN_EXTRA_MILLIS
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -60,6 +61,13 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
+
         initView()
         initClickListeners()
         observeAppState()
@@ -159,9 +167,8 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
         }
 
         lastStopActivityInvokeTime = SystemClock.elapsedRealtime()
-        val intent = Intent(this, HomeScreenActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val intent = Intent(this, AppLockActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
     }

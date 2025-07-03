@@ -15,9 +15,11 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.widget.addTextChangedListener
@@ -34,6 +36,7 @@ import com.celzero.bravedns.databinding.FragmentCustomDomainBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
 import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
@@ -43,13 +46,16 @@ import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.net.URI
 
 class CustomDomainFragment :
     Fragment(R.layout.fragment_custom_domain), SearchView.OnQueryTextListener {
 
     private val b by viewBinding(FragmentCustomDomainBinding::bind)
     private var layoutManager: RecyclerView.LayoutManager? = null
+    private lateinit var adapter: CustomDomainAdapter
 
     private val viewModel by inject<CustomDomainViewModel>()
 
@@ -70,6 +76,19 @@ class CustomDomainFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // fix for #1939, OEM-specific bug, especially on heavily customized Android
+        // some ROMs kill or freeze the keyboard/IME process to save memory or battery,
+        // causing SearchView to stop receiving input events
+        // this is a workaround to restart the IME process
+        b.cdaSearchView.setQuery("", false)
+        b.cdaSearchView.clearFocus()
+
+        val imm = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.restartInput(b.cdaSearchView)
     }
 
     private fun initView() {
@@ -101,17 +120,36 @@ class CustomDomainFragment :
 
     private fun setupAppSpecificRules(rule: CustomRulesActivity.RULES) {
         observeCustomRules()
-        val adapter = CustomDomainAdapter(requireContext(), rule)
+        adapter = CustomDomainAdapter(requireContext(), this, rule)
         b.cdaRecycler.adapter = adapter
         viewModel.setUid(uid)
         viewModel.customDomains.observe(this as LifecycleOwner) {
             adapter.submitData(this.lifecycle, it)
         }
+        io {
+            val appName = FirewallManager.getAppNameByUid(uid)
+            if (appName != null) {
+                uiCtx { updateAppNameInSearchHint(appName) }
+            }
+        }
+    }
+
+    private fun updateAppNameInSearchHint(appName: String) {
+        val appNameTruncated = appName.substring(0, appName.length.coerceAtMost(10))
+        val hint = getString(
+            R.string.two_argument_colon,
+            appNameTruncated,
+            getString(R.string.search_custom_domains)
+        )
+        b.cdaSearchView.queryHint = hint
+        b.cdaSearchView.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text).textSize =
+            14f
+        return
     }
 
     private fun setupAllRules(rule: CustomRulesActivity.RULES) {
         observeAllRules()
-        val adapter = CustomDomainAdapter(requireContext(), rule)
+        adapter = CustomDomainAdapter(requireContext(), this, rule)
         b.cdaRecycler.adapter = adapter
         viewModel.allDomainRules.observe(this as LifecycleOwner) {
             adapter.submitData(this.lifecycle, it)
@@ -189,8 +227,10 @@ class CustomDomainFragment :
         var selectedType: DomainRulesManager.DomainType = DomainRulesManager.DomainType.DOMAIN
 
         dBind.dacdDomainEditText.addTextChangedListener {
-            if (it?.contains("*") == true) {
+            if (it?.startsWith("*") == true || it?.startsWith(".") == true) {
                 dBind.dacdWildcardChip.isChecked = true
+            } else {
+                dBind.dacdDomainChip.isChecked = true
             }
         }
 
@@ -251,9 +291,15 @@ class CustomDomainFragment :
     ) {
         dBind.dacdFailureText.visibility = View.GONE
         val url = dBind.dacdDomainEditText.text.toString()
+        val extractedHost = extractHost(url) ?: run {
+            dBind.dacdFailureText.text =
+                getString(R.string.cd_dialog_error_invalid_domain)
+            dBind.dacdFailureText.visibility = View.VISIBLE
+            return
+        }
         when (selectedType) {
             DomainRulesManager.DomainType.WILDCARD -> {
-                if (!isWildCardEntry(url)) {
+                if (!isWildCardEntry(extractedHost)) {
                     dBind.dacdFailureText.text =
                         getString(R.string.cd_dialog_error_invalid_wildcard)
                     dBind.dacdFailureText.visibility = View.VISIBLE
@@ -261,7 +307,7 @@ class CustomDomainFragment :
                 }
             }
             DomainRulesManager.DomainType.DOMAIN -> {
-                if (!isValidDomain(url)) {
+                if (!isValidDomain(extractedHost)) {
                     dBind.dacdFailureText.text = getString(R.string.cd_dialog_error_invalid_domain)
                     dBind.dacdFailureText.visibility = View.VISIBLE
                     return
@@ -269,8 +315,43 @@ class CustomDomainFragment :
             }
         }
 
-        insertDomain(removeLeadingAndTrailingDots(url), selectedType, status)
+        insertDomain(removeLeadingAndTrailingDots(extractedHost), selectedType, status)
     }
+
+    private fun extractHost(input: String): String? {
+        val trimmedInput = input.trim()
+
+        return when {
+            // case: valid wildcard input without schema, eg., *.example.com
+            trimmedInput.startsWith("*.") && !trimmedInput.contains("://") -> {
+                trimmedInput
+            }
+
+            // case: invalid wildcard with schema, eg., https://*.example.com
+            trimmedInput.contains("://") && trimmedInput.contains("*") -> {
+                null // Invalid: Wildcards shouldn't appear in URLs
+            }
+
+            // case: standard URL input, eg., https://www.example.com
+            trimmedInput.contains("://") -> {
+                try {
+                    // return the host part of the URL
+                    // only www. is the common prefix you'd want to strip for cosmetic or
+                    // standardization reasons (like www.google.com → google.com). Other subdomains
+                    // (e.g., mail., api., m.) are actually part of the valid hostname and
+                    // should not be removed
+                    val uri = URI(trimmedInput)
+                    uri.host?.removePrefix("www.") // remove 'www.' prefix if present
+                } catch (e: Exception) {
+                    null
+                }
+            }
+
+            // case: plain domain (no schema, no wildcard), eg., example.com
+            else -> trimmedInput
+        }
+    }
+
 
     private fun insertDomain(
         domain: String,
@@ -300,11 +381,18 @@ class CustomDomainFragment :
         builder.setTitle(R.string.univ_delete_firewall_dialog_title)
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
+
             io {
-                if (rule == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
-                    DomainRulesManager.deleteRulesByUid(uid)
+                val selectedItems = adapter.getSelectedItems()
+                if (selectedItems.isNotEmpty()) {
+                    uiCtx { adapter.clearSelection() }
+                    DomainRulesManager.deleteRules(selectedItems)
                 } else {
-                    DomainRulesManager.deleteAllRules()
+                    if (rule == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
+                        DomainRulesManager.deleteRulesByUid(uid)
+                    } else {
+                        DomainRulesManager.deleteAllRules()
+                    }
                 }
             }
             Utilities.showToastUiCentered(
@@ -315,7 +403,7 @@ class CustomDomainFragment :
         }
 
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
-            // no-op
+            adapter.clearSelection()
         }
 
         builder.setCancelable(true)
@@ -324,5 +412,9 @@ class CustomDomainFragment :
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }

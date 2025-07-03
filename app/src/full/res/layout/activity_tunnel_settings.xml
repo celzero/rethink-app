@@ -137,9 +137,10 @@
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
                         android:layout_marginEnd="5dp"
+                        android:alpha="0.5"
                         android:layout_marginBottom="5dp"
                         android:padding="10dp"
-                        android:src="@drawable/ic_firewall_exclude_off" />
+                        android:src="@drawable/ic_loop_back_app" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -289,6 +290,62 @@
                 </RelativeLayout>
 
                 <RelativeLayout
+                    android:id="@+id/settings_activity_mobile_metered_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/settings_activity_mobile_metered_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:alpha="0.5"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_private_network" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/settings_activity_mobile_metered_switch"
+                        android:layout_toEndOf="@id/settings_activity_mobile_metered_icon"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/gen_settings_mobile_metered_txt"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_mobile_metered_heading"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="5dp"
+                            android:text="@string/settings_mobile_metered_desc"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/settings_activity_mobile_metered_switch"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:padding="10dp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
                     android:id="@+id/settings_r_in_r_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -307,7 +364,7 @@
                         android:layout_marginBottom="5dp"
                         android:alpha="0.5"
                         android:padding="10dp"
-                        android:src="@drawable/rethink_within_rethink" />
+                        android:src="@drawable/ic_loopback" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -336,6 +393,64 @@
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/settings_r_in_r_switch"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_right_arrow_small" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/settings_fail_open_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/settings_fail_open_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:alpha="0.5"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_loopback" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/settings_fail_open_switch"
+                        android:layout_toEndOf="@id/settings_fail_open_icon"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/gen_fail_open_txt"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/fail_open_network_title"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                        <TextView
+                            android:id="@+id/gen_fail_open_desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="5dp"
+                            android:text="@string/fail_open_network_desc"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/settings_fail_open_switch"
                         style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -543,6 +658,7 @@
                         android:src="@drawable/ic_connectivity_checks" />
 
                     <LinearLayout
+                        android:id="@+id/settings_activity_connectivity_checks_ll"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
@@ -576,6 +692,23 @@
                         android:padding="10dp" />
 
                 </RelativeLayout>
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/settings_activity_ping_ips_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rt_edit_dialog_positive"
+                    android:background="@drawable/rectangle_border_background"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="15dp"
+                    android:paddingTop="7dp"
+                    android:paddingBottom="7dp"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:textColor="?attr/primaryTextColor"
+                    />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

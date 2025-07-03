@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.adapter.RethinkEndpointAdapter
@@ -28,6 +29,7 @@ import com.celzero.bravedns.databinding.BottomSheetRethinkListBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.get
@@ -69,6 +71,13 @@ class RethinkListBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.let { window ->
+            if (isAtleastQ()) {
+                val controller = WindowInsetsControllerCompat(window, window.decorView)
+                controller.isAppearanceLightNavigationBars = false
+                window.isNavigationBarContrastEnforced = false
+            }
+        }
         initView()
         initClickListeners()
     }

@@ -19,13 +19,16 @@ import Logger
 import Logger.LOG_TAG_VPN
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.SystemClock
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
 import com.celzero.bravedns.service.PersistentState
@@ -33,10 +36,12 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import kotlin.math.abs
 
 class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetHomeScreenBinding? = null
@@ -73,6 +78,13 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.let { window ->
+            if (isAtleastQ()) {
+                val controller = WindowInsetsControllerCompat(window, window.decorView)
+                controller.isAppearanceLightNavigationBars = false
+                window.isNavigationBarContrastEnforced = false
+            }
+        }
         initView()
         updateUptime()
         initializeClickListeners()
@@ -82,7 +94,6 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         b.bsHomeScreenConnectedStatus.text = getConnectionStatus()
         val selectedIndex = appConfig.getBraveMode().mode
         Logger.d(LOG_TAG_VPN, "Home screen bottom sheet selectedIndex: $selectedIndex")
-
         updateStatus(selectedIndex)
     }
 
@@ -163,7 +174,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
             b.bsHsFirewallRl.alpha = 0.5f
             setRadioButtonsEnabled(false)
         } else if (isProxyEnabled) {
-            b.bsHomeScreenVpnLockdownDesc.text = getString(R.string.settings_lock_down_proxy_desc)
+            b.bsHomeScreenVpnLockdownDesc.text = getString(R.string.mode_change_error_proxy_enabled)
             b.bsHomeScreenVpnLockdownDesc.visibility = View.VISIBLE
             b.bsHsDnsRl.alpha = 0.5f
             b.bsHsFirewallRl.alpha = 0.5f
