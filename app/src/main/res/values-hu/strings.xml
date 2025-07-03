@@ -221,7 +221,7 @@
     <string name="lbl_listen_port" translatable="true">Figyelő port</string>
     <string name="lbl_mtu" translatable="true">MTU</string>
     <string name="lbl_auto" translatable="true">(auto)</string>
-    <string name="lbl_include" translatable="true">Tartalmaz</string>
+    <string name="lbl_include" translatable="true">Bevonás</string>
     <string name="lbl_select_all" translatable="true">összes kijelölése</string>
     <string name="lbl_active" translatable="true">Aktív</string>
     <string name="lbl_inactive" translatable="true">Inaktív</string>
@@ -237,10 +237,10 @@
     <string name="lbl_min" translatable="true">perc</string>
     <string name="lbl_hour" translatable="true">óra</string>
     <string name="lbl_day" translatable="true">nap</string>
-    <string name="lbl_preshared_key" translatable="true">Megosztott kulcs</string>
+    <string name="lbl_preshared_key" translatable="true">Előre megosztott kulcs</string>
     <string name="lbl_insecure" translatable="true">(nem biztonságos)</string>
     <string name="lbl_optional" translatable="true">(opcionális)</string>
-    <string name="lbl_persistent_keepalive" translatable="true">Állandó ébrentartás</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Állandó tartalék</string>
     <string name="lbl_allowed_ips" translatable="true">Engedélyezett IP-címek</string>
     <string name="lbl_save" translatable="true">mentés</string>
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
@@ -883,7 +883,7 @@
     <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Leggyakrabban blokkolt országok</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Indítsa el a Rethink-et a folytatáshoz</string>
     <string name="ssv_see_more" translatable="true">Összes megjelenítése</string>
-    <string name="bad_config_reason_invalid_key" translatable="true">Érvénytelen kulcs.</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">Érvénytelen kulcs</string>
     <string name="bad_config_reason_invalid_number" translatable="true">Érvénytelen szám</string>
     <string name="bad_config_reason_invalid_value" translatable="true">Érvénytelen érték</string>
     <string name="bad_config_reason_missing_attribute" translatable="true">Hiányzó tulajdonság</string>
@@ -943,10 +943,27 @@
     <string name="wg_apps_dialog_title_exclude" translatable="true">%1$s db alkalmazás kizárása</string>
     <string name="wireguard_no_config_msg" translatable="true">Nincsenek WireGuard VPN konfigurációk. Adjon hozzá néhányat a kezdéshez.</string>
     <string name="wireguard_connection_error" translatable="true">A WireGuard VPN csatlakozása sikertelen</string>
-    <string name="wireguard_disclaimer" translatable="true">Ez WireGuard, mint TCP és UDP proxy. Míg a DNS forgalmat %1$s továbbítják, az ICMP forgalmat (ex: ping) az alapul szolgáló hálózatba küldik.</string>
-    <string name="wireguard_disable_title" translatable="true">Stop WireGuard</string>
-    <string name="wireguard_disable_message" translatable="true">Állítsa le az összes aktív WireGuard VPN-t?</string>
-    <string name="lbl_remaining_apps" translatable="true">Remaining alkalmazások</string>
-    <string name="remaining_apps_dialog_title" translatable="true">Tartalmazza a maradék alkalmazásokat</string>
-    <string name="remaining_apps_dialog_desc" translatable="true">Tartsa be az összes fennmaradó alkalmazást, amelyet semmilyen más Proxy nem irányít</string>
+    <string name="wireguard_disclaimer" translatable="true">A DNS-forgalom továbbításra kerül a(z) %1$s címre, az ICMP (például: ping) csomagokat pedig az alapértelmezett hálózaton keresztül küldi a rendszer.</string>
+    <string name="wireguard_disable_title" translatable="true">WireGuard leállítása</string>
+    <string name="wireguard_disable_message" translatable="true">Szeretné leállítani az összes aktív WireGuard VPN-t?</string>
+    <string name="lbl_remaining_apps" translatable="true">Fennmaradó alkalmazások</string>
+    <string name="remaining_apps_dialog_title" translatable="true">Fennmaradó alkalmazások bevonása</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Az összes olyan fennmaradó alkalmazás bevonása, amelyeket más proxy nem irányít</string>
+    <string name="cloudflare_dns_desc" translatable="true">Nem blokkol egyetlen DNS-kérést sem. A Cloudflare 1.1.1.1 DNS-végpontot használja.</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">Blokkolja a kártevőket (malware) és a felnőtt tartalmakat. A Cloudflare 1.1.1.3 DNS-végpontot használja.</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">Blokkolja a rosszindulatú tartalmakat. A Cloudflare 1.1.1.2 DNS-végpontot használja.</string>
+    <string name="google_dns_desc" translatable="true">Nem blokkol egyetlen DNS-kérést sem. A Google DNS-végpontját használja.</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">A családi szűrő blokkolja az összes felnőtt, pornográf és explicit oldalt. Emellett blokkolja a proxy és VPN domaineket is, amelyekkel meg lehetne kerülni a szűrőt. A vegyes tartalmú oldalak (például Reddit) szintén tiltottak. A Google, a Bing és a YouTube biztonságos (Safe Mode) üzemmódba kerülnek.</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">A felnőtt tartalomszűrő blokkolja az összes felnőtt, pornográf és explicit oldalt. Nem blokkolja a proxykat, VPN-eket vagy a vegyes tartalmú oldalakat (például a Reddit továbbra is elérhető). A Google és a Bing keresők biztonságos (Safe Mode) üzemmódba kerülnek.</string>
+    <string name="quad9_dns_desc" translatable="true">A Quad9 a DNS-lekérdezéseidet világszerte egy biztonságos szerverhálózaton keresztül irányítja.</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Blokkolja az összes felnőtt, pornográf és explicit oldalt. Emellett blokkolja a proxy és VPN domaineket is, amelyeket a szűrők megkerülésére használnának. A vegyes tartalmú oldalak (például a Reddit) szintén blokkolva vannak. A Google, a Bing és a YouTube biztonságos (Safe Mode) üzemmódban működnek.</string>
+    <string name="crypt_adguard_desc" translatable="true">Védi az eszközt a kártevőktől és egyéb fenyegetésektől.</string>
+    <string name="crypt_adguard_family_desc" translatable="true">Az AdGuard DNS szülői felügyeleti (parental control) és családi védelem (Family Protection) módja egyszerre biztosítja a Safe Search (biztonságos keresés) funkciót és a felnőtt tartalmak blokkolását.</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) – DNSSEC ellenőrzés, nincs naplózás/szűrés 9.9.9 – 149.112.112.9 – 149.112.1112</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) – nincs DNSSEC, nincs naplózás, nincs szűrés, ECS támogatás, 9.9.9.12 és 149.112.112.12</string>
+    <string name="crypt_relay_netherlands" translatable="true">Névtelenített DNS átjátszó (relay) Hollandiában üzemeltetve</string>
+    <string name="crypt_relay_france" translatable="true">Névtelenített DNS átjátszó (relay) Párizsban, Franciaországban, a https://cryptostorm.is/ szolgáltató üzemeltetésében.</string>
+    <string name="crypt_relay_sweden" translatable="true">Névtelenített DNS átjátszó (relay) Svédországban, a https://cryptostorm.is/ szolgáltató üzemeltetésében.</string>
+    <string name="crypt_relay_us" translatable="true">Névtelenített DNS átjátszó (relay) az USA-ban, Los Angelesben, a https://cryptostorm.is/ szolgáltató üzemeltetésében.</string>
+    <string name="crypt_relay_singapore" translatable="true">Névtelenített DNS átjátszó (relay) Szingapúrban.</string>
 </resources>
