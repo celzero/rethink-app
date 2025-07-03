@@ -926,6 +926,15 @@
     <string name="catch_all_wg_dialog_desc" translatable="true">Minden olyan kapcsolat és alkalmazás, amit más WireGuard VPN-ek nem irányítanak, ezen a VPN-en keresztül lesz továbbítva.</string>
     <string name="one_wg_error_toast" translatable="true">Az „Speciális” módra váltáshoz először állítsd le a WireGuardot az „Egyszerű” módban</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Érvénytelen WARP konfiguráció</string>
-    <string name="add_remove_apps" translatable="true">Add / Távolítsa el az alkalmazásokat (%1$s alkalmazások)</string>
-    <string name="routing_remaining_apps" translatable="true">Routing maradék alkalmazások</string>
+    <string name="add_remove_apps" translatable="true">Alkalmazás hozzáadása / eltávolítása (%1$s db alkalmazás)</string>
+    <string name="routing_remaining_apps" translatable="true">A fennmaradó alkalmazások forgalmának irányítása</string>
+    <string name="add_peer" translatable="true">Partner hozzáadása</string>
+    <string name="config_delete_dialog_desc" translatable="true">Biztosan törölni szeretné ezt a WireGuard VPN konfigurációt?</string>
+    <string name="config_delete_dialog_title" translatable="true">Törlés</string>
+    <string name="config_add_success_toast" translatable="true">Kész</string>
+    <string name="include_all_app_wg_dialog_title" translatable="true">Minden alkalmazás bevonása</string>
+    <string name="include_all_app_wg_dialog_desc" translatable="true">Szeretné, hogy ez a WireGuard VPN legyen használva minden alkalmazáshoz?</string>
+    <string name="exclude_all_app_wg_dialog_title" translatable="true">Az összes alkalmazás kizárása</string>
+    <string name="exclude_all_app_wg_dialog_desc" translatable="true">Az összes alkalmazás kizárása ebből a WireGuard VPN-ből?</string>
+    <string name="wireguard_enabled_failure" translatable="true">Állítsd le a többi aktív proxyt, hogy engedélyezni tudja a WireGuardot.</string>
 </resources>
