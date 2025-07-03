@@ -800,4 +800,6 @@
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">Naplók törlése</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Az alkalmazáshoz tartozó összes napló törlése.</string>
     <string name="bypass_dns_firewall_tooltip">%1$s csak a Rethink DNS-ével működik</string>
+    <string name="exclude_apps_from_proxy">Bypass app minden Proxies</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Kerületi alkalmazás minden Proxies lehetővé teszi</string>
 </resources>
