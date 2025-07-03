@@ -45,7 +45,7 @@
     <string name="lbl_status" translatable="true">Állapot</string>
     <string name="lbl_remove" translatable="true">Eltávolítás</string>
     <string name="lbl_last" translatable="true">Utolsó</string>
-    <string name="lbl_starting" translatable="true">Indítás</string>
+    <string name="lbl_starting" translatable="true">Indítás folyamatban</string>
     <string name="lbl_overall" translatable="true">Összesen</string>
     <string name="lbl_stopped" translatable="true">Leállított</string>
     <string name="lbl_private" translatable="true">privát</string>
@@ -430,25 +430,25 @@
     <string name="hsf_whats_new_remove_text" translatable="true">Bezárás…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">Engedélyezés…</string>
     <string name="hsf_chip_appearance" translatable="true">Téma: %1$s</string>
-    <string name="hsf_pause_vpn_failure" translatable="true">Nem lehet szünetet tartani: RethinkDNS nem aktív</string>
-    <string name="lbl_background_data" translatable="true">Korlátozza a háttér adatait</string>
-    <string name="battery_optimization_dialog_heading" translatable="true">Disable %1$s</string>
-    <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> a kapcsolódási veszteséget eredményezheti. Változtassa meg a Rethink használati adatokat és más erőforrásokat háttérben.</string>
+    <string name="hsf_pause_vpn_failure" translatable="true">Nem lehet szüneteltetni: RethinkDNS nem aktív</string>
+    <string name="lbl_background_data" translatable="true">Háttéradat-forgalom korlátozása</string>
+    <string name="battery_optimization_dialog_heading" translatable="true">%1$s letiltása</string>
+    <string name="restrict_dialog_message" translatable="true">A(z) <i>%1$s</i> kapcsolatvesztést okozhat. Módosítsa a beállítást, hogy a Rethink a háttérben is használhassa az adatforgalmat és egyéb erőforrásokat.</string>
     <string name="dc_block_heading" translatable="true">szabályok</string>
     <string name="dc_other_dns_heading" translatable="true">típus</string>
     <string name="dc_custom_dns_radio" translatable="true">Egyéb DNS</string>
     <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
-    <string name="dc_entries" translatable="true">%1$s bejegyzés »</string>
-    <string name="dc_local_block_heading" translatable="true">Eszközön tárolt tiltólisták</string>
-    <string name="dc_local_block_desc_1" translatable="true">Válasszon a több mint 195 tiltólista közül! Kattintson ide a tiltólisták letöltéséhez vagy beállításához.</string>
+    <string name="dc_entries" translatable="true">%1$s bejegyzések 🔗</string>
+    <string name="dc_local_block_heading" translatable="true">Eszközön tárolt blokklisták</string>
+    <string name="dc_local_block_desc_1" translatable="true">Válasszon több mint 185+ blokklista közül. Kattintson ide a blokklisták letöltéséhez vagy konfigurálásához.</string>
     <string name="dc_custom_block_heading" translatable="true">Egyedi tartományok engedélyezése vagy megtagadása</string>
     <string name="dc_dns_website_heading" translatable="true">Weboldal ikon megjelenítése a DNS-naplókban (kísérleti funkció)</string>
-    <string name="dc_dns_website_desc" translatable="true">A weboldalikonokat a <i>nextdns.io</i> és a <i>duckduckgo.com</i> oldalakról tölti le. Legfeljebb 350 MB tárhelyet használhat fel</string>
+    <string name="dc_dns_website_desc" translatable="true">Weboldal ikonokat hív le a <i>nextdns.com</i> és a <i>duckduckgo.com</i> oldalról. Legfeljebb 350 MB lemezterületet foglal el</string>
     <string name="dc_dns_leaks_heading" translatable="true">DNS-szivárgások megakadályozása</string>
     <string name="dc_dns_leaks_desc" translatable="true">Amikor ez a funkció engedélyezve van, a Rethink minden, 53-as porton érkező csomagot rögzít, és azokat az Ön által beállított DNS-végpontra továbbítja</string>
-    <string name="dc_check_update_heading" translatable="true">Értesítés tiltólista-frissítésekről</string>
+    <string name="dc_check_update_heading" translatable="true">Prompt a blokklista frissítésekre</string>
     <string name="dc_check_update_desc" translatable="true">Ellenőrizze a blokklisták frissítését <i>három</i> naponként egyszer</string>
-    <string name="dc_proxy_dns_heading" translatable="true">Soha ne proxy DNS</string>
+    <string name="dc_proxy_dns_heading" translatable="true">Soha ne használd proxyként a DNS-t.</string>
     <string name="dc_proxy_dns_desc" translatable="true">Ne továbbítsa a DNS-forgalmat proxy-n keresztül folyamatosan aktív WireGuard, SOCKS5 vagy HTTP proxy használata esetén.</string>
     <string name="about_bravedns_explantion" translatable="true">A Rethink a legegyszerűbb módja annak, hogy figyelje az alkalmazások tevékenységét, megkerülje az internetes cenzúrát, és tűzfalat állítson be alkalmazásaihoz Android készülékén.</string>
     <string name="about_bravedns_whoarewe" translatable="true">A Rethink egy ingyenes és nyílt forráskódú projekt, amelyet az Amazon, az IBM és a Scientific Games korábbi mérnökei vezetnek.</string>
