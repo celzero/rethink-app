@@ -927,4 +927,5 @@
     <string name="one_wg_error_toast" translatable="true">Az „Speciális” módra váltáshoz először állítsd le a WireGuardot az „Egyszerű” módban</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Érvénytelen WARP konfiguráció</string>
     <string name="add_remove_apps" translatable="true">Add / Távolítsa el az alkalmazásokat (%1$s alkalmazások)</string>
+    <string name="routing_remaining_apps" translatable="true">Routing maradék alkalmazások</string>
 </resources>
