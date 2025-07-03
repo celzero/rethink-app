@@ -49,7 +49,7 @@
     <string name="lbl_overall" translatable="true">Összességében</string>
     <string name="lbl_stopped" translatable="true">Leállított</string>
     <string name="lbl_private" translatable="true">privát</string>
-    <string name="lbl_secure" translatable="true">védett</string>
+    <string name="lbl_secure" translatable="true">biztonságos</string>
     <string name="lbl_anonymous" translatable="true">anonim</string>
     <string name="lbl_peer" translatable="true">Partner</string>
     <string name="firewall_mode_notification_title" translatable="true">Védett! Csatlakozva a tűzfalhoz.</string>
@@ -257,7 +257,7 @@
     <string name="app_mode_choose" translatable="true">Válassz módot</string>
     <string name="settings_autostart_bootup_desc" translatable="true">Az eszköz bekapcsolásakor indítsa el a Rethink alkalmazást, ha a leállítás előtt futott.</string>
     <string name="settings_http_proxy_error_text3" translatable="true">A kiszolgálónév üres</string>
-    <string name="lbl_notification" translatable="true">értesítés</string>
+    <string name="lbl_notification" translatable="true">Értesítés</string>
     <string name="memory_notification_text">A Rethink alacsony memória használatot tapasztal. A rendszer műveletei korlátozottak lehetnek.</string>
     <string name="slide_2_title" translatable="true">Üdvözlünk</string>
     <string name="slide_2_desc" translatable="true">A Rethink a legkönnyebb módja a hálózati aktivitás figyelésének, az internetes cenzúra megkerülésének és az alkalmazások tűzfalának kezelésére Android eszközön.</string>
@@ -404,7 +404,7 @@
     <string name="universal_firewall_explanation" translatable="true">Alkalmazza a tűzfal szabályokat minden alkalmazásra az eszközhöz kapcsolódó események alapján, például tűzfal alkalmazása, amikor az eszköz zárva van, vagy amikor egy adott alkalmazás nincs használatban.</string>
     <string name="lbl_unselected" translatable="true">Elválasztott</string>
     <string name="apps_icon_content_desc" translatable="true">Alkalmazásikon</string>
-    <string name="lbl_idle" translatable="true">Tétlen</string>
+    <string name="lbl_idle" translatable="true">Üresjárat</string>
     <string name="lbl_split" translatable="true">Felosztás</string>
     <string name="lbl_on_device" translatable="true">on-device</string>
     <string name="status_protected_with_tor_private_dns" translatable="true">Tor és privát DNS segítségével védett</string>
@@ -966,4 +966,5 @@
     <string name="crypt_relay_sweden" translatable="true">Névtelenített DNS átjátszó (relay) Svédországban, a https://cryptostorm.is/ szolgáltató üzemeltetésében.</string>
     <string name="crypt_relay_us" translatable="true">Névtelenített DNS átjátszó (relay) az USA-ban, Los Angelesben, a https://cryptostorm.is/ szolgáltató üzemeltetésében.</string>
     <string name="crypt_relay_singapore" translatable="true">Névtelenített DNS átjátszó (relay) Szingapúrban.</string>
+    <string name="cd_toast_edit" translatable="true">Szerkesztve</string>
 </resources>
