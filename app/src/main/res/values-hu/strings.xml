@@ -799,7 +799,123 @@
     <string name="ada_app_dns_settings" translatable="true">DNS-beállítások</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">Naplók törlése</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Az alkalmazáshoz tartozó összes napló törlése.</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s csak a Rethink DNS-ével működik</string>
-    <string name="exclude_apps_from_proxy">Bypass app minden Proxies</string>
-    <string name="exclude_apps_from_proxy_failure_toast">Kerületi alkalmazás minden Proxies lehetővé teszi</string>
+    <string name="bypass_dns_firewall_tooltip">A(z) %1$s csak a Rethink DNS-sel működik</string>
+    <string name="exclude_apps_from_proxy">Az alkalmazás megkerüli az összes proxy szervert</string>
+    <string name="exclude_apps_from_proxy_failure_toast">Ez az alkalmazás megkerüli a proxykat</string>
+    <string name="bsac_title_desc" translatable="true">A szabályok csak erre az alkalmazásra vonatkoznak.</string>
+    <string name="bsdl_block_desc" translatable="true">Tiltás, megbízhatóvá tétel <u>ennek a domainnek</u></string>
+    <string name="bsdl_blocked_desc" translatable="true">blokkolt %1$s által %2$s</string>
+    <string name="network_dns" translatable="true">Rendszer DNS</string>
+    <string name="notif_download_content_title" translatable="true">Eszközön tárolt tiltólista letöltése</string>
+    <string name="notif_download_content_text" translatable="true">Letöltés folyamatban…</string>
+    <string name="notif_download_failure_content" translatable="true">Letöltés sikertelen. Próbálja újra.</string>
+    <string name="notif_download_cancel_content" translatable="true">Letöltés törölve.</string>
+    <string name="notif_download_success_content" translatable="true">Sikeres letöltés.</string>
+    <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Szülői felügyelet</string>
+    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen" translatable="true">A felnőtt és kalóz tartalmak, az online szerencsejátékok és társkereső oldalak, valamint a közösségi média blokkolása.</string>
+    <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Adatvédelem</string>
+    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen" translatable="true">Figyelemfelkeltő szoftverek, kémprogramok és ijesztgető programok blokkolása.</string>
+    <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">Biztonság</string>
+    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen" translatable="true">A rosszindulatú programok, zsarolóprogramok, kriptovédelmi programok, adathalászok és egyéb fenyegetések blokkolása.</string>
+    <string name="rt_dialog_title" translatable="true">Változtatások mentése</string>
+    <string name="rt_dialog_message" translatable="true">Szeretné alkalmazni az újonnan konfigurált blokklistákat?</string>
+    <string name="rt_dialog_neutral" translatable="true">Folytatás</string>
+    <string name="rt_edit_dialog_positive" translatable="true">Szerkesztés</string>
+    <string name="rt_download_start" translatable="true">Blokkolólisták letöltése…</string>
+    <string name="rt_download" translatable="true">Blokklisták letöltése</string>
+    <string name="rt_chip_update_available" translatable="true">Frissítés érhető el</string>
+    <string name="rt_chip_check_update" translatable="true">Frissítés keresése</string>
+    <string name="rt_re_download" translatable="true">Blokkolólisták újratöltése</string>
+    <string name="rt_list_simple_btn_txt" translatable="true">egyszerű</string>
+    <string name="lbl_advanced" translatable="true">Speciális</string>
+    <string name="rt_filter_parent_selected" translatable="true">Kiválasztva</string>
+    <string name="rt_download_desc" translatable="true">Töltse le a blokklistákat (kb. 60 MB), hogy használhassa ezt a funkciót.</string>
+    <string name="radio_sky_btn" translatable="true">⛅ Ég</string>
+    <string name="radio_max_btn" translatable="true">🪂 Max</string>
+    <string name="rt_filter_hint" translatable="true"><u>Az összes</u> blokklista megjelenítése</string>
+    <string name="rt_filter_desc" translatable="true">A <u>%1$s</u> blokklisták megjelenítése</string>
+    <string name="rt_filter_desc_subgroups" translatable="true">A <u>%1$s</u> blokklisták megjelenítése a következő csoportban: %2$s és alcsoportban: %3$s</string>
+    <string name="rethink_sky_desc" translatable="true">280+ helyszín; nagyobb rendelkezésre állás; a stub resolver a cloudflare.com-on fut</string>
+    <string name="rethink_max_desc" translatable="true">50+ helyszín; nagyobb adatvédelem; a rekurzív resolver a fly.io-n fut</string>
+    <string name="bsrf_sub_group_heading" translatable="true">Alcsoport</string>
+    <string name="bsrf_clear_filter" translatable="true">Törlés</string>
+    <string name="dc_local_block_enabled" translatable="true">Engedélyezve</string>
+    <string name="dc_setting_dns_cache_heading" translatable="true">DNS gyorsító (kísérleti)</string>
+    <string name="dc_setting_dns_cache_desc" translatable="true">Kérelmek összevonása, válaszok gyorsítótárazása, ellenálló hibakezelés</string>
+    <string name="dc_refresh_toast" translatable="true">Frissítés befejezve</string>
+    <string name="lbbs_enabled" translatable="true">Engedélyezve</string>
+    <string name="lbbs_configure" translatable="true">Beállítás</string>
+    <string name="lbbs_copy" translatable="true">Másolás RDNS+ URL-ként</string>
+    <string name="lbbs_search" translatable="true">Keresés a domainek blokklistákban</string>
+    <string name="lbbs_update_check" translatable="true">Frissítés keresése</string>
+    <string name="lbbs_redownload" translatable="true">Blokkolólisták újratöltése</string>
+    <string name="lbbs_download" translatable="true">Blokkolólisták frissítése</string>
+    <string name="lbbs_heading" translatable="true">185+ blokklista konfigurálása</string>
+    <string name="brbs_title" translatable="true">Biztonsági másolat és visszaállítás</string>
+    <string name="brbs_backup_title" translatable="true">Biztonsági másolat</string>
+    <string name="brbs_backup_desc" translatable="true">Biztonsági mentés az alkalmazás beállításairól, hálózati és dns naplókról</string>
+    <string name="brbs_restore_title" translatable="true">Visszaállítás</string>
+    <string name="brbs_restore_desc" translatable="true">Visszaállítás fájlból</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Nem működik az alkalmazás verziók és eszközök között</string>
+    <string name="brbs_backup_dialog_title" translatable="true">Készítsen biztonsági másolatot</string>
+    <string name="brbs_backup_dialog_message" translatable="true">Biztonsági mentést készít az alkalmazás beállításairól, a hálózati és dns naplókról egy fájlba. Ez újraindítja a VPN-t.</string>
+    <string name="brbs_backup_dialog_positive" translatable="true">Biztonsági másolat</string>
+    <string name="brbs_restore_dialog_title" translatable="true">Biztonsági mentés visszaállítása</string>
+    <string name="brbs_restore_dialog_message" translatable="true">Alkalmazásbeállítások, hálózati és dns-naplók visszaállítása biztonsági másolatból. Ez újraindítja az alkalmazást.</string>
+    <string name="brbs_restore_dialog_positive" translatable="true">Visszaállítás</string>
+    <string name="brbs_backup_dialog_failure_title" translatable="true">Biztonsági mentés sikertelen</string>
+    <string name="brbs_backup_dialog_failure_message" translatable="true">A biztonsági mentés nem sikerült. Szeretné újra megpróbálni?</string>
+    <string name="brbs_backup_dialog_failure_positive" translatable="true">Biztonsági mentés megismétlése</string>
+    <string name="brbs_restore_dialog_failure_title" translatable="true">A visszaállítás sikertelen</string>
+    <string name="brbs_restore_dialog_failure_message" translatable="true">A visszaállítás nem sikerült. Szeretné újra megpróbálni?</string>
+    <string name="brbs_restore_dialog_failure_positive" translatable="true">Visszaállítás újrakezdése</string>
+    <string name="brbs_restore_complete_toast" translatable="true">Visszaállítás befejeződött, alkalmazás újraindítása…</string>
+    <string name="brbs_backup_complete_toast" translatable="true">A biztonsági mentés kész</string>
+    <string name="brbs_restore_no_uri_toast" translatable="true">A visszaállítás sikertelen; próbálja újra</string>
+    <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category" translatable="true">%1$s blokklisták</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">Jelenleg engedélyezett alkalmazások</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">Jelenleg letiltott alkalmazások</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">Leggyakrabban elért domainek</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Leggyakrabban elért országok</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">Leggyakrabban blokkolt domainek</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">Leggyakrabban elért IP-címek</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">Leggyakrabban blokkolt IP-címek</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Leggyakrabban blokkolt országok</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Indítsa el a Rethink-et a folytatáshoz</string>
+    <string name="ssv_see_more" translatable="true">Összes megjelenítése</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">Érvénytelen kulcs.</string>
+    <string name="bad_config_reason_invalid_number" translatable="true">Érvénytelen szám</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">Érvénytelen érték</string>
+    <string name="bad_config_reason_missing_attribute" translatable="true">Hiányzó tulajdonság</string>
+    <string name="bad_config_reason_missing_section" translatable="true">Hiányzó rész</string>
+    <string name="bad_config_reason_syntax_error" translatable="true">Szintaktikus hiba</string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true">Ismeretlen tulajdonság</string>
+    <string name="bad_config_reason_unknown_section" translatable="true">Ismeretlen szakasz</string>
+    <string name="key_length_explanation_base64" translatable="true">A WireGuard base64 kulcsoknak pontosan 44 karakteresnek (32 bájtosnak) kell lenniük</string>
+    <string name="key_length_explanation_binary" translatable="true">A WireGuard kulcsoknak 32 byte-nek kell lenniük</string>
+    <string name="key_length_explanation_hex" translatable="true">A WireGuard hexadecimális kulcsoknak 64 karakter hosszúnak (32 bájtosnak) kell lenniük</string>
+    <string name="key_contents_error" translatable="true">Rossz karakterek a kulcsban</string>
+    <string name="key_length_error" translatable="true">Helytelen kulcshossz</string>
+    <string name="parse_error_inet_address" translatable="true">IP-cím</string>
+    <string name="parse_error_inet_endpoint" translatable="true">Végpont</string>
+    <string name="parse_error_inet_network" translatable="true">IP hálózat</string>
+    <string name="parse_error_integer" translatable="true">szám</string>
+    <string name="bad_config_explanation_pka" translatable="true">Pozitív számnak kell lennie, és nem haladhatja meg a 65535-öt</string>
+    <string name="bad_config_explanation_positive_number" translatable="true">: Pozitív legyen</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">: Legyen érvényes UDP portszám</string>
+    <string name="bad_config_context" translatable="true">%1$s : %2$s</string>
+    <string name="bad_config_error" translatable="true">%1$s : %2$s</string>
+    <string name="generic_error" translatable="true">Ismeretlen „%s” hiba</string>
+    <string name="parse_error_generic" translatable="true">Karakterlánc</string>
+    <string name="parse_error_reason" translatable="true">Nem sikerült feldolgozni a(z) %1$s „%2$s” értéket</string>
+    <string name="unknown_error" translatable="true">Ismeretlen hiba</string>
+    <string name="invalid_file_error" translatable="true">érvénytelen fájl</string>
+    <string name="import_error" translatable="true">Alagút importálása sikertelen: %s</string>
+    <string name="illegal_filename_error" translatable="true">Illegális fájlnév \"%s\"</string>
+    <string name="no_configs_error" translatable="true">Konfigurációk nem találhatók</string>
+    <string name="bad_extension_error" translatable="true">A fájlnak .conf vagy .zip kiterjesztésűnek kell lennie</string>
+    <string name="setup_wireguard" translatable="true">WireGuard Beállítása</string>
+    <string name="wireguard_description" translatable="true">WireGuard mint proxy.</string>
+    <string name="new_warp_config_desc" translatable="true">Fetch WARP konfiguráció a szerverről</string>
+    <string name="new_warp_error_toast" translatable="true">Képtelen a WARP konfigurációra</string>
 </resources>
