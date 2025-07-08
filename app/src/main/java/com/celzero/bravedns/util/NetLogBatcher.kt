@@ -18,7 +18,6 @@ package com.celzero.bravedns.util
 
 import Logger.LOG_BATCH_LOGGER
 import android.util.Log
-import co.touchlab.stately.concurrency.AtomicBoolean
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -29,6 +28,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicBoolean
 
 // channel buffer receives batched entries of batchsize or once every waitms from a batching
 // producer or a time-based monitor (signal) running in a single-threaded co-routine context.
@@ -79,7 +79,7 @@ class NetLogBatcher<T, V>(
 
     // stackoverflow.com/a/68905423
     suspend fun close() = withContext(NonCancellable) {
-                if (closed.compareAndSet(expected = false, new = true)) {
+                if (closed.compareAndSet(false, true)) {
                     signal.close()
                     buffersCh.close()
                     updatesCh.close()
