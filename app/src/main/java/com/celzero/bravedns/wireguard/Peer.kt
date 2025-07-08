@@ -32,7 +32,6 @@ import java.util.function.Consumer
  *
  * Instances of this class are immutable.
  */
-@NonNullForAll
 class Peer private constructor(builder: Builder) {
     val id: Int = 0
     private val allowedIps: Set<InetNetwork>

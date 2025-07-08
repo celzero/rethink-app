@@ -26,7 +26,6 @@ import java.net.UnknownHostException
 import java.util.regex.Pattern
 
 /** Utility methods for creating instances of [InetAddress]. */
-@NonNullForAll
 object InetAddresses {
     private var PARSER_METHOD: Method? = null
     private val WONT_TOUCH_RESOLVER =

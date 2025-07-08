@@ -26,7 +26,6 @@ import com.celzero.firestack.backend.WgKey
  *
  * Instances of this class are immutable.
  */
-@NonNullForAll
 class KeyPair @JvmOverloads constructor(key: WgKey = Backend.newWgPrivateKey()) {
     private val privateKey: WgKey
     private val publicKey: WgKey

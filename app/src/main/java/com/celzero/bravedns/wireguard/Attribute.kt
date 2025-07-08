@@ -21,7 +21,6 @@ package com.celzero.bravedns.wireguard
 import java.util.Optional
 import java.util.regex.Pattern
 
-@NonNullForAll
 class Attribute private constructor(val key: String, val value: String) {
 
     companion object {

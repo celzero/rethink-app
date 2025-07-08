@@ -26,7 +26,6 @@ import java.net.InetAddress
  *
  * Instances of this class are immutable.
  */
-@NonNullForAll
 class InetNetwork private constructor(val address: InetAddress, val mask: Int) {
 
     override fun equals(obj: Any?): Boolean {

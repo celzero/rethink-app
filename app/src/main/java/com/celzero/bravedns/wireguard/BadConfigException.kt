@@ -18,7 +18,6 @@
  */
 package com.celzero.bravedns.wireguard
 
-@NonNullForAll
 class BadConfigException
 private constructor(
     val section: Section,

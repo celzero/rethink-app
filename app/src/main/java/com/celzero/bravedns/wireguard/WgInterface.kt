@@ -31,7 +31,6 @@ import java.util.stream.Collectors
  *
  * Instances of this class are immutable.
  */
-@NonNullForAll
 class WgInterface private constructor(builder: Builder) {
 
 

@@ -31,7 +31,6 @@ import java.util.*
  *
  * Instances of this class are immutable.
  */
-@NonNullForAll
 class Config private constructor(builder: Builder) {
     private val id: Int
     private val name: String
