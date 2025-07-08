@@ -344,5 +344,10 @@ class Constants {
                 "2606:4700::6810:84e5", // cloudflare
                 "2606:4700:3033::ac43:a21b" // rethinkdns
             )
+
+        // URLs to check IPv4 and IPv6 connectivity
+        val urlV4probe = "https://example.com#ipv4" // a service to check IPv4 connectivity
+
+        val urlV6probe = "https://example.com#ipv6" // a service to check IPv6 connectivity
     }
 }
