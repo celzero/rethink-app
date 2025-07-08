@@ -68,7 +68,8 @@ internal constructor(
     private var consoleLogBatcher: NetLogBatcher<ConsoleLog, Nothing>? = null
 
     // dispatch buffer to consumer if greater than batch size for dns, ip and rr logs
-    private val logBatchSize = 20
+    // expected per row size is 100 bytes to 500 bytes, so a batch of 40 rows is around 4KB to 20KB
+    private val logBatchSize = 40
     // dispatch buffer to consumer if greater than batch size, for console logs
     private val consoleLogBatchSize = 512
 
