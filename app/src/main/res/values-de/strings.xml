@@ -4,8 +4,8 @@
     <string name="app_name_small_case">rethink</string>
     <string name="title_settings">Einstellungen</string>
     <string name="title_about">Über</string>
-    <string name="about_title_desc">Netzwerkbedrohungen erkennen und blockieren</string>
-    <string name="pause_title_desc">Pausieren…</string>
+    <string name="about_title_desc">Erkennen und blockieren Sie Netzwerksicherheitsbedrohungen</string>
+    <string name="pause_title_desc">ein Nickerchen machen…</string>
     <string name="txt_home">Startseite</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Warnung: Rethink wurde deaktiviert</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Tippen zum ändern der Schutzeinstellung</string>
@@ -782,7 +782,7 @@
     <string name="firewall_rule_block_domain_desc" translatable="true">Eine benutzerdefinierte Firewallregel hat die <i>Domäne</i> blockiert.<br/><br/>Zur Änderung den Bildschirm <i>App-spezifische Firewall</i> benutzen.</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true">Diese Verbindung wurde zugelassen, weil die <i>Domäne</i> als vertrauenswürdige Domäne definiert ist.<br/><br/>Zur Änderung den Bildschirm <i>App-spezifische Firewall</i> benutzen.</string>
     <string name="lbl_cancel" translatable="true">Abbrechen</string>
-    <string name="lbl_apply" translatable="true">Akzeptieren</string>
+    <string name="lbl_apply" translatable="true">Übernehmen</string>
     <string name="lbl_dismiss" translatable="true">Verwerfen</string>
     <string name="lbl_all" translatable="true">Alle</string>
     <string name="lbl_ip_rules" translatable="true">IP-Regeln</string>
