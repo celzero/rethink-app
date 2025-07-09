@@ -56,7 +56,8 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
             BlocklistDownloadHelper.checkBlocklistUpdate(
                 timestamp,
                 persistentState.appVersion,
-                retryCount = 0
+                retryCount = 0,
+                persistentState.routeRethinkInRethink
             ) ?: return
 
         val updatableTs = BlocklistDownloadHelper.getDownloadableTimestamp(response)

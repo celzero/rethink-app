@@ -24,9 +24,11 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.addCallback
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -43,6 +45,7 @@ import com.celzero.bravedns.util.TunnelImporter
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.viewmodel.WgConfigViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -152,6 +155,26 @@ class WgMainActivity :
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         init()
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
+
+        onBackPressedDispatcher.addCallback(
+            this /* lifecycle owner */,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (b.createFab.isVisible) {
+                        collapseFab()
+                    } else {
+                        finish()
+                    }
+                    return
+                }
+            }
+        )
     }
 
     private fun init() {
@@ -160,14 +183,6 @@ class WgMainActivity :
         observeConfig()
         observeDnsName()
         setupClickListeners()
-
-        onBackPressedDispatcher.addCallback(this /* lifecycle owner */) {
-            if (b.createFab.visibility == View.VISIBLE) {
-                collapseFab()
-            } else {
-                finish()
-            }
-        }
     }
 
     private fun setAdapter() {
@@ -207,7 +222,7 @@ class WgMainActivity :
         val layoutManager = LinearLayoutManager(this)
         b.wgGeneralInterfaceList.layoutManager = layoutManager
 
-        wgConfigAdapter = WgConfigAdapter(this)
+        wgConfigAdapter = WgConfigAdapter(this, this, persistentState.splitDns)
         wgConfigViewModel.interfaces.observe(this) { wgConfigAdapter?.submitData(lifecycle, it) }
         b.wgGeneralInterfaceList.adapter = wgConfigAdapter
     }
@@ -277,18 +292,32 @@ class WgMainActivity :
     }
 
     private fun observeDnsName() {
+        val activeConfigs = WireguardManager.getActiveConfigs()
         if (WireguardManager.oneWireGuardEnabled()) {
-            val activeConfigs = WireguardManager.getEnabledConfigs()
-            val isAnyConfigActive = activeConfigs.isNotEmpty()
-            if (isAnyConfigActive) {
-                val dnsName = activeConfigs.firstOrNull()?.getName() ?: return
+            val dnsName = activeConfigs.firstOrNull()?.getName() ?: return
+            if (isAtleastQ()) {
                 b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsName)
+            } else {
+                b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer_below_android_Q)
             }
             // remove the observer if any config is active
             appConfig.getConnectedDnsObservable().removeObservers(this)
         } else {
-            appConfig.getConnectedDnsObservable().observe(this) {
-                b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, it)
+            appConfig.getConnectedDnsObservable().observe(this) { dns ->
+                var dnsNames: String = dns.ifEmpty { "" }
+                if (persistentState.splitDns) {
+                    if (activeConfigs.isNotEmpty()) {
+                        dnsNames += ","
+                    }
+                    dnsNames += activeConfigs.joinToString(",") { it.getName() }
+                }
+                if (isAtleastQ()) {
+                    b.wgWireguardDisclaimer.text =
+                        getString(R.string.wireguard_disclaimer, dnsNames)
+                } else {
+                    b.wgWireguardDisclaimer.text =
+                        getString(R.string.wireguard_disclaimer_below_android_Q)
+                }
             }
         }
     }
@@ -297,7 +326,7 @@ class WgMainActivity :
         // see CustomIpFragment#setupClickListeners#bringToFront()
         b.wgAddFab.bringToFront()
         b.wgAddFab.setOnClickListener {
-            if (b.createFab.visibility == View.VISIBLE) {
+            if (b.createFab.isVisible) {
                 collapseFab()
             } else {
                 expendFab()
@@ -324,7 +353,7 @@ class WgMainActivity :
             showGeneralToggle()
         }
         b.oneWgToggleBtn.setOnClickListener {
-            val activeConfigs = WireguardManager.getEnabledConfigs()
+            val activeConfigs = WireguardManager.getActiveConfigs()
             val isAnyConfigActive = activeConfigs.isNotEmpty()
             val isOneWgEnabled = WireguardManager.oneWireGuardEnabled()
             if (isAnyConfigActive && !isOneWgEnabled) {

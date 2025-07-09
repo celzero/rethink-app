@@ -39,12 +39,25 @@ class BlocklistDownloadHelper {
     )
 
     companion object {
+        private const val TOTAL_RETRY_COUNT = 3
+        fun logd(message: String) {
+            Logger.d(LOG_TAG_DOWNLOAD, message)
+        }
+
+        fun logi(message: String) {
+            Logger.i(LOG_TAG_DOWNLOAD, message)
+        }
+
+        fun logw(message: String, exception: Exception) {
+            Logger.w(LOG_TAG_DOWNLOAD, message, exception)
+        }
+
         fun isDownloadComplete(context: Context, timestamp: Long): Boolean {
             var result = false
             var total: Int? = 0
             var dir: File? = null
             try {
-                Logger.d(LOG_TAG_DOWNLOAD, "Local block list validation: $timestamp")
+                logd("Local block list validation: $timestamp")
                 dir = File(getExternalFilePath(context, timestamp.toString()))
                 total =
                     if (dir.isDirectory) {
@@ -54,17 +67,10 @@ class BlocklistDownloadHelper {
                     }
                 result = Constants.ONDEVICE_BLOCKLISTS_ADM.count() == total
             } catch (ignored: Exception) {
-                Logger.w(
-                    LOG_TAG_DOWNLOAD,
-                    "Local block list validation failed: ${ignored.message}",
-                    ignored
-                )
+                logw("Local block list validation failed: ${ignored.message}", ignored)
             }
 
-            Logger.d(
-                LOG_TAG_DOWNLOAD,
-                "Valid on-device blocklist ($timestamp) download? $result, files: $total, dir? ${dir?.isDirectory}"
-            )
+            logd("on-device blocklist($timestamp) download? $result, files: $total, dir? ${dir?.isDirectory}")
             return result
         }
 
@@ -86,7 +92,7 @@ class BlocklistDownloadHelper {
                     Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH
                 }
             val dir = File(context.getExternalFilesDir(null).toString() + path + timestamp)
-            Logger.d(LOG_TAG_DOWNLOAD, "deleteOldFiles, File : ${dir.path}, ${dir.isDirectory}")
+            logd("deleteOldFiles, File : ${dir.path}, ${dir.isDirectory}")
             deleteRecursive(dir)
         }
 
@@ -95,23 +101,13 @@ class BlocklistDownloadHelper {
             if (!dir.exists()) return
 
             dir.listFiles()?.forEach {
-                Logger.d(
-                    LOG_TAG_DOWNLOAD,
-                    "Delete blocklist list residue for $which, dir: ${it.name}"
+            logd("delete blocklist list residue for $which, dir: ${it.name}"
                 )
                 // delete all the dir other than current timestamp dir
                 if (it.name != timestamp.toString()) {
                     deleteRecursive(it)
                 }
             }
-        }
-
-        fun deleteFromCanonicalPath(context: Context) {
-            val canonicalPath =
-                File(
-                    blocklistCanonicalPath(context, Constants.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME)
-                )
-            deleteRecursive(canonicalPath)
         }
 
         fun getExternalFilePath(context: Context, timestamp: String): String {
@@ -136,18 +132,16 @@ class BlocklistDownloadHelper {
         suspend fun checkBlocklistUpdate(
             timestamp: Long,
             vcode: Int,
-            retryCount: Int
+            retryCount: Int,
+            isRinRActive: Boolean
         ): BlocklistUpdateServerResponse? {
             try {
                 val retrofit =
-                    RetrofitManager.getBlocklistBaseBuilder(retryCount)
+                    RetrofitManager.getBlocklistBaseBuilder(isRinRActive)
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()
                 val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
-                Logger.i(
-                    LOG_TAG_DOWNLOAD,
-                    "downloadAvailabilityCheck: ${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_1}, ${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_2}, $vcode, $timestamp"
-                )
+                logi("downloadAvailabilityCheck: ${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_1}, ${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_2}, $vcode, $timestamp")
                 val response =
                     retrofitInterface.downloadAvailabilityCheck(
                         Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_1,
@@ -155,32 +149,26 @@ class BlocklistDownloadHelper {
                         timestamp,
                         vcode
                     )
-                Logger.i(
-                    LOG_TAG_DOWNLOAD,
-                    "downloadAvailabilityCheck: $response, $retryCount, $vcode, $timestamp"
-                )
+                logi("downloadAvailabilityCheck: $response, $retryCount, $vcode, $timestamp")
                 if (response?.isSuccessful == true) {
                     val r = response.body()?.toString()?.let { JSONObject(it) }
                     return processCheckDownloadResponse(r)
                 }
             } catch (ex: Exception) {
-                Logger.crash(LOG_TAG_DOWNLOAD, "exception in checkBlocklistUpdate: ${ex.message}", ex)
+                logw("exception in checkBlocklistUpdate: ${ex.message}", ex)
             }
-            Logger.i(
-                LOG_TAG_DOWNLOAD,
-                "downloadAvailabilityCheck: failed, returning null, $retryCount"
-            )
+            logi("downloadAvailabilityCheck: failed, returning null, $retryCount")
             return if (isRetryRequired(retryCount)) {
-                Logger.i(LOG_TAG_DOWNLOAD, "retrying the downloadAvailabilityCheck")
-                checkBlocklistUpdate(timestamp, vcode, retryCount + 1)
+                logi("retrying the downloadAvailabilityCheck")
+                checkBlocklistUpdate(timestamp, vcode, retryCount + 1, isRinRActive)
             } else {
-                Logger.i(LOG_TAG_DOWNLOAD, "retry count exceeded, returning null")
+                logi("retry count exceeded, returning null")
                 null
             }
         }
 
         private fun isRetryRequired(retryCount: Int): Boolean {
-            return retryCount < RetrofitManager.Companion.OkHttpDnsType.entries.size - 1
+            return retryCount < TOTAL_RETRY_COUNT
         }
 
         private fun processCheckDownloadResponse(
@@ -190,21 +178,15 @@ class BlocklistDownloadHelper {
 
             try {
                 val version = response.optInt(Constants.JSON_VERSION, 0)
-                Logger.d(
-                    LOG_TAG_DOWNLOAD,
-                    "client onResponse for refresh blocklist files:  $version"
-                )
+                logd("client onResponse for refresh blocklist files:  $version")
 
-                val shouldUpdate = response.optBoolean(Constants.JSON_UPDATE, false)
+                val hasUpdate = response.optBoolean(Constants.JSON_UPDATE, false)
                 val timestamp = response.optLong(Constants.JSON_LATEST, INIT_TIME_MS)
-                Logger.i(
-                    LOG_TAG_DOWNLOAD,
-                    "response for blocklist update check: version: $version, update? $shouldUpdate, timestamp: $timestamp"
-                )
+                logi("response for blocklist update check: version: $version, update? $hasUpdate, timestamp: $timestamp")
 
-                return BlocklistUpdateServerResponse(version, shouldUpdate, timestamp)
+                return BlocklistUpdateServerResponse(version, hasUpdate, timestamp)
             } catch (e: JSONException) {
-                Logger.crash(LOG_TAG_DOWNLOAD, "Error in parsing the response: ${e.message}", e)
+                logw("err parsing the response: ${e.message}", e)
             }
             return null
         }
