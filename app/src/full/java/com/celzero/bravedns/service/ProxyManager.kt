@@ -34,7 +34,7 @@ object ProxyManager : KoinComponent {
     const val ID_TCP_BASE = "TCP"
     const val ID_S5_BASE = "S5"
     const val ID_HTTP_BASE = "HTTP"
-    const val ID_NONE = "SYSTEM"
+    const val ID_NONE = "SYSTEM" // no proxy
 
     const val TCP_PROXY_NAME = "Rethink-Proxy"
     const val ORBOT_PROXY_NAME = "Orbot"
