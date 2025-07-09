@@ -64,7 +64,6 @@ import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.Gobyte
-import com.celzero.firestack.backend.Gomsg
 import com.celzero.firestack.backend.Gostr
 import com.google.common.net.InternetDomainName
 import com.google.gson.JsonParser
@@ -805,11 +804,12 @@ object Utilities {
         return port
     }
 
-    // generates a random 12-byte value, converts it to hexadecimal, and then
+    // generates a user-specified number of random bytes, converts it to hexadecimal, and then
     // provides the hexadecimal value as a string
     fun getRandomString(length: Int): String {
+        val secureRandom = SecureRandom()
         val random = ByteArray(length)
-        SecureRandom().nextBytes(random)
+        secureRandom.nextBytes(random)
         // formats each byte as a two-character hexadecimal string
         return random.joinToString("") { "%02x".format(it) }
     }
@@ -910,7 +910,6 @@ object Utilities {
      */
     fun String?.togs(): Gostr? {
         if (this.isNullOrEmpty()) {
-            Logger.w(LOG_TAG_VPN, "Input string is null or empty, returning empty Gostr")
             return Backend.strOf("")
         }
         return Backend.strOf(this)
@@ -925,15 +924,6 @@ object Utilities {
      */
     fun Gostr?.tos(): String? {
         if (this == null) {
-            Logger.w(LOG_TAG_VPN, "Gostr is null, returning empty string")
-            return null
-        }
-        return this.v()
-    }
-
-    fun Gomsg?.tos(): String? {
-        if (this == null) {
-            Logger.w(LOG_TAG_VPN, "Gomsg is null, returning empty string")
             return null
         }
         return this.s
@@ -948,7 +938,6 @@ object Utilities {
      */
     fun ByteArray?.togb(): Gobyte? {
         if (this == null) {
-            Logger.w(LOG_TAG_VPN, "ByteArray is null, returning empty Gobyte")
             return Backend.bytesOf(byteArrayOf())
         }
         return Backend.bytesOf(this)
@@ -963,9 +952,9 @@ object Utilities {
      */
     fun Gobyte?.tob(): ByteArray? {
         if (this == null) {
-            Logger.w(LOG_TAG_VPN, "Gobyte is null, returning empty ByteArray")
             return null
         }
+
         return this.v()
     }
 
