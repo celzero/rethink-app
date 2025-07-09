@@ -27,6 +27,7 @@ import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.database.WgConfigFilesRepository
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_ID
 import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_NAME
+import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
@@ -341,14 +342,13 @@ object WireguardManager : KoinComponent {
     private suspend fun canUseConfig(idStr: String, type: String, usesMtrdNw: Boolean): Pair<String, Boolean> {
         val block = Backend.Block
         if (idStr.isEmpty()) {
-            Logger.d(LOG_TAG_PROXY, "config id is empty, return empty")
             return Pair("", true)
         }
         val id = convertStringIdToId(idStr)
         val config = if (id == INVALID_CONF_ID) null else mappings.find { it.id == id }
 
         if (config == null) {
-            Logger.d(LOG_TAG_PROXY, "config null no need to proceed, return empty")
+            Logger.d(LOG_TAG_PROXY, "config null($idStr) no need to proceed, return empty")
             return Pair("", true)
         }
 
@@ -443,7 +443,10 @@ object WireguardManager : KoinComponent {
 
         // check for app specific config
         val ac = ProxyManager.getProxyIdForApp(uid)
-        val appProxyPair = canUseConfig(ac, "app($uid)", usesMeteredNw)
+        // app-specific config can be empty, if the app is not configured
+        // app-specific config id
+        val acid = if (ac == ID_NONE) "" else ac // ignore id string if it is ID_NONE
+        val appProxyPair = canUseConfig(acid, "app($uid)", usesMeteredNw)
         if (!appProxyPair.second) {
             if (appProxyPair.first == block) {
                 proxyIds.clear()
