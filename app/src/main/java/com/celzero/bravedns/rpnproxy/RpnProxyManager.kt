@@ -18,14 +18,29 @@ package com.celzero.bravedns.rpnproxy
 import Logger
 import Logger.LOG_TAG_PROXY
 import android.content.Context
-import com.celzero.firestack.backend.Backend
+import android.os.SystemClock
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.Data
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import com.android.billingclient.api.Purchase
 import com.celzero.bravedns.database.RpnProxy
 import com.celzero.bravedns.database.RpnProxyRepository
+import com.celzero.bravedns.database.SubscriptionStatus
+import com.celzero.bravedns.database.SubscriptionStatusRepository
+import com.celzero.bravedns.iab.PurchaseDetail
+import com.celzero.bravedns.iab.QueryUtils
+import com.celzero.bravedns.scheduler.PaymentWorker
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.EncryptedFileManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.TcpProxyHelper.PAYMENT_WORKER_TAG
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.RPN_PROXY_FOLDER_NAME
@@ -33,6 +48,8 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.BadConfigException
 import com.celzero.bravedns.wireguard.Config
+import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.settings.Settings
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.CoroutineScope
@@ -41,11 +58,11 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import com.celzero.firestack.settings.Settings
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.CopyOnWriteArraySet
+import java.util.concurrent.TimeUnit
 
 object RpnProxyManager : KoinComponent {
 
@@ -53,7 +70,10 @@ object RpnProxyManager : KoinComponent {
 
     private const val TAG = "RpnMgr"
 
+    private var preferredId = Backend.Auto
+
     private val db: RpnProxyRepository by inject()
+    private val subsDb: SubscriptionStatusRepository by inject()
     private val workScheduler by inject<WorkScheduler>()
     private val persistentState by inject<PersistentState>()
 
@@ -99,13 +119,22 @@ object RpnProxyManager : KoinComponent {
         }
     }
 
-    enum class RpnMode(val id: Int, val value: String) {
-        ANTI_CENSORSHIP(1, Backend.Auto),
-        HIDE_IP(2, Backend.Auto),
-        NONE(0, "");
+    enum class RpnMode(val id: Int) {
+        NONE(0),
+        ANTI_CENSORSHIP(1),
+        HIDE_IP(2);
 
         companion object {
             fun fromId(id: Int) = RpnMode.entries.first { it.id == id }
+
+            fun getPreferredId(id: Int): String {
+                val mode = fromId(id)
+                return when (mode) {
+                    NONE -> ""
+                    ANTI_CENSORSHIP -> getPreferredId()
+                    HIDE_IP -> getPreferredId()
+                }
+            }
         }
 
         fun isAntiCensorship() = this == ANTI_CENSORSHIP
@@ -116,43 +145,109 @@ object RpnProxyManager : KoinComponent {
     }
 
     enum class RpnState(val id: Int) {
-        INACTIVE(0),
-        PAUSED(1),
-        ACTIVE(2);
+        DISABLED(0),
+        PAUSED(1), // not used in the app, but kept for future use
+        ENABLED(2);
 
         companion object {
             fun fromId(id: Int) = RpnState.entries.first { it.id == id }
         }
 
-        fun isActive() = this == ACTIVE
+        fun isEnabled() = this == ENABLED
         fun isPaused() = this == PAUSED
-        fun isInactive() = this == INACTIVE
+        fun isInactive() = this == DISABLED
     }
 
-    fun isRpnActive() = RpnState.fromId(persistentState.rpnState).isActive()
+    fun isRpnActive(): Boolean {
+        val isEnabled = RpnState.fromId(persistentState.rpnState).isEnabled()
+        val isActive = !rpnMode().isNone()
+        return isEnabled && isActive
+    }
+
+    fun isRpnEnabled() = RpnState.fromId(persistentState.rpnState).isEnabled()
 
     fun rpnMode() = RpnMode.fromId(persistentState.rpnMode)
 
     fun rpnState() = RpnState.fromId(persistentState.rpnState)
 
+    fun setRpnMode(mode: RpnMode) {
+        if (rpnMode() == mode) {
+            Logger.i(LOG_TAG_PROXY, "$TAG; rpn mode already set to ${RpnMode.getPreferredId(mode.id)}, skipping")
+            return
+        }
+        persistentState.rpnMode = mode.id
+        Logger.i(LOG_TAG_PROXY, "$TAG; rpn mode set to $${RpnMode.getPreferredId(mode.id)}")
+    }
+
     fun deactivateRpn() {
-        if (persistentState.rpnState == RpnState.INACTIVE.id) {
+        if (persistentState.rpnState == RpnState.DISABLED.id) {
             Logger.i(LOG_TAG_PROXY, "$TAG; rpn already deactivated, skipping")
             return
         }
-        persistentState.rpnState = RpnState.INACTIVE.id
+        persistentState.rpnState = RpnState.DISABLED.id
+        setRpnProductId("")
         persistentState.showConfettiOnRPlus = true
         Logger.i(LOG_TAG_PROXY, "$TAG; rpn deactivated")
     }
 
-    fun activateRpn() {
-        if (persistentState.rpnState == RpnState.ACTIVE.id) {
+    fun activateRpn(purchase: PurchaseDetail) {
+        if (persistentState.rpnState == RpnState.ENABLED.id) {
             Logger.i(LOG_TAG_PROXY, "$TAG; rpn already activated, skipping")
             return
         }
-        persistentState.rpnState = RpnState.ACTIVE.id
-        persistentState.showConfettiOnRPlus = false
-        Logger.i(LOG_TAG_PROXY, "$TAG; rpn activated, mode: ${rpnMode().value}")
+        persistentState.rpnState = RpnState.ENABLED.id
+        setRpnProductId(purchase.productId)
+        updateSubscriptionStatus(purchase)
+        Logger.i(LOG_TAG_PROXY, "$TAG; rpn activated, mode: ${rpnMode()}")
+    }
+
+    private fun updateSubscriptionStatus(purchase: PurchaseDetail) {
+        // create an entry in the subscription status db
+        val sessionToken = purchase.payload.split(":").firstOrNull() ?: ""
+        val subs = SubscriptionStatus()
+        subs.id = 0 // auto-incremented
+        subs.accountId = purchase.accountId
+        subs.purchaseToken = purchase.purchaseToken
+        subs.productId = purchase.productId
+        subs.planId = purchase.planId
+        subs.sessionToken = sessionToken
+        subs.productTitle = purchase.productTitle
+        subs.status = purchase.state
+        subs.purchaseTime = purchase.purchaseTimeMillis
+        subs.accountExpiry = 0L // will be set later
+        subs.billingExpiry = purchase.expiryTime
+        subs.developerPayload = purchase.payload
+        io {
+            val id = subsDb.upsert(subs)
+            if (id > 0) {
+                Logger.i(LOG_TAG_PROXY, "$TAG; subscription status updated, id: $id")
+            } else {
+                Logger.e(LOG_TAG_PROXY, "$TAG; err updating subscription status")
+            }
+        }
+    }
+
+    fun changePreferredId(id: String) {
+        if (id.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err; preferred id is empty, resetting to default")
+            preferredId = Backend.Auto
+            return
+        }
+        preferredId = id
+        Logger.i(LOG_TAG_PROXY, "$TAG; preferred id changed to $preferredId")
+    }
+
+    fun getPreferredId(): String {
+        Logger.v(LOG_TAG_PROXY, "$TAG; getPreferredId: $preferredId")
+        return preferredId
+    }
+
+    fun getRpnProductId(): String {
+        return persistentState.rpnProductId
+    }
+
+    fun setRpnProductId(productId: String) {
+        persistentState.rpnProductId = productId
     }
 
     enum class RpnType(val id: Int) {
@@ -503,8 +598,8 @@ object RpnProxyManager : KoinComponent {
                 name = PROTON_NAME,
                 configPath = protonConfigFile.absolutePath,
                 serverResPath = serverResFile.absolutePath ?: "",
-                isActive = rpnpro?.isActive ?: false,
-                isLockdown = rpnpro?.isLockdown ?: false,
+                isActive = rpnpro?.isActive == true,
+                isLockdown = rpnpro?.isLockdown == true,
                 createdTs = rpnpro?.createdTs ?: System.currentTimeMillis(),
                 modifiedTs = System.currentTimeMillis(),
                 misc = rpnpro?.misc ?: "",
@@ -620,8 +715,8 @@ object RpnProxyManager : KoinComponent {
                 name = cfg.getName(),
                 configPath = cfgFile.absolutePath,
                 serverResPath = resFile.absolutePath,
-                isActive = prev?.isActive ?: false,
-                isLockdown = prev?.isLockdown ?: false,
+                isActive = prev?.isActive == true,
+                isLockdown = prev?.isLockdown == true,
                 createdTs = prev?.createdTs ?: System.currentTimeMillis(),
                 modifiedTs = System.currentTimeMillis(),
                 misc = prev?.misc ?: "",
@@ -684,7 +779,7 @@ object RpnProxyManager : KoinComponent {
     fun canSelectCountryCode(cc: String): Pair<Boolean, String> {
         // Check if the country code is available in the proton config
         // and see if only max of 5 countries can be selected
-        val isAvailable = protonConfig?.regionalWgConfs?.any { it.cc == cc } ?: false
+        val isAvailable = protonConfig?.regionalWgConfs?.any { it.cc == cc } == true
         if (!isAvailable) {
             Logger.i(LOG_TAG_PROXY, "$TAG; cc not available in proton config: $cc")
             return Pair(false, "Country code not available in the proton config")
@@ -708,6 +803,183 @@ object RpnProxyManager : KoinComponent {
         sb.append("   proton config? ${protonConfig != null}\n")
 
         return sb.toString()
+    }
+
+    /**
+     * Validate the payload received from Play Billing.
+     * The payload is expected to be in the format: "accountId:session_token"
+     * where accountId is the account ID from PipKeyManager and hashkey represents the user
+     * session_token created during the purchase by server
+     */
+    suspend fun isValidPayload(payload: String): Boolean {
+        if (payload.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err; payload is empty")
+            return false
+        }
+        val keyState = PipKeyManager.getToken(applicationContext)
+        val keyFromPlayBilling = getCidFromPayload(payload)
+        if (keyState.isEmpty() || keyFromPlayBilling.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err; key state or key from play billing is empty")
+            return false
+        }
+        if (keyState != keyFromPlayBilling) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err; key state and key from play billing do not match")
+            return false
+        }
+        Logger.i(LOG_TAG_PROXY, "$TAG; key state and key from play billing match, processing payment")
+        return true
+    }
+
+    private fun getCidFromPayload(payload: String): String {
+        // sample payload: payload={"ws":{"cid":"aa95f04efcb19a54c7605a02e5dd0b435906b993d12bec031a60f3f1272f4f0e","sessiontoken":"22605:4:1752145272:1da0c248e6cf32ca071a96e477bdf0033368599b4b:307dfd06996672f735409fec4807fcf40a0677e2ef","status":"valid"}}
+        val payloadJson = try {
+            JSONObject(payload)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err parsing payload json: ${e.message}")
+            return ""
+        }
+        val ws = payloadJson.optJSONObject("ws")
+        if (ws == null) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err; ws object is null in payload")
+            return ""
+        }
+        return ws.optString("cid", "")
+    }
+
+    suspend fun isValidAccountId(accountId: String): Boolean {
+        if (accountId.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err; accountId is empty")
+            return false
+        }
+        val keyState = PipKeyManager.getToken(applicationContext)
+        if (keyState.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err; key state is empty")
+            return false
+        }
+        if (keyState != accountId) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err; key state and accountId do not match")
+            return false
+        }
+        Logger.i(LOG_TAG_PROXY, "$TAG; key state and accountId match, processing payment")
+        return true
+    }
+
+    suspend fun cancelRpnSubscription(accountId: String, purchaseToken: String): Boolean {
+        if (purchaseToken.isEmpty() || accountId.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err; purchaseToken is empty")
+            return false
+        }
+        // Cancel the subscription using the purchase token
+        val result = subsDb.cancelSubscription(accountId, purchaseToken, SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id)
+        // If the result is greater than 0, it means the subscription was cancelled successfully
+        return if (result > 0) {
+            Logger.i(LOG_TAG_PROXY, "$TAG; subscription cancelled successfully for token: $purchaseToken")
+            deactivateRpn()
+            true
+        } else {
+            Logger.e(LOG_TAG_PROXY, "$TAG; err cancelling subscription for token in db: $purchaseToken")
+            false
+        }
+    }
+
+    suspend fun revokeRpnSubscription(accountId: String, purchaseToken: String): Boolean {
+        if (purchaseToken.isEmpty() || accountId.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err; purchaseToken is empty")
+            return false
+        }
+        // Revoke the subscription using the purchase token
+        val result = subsDb.revokeSubscription(accountId, purchaseToken, SubscriptionStatus.SubscriptionState.STATE_REVOKED.id)
+        // If the result is greater than 0, it means the subscription was revoked successfully
+        return if (result > 0) {
+            Logger.i(LOG_TAG_PROXY, "$TAG; subscription revoked successfully for token: $purchaseToken")
+            deactivateRpn()
+            true
+        } else {
+            Logger.e(LOG_TAG_PROXY, "$TAG; err revoking subscription for token in db: $purchaseToken")
+            false
+        }
+    }
+
+    suspend fun processRpnPurchase(purchases: List<PurchaseDetail>): Boolean {
+        if (purchases.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err; no purchases to process")
+            return false
+        }
+        purchases.forEach { purchase ->
+            if (purchase.productId.isEmpty()) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; err; productId is empty for purchase: $purchase")
+                return@forEach
+            }
+            if (!isValidPayload(purchase.payload) && !isValidAccountId(purchase.accountId)) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; err; invalid payload for purchase: $purchase")
+                return@forEach
+            }
+
+            val subStatus = SubscriptionStatus.SubscriptionState.fromId(purchase.state)
+            when (subStatus) {
+                SubscriptionStatus.SubscriptionState.STATE_ACTIVE,
+                SubscriptionStatus.SubscriptionState.STATE_GRACE_PERIOD -> {
+                    activateRpn(purchase)
+                    Logger.i(LOG_TAG_PROXY, "$TAG; processed purchase: $purchase")
+                    return true
+                }
+                SubscriptionStatus.SubscriptionState.STATE_PURCHASED,
+                SubscriptionStatus.SubscriptionState.STATE_PENDING -> {
+                    // Do not activate RPN, but update the subscription status
+                    updateSubscriptionStatus(purchase)
+                    Logger.i(
+                        LOG_TAG_PROXY,
+                        "$TAG; purchase is in pending state, not activating RPN: $purchase"
+                    )
+                    return true
+                }
+                else -> {
+                    Logger.w(
+                        LOG_TAG_PROXY,
+                        "$TAG; purchase in unhandled state, deactivating RPN. State: ${subStatus.name}"
+                    )
+                    return@forEach
+                }
+            }
+        }
+        Logger.w(LOG_TAG_PROXY, "$TAG; err; no valid purchases to process")
+        deactivateRpn()
+        return false
+    }
+
+
+    suspend fun checkForAcknowledgments(purchase: Purchase) {
+        val appContext = applicationContext
+        Logger.d(LOG_TAG_PROXY, "initiatePaymentVerification: initiating payment verification")
+
+        // if worker is already running, don't start another one
+        val workInfos = WorkManager.getInstance(appContext).getWorkInfosByTag(PAYMENT_WORKER_TAG)
+        if (workInfos.get().any { it.state == WorkInfo.State.RUNNING }) {
+            Logger.i(LOG_TAG_PROXY, "initiatePaymentVerification: worker already running")
+            return
+        }
+        val data = Data.Builder()
+        data.putLong("workerStartTime", SystemClock.elapsedRealtime())
+        data.putString("productId", purchase.products.firstOrNull() ?: "")
+        data.putString("purchaseToken", purchase.purchaseToken)
+        data.putString("referenceId", purchase.developerPayload)
+        data.putString("accountId", purchase.orderId)
+        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+        val paymentWorker =
+            OneTimeWorkRequestBuilder<PaymentWorker>()
+                .setInputData(data.build())
+                .setConstraints(constraints)
+                .setBackoffCriteria(
+                    BackoffPolicy.LINEAR,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
+                    TimeUnit.MILLISECONDS
+                )
+                .addTag(PAYMENT_WORKER_TAG)
+                .setInitialDelay(10, TimeUnit.SECONDS)
+                .build()
+
+        Logger.i(LOG_TAG_PROXY, "initiatePaymentVerification: enqueuing payment worker")
+        WorkManager.getInstance(appContext).beginWith(paymentWorker).enqueue()
     }
 
     private fun io(f: suspend () -> Unit) {

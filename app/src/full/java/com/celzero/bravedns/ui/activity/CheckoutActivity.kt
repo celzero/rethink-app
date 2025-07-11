@@ -26,10 +26,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -42,8 +39,8 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.togb
 import com.celzero.bravedns.util.Utilities.togs
 import com.celzero.bravedns.util.Utilities.tos
 import kotlinx.coroutines.Dispatchers
@@ -187,9 +184,18 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
             try {
                 val key = TcpProxyHelper.getPublicKey()
                 Logger.d(Logger.LOG_TAG_PROXY, "Public Key: $key")
-                val encryptedKey = Backend.newPipKey(key.togs(), "".togs())
-                val blind = encryptedKey.blind()
-                Logger.d(Logger.LOG_TAG_PROXY, "Blind: $blind")
+                // if there is a key state, the msgOrExistingState (keyState.msg/keyState.v()) should not be empty
+                val keyGenerator = Backend.newPipKeyProvider(key.togb(), "".togs())
+                val keyState = keyGenerator.blind()
+                // id: use 64 chars as account id
+                val id = keyState.msg.opaque()?.s ?: ""
+                val accountId = id.substring(0, 64)
+                // rest of the keyState values will never be used in kotlin
+
+                // keyState.v() should be retrieved from the file system
+                Backend.newPipKeyStateFrom(keyState.v()) // retrieve the key state alone
+
+                Logger.d(Logger.LOG_TAG_PROXY, "Blind: $keyState")
                 val path =
                     File(
                         this.filesDir.canonicalPath +
@@ -198,7 +204,7 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
                             File.separator +
                             TcpProxyHelper.PIP_KEY_FILE_NAME
                     )
-                EncryptedFileManager.writeTcpConfig(this, blind.tos() ?: "", TcpProxyHelper.PIP_KEY_FILE_NAME)
+                EncryptedFileManager.writeTcpConfig(this, keyState.v().tos() ?: "", TcpProxyHelper.PIP_KEY_FILE_NAME)
                 val content = EncryptedFileManager.read(this, path)
                 Logger.d(Logger.LOG_TAG_PROXY, "Content: $content")
             } catch (e: Exception) {

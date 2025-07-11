@@ -30,7 +30,7 @@ class RpnProxiesUpdateWorker(context: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         // perform the update only if RPN is active
-        if (!RpnProxyManager.isRpnActive()) {
+        if (!RpnProxyManager.isRpnEnabled()) {
             Logger.i(LOG_TAG_SCHEDULER, "$TAG RPN is not active, skipping update")
             return Result.success()
         }
