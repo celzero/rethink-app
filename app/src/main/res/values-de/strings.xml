@@ -4,8 +4,8 @@
     <string name="app_name_small_case">rethink</string>
     <string name="title_settings">Einstellungen</string>
     <string name="title_about">Über</string>
-    <string name="about_title_desc">Erkennen und blockieren Sie Netzwerksicherheitsbedrohungen</string>
-    <string name="pause_title_desc">ein Nickerchen machen…</string>
+    <string name="about_title_desc">Netzwerksicherheitsbedrohungen erkennen und blockieren</string>
+    <string name="pause_title_desc">Pause…</string>
     <string name="txt_home">Startseite</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Warnung: Rethink wurde deaktiviert</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Tippen zum ändern der Schutzeinstellung</string>
