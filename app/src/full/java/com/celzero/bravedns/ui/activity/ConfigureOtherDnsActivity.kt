@@ -19,6 +19,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -31,6 +32,7 @@ import com.celzero.bravedns.ui.fragment.DoTListFragment
 import com.celzero.bravedns.ui.fragment.DohListFragment
 import com.celzero.bravedns.ui.fragment.ODoHListFragment
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 
@@ -79,6 +81,12 @@ class ConfigureOtherDnsActivity : AppCompatActivity(R.layout.activity_configure_
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
         dnsType = intent.getIntExtra(DNS_TYPE, dnsType)
         init()
     }

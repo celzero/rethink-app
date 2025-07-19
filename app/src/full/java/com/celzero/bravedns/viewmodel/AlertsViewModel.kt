@@ -39,26 +39,4 @@ class AlertsViewModel(
         fromTime.value = System.currentTimeMillis() - 1 * 60 * 60 * 1000L
         toTime.value = System.currentTimeMillis()
     }
-
-    fun getBlockedIpLogList(): LiveData<List<AppConnection>> {
-        val fromTime = fromTime.value ?: 0L
-        val toTime = toTime.value ?: 0L
-        return connectionTrackerDao.getBlockedIpLogList(fromTime, toTime)
-    }
-
-    fun getBlockedAppsLogList(): LiveData<List<AppConnection>> {
-        val fromTime = fromTime.value ?: 0L
-        val toTime = toTime.value ?: 0L
-        return connectionTrackerDao.getBlockedAppLogList(fromTime, toTime)
-    }
-
-    fun getBlockedDnsLogList(isAppBypassed: Boolean): LiveData<List<AppConnection>> {
-        val fromTime = fromTime.value ?: 0L
-        val toTime = toTime.value ?: 0L
-        return if (isAppBypassed) {
-            connectionTrackerDao.getBlockedDomainsList(fromTime, toTime)
-        } else {
-            dnsLogDao.getBlockedDnsLogList(fromTime, toTime)
-        }
-    }
 }

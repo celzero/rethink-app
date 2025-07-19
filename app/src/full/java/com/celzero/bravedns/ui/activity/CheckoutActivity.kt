@@ -26,10 +26,14 @@ import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityCheckoutProxyBinding
@@ -38,6 +42,10 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
+import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.togs
+import com.celzero.bravedns.util.Utilities.tos
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -50,9 +58,6 @@ import java.util.UUID
 class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
     private val b by viewBinding(ActivityCheckoutProxyBinding::bind)
     private val persistentState by inject<PersistentState>()
-    // lateinit var paymentSheet: PaymentSheet
-    // lateinit var customerConfig: PaymentSheet.CustomerConfiguration
-    lateinit var paymentIntentClientSecret: String
 
     companion object {
         private const val TOKEN_LENGTH = 32
@@ -66,6 +71,12 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
         init()
         setupClickListeners()
 
@@ -176,7 +187,7 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
             try {
                 val key = TcpProxyHelper.getPublicKey()
                 Logger.d(Logger.LOG_TAG_PROXY, "Public Key: $key")
-                val encryptedKey = Backend.newPipKey(key, "")
+                val encryptedKey = Backend.newPipKey(key.togs(), "".togs())
                 val blind = encryptedKey.blind()
                 Logger.d(Logger.LOG_TAG_PROXY, "Blind: $blind")
                 val path =
@@ -187,7 +198,7 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
                             File.separator +
                             TcpProxyHelper.PIP_KEY_FILE_NAME
                     )
-                EncryptedFileManager.writeTcpConfig(this, blind, TcpProxyHelper.PIP_KEY_FILE_NAME)
+                EncryptedFileManager.writeTcpConfig(this, blind.tos() ?: "", TcpProxyHelper.PIP_KEY_FILE_NAME)
                 val content = EncryptedFileManager.read(this, path)
                 Logger.d(Logger.LOG_TAG_PROXY, "Content: $content")
             } catch (e: Exception) {
@@ -200,21 +211,18 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
 
         b.paymentSuccessButton.setOnClickListener {
             val intent = Intent(this, TcpProxyMainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             startActivity(intent)
             finish()
         }
 
         b.restoreButton.setOnClickListener {
             val intent = Intent(this, TcpProxyMainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             startActivity(intent)
             finish()
         }
 
         b.paymentFailedButton.setOnClickListener {
             val intent = Intent(this, TcpProxyMainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             startActivity(intent)
             finish()
         }

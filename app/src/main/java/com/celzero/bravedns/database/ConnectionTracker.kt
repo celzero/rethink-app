@@ -29,12 +29,15 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
             Index(value = arrayOf("dnsQuery"), unique = false),
             Index(value = arrayOf("blockedByRule"), unique = false),
             Index(value = arrayOf("isBlocked", "timeStamp"), unique = false),
+            Index(value = arrayOf("connId"), unique = false),
+            Index(value = arrayOf("proxyDetails"), unique = false)
         ]
 )
 class ConnectionTracker {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var appName: String = ""
     var uid: Int = 0
+    var packageName: String = ""
     var usrId: Int = 0
     var ipAddress: String = ""
     var port: Int = 0
@@ -50,7 +53,8 @@ class ConnectionTracker {
     var downloadBytes: Long = 0
     var uploadBytes: Long = 0
     var duration: Int = 0
-    var synack: Int = 0
+    var synack: Long = 0 // treat it as rtt (round trip time)
+    var rpid: String = "" // relay proxy id
     var message: String = ""
     var connType: String = ""
 

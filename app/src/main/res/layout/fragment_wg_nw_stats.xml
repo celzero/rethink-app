@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background"
+    android:clipToPadding="false"
+    android:paddingBottom="70dp"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    app:layout_scrollFlags="scroll|enterAlways">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:weightSum="1">
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggle_group"
+            style="@style/toggleButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:checkedButton="@id/tb_recent_toggle_btn"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tb_recent_toggle_btn"
+                style="@style/toggleButtonNoStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:tag="0"
+                android:textAllCaps="false"
+                android:textColor="?attr/defaultToggleBtnTxt"
+                android:textSize="@dimen/default_font_text_view"
+                app:cornerRadius="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tb_daily_toggle_btn"
+                style="@style/toggleButtonNoStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:tag="1"
+                android:textAllCaps="false"
+                android:textColor="?attr/defaultToggleBtnTxt"
+                android:textSize="@dimen/default_font_text_view"
+                app:cornerRadius="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tb_weekly_toggle_btn"
+                style="@style/toggleButtonNoStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:tag="2"
+                android:textAllCaps="false"
+                android:textColor="?attr/defaultToggleBtnTxt"
+                android:textSize="@dimen/default_font_text_view"
+                app:cornerRadius="16dp" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <TextView
+            android:id="@+id/tb_logs_disabled_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/background"
+            android:gravity="top|center"
+            android:paddingStart="10dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="10dp"
+            android:text="@string/no_stats_available"
+            android:textSize="@dimen/large_font_text_view"
+            android:visibility="visible" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tb_stats_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="true"
+            app:cardBackgroundColor="?attr/background"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true"
+            app:strokeColor="?attr/secondaryTextColor"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <ProgressBar
+                    android:id="@+id/fss_progress_bar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:max="100"
+                    android:progress="50"
+                    android:secondaryProgress="80" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fss_unmetered_data_usage"
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_toStartOf="@id/fss_total_data_usage"
+                        android:drawableStart="@drawable/dot_accent"
+                        android:drawablePadding="10dp"
+                        android:padding="5dp"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/small_font_subheading_text" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/fss_total_data_usage"
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:padding="5dp"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/small_font_subheading_text" />
+                </RelativeLayout>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fss_metered_data_usage"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/dot_accent"
+                    android:drawablePadding="10dp"
+                    android:padding="5dp"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/small_font_subheading_text" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/stats_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:nestedScrollingEnabled="false" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

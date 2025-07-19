@@ -15,24 +15,27 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import Logger.LOG_TAG_UI
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.DnsQueryAdapter
+import com.celzero.bravedns.adapter.DnsLogAdapter
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
 import com.celzero.bravedns.util.Utilities
@@ -56,8 +59,11 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
 
     private val dnsLogRepository by inject<DnsLogRepository>()
     private val persistentState by inject<PersistentState>()
+    private val appConfig by inject<AppConfig>()
 
     companion object {
+        private const val QUERY_TEXT_DELAY: Long = 1000
+
         fun newInstance(param: String): DnsLogFragment {
             val args = Bundle()
             args.putString(Constants.SEARCH_QUERY, param)
@@ -80,6 +86,10 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         initView()
         if (arguments != null) {
             val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
+            if (query.contains(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)) {
+                // do nothing, as the search is for the firewall rules and not for the dns
+                return
+            }
             b.queryListSearch.setQuery(query, true)
         }
     }
@@ -100,6 +110,15 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
 
     override fun onResume() {
         super.onResume()
+        // fix for #1939, OEM-specific bug, especially on heavily customized Android
+        // some ROMs kill or freeze the keyboard/IME process to save memory or battery,
+        // causing SearchView to stop receiving input events
+        // this is a workaround to restart the IME process
+        b.queryListSearch.setQuery("", false)
+        b.queryListSearch.clearFocus()
+
+        val imm = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.restartInput(b.queryListSearch)
         b.topRl.requestFocus()
     }
 
@@ -124,12 +143,12 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerQuery.layoutManager = layoutManager
 
-        val recyclerAdapter = DnsQueryAdapter(requireContext(), persistentState.fetchFavIcon)
+        val favIcon = persistentState.fetchFavIcon
+        val isRethinkDns = appConfig.isRethinkDnsConnected()
+        val recyclerAdapter = DnsLogAdapter(requireContext(), favIcon, isRethinkDns)
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.dnsLogsList.observe(viewLifecycleOwner) {
-                    recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
-                }
+            viewModel.dnsLogsList.observe(viewLifecycleOwner) {
+                recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
             }
         }
         b.recyclerQuery.adapter = recyclerAdapter
@@ -140,9 +159,17 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
 
-                    if (recyclerView.getChildAt(0)?.tag == null) return
+                    val firstChild = recyclerView.getChildAt(0)
+                    if (firstChild == null) {
+                        Logger.w(LOG_TAG_UI, "DnsLogs; err; no child views found in recyclerView")
+                        return
+                    }
 
-                    val tag: Long = recyclerView.getChildAt(0).tag as Long
+                    val tag = firstChild.tag as? Long
+                    if (tag == null) {
+                        Logger.w(LOG_TAG_UI, "DnsLogs; err; tag is null")
+                        return
+                    }
 
                     b.queryListRecyclerScrollHeader.text =
                         formatToRelativeTime(requireContext(), tag)
@@ -157,6 +184,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
                 }
             }
         b.recyclerQuery.addOnScrollListener(scrollListener)
+        b.recyclerQuery.layoutAnimation = null
     }
 
     private fun remakeFilterChipsUi() {
@@ -254,13 +282,17 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
-        this.filterValue = query
-        viewModel.setFilter(filterValue, filterType)
+        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
+            if (this.isAdded) {
+                this.filterValue = query
+                viewModel.setFilter(filterValue, filterType)
+            }
+        }
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(500, lifecycleScope) {
+        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
             if (this.isAdded) {
                 this.filterValue = query
                 viewModel.setFilter(filterValue, filterType)

@@ -27,6 +27,7 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
             Index(value = arrayOf("ipAddress"), unique = false),
             Index(value = arrayOf("appName"), unique = false),
             Index(value = arrayOf("dnsQuery"), unique = false),
+            Index(value = arrayOf("connId"), unique = false)
         ]
 )
 class RethinkLog {
@@ -45,7 +46,8 @@ class RethinkLog {
     var downloadBytes: Long = 0
     var uploadBytes: Long = 0
     var duration: Int = 0
-    var synack: Int = 0
+    var synack: Long = 0
+    var rpid = "" // relay proxy id
     var message: String = ""
     var connType: String = ""
 
