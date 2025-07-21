@@ -279,7 +279,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     }
 
     private fun showDefaultDnsDialog() {
-        if (RpnProxyManager.isRpnActive()) {
+        if (RpnProxyManager.isRpnEnabled()) {
             showToastUiCentered(
                 this,
                 getString(R.string.fallback_rplus_toast),
@@ -305,6 +305,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     }
 
     private fun showPingIpsDialog() {
+        val urlSegment4 = "#ipv4"
+        val urlSegment6 = "#ipv6"
         val alertBuilder = MaterialAlertDialogBuilder(this)
         val inflater = LayoutInflater.from(this)
         val dialogView = inflater.inflate(R.layout.dialog_input_ips, null)
@@ -329,6 +331,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         val progress43 = dialogView.findViewById<ProgressBar>(R.id.progress_ipv4_3)
         val status43 = dialogView.findViewById<AppCompatImageView>(R.id.status_ipv4_3)
 
+        val url4 = dialogView.findViewById<AppCompatEditText>(R.id.url_v4_address)
+        val progressUrl4 = dialogView.findViewById<ProgressBar>(R.id.progress_url_v4)
+        val statusUrl4 = dialogView.findViewById<AppCompatImageView>(R.id.status_url_v4)
+
         val ip61 = dialogView.findViewById<AppCompatEditText>(R.id.ipv6_address_1)
         val progress61 = dialogView.findViewById<ProgressBar>(R.id.progress_ipv6_1)
         val status61 = dialogView.findViewById<AppCompatImageView>(R.id.status_ipv6_1)
@@ -340,6 +346,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         val ip63 = dialogView.findViewById<AppCompatEditText>(R.id.ipv6_address_3)
         val progress63 = dialogView.findViewById<ProgressBar>(R.id.progress_ipv6_3)
         val status63 = dialogView.findViewById<AppCompatImageView>(R.id.status_ipv6_3)
+
+        val url6 = dialogView.findViewById<AppCompatEditText>(R.id.url_v6_address)
+        val progressUrl6 = dialogView.findViewById<ProgressBar>(R.id.progress_url_v6)
+        val statusUrl6 = dialogView.findViewById<AppCompatImageView>(R.id.status_url_v6)
 
         val defaultDrawable = ContextCompat.getDrawable(this, R.drawable.edittext_default)
         val errorDrawable = ContextCompat.getDrawable(this, R.drawable.edittext_error)
@@ -354,8 +364,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         val errorMsg: AppCompatTextView = dialogView.findViewById(R.id.error_message)
 
-        val items4 = persistentState.pingv4Ips.split(",").toTypedArray()
-        val items6 = persistentState.pingv6Ips.split(",").toTypedArray()
+        val itemsIp4 = persistentState.pingv4Ips.split(",").toTypedArray()
+        val itemsIp6 = persistentState.pingv6Ips.split(",").toTypedArray()
+        val itemsUrl4 = persistentState.pingv4Url.split(urlSegment4).firstOrNull() ?: Constants.urlV4probe
+        val itemsUrl6 = persistentState.pingv6Url.split(urlSegment6).firstOrNull() ?: Constants.urlV6probe
 
         if (protocols.contains("IPv4")) {
             proto4.setImageResource(R.drawable.ic_tick)
@@ -369,24 +381,30 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             proto6.setImageResource(R.drawable.ic_cross_accent)
         }
 
-        ip41.setText(items4.getOrNull(0) ?: "")
-        ip42.setText(items4.getOrNull(1) ?: "")
-        ip43.setText(items4.getOrNull(2) ?: "")
+        ip41.setText(itemsIp4.getOrNull(0) ?: "")
+        ip42.setText(itemsIp4.getOrNull(1) ?: "")
+        ip43.setText(itemsIp4.getOrNull(2) ?: "")
+        url4.setText(itemsUrl4)
 
-        ip61.setText(items6.getOrNull(0) ?: "")
-        ip62.setText(items6.getOrNull(1) ?: "")
-        ip63.setText(items6.getOrNull(2) ?: "")
+        ip61.setText(itemsIp6.getOrNull(0) ?: "")
+        ip62.setText(itemsIp6.getOrNull(1) ?: "")
+        ip63.setText(itemsIp6.getOrNull(2) ?: "")
+        url6.setText(itemsUrl6)
 
         val dialog = alertBuilder.create()
 
         resetChip.setOnClickListener {
+            val v4 = Constants.urlV4probe.split(urlSegment4).firstOrNull() ?: Constants.urlV4probe
+            val v6 = Constants.urlV6probe.split(urlSegment6).firstOrNull() ?: Constants.urlV6probe
             // reset to default values
             ip41.setText(Constants.ip4probes[0])
             ip42.setText(Constants.ip4probes[1])
             ip43.setText(Constants.ip4probes[2])
+            url4.setText(v4)
             ip61.setText(Constants.ip6probes[0])
             ip62.setText(Constants.ip6probes[1])
             ip63.setText(Constants.ip6probes[2])
+            url6.setText(v6)
         }
 
         testBtn.setOnClickListener {
@@ -394,18 +412,23 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                 progress41.visibility = View.VISIBLE
                 progress42.visibility = View.VISIBLE
                 progress43.visibility = View.VISIBLE
+                progressUrl4.visibility = View.VISIBLE
                 progress61.visibility = View.VISIBLE
                 progress62.visibility = View.VISIBLE
                 progress63.visibility = View.VISIBLE
+                progressUrl6.visibility = View.VISIBLE
+
 
                 io {
                     val valid41 = isReachable(ip41.text.toString())
                     val valid42 = isReachable(ip42.text.toString())
                     val valid43 = isReachable(ip43.text.toString())
+                    val validUrl4 = isReachable(url4.text.toString() + urlSegment4)
 
                     val valid61 = isReachable(ip61.text.toString())
                     val valid62 = isReachable(ip62.text.toString())
                     val valid63 = isReachable(ip63.text.toString())
+                    val validUrl6 = isReachable(url6.text.toString() + urlSegment6)
 
                     uiCtx {
                         if (!dialogView.isShown) return@uiCtx
@@ -413,23 +436,29 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                         progress41.visibility = View.GONE
                         progress42.visibility = View.GONE
                         progress43.visibility = View.GONE
+                        progressUrl4.visibility = View.GONE
                         progress61.visibility = View.GONE
                         progress62.visibility = View.GONE
                         progress63.visibility = View.GONE
+                        progressUrl6.visibility = View.GONE
 
                         status41.visibility = View.VISIBLE
                         status42.visibility = View.VISIBLE
                         status43.visibility = View.VISIBLE
+                        statusUrl4.visibility = View.VISIBLE
                         status61.visibility = View.VISIBLE
                         status62.visibility = View.VISIBLE
                         status63.visibility = View.VISIBLE
+                        statusUrl6.visibility = View.VISIBLE
 
                         status41.setImageDrawable(getImgRes(valid41))
                         status42.setImageDrawable(getImgRes(valid42))
                         status43.setImageDrawable(getImgRes(valid43))
+                        statusUrl4.setImageDrawable(getImgRes(validUrl4))
                         status61.setImageDrawable(getImgRes(valid61))
                         status62.setImageDrawable(getImgRes(valid62))
                         status63.setImageDrawable(getImgRes(valid63))
+                        statusUrl6.setImageDrawable(getImgRes(validUrl6))
                     }
                 }
             } catch (e: Exception) {
@@ -443,21 +472,26 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         saveBtn.setOnClickListener {
             try {
+                // no validation on the url, just check if it is empty
                 val valid41 = isValidIp(ip41.text.toString(), IPVersion.IPV4)
                 val valid42 = isValidIp(ip42.text.toString(), IPVersion.IPV4)
                 val valid43 = isValidIp(ip43.text.toString(), IPVersion.IPV4)
+                val url4Valid = url4.text?.isNotEmpty() == true
 
                 val valid61 = isValidIp(ip61.text.toString(), IPVersion.IPV6)
                 val valid62 = isValidIp(ip62.text.toString(), IPVersion.IPV6)
                 val valid63 = isValidIp(ip63.text.toString(), IPVersion.IPV6)
+                val url6Valid = url6.text?.isNotEmpty() == true
 
                 // mark the edit text background as red if the ip is invalid
                 ip41.background = if (valid41) defaultDrawable else errorDrawable
                 ip42.background = if (valid42) defaultDrawable else errorDrawable
                 ip43.background = if (valid43) defaultDrawable else errorDrawable
+                url4.background = if (url4Valid) defaultDrawable else errorDrawable
                 ip61.background = if (valid61) defaultDrawable else errorDrawable
                 ip62.background = if (valid62) defaultDrawable else errorDrawable
                 ip63.background = if (valid63) defaultDrawable else errorDrawable
+                url6.background = if (url6Valid) defaultDrawable else errorDrawable
 
                 if (!valid41 || !valid42 || !valid43 || !valid61 || !valid62 || !valid63) {
                     errorMsg.visibility = View.VISIBLE
@@ -470,9 +504,21 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
                 val ip4 = listOf(ip41.text.toString(), ip42.text.toString(), ip43.text.toString())
                 val ip6 = listOf(ip61.text.toString(), ip62.text.toString(), ip63.text.toString())
+                val url4Txt = if (url4.text.toString().contains(urlSegment4)) {
+                    url4.text.toString()
+                } else {
+                    url4.text.toString() + urlSegment4
+                }
+                val url6Txt = if (url6.text.toString().contains(urlSegment6)) {
+                    url6.text.toString()
+                } else {
+                    url6.text.toString() + urlSegment6
+                }
 
                 val isSame = persistentState.pingv4Ips == ip4.joinToString(",") &&
-                    persistentState.pingv6Ips == ip6.joinToString(",")
+                    persistentState.pingv6Ips == ip6.joinToString(",") &&
+                    persistentState.pingv4Url == url4Txt &&
+                    persistentState.pingv6Url == url6Txt
 
                 if (isSame) {
                     dialog.dismiss()
@@ -481,11 +527,9 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
                 persistentState.pingv4Ips = ip4.joinToString(",")
                 persistentState.pingv6Ips = ip6.joinToString(",")
-                Utilities.showToastUiCentered(
-                    this,
-                    getString(R.string.config_add_success_toast),
-                    Toast.LENGTH_LONG
-                )
+                persistentState.pingv4Url = url4.text.toString() + urlSegment4
+                persistentState.pingv6Url = url6.text.toString() + urlSegment6
+                showToastUiCentered(this, getString(R.string.config_add_success_toast), Toast.LENGTH_LONG)
                 notifyConnectionMonitor()
 
                 Logger.i(LOG_TAG_UI, "ping ips: ${persistentState.pingv4Ips}, ${persistentState.pingv6Ips}")
@@ -495,6 +539,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                 // reset persistent state to the previous value
                 persistentState.pingv4Ips = Constants.ip4probes.joinToString(",")
                 persistentState.pingv6Ips = Constants.ip6probes.joinToString(",")
+                persistentState.pingv4Url = Constants.urlV4probe
+                persistentState.pingv6Url = Constants.urlV6probe
             }
         }
 
@@ -528,10 +574,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         return ContextCompat.getDrawable(this, a) ?: successDrawable
     }
 
-    private suspend fun isReachable(ip: String): ConnectionMonitor.ProbeResult? {
+    private suspend fun isReachable(ipOrUrl: String): ConnectionMonitor.ProbeResult? {
         delay(500)
         return try {
-            val res = VpnController.probeIp(ip)
+            val res = VpnController.probeIpOrUrl(ipOrUrl)
             Logger.d(LOG_TAG_UI, "probe res: ${res?.ok}, ${res?.ip}, ${res?.capabilities}")
             res
         } catch (e: Exception) {
