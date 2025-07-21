@@ -289,7 +289,6 @@
                 android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center"
                 android:padding="10dp"
-
                 android:text="@string/lbl_test"
                 android:textColor="?attr/accentGood" />
 
@@ -301,24 +300,35 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginTop="40dp"
-            android:visibility="gone"
             android:layout_marginEnd="10dp"
             android:gravity="center_vertical"
+            android:visibility="gone"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.3"
-                android:gravity="center_vertical"
+                android:layout_weight="0.25"
                 android:padding="10dp"
+                android:textAlignment="center"
                 android:text="@string/ping_strength_title" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/ping_result"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:layout_weight="0.15"
+                android:textAlignment="center"
+                android:textColor="?attr/secondaryTextColor"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/strength_indicator"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.8"
+                android:layout_weight="0.6"
                 android:gravity="center_vertical"
                 android:max="4"
                 android:padding="10dp"
