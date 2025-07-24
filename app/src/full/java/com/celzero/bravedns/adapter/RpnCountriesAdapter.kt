@@ -33,7 +33,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class RpnCountriesAdapter(private val context: Context, private val countries: List<RegionalWgConf>, private val selectedCCs: Set<String>) :
+class RpnCountriesAdapter(private val context: Context, private val countries: List<String>, private val selectedCCs: Set<String>) :
     RecyclerView.Adapter<RpnCountriesAdapter.RpnCountriesViewHolder>() {
 
     private var lifecycleOwner: LifecycleOwner? = null
@@ -62,13 +62,12 @@ class RpnCountriesAdapter(private val context: Context, private val countries: L
     inner class RpnCountriesViewHolder(private val b: ListItemRpnCountriesBinding) :
         RecyclerView.ViewHolder(b.root) {
 
-        fun update(conf: RegionalWgConf) {
-            val flag = getFlag(conf.cc)
-            val ccName = conf.name.ifEmpty { getCountryNameFromFlag(flag) }
+        fun update(conf: String) {
+            val flag = getFlag(conf)
+            val ccName = conf //.name.ifEmpty { getCountryNameFromFlag(flag) }
             b.rpncNameText.text = ccName
             b.rpncFlagText.text = flag
-            setupClickListeners(conf)
-            val isSelected = selectedCCs.contains(conf.cc)
+            val isSelected = selectedCCs.contains(conf)
             if (isSelected) {
                 enableInterface()
             } else {
@@ -103,9 +102,6 @@ class RpnCountriesAdapter(private val context: Context, private val countries: L
                 context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
         }
 
-        fun setupClickListeners(conf: RegionalWgConf) {
-
-        }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

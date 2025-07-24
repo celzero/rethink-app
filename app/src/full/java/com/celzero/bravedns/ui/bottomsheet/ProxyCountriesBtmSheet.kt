@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List<RegionalWgConf>, val listener: CountriesDismissListener) :
+class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List<String>, val listener: CountriesDismissListener) :
     BottomSheetDialogFragment() {
     private var _binding: BottomSheetProxiesListBinding? = null
 
@@ -55,7 +55,7 @@ class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List
     }
 
     companion object {
-        fun newInstance(input: InputType, obj: Any?, data: List<RegionalWgConf>, listener: CountriesDismissListener): ProxyCountriesBtmSheet {
+        fun newInstance(input: InputType, obj: Any?, data: List<String>, listener: CountriesDismissListener): ProxyCountriesBtmSheet {
             return ProxyCountriesBtmSheet(input, obj, data, listener)
         }
 
@@ -126,12 +126,12 @@ class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List
         b.recyclerView.adapter = adapter
     }
 
-    private fun handleOnItemClicked(conf: RegionalWgConf) {
-        Logger.v(LOG_TAG_UI, "$TAG: Item clicked: ${conf.name}")
+    private fun handleOnItemClicked(conf: String) {
+        Logger.v(LOG_TAG_UI, "$TAG: Item clicked: $conf")
         Logger.v(LOG_TAG_UI, "$TAG: country selected: $conf")
         // TODO: Implement the action to be taken when an item is selected
         // returns a pair of boolean and error message
-        val pair = RpnProxyManager.canSelectCountryCode(conf.cc)
+        val pair = RpnProxyManager.canSelectCountryCode(conf)
         if (!pair.first) {
             Utilities.showToastUiCentered(
                 requireContext(),
@@ -156,13 +156,13 @@ class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List
         }
     }
 
-    private suspend fun processDomain(conf: RegionalWgConf) {
+    private suspend fun processDomain(conf: String) {
         if (cd == null) {
             Logger.w(LOG_TAG_UI, "$TAG: custom domain is null")
             return
         }
-        DomainRulesManager.setCC(cd, conf.cc)
-        cd.proxyCC = conf.cc
+        DomainRulesManager.setCC(cd, conf)
+        cd.proxyCC = conf
         uiCtx {
             Utilities.showToastUiCentered(
                 requireContext(),
@@ -172,13 +172,13 @@ class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List
         }
     }
 
-    private suspend fun processIp(conf: RegionalWgConf) {
+    private suspend fun processIp(conf: String) {
         if (ci == null) {
             Logger.w(LOG_TAG_UI, "$TAG: custom ip is null")
             return
         }
-        IpRulesManager.updateProxyCC(ci, conf.cc)
-        ci.proxyCC = conf.cc
+        IpRulesManager.updateProxyCC(ci, conf)
+        ci.proxyCC = conf
         uiCtx {
             Utilities.showToastUiCentered(
                 requireContext(),
@@ -189,8 +189,8 @@ class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List
     }
 
     inner class RecyclerViewAdapter(
-        private val data: List<RegionalWgConf>,
-        private val onItemClicked: (RegionalWgConf) -> Unit
+        private val data: List<String>,
+        private val onItemClicked: (String) -> Unit
     ) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -208,21 +208,21 @@ class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List
         inner class ViewHolder(private val bb: ListItemProxyCcWgBinding) :
             RecyclerView.ViewHolder(bb.root) {
 
-            fun bind(conf: RegionalWgConf) {
-                Logger.v(LOG_TAG_UI, "$TAG: binding item: ${conf.cc}, ${conf.name}")
-                val flag = getFlag(conf.cc)
-                val ccName = conf.name.ifEmpty { getCountryNameFromFlag(flag) }
+            fun bind(conf: String) {
+                Logger.v(LOG_TAG_UI, "$TAG: binding item: ${conf}, ${conf}")
+                val flag = getFlag(conf)
+                val ccName = conf //conf.name.ifEmpty { getCountryNameFromFlag(flag) }
                 when (type) {
                     InputType.DOMAIN -> {
-                        bb.proxyNameCc.text = conf.cc
+                        bb.proxyNameCc.text = conf
                         bb.proxyIconCc.text = flag
-                        bb.proxyRadioCc.isChecked = conf.cc == cd?.proxyCC
+                        bb.proxyRadioCc.isChecked = conf == cd?.proxyCC
                         bb.proxyDescCc.text = ccName
                     }
                     InputType.IP -> {
-                        bb.proxyNameCc.text = conf.cc
+                        bb.proxyNameCc.text = conf
                         bb.proxyIconCc.text = flag
-                        bb.proxyRadioCc.isChecked = conf.cc == ci?.proxyCC
+                        bb.proxyRadioCc.isChecked = conf == ci?.proxyCC
                         bb.proxyDescCc.text = ccName
                     }
                     InputType.APP -> {

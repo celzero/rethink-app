@@ -380,7 +380,7 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
         )
     }
 
-    private fun showProxyCountriesBtmSheet(data: List<RegionalWgConf>) {
+    private fun showProxyCountriesBtmSheet(data: List<String>) {
         Logger.v(LOG_TAG_UI, "$TAG show countries(${data.size} for ${cd.domain}")
         val bottomSheetFragment = ProxyCountriesBtmSheet.newInstance(ProxyCountriesBtmSheet.InputType.DOMAIN, cd,  data, this)
         bottomSheetFragment.show(
