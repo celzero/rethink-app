@@ -28,7 +28,6 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.RpnCountriesAdapter
 import com.celzero.bravedns.databinding.ActivityRpnCountriesBinding
-import com.celzero.bravedns.rpnproxy.RegionalWgConf
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
@@ -44,7 +43,7 @@ class RpnCountriesActivity: AppCompatActivity(R.layout.activity_rpn_countries) {
     private val persistentState by inject<PersistentState>()
 
     //private val proxyCountriesAdapter = ProxyCountriesAdapter()
-    private val proxyCountries = mutableListOf<RegionalWgConf>()
+    private val proxyCountries = mutableListOf<String>()
     private val selectedCountries = mutableSetOf<String>()
 
     companion object {
@@ -74,7 +73,8 @@ class RpnCountriesActivity: AppCompatActivity(R.layout.activity_rpn_countries) {
     }
 
     private suspend fun fetchProxyCountries() {
-        val ccs = RpnProxyManager.getProtonUniqueCC()
+        // TODO: fetch the proxy countries from win config
+        val ccs = emptyList<String>()
         Logger.v(LOG_TAG_UI, "$TAG fetch proxy countries: ${ccs.size}")
         proxyCountries.addAll(ccs)
         val selectedCCs = RpnProxyManager.getSelectedCCs()

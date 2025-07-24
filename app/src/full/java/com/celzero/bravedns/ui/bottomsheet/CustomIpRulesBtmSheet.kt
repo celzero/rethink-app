@@ -18,7 +18,6 @@ import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.BottomSheetCustomIpsBinding
-import com.celzero.bravedns.rpnproxy.RegionalWgConf
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
@@ -114,13 +113,13 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
 
         b.chooseCountryCard.setOnClickListener {
             io {
-                val ctrys = RpnProxyManager.getProtonUniqueCC()
+                val ctrys = emptyList<String>()//RpnProxyManager.getProtonUniqueCC()
                 if (ctrys.isEmpty()) {
                     Logger.w(LOG_TAG_UI, "$TAG No country codes found")
                     uiCtx {
                         Utilities.showToastUiCentered(
                             requireContext(),
-                            "No ProtonVPN country codes found",
+                            "No country codes found",
                             Toast.LENGTH_SHORT
                         )
                     }
@@ -358,7 +357,7 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
         )
     }
 
-    private fun showProxyCountriesBtmSheet(data: List<RegionalWgConf>) {
+    private fun showProxyCountriesBtmSheet(data: List<String>) {
         Logger.v(LOG_TAG_UI, "$TAG: show pcc btm sheet for ${ci.ipAddress}")
         val bottomSheetFragment = ProxyCountriesBtmSheet.newInstance(ProxyCountriesBtmSheet.InputType.IP, ci, data, this)
         bottomSheetFragment.show(

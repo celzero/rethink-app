@@ -19,7 +19,6 @@ import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.databinding.BottomSheetProxiesListBinding
 import com.celzero.bravedns.databinding.ListItemProxyCcWgBinding
-import com.celzero.bravedns.rpnproxy.RegionalWgConf
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.IpRulesManager

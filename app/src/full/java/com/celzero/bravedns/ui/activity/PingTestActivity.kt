@@ -216,7 +216,7 @@ class PingTestActivity: AppCompatActivity(R.layout.activity_ping_test) {
     }
 
     private suspend fun calculateStrength(csv: String): Int {
-        val (wg, amz, proton, se, w64) = if (proxiesStatus.isEmpty()) {
+        val (wg, amz, win, se, w64) = if (proxiesStatus.isEmpty()) {
             getProxiesStatus(csv)
         } else {
             proxiesStatus
@@ -227,7 +227,7 @@ class PingTestActivity: AppCompatActivity(R.layout.activity_ping_test) {
         var strength = 0
         if (wg) strength++
         if (amz) strength++
-        if (proton) strength++
+        if (win) strength++
         if (se) strength++
         if (w64) strength++
 
@@ -240,15 +240,15 @@ class PingTestActivity: AppCompatActivity(R.layout.activity_ping_test) {
 
         val warp = VpnController.isProxyReachable(Backend.RpnWg, csv)
         val amz = VpnController.isProxyReachable(Backend.RpnAmz, csv)
-        val proton = VpnController.isProxyReachable(Backend.RpnPro, csv)
+        val win = VpnController.isProxyReachable(Backend.RpnWin, csv)
         val se = VpnController.isProxyReachable(Backend.RpnSE, csv)
         val w64 = VpnController.isProxyReachable(Backend.Rpn64, csv)
-        Logger.d(Logger.LOG_IAB, "$TAG proxies reachable: $warp, $amz $proton, $se, $w64")
+        Logger.d(Logger.LOG_IAB, "$TAG proxies reachable: $warp, $amz $win, $se, $w64")
         return proxiesStatus.apply {
             clear()
             add(warp)
             add(amz)
-            add(proton)
+            add(win)
             add(se)
             add(w64)
         }

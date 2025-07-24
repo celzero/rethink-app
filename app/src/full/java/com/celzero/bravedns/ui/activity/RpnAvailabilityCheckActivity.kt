@@ -125,7 +125,7 @@ class RpnAvailabilityCheckActivity : AppCompatActivity() {
         val res = when (value) {
             0 -> VpnController.testRpnProxy(RpnProxyManager.RpnType.WARP)
             1 -> VpnController.testRpnProxy(RpnProxyManager.RpnType.AMZ)
-            2 -> VpnController.testRpnProxy(RpnProxyManager.RpnType.PROTON)
+            2 -> VpnController.testRpnProxy(RpnProxyManager.RpnType.WIN)
             3 -> VpnController.testRpnProxy(RpnProxyManager.RpnType.SE)
             4 -> VpnController.testRpnProxy(RpnProxyManager.RpnType.EXIT_64)
             5 -> VpnController.testRpnProxy(RpnProxyManager.RpnType.EXIT)
