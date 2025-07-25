@@ -36,7 +36,7 @@ class ConsoleLogAdapter(private val context: Context) :
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<ConsoleLog>() {
                 override fun areItemsTheSame(old: ConsoleLog, new: ConsoleLog): Boolean {
-                    return old == new
+                    return old.id == new.id
                 }
 
                 override fun areContentsTheSame(old: ConsoleLog, new: ConsoleLog): Boolean {

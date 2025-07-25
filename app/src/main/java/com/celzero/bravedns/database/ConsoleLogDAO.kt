@@ -36,7 +36,7 @@ interface ConsoleLogDAO {
     @RawQuery
     fun getLogsCursor(query: SimpleSQLiteQuery): Cursor
 
-    @Query("select * from ConsoleLog where message like :input order by id desc LIMIT ${Constants.MAX_LOGS}")
+    @Query("select * from ConsoleLog where message like :input order by id desc")
     fun getLogs(input: String): PagingSource<Int, ConsoleLog>
 
     @Query("DELETE FROM ConsoleLog WHERE timestamp < :to")

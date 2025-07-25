@@ -50,7 +50,11 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.ConsoleLogViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -88,6 +92,19 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
         }
         initView()
         setupClickListener()
+        setQueryFilter()
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun setQueryFilter() {
+        lifecycleScope.launch {
+            searchQuery
+                .debounce(QUERY_TEXT_DELAY)
+                .distinctUntilChanged()
+                .collect { query ->
+                    viewModel.setFilter(query)
+                }
+        }
     }
 
     override fun onResume() {
@@ -136,7 +153,6 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
     private fun observeLog() {
         viewModel.logs.observe(this) { l ->
             lifecycleScope.launch {
-                delay(500)
                 recyclerAdapter?.submitData(l)
             }
         }
@@ -336,17 +352,16 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
         withContext(Dispatchers.Main) { f() }
     }
 
+    val searchQuery = MutableStateFlow("")
+    @OptIn(FlowPreview::class)
     override fun onQueryTextSubmit(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
-            viewModel.setFilter(query)
-        }
+        searchQuery.value = query
         return true
     }
 
+    @OptIn(FlowPreview::class)
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
-            viewModel.setFilter(query)
-        }
+        searchQuery.value = query
         return true
     }
 }
