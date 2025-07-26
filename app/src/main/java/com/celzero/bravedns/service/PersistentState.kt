@@ -368,6 +368,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // last key rotation time
     var pipKeyRotationTime by longPref("pip_key_rotation_time").withDefault<Long>(INIT_TIME_MS)
 
+    // perform auto or manual network connectivity checks
+    var performAutoNetworkConnectivityChecks by booleanPref("perform_auto_network_connectivity_checks").withDefault<Boolean>(true)
+
     // fail-open on no network
     // TODO: add routes as normal but do not send fd to netstack
     // repopulateTrackedNetworks also fails open see isAnyNwValidated

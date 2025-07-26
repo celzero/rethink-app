@@ -14,11 +14,48 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggle_group"
+            style="@style/toggleButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:checkedButton="@id/tb_recent_toggle_btn"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/auto_toggle_btn"
+                style="@style/toggleButtonNoStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:tag="0"
+                android:text="Auto"
+                android:textAllCaps="false"
+                android:textColor="?attr/defaultToggleBtnTxt"
+                android:textSize="@dimen/default_font_text_view"
+                app:cornerRadius="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/manual_toggle_btn"
+                style="@style/toggleButtonNoStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:tag="2"
+                android:text="Manual"
+                android:textAllCaps="false"
+                android:textColor="?attr/defaultToggleBtnTxt"
+                android:textSize="@dimen/default_font_text_view"
+                app:cornerRadius="16dp" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:orientation="horizontal"
+            android:layout_marginTop="10dp"
             android:paddingTop="5dp"
             android:paddingBottom="5dp">
 
@@ -53,13 +90,19 @@
                 app:chipBackgroundColor="?attr/chipBgColorPositive"
                 app:chipSurfaceColor="@null" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/test_button"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/save_chip"
+                style="@style/ThinnerChip.Action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:padding="5dp"
-                android:src="@drawable/ic_refresh_white" />
+                android:layout_gravity="end|center"
+                android:layout_marginEnd="10dp"
+                android:text="@string/lbl_save"
+                android:textColor="?attr/chipTextPositive"
+                android:textSize="@dimen/large_font_text_view"
+                android:visibility="visible"
+                app:chipBackgroundColor="?attr/chipBgColorPositive"
+                app:chipSurfaceColor="@null" />
 
         </LinearLayout>
 
@@ -163,6 +206,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/url_v4_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -200,6 +244,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:orientation="horizontal"
+            android:layout_marginTop="10dp"
             android:paddingTop="5dp"
             android:paddingBottom="5dp">
 
@@ -322,6 +367,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/url_v6_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -382,7 +428,7 @@
                 android:text="@string/lbl_cancel" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/save_button"
+                android:id="@+id/test_button"
                 android:background="@drawable/rectangle_border_background"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -397,6 +443,17 @@
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:padding="5dp"
+            android:text="@string/bypasses_network_restrictions"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="14sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/chosen_mode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
