@@ -30,9 +30,9 @@ import com.celzero.firestack.backend.RouterStats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.service.BraveVPNService.Companion.FAIL_OPEN_ON_NO_NETWORK
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
+import com.celzero.firestack.backend.DNSTransport
 import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.intra.Controller
 import java.net.Socket
@@ -125,8 +125,8 @@ object VpnController : KoinComponent {
         externalScope?.launch { states?.send(state) }
     }
 
-    fun onServerNameUpdated(ech: String?) {
-        lastConnectedServerName = ech
+    fun onServerNameUpdated(name: String?) {
+        lastConnectedServerName = name
     }
 
     private fun updateState(state: BraveVPNService.State?) {
@@ -262,7 +262,7 @@ object VpnController : KoinComponent {
             "IPv4"
         } else {
             // if both are false, then return based on the FAIL_OPEN_ON_NO_NETWORK value
-            if (FAIL_OPEN_ON_NO_NETWORK) {
+            if (persistentState.failOpenOnNoNetwork) {
                 "IPv4, IPv6"
             } else {
                 ""
@@ -272,8 +272,9 @@ object VpnController : KoinComponent {
 
     fun updateProtocol(proto: Pair<Boolean, Boolean>) {
         if (!proto.first && !proto.second) {
-            Logger.i(LOG_TAG_VPN, "both v4 and v6 false, setting $FAIL_OPEN_ON_NO_NETWORK")
-            protocol = Pair(FAIL_OPEN_ON_NO_NETWORK, FAIL_OPEN_ON_NO_NETWORK)
+            val failOpen = persistentState.failOpenOnNoNetwork
+            Logger.i(LOG_TAG_VPN, "both v4 and v6 false, setting $failOpen")
+            protocol = Pair(failOpen, failOpen)
             return
         }
         protocol = proto
@@ -314,16 +315,16 @@ object VpnController : KoinComponent {
         braveVpnService?.addWireGuardProxy(id)
     }
 
-    fun refreshProxies() {
-        braveVpnService?.refreshProxies()
+    fun refreshOrReAddProxies() {
+        braveVpnService?.refreshOrReAddProxies()
     }
 
     fun closeConnectionsIfNeeded(uid: Int = INVALID_UID) {
         braveVpnService?.closeConnectionsIfNeeded(uid)
     }
 
-    fun closeConnectionsByUidDomain(uid: Int, domain: String?) {
-        braveVpnService?.closeConnectionsByUidDomain(uid, domain)
+    fun closeConnectionsByUidDomain(uid: Int, ipAddress: String?) {
+        braveVpnService?.closeConnectionsByUidDomain(uid, ipAddress)
     }
 
     suspend fun getDnsStatus(id: String): Long? {
@@ -342,8 +343,8 @@ object VpnController : KoinComponent {
         braveVpnService?.protectSocket(socket)
     }
 
-    suspend fun probeIp(ip: String): ConnectionMonitor.ProbeResult? {
-        return braveVpnService?.probeIp(ip)
+    suspend fun probeIpOrUrl(ip: String, useAuto: Boolean): ConnectionMonitor.ProbeResult? {
+        return braveVpnService?.probeIpOrUrl(ip, useAuto)
     }
 
     suspend fun notifyConnectionMonitor() {
@@ -362,32 +363,20 @@ object VpnController : KoinComponent {
         braveVpnService?.writeConsoleLog(log)
     }
 
-    suspend fun registerAndFetchWarpConfig(prevBytes: ByteArray?): ByteArray? {
-        return braveVpnService?.registerAndFetchWarpConfigIfNeeded(prevBytes)
-    }
-
-    suspend fun registerAndFetchAmneziaConfig(prevBytes: ByteArray?): ByteArray? {
-        return braveVpnService?.registerAndFetchAmzConfigIfNeeded(prevBytes)
-    }
-
     suspend fun isProxyReachable(proxyId: String, ippcsv: String): Boolean {
         return braveVpnService?.isProxyReachable(proxyId, ippcsv) ?: false
     }
 
-    suspend fun registerSEToTunnel(): Boolean {
-        return braveVpnService?.registerSEToTunnel() ?: false
-    }
-
-    suspend fun registerAndFetchProtonIfNeeded(prevBytes: ByteArray?): ByteArray? {
-        return braveVpnService?.registerAndFetchProtonIfNeeded(prevBytes)
+    suspend fun registerAndFetchWinConfig(prevBytes: ByteArray?): ByteArray? {
+        return braveVpnService?.registerAndFetchWinIfNeeded(prevBytes)
     }
 
     suspend fun createWgHop(origin: String, hop: String): Pair<Boolean, String> {
         return (braveVpnService?.createWgHop(origin, hop) ?: Pair(false, "vpn service not available"))
     }
 
-    suspend fun testRpnProxy(type: RpnProxyManager.RpnType): Boolean {
-        return braveVpnService?.testRpnProxy(type) == true
+    suspend fun testRpnProxy(proxyId: String): Boolean {
+        return braveVpnService?.testRpnProxy(proxyId) == true
     }
 
     suspend fun testHop(src: String, hop: String): Pair<Boolean, String?> {
@@ -402,14 +391,10 @@ object VpnController : KoinComponent {
         return braveVpnService?.removeHop(src) ?: Pair(false, "vpn service not available")
     }
 
-    suspend fun getRpnProps(type: RpnProxyManager.RpnType): Pair<RpnProxyManager.RpnProps?, String?> {
+    /*suspend fun getRpnProps(type: RpnProxyManager.RpnType): Pair<RpnProxyManager.RpnProps?, String?> {
         return braveVpnService?.getRpnProps(type) ?: Pair(null, null)
     }
-
-    suspend fun updateRpnProxy(type: RpnProxyManager.RpnType): ByteArray? {
-        return braveVpnService?.updateRpnProxy(type)
-    }
-
+*/
     suspend fun vpnStats(): String? {
         return braveVpnService?.vpnStats()
     }
@@ -418,12 +403,24 @@ object VpnController : KoinComponent {
         return braveVpnService?.performConnectivityCheck(controller, id, addrPort) ?: false
     }
 
+    fun performAutoConnectivityCheck(controller: Controller, id: String, mode: String): Boolean {
+        return braveVpnService?.performAutoConnectivityCheck(controller, id, mode) ?: false
+    }
+
     fun bindToNwForConnectivityChecks(nw: Network, pfd: Long): Boolean {
         return braveVpnService?.bindToNwForConnectivityChecks(nw, pfd) ?: false
     }
 
     fun protectFdForConnectivityChecks(fd: Long) {
         this.braveVpnService?.protectFdForConnectivityChecks(fd)
+    }
+
+    suspend fun getPlusResolvers(): List<String> {
+        return braveVpnService?.getPlusResolvers() ?: emptyList()
+    }
+
+    suspend fun getPlusTransportById(id: String): DNSTransport? {
+        return braveVpnService?.getPlusTransportById(id)
     }
 
     fun screenLock() {

@@ -101,8 +101,7 @@ internal constructor(
         val ptMode: ProtoTranslationMode,
         val bridge: Bridge,
         val defaultDns: String,
-        val fakeDns: String,
-        val mtu: Int
+        val fakeDns: String
     )
 
     enum class BraveMode(val mode: Int) {
@@ -622,8 +621,7 @@ internal constructor(
     fun newTunnelOptions(
         bridge: Bridge,
         fakeDns: String,
-        ptMode: ProtoTranslationMode,
-        mtu: Int
+        ptMode: ProtoTranslationMode
     ): TunnelOptions {
         return TunnelOptions(
             getDnsMode(),
@@ -632,8 +630,7 @@ internal constructor(
             ptMode,
             bridge,
             getDefaultDns(),
-            fakeDns,
-            mtu
+            fakeDns
         )
     }
 
