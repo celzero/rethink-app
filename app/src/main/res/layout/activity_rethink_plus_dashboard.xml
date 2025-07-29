@@ -43,21 +43,53 @@
 
         </LinearLayout>
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/settings_heading"
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="55dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="10dp"
-            android:fontFamily="sans-serif-smallcaps"
-            android:lineSpacingExtra="5dp"
-            android:padding="5dp"
-            android:text="@string/lbl_configure"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/extra_large_font_text_view"
-            android:textStyle="bold" />
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/settings_heading"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="55dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp"
+                android:layout_toStartOf="@id/renew_button"
+                android:fontFamily="sans-serif-smallcaps"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/lbl_configure"
+                android:textColor="?attr/accentGood"
+                android:textSize="@dimen/extra_large_font_text_view"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/renew_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/rectangle_border_background"
+                android:fontFamily="sans-serif-smallcaps"
+                android:gravity="center"
+                android:includeFontPadding="true"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="resubscribe"
+                android:textColor="?attr/secondaryTextColor"
+                android:textSize="@dimen/default_font_text_view"
+                android:visibility="gone"
+                app:drawableEndCompat="@drawable/ic_rethink_plus" />
+
+        </RelativeLayout>
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
@@ -286,6 +318,11 @@
             </RadioGroup>
         </com.google.android.material.card.MaterialCardView>
 
+        <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/proxies_info_heading"
             style="@style/TextAppearance.AppCompat.Subhead"
@@ -301,6 +338,26 @@
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/add_more_proxies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:padding="5dp"
+                android:background="@drawable/rectangle_border_background"
+                android:drawableStart="@drawable/ic_add"
+                android:drawableTint="?attr/accentGood"
+                android:textColor="?attr/secondaryTextColor"
+                android:gravity="center_vertical"
+                android:drawablePadding="5dp"
+                android:foregroundGravity="center_vertical"
+                android:text="Add Proxy" />
+
+        </RelativeLayout>
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
@@ -396,6 +453,124 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/ping_test_img"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:src="@drawable/ic_right_arrow_white" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/manage_subs_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/manage_subs_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_pcap" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/manage_subs_img"
+                        android:layout_toEndOf="@id/manage_subs_icon"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/manage_subs_heading"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="10dp"
+                            android:text="@string/manage_subscription_title"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                        <TextView
+                            android:id="@+id/manage_subs_desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/manage_subscription_title"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/manage_subs_img"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:src="@drawable/ic_right_arrow_white" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/payment_history_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/payment_history_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_pcap" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/payment_history_img"
+                        android:layout_toEndOf="@id/payment_history_icon"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/payment_history_heading"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="10dp"
+                            android:text="@string/payment_history_title"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                        <TextView
+                            android:id="@+id/payment_history_desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/payment_history_title"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/payment_history_img"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"

@@ -12,7 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 package com.celzero.bravedns.ui.fragment
 
 import Logger
@@ -37,7 +38,6 @@ import com.celzero.bravedns.adapter.GooglePlaySubsAdapter
 import com.celzero.bravedns.databinding.FragmentRethinkPlusBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.PricingPhase
-import com.celzero.bravedns.iab.Result.resultState
 import com.celzero.bravedns.iab.stripe.CustomerCreateParams
 import com.celzero.bravedns.iab.stripe.PaymentIntentResponse
 import com.celzero.bravedns.iab.stripe.PricesAdapter
@@ -518,7 +518,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
     }
 
     private fun initObservers() {
-        resultState.observe(viewLifecycleOwner) { i ->
+        Result.getResultStateLiveData().distinctUntilChanged().observe(viewLifecycleOwner) { i ->
             Logger.d(LOG_IAB, "res state: ${i.name}, ${i.message};p? ${i.priority}")
             if (i.priority == InAppBillingHandler.Priority.HIGH) {
                 Logger.e(LOG_IAB, "res failure: ${i.name}, ${i.message}; p? ${i.priority}")
@@ -717,9 +717,12 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
         }
     }
 
-    /*private val billingListener = object : BillingListener {
+    */
+/*private val billingListener = object : BillingListener {
         override fun onConnectionResult(isSuccess: Boolean, message: String) {
-            *//*Logger.d(LOG_IAB, "onConnectionResult: isSuccess: $isSuccess, message: $message")
+            *//*
+*/
+/*Logger.d(LOG_IAB, "onConnectionResult: isSuccess: $isSuccess, message: $message")
             if (!isSuccess) {
                 Logger.e(LOG_IAB, "Billing connection failed: $message")
                 ui {
@@ -732,10 +735,14 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
             // check for the subscription status after the connection is established
             val productType = listOf(ProductType.SUBS)
             InAppBillingHandler.fetchPurchases(productType)*//*
+*/
+/*
         }
 
         override fun purchasesResult(isSuccess: Boolean, purchaseDetailList: List<PurchaseDetail>) {
-            *//*if (!isSuccess) {
+            *//*
+*/
+/*if (!isSuccess) {
                 Logger.e(LOG_IAB, "query purchase details failed")
                 // TODO: should we show a toast here / retry the query?
                 return
@@ -766,10 +773,14 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
                     )
                 }
             }*//*
+*/
+/*
         }
 
         override fun productResult(isSuccess: Boolean, productList: List<ProductDetail>) {
-            *//*Logger.d(LOG_IAB, "productResult: Product details: ${productList.size}, $isSuccess")
+            *//*
+*/
+/*Logger.d(LOG_IAB, "productResult: Product details: ${productList.size}, $isSuccess")
             if (!isSuccess) {
                 Logger.e(LOG_IAB, "Product details failed")
                 io {
@@ -805,8 +816,11 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
                     }
                 }
             }*//*
+*/
+/*
         }
-    }*/
+    }*//*
+
 
     private fun isRethinkPlusSubscribed(): Boolean {
         // check whether the user has already subscribed to Rethink+ or not in database
@@ -825,3 +839,4 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }
+*/

@@ -15,12 +15,12 @@ class SubscriptionViewModel : ViewModel() {
 
     private val productKey = ""
 
-    private val stripeApi = RetrofitInstance.api
+    //private val stripeApi = RetrofitInstance.api
     private val publishableKey = ""
     private val secretKey = ""
 
     fun fetchPrices() {
-        stripeApi.getPrices(authorization = secretKey).enqueue(object : Callback<PricesResponse> {
+        /*stripeApi.getPrices(authorization = secretKey).enqueue(object : Callback<PricesResponse> {
             override fun onResponse(call: Call<PricesResponse>, response: Response<PricesResponse>) {
                 if (response.isSuccessful) {
                     val prices = response.body()?.data ?: emptyList()
@@ -33,6 +33,6 @@ class SubscriptionViewModel : ViewModel() {
             override fun onFailure(call: Call<PricesResponse>, t: Throwable) {
                 Log.e("StripeAPI", "Failure: ${t.message}")
             }
-        })
+        })*/
     }
 }

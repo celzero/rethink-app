@@ -15,56 +15,10 @@
  */
 package com.celzero.bravedns.rpnproxy
 
-import Logger
-import Logger.LOG_TAG_PROXY
-import android.content.Context
-import android.os.SystemClock
-import androidx.work.BackoffPolicy
-import androidx.work.Constraints
-import androidx.work.Data
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
-import androidx.work.WorkRequest
-import com.android.billingclient.api.Purchase
-import com.celzero.bravedns.database.RpnProxy
-import com.celzero.bravedns.database.RpnProxyRepository
-import com.celzero.bravedns.database.SubscriptionStatus
-import com.celzero.bravedns.database.SubscriptionStatusRepository
-import com.celzero.bravedns.iab.PurchaseDetail
-import com.celzero.bravedns.iab.QueryUtils
-import com.celzero.bravedns.scheduler.PaymentWorker
-import com.celzero.bravedns.scheduler.WorkScheduler
-import com.celzero.bravedns.service.DomainRulesManager
-import com.celzero.bravedns.service.EncryptedFileManager
-import com.celzero.bravedns.service.IpRulesManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.TcpProxyHelper.PAYMENT_WORKER_TAG
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.RPN_PROXY_FOLDER_NAME
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.wireguard.BadConfigException
-import com.celzero.bravedns.wireguard.Config
-import com.celzero.firestack.backend.Backend
-import com.celzero.firestack.settings.Settings
-import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.json.JSONObject
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import java.io.ByteArrayInputStream
-import java.io.File
-import java.nio.charset.StandardCharsets
-import java.util.concurrent.CopyOnWriteArraySet
-import java.util.concurrent.TimeUnit
 
 object RpnProxyManager : KoinComponent {
+/*
 
     private val applicationContext: Context by inject()
 
@@ -74,32 +28,42 @@ object RpnProxyManager : KoinComponent {
 
     private val db: RpnProxyRepository by inject()
     private val subsDb: SubscriptionStatusRepository by inject()
+    private val subsHistoryDb: SubscriptionStateHistoryDao by inject()
     private val workScheduler by inject<WorkScheduler>()
     private val persistentState by inject<PersistentState>()
 
-    // warp primary and secondary config names, ids and file names
-    const val WARP_ID = 1
-    const val WARP_NAME = "WARP"
-    const val WARP_FILE_NAME = "warp.conf"
-    private const val WARP_RESPONSE_FILE_NAME = "warp_response.json"
+    private const val WIN_ID = 4
+    private const val WIN_NAME = "WIN"
+    private const val WIN_ENTITLEMENT_FILE_NAME = "win_response.json"
+    private const val WIN_STATE_FILE_NAME = "win_state.json"
+    const val MAX_WIN_SERVERS = 5
 
-    private const val AMZ_ID = 2
-    private const val AMZ_NAME = "AMZ"
-    private const val AMZ_FILE_NAME = "amz.conf"
-    private const val AMZ_RESPONSE_FILE_NAME = "amz_response.json"
-
-    private const val PROTON_ID = 3
-    private const val PROTON_NAME = "PROTON"
-    private const val PROTON_FILE_NAME = "proton.conf"
-    private const val PROTON_RESPONSE_FILE_NAME = "proton_response.json"
-
-    private var warpConfig: Config? = null
-    private var amzConfig: Config? = null
-    private var protonConfig: ProtonConfig? = null
+    private var winConfig: ByteArray? = null
+    private var winServers: Set<RpnWinServer> = emptySet()
 
     private val rpnProxies = CopyOnWriteArraySet<RpnProxy>()
 
     private val selectedCountries = mutableSetOf<String>()
+
+    private val subscriptionStateMachine: SubscriptionStateMachineV2 by inject()
+    private val stateObserverJob = SupervisorJob()
+    private val stateObserverScope = CoroutineScope(Dispatchers.IO + stateObserverJob)
+
+    init {
+        io {
+            try {
+                load()
+                startStateObserver()
+                Logger.i(
+                    LOG_TAG_PROXY,
+                    "$TAG; RpnProxyManager initialized with state machine integration"
+                )
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_PROXY, "$TAG; error during initialization: ${e.message}", e)
+                // Continue without state machine if initialization fails
+            }
+        }
+    }
 
     enum class RpnTunMode(val id: Int) {
         NONE(Settings.AutoModeLocal),
@@ -158,6 +122,8 @@ object RpnProxyManager : KoinComponent {
         fun isInactive() = this == DISABLED
     }
 
+    data class RpnWinServer(val names: String, val countryCode: String, val address: String, val isActive: Boolean)
+
     fun isRpnActive(): Boolean {
         val isEnabled = RpnState.fromId(persistentState.rpnState).isEnabled()
         val isActive = !rpnMode().isNone()
@@ -179,53 +145,133 @@ object RpnProxyManager : KoinComponent {
         Logger.i(LOG_TAG_PROXY, "$TAG; rpn mode set to $${RpnMode.getPreferredId(mode.id)}")
     }
 
-    fun deactivateRpn() {
+    fun deactivateRpn(reason: String = "manual deactivation") {
+        Logger.i(LOG_TAG_PROXY, "$TAG; deactivating RPN, reason: $reason, current state: ${rpnState().name}")
         if (persistentState.rpnState == RpnState.DISABLED.id) {
             Logger.i(LOG_TAG_PROXY, "$TAG; rpn already deactivated, skipping")
             return
         }
+
+        // no need to check the state, as user can manually deactivate RPN
         persistentState.rpnState = RpnState.DISABLED.id
-        setRpnProductId("")
-        persistentState.showConfettiOnRPlus = true
-        Logger.i(LOG_TAG_PROXY, "$TAG; rpn deactivated")
     }
 
-    fun activateRpn(purchase: PurchaseDetail) {
+
+    fun activateRpn(purchase: PurchaseDetail, newPayload: String? = null) {
+
         if (persistentState.rpnState == RpnState.ENABLED.id) {
             Logger.i(LOG_TAG_PROXY, "$TAG; rpn already activated, skipping")
             return
         }
-        persistentState.rpnState = RpnState.ENABLED.id
-        setRpnProductId(purchase.productId)
-        updateSubscriptionStatus(purchase)
-        Logger.i(LOG_TAG_PROXY, "$TAG; rpn activated, mode: ${rpnMode()}")
-    }
 
-    private fun updateSubscriptionStatus(purchase: PurchaseDetail) {
-        // create an entry in the subscription status db
-        val sessionToken = purchase.payload.split(":").firstOrNull() ?: ""
-        val subs = SubscriptionStatus()
-        subs.id = 0 // auto-incremented
-        subs.accountId = purchase.accountId
-        subs.purchaseToken = purchase.purchaseToken
-        subs.productId = purchase.productId
-        subs.planId = purchase.planId
-        subs.sessionToken = sessionToken
-        subs.productTitle = purchase.productTitle
-        subs.status = purchase.state
-        subs.purchaseTime = purchase.purchaseTimeMillis
-        subs.accountExpiry = 0L // will be set later
-        subs.billingExpiry = purchase.expiryTime
-        subs.developerPayload = purchase.payload
-        io {
-            val id = subsDb.upsert(subs)
-            if (id > 0) {
-                Logger.i(LOG_TAG_PROXY, "$TAG; subscription status updated, id: $id")
-            } else {
-                Logger.e(LOG_TAG_PROXY, "$TAG; err updating subscription status")
+        val currentState = subscriptionStateMachine.getCurrentState()
+
+        // Check if current state allows RPN activation
+        if (!subscriptionStateMachine.hasValidSubscription()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; cannot activate RPN - no valid subscription, current state: ${currentState.name}")
+            return
+        }
+
+        try {
+            persistentState.rpnState = RpnState.ENABLED.id
+            setRpnProductId(purchase.productId)
+            persistentState.showConfettiOnRPlus = true
+            io {
+                val payload = if (newPayload != null && newPayload.isNotEmpty()) {
+                    // If new payload is provided, use it to update the purchase payload
+                    Logger.i(LOG_TAG_PROXY, "$TAG; updating purchase payload with new data")
+                    newPayload
+                } else {
+                    // Otherwise, use the existing payload from the purchase
+                    purchase.payload
+                }
+                storeWinEntitlement(payload)
             }
+            Logger.i(
+                LOG_TAG_PROXY,
+                "$TAG; rpn activated, mode: ${rpnMode()}, product: ${purchase.productId}"
+            )
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; error activating RPN: ${e.message}", e)
+            // Rollback on error
+            persistentState.rpnState = RpnState.DISABLED.id
+            throw e
         }
     }
+
+    fun getSessionTokenFromPayload(payload: String): String {
+        // "developerPayload":"{\"ws\":{\"cid\":\"aa95f04efcb19a54c7605a02e5dd0b435906b993d12bec031a60f3f1272f4f0e\",\"sessiontoken\":\"22695:4:1752256088:524537c17ba103463ba1d330efaf05c146ba3404af:023f958b6c1949568f55078e3c58fe6885d3e57322\",\"expiry\":\"2025-08-11T00:00:00.000Z\",\"status\":\"valid\"}}"
+        try {
+            val json = JSONObject(payload)
+            val ws = json.getJSONObject("ws")
+            val sessionToken = ws.getString("sessiontoken")
+            Logger.i(LOG_TAG_PROXY, "$TAG; session token parsed from payload? ${sessionToken.isNotEmpty()}")
+            return sessionToken
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; error parsing session token from payload: ${e.message}", e)
+        }
+        return ""
+    }
+
+    fun getExpiryFromPayload(payload: String): Long? {
+        // "developerPayload":"{\"ws\":{\"cid\":\"aa95f04efcb19a54c7605a02e5dd0b435906b993d12bec031a60f3f1272f4f0e\",\"sessiontoken\":\"22695:4:1752256088:524537c17ba103463ba1d330efaf05c146ba3404af:023f958b6c1949568f55078e3c58fe6885d3e57322\",\"expiry\":\"2025-08-11T00:00:00.000Z\",\"status\":\"valid\"}}"
+        try {
+            val json = JSONObject(payload)
+            val ws = json.getJSONObject("ws")
+            val expiryStr = ws.getString("expiry")
+            val timestamp: Long = Instant.parse(expiryStr).toEpochMilli()
+            Logger.i(LOG_TAG_PROXY, "$TAG; expiry parsed from payload: $timestamp")
+            return timestamp
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; error parsing expiry from payload: ${e.message}")
+        }
+        return null
+    }
+
+    suspend fun storeWinEntitlement(payload: String) {
+        // Store the win entitlement in a file and the path in serverResponsePath
+        try {
+            // "developerPayload":"{\"ws\":{\"cid\":\"aa95f04efcb19a54c7605a02e5dd0b435906b993d12bec031a60f3f1272f4f0e\",\"sessiontoken\":\"22695:4:1752256088:524537c17ba103463ba1d330efaf05c146ba3404af:023f958b6c1949568f55078e3c58fe6885d3e57322\",\"expiry\":\"2025-08-11T00:00:00.000Z\",\"status\":\"valid\"}}"
+            val json = JSONObject(payload)
+            val ws = json.getJSONObject("ws")
+            val fileName = getJsonResponseFileName(WIN_ID)
+            val file = File(applicationContext.getExternalFilesDir(RPN_PROXY_FOLDER_NAME), fileName)
+            val res = EncryptedFileManager.write(applicationContext, ws.toString(), file)
+            // update the winConfig with the file path
+            winConfig = ws.toString().toByteArray()
+            val winProxy = db.getProxyById(WIN_ID)
+            val ll = if (winProxy != null) {
+                winProxy.serverResPath = file.absolutePath
+                db.update(winProxy)
+            } else {
+                // insert a new proxy entry if it doesn't exist
+                val newWinProxy = RpnProxy(
+                    id = WIN_ID,
+                    name = WIN_NAME,
+                    configPath = "",
+                    serverResPath = file.absolutePath,
+                    isActive = true,
+                    isLockdown = false,
+                    createdTs = System.currentTimeMillis(),
+                    modifiedTs = System.currentTimeMillis(),
+                    misc = "",
+                    tunId = "",
+                    latency = 0,
+                    lastRefreshTime = System.currentTimeMillis()
+                )
+                db.insert(newWinProxy).toInt()
+            }
+            if (ll < 0) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; error updating win proxy in db, result: $ll")
+            } else {
+                Logger.i(LOG_TAG_PROXY, "$TAG; win proxy updated in db, result: $ll")
+            }
+            Logger.i(LOG_TAG_PROXY, "$TAG; win entitlement stored in file: $fileName, result: $res")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; error storing win configs: ${e.message}", e)
+        }
+    }
+
 
     fun changePreferredId(id: String) {
         if (id.isEmpty()) {
@@ -251,33 +297,25 @@ object RpnProxyManager : KoinComponent {
     }
 
     enum class RpnType(val id: Int) {
-        WARP(1),
-        AMZ(2),
-        PROTON(3),
-        SE(4),
-        EXIT_64(5),
-        EXIT(6);
+        EXIT(0),
+        WIN(1);
 
         companion object {
             fun fromId(id: Int) = entries.first { it.id == id }
         }
     }
 
-    data class RpnProps(val id: String, val status: Long, val type: String, val kids: String, val addr: String, val created: Long, val expires: Long, val who: String) {
+    data class RpnProps(val id: String, val status: Long, val type: String, val kids: String, val addr: String, val created: Long, val expires: Long, val who: String, val locations: RpnServers) {
         override fun toString(): String {
             val cts = getTime(created)
             val ets = getTime(expires)
             val s = applicationContext.getString(UIUtils.getProxyStatusStringRes(status))
-            return "id = $id\nstatus = $s\ntype = $type\nkids = $kids\naddr = $addr\ncreated = $cts\nexpires = $ets\nwho = $who"
+            return "id = $id\nstatus = $s\ntype = $type\nkids = $kids\naddr = $addr\ncreated = $cts\nexpires = $ets\nwho = $who\nlocations = $locations"
         }
     }
 
     private fun getTime(time: Long): String {
         return  Utilities.convertLongToTime(time, Constants.TIME_FORMAT_4)
-    }
-
-    init {
-        io { load() }
     }
 
     suspend fun load(): Int {
@@ -290,34 +328,23 @@ object RpnProxyManager : KoinComponent {
         rp.forEach {
             try {
                 val cfgFile = File(it.configPath)
-                if (!cfgFile.exists()) {
-                    Logger.w(LOG_TAG_PROXY, "$TAG; load, file not found: ${it.configPath}")
+                if (!cfgFile.exists() && it.id != WIN_ID) { // win proxy is handled differently
+                    Logger.w(LOG_TAG_PROXY, "$TAG; load, file not found: ${it.configPath} for ${it.name}")
                     return@forEach
                 }
                 when (it.id) {
-                    PROTON_ID -> {
-                        val json = EncryptedFileManager.read(applicationContext, cfgFile)
-                        protonConfig = stringToProtonConfig(json)
-                        Logger.i(
-                            LOG_TAG_PROXY,
-                            "$TAG; proton config loaded, ${protonConfig != null}"
-                        )
-                    }
-                    WARP_ID, AMZ_ID -> {
-                        val cfg = EncryptedFileManager.read(applicationContext, cfgFile)
-                        val inputStream =
-                            ByteArrayInputStream(cfg.toByteArray(StandardCharsets.UTF_8))
-                        val c = Config.parse(inputStream)
-                        // set name and id to the config
-                        val config = Config.Builder().setId(it.id).setName(it.name)
-                            .setInterface(c.getInterface())
-                            .addPeers(c.getPeers()).build()
-                        if (it.id == WARP_ID) {
-                            warpConfig = config
-                        } else if (it.id == AMZ_ID) {
-                            amzConfig = config
+                    WIN_ID -> {
+                        // read the win entitlement file
+                        val entitlementFile = File(it.serverResPath)
+                        val entitlement = EncryptedFileManager.readByteArray(applicationContext, entitlementFile)
+                        val state = EncryptedFileManager.readByteArray(applicationContext, cfgFile)
+                        if (state.isEmpty()) {
+                            Logger.d(LOG_TAG_PROXY, "$TAG; win state file is empty (path: ${cfgFile.absolutePath}, using entitlement")
+                            winConfig = entitlement
+                        } else {
+                            winConfig = state
                         }
-                        Logger.i(LOG_TAG_PROXY, "$TAG; config loaded: ${it.name}")
+                        Logger.i(LOG_TAG_PROXY, "$TAG; win config loaded, ${winConfig?.isNotEmpty()}")
                     }
                 }
             } catch (e: Exception) {
@@ -331,34 +358,17 @@ object RpnProxyManager : KoinComponent {
             LOG_TAG_PROXY,
             "$TAG; total selected countries: ${selectedCountries.size}, $selectedCountries"
         )
+        // subsDb.deleteAll()
+        // subsHistoryDb.clearHistory()
         return rp.size
     }
 
     fun getProxy(type: RpnType): RpnProxy? {
         return when (type) {
-            RpnType.WARP -> {
-                rpnProxies.find { it.name == WARP_NAME || it.name == WARP_NAME.lowercase() }
-            }
-            RpnType.AMZ -> {
-                rpnProxies.find { it.name == AMZ_NAME || it.name == AMZ_NAME.lowercase() }
-            }
-            RpnType.PROTON -> {
-                rpnProxies.find { it.name == PROTON_NAME || it.name == PROTON_NAME.lowercase()}
+            RpnType.WIN -> {
+                rpnProxies.find { it.name == WIN_NAME || it.name == WIN_NAME.lowercase() }
             }
             else -> null
-        }
-    }
-
-    suspend fun getNewProtonConfig(): ProtonConfig? {
-        // pass null to get the new proton config
-        val byteArray = VpnController.registerAndFetchProtonIfNeeded(null)
-        val res = updateProtonConfig(byteArray)
-        return if (res) {
-            Logger.i(LOG_TAG_PROXY, "new proton config updated")
-            protonConfig
-        } else {
-            Logger.e(LOG_TAG_PROXY, "err: new proton cfg, returning old cfg if available")
-            protonConfig
         }
     }
 
@@ -366,17 +376,27 @@ object RpnProxyManager : KoinComponent {
     suspend fun registerNewProxy(type: RpnType): Boolean {
         // in case of update failure, call register with null
         when (type) {
-            RpnType.WARP -> {
-                val bytes = VpnController.registerAndFetchWarpConfig(null) ?: return false
-                return updateWarpConfig(bytes)
-            }
-            RpnType.AMZ -> {
-                val bytes = VpnController.registerAndFetchAmneziaConfig(null) ?: return false
-                return updateAmzConfig(bytes)
-            }
-            RpnType.PROTON -> {
-                val bytes = VpnController.registerAndFetchProtonIfNeeded(null) ?: return false
-                return updateProtonConfig(bytes)
+            RpnType.WIN -> {
+                // check if state is there if not, fetch the entitlement
+                var bytes = getWinExistingData() // fetch existing win state
+                if (bytes == null) {
+                    Logger.i(LOG_TAG_PROXY, "$TAG; win state is null, fetching entitlement")
+                    bytes = getWinEntitlement()
+                }
+                if (bytes == null || bytes.isEmpty()) {
+                    Logger.w(LOG_TAG_PROXY, "$TAG; win entitlement is null or empty, cannot register")
+                    return false
+                }
+                val currBytes = VpnController.registerAndFetchWinConfig(bytes) ?: return false
+                val ok = updateWinConfigState(currBytes)
+                winServers = fetchAndConstructWinLocations()
+                if (winServers.isEmpty()) {
+                    Logger.w(LOG_TAG_PROXY, "$TAG; no win servers found, retry")
+                    io {
+                        retryLocationFetch()
+                    }
+                }
+                return ok
             }
             else -> {
                 Logger.e(LOG_TAG_PROXY, "$TAG; err; invalid type for register: $type")
@@ -385,164 +405,77 @@ object RpnProxyManager : KoinComponent {
         }
     }
 
-    suspend fun refreshRpnCreds(type: RpnType): Boolean {
-        val bytes = VpnController.updateRpnProxy(type)
-        var res = when (type) {
-            RpnType.WARP -> {
-                updateWarpConfig(bytes)
+    suspend fun retryLocationFetch() {
+        // keep retrying to fetch win properties for next 15 sec and see
+        // if the locations are available
+        for (i in 1..15) {
+            Logger.i(LOG_TAG_PROXY, "$TAG; retrying to fetch win properties, attempt: $i")
+            winServers = fetchAndConstructWinLocations()
+            if (winServers.isNotEmpty()) {
+                Logger.i(LOG_TAG_PROXY, "$TAG; win servers found after retry, attempt: $i, size: ${winServers.size}")
+                break
             }
-            RpnType.AMZ -> {
-                updateAmzConfig(bytes)
-            }
-            RpnType.PROTON -> {
-                updateProtonConfig(bytes)
-            }
-            else -> {
-                // Do nothing
-                false
-            }
+            Thread.sleep(1000L) // wait for 1 second before next retry
         }
-        return res
     }
 
-    suspend fun updateProtonConfig(byteArray: ByteArray?): Boolean {
-        if (byteArray == null) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err in getting the proton config")
+    suspend fun getWinServers(): List<RpnWinServer> {
+        if (winServers.isNotEmpty()) {
+            return winServers.toList()
+        }
+
+        Logger.w(LOG_TAG_PROXY, "$TAG; win servers are empty, fetching from tun")
+        winServers = fetchAndConstructWinLocations()
+        return winServers.toList()
+    }
+
+    suspend fun getWinEntitlement(): ByteArray? {
+        if (winConfig == null || winConfig!!.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; win config is null or empty, returning empty byte array")
+            // read from database if available
+            val winProxy = db.getProxyById(WIN_ID)
+            if (winProxy != null) {
+                val file = File(winProxy.serverResPath)
+                val bytes = EncryptedFileManager.readByteArray(applicationContext, file)
+                if (bytes.isNotEmpty()) {
+                    Logger.i(LOG_TAG_PROXY, "$TAG; win proxy found in db, returning bytes")
+                    return bytes
+                } else {
+                    Logger.w(LOG_TAG_PROXY, "$TAG; win proxy file is empty, returning null")
+                    return null
+                }
+            } else {
+                Logger.w(LOG_TAG_PROXY, "$TAG; win proxy not found in db, returning null")
+                return null
+            }
+        } else {
+            Logger.i(LOG_TAG_PROXY, "$TAG; win config is not null, returning bytes")
+            return winConfig
+        }
+    }
+
+    suspend fun updateWinConfigState(byteArray: ByteArray?): Boolean {
+        if (byteArray == null || byteArray.isEmpty()) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; err; byte array is null for win config")
             return false
         }
 
         try {
-            val p = byteArrayToProtonWgConfig(byteArray)
-            return if (p != null) {
-                val res = saveProtonConfig(byteArray)
-                Logger.d(LOG_TAG_PROXY, "$TAG; proton config saved? $res")
-                if (res) {
-                    protonConfig = p
-                    Logger.i(LOG_TAG_PROXY, "$TAG; proton config updated")
-                    // asserting as protonConfig will not be null here
-                    val expiry = getProxyExpiry(RpnType.PROTON) ?: 0
-                    scheduledUpdateConfig(RpnType.PROTON, expiry)
-                    Logger.i(LOG_TAG_PROXY, "$TAG; scheduled proton update, $expiry")
-                }
-                res
-            } else {
-                Logger.e(LOG_TAG_PROXY, "$TAG; err parsing proton config")
-                false
+            val res = updateWinConfigToFileAndDb(byteArray)
+            Logger.i(LOG_TAG_PROXY, "$TAG; win config saved? $res")
+            if (res) {
+                winConfig = byteArray
+                Logger.i(LOG_TAG_PROXY, "$TAG; win config updated")
             }
+            return res
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err updating proton config: ${e.message}", e)
+            Logger.e(LOG_TAG_PROXY, "$TAG; err updating win config: ${e.message}", e)
         }
         return false
     }
 
-    suspend fun updateWarpConfig(byteArray: ByteArray?): Boolean {
-        if (byteArray == null) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err: byte array is null for warp config")
-            return false
-        }
-
-        try {
-            // convert the bytearray to json object
-            val b2s = byteArray.toString(StandardCharsets.UTF_8)
-            val jo = JSONObject(b2s)
-            // TODO: remove the below log
-            Logger.vv(LOG_TAG_PROXY, "$TAG; init warp config update")
-            val cfg = parseNewConfigJsonResponse(jo)
-            return if (cfg != null) {
-                val c =
-                    Config.Builder()
-                        .setId(WARP_ID)
-                        .setName(WARP_NAME.lowercase())
-                        .setInterface(cfg.getInterface())
-                        .addPeers(cfg.getPeers())
-                        .build()
-                val res = writeConfigAndUpdateDb(c, jo.toString())
-                Logger.i(LOG_TAG_PROXY, "$TAG; warp config saved? $res")
-                if (res) {
-                    warpConfig = c
-                    Logger.i(LOG_TAG_PROXY, "$TAG; warp config updated")
-                    val expiry = getProxyExpiry(RpnType.WARP) ?: 0
-                    scheduledUpdateConfig(RpnType.WARP, expiry)
-                    Logger.i(LOG_TAG_PROXY, "$TAG; scheduled warp update, $expiry")
-                }
-                res
-            } else {
-                Logger.e(LOG_TAG_PROXY, "$TAG; err parsing warp config")
-                false
-            }
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err updating warp config: ${e.message}", e)
-        }
-        return false
-    }
-
-    suspend fun updateAmzConfig(byteArray: ByteArray?): Boolean {
-        if (byteArray == null) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err; byte array is null for amz config")
-            return false
-        }
-
-        try {
-            // convert the bytearray to json object
-            val b2s = byteArray.toString(StandardCharsets.UTF_8)
-            val jo = JSONObject(b2s)
-            val cfg = parseNewConfigJsonResponse(jo)
-            return if (cfg != null) {
-                val c =
-                    Config.Builder()
-                        .setId(AMZ_ID)
-                        .setName(AMZ_NAME.lowercase())
-                        .setInterface(cfg.getInterface())
-                        .addPeers(cfg.getPeers())
-                        .build()
-                val res = writeConfigAndUpdateDb(c, jo.toString())
-                Logger.i(LOG_TAG_PROXY, "$TAG; amz config saved? $res")
-                if (res) {
-                    amzConfig = c
-                    Logger.i(LOG_TAG_PROXY, "$TAG; amz config updated")
-                    val expiry = getProxyExpiry(RpnType.AMZ) ?: 0
-                    scheduledUpdateConfig(RpnType.AMZ, expiry)
-                    Logger.i(LOG_TAG_PROXY, "$TAG; scheduled amz update, $expiry")
-                }
-                res
-            } else {
-                Logger.e(LOG_TAG_PROXY, "$TAG; err parsing amz config")
-                false
-            }
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err updating amz config: ${e.message}", e)
-        }
-        return false
-    }
-
-    private suspend fun getProxyExpiry(type: RpnType): Long? {
-        return VpnController.getRpnProps(type).first?.expires
-    }
-
-    private fun scheduledUpdateConfig(type: RpnType, expiry: Long) {
-        if (type != RpnType.WARP && type != RpnType.AMZ && type != RpnType.PROTON) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err; invalid type for scheduled update: $type")
-            return
-        }
-
-        workScheduler.scheduleRpnProxiesUpdate(type, expiry)
-    }
-
-    fun getWarpConfig(): Pair<Config?, Boolean> {
-        // warp config will always be the first config in the list
-        return Pair(warpConfig, false) // config, isActive
-    }
-
-    suspend fun getWarpExistingData(): ByteArray? {
-        return getExistingData(WARP_ID)
-    }
-
-    suspend fun getAmzExistingData(): ByteArray? {
-        return getExistingData(AMZ_ID)
-    }
-
-    suspend fun getProtonExistingData(): ByteArray? {
-        return getExistingData(PROTON_ID)
+    suspend fun getWinExistingData(): ByteArray? {
+        return getExistingData(WIN_ID)
     }
 
     private suspend fun getExistingData(id: Int): ByteArray? {
@@ -552,7 +485,7 @@ object RpnProxyManager : KoinComponent {
                 Logger.w(LOG_TAG_PROXY, "$TAG; db is null for id: $id")
                 return null
             }
-            val cfgFile = File(db.serverResPath)
+            val cfgFile = File(db.configPath)
             if (cfgFile.exists()) {
                 Logger.d(LOG_TAG_PROXY, "$TAG; config for $id exists, reading the file")
                 val bytes = EncryptedFileManager.readByteArray(applicationContext, cfgFile)
@@ -567,222 +500,85 @@ object RpnProxyManager : KoinComponent {
         return null
     }
 
-    suspend fun getProtonUniqueCC(): List<RegionalWgConf> {
-        return protonConfig?.regionalWgConfs?.distinctBy { it.cc }?.sortedBy { it.cc } ?: emptyList()
-    }
-
     suspend fun getSelectedCCs(): Set<String> {
         return selectedCountries
     }
 
-    private suspend fun saveProtonConfig(byteArray: ByteArray): Boolean {
-        try {
-            val dir = getProtonConfigDir()
-            if (!File(dir).exists()) {
-                Logger.d(LOG_TAG_PROXY, "$TAG; creating dir: $dir")
-                File(dir).mkdirs()
-            }
-
-            // write the byte array to the file
-            val protonConfigFile = File(dir, getConfigFileName(PROTON_ID))
-            val res = EncryptedFileManager.write(applicationContext, byteArray, protonConfigFile)
-            Logger.d(LOG_TAG_PROXY, "$TAG; proton config saved? $res")
-
-            val serverResFile = File(dir, getJsonResponseFileName(PROTON_ID))
-            val serRes = EncryptedFileManager.write(applicationContext, byteArray, serverResFile)
-            Logger.d(LOG_TAG_PROXY, "$TAG; proton server response saved? $serRes")
-
-            val rpnpro = db.getProxyById(PROTON_ID)
-            val rpnProxy = RpnProxy(
-                id = PROTON_ID,
-                name = PROTON_NAME,
-                configPath = protonConfigFile.absolutePath,
-                serverResPath = serverResFile.absolutePath ?: "",
-                isActive = rpnpro?.isActive == true,
-                isLockdown = rpnpro?.isLockdown == true,
-                createdTs = rpnpro?.createdTs ?: System.currentTimeMillis(),
-                modifiedTs = System.currentTimeMillis(),
-                misc = rpnpro?.misc ?: "",
-                tunId = rpnpro?.tunId ?: "",
-                latency = rpnpro?.latency ?: 0,
-                lastRefreshTime = System.currentTimeMillis()
-            )
-            val l = db.insert(rpnProxy)
-            Logger.d(LOG_TAG_PROXY, "$TAG; proton config saved in db? ${l > 0}")
-            return l > 0
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err saving proton config: ${e.message}", e)
+    private suspend fun updateWinConfigToFileAndDb(state: ByteArray): Boolean {
+        // write the win config to the file and update the database
+        // store entitlement in serverResponse column and state in config path column
+        val dir = File(
+            applicationContext.filesDir.absolutePath +
+                    File.separator +
+                    RPN_PROXY_FOLDER_NAME +
+                    File.separator +
+                    WIN_NAME.lowercase() +
+                    File.separator
+        )
+        if (!dir.exists()) {
+            Logger.d(LOG_TAG_PROXY, "$TAG; creating dir: ${dir.absolutePath}")
+            dir.mkdirs()
         }
-        return false
-    }
-
-    private fun byteArrayToProtonWgConfig(byteArray: ByteArray): ProtonConfig? {
+        val cfgFile = File(dir, getConfigFileName(WIN_ID))
         try {
-            val jsonString = byteArray.toString(StandardCharsets.UTF_8)
-            val p = Gson().fromJson(jsonString, ProtonConfig::class.java)
-            return p
-        } catch (e: JsonSyntaxException) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err parsing proton config: ${e.message}", e)
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err parsing proton config: ${e.message}", e)
-        }
-        return null
-    }
-
-    private fun stringToProtonConfig(jsonString: String): ProtonConfig? {
-        try {
-            return Gson().fromJson(jsonString, ProtonConfig::class.java)
-        } catch (e: JsonSyntaxException) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err parsing proton config: ${e.message}", e)
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err parsing proton config: ${e.message}", e)
-        }
-        return null
-    }
-
-    private fun getProtonConfigDir(): String {
-        // Get the proton config file path from the database
-        return applicationContext.filesDir.absolutePath +
-                File.separator +
-                RPN_PROXY_FOLDER_NAME +
-                File.separator +
-                PROTON_NAME.lowercase() +
-                File.separator
-    }
-
-    suspend fun getNewAmzConfig(): Config? {
-        try {
-            val res = registerNewProxy(RpnType.AMZ)
-            return if (res) {
-                Logger.i(LOG_TAG_PROXY, "$TAG; new amz config updated")
-                amzConfig
+            // write the entitlement to the config file
+            val cfgRes = EncryptedFileManager.write(applicationContext, state, cfgFile)
+            Logger.i(LOG_TAG_PROXY, "$TAG writing win config to file: ${cfgFile.absolutePath}")
+            val existingDb = db.getProxyById(WIN_ID)
+            val l = if (existingDb != null) {
+                // if the proxy already exists, update it
+                existingDb.configPath = cfgFile.absolutePath
+                db.update(existingDb)
             } else {
-                Logger.e(LOG_TAG_PROXY, "$TAG; err: new amz config, returning old config")
-                amzConfig
+                // if the proxy does not exist, insert it
+                val rpnProxy = RpnProxy(
+                    id = WIN_ID,
+                    name = WIN_NAME,
+                    configPath = cfgFile.absolutePath,
+                    serverResPath = "", // serverResPath is used to store the entitlement
+                    isActive = true,
+                    isLockdown = false,
+                    createdTs = System.currentTimeMillis(),
+                    modifiedTs = System.currentTimeMillis(),
+                    misc = "",
+                    tunId = "",
+                    latency = 0,
+                    lastRefreshTime = System.currentTimeMillis()
+                )
+                db.insert(rpnProxy).toInt()
+            }
+            Logger.d(LOG_TAG_PROXY, "$TAG; win config saved in db? ${l > 0}")
+            if (l > 0 && cfgRes) {
+                winConfig = state
+                Logger.i(LOG_TAG_PROXY, "$TAG; win config updated")
+                return true
             }
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err: new amz config: ${e.message}")
-        }
-        return null
-    }
-
-    suspend fun getNewWarpConfig(): Config? {
-        try {
-            val res = registerNewProxy(RpnType.WARP)
-            return if (res) {
-                Logger.i(LOG_TAG_PROXY, "$TAG; new warp config updated")
-                 warpConfig
-            } else {
-                Logger.e(LOG_TAG_PROXY, "$TAG; err: new warp config, returning old config")
-                warpConfig
-            }
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err: new wg(warp) config: ${e.message}")
-        }
-        return null
-    }
-
-    private suspend fun writeConfigAndUpdateDb(cfg: Config, json: String): Boolean {
-        try {
-            // write the config to the file
-            val dir = File(
-                applicationContext.filesDir.absolutePath +
-                        File.separator +
-                        RPN_PROXY_FOLDER_NAME +
-                        File.separator +
-                        cfg.getName() +
-                        File.separator
-            )
-            if (!dir.exists()) {
-                Logger.d(LOG_TAG_PROXY, "$TAG; creating dir: ${dir.absolutePath}")
-                dir.mkdirs()
-            }
-
-            val cfgFile = File(dir, getConfigFileName(cfg.getId()))
-            val cfgRes = EncryptedFileManager.write(applicationContext, cfg.toWgQuickString(), cfgFile)
-            Logger.i(LOG_TAG_PROXY, "$TAG writing wg config to file: ${cfgFile.absolutePath}")
-
-            val resFile = File(dir, getJsonResponseFileName(cfg.getId()))
-            val res = EncryptedFileManager.write(applicationContext, json, resFile)
-            Logger.i(LOG_TAG_PROXY, "$TAG writing server response to file: ${resFile.absolutePath}")
-
-            Logger.d(LOG_TAG_PROXY, "$TAG parse write?$cfgRes, response write?$res")
-
-            val prev = db.getProxyById(cfg.getId())
-
-            val rpnProxy = RpnProxy(
-                id = cfg.getId(),
-                name = cfg.getName(),
-                configPath = cfgFile.absolutePath,
-                serverResPath = resFile.absolutePath,
-                isActive = prev?.isActive == true,
-                isLockdown = prev?.isLockdown == true,
-                createdTs = prev?.createdTs ?: System.currentTimeMillis(),
-                modifiedTs = System.currentTimeMillis(),
-                misc = prev?.misc ?: "",
-                tunId = prev?.tunId ?: "",
-                latency = prev?.latency ?: 0,
-                lastRefreshTime = System.currentTimeMillis()
-            )
-            val l = db.insert(rpnProxy)
-            Logger.d(LOG_TAG_PROXY, "$TAG; config saved in db? ${l > 0}")
-            return l > 0
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err writing config to file: ${e.message}", e)
+            Logger.e(LOG_TAG_PROXY, "$TAG; err writing win config to file: ${e.message}", e)
         }
         return false
     }
 
     private fun getConfigFileName(id: Int): String {
         return when (id) {
-            WARP_ID -> WARP_FILE_NAME
-            AMZ_ID -> AMZ_FILE_NAME
-            PROTON_ID -> PROTON_FILE_NAME
+            WIN_ID -> WIN_STATE_FILE_NAME
             else -> ""
         }
     }
 
     private fun getJsonResponseFileName(id: Int): String {
         return when (id) {
-            WARP_ID -> WARP_RESPONSE_FILE_NAME
-            AMZ_ID -> AMZ_RESPONSE_FILE_NAME
-            PROTON_ID -> PROTON_RESPONSE_FILE_NAME
+            WIN_ID -> WIN_ENTITLEMENT_FILE_NAME
             else -> ""
         }
     }
 
-    private fun parseNewConfigJsonResponse(jsonObject: JSONObject?): Config? {
-        if (jsonObject == null) {
-            Logger.e(LOG_TAG_PROXY, "$TAG; new warp config json object is null")
-            return null
-        }
-
-        // get the json tag "wgconf" from the response
-        val o2s = jsonObject.optString("wgconf")
-        // convert string to input stream
-        val configStream = ByteArrayInputStream(o2s.toByteArray(StandardCharsets.UTF_8))
-
-        val cfg =
-            try {
-                Config.parse(configStream)
-            } catch (e: BadConfigException) {
-                Logger.e(
-                    LOG_TAG_PROXY,
-                    "$TAG err parsing config: ${e.message}, ${e.reason}, ${e.text}, ${e.location}, ${e.section}, ${e.stackTrace}, ${e.cause}"
-                )
-                null
-            }
-        Logger.i(LOG_TAG_PROXY, "$TAG json parse complete? ${cfg != null}")
-        return cfg
-    }
-
     fun canSelectCountryCode(cc: String): Pair<Boolean, String> {
-        // Check if the country code is available in the proton config
-        // and see if only max of 5 countries can be selected
-        val isAvailable = protonConfig?.regionalWgConfs?.any { it.cc == cc } == true
+        // TODO: get country code from win config
+        val isAvailable = false
         if (!isAvailable) {
-            Logger.i(LOG_TAG_PROXY, "$TAG; cc not available in proton config: $cc")
-            return Pair(false, "Country code not available in the proton config")
+            Logger.i(LOG_TAG_PROXY, "$TAG; cc not available in config: $cc")
+            return Pair(false, "Country code not available in the config")
         }
         return if (selectedCountries.size >= 5) {
             Logger.i(LOG_TAG_PROXY, "$TAG; cc limit reached, selected: ${selectedCountries.size}, $selectedCountries")
@@ -798,19 +594,22 @@ object RpnProxyManager : KoinComponent {
         val sb = StringBuilder()
         sb.append("   rpnState: ${rpnState().name}\n")
         sb.append("   rpnMode: ${rpnMode().name}\n")
-        sb.append("   warp config? ${warpConfig != null}\n")
-        sb.append("   amz config? ${amzConfig != null}\n")
-        sb.append("   proton config? ${protonConfig != null}\n")
-
+        sb.append("   win config? ${winConfig != null}\n")
+        //sb.append("   subscription stats: ${getSubscriptionStatistics()}\n")
+        //sb.append("   current subscription: ${getDetailedSubscriptionInfo()}\n")
+        sb.append("   selected countries: ${selectedCountries.size}, $selectedCountries\n")
+        sb.append("   state machine stats: ${InAppBillingHandler.getConnectionStatusWithStateMachine()}\n")
         return sb.toString()
     }
 
-    /**
+    */
+/**
      * Validate the payload received from Play Billing.
      * The payload is expected to be in the format: "accountId:session_token"
      * where accountId is the account ID from PipKeyManager and hashkey represents the user
      * session_token created during the purchase by server
-     */
+     *//*
+
     suspend fun isValidPayload(payload: String): Boolean {
         if (payload.isEmpty()) {
             Logger.w(LOG_TAG_PROXY, "$TAG; err; payload is empty")
@@ -864,126 +663,394 @@ object RpnProxyManager : KoinComponent {
         return true
     }
 
-    suspend fun cancelRpnSubscription(accountId: String, purchaseToken: String): Boolean {
+    suspend fun updateCancelledSubscription(accountId: String, purchaseToken: String): Boolean {
         if (purchaseToken.isEmpty() || accountId.isEmpty()) {
             Logger.w(LOG_TAG_PROXY, "$TAG; err; purchaseToken is empty")
             return false
         }
-        // Cancel the subscription using the purchase token
-        val result = subsDb.cancelSubscription(accountId, purchaseToken, SubscriptionStatus.SubscriptionState.STATE_CANCELLED.id)
-        // If the result is greater than 0, it means the subscription was cancelled successfully
-        return if (result > 0) {
-            Logger.i(LOG_TAG_PROXY, "$TAG; subscription cancelled successfully for token: $purchaseToken")
-            deactivateRpn()
-            true
-        } else {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err cancelling subscription for token in db: $purchaseToken")
-            false
-        }
+        // TODO: perform the validation of purchaseToken and accountId with the subscription data
+        handleUserCancellation()
+        return true
     }
 
-    suspend fun revokeRpnSubscription(accountId: String, purchaseToken: String): Boolean {
+    suspend fun getCurrentSubscription(): SubscriptionStateMachineV2.SubscriptionData? {
+        return subscriptionStateMachine.getSubscriptionData()
+    }
+
+    suspend fun updateRevokedSubscription(accountId: String, purchaseToken: String): Boolean {
         if (purchaseToken.isEmpty() || accountId.isEmpty()) {
             Logger.w(LOG_TAG_PROXY, "$TAG; err; purchaseToken is empty")
             return false
         }
-        // Revoke the subscription using the purchase token
-        val result = subsDb.revokeSubscription(accountId, purchaseToken, SubscriptionStatus.SubscriptionState.STATE_REVOKED.id)
-        // If the result is greater than 0, it means the subscription was revoked successfully
-        return if (result > 0) {
-            Logger.i(LOG_TAG_PROXY, "$TAG; subscription revoked successfully for token: $purchaseToken")
-            deactivateRpn()
-            true
-        } else {
-            Logger.e(LOG_TAG_PROXY, "$TAG; err revoking subscription for token in db: $purchaseToken")
-            false
-        }
+        handleSubscriptionRevoked()
+        return true
     }
 
-    suspend fun processRpnPurchase(purchases: List<PurchaseDetail>): Boolean {
-        if (purchases.isEmpty()) {
+    suspend fun fetchAndConstructWinLocations(): Set<RpnWinServer> {
+        // there will be multiple location names for single country code
+        // construct the RpnWinServer object
+        // contains pair RpnProps and errorMsg
+        val winProps = VpnController.getRpnProps(RpnType.WIN).first
+        if (winProps == null) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err; win props is null")
+            return emptySet()
+        }
+        val count = winProps.locations.len()
+        if (count == 0L) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err; no locations found in win props")
+            return emptySet()
+        }
+        val servers = mutableSetOf<RpnWinServer>()
+        for( i in 0 until count) {
+            val loc = winProps.locations.get(i)
+            if (loc == null) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; err; location is null at index $i")
+                continue
+            }
+            val prevNames = servers.filter { it.countryCode == loc.cc }.map { it.names }.toMutableList()
+            prevNames.add(loc.name)
+            val newNames = prevNames.distinct().sorted().joinToString { "," }
+            // each cc will have multiple locations
+            // add that to the list of servers
+            val s = RpnWinServer(newNames, loc.cc, loc.addrs, true)
+            servers.add(s)
+        }
+        // assign it to winServers
+        return servers
+    }
+
+    suspend fun processRpnPurchase(purchase: PurchaseDetail?, existingSubs: SubscriptionStatus): Boolean {
+        if (purchase == null) {
             Logger.w(LOG_TAG_PROXY, "$TAG; err; no purchases to process")
+            try {
+                subscriptionStateMachine.subscriptionExpired()
+            } catch (e: Exception) {
+                Logger.e(
+                    LOG_TAG_PROXY,
+                    "$TAG; error notifying state machine of expiration: ${e.message}",
+                    e
+                )
+            }
             return false
         }
-        purchases.forEach { purchase ->
-            if (purchase.productId.isEmpty()) {
-                Logger.w(LOG_TAG_PROXY, "$TAG; err; productId is empty for purchase: $purchase")
-                return@forEach
-            }
-            if (!isValidPayload(purchase.payload) && !isValidAccountId(purchase.accountId)) {
-                Logger.w(LOG_TAG_PROXY, "$TAG; err; invalid payload for purchase: $purchase")
-                return@forEach
-            }
 
-            val subStatus = SubscriptionStatus.SubscriptionState.fromId(purchase.state)
-            when (subStatus) {
-                SubscriptionStatus.SubscriptionState.STATE_ACTIVE,
-                SubscriptionStatus.SubscriptionState.STATE_GRACE_PERIOD -> {
-                    activateRpn(purchase)
-                    Logger.i(LOG_TAG_PROXY, "$TAG; processed purchase: $purchase")
-                    return true
+        if (purchase.productId.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; err; productId is empty for purchase: $purchase")
+            try {
+                subscriptionStateMachine.purchaseFailed("Empty product ID", null)
+            } catch (e: Exception) {
+                Logger.e(
+                    LOG_TAG_PROXY,
+                    "$TAG; error notifying state machine of purchase failure: ${e.message}",
+                    e
+                )
+            }
+            return false
+        }
+
+        // Enhanced validation
+        if (!isValidPayload(purchase.payload) && !isValidAccountId(purchase.accountId)) {
+            Logger.w(
+                LOG_TAG_PROXY,
+                "$TAG; err; invalid payload or account ID for purchase: $purchase"
+            )
+            try {
+                subscriptionStateMachine.purchaseFailed(
+                    "Invalid payload or account ID",
+                    null
+                )
+            } catch (e: Exception) {
+                Logger.e(
+                    LOG_TAG_PROXY,
+                    "$TAG; error notifying state machine of validation failure: ${e.message}",
+                    e
+                )
+            }
+            return false
+        }
+
+        val accExpiry = existingSubs.accountExpiry
+        val billingExpiry = existingSubs.billingExpiry
+        val currTs = System.currentTimeMillis()
+
+        if (billingExpiry > currTs) {
+            Logger.d(LOG_TAG_PROXY, "$TAG; existing subscription is still valid, no immediate action needed")
+        }
+
+
+        if (accExpiry > currTs) {
+            Logger.d(LOG_TAG_PROXY, "$TAG; existing account is still valid, no immediate action needed")
+        }
+
+        // in case if the account expiry is less than the billing expiry, query the entitlement
+        // from server and update the subscription state machine
+        // Check if the billing expiry + 1 day is greater than the account expiry.
+        // there is always a delay so just add 1 more day to the billing expiry
+        val oneDay = 24 * 60 * 60 * 1000 // 1 day in milliseconds
+        if (accExpiry < billingExpiry + oneDay ) {
+            Logger.d(LOG_TAG_PROXY, "$TAG; account expiry is less than billing expiry, querying entitlement")
+            try {
+                val developerPayload = InAppBillingHandler.queryEntitlementFromServer(purchase.accountId)
+                if (developerPayload != null && developerPayload.isNotEmpty()) {
+                    Logger.i(LOG_TAG_PROXY, "$TAG; developer payload received for ${purchase.productId}")
+                    activateRpn(purchase, developerPayload)
+                    val newPurchase = purchase.copy(payload = developerPayload)
+                    val subsData = subscriptionStateMachine.getSubscriptionData()
+                    if (subsData != null) {
+                        subsData.subscriptionStatus.developerPayload = newPurchase.payload
+                        subsData.purchaseDetail?.copy(payload = developerPayload)
+                        subscriptionStateMachine.stateMachine.updateData(subsData)
+                    }
                 }
-                SubscriptionStatus.SubscriptionState.STATE_PURCHASED,
-                SubscriptionStatus.SubscriptionState.STATE_PENDING -> {
-                    // Do not activate RPN, but update the subscription status
-                    updateSubscriptionStatus(purchase)
-                    Logger.i(
-                        LOG_TAG_PROXY,
-                        "$TAG; purchase is in pending state, not activating RPN: $purchase"
-                    )
-                    return true
-                }
-                else -> {
-                    Logger.w(
-                        LOG_TAG_PROXY,
-                        "$TAG; purchase in unhandled state, deactivating RPN. State: ${subStatus.name}"
-                    )
-                    return@forEach
-                }
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_PROXY, "$TAG; error querying entitlement: ${e.message}")
             }
         }
-        Logger.w(LOG_TAG_PROXY, "$TAG; err; no valid purchases to process")
-        deactivateRpn()
-        return false
+
+        // activate the RPN
+        activateRpn(purchase)
+        return true
     }
 
-
-    suspend fun checkForAcknowledgments(purchase: Purchase) {
-        val appContext = applicationContext
-        Logger.d(LOG_TAG_PROXY, "initiatePaymentVerification: initiating payment verification")
-
-        // if worker is already running, don't start another one
-        val workInfos = WorkManager.getInstance(appContext).getWorkInfosByTag(PAYMENT_WORKER_TAG)
-        if (workInfos.get().any { it.state == WorkInfo.State.RUNNING }) {
-            Logger.i(LOG_TAG_PROXY, "initiatePaymentVerification: worker already running")
-            return
+    private fun startStateObserver() {
+        stateObserverScope.launch {
+            try {
+                subscriptionStateMachine.currentState.collect { state ->
+                    Logger.d(LOG_TAG_PROXY, "$TAG; collect; initial subscription state: ${state.name}")
+                    io { handleStateChange(state) }
+                 }
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_PROXY, "$TAG; collect; error in state observer: ${e.message}", e)
+            }
         }
-        val data = Data.Builder()
-        data.putLong("workerStartTime", SystemClock.elapsedRealtime())
-        data.putString("productId", purchase.products.firstOrNull() ?: "")
-        data.putString("purchaseToken", purchase.purchaseToken)
-        data.putString("referenceId", purchase.developerPayload)
-        data.putString("accountId", purchase.orderId)
-        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-        val paymentWorker =
-            OneTimeWorkRequestBuilder<PaymentWorker>()
-                .setInputData(data.build())
-                .setConstraints(constraints)
-                .setBackoffCriteria(
-                    BackoffPolicy.LINEAR,
-                    WorkRequest.MIN_BACKOFF_MILLIS,
-                    TimeUnit.MILLISECONDS
-                )
-                .addTag(PAYMENT_WORKER_TAG)
-                .setInitialDelay(10, TimeUnit.SECONDS)
-                .build()
+    }
 
-        Logger.i(LOG_TAG_PROXY, "initiatePaymentVerification: enqueuing payment worker")
-        WorkManager.getInstance(appContext).beginWith(paymentWorker).enqueue()
+    private suspend fun handleStateChange(state: SubscriptionStateMachineV2.SubscriptionState) {
+        when (state) {
+            is SubscriptionStateMachineV2.SubscriptionState.Active -> {
+                Logger.i(
+                    LOG_TAG_PROXY,
+                    "$TAG; subscription activated, ensuring RPN is enabled if configured"
+                )
+                // Could potentially auto-enable RPN if conditions are met
+                if (!isRpnEnabled()) {
+                    val subs = subscriptionStateMachine.getSubscriptionData()
+                    val purchaseDetail = subs?.purchaseDetail
+                    if (purchaseDetail == null) { // this should not happen
+                        Logger.w(LOG_TAG_PROXY, "$TAG; no purchase detail available for activation, but state is active")
+                        return
+                    }
+                    activateRpn(purchaseDetail)
+                }
+            }
+
+            is SubscriptionStateMachineV2.SubscriptionState.Cancelled -> {
+                Logger.i(LOG_TAG_PROXY, "$TAG; subscription cancelled, disabling RPN if active")
+                val subs = subscriptionStateMachine.getSubscriptionData()
+                val status = subs?.subscriptionStatus
+                val currTs = System.currentTimeMillis()
+                if ((status != null && status.billingExpiry > currTs) || DEBUG) {
+                    deactivateRpn("Subscription cancelled")
+                } else {
+                    Logger.w(LOG_TAG_PROXY, "$TAG; subscription cancelled but still valid, not deactivating RPN")
+                }
+            }
+
+            is SubscriptionStateMachineV2.SubscriptionState.Expired -> {
+                Logger.w(LOG_TAG_PROXY, "$TAG; subscription expired, disabling RPN")
+                deactivateRpn("Subscription expired")
+            }
+
+            is SubscriptionStateMachineV2.SubscriptionState.Revoked -> {
+                Logger.w(LOG_TAG_PROXY, "$TAG; subscription revoked, immediately disabling RPN")
+                deactivateRpn("Subscription revoked")
+            }
+
+            is SubscriptionStateMachineV2.SubscriptionState.Error -> {
+                Logger.e(LOG_TAG_PROXY, "$TAG; subscription state machine in error state")
+                // Could implement error recovery logic here
+            }
+
+            else -> {
+                Logger.d(LOG_TAG_PROXY, "$TAG; subscription state: ${state.name}")
+            }
+        }
+    }
+
+    fun collectSubscriptionState(): Flow<SubscriptionStateMachineV2.SubscriptionState> {
+        return subscriptionStateMachine.currentState
+    }
+
+    fun getSubscriptionState(): SubscriptionStateMachineV2.SubscriptionState {
+        return subscriptionStateMachine.getCurrentState()
+    }
+
+    fun getSubscriptionData(): SubscriptionStateMachineV2.SubscriptionData? {
+        return subscriptionStateMachine.getSubscriptionData()
+    }
+
+    fun canMakePurchase(): Boolean {
+        return subscriptionStateMachine.canMakePurchase()
+    }
+
+    fun hasValidSubscription(): Boolean {
+        val valid = subscriptionStateMachine.hasValidSubscription()
+        Logger.i(LOG_TAG_PROXY, "$TAG; using state machine for subscription check, valid: $valid")
+        return valid
+    }
+
+    fun isSubscriptionActiveInStateMachine(): Boolean {
+        return subscriptionStateMachine.isSubscriptionActive()
+    }
+
+    suspend fun handleSubscriptionRestored(purchaseDetail: PurchaseDetail) {
+        try {
+            subscriptionStateMachine.restoreSubscription(purchaseDetail)
+            Logger.i(LOG_TAG_PROXY, "$TAG; subscription restored: ${purchaseDetail.productId}")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; error restoring subscription: ${e.message}", e)
+        }
+    }
+
+    suspend fun handleUserCancellation() {
+        try {
+            subscriptionStateMachine.userCancelled()
+            Logger.i(LOG_TAG_PROXY, "$TAG; user cancellation handled")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; error handling user cancellation: ${e.message}", e)
+        }
+    }
+
+    suspend fun handleSubscriptionRevoked() {
+        try {
+            subscriptionStateMachine.subscriptionRevoked()
+            Logger.w(LOG_TAG_PROXY, "$TAG; subscription revocation handled")
+
+            // Immediately deactivate RPN
+            deactivateRpn()
+            Logger.i(LOG_TAG_PROXY, "$TAG; RPN deactivated due to revocation")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; error handling subscription revocation: ${e.message}", e)
+        }
+    }
+
+    suspend fun performSystemCheck() {
+        try {
+            subscriptionStateMachine.systemCheck()
+            Logger.d(LOG_TAG_PROXY, "$TAG; system check performed")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; error during system check: ${e.message}", e)
+        }
+    }
+
+    fun getSubscriptionStatistics(): StateMachineStatistics? {
+        return subscriptionStateMachine.getStatistics()
+    }
+
+    fun cleanup() {
+        try {
+            stateObserverJob.cancel()
+            Logger.i(LOG_TAG_PROXY, "$TAG; subscription state machine integration cleaned up")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_PROXY, "$TAG; error during cleanup: ${e.message}", e)
+        }
+    }
+
+    private fun isValidForRpnActivation(purchase: PurchaseDetail): Boolean {
+        // Check basic purchase validity
+        if (purchase.productId.isEmpty()) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; invalid purchase - empty product ID")
+            return false
+        }
+
+        // Check if purchase is revoked
+        if (purchase.status == SubscriptionStatus.SubscriptionState.STATE_REVOKED.id) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; invalid purchase - revoked status")
+            return false
+        }
+
+        // Check if purchase is expired
+        if (purchase.expiryTime > 0 && System.currentTimeMillis() > purchase.expiryTime) {
+            Logger.w(LOG_TAG_PROXY, "$TAG; invalid purchase - expired")
+            return false
+        }
+
+        // Check state machine state if available
+        val currentState = subscriptionStateMachine.getCurrentState()
+        when (currentState) {
+            is SubscriptionStateMachineV2.SubscriptionState.Revoked,
+            is SubscriptionStateMachineV2.SubscriptionState.Expired -> {
+                Logger.w(
+                    LOG_TAG_PROXY,
+                    "$TAG; invalid for activation - state machine in ${currentState.name}"
+                )
+                return false
+            }
+
+            else -> {
+                // Other states are potentially valid
+            }
+        }
+
+        return true
+    }
+
+    fun isRpnValidForCurrentSubscription(): Boolean {
+        if (!isRpnEnabled()) {
+            return false
+        }
+
+        val currentState = subscriptionStateMachine.getCurrentState()
+        when (currentState) {
+            is SubscriptionStateMachineV2.SubscriptionState.Active,
+            is SubscriptionStateMachineV2.SubscriptionState.Cancelled -> {
+                Logger.i(
+                    LOG_TAG_PROXY,
+                    "$TAG; RPN is valid for current subscription state: ${currentState.name}"
+                )
+                return true
+            }
+
+            is SubscriptionStateMachineV2.SubscriptionState.Revoked,
+            is SubscriptionStateMachineV2.SubscriptionState.Expired -> {
+                Logger.w(
+                    LOG_TAG_PROXY,
+                    "$TAG; RPN should be disabled - subscription ${currentState.name}"
+                )
+                return false
+            }
+
+            else -> {
+                Logger.d(
+                    LOG_TAG_PROXY,
+                    "$TAG; RPN validity uncertain for state: ${currentState.name}"
+                )
+                return true // Allow by default for uncertain states
+            }
+        }
+    }
+
+    fun getDetailedSubscriptionInfo(): String {
+        val statistics = subscriptionStateMachine.getStatistics()
+        val subscriptionData = subscriptionStateMachine.getSubscriptionData()
+        val currentState = subscriptionStateMachine.getCurrentState()
+
+        return """
+            Current State: ${currentState.name}
+            RPN Enabled: ${isRpnEnabled()}
+            RPN Valid: ${isRpnValidForCurrentSubscription()}
+            Total Transitions: ${statistics.totalTransitions}
+            Success Rate: ${String.format("%.2f", statistics.successRate * 100)}%
+            Product ID: ${subscriptionData?.subscriptionStatus?.productId ?: "None"}
+            Subscription Status: ${subscriptionData?.subscriptionStatus?.status?.let { SubscriptionStatus.SubscriptionState.fromId(it).name } ?: "Unknown"}
+            Billing Expiry: ${subscriptionData?.subscriptionStatus?.billingExpiry?.let { if (it > 0) java.util.Date(it) else "N/A" } ?: "N/A"}
+            Account Expiry: ${subscriptionData?.subscriptionStatus?.accountExpiry?.let { if (it > 0) java.util.Date(it) else "N/A" } ?: "N/A"}
+        """.trimIndent()
     }
 
     private fun io(f: suspend () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch { f() }
     }
+*/
 
 }

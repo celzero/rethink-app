@@ -1,14 +1,12 @@
 package com.celzero.bravedns.iab
 
-import Logger
+/*import Logger
 import Logger.LOG_IAB
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.android.billingclient.api.BillingClient.ProductType
-import com.android.billingclient.api.Purchase
 import com.celzero.bravedns.iab.InAppBillingHandler.isListenerRegistered
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
@@ -21,32 +19,33 @@ class SubscriptionCheckWorker(
     private var attempts = 0
 
     companion object {
+        private const val TAG = "SubscriptionCheckWorker"
         const val WORK_NAME = "SubscriptionCheckWorker"
     }
 
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
             try {
-                initiate()
+                initiateAndFetchPurchases()
                 // by default, return success
                 Result.success()
             } catch (e: Exception) {
-                Logger.e(LOG_IAB, "$WORK_NAME; failed: ${e.message}")
+                Logger.e(LOG_IAB, "$TAG; failed: ${e.message}")
                 Result.retry()
             }
         }
     }
 
-    private fun initiate() {
+    private fun initiateAndFetchPurchases() {
         if (InAppBillingHandler.isBillingClientSetup() && isListenerRegistered(listener)) {
-            Logger.i(LOG_IAB, "initBilling: billing client already setup")
+            Logger.i(LOG_IAB, "$TAG; initBilling: billing client already setup")
             InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS))
             return
         }
         if (InAppBillingHandler.isBillingClientSetup() && !isListenerRegistered(listener)) {
             InAppBillingHandler.registerListener(listener)
             InAppBillingHandler.fetchPurchases(listOf(ProductType.SUBS))
-            Logger.i(LOG_IAB, "initBilling: billing listener registered")
+            Logger.i(LOG_IAB, "$TAG; initBilling: billing listener registered")
             return
         }
         // initiate the billing client, which will also register the listener and fetch purchases
@@ -55,18 +54,18 @@ class SubscriptionCheckWorker(
 
     private fun reinitiate(attempt: Int = 0) {
         if (attempt > 3) {
-            Logger.e(LOG_IAB, "$WORK_NAME; reinitiate failed after 3 attempts")
+            Logger.e(LOG_IAB, "$TAG; reinitiate failed after 3 attempts")
             return
         }
         // reinitiate the billing client
-        initiate()
+        initiateAndFetchPurchases()
     }
 
     private val listener = object : BillingListener {
         override fun onConnectionResult(isSuccess: Boolean, message: String) {
-            Logger.d(LOG_IAB, "$WORK_NAME; onConnectionResult: isSuccess: $isSuccess, message: $message")
+            Logger.d(LOG_IAB, "$TAG; onConnectionResult: isSuccess: $isSuccess, message: $message")
             if (!isSuccess) {
-                Logger.e(LOG_IAB, "$WORK_NAME;Billing connection failed: $message")
+                Logger.e(LOG_IAB, "$TAG; billing connection failed: $message")
                 reinitiate(attempts++)
                 return
             }
@@ -76,29 +75,23 @@ class SubscriptionCheckWorker(
         }
 
         override fun purchasesResult(isSuccess: Boolean, purchaseDetailList: List<PurchaseDetail>) {
-            val first = purchaseDetailList.firstOrNull()
-            if (first == null) {
-                Logger.d(LOG_IAB, "$WORK_NAME; No purchases found")
-                RpnProxyManager.deactivateRpn()
+            // no need to process the purchase details as the InAppBillingHandler will handle it
+            Logger.v(LOG_IAB, "$TAG; purchasesResult: isSuccess: $isSuccess, purchaseDetailList: $purchaseDetailList")
+            if (!isSuccess) {
+                Logger.e(LOG_IAB, "$TAG; failed to fetch purchases")
+                reinitiate(attempts++)
                 return
             }
-            if (first.productType == ProductType.SUBS) {
-                Logger.d(LOG_IAB, "$WORK_NAME; Subscription found: ${first.state}")
-                val purchased = first.state == Purchase.PurchaseState.PURCHASED
-                if (purchased) {
-                    RpnProxyManager.activateRpn()
-                } else {
-                    RpnProxyManager.deactivateRpn()
-                }
-            } else {
-                Logger.d(LOG_IAB, "$WORK_NAME; No subscription found")
-                RpnProxyManager.deactivateRpn()
+            if (purchaseDetailList.isEmpty()) {
+                Logger.i(LOG_IAB, "$TAG; no active subscriptions found")
+                return
             }
+            Logger.i(LOG_IAB, "$TAG; active subscriptions found: $purchaseDetailList")
         }
 
         override fun productResult(isSuccess: Boolean, productList: List<ProductDetail>) {
-            Logger.v(LOG_IAB, "$WORK_NAME; productResult: isSuccess: $isSuccess, productList: $productList")
+            Logger.v(LOG_IAB, "$TAG; productResult: isSuccess: $isSuccess, productList: $productList")
         }
     }
 
-}
+}*/

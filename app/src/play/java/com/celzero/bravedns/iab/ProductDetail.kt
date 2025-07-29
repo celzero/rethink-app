@@ -1,7 +1,6 @@
 package com.celzero.bravedns.iab
 
-import com.android.billingclient.api.BillingClient
-
+/*
 data class ProductDetail(
     var productId: String,
     var planId: String,
@@ -18,3 +17,4 @@ data class ProductDetail(
         pricingDetails = listOf(),
     )
 }
+*/

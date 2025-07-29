@@ -11,4 +11,8 @@ data class PurchaseDetail(
     val purchaseTime: String,
     val purchaseTimeMillis: Long,
     val isAutoRenewing: Boolean,
+    val accountId: String,
+    val payload: String,
+    val expiryTime: Long,
+    val status: Int
 )

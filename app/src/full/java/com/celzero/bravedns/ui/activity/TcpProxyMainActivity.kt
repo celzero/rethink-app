@@ -17,7 +17,6 @@ import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityTcpProxyBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_ID
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
@@ -61,7 +60,6 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
     private fun init() {
         displayTcpProxyStatus()
         observeTcpProxyApps()
-        displayWarpStatus()
     }
 
     private fun displayTcpProxyStatus() {
@@ -96,32 +94,10 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
         }
     }
 
-    private fun displayWarpStatus() {
-        io {
-            uiCtx {
-                val config = RpnProxyManager.getWarpConfig()
-                val isActive = false
-                if (config == null) {
-                    b.warpStatus.text =
-                        "Fetch from server" // getString(R.string.tcp_proxy_description)
-                    b.warpSwitch.isChecked = false
-                    return@uiCtx
-                }
-                if (isActive == true) {
-                    b.warpStatus.text = "Active" // getString(R.string.tcp_proxy_description_active)
-                    b.warpSwitch.isChecked = true
-                } else {
-                    b.warpStatus.text = "Not active" // getString(R.string.tcp_proxy_description)
-                    b.warpSwitch.isChecked = false
-                }
-            }
-        }
-    }
-
     private fun setupClickListeners() {
         b.tcpProxySwitch.setOnCheckedChangeListener { _, checked ->
             io {
-                val isActive = WireguardManager.isConfigActive(ProxyManager.ID_WG_BASE + WARP_ID)
+                val isActive = true
                 uiCtx {
                     if (checked && isActive) {
                         b.tcpProxySwitch.isChecked = false
@@ -179,46 +155,9 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
         }
 
         b.warpSwitch.setOnCheckedChangeListener { _, checked ->
-            if (checked && TcpProxyHelper.isTcpProxyEnabled()) {
-                Utilities.showToastUiCentered(
-                    this,
-                    "Please disable TCP Proxy to enable WARP",
-                    Toast.LENGTH_SHORT
-                )
-                b.warpSwitch.isChecked = false
-                return@setOnCheckedChangeListener
-            }
-
-            io {
-                val apps = ProxyManager.isAnyAppSelected(ProxyManager.ID_WG_BASE + WARP_ID)
-                uiCtx {
-                    if (!apps) {
-                        Utilities.showToastUiCentered(
-                            this,
-                            "Please add at least one app to enable WARP",
-                            Toast.LENGTH_SHORT
-                        )
-                        b.warpSwitch.isChecked = false
-                        return@uiCtx
-                    }
-
-                    val configFiles = WireguardManager.getConfigFilesById(WARP_ID) ?: return@uiCtx
-                    if (checked) {
-                        WireguardManager.enableConfig(configFiles)
-                        b.warpStatus.text =
-                            "Active" // getString(R.string.tcp_proxy_description_active)
-                    } else {
-                        WireguardManager.disableConfig(configFiles)
-                        b.warpStatus.text =
-                            "Not active" // getString(R.string.tcp_proxy_description)
-                    }
-                }
-            }
         }
 
         b.tcpProxyAddApps.setOnClickListener { openAppsDialog() }
-
-        b.warpTopRl.setOnClickListener { launchConfigDetail() }
     }
 
     private fun openAppsDialog() {
@@ -231,12 +170,6 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
             WgIncludeAppsDialog(this, appsAdapter, mappingViewModel, themeId, proxyId, proxyName)
         includeAppsDialog.setCanceledOnTouchOutside(false)
         includeAppsDialog.show()
-    }
-
-    private fun launchConfigDetail() {
-        val intent = Intent(this, WgConfigDetailActivity::class.java)
-        intent.putExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, WARP_ID)
-        startActivity(intent)
     }
 
     private suspend fun showConfigCreationError() {

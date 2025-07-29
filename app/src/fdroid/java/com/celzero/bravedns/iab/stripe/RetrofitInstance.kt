@@ -10,9 +10,9 @@ object RetrofitInstance {
 
     private val client = OkHttpClient.Builder().build()
 
-    val api: StripeApiService by lazy {
+    /*val api: StripeApiService by lazy {
         RetrofitManager.getStripeBaseBuilder(0)
-    }
+    }*/
 
     val paymentApi: StripePaymentService by lazy {
         Retrofit.Builder()

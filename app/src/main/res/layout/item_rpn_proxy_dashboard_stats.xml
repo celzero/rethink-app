@@ -1,123 +1,251 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/proxy_det_rl"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/proxy_info_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_marginVertical="8dp"
+    app:cardUseCompatPadding="true"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="?attr/background"
+    app:cardCornerRadius="16dp">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:orientation="vertical"
+        android:padding="18dp"
+        android:gravity="center_horizontal">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="10dp"
-            android:src="@drawable/ic_wireguard_icon" />
-
+        <!-- Header: Icon - Title - Status -->
         <LinearLayout
-            android:id="@+id/title_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_toEndOf="@id/icon"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/title"
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/proxy_icon"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_wireguard_icon"
+                android:background="@drawable/bg_glow_ring"
+                android:contentDescription="Proxy Icon" />
+
+            <TextView
+                android:id="@+id/proxy_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="8dp"
+                android:text="Proxy Name / IP"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/large_font_text_view"
-                android:textStyle="bold" />
+                android:paddingHorizontal="8dp" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/info"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="8dp"
-                android:src="@drawable/ic_info"
-                app:tint="?attr/primaryTextColor" />
+            <TextView
+                android:id="@+id/proxy_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CONNECTED"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="3dp"
+                android:textColor="?attr/primaryTextColor"
+                android:background="@drawable/badge_connected_bg"
+                android:gravity="center"/>
         </LinearLayout>
 
-        <!-- Status Chip -->
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/title_ll"
-            android:layout_toEndOf="@id/icon"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/small_font_subheading_text" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/who"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/status"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_toEndOf="@id/icon"
-            android:text="@string/ac_title"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/small_font_subheading_text" />
-
-        <RelativeLayout
+        <!-- Property Grid -->
+        <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/who"
-            android:layout_toEndOf="@id/icon"
-            android:gravity="center">
+            android:layout_marginTop="16dp"
+            android:columnCount="2">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/last_refresh_time_label"
+            <!-- Protocol -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_columnWeight="1"
+                android:layout_row="0"
+                android:layout_column="0"
+                android:gravity="center_vertical"
+                android:padding="6dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_wireguard_icon"
+                    android:tint="?attr/accentGood" />
+                <TextView
+                    android:id="@+id/proxy_protocol"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="WireGuard"
+                    android:textSize="15sp"
+                    android:textColor="?attr/primaryTextColor"
+                    android:layout_marginStart="6dp"/>
+            </LinearLayout>
+
+            <!-- Country -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_columnWeight="1"
+                android:layout_row="0"
+                android:layout_column="1"
+                android:gravity="center_vertical"
+                android:padding="6dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_firewall_lockdown_off"
+                    android:tint="?attr/secondaryTextColor" />
+                <TextView
+                    android:id="@+id/proxy_country"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="US"
+                    android:textSize="15sp"
+                    android:textColor="?attr/primaryTextColor"
+                    android:layout_marginStart="6dp"/>
+            </LinearLayout>
+
+            <!-- Port -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_columnWeight="1"
+                android:layout_row="1"
+                android:layout_column="0"
+                android:gravity="center_vertical"
+                android:padding="6dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_firewall_lockdown_off"
+                    android:tint="?attr/secondaryTextColor" />
+                <TextView
+                    android:id="@+id/proxy_port"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="51820"
+                    android:textSize="15sp"
+                    android:textColor="?attr/primaryTextColor"
+                    android:layout_marginStart="6dp"/>
+            </LinearLayout>
+
+            <!-- Latency -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_columnWeight="1"
+                android:layout_row="1"
+                android:layout_column="1"
+                android:gravity="center_vertical"
+                android:padding="6dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_firewall_lockdown_off"
+                    android:tint="?attr/secondaryTextColor" />
+                <TextView
+                    android:id="@+id/proxy_latency"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="45ms"
+                    android:textSize="15sp"
+                    android:textColor="?attr/primaryTextColor"
+                    android:layout_marginStart="6dp"/>
+            </LinearLayout>
+
+        </GridLayout>
+
+        <!-- Chips: Extra Info -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/proxy_last_checked"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="8dp"
-                android:layout_toStartOf="@id/last_refresh_time_tv"
-                android:text="@string/refresh_complete"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/small_font_subheading_text" />
+                style="@style/Chip.HomeScreen.Action"
+                android:text="Checked: 1 min ago"
+                android:textSize="12sp" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/last_refresh_time_tv"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/proxy_expiry"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/rectangle_border_background"
-                android:drawablePadding="5dp"
-                android:padding="5dp"
-                android:text="Refresh identity" />
+                style="@style/Chip.HomeScreen.Action"
+                android:text="Expires: 24 Apr"
+                android:textSize="12sp"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/refresh_icon"
-                android:layout_width="wrap_content"
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/error_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/use_button"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/last_refresh_time_tv"
-                android:src="@drawable/ic_refresh_white"
-                android:tint="?attr/primaryTextColor"
-                android:visibility="gone" />
-        </RelativeLayout>
+                android:text="Use"
+                android:textColor="?attr/primaryTextColor"
+                android:textAllCaps="false"
+                android:icon="@drawable/ic_import_conf"
+                app:iconTint="?attr/accentGood"
+                android:layout_marginEnd="8dp" />
 
-    </RelativeLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/refresh_button"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Refresh"
+                android:textAllCaps="false"
+                android:textColor="?attr/primaryTextColor"
+                android:icon="@drawable/ic_import_conf"
+                app:iconTint="?attr/accentGood"
+                android:layout_marginEnd="8dp" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="?attr/border" />
-</LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/info_button"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Info"
+                android:textAllCaps="false"
+                android:textColor="?attr/primaryTextColor"
+                android:icon="@drawable/ic_info"
+                app:iconTint="?attr/accentGood" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

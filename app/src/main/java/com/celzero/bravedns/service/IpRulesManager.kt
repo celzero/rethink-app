@@ -125,6 +125,10 @@ object IpRulesManager : KoinComponent {
         return selectedCCs
     }
 
+    suspend fun getRulesCountByCC(cc: String): Int {
+        return db.getRulesCountByCC(cc)
+    }
+
     fun getCustomIpsLiveData(): LiveData<Int> {
         return db.getCustomIpsLiveData()
     }

@@ -16,6 +16,7 @@
 package com.celzero.bravedns.ui
 
 import Logger
+import Logger.LOG_IAB
 import Logger.LOG_TAG_APP_UPDATE
 import Logger.LOG_TAG_BACKUP_RESTORE
 import Logger.LOG_TAG_DOWNLOAD
@@ -32,22 +33,23 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
 import androidx.work.BackoffPolicy
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
@@ -58,7 +60,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
@@ -88,7 +90,6 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
-import androidx.core.net.toUri
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val persistentState by inject<PersistentState>()
@@ -103,7 +104,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     // TODO - #324 - Usage of isDarkTheme() in all activities.
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-            UI_MODE_NIGHT_YES
+                UI_MODE_NIGHT_YES
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -141,15 +142,37 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         initUpdateCheck()
 
         observeAppState()
+
+        handleOnBackPressed()
+
+        // enable in-app messaging, will be used to show in-app messages in case of billing issues
+        //enableInAppMessaging()
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    /*private fun enableInAppMessaging() {
+        initiateBillingIfNeeded()
+        // enable in-app messaging
+        InAppBillingHandler.enableInAppMessaging(this)
+        Logger.v(LOG_IAB, "enableInAppMessaging: enabled")
+    }
+
+    private fun initiateBillingIfNeeded() {
+        if (InAppBillingHandler.isBillingClientSetup()) {
+            Logger.i(LOG_IAB, "ensureBillingSetup: billing client already setup")
+            return
+        }
+
+        InAppBillingHandler.initiate(this.applicationContext)
+        Logger.i(LOG_IAB, "ensureBillingSetup: billing client initiated")
+    }*/
+
+    /*override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
         // by simply receiving and setting the new intent, we ensure that when the activity
         // is brought back to the foreground, it uses the latest intent state
         Logger.v(LOG_TAG_UI, "home screen activity received new intent")
-    }
+    }*/
 
     override fun onResume() {
         super.onResume()
@@ -178,7 +201,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         val intent = this.intent ?: return
         if (
             intent.scheme?.equals(INTENT_SCHEME) == true &&
-                intent.data?.path?.contains(BACKUP_FILE_EXTN) == true
+            intent.data?.path?.contains(BACKUP_FILE_EXTN) == true
         ) {
             handleRestoreProcess(intent.data)
         } else if (intent.scheme?.equals(INTENT_SCHEME) == true) {
@@ -262,7 +285,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 workManager.pruneWork()
             } else if (
                 WorkInfo.State.CANCELLED == workInfo.state ||
-                    WorkInfo.State.FAILED == workInfo.state
+                WorkInfo.State.FAILED == workInfo.state
             ) {
                 showToastUiCentered(
                     this,
@@ -306,7 +329,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         io { appInfoDb.resetRethinkAppFirewallMode() }
         // if biometric auth is enabled, then set the biometric auth type to 3 (15 minutes)
         if (persistentState.biometricAuth) {
-            persistentState.biometricAuthType = MiscSettingsActivity.BioMetricType.FIFTEEN_MIN.action
+            persistentState.biometricAuthType =
+                MiscSettingsActivity.BioMetricType.FIFTEEN_MIN.action
             // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
             // to SystemClock.elapsedRealtime
             persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
@@ -322,7 +346,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             // already there is a remote blocklist file available
             if (
                 persistentState.remoteBlocklistTimestamp >
-                    Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
+                Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
             ) {
                 RethinkBlocklistManager.readJson(
                     this,
@@ -390,7 +414,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         val calendar: Calendar = Calendar.getInstance()
         val day: Int = calendar.get(Calendar.DAY_OF_WEEK)
         return (day == Calendar.FRIDAY || day == Calendar.SATURDAY) &&
-            persistentState.checkForAppUpdate
+                persistentState.checkForAppUpdate
     }
 
     fun checkForUpdate(
@@ -448,7 +472,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // status.
         // TODO: prompt dialog to user that Playservice is disabled, so switch to update
         // check for website
-        return Utilities.getApplicationInfo(this, PKG_NAME_PLAY_STORE)?.enabled ?: false
+        return Utilities.getApplicationInfo(this, PKG_NAME_PLAY_STORE)?.enabled == true
     }
 
     private val installStateUpdatedListener =
@@ -460,6 +484,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         // CHECK THIS if AppUpdateType.FLEXIBLE, otherwise you can skip
                         showUpdateCompleteSnackbar()
                     }
+
                     else -> {
                         appUpdateManager.unregisterListener(this)
                     }
@@ -532,7 +557,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             snack.setActionTextColor(ContextCompat.getColor(this, R.color.primaryLightColorText))
             snack.show()
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_UI, "Error showing update complete snackbar: ${e.message}", e)
+            Logger.e(LOG_TAG_UI, "err showing update complete snackbar: ${e.message}", e)
         }
     }
 
@@ -549,33 +574,25 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         builder.setCancelable(false)
         if (
             message == getString(R.string.download_update_dialog_message_ok) ||
-                message == getString(R.string.download_update_dialog_failure_message) ||
-                message == getString(R.string.download_update_dialog_trylater_message)
+            message == getString(R.string.download_update_dialog_failure_message) ||
+            message == getString(R.string.download_update_dialog_trylater_message)
         ) {
-            builder.setPositiveButton(getString(R.string.hs_download_positive_default)) {
-                dialogInterface,
-                _ ->
+            builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
         } else {
             if (source == AppUpdater.InstallSource.STORE) {
-                builder.setPositiveButton(getString(R.string.hs_download_positive_play_store)) {
-                    dialogInterface,
-                    _ ->
+                builder.setPositiveButton(getString(R.string.hs_download_positive_play_store)) { dialogInterface, _ ->
                     appUpdateManager.completeUpdate()
                     dialogInterface.dismiss()
                 }
             } else {
-                builder.setPositiveButton(getString(R.string.hs_download_positive_website)) {
-                    dialogInterface,
-                    _ ->
+                builder.setPositiveButton(getString(R.string.hs_download_positive_website)) { dialogInterface, _ ->
                     initiateDownload()
                     dialogInterface.dismiss()
                 }
             }
-            builder.setNegativeButton(getString(R.string.hs_download_negative_default)) {
-                dialogInterface,
-                _ ->
+            builder.setNegativeButton(getString(R.string.hs_download_negative_default)) { dialogInterface, _ ->
                 persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                 dialogInterface.dismiss()
             }
@@ -595,7 +612,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             showToastUiCentered(this, getString(R.string.no_browser_error), Toast.LENGTH_SHORT)
-            Logger.w(Logger.LOG_TAG_VPN, "Failure opening rethink download link: ${e.message}", e)
+            Logger.w(Logger.LOG_TAG_VPN, "err opening rethink download link: ${e.message}", e)
         }
     }
 
@@ -611,12 +628,109 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         Logger.v(LOG_TAG_UI, "home screen activity is stopped, app going to background")
     }
 
-    private fun setupNavigationItemSelectedListener() {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
-        val navController = navHostFragment.navController
+    private fun handleOnBackPressed() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val navHostFragment =
+                        supportFragmentManager.findFragmentById(R.id.fragment_container) as? NavHostFragment
+                    val navController = navHostFragment?.navController
+                    val homeId = R.id.homeScreenFragment
+                    if (navController?.currentDestination?.id != homeId) {
+                        val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
+                        btmNavView.selectedItemId = homeId
+                        navController?.navigate(
+                            homeId,
+                            null,
+                            NavOptions.Builder().setPopUpTo(homeId, true).build()
+                        )
+                    } else {
+                        finish()
+                    }
+                }
+            }
+        )
+    }
+
+    /*private fun updateRethinkPlusHighlight() {
         val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
-        btmNavView.setupWithNavController(navController)
+        val rethinkPlusItem = btmNavView.menu.findItem(R.id.rethinkPlus)
+        rethinkPlusItem.setIcon(R.drawable.ic_rethink_plus_sparkle)
+        btmNavView.removeBadge(R.id.rethinkPlus)
+    }*/
+
+    private fun setupNavigationItemSelectedListener() {
+        val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as? NavHostFragment
+        val navController = navHostFragment?.navController
+
+        btmNavView.setOnItemSelectedListener { item ->
+            val homeId = R.id.homeScreenFragment
+
+            when (item.itemId) {
+                R.id.rethinkPlus -> {
+                    showToastUiCentered(this, "Coming soon!", Toast.LENGTH_SHORT)
+                    true
+                    /*if (RpnProxyManager.hasValidSubscription()) {
+                        // Navigate to rethinkPlusDashboardFragment
+                        if (navController?.currentDestination?.id != R.id.rethinkPlusDashboardFragment) {
+                            navController?.navigate(
+                                R.id.rethinkPlusDashboardFragment,
+                                null,
+                                NavOptions.Builder().setPopUpTo(homeId, false).build()
+                            )
+                        }
+                        btmNavView.menu.findItem(R.id.rethinkPlus)?.isChecked = true
+                        true
+                    } else {
+                        // Navigate to rethinkPlus fragment
+                        if (navController?.currentDestination?.id != R.id.rethinkPlus) {
+                            navController?.navigate(
+                                R.id.rethinkPlus,
+                                null,
+                                NavOptions.Builder().setPopUpTo(homeId, false).build()
+                            )
+                        }
+                        btmNavView.menu.findItem(R.id.rethinkPlus)?.isChecked = true
+                        true
+                    }*/
+                }
+
+                homeId -> {
+                    if (navController != null && navController.currentDestination?.id != homeId) {
+                        navController.navigate(
+                            homeId,
+                            null,
+                            NavOptions.Builder().setPopUpTo(homeId, true).build()
+                        )
+                        true
+                    } else {
+                        false
+                    }
+                }
+
+                else -> {
+                    if (navController != null && navController.currentDestination?.id != item.itemId) {
+                        navController.navigate(
+                            item.itemId,
+                            null,
+                            NavOptions.Builder().setPopUpTo(homeId, false).build()
+                        )
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
+        }
+
+        // Optionally sync the bottom nav highlight with nav changes
+        /*navController?.addOnDestinationChangedListener { _, destination, _ ->
+            // Update Rethink Plus badge or icon here if needed
+            updateRethinkPlusHighlight()
+        }*/
     }
 
     private fun io(f: suspend () -> Unit) {

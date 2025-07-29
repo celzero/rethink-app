@@ -1,10 +1,8 @@
 package com.celzero.bravedns.iab
 
-import com.android.billingclient.api.BillingClient
-
 @JvmInline
 value class BillingResponse(private val code: Int) {
-    val isOk: Boolean
+    /*val isOk: Boolean
         get() = code == BillingClient.BillingResponseCode.OK
 
     val isUserCancelled: Boolean
@@ -34,5 +32,5 @@ value class BillingResponse(private val code: Int) {
             BillingClient.BillingResponseCode.ITEM_UNAVAILABLE,
             BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED,
             BillingClient.BillingResponseCode.ITEM_NOT_OWNED,
-        )
+        )*/
 }

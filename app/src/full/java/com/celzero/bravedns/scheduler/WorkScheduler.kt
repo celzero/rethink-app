@@ -36,10 +36,9 @@ import com.google.common.util.concurrent.ListenableFuture
 import java.util.UUID
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
+import kotlin.collections.remove
 
 class WorkScheduler(val context: Context) {
-    private val rpnProxiesWorkMap = mutableMapOf<RpnProxyManager.RpnType, UUID>()
-
     companion object {
         const val APP_EXIT_INFO_ONE_TIME_JOB_TAG = "OnDemandCollectAppExitInfoJob"
         const val APP_EXIT_INFO_JOB_TAG = "ScheduledCollectAppExitInfoJob"
@@ -243,46 +242,5 @@ class WorkScheduler(val context: Context) {
                 ExistingWorkPolicy.REPLACE,
                 workRequest
             )
-    }
-
-    fun scheduleRpnProxiesUpdate(type: RpnProxyManager.RpnType, expiryTimeMs: Long) {
-        Logger.v(LOG_TAG_SCHEDULER, "init; rpn proxies update scheduled for ${type.name}")
-        val now = System.currentTimeMillis()
-        val inputDataKey = "type"
-
-        // cancel the existing work if any
-        rpnProxiesWorkMap[type]?.let {
-            WorkManager.getInstance(context.applicationContext).cancelWorkById(it)
-            rpnProxiesWorkMap.remove(type)
-        }
-        var delay = expiryTimeMs - now
-        if (delay <= 0) {
-            Logger.i(LOG_TAG_SCHEDULER, "rpn proxies update expired for ${type.name}")
-            // perform the update immediately as the expiry time is already passed
-            delay = 0
-        }
-
-        val inputData = Data.Builder().putInt(inputDataKey, type.id).build()
-        // schedule the work when the internet is available
-        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-
-        val workRequest =
-            OneTimeWorkRequestBuilder<RpnProxiesUpdateWorker>()
-                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                .setInputData(inputData)
-                .setConstraints(constraints)
-                .setBackoffCriteria(
-                    BackoffPolicy.EXPONENTIAL,
-                    WorkRequest.MIN_BACKOFF_MILLIS,
-                    TimeUnit.MILLISECONDS
-                )
-                .build()
-
-        WorkManager.getInstance(context.applicationContext)
-            .enqueue(workRequest)
-
-        rpnProxiesWorkMap[type] = workRequest.id
-        Logger.i(LOG_TAG_SCHEDULER, "rpn proxies update scheduled for ${type.name}")
-        Logger.v(LOG_TAG_SCHEDULER, "rpn proxies update map: $rpnProxiesWorkMap")
     }
 }

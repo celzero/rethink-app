@@ -131,7 +131,7 @@ class ProxyCountriesBtmSheet(val type: InputType, val obj: Any?, val confs: List
         Logger.v(LOG_TAG_UI, "$TAG: country selected: $conf")
         // TODO: Implement the action to be taken when an item is selected
         // returns a pair of boolean and error message
-        val pair = RpnProxyManager.canSelectCountryCode(conf)
+        val pair = Pair(true, "")//RpnProxyManager.canSelectCountryCode(conf)
         if (!pair.first) {
             Utilities.showToastUiCentered(
                 requireContext(),

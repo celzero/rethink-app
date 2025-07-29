@@ -405,6 +405,10 @@ object DomainRulesManager : KoinComponent {
         return db.getUniversalCustomDomainCount()
     }
 
+    suspend fun getRulesCountByCC(cc: String): Int {
+        return db.getRulesCountByCC(cc)
+    }
+
     fun isValidDomain(url: String): Boolean {
         return try {
             Patterns.WEB_URL.matcher(url).matches() || Patterns.DOMAIN_NAME.matcher(url).matches()

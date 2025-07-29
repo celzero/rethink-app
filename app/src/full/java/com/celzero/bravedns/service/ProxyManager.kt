@@ -35,6 +35,7 @@ object ProxyManager : KoinComponent {
     const val ID_S5_BASE = "S5"
     const val ID_HTTP_BASE = "HTTP"
     const val ID_NONE = "SYSTEM" // no proxy
+    const val ID_RPN_WIN = "RPN-WIN" // rpn win proxy
 
     const val TCP_PROXY_NAME = "Rethink-Proxy"
     const val ORBOT_PROXY_NAME = "Orbot"
@@ -151,6 +152,18 @@ object ProxyManager : KoinComponent {
         pamSet.addAll(n)
         db.updateProxyForUnselectedApps(proxyId, proxyName)
         Logger.i(LOG_TAG_PROXY, "added unselected apps to interface: $proxyId")
+    }
+
+    suspend fun getAllSelectedApps(): Set<ProxyAppMapTuple> {
+        // return all apps that are part of some proxy
+        return pamSet.filter { it.proxyId != "" }
+            .map { ProxyAppMapTuple(it.uid, it.packageName, it.proxyId) }
+            .toSet()
+    }
+
+    suspend fun getAppsCountForProxy(proxyId: String): Int {
+        // return the count of apps that are part of the proxy
+        return pamSet.count { it.proxyId == proxyId }
     }
 
     suspend fun setNoProxyForApp(uid: Int) {
@@ -306,7 +319,8 @@ object ProxyManager : KoinComponent {
             pid.startsWith(ID_WG_BASE) ||
             pid.startsWith(ID_TCP_BASE) ||
             pid.startsWith(ID_S5_BASE) ||
-            pid.startsWith(ID_HTTP_BASE)
+            pid.startsWith(ID_HTTP_BASE) ||
+            pid.startsWith(ID_RPN_WIN)
     }
 
     fun getAppCountForProxy(proxyId: String): Int {

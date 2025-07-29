@@ -151,11 +151,11 @@ internal constructor(
             val wgm = WireguardManager.load(forceRefresh = false)
             val hm = WgHopManager.load(forceRefresh = false)
             val tm = TcpProxyHelper.load()
-            val rm = RpnProxyManager.load()
+            //val rm = RpnProxyManager.load()
 
             Logger.i(
                 LOG_TAG_APP_DB,
-                "reload: fm: $fm; ip: $ipm; dom: $dm; px: $pxm; wg: $wgm; hm: $hm t: $tm, rpn: $rm"
+                "reload: fm: $fm; ip: $ipm; dom: $dm; px: $pxm; wg: $wgm; hm: $hm t: $tm"
             )
 
             val trackedApps = FirewallManager.getAllApps()

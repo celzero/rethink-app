@@ -598,6 +598,10 @@ object FirewallManager : KoinComponent {
         }
     }
 
+    suspend fun getTotalAppsCount(): Int {
+        return getAppInfos().size
+    }
+
     suspend fun isUnknownPackage(uid: Int): Boolean {
         return getAppInfoByUid(uid)?.packageName?.startsWith(NO_PACKAGE_PREFIX) ?: false
     }

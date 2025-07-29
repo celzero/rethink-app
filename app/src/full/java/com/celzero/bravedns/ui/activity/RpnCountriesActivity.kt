@@ -77,7 +77,7 @@ class RpnCountriesActivity: AppCompatActivity(R.layout.activity_rpn_countries) {
         val ccs = emptyList<String>()
         Logger.v(LOG_TAG_UI, "$TAG fetch proxy countries: ${ccs.size}")
         proxyCountries.addAll(ccs)
-        val selectedCCs = RpnProxyManager.getSelectedCCs()
+        val selectedCCs = emptyList<String>()//RpnProxyManager.getSelectedCCs()
         Logger.v(LOG_TAG_UI, "$TAG selected countries: ${selectedCCs.size}")
         selectedCountries.addAll(selectedCCs)
         Logger.i(LOG_TAG_UI, "$TAG total cc: ${ccs.size}, selected: ${selectedCCs.size}")

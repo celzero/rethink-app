@@ -25,8 +25,6 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.database.WgConfigFilesRepository
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_ID
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_NAME
 import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
@@ -71,6 +69,9 @@ object WireguardManager : KoinComponent {
 
     // invalid config id
     const val INVALID_CONF_ID = -1
+
+    const val WARP_ID = 1
+    const val WARP_NAME = "WARP"
 
     const val SEC_WARP_ID = 0
     const val SEC_WARP_NAME = "SEC_WARP"

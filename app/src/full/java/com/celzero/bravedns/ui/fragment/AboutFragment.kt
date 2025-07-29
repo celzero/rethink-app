@@ -151,11 +151,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun updateSponsorInfo() {
-        if (RpnProxyManager.isRpnEnabled()) {
+        /*if (RpnProxyManager.isRpnEnabled()) {
             b.sponsorInfoUsage.visibility = View.GONE
             b.aboutSponsor.visibility = View.GONE
             return
-        }
+        }*/
 
         b.sponsorInfoUsage.text = getSponsorInfo()
     }

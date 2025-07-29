@@ -20,8 +20,8 @@ import androidx.room.Transaction
 class RpnProxyRepository(private val dao: RpnProxyDao) {
 
     @Transaction
-    suspend fun update(rpn: RpnProxy) {
-        dao.update(rpn)
+    suspend fun update(rpn: RpnProxy): Int {
+        return dao.update(rpn)
     }
 
     suspend fun insertAll(rpns: List<RpnProxy>): LongArray {

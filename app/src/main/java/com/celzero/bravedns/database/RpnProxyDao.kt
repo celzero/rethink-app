@@ -25,7 +25,7 @@ import androidx.room.Update
 @Dao
 interface RpnProxyDao {
 
-    @Update fun update(rpnProxy: RpnProxy)
+    @Update fun update(rpnProxy: RpnProxy): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(rpnProxies: List<RpnProxy>): LongArray

@@ -67,7 +67,7 @@ class RpnAvailabilityCheckActivity : AppCompatActivity() {
             controller.isAppearanceLightNavigationBars = false
             window.isNavigationBarContrastEnforced = false
         }
-        options = resources.getStringArray(R.array.rpn_proxies_list)
+        options = listOf("WIN-US", "WIN-UK", "WIN-IN", "WIN-DE", "WIN-CA").toTypedArray()
         startChecks()
     }
 
@@ -76,7 +76,8 @@ class RpnAvailabilityCheckActivity : AppCompatActivity() {
         val ctx = this
         lifecycleScope.launch {
             ui {
-                for (option in options) {
+                val optionsFiltered = options.dropLast(1) // exclude Exit
+                for (option in optionsFiltered) {
                     val rowView =
                         layoutInflater.inflate(
                             R.layout.item_rpn_availability_row,
@@ -94,8 +95,7 @@ class RpnAvailabilityCheckActivity : AppCompatActivity() {
                     b.statusContainer.addView(rowView)
                     var res = false
                     ioCtx {
-                         res = getProxiesStatus(options.indexOf(option))
-                         delay(1000)
+                         res = false//getProxiesStatus(options.find { it == option } ?: "")
                     }
 
                     loader.visibility = View.GONE
@@ -113,29 +113,12 @@ class RpnAvailabilityCheckActivity : AppCompatActivity() {
 
                     Logger.i(Logger.LOG_IAB, "$TAG strength: $strength ($res)")
 
-                    b.strengthProgress.max = 6
+                    b.strengthProgress.max = 5
                     b.strengthProgress.setProgressCompat(strength, true)
                     b.strengthText.text = "$strength/${b.strengthProgress.max}"
                 }
             }
         }
-    }
-
-    private suspend fun getProxiesStatus(value: Int): Boolean {
-        val res = when (value) {
-            0 -> VpnController.testRpnProxy(RpnProxyManager.RpnType.WARP)
-            1 -> VpnController.testRpnProxy(RpnProxyManager.RpnType.AMZ)
-            2 -> VpnController.testRpnProxy(RpnProxyManager.RpnType.WIN)
-            3 -> VpnController.testRpnProxy(RpnProxyManager.RpnType.SE)
-            4 -> VpnController.testRpnProxy(RpnProxyManager.RpnType.EXIT_64)
-            5 -> VpnController.testRpnProxy(RpnProxyManager.RpnType.EXIT)
-            else -> {
-                Logger.e(Logger.LOG_IAB, "$TAG invalid proxy type")
-                return false
-            }
-        }
-
-        return res
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {

@@ -1,10 +1,13 @@
 package com.celzero.bravedns.iab
 
+/*
 enum class ResultState(val message: String, val priority: InAppBillingHandler.Priority = InAppBillingHandler.Priority.LOW) {
 
     NONE("Not Started"),
 
-    /* ------------------------------------------------------ New ------------------------------------------------------ */
+    */
+/* ------------------------------------------------------ New ------------------------------------------------------ *//*
+
 
     ACTIVITY_REFERENCE_NOT_FOUND("Activity reference is null", InAppBillingHandler.Priority.HIGH),
 
@@ -37,6 +40,7 @@ enum class ResultState(val message: String, val priority: InAppBillingHandler.Pr
     CONSOLE_QUERY_PRODUCTS_INAPP_FETCHING("InApp -> Querying product details from console", InAppBillingHandler.Priority.LOW),
     CONSOLE_QUERY_PRODUCTS_SUB_FETCHING("Subs -> Querying product details from console", InAppBillingHandler.Priority.LOW),
     CONSOLE_QUERY_PRODUCTS_COMPLETED("InApp, Subs -> Fetched product details from console", InAppBillingHandler.Priority.LOW),
+    CONSOLE_QUERY_PRODUCTS_FAILED("Failed to fetch product details from console", InAppBillingHandler.Priority.HIGH),
 
     // Buying
     CONSOLE_BUY_PRODUCT_EMPTY_ID("InApp, Subs -> Product Id can't be empty", InAppBillingHandler.Priority.HIGH),
@@ -56,6 +60,9 @@ enum class ResultState(val message: String, val priority: InAppBillingHandler.Pr
     PURCHASING_FAILURE("Failed to make transaction", InAppBillingHandler.Priority.HIGH),
 
     PURCHASE_CONSUME("Successfully Consumed", InAppBillingHandler.Priority.LOW),
+    PURCHASE_PENDING("Purchase is pending", InAppBillingHandler.Priority.MEDIUM),
+    PURCHASE_ACK_PENDING("Purchase confirmation is pending", InAppBillingHandler.Priority.MEDIUM),
     PURCHASE_FAILURE("Failed to consume product", InAppBillingHandler.Priority.HIGH),
 }
 
+*/

@@ -14,46 +14,89 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.adapter
-
+/*
 import Logger.LOG_IAB
 import Logger.LOG_TAG_UI
 import android.content.Context
+import android.graphics.Paint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ListItemPlaySubsBinding
+import com.celzero.bravedns.databinding.ListItemShimmerCardBinding
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.ProductDetail
 import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.facebook.shimmer.ShimmerFrameLayout
 
-class GooglePlaySubsAdapter(val listener: SubscriptionClickListener, val context: Context, val list: List<ProductDetail>, pos: Int = 0): RecyclerView.Adapter<GooglePlaySubsAdapter.SubscriptionPlansViewHolder>() {
+class GooglePlaySubsAdapter(val listener: SubscriptionChangeListener, val context: Context, var pds: List<ProductDetail> = emptyList(), pos: Int = 0, var showShimmer: Boolean = true): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var selectedPos = -1
+
+    companion object {
+        private const val SHIMMER_ITEM_COUNT = 2
+        private const val VIEW_TYPE_SHIMMER = 0
+        private const val VIEW_TYPE_REAL = 1
+    }
+
+
+    override fun getItemViewType(position: Int): Int {
+        return if (showShimmer) VIEW_TYPE_SHIMMER else VIEW_TYPE_REAL
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): SubscriptionPlansViewHolder {
-        val binding = ListItemPlaySubsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return SubscriptionPlansViewHolder(binding)
+    ): RecyclerView.ViewHolder {
+
+        return if (viewType == VIEW_TYPE_SHIMMER) {
+            val binding = ListItemShimmerCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ShimmerViewHolder(binding)
+        } else {
+            val binding = ListItemPlaySubsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            SubscriptionPlansViewHolder(binding)
+        }
     }
 
     init {
         selectedPos = pos
     }
 
-    interface SubscriptionClickListener {
+    interface SubscriptionChangeListener {
         fun onSubscriptionSelected(productId: String, planId: String)
     }
 
     override fun onBindViewHolder(
-        holder: SubscriptionPlansViewHolder,
+        holder: RecyclerView.ViewHolder,
         position: Int
     ) {
-        holder.bind(list[position], position)
+        if (holder is ShimmerViewHolder) {
+            holder.shimmerLayout.startShimmer()
+        } else if (holder is SubscriptionPlansViewHolder) {
+            holder.bind(pds[position], position)
+        }
+    }
+
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        if (holder is ShimmerViewHolder) {
+            holder.shimmerLayout.stopShimmer()
+        }
+        super.onViewRecycled(holder)
+    }
+
+    fun setData(data: List<ProductDetail>) {
+        this.pds = data
+        showShimmer = false
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
-        return list.size
+        return if (showShimmer) SHIMMER_ITEM_COUNT else pds.size
+    }
+
+    inner class ShimmerViewHolder(private val binding: ListItemShimmerCardBinding) : RecyclerView.ViewHolder(binding.root) {
+        val shimmerLayout: ShimmerFrameLayout = binding.shimmerViewContainer
     }
 
     inner class SubscriptionPlansViewHolder(private val binding: ListItemPlaySubsBinding) :
@@ -61,39 +104,41 @@ class GooglePlaySubsAdapter(val listener: SubscriptionClickListener, val context
 
         fun bind(prod: ProductDetail, pos: Int) {
             // remove (Rethink: DNS + Firewall + VPN) from the title
-            val title = prod.productTitle.replace(" (Rethink: DNS + Firewall + VPN)", "")
-            var offer = ""
-            var price = ""
-            /**
+            val pricing = prod.pricingDetails.firstOrNull() ?: return
+            val title = pricing.planTitle.replace(" (Rethink: DNS + Firewall + VPN)", "")
+            var offerPrice = ""
+            var originalPrice = ""
+            *//**
             *   sample
-             * Product Title: Annual Proxy Access (Rethink: DNS + Firewall + VPN), pricing size: 2,
+             * [productDetail=ProductDetail(productId=test_product_acp, planId=test-proxy-yearly, productTitle=test_product_acp (Rethink: DNS + Firewall + VPN), productType=subs, pricingDetails=[PricingPhase(recurringMode=ORIGINAL, price=₹1,700, currencyCode=INR, planTitle=Yearly, billingCycleCount=0, billingPeriod=P1Y, priceAmountMicros=1700000000, freeTrialPeriod=0)]), productDetails=ProductDetails{jsonString='{"productId":"test_product_acp","type":"subs","title":"test_product_acp (Rethink: DNS + Firewall + VPN)","name":"test_product_acp","localizedIn":["en-GB"],"skuDetailsToken":"AEuhp4JS1isixh_29bFQ6VAUZIGGn46BJIo2_Vdg5EpA40dZnrVghFzBmVEOCGhoBDTY","subscriptionOfferDetails":[{"offerIdToken":"Aezw0slCKFuN3u6CLJqjmmCXlPvzNEDtWjWlaD4dLU71Z2xdPT337FKuo8z5Q\/3dPfd8A5GAY7JiV9TByoq1EBYQRIYcIlKt\/bUO","basePlanId":"test-proxy-yearly","pricingPhases":[{"priceAmountMicros":1700000000,"priceCurrencyCode":"INR","formattedPrice":"₹1,700.00","billingPeriod":"P1Y","recurrenceMode":1}],"offerTags":[]},{"offerIdToken":"Aezw0sk0TeTw2PEG172yjUKkSak0JtKFsIcSLQUrKJDRkkSOnFxZvvhgFlLOlOp\/Jge6TIvquUNLNbQ0U5BR0wZ3PnTYUfZwnhZ2","basePlanId":"test-proxy-monthly","pricingPhases":[{"priceAmountMicros":210000000,"priceCurrencyCode":"INR","formattedPrice":"₹210.00","billingPeriod":"P1M","recurrenceMode":1}],"offerTags":[]}]}', parsedJson={"productId":"test_product_acp","type":"subs","title":"test_product_acp (Rethink: DNS + Firewall + VPN)","name":"test_product_acp","localizedIn":["en-GB"],"skuDetailsToken":"AEuhp4JS1isixh_29bFQ6VAUZIGGn46BJIo2_Vdg5EpA40dZnrVghFzBmVEOCGhoBDTY","subscriptionOfferDetails":[{"offerIdToken":"Aezw0slCKFuN3u6CLJqjmmCXlPvzNEDtWjWlaD4dLU71Z2xdPT337FKuo8z5Q\/3dPfd8A5GAY7JiV9TByoq1EBYQRIYcIlKt\/bUO","basePlanId":"test-proxy-yearly","pricingPhases":[{"priceAmountMicros":1700000000,"priceCurrencyCode":"INR","formattedPrice":"₹1,700.00","billingPeriod":"P1Y","recurrenceMode":1}],"offerTags":[]},{"offerIdToken":"Aezw0sk0TeTw2PEG172yjUKkSak0JtKFsIcSLQUrKJDRkkSOnFxZvvhgFlLOlOp\/Jge6TIvquUNLNbQ0U5BR0wZ3PnTYUfZwnhZ2","basePlanId":"test-proxy-monthly","pricingPhases":[{"priceAmountMicros":210000000,"priceCurrencyCode":"INR","formattedPrice":"₹210.00","billingPeriod":"P1M","recurrenceMode":1}],"offerTags":[]}]}, productId='test_product_acp', productType='subs', title='test_product_acp (Rethink: DNS + Firewall + VPN)', productDetailsToken='AEuhp4JS1isixh_29bFQ6VAUZIGGn46BJIo2_Vdg5EpA40dZnrVghFzBmVEOCGhoBDTY', subscriptionOfferDetails=[com.android.billingclient.api.ProductDetails$SubscriptionOfferDetails@83478a9, com.android.billingclient.api.ProductDetails$SubscriptionOfferDetails@6d10e2e]}, offerDetails=com.android.billingclient.api.ProductDetails$SubscriptionOfferDetails@83478a9), QueryProductDetail(productDetail=ProductDetail(productId=test_product_acp, planId=test-proxy-monthly, productTitle=test_product_acp (Rethink: DNS + Firewall + VPN), productType=subs, pricingDetails=[PricingPhase(recurringMode=ORIGINAL, price=₹210, currencyCode=INR, planTitle=Monthly, billingCycleCount=0, billingPeriod=P1M, priceAmountMicros=210000000, freeTrialPeriod=0)]), productDetails=ProductDetails{jsonString='{"productId":"test_product_acp","type":"subs","title":"test_product_acp (Rethink: DNS + Firewall + VPN)","name":"test_product_acp","localizedIn":["en-GB"],"skuDetailsToken":"AEuhp4JS1isixh_29bFQ6VAUZIGGn46BJIo2_Vdg5EpA40dZnrVghFzBmVEOCGhoBDTY","subscriptionOfferDetails":[{"offerIdToken":"Aezw0slCKFuN3u6CLJqjmmCXlPvzNEDtWjWlaD4dLU71Z2xdPT337FKuo8z5Q\/3dPfd8A5GAY7JiV9TByoq1EBYQRIYcIlKt\/bUO","basePlanId":"test-proxy-yearly","pricingPhases":[{"priceAmountMicros":1700000000,"priceCurrencyCode":"INR","formattedPrice":"₹1,700.00","billingPeriod":"P1Y","recurrenceMode":1}],"offerTags":[]},{"offerIdToken":"Aezw0sk0TeTw2PEG172yjUKkSak0JtKFsIcSLQUrKJDRkkSOnFxZvvhgFlLOlOp\/Jge6TIvquUNLNbQ0U5BR0wZ3PnTYUfZwnhZ2","basePlanId":"test-proxy-monthly","pricingPhases":[{"priceAmountMicros":210000000,"priceCurrencyCode":"INR","formattedPrice":"₹21
              *
-             * [
-             * PricingPhase(recurringMode=FREE, price=Free, currencyCode=INR, planTitle=Weekly, billingCycleCount=0, billingPeriod=P1W, priceAmountMicros=0, freeTrialPeriod=7),
-             *
-             * PricingPhase(recurringMode=ORIGINAL, price=₹850, currencyCode=INR, planTitle=Yearly, billingCycleCount=0, billingPeriod=P1Y, priceAmountMicros=850000000, freeTrialPeriod=0)]
-             */
-            prod.pricingDetails.forEach { p ->
-                if (p.recurringMode == InAppBillingHandler.RecurringMode.FREE) {
-                    offer = "Trail period: ${p.freeTrialPeriod} days"
-                } else {
-                    price = "${p.price} ${p.currencyCode}"
+             * Pricing Phase: DISCOUNTED, Price: ₹189, Currency: INR, Plan Title: Monthly, Billing Period: P1M, Price Amount Micros: 189000000, Free Trial Period: 0, cycleCount: 1
+             * Pricing Phase: ORIGINAL, Price: ₹210, Currency: INR, Plan Title: Monthly, Billing Period: P1M, Price Amount Micros: 210000000, Free Trial Period: 0, cycleCount: 0
+             *//*
+
+            prod.pricingDetails.forEach {
+                if (it.freeTrialPeriod > 0) {
+                    offerPrice = "Trial period: ${it.freeTrialPeriod} days"
+                } else if (it.recurringMode == InAppBillingHandler.RecurringMode.DISCOUNTED && it.price.isNotEmpty()) {
+                    offerPrice = it.price
+                } else if (it.recurringMode == InAppBillingHandler.RecurringMode.ORIGINAL && it.price.isNotEmpty()) {
+                    originalPrice = it.price
                 }
             }
-            if (offer.isNotEmpty()) {
-                binding.offerDetail.text = offer
+
+            if (offerPrice.isEmpty()) {
+                binding.originalPrice.visibility = View.GONE
+                binding.offerPrice.text = originalPrice
             } else {
-                binding.offerDetail.text = ""
+                binding.offerPrice.text = offerPrice
+                binding.originalPrice.visibility = View.VISIBLE
+                binding.originalPrice.paintFlags = binding.offerPrice.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                binding.originalPrice.text = originalPrice
             }
 
-            if (price.isNotEmpty()) {
-                binding.subsPrice.text = price
-            } else {
-                binding.subsPrice.text = ""
-            }
-            binding.subsName.text = title
+            binding.productName.text = title
             setCardStroke(selectedPos == pos)
-            Logger.d(LOG_TAG_UI, "Product Title: $title (${selectedPos == pos}), pricing size: ${prod.pricingDetails.size}, ${prod.pricingDetails}")
+            Logger.d(LOG_TAG_UI, "Product Title: $title (${selectedPos == pos}), Price: $originalPrice, Offer: $offerPrice")
             setupClickListeners(prod, pos)
         }
 
@@ -125,4 +170,4 @@ class GooglePlaySubsAdapter(val listener: SubscriptionClickListener, val context
             }
         }
     }
-}
+}*/

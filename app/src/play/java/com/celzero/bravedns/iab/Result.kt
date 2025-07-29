@@ -1,23 +1,30 @@
 package com.celzero.bravedns.iab
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
-object Result {
-
+/*object Result {
     private var RESULT_STATE = ResultState.NONE
 
-    private var _resultState = MutableLiveData<ResultState>()
-    val resultState: LiveData<ResultState> get() = _resultState
+    private var _resultState = MutableStateFlow(ResultState.NONE)
+    private val resultState: StateFlow<ResultState> get() = _resultState
+
+    init {
+        _resultState.value = ResultState.NONE
+    }
 
     fun setResultState(resultState: ResultState) {
         Logger.d(Logger.LOG_IAB, "setResultState: $resultState")
         RESULT_STATE = resultState
-        _resultState.postValue(RESULT_STATE)
+        _resultState.value = RESULT_STATE
     }
 
     fun getResultState(): ResultState {
         return RESULT_STATE
+    }
+
+    fun getResultStateFlow(): StateFlow<ResultState> {
+        return resultState
     }
 
     override fun toString(): String {
@@ -50,6 +57,7 @@ object Result {
             ResultState.CONSOLE_QUERY_PRODUCTS_INAPP_FETCHING -> ResultState.CONSOLE_QUERY_PRODUCTS_INAPP_FETCHING.message
             ResultState.CONSOLE_QUERY_PRODUCTS_SUB_FETCHING -> ResultState.CONSOLE_QUERY_PRODUCTS_SUB_FETCHING.message
             ResultState.CONSOLE_QUERY_PRODUCTS_COMPLETED -> ResultState.CONSOLE_QUERY_PRODUCTS_COMPLETED.message
+            ResultState.CONSOLE_QUERY_PRODUCTS_FAILED -> ResultState.CONSOLE_QUERY_PRODUCTS_FAILED.message
 
             ResultState.CONSOLE_BUY_PRODUCT_EMPTY_ID -> ResultState.CONSOLE_BUY_PRODUCT_EMPTY_ID.message
             ResultState.CONSOLE_PRODUCTS_IN_APP_NOT_EXIST -> ResultState.CONSOLE_PRODUCTS_IN_APP_NOT_EXIST.message
@@ -67,7 +75,9 @@ object Result {
             ResultState.PURCHASING_FAILURE -> ResultState.PURCHASING_FAILURE.message
 
             ResultState.PURCHASE_CONSUME -> ResultState.PURCHASE_CONSUME.message
+            ResultState.PURCHASE_PENDING -> ResultState.PURCHASE_PENDING.message
+            ResultState.PURCHASE_ACK_PENDING -> ResultState.PURCHASE_ACK_PENDING.message
             ResultState.PURCHASE_FAILURE -> ResultState.PURCHASE_FAILURE.message
         }
     }
-}
+}*/

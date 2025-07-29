@@ -18,7 +18,7 @@ object RetrofitInstance {
     private fun getStripeBaseBuilder(): StripeApiService {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(okHttpClient())
+            .client(okHttpClient(false))
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(StripeApiService::class.java)
