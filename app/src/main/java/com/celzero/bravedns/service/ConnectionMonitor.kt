@@ -23,39 +23,41 @@ import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.net.TrafficStats
 import android.os.Handler
-import android.os.HandlerThread
 import android.os.Looper
-import android.os.Message
 import android.os.SystemClock
-import android.system.ErrnoException
-import android.system.OsConstants.ECONNREFUSED
+import com.celzero.bravedns.util.ConnectivityCheckHelper
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isNetworkSame
 import com.google.common.collect.Sets
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.Closeable
-import java.io.IOException
 import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.InetAddress
-import java.net.InetSocketAddress
-import java.net.Socket
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
 
-class ConnectionMonitor(private val networkListener: NetworkListener) :
+class ConnectionMonitor(private val networkListener: NetworkListener, private val serializer: CoroutineDispatcher, private val scope: CoroutineScope) :
     ConnectivityManager.NetworkCallback(), KoinComponent {
 
     private val networkSet: MutableSet<Network> = ConcurrentHashMap.newKeySet()
+
+    // create drop oldest channel to handle the network changes from the connectivity manager
+    private lateinit var channel: Channel<OpPrefs>
 
     // add cellular, wifi, bluetooth, ethernet, vpn, wifi aware, low pan
     private val networkRequest: NetworkRequest =
@@ -66,10 +68,10 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             // api26: .addTransportType(NetworkCapabilities.TRANSPORT_LOWPAN)
             .build()
 
-    private var serviceHandler: NetworkRequestHandler? = null
+    //private var serviceHandler: NetworkRequestHandler? = null
     private val persistentState by inject<PersistentState>()
 
-    private lateinit var connectivityManager: ConnectivityManager
+    private lateinit var cm: ConnectivityManager
 
     companion object {
         // add active network as underlying vpn network
@@ -77,6 +79,19 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
 
         // add all available networks as underlying vpn networks
         const val MSG_ADD_ALL_NETWORKS = 2
+
+        // below constants are used for probe connectivity checks in Auto mode
+        const val PROTOCOL_V4 = "v4"
+        const val PROTOCOL_V6 = "v6"
+        const val SCHEME_HTTP = "http"
+        const val SCHEME_HTTPS = "https"
+        const val SCHEME_IP = "ip"
+
+        // variable to check whether to rely on the TCP/UDP reachability checks from
+        // kotlin end instead of tunnel reachability checks, set false by default for now
+        // TODO: set it to true when the reachability checks are required to be done from
+        // kotlin end
+        const val USE_KOTLIN_REACHABILITY_CHECKS = false
 
         fun networkType(netCap: NetworkCapabilities?): String {
             val a =
@@ -122,55 +137,78 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
     data class ProbeResult(val ip: String, val ok: Boolean, val capabilities: NetworkCapabilities?)
 
     interface NetworkListener {
-        fun onNetworkDisconnected(networks: UnderlyingNetworks)
+        suspend fun onNetworkDisconnected(networks: UnderlyingNetworks)
 
-        fun onNetworkConnected(networks: UnderlyingNetworks)
+        suspend fun onNetworkConnected(networks: UnderlyingNetworks)
 
-        fun onNetworkRegistrationFailed()
+        suspend fun onNetworkRegistrationFailed()
     }
 
     override fun onAvailable(network: Network) {
-        val res = networkSet.add(network)
-        if (!res) {
-            networkSet.remove(network)
-            networkSet.add(network) // re-add to ensure the latest network is used
+        scope.launch(CoroutineName("cmAvl") + serializer) {
+            val res = networkSet.add(network)
+            if (!res) {
+                networkSet.remove(network)
+                networkSet.add(network) // re-add to ensure the latest network is used
+            }
+            val cap = cm.getNetworkCapabilities(network)
+            Logger.d(
+                LOG_TAG_CONNECTION,
+                "onAvailable: ${network.networkHandle}, netid: ${netId(network.networkHandle)}, $network, ${networkSet.size}, ${
+                    networkType(
+                        cap
+                    )
+                }"
+            )
+            handleNetworkChange()
         }
-        val cap = connectivityManager.getNetworkCapabilities(network)
-        Logger.d(
-            LOG_TAG_CONNECTION,
-            "onAvailable: ${network.networkHandle}, netid: ${netId(network.networkHandle)}, $network, ${networkSet.size}, ${networkType(cap)}"
-        )
-        handleNetworkChange()
     }
 
     override fun onLost(network: Network) {
-        networkSet.remove(network)
-        val cap = connectivityManager.getNetworkCapabilities(network)
-        Logger.d(
-            LOG_TAG_CONNECTION,
-            "onLost: ${network.networkHandle}, netid: ${netId(network.networkHandle)}, $network, ${networkSet.size}, ${networkType(cap)}"
-        )
-        handleNetworkChange()
+        scope.launch(CoroutineName("cmLost") + serializer) {
+            networkSet.remove(network)
+            val cap = cm.getNetworkCapabilities(network)
+            Logger.d(
+                LOG_TAG_CONNECTION,
+                "onLost: ${network.networkHandle}, netid: ${netId(network.networkHandle)}, $network, ${networkSet.size}, ${
+                    networkType(
+                        cap
+                    )
+                }"
+            )
+            handleNetworkChange()
+        }
     }
 
     override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
-        Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged, ${network.networkHandle}, netid: ${netId(network.networkHandle)}, $network")
-        val res = networkSet.add(network) // ensure the network is added to the set
-        if (!res) {
-            networkSet.remove(network)
-            networkSet.add(network) // re-add to ensure the latest network is used
+        scope.launch(CoroutineName("cmCap") + serializer) {
+            Logger.d(
+                LOG_TAG_CONNECTION,
+                "onCapabilitiesChanged, ${network.networkHandle}, netid: ${netId(network.networkHandle)}, $network"
+            )
+            val res = networkSet.add(network) // ensure the network is added to the set
+            if (!res) {
+                networkSet.remove(network)
+                networkSet.add(network) // re-add to ensure the latest network is used
+            }
+
+            handleNetworkChange(isForceUpdate = true)
         }
-        handleNetworkChange(isForceUpdate = true, TimeUnit.SECONDS.toMillis(3))
     }
 
     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
-        Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged: ${network.networkHandle}, netid: ${netId(network.networkHandle)}, $network")
-        val res = networkSet.add(network) // ensure the network is added to the set
-        if (!res) {
-            networkSet.remove(network)
-            networkSet.add(network) // re-add to ensure the latest network is used
+        scope.launch(CoroutineName("cmAvl") + serializer) {
+            Logger.d(
+                LOG_TAG_CONNECTION,
+                "onLinkPropertiesChanged: ${network.networkHandle}, netid: ${netId(network.networkHandle)}, $network"
+            )
+            val res = networkSet.add(network) // ensure the network is added to the set
+            if (!res) {
+                networkSet.remove(network)
+                networkSet.add(network) // re-add to ensure the latest network is used
+            }
+            handleNetworkChange(isForceUpdate = true)
         }
-        handleNetworkChange(isForceUpdate = true, TimeUnit.SECONDS.toMillis(3))
     }
 
     /**
@@ -179,44 +217,32 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
      */
     fun onUserPreferenceChanged() {
         Logger.d(LOG_TAG_CONNECTION, "onUserPreferenceChanged")
-        handleNetworkChange(isForceUpdate = true)
-    }
-
-    suspend fun probeIpOrUrl(ipOrUrl: String): ProbeResult? {
-        Logger.d(LOG_TAG_CONNECTION, "pingIpOrUrl: $ipOrUrl")
-        return serviceHandler?.let {
-            val res = it.probeIpOrUrl(ipOrUrl, networkSet)
-            Logger.d(LOG_TAG_CONNECTION, "pingIpOrUrl: $ipOrUrl, $res, nws: ${networkSet.size}")
-            res
-        }
+        scope.launch(CoroutineName("cmPref") + serializer) { handleNetworkChange(isForceUpdate = true) }
     }
 
     /**
      * Force updates the VPN's underlying network based on the preference. Will be initiated when
      * the VPN start is completed. Always called from the main thread
      */
-    fun onVpnStart(context: Context): Boolean {
-        val isNewVpn = serviceHandler == null
+    suspend fun onVpnStart(context: Context): Boolean {
+        val isNewVpn = !::cm.isInitialized
 
-        if (this.serviceHandler != null) {
+        if (!isNewVpn) {
             Logger.w(LOG_TAG_CONNECTION, "connection monitor is already running")
-            return isNewVpn
+            return false
         }
 
         Logger.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
-        connectivityManager =
-            context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
-                    as ConnectivityManager
+        cm = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        channel = Channel(Channel.CONFLATED)
         try {
-            connectivityManager.registerNetworkCallback(networkRequest, this)
+            cm.registerNetworkCallback(networkRequest, this)
         } catch (e: Exception) {
             Logger.w(LOG_TAG_CONNECTION, "Exception while registering network callback", e)
             networkListener.onNetworkRegistrationFailed()
             return isNewVpn
         }
 
-        val handlerThread = HandlerThread(NetworkRequestHandler::class.simpleName)
-        handlerThread.start()
         // Filter out empty strings from probe IPs to avoid unnecessary probe attempts
         val ips = IpsAndUrlToProbe(
             persistentState.pingv4Ips.split(",").map { it.trim() }.filter { it.isNotEmpty() },
@@ -224,9 +250,16 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             persistentState.pingv4Url.trim(),
             persistentState.pingv6Url.trim()
         )
-        this.serviceHandler =
-            NetworkRequestHandler(connectivityManager, handlerThread.looper, networkListener, ips)
+
+        val hdl = NetworkRequestHandler(cm,  networkListener, ips)
         handleNetworkChange(isForceUpdate = true)
+
+        scope.launch(CoroutineName("nwhdl") + serializer) {
+            for (m in channel) {
+                // process the message in a coroutine context
+                hdl.handleMessage(m)
+            }
+        }
 
         return isNewVpn
     }
@@ -235,22 +268,20 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
     // Always called from the main thread
     fun onVpnStop() {
         try {
-            this.serviceHandler?.removeCallbacksAndMessages(null)
-            serviceHandler?.looper?.quitSafely()
-            this.serviceHandler = null
+            networkSet.clear()
+            if (::channel.isInitialized) {
+                channel.close()
+            }
             // check if connectivity manager is initialized as it is lazy initialized
-            if (::connectivityManager.isInitialized) {
-                connectivityManager.unregisterNetworkCallback(this)
+            if (::cm.isInitialized) {
+                cm.unregisterNetworkCallback(this)
             }
         } catch (e: Exception) {
             Logger.w(LOG_TAG_CONNECTION, "ConnectionMonitor: err while unregistering", e)
         }
     }
 
-    private fun handleNetworkChange(
-        isForceUpdate: Boolean = true,
-        delay: Long = TimeUnit.SECONDS.toMillis(1)
-    ) {
+    private suspend fun handleNetworkChange(isForceUpdate: Boolean = true) {
         val dualStack =
             InternetProtocol.getInternetProtocol(persistentState.internetProtocolType).isIPv46()
         val testReachability = dualStack && persistentState.connectivityChecks
@@ -263,10 +294,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 testReachability,
                 failOpenOnNoNetwork
             )
-        serviceHandler?.removeMessages(MSG_ADD_ACTIVE_NETWORK, null)
-        serviceHandler?.removeMessages(MSG_ADD_ALL_NETWORKS, null)
-        // process after a delay to avoid processing multiple network changes in short bursts
-        serviceHandler?.sendMessageDelayed(msg, delay)
+        // TODO: process after a delay to avoid processing multiple network changes in short bursts
+        channel.send(msg)
     }
 
     /**
@@ -278,12 +307,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         isForceUpdate: Boolean,
         testReachability: Boolean,
         failOpenOnNoNetwork: Boolean
-    ): Message {
-        val opPrefs = OpPrefs(what, networkSet.toSet(), isForceUpdate, testReachability, failOpenOnNoNetwork)
-        val message = Message.obtain()
-        message.what = what
-        message.obj = opPrefs
-        return message
+    ): OpPrefs {
+        return OpPrefs(what, networkSet.toSet(), isForceUpdate, testReachability, failOpenOnNoNetwork)
     }
 
     data class NetworkProperties(
@@ -341,10 +366,9 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
      */// Handles the network messages from the callback from the connectivity manager
     private class NetworkRequestHandler(
         val cm: ConnectivityManager,
-        looper: Looper,
         val listener: NetworkListener,
         ipsAndUrl: IpsAndUrlToProbe
-    ) : Handler(looper) {
+    ) {
 
         // number of times the reachability check is performed due to failures
         private var reachabilityCount = 0L
@@ -353,11 +377,6 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         companion object {
             private const val DEFAULT_MTU = 1280 // same as BraveVpnService#VPN_INTERFACE_MTU
             private const val MIN_MTU = 1280
-            // variable to check whether to rely on the TCP/UDP reachability checks from
-            // kotlin end instead of tunnel reachability checks, set false by default for now
-            // TODO: set it to true when the reachability checks are required to be done from
-            // kotlin end
-            private const val USE_KOTLIN_REACHABILITY_CHECKS = false
         }
 
         val ip4probes = ipsAndUrl.ip4probes
@@ -377,17 +396,15 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         var trackedIpv4Networks: LinkedHashSet<NetworkProperties> = linkedSetOf()
         var trackedIpv6Networks: LinkedHashSet<NetworkProperties> = linkedSetOf()
 
-        override fun handleMessage(msg: Message) {
+        suspend fun handleMessage(opPrefs: OpPrefs) {
             // isForceUpdate - true if onUserPreferenceChanged is changes, the messages should be
             // processed forcefully regardless of the current and new networks.
-            when (msg.what) {
+            when (opPrefs.msgType) {
                 MSG_ADD_ACTIVE_NETWORK -> {
-                    val opPrefs = msg.obj as OpPrefs
                     processActiveNetwork(opPrefs)
                 }
 
                 MSG_ADD_ALL_NETWORKS -> {
-                    val opPrefs = msg.obj as OpPrefs
                     processAllNetworks(opPrefs)
                 }
             }
@@ -397,7 +414,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
          * tracks the changes in active network. Set the underlying network if the current active
          * network is different from already assigned one unless the force update is required.
          */
-        private fun processActiveNetwork(opPrefs: OpPrefs) {
+        private suspend fun processActiveNetwork(opPrefs: OpPrefs) {
             val newActiveNetwork = cm.activeNetwork
             val newActiveNetworkCap = cm.getNetworkCapabilities(newActiveNetwork)
             // set active network's connection status
@@ -423,7 +440,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
         }
 
         /** Adds all the available network to the underlying network. */
-        private fun processAllNetworks(opPrefs: OpPrefs) {
+        private suspend fun processAllNetworks(opPrefs: OpPrefs) {
             val newActiveNetwork = cm.activeNetwork
             // set active network's connection status
             val isActiveNetworkMetered = isActiveConnectionMetered()
@@ -456,7 +473,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
          *         and the second element indicates IPv6 support (true if supported).
          *         Returns null if no VPN network is found in the provided set.
          */
-        private fun determineVpnProtos(nws: Set<Network?>): Pair<Boolean, Boolean>? {
+        private suspend fun determineVpnProtos(nws: Set<Network?>): Pair<Boolean, Boolean>? {
             var vpnNw = nws.firstOrNull { isVPN(it) == true }
             if (vpnNw == null) {
                 // fallback to the active network if the vpn network is not found
@@ -576,7 +593,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
          *                  IPv6 (second element) are available. Can be null if VPN routes are not
          *                  determined.
          */
-        private fun informListener(
+        private suspend fun informListener(
             useActiveNetwork: Boolean = false,
             isActiveNetworkMetered: Boolean,
             isActiveNetworkCellular: Boolean,
@@ -654,7 +671,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
          *         DNS servers, and values are the [Network] objects they are associated with.
          *         Returns an empty map if no DNS servers are found or if `nws` is empty.
          */
-        private fun getDnsServers(
+        private suspend fun getDnsServers(
             nws: LinkedHashSet<NetworkProperties>
         ): LinkedHashMap<InetAddress, Network> {
             // add dns servers into a set to avoid duplicates and add corresponding network to it
@@ -688,7 +705,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
          *                         for MTU determination.
          * @return The calculated MTU value.
          */
-        private fun determineMtu(useActiveNetwork: Boolean): Int {
+        private suspend fun determineMtu(useActiveNetwork: Boolean): Int {
             var minMtu4: Int = -1
             var minMtu6: Int = -1
             if (!isAtleastQ()) {
@@ -749,7 +766,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
          *         (not null and > 0) and `m2` is not positive, `m1` is returned. If `m1` is not
          *         valid, `m2` is returned. Otherwise, the minimum of `m1` and `m2` is returned.
          */
-        private fun minNonZeroMtu(m1: Int?, m2: Int): Int {
+        private suspend fun minNonZeroMtu(m1: Int?, m2: Int): Int {
             return if (m1 != null && m1 > 0) {
                 // mtu can be null when lp is null
                 // mtu can be 0 when the value is not set, see:LinkProperties#getMtu()
@@ -765,7 +782,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
          *
          * @return True if the active network connection is metered, false otherwise.
          */
-        private fun isActiveConnectionMetered(): Boolean {
+        private suspend fun isActiveConnectionMetered(): Boolean {
             return cm.isActiveNetworkMetered
         }
 
@@ -775,7 +792,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
          * @param network The network to check.
          * @return True if the active connection is cellular, false otherwise.
          */
-        private fun isActiveConnectionCellular(network: Network?): Boolean {
+        private suspend fun isActiveConnectionCellular(network: Network?): Boolean {
             if (network == null) {
                 Logger.d(LOG_TAG_CONNECTION, "isActiveConnectionCellular: network is null")
                 return false
@@ -815,7 +832,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
          *
          * @param opPrefs The operation preferences, which include settings like whether to test
          */
-        private fun repopulateTrackedNetworks(
+        private suspend fun repopulateTrackedNetworks(
             opPrefs: OpPrefs,
             nwProps: LinkedHashSet<NetworkProperties>
         ) {
@@ -842,22 +859,34 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 val isValidated = isValidated(network)
                 val hasInternet = hasInternet(network)
                 Logger.d(LOG_TAG_CONNECTION, "processing: ${network.networkHandle}, netid: ${netId(network.networkHandle)}, active? $isActive, activeNull? $isActiveNull, internet? $hasInternet, captive? $isCaptive, validated? $isValidated")
-
+                var fallthrough = true
                 // TODO: case: CAPTIVE_PORTAL, should we not test reachability?
                 if (testReachability) {
                     // for active network, ICMP echo is additionally used with TCP and UDP checks
                     // but ICMP echo will always return reachable when app is in rinr mode
                     // so till we have checks for rinr mode, we should not use ICMP reachability
 
-                    val has4 = probeConnectivity(listOf(url4Probe), network)
-                    val has6 = probeConnectivity(listOf(url6Probe), network)
-                    if (has4) trackedIpv4Networks.add(prop)
-                    if (has6) trackedIpv6Networks.add(prop)
-                    Logger.i(LOG_TAG_CONNECTION, "url probe, nw(${network.networkHandle}, netid: ${netId(network.networkHandle)}): has4? $has4, has6? $has6, $prop")
-                    if (has4 && has6) return@outer
+                    withContext(Dispatchers.IO) {
+                        val has4 = ConnectivityCheckHelper.probeConnectivityInAutoMode(network, SCHEME_HTTPS, PROTOCOL_V4)
+                        val has6 = ConnectivityCheckHelper.probeConnectivityInAutoMode(network, SCHEME_HTTPS, PROTOCOL_V6)
+                        if (has4) trackedIpv4Networks.add(prop)
+                        if (has6) trackedIpv6Networks.add(prop)
+                        Logger.i(
+                            LOG_TAG_CONNECTION,
+                            "url probe, nw(${network.networkHandle}, netid: ${netId(network.networkHandle)}): has4? $has4, has6? $has6, $prop"
+                        )
+                        if (has4 && has6) {
+                            fallthrough = false
+                            return@withContext
+                        }
+                    }
                     // else: fall-through to check reachability with ips or network capabilities
                 }
+                // this is to mitigate the limitation of return inside the withContext block
+                // so that we can continue with the outer loop
+                if (!fallthrough) return@outer
 
+                fallthrough = true
                 val nwHas4 = trackedIpv4Networks.any { it.network == network }
                 val nwHas6 = trackedIpv6Networks.any { it.network == network }
                 // if either of the trackedIpv4Networks or trackedIpv6Networks has the network,
@@ -865,13 +894,20 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 if (testReachability && (!nwHas4 && !nwHas6)) {
                     // both the ipv4 and ipv6 networks are not reachable, so try to check
                     // for ip reachability
-                    val has4 = probeConnectivity(ip4probes, network)
-                    val has6 = probeConnectivity(ip6probes, network)
-                    if (has4) trackedIpv4Networks.add(prop)
-                    if (has6) trackedIpv6Networks.add(prop)
-                    Logger.i(LOG_TAG_CONNECTION, "ip probe, nw(${network.networkHandle}, netid: ${netId(network.networkHandle)}): has4? $has4, has6? $has6, $prop")
-                    if (has4 && has6) return@outer
+                    withContext(Dispatchers.IO) {
+                        val has4 = ConnectivityCheckHelper.probeConnectivityInAutoMode(network, SCHEME_IP, PROTOCOL_V4)
+                        val has6 = ConnectivityCheckHelper.probeConnectivityInAutoMode(network, SCHEME_IP, PROTOCOL_V6)
+                        if (has4) trackedIpv4Networks.add(prop)
+                        if (has6) trackedIpv6Networks.add(prop)
+                        Logger.i(LOG_TAG_CONNECTION, "ip probe, nw(${network.networkHandle}, netid: ${netId(network.networkHandle)}): has4? $has4, has6? $has6, $prop")
+                        if (has4 && has6) {
+                            fallthrough = false
+                            return@withContext
+                        }
+                    }
                 }
+
+                if (!fallthrough) return@outer
 
                 val nwHas4AfterProbe = trackedIpv4Networks.any { it.network == network }
                 val nwHas6AfterProbe = trackedIpv6Networks.any { it.network == network }
@@ -1003,7 +1039,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
          * @param opPrefs The operation preferences containing the message type and other settings
          *                for the reachability check. It's assumed to be immutable.
          */
-        private fun redoReachabilityIfNeeded(
+        private suspend fun redoReachabilityIfNeeded(
             ipv4: LinkedHashSet<NetworkProperties>,
             ipv6: LinkedHashSet<NetworkProperties>,
             opPrefs: OpPrefs
@@ -1012,12 +1048,10 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 reachabilityCount++
                 Logger.i(LOG_TAG_CONNECTION, "redo reachability, try: $reachabilityCount")
                 if (reachabilityCount > maxReachabilityCount) return
-                val message = Message.obtain()
-                // assume opPrefs is immutable
-                message.what = opPrefs.msgType
-                message.obj = opPrefs
+
                 val delay = TimeUnit.SECONDS.toMillis(10 * reachabilityCount)
-                this.sendMessageDelayed(message, delay)
+                delay(delay)
+                handleMessage(opPrefs)
             } else {
                 Logger.d(LOG_TAG_CONNECTION, "reset reachability count, prev: $reachabilityCount")
                 // reset the reachability count
@@ -1033,7 +1067,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
          * @param newNetworks The set of new networks.
          * @return True if there is a difference, false otherwise.
          */
-        private fun hasDifference(
+        private suspend fun hasDifference(
             currentNetworks: LinkedHashSet<NetworkProperties>,
             newNetworks: LinkedHashSet<NetworkProperties>
         ): Boolean {
@@ -1052,7 +1086,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
          * @param networks The set of networks to rearrange.
          * @return A new set of networks with the rearranged order.
          */
-        private fun rearrangeNetworks(
+        private suspend fun rearrangeNetworks(
             networks: LinkedHashSet<NetworkProperties>
         ): LinkedHashSet<NetworkProperties> {
             val newNetworks: LinkedHashSet<NetworkProperties> = linkedSetOf()
@@ -1080,7 +1114,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
          * @param nws The set of networks to rearrange.
          * @return A new set of networks with the rearranged order.
          */
-        private fun rearrangeNetworks(nws: Set<Network>): Set<Network> {
+        private suspend fun rearrangeNetworks(nws: Set<Network>): Set<Network> {
             val newNetworks: LinkedHashSet<Network> = linkedSetOf()
             val activeNetwork = cm.activeNetwork
             val n = nws.firstOrNull { isNetworkSame(it, activeNetwork) }
@@ -1106,7 +1140,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
          * the list must be active network. requireAllNetwork - if true adds all networks to the set
          * else adds active network alone to the set.
          */
-        private fun createNetworksSet(
+        private suspend fun createNetworksSet(
             activeNetwork: Network?,
             networkSet: Set<Network>
         ): LinkedHashSet<NetworkProperties> {
@@ -1160,261 +1194,6 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
             return newNetworks
         }
 
-        /**
-         * Probes connectivity to a list of IP addresses on a given network.
-         *
-         * This function iterates through the provided IP addresses and attempts to establish
-         * connectivity using [VpnController.performConnectivityCheck].
-         *
-         * If `useActive` is true, it first attempts to probe using the active network (socket
-         * will be protected but not bound). If that fails or `useActive` is false, it proceeds
-         * to probe using the specified `nw` (socket will be bound to this network).
-         *
-         * If both attempts fail and `USE_KOTLIN_REACHABILITY_CHECKS` is true, it falls back to
-         * [isReachableTcpUdp] for an additional check.
-         *
-         * The function returns true as soon as any probe is successful.
-         *
-         * @param probes A collection of IP addresses (as strings) to probe. Empty strings are skipped.
-         * @param nw The [Network] to use for probing. If null and `useActive` is false,
-         *           the probe controller will protect the socket to the default network.
-         * @return True if connectivity is established to any of the probed IPs, false otherwise.
-         */
-        private fun probeConnectivity(
-            probes: Collection<String>,
-            nw: Network?
-        ): Boolean = runBlocking {
-            var ok = false
-            val probeController = if (nw != null) {
-                ProbeController(nw.networkHandle, nw)
-            } else {
-                // in case of use active network, the network is null, so the controller will
-                // protect the socket to the default network instead of bind
-                // assign the networkHandle as 0 and nw as null, so that the controller will not
-                // bind the socket
-                ProbeController(-1, null)
-            }
-            probes.forEach { ipOrUrl ->
-                if (ipOrUrl.isEmpty()) return@forEach // skip empty IPs
-
-                val id = "probe:${netId(nw?.networkHandle)}:$ipOrUrl"
-                ok = VpnController.performConnectivityCheck(probeController, id, ipOrUrl)
-
-                if (!ok && USE_KOTLIN_REACHABILITY_CHECKS) {
-                    ok = isReachableTcpUdp(nw, ipOrUrl)
-                }
-                Logger.v(LOG_TAG_CONNECTION, "probeConnectivity, id($id): $ipOrUrl, ok? $ok, nw: ${nw?.networkHandle}, netid: ${netId(nw?.networkHandle)}")
-                if (ok) {
-                    return@forEach // break
-                }
-            }
-            return@runBlocking ok
-        }
-
-        /**
-         * Probes the given IP address for connectivity on the available networks.
-         *
-         * This function attempts to establish a connection to the specified IP address
-         * using the provided set of networks. It prioritizes networks based on their
-         * type (active, non-metered, metered).
-         *
-         * If initial probes fail and `USE_KOTLIN_REACHABILITY_CHECKS` is enabled,
-         * it will fall back to ICMP or TCP/UDP reachability checks.
-         *
-         * @param ip The IP address to probe.
-         * @param nws The set of available networks to use for probing.
-         * @return A [ProbeResult] object containing the IP address, a boolean indicating
-         *         if the probe was successful, and the [NetworkCapabilities] of the
-         *         network on which the successful probe occurred (or null if unsuccessful).
-         */
-        suspend fun probeIpOrUrl(ip: String, nws: Set<Network>): ProbeResult {
-            val newNws = rearrangeNetworks(nws)
-            if (newNws.isEmpty()) {
-                var ok = probeConnectivity(listOf(ip), nw = null)
-                if (!ok && USE_KOTLIN_REACHABILITY_CHECKS) {
-                    // if no networks are available, try to reach the ip using ICMP
-                    // or TCP/UDP checks
-                    ok = isReachable(ip)
-                }
-                val cap = cm.getNetworkCapabilities(cm.activeNetwork)
-                Logger.i(LOG_TAG_CONNECTION, "probeIpOrUrl: $ip, ok? $ok, cap: $cap")
-                return ProbeResult(ip, ok, cap)
-            }
-            newNws.forEach { nw ->
-                val ok = probeConnectivity(listOf(ip), nw)
-                val cap = cm.getNetworkCapabilities(nw)
-                if (!ok && USE_KOTLIN_REACHABILITY_CHECKS) {
-                    // if the probe fails, try to reach the ip using ICMP or TCP/UDP checks
-                    val reachable = isReachableTcpUdp(nw, ip)
-                    if (reachable) {
-                        return ProbeResult(ip, true, cap)
-                    }
-                }
-                if (ok) {
-                    Logger.i(LOG_TAG_CONNECTION, "probeIpOrUrl: $ip, ok? $ok, netid: ${netId(nw.networkHandle)}, cap: $cap")
-                    return ProbeResult(ip, true, cap)
-                }
-            }
-            return ProbeResult(ip, false, null)
-        }
-
-        /**
-         * Checks if the host is reachable via TCP/UDP on the given network.
-         * It tries to connect to the host on port 80 (HTTP) and port 53 (DNS) via TCP.
-         * If either of these connections is successful, the host is considered reachable.
-         * The socket is bound to the given network before attempting to connect.
-         * @param nw The network to use for the reachability check.
-         * @param host The host to check for reachability.
-         * @return True if the host is reachable, false otherwise.
-         */
-        private suspend fun isReachableTcpUdp(nw: Network?, host: String): Boolean {
-            try {
-                // https://developer.android.com/reference/android/net/Network#bindSocket(java.net.Socket)
-                TrafficStats.setThreadStatsTag(Thread.currentThread().id.toIntOrDefault())
-
-                val yes = tcp80(nw, host) || tcp53(nw, host)
-
-                Logger.d(LOG_TAG_CONNECTION, "$host isReachable on network ${nw?.networkHandle}, netid: ${netId(nw?.networkHandle)},($nw): $yes")
-                return yes
-            } catch (e: Exception) {
-                Logger.w(LOG_TAG_CONNECTION, "err isReachable: ${e.message}")
-            }
-            return false
-        }
-
-        /**
-         * Checks if the host is reachable using ICMP echo request.
-         *
-         * The 'isReachable()' function sends an ICMP echo request to the target host. In the
-         * event of the 'Rethink within Rethink' option being used, ICMP checks will fail.
-         * Ideally, there is no need to perform ICMP checks. However, if 'Rethink within
-         * Rethink' is not supplied to this handler, these checks will be carried out but will
-         * result in failure.
-         *
-         * @param host The hostname or IP address to check.
-         * @return True if the host is reachable, false otherwise.
-         */
-        private suspend fun isReachable(host: String): Boolean {
-            try {
-                val timeout = 500 // ms
-                // https://developer.android.com/reference/android/net/Network#bindSocket(java.net.Socket)
-                TrafficStats.setThreadStatsTag(Thread.currentThread().id.toIntOrDefault())
-                // https://developer.android.com/reference/java/net/InetAddress#isReachable(int)
-                // network.getByName() binds the socket to that network; InetAddress.getByName.
-                // isReachable(network-interface, ttl, timeout) cannot be used here since
-                // "network-interface" is a java-construct while "Network" is an android-construct
-                // InetAddress.getByName() will bind the socket to the default active network.
-                val yes = InetAddress.getByName(host).isReachable(timeout)
-
-                Logger.d(LOG_TAG_CONNECTION, "$host isReachable on network: $yes")
-                return yes
-            } catch (e: Exception) {
-                Logger.w(LOG_TAG_CONNECTION, "err isReachable: ${e.message}")
-            }
-            return false
-        }
-
-        /**
-         * Checks if the host is reachable via TCP on port 80.
-         *
-         * The check involves creating a socket, binding it to the provided network (if any),
-         * protecting the socket using VpnController, and then attempting to connect to the
-         * host on port 80 with a timeout.
-         *
-         * android.googlesource.com/platform/prebuilts/fullsdk/sources/android-30/+/refs/heads/androidx-benchmark-release/java/net/Inet6AddressImpl.java#217
-         *
-         * @param nw The network to use for the connection. If null, the default network is used.
-         * @param host The hostname or IP address to connect to.
-         * @return True if the connection is successful or if the connection is refused (ECONNREFUSED),
-         *         false otherwise.
-         */
-
-        private suspend fun tcp80(nw: Network?, host: String): Boolean {
-            val timeout = 500 // ms
-            val port80 = 80 // port
-            var socket: Socket? = null
-            try {
-                // port 7 is echo port, blocked by most firewalls. use port 80 instead
-                val s = InetSocketAddress(host, port80)
-                socket = Socket()
-                nw?.bindSocket(socket)
-                VpnController.protectSocket(socket)
-                socket.connect(s, timeout)
-                val c = socket.isConnected
-                val b = socket.isBound
-                Logger.d(LOG_TAG_CONNECTION, "tcpEcho80: $host, ${nw?.networkHandle}, netid: ${netId(nw?.networkHandle)}, $c, $b, $nw")
-
-                return true
-            } catch (e: IOException) {
-                Logger.w(LOG_TAG_CONNECTION, "err tcpEcho80: ${e.message}, ${e.cause}")
-                val cause: Throwable = e.cause ?: return false
-
-                return (cause is ErrnoException && cause.errno == ECONNREFUSED)
-            } catch (e: IllegalArgumentException) {
-                Logger.w(LOG_TAG_CONNECTION, "err tcpEcho80: ${e.message}, ${e.cause}")
-                return false
-            } catch (e: SecurityException) {
-                Logger.w(LOG_TAG_CONNECTION, "err tcpEcho80: ${e.message}, ${e.cause}")
-                return false
-            } finally {
-                clos(socket)
-            }
-        }
-
-        /**
-         * Check if the host is reachable on port 53 (DNS) using TCP.
-         * Tries to establish a TCP connection to the host on port 53. If the connection is
-         * successful, the host is considered reachable. If the connection is refused (ECONNREFUSED),
-         * it's also considered reachable as it implies a service is listening but refused the
-         * specific connection. Other IOExceptions or errors indicate unreachability.
-         *
-         * @param nw The network to use for the connection. If null, the default network is used.
-         * @param host The hostname or IP address of the host to check.
-         * @return True if the host is reachable on port 53, false otherwise.
-         */
-        private suspend fun tcp53(nw: Network?, host: String): Boolean {
-            val timeout = 500 // ms
-            val port53 = 53 // port
-            var socket: Socket? = null
-
-            try {
-                socket = Socket()
-                val s = InetSocketAddress(host, port53)
-                nw?.bindSocket(socket)
-                VpnController.protectSocket(socket)
-                socket.connect(s, timeout)
-                val c = socket.isConnected
-                val b = socket.isBound
-                Logger.d(LOG_TAG_CONNECTION, "tcpEcho53: $host, ${nw?.networkHandle}, netid: ${netId(nw?.networkHandle)}: $c, $b, $nw")
-                return true
-            } catch (e: IOException) {
-                Logger.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
-                val cause: Throwable = e.cause ?: return false
-
-                return (cause is ErrnoException && cause.errno == ECONNREFUSED)
-            } catch (e: IllegalArgumentException) {
-                Logger.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
-            } catch (e: SecurityException) {
-                Logger.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
-            } finally {
-                clos(socket)
-            }
-            return false
-        }
-
-        /**
-         * Closes the given [Closeable] and ignores any [IOException] that may occur.
-         *
-         * @param socket The [Closeable] to close.
-         */
-        private fun clos(socket: Closeable?) {
-            try {
-                socket?.use {
-                    it.close()
-                }
-            } catch (ignored: IOException) {
-            }
-        }
 
         /**
          * Checks if the given network has internet capability.
@@ -1472,13 +1251,5 @@ class ConnectionMonitor(private val networkListener: NetworkListener) :
                 ?.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
         }
 
-        // convert long to int, if the value is out of range return 10000
-        private fun Long.toIntOrDefault(): Int {
-            return if (this < Int.MIN_VALUE || this > Int.MAX_VALUE) {
-                10000
-            } else {
-                this.toInt()
-            }
-        }
     }
 }
