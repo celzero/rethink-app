@@ -44,11 +44,12 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.celzero.firestack.backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -92,6 +93,7 @@ import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -117,6 +119,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     companion object {
         private const val TAG = "HSFragment"
+        private const val GRACE_DIALOG_REMIND_AFTER_DAYS = 1 // days to remind again
     }
 
     enum class ScreenType {
@@ -156,13 +159,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsCardLogsTv.text = getString(R.string.lbl_logs).replaceFirstChar(Char::titlecase)
 
         // do not show the sponsor card if the rethink plus is enabled
-        if (RpnProxyManager.isRpnActive()) {
+        /*if (RpnProxyManager.isRpnEnabled()) {
             b.fhsSponsor.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_rethink_plus_sparkle))
             b.fhsSponsor.visibility = View.VISIBLE
         } else {
             b.fhsSponsor.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_heart_accent))
             b.fhsSponsor.visibility = View.VISIBLE
-        }
+        }*/
+        b.fhsSponsor.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_heart_accent))
+        b.fhsSponsor.visibility = View.VISIBLE
     }
 
     private fun initializeClickListeners() {
@@ -226,33 +231,29 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         b.fhsSponsor.setOnClickListener {
-            if (RpnProxyManager.isRpnActive()) {
-                Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
-                return@setOnClickListener
-            }
             Logger.v(LOG_TAG_UI, "$TAG: click event on sponsor card")
-            if (RpnProxyManager.isRpnActive()) {
+            /*if (RpnProxyManager.isRpnEnabled()) {
                 Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
                 return@setOnClickListener
-            }
+            }*/
             promptForAppSponsorship()
         }
 
         b.fhsSponsorBottom.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on sponsor card")
-            if (RpnProxyManager.isRpnActive()) {
+            /*if (RpnProxyManager.isRpnEnabled()) {
                 Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
                 return@setOnClickListener
-            }
+            }*/
             promptForAppSponsorship()
         }
 
         b.fhsTitleRethink.setOnClickListener {
             Logger.v(LOG_TAG_UI, "$TAG: click event on rethink card")
-            if (RpnProxyManager.isRpnActive()) {
+            /*if (RpnProxyManager.isRpnEnabled()) {
                 Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
                 return@setOnClickListener
-            }
+            }*/
             promptForAppSponsorship()
         }
 
@@ -1140,6 +1141,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         syncDnsStatus()
         handleLockdownModeIfNeeded()
         startTrafficStats()
+        //maybeShowGracePeriodDialog()
         b.fhsSponsorBottom.bringToFront()
     }
 
@@ -1519,6 +1521,87 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.create().show()
     }
 
+    /*private fun maybeShowGracePeriodDialog() {
+        val now = System.currentTimeMillis()
+
+        val lastShown = persistentState.lastGracePeriodReminderTime
+        val daysSinceLastShown = TimeUnit.MILLISECONDS.toDays(now - lastShown)
+        if (daysSinceLastShown < GRACE_DIALOG_REMIND_AFTER_DAYS) return
+        Logger.d(LOG_TAG_UI, "$TAG Grace period dialog last shown $daysSinceLastShown days ago")
+        io {
+            val currentSubs = RpnProxyManager.getSubscriptionState()
+            if (currentSubs.isActive) {
+                Logger.v(LOG_TAG_UI, "$TAG Current subscription is active, skipping grace period dialog")
+                return@io
+            }
+            if (!currentSubs.isCancelled) {
+                Logger.v(LOG_TAG_UI, "$TAG Current subscription is not cancelled, skipping grace period dialog, state: ${currentSubs.state().name}")
+                return@io
+            }
+            val subsData = RpnProxyManager.getSubscriptionData()
+            if (subsData == null) {
+                Logger.v(LOG_TAG_UI, "$TAG No subscription data found, skipping grace period dialog")
+                return@io
+            }
+
+            val billingExpiry = subsData.subscriptionStatus.billingExpiry
+            val accountExpiry = subsData.subscriptionStatus.accountExpiry
+            // grace period is calculated based on billingExpiry and accountExpiry
+            val timeLeft = accountExpiry.minus(now)
+            val timeLeftDays = TimeUnit.MILLISECONDS.toDays(timeLeft)
+            val gracePeriod = accountExpiry - billingExpiry
+            val gracePeriodDays = TimeUnit.MILLISECONDS.toDays(gracePeriod)
+            if (gracePeriodDays <= 0L) {
+                Logger.v(LOG_TAG_UI, "$TAG No grace period available($gracePeriodDays), skipping grace period dialog")
+                return@io
+            }
+
+            if (timeLeftDays <= 0L) {
+                Logger.i(LOG_TAG_UI, "$TAG Grace period has ended(@$timeLeftDays), skipping grace period dialog")
+                return@io
+            }
+
+            val daysRemaining = TimeUnit.MILLISECONDS.toDays(timeLeft).toInt().coerceAtLeast(1)
+            if (daysRemaining <= 0) {
+                Logger.v(LOG_TAG_UI, "$TAG No days remaining in grace period, skipping dialog")
+                return@io
+            }
+            Logger.v(LOG_TAG_UI, "$TAG Showing grace period dialog, $daysRemaining days remaining")
+            uiCtx {
+                val dialogView = LayoutInflater.from(requireContext())
+                    .inflate(R.layout.dialog_grace_period_layout, null)
+
+                dialogView.findViewById<AppCompatTextView>(R.id.dialog_days_left).text =
+                    "\u23F3 $daysRemaining days remaining"
+
+                dialogView.findViewById<LinearProgressIndicator>(R.id.dialog_progress).apply {
+                    max = 100
+                    // should be decreased from 100 to 0
+                    progress =  100 - (timeLeftDays * 100 / gracePeriodDays).toInt()
+                    if (progress < 0) 0 else progress
+                    Logger.v(LOG_TAG_UI, "$TAG Grace period progress: $progress%")
+                }
+
+                val dialog = MaterialAlertDialogBuilder(requireContext())
+                    .setView(dialogView)
+                    .setCancelable(false)
+                    .create()
+
+                dialogView.findViewById<AppCompatButton>(R.id.button_renew).setOnClickListener {
+                    dialog.dismiss()
+                    findNavController().navigate(R.id.rethinkPlus)
+                }
+
+                dialogView.findViewById<AppCompatButton>(R.id.button_later).setOnClickListener {
+                    dialog.dismiss()
+                    persistentState.lastGracePeriodReminderTime = System.currentTimeMillis()
+                }
+                persistentState.lastGracePeriodReminderTime = System.currentTimeMillis()
+                dialog.show()
+            }
+        }
+    }*/
+
     private fun registerForActivityResult() {
         startForResult =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -1559,48 +1642,47 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     // Sets the UI DNS status on/off.
     private fun syncDnsStatus() {
-        val status = VpnController.state()
-        val isEch = status.serverName?.contains(DnsLogTracker.ECH, true) == true
+        val vpnState = VpnController.state()
+        val isEch = vpnState.serverName?.contains(DnsLogTracker.ECH, true) == true
 
         // Change status and explanation text
         var statusId: Int
         var colorId: Int
-        // val explanationId: Int
         val privateDnsMode: Utilities.PrivateDnsMode = getPrivateDnsMode(requireContext())
 
         if (appConfig.getBraveMode().isFirewallMode()) {
-            status.connectionState = BraveVPNService.State.WORKING
+            vpnState.connectionState = BraveVPNService.State.WORKING
         }
-        if (status.on) {
+        if (vpnState.on) {
             colorId = fetchTextColor(R.color.accentGood)
             statusId =
                 when {
-                    status.connectionState == null -> {
+                    vpnState.connectionState == null -> {
                         // app's waiting here, but such a status is a cause for confusion
                         // R.string.status_waiting
                         R.string.status_no_internet
                     }
-                    status.connectionState === BraveVPNService.State.NEW -> {
+                    vpnState.connectionState === BraveVPNService.State.NEW -> {
                         // app's starting here, but such a status confuses users
                         // R.string.status_starting
                         R.string.status_protected
                     }
-                    status.connectionState === BraveVPNService.State.WORKING -> {
+                    vpnState.connectionState === BraveVPNService.State.WORKING -> {
                         R.string.status_protected
                     }
-                    status.connectionState === BraveVPNService.State.APP_ERROR -> {
+                    vpnState.connectionState === BraveVPNService.State.APP_ERROR -> {
                         colorId = fetchTextColor(R.color.accentBad)
                         R.string.status_app_error
                     }
-                    status.connectionState === BraveVPNService.State.DNS_ERROR -> {
+                    vpnState.connectionState === BraveVPNService.State.DNS_ERROR -> {
                         colorId = fetchTextColor(R.color.accentBad)
                         R.string.status_dns_error
                     }
-                    status.connectionState === BraveVPNService.State.DNS_SERVER_DOWN -> {
+                    vpnState.connectionState === BraveVPNService.State.DNS_SERVER_DOWN -> {
                         colorId = fetchTextColor(R.color.accentBad)
                         R.string.status_dns_server_down
                     }
-                    status.connectionState === BraveVPNService.State.NO_INTERNET -> {
+                    vpnState.connectionState === BraveVPNService.State.NO_INTERNET -> {
                         colorId = fetchTextColor(R.color.accentBad)
                         R.string.status_no_internet
                     }
