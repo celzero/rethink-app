@@ -86,4 +86,7 @@ interface CustomDomainDAO {
 
     @Query("SELECT COUNT(*) FROM CustomDomain")
     fun getCustomDomainCount(): Int
+
+    @Query("SELECT COUNT(*) FROM CustomDomain WHERE proxyCC = :cc")
+    fun getRulesCountByCC(cc: String): Int
 }

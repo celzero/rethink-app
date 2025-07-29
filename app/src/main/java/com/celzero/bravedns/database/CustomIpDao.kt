@@ -109,4 +109,6 @@ interface CustomIpDao {
     @Query("delete from CustomIp where uid != $UID_EVERYBODY") fun deleteAllAppsRules()
 
     @Query("select count(*) from CustomIp") fun getRulesCount(): Int
+
+    @Query("select count(*) from CustomIp where proxyCC = :cc") fun getRulesCountByCC(cc: String): Int
 }

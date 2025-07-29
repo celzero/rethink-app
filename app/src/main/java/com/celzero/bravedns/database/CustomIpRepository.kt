@@ -66,4 +66,8 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
     suspend fun getRulesCount(): Int {
         return customIpDao.getRulesCount()
     }
+
+    suspend fun getRulesCountByCC(cc: String): Int {
+        return customIpDao.getRulesCountByCC(cc)
+    }
 }

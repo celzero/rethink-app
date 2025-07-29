@@ -96,4 +96,8 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
     suspend fun getCustomDomainCount() : Int {
         return customDomainDAO.getCustomDomainCount()
     }
+
+    suspend fun getRulesCountByCC(cc: String): Int {
+        return customDomainDAO.getRulesCountByCC(cc)
+    }
 }
