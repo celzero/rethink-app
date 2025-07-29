@@ -145,4 +145,16 @@
     <string name="fapps_info_dialog_positive_btn" translatable="true">Hyvä on</string>
     <string name="lbl_notification" translatable="true">ilmoitus</string>
     <string name="memory_notification_text">Rethink kokee alhaista muistin määrää. Järjestelmä toimet saattaa rajoittua.</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">Ei onnistuttu avaamaan Saavutettavuuden asetuksia. Yritä myöhemmin uudelleen!</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">Valitse tila.</string>
+    <string name="brave_dns_connect_mode_change_dns" translatable="true">Valitse tila.</string>
+    <string name="default_dns_name" translatable="true">Oletusarvoinen RDNS</string>
+    <string name="custom_url_error_invalid_url" translatable="true">Epäkelpo osoite</string>
+    <string name="conn_track_clear_logs_title" translatable="true">Poista kaikki verkkotoiminnan lokit?</string>
+    <string name="conn_track_clear_logs_message" translatable="true">Tämä poistaa vain verkkotoiminnan lokit, ei palomuurisääntöjä. Tätä ei voi kumota. Haluatko jatkaa?</string>
+    <string name="dns_query_clear_logs_title" translatable="true">Poista kaikki DNS-lokit?</string>
+    <string name="dns_query_clear_logs_message" translatable="true">Tämä poistaa kaikki laitteella olevat DNS-lokit. Tätä ei voi kumota. Haluatko jatkaa?</string>
+    <string name="bsct_app_info" translatable="true">Tietoa sovelluksesta</string>
+    <string name="bsct_block_ip" translatable="true">Estä, luota <u>tähän IP-osoitteeseen</u> <u>tälle sovellukselle</u></string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Käytettävyyspalvelu on pysähtynyt tai kaatunut. <i><b>Mene asetuksiin ja pakota Rethinkin lopetus</b></i> \u0020ja käynnistä se uudelleen <i>Estä mikä tahansa sovellus, jota ei käytetä.</i>\n\nRethink käyttää saavutettavuuspalvelua seuraamaan, mitkä sovellukset ovat käytössä (etualalla) verrattuna niihin, jotka eivät ole käytössä (taustalla).</string>
 </resources>
