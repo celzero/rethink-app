@@ -282,14 +282,14 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     }
 
     private fun showDefaultDnsDialog() {
-        if (RpnProxyManager.isRpnEnabled()) {
+        /*if (RpnProxyManager.isRpnEnabled()) {
             showToastUiCentered(
                 this,
                 getString(R.string.fallback_rplus_toast),
                 Toast.LENGTH_SHORT
             )
             return
-        }
+        }*/
 
         val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_default_dns_heading))
