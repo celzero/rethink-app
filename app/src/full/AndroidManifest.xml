@@ -169,6 +169,10 @@
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.RpnAvailabilityCheckActivity"
             android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.FragmentHostActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.RpnWinProxyDetailsActivity"
+            android:finishOnTaskLaunch="true" />
 
         <receiver
             android:name=".receiver.BraveAutoStartReceiver"
