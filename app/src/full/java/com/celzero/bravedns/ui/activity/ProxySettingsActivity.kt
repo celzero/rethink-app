@@ -135,13 +135,16 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         b.orbotTitle.text = getString(R.string.orbot).lowercase()
         b.otherTitle.text = getString(R.string.category_name_others).lowercase()
 
-        if (RpnProxyManager.isRpnActive()) {
+        /*if (RpnProxyManager.isRpnEnabled()) {
             b.rpnTitle.visibility = View.VISIBLE
             b.settingsActivityRpnContainer.visibility = View.VISIBLE
         } else {
             b.rpnTitle.visibility = View.GONE
             b.settingsActivityRpnContainer.visibility = View.GONE
-        }
+        }*/
+        b.rpnTitle.visibility = View.GONE
+        b.settingsActivityRpnContainer.visibility = View.GONE
+
         displayHttpProxyUi()
         displaySocks5Ui()
     }
@@ -149,8 +152,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     private fun initClickListeners() {
 
         b.settingsActivityRpnContainer.setOnClickListener {
-            val intent = Intent(this, RethinkPlusDashboardActivity::class.java)
-            startActivity(intent)
+            // create an empty activity and load RethinkPlusDashboard fragment
         }
 
         b.wgRefresh.setOnClickListener { refresh() }
@@ -265,7 +267,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         b.wgRefresh.isEnabled = false
         b.wgRefresh.animation = animation
         b.wgRefresh.startAnimation(animation)
-        VpnController.refreshProxies()
+        VpnController.refreshOrReAddProxies()
         delay(REFRESH_TIMEOUT, lifecycleScope) {
             b.wgRefresh.isEnabled = true
             b.wgRefresh.clearAnimation()
