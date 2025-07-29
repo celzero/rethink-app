@@ -680,7 +680,7 @@ object UIUtils {
         val go = stat.go()?.toString()
         val tun = stat.tun()?.toString()
 
-        var stats = nic + nicInfo + fwd + ip + icmp + tcp + udp + rdnsInfo + go + tun
+        var stats = nic + nicInfo + tun + fwd + ip + icmp + tcp + udp + rdnsInfo + go
         stats = stats.replace("{", "\n")
         stats = stats.replace("}", "\n\n")
         stats = stats.replace(",", "\n")
