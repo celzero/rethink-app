@@ -57,6 +57,7 @@ internal constructor(
         val DNS_TTL_GRACE_SEC = TimeUnit.MINUTES.toSeconds(5L)
         private const val RDATA_MAX_LENGTH = 100
         private const val EMPTY_RESPONSE = "--"
+        private const val START_RESPONSE = "START"
     }
 
     private val vpnStateMap = HashMap<Transaction.Status, BraveVPNService.State>()
@@ -150,7 +151,10 @@ internal constructor(
         if (transaction.id == Backend.BlockAll) {
             // TODO: rdata should be empty for block all
             if (transaction.response.isNotEmpty()) {
-                Logger.w(LOG_TAG_VPN, "id is BlockAll, but rdata is not empty: ${transaction.response} for ${transaction.qName}")
+                Logger.w(
+                    LOG_TAG_VPN,
+                    "id is BlockAll, but rdata is not empty: ${transaction.response} for ${transaction.qName}"
+                )
             }
             dnsLog.isBlocked = true
         }
@@ -173,7 +177,7 @@ internal constructor(
                         }
                     dnsLog.isBlocked =
                         destination.hostAddress == UNSPECIFIED_IP_IPV4 ||
-                            destination.hostAddress == UNSPECIFIED_IP_IPV6
+                                destination.hostAddress == UNSPECIFIED_IP_IPV6
 
                     dnsLog.flag = getFlagIfPresent(countryCode)
                 } else {
@@ -187,11 +191,7 @@ internal constructor(
                     }
                     // there is no empty response, instead -- is added as response from go,
                     // there are cases where the response so check for empty response as well
-                    if (
-                        (transaction.response.isEmpty() ||
-                            transaction.response == EMPTY_RESPONSE) &&
-                            (transaction.blocklist.isNotEmpty() || transaction.upstreamBlock)
-                    ) {
+                    if ((transaction.response == EMPTY_RESPONSE) && (transaction.blocklist.isNotEmpty() || transaction.upstreamBlock)) {
                         dnsLog.isBlocked = true
                     }
                 }
@@ -200,6 +200,9 @@ internal constructor(
                 dnsLog.response = transaction.response.take(RDATA_MAX_LENGTH)
                 dnsLog.flag = context.getString(R.string.unicode_check_sign) // green check mark
             }
+        } else if (transaction.status == Transaction.Status.START) {
+            dnsLog.response = transaction.status.name
+            dnsLog.flag = context.getString(R.string.unicode_start_sign) // start sign
         } else {
             // error
             dnsLog.response = transaction.status.name
