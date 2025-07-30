@@ -41,8 +41,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class NetworkReachabilityDialog(
-    private val activity: Activity,
+class NetworkReachabilityDialog(activity: Activity,
     private val persistentState: PersistentState,
     themeId: Int
 ) : androidx.appcompat.app.AppCompatDialog(activity, themeId) {
