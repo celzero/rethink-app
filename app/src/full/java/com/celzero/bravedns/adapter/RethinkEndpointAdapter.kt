@@ -117,7 +117,7 @@ class RethinkEndpointAdapter(private val context: Context, private val appConfig
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)
 
-            if (endpoint.isActive && VpnController.hasTunnel()) {
+            if (endpoint.isActive && VpnController.hasTunnel() && !appConfig.isSmartDnsEnabled()) {
                 keepSelectedStatusUpdated(endpoint)
             } else if (endpoint.isActive) {
                 b.rethinkEndpointListUrlExplanation.text =

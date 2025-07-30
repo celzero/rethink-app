@@ -117,7 +117,7 @@ class DnsCryptEndpointAdapter(private val context: Context, private val appConfi
             b.dnsCryptEndpointListUrlName.text = endpoint.dnsCryptName
             b.dnsCryptEndpointListActionImage.isChecked = endpoint.isSelected
 
-            if (endpoint.isSelected && VpnController.hasTunnel()) {
+            if (endpoint.isSelected && VpnController.hasTunnel() && !appConfig.isSmartDnsEnabled()) {
                 keepSelectedStatusUpdated()
             } else if (endpoint.isSelected) {
                 b.dnsCryptEndpointListUrlExplanation.text =

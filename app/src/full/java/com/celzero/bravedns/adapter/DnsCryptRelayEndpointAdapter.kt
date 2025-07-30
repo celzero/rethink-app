@@ -114,7 +114,7 @@ class DnsCryptRelayEndpointAdapter(
 
         private fun displayDetails(endpoint: DnsCryptRelayEndpoint) {
             b.dnsCryptEndpointListUrlName.text = endpoint.dnsCryptRelayName
-            if (endpoint.isSelected) {
+            if (endpoint.isSelected && !appConfig.isSmartDnsEnabled()) {
                 updateSelectedStatus()
             } else {
                 b.dnsCryptEndpointListUrlExplanation.text = ""

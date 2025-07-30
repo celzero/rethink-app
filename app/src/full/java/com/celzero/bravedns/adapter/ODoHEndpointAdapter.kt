@@ -104,7 +104,7 @@ class ODoHEndpointAdapter(private val context: Context, private val appConfig: A
             b.endpointName.text = endpoint.name
             b.endpointCheck.isChecked = endpoint.isSelected
 
-            if (endpoint.isSelected && VpnController.hasTunnel()) {
+            if (endpoint.isSelected && VpnController.hasTunnel() && !appConfig.isSmartDnsEnabled()) {
                 keepSelectedStatusUpdated()
             } else if (endpoint.isSelected) {
                 b.endpointDesc.text = context.getString(R.string.rt_filter_parent_selected)

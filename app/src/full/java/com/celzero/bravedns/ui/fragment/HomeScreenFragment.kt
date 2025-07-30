@@ -683,12 +683,20 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             val dnsId = if (WireguardManager.oneWireGuardEnabled()) {
                 val id = WireguardManager.getOneWireGuardProxyId()
                 if (id == null) {
-                    Backend.Preferred
+                    if (appConfig.isSmartDnsEnabled()) {
+                        Backend.Plus
+                    } else {
+                        Backend.Preferred
+                    }
                 } else {
                     "${ProxyManager.ID_WG_BASE}${id}"
                 }
             } else {
-                Backend.Preferred
+                if (appConfig.isSmartDnsEnabled()) {
+                    Backend.Plus
+                } else {
+                    Backend.Preferred
+                }
             }
             val p50 = VpnController.p50(dnsId)
             uiCtx {

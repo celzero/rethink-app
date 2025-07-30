@@ -151,7 +151,12 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
     private fun updateSelectedStatus() {
         io {
             // always use the id as Dnsx.Preffered as it is the primary dns id for now
-            val state = VpnController.getDnsStatus(Backend.Preferred)
+            val id = if (appConfig.isSmartDnsEnabled()) {
+                Backend.Plus
+            } else {
+                Backend.Preferred
+            }
+            val state = VpnController.getDnsStatus(id)
             val working =
                 if (state == null) {
                     false

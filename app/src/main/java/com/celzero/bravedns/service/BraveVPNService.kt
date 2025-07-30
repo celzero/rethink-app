@@ -2936,12 +2936,22 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     vpnAdapter?.addDefaultTransport(dnsCsv)
                 }
                 // special case, check if preferred is available, if not add again
-                val isPrefOk = vpnAdapter?.getDnsStatus(Backend.Preferred)
-                if (isPrefOk == null) {
-                    Logger.i(LOG_TAG_VPN, "preferred dns is not set, set it again")
-                    vpnAdapter?.addTransport()
+                if (appConfig.isSmartDnsEnabled()) {
+                    val isPrefOk = vpnAdapter?.getDnsStatus(Backend.Plus)
+                    if (isPrefOk == null) {
+                        Logger.i(LOG_TAG_VPN, "plus dns is not set, set it again")
+                        vpnAdapter?.addMultipleDnsAsPlus()
+                    } else {
+                        Logger.i(LOG_TAG_VPN, "plus dns is already set, no need to set again")
+                    }
                 } else {
-                    Logger.i(LOG_TAG_VPN, "preferred dns is already set, no need to set again")
+                    val isPrefOk = vpnAdapter?.getDnsStatus(Backend.Preferred)
+                    if (isPrefOk == null) {
+                        Logger.i(LOG_TAG_VPN, "preferred dns is not set, set it again")
+                        vpnAdapter?.addTransport()
+                    } else {
+                        Logger.i(LOG_TAG_VPN, "preferred dns is already set, no need to set again")
+                    }
                 }
             }
         }
