@@ -129,6 +129,7 @@
                     android:layout_gravity="center"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
                     android:drawableEnd="@drawable/ic_right_arrow_white"
                     android:enabled="true"
                     android:minHeight="48dp"
