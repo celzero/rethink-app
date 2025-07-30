@@ -2935,10 +2935,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     val dnsCsv = dns.joinToString(",")
                     vpnAdapter?.addDefaultTransport(dnsCsv)
                 }
-                // special case, check if preferred is available, if not add again
+                // special case, check if preferred/plus is available, if not add again
                 if (appConfig.isSmartDnsEnabled()) {
-                    val isPrefOk = vpnAdapter?.getDnsStatus(Backend.Plus)
-                    if (isPrefOk == null) {
+                    val isPlusOk = vpnAdapter?.getDnsStatus(Backend.Plus)
+                    if (isPlusOk == null) {
                         Logger.i(LOG_TAG_VPN, "plus dns is not set, set it again")
                         vpnAdapter?.addMultipleDnsAsPlus()
                     } else {

@@ -1151,10 +1151,23 @@ class GoVpnAdapter : KoinComponent {
             Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing resolvers")
             return
         }
-        // if preferred is not available, then add explicitly
-        val isPrefAvailable = getResolver()?.get(Backend.Preferred.togs())
-        if (isPrefAvailable == null) {
-            addTransport()
+        // if preferred/plus is not available, then add explicitly
+        if (appConfig.isSmartDnsEnabled()) {
+            val isPlusOk = getResolver()?.get(Backend.Plus.togs())
+            if (isPlusOk == null) {
+                Logger.i(LOG_TAG_VPN, "plus dns is not set, set it again")
+                addMultipleDnsAsPlus()
+            } else {
+                Logger.i(LOG_TAG_VPN, "plus dns is already set, no need to set again")
+            }
+        } else {
+            val isPrefOk = getResolver()?.get(Backend.Preferred.togs())
+            if (isPrefOk == null) {
+                Logger.i(LOG_TAG_VPN, "preferred dns is not set, set it again")
+                addTransport()
+            } else {
+                Logger.i(LOG_TAG_VPN, "preferred dns is already set, no need to set again")
+            }
         }
         Logger.i(LOG_TAG_VPN, "$TAG refresh resolvers")
         getResolver()?.refresh()
