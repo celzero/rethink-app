@@ -40,7 +40,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class PingTestActivity: AppCompatActivity(R.layout.activity_ping_test) {
-    private val b by viewBinding(ActivityPingTestBinding::bind)
+    /*private val b by viewBinding(ActivityPingTestBinding::bind)
 
     private val persistentState by inject<PersistentState>()
 
@@ -260,5 +260,5 @@ class PingTestActivity: AppCompatActivity(R.layout.activity_ping_test) {
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
-    }
+    }*/
 }

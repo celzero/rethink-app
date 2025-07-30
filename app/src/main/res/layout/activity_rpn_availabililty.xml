@@ -9,12 +9,13 @@
     android:orientation="vertical"
     android:padding="8dp">
 
+    <!-- @string/rpn_availablity -->
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:text="@string/rpn_availablity"
+        android:text=""
         android:layout_marginTop="24dp"
         android:textSize="20sp"
         android:textStyle="bold" />

@@ -22,13 +22,14 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp">
 
+            <!-- @string/ping_ip_port_title -->
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:padding="10dp"
-                android:text="@string/ping_ip_port_title"
+                android:text=""
                 android:textColor="?attr/secondaryTextColor"
                 android:textSize="18sp" />
 
@@ -141,13 +142,14 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp">
 
+            <!--@string/ping_host_port_title -->
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:padding="10dp"
-                android:text="@string/ping_host_port_title"
+                android:text=""
                 android:textColor="?attr/secondaryTextColor"
                 android:textSize="18sp" />
 
@@ -305,13 +307,14 @@
             android:visibility="gone"
             android:orientation="horizontal">
 
+            <!-- @string/ping_strength_title -->
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.25"
                 android:padding="10dp"
                 android:textAlignment="center"
-                android:text="@string/ping_strength_title" />
+                android:text="" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ping_result"

@@ -21,6 +21,7 @@
             android:orientation="vertical"
             android:padding="15dp">
 
+            <!-- @string/rethink_plus_title -->
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_title_rethink"
                 style="@style/TextAppearance.Heading.HomeScreen"
@@ -29,8 +30,9 @@
                 android:alpha="0.5"
                 android:paddingStart="7dp"
                 android:paddingEnd="7dp"
-                android:text="@string/rethink_plus_title" />
+                android:text="" />
 
+            <!-- @string/rethink_plus_title_desc" -->
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_title_rethink_desc"
                 style="@style/TextAppearance.SubHeading.HomeScreen"
@@ -39,7 +41,7 @@
                 android:alpha="0.5"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                android:text="@string/rethink_plus_title_desc" />
+                android:text="" />
 
         </LinearLayout>
 
@@ -139,21 +141,23 @@
                         android:layout_toEndOf="@id/rs_off_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <!-- @string/rethink_off -->
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
                             android:paddingEnd="5dp"
-                            android:text="@string/rethink_off"
+                            android:text=""
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <!-- @string/rethink_off_desc -->
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
                             android:paddingEnd="5dp"
-                            android:text="@string/rethink_off_desc"
+                            android:text=""
                             android:textColor="?attr/primaryLightColorText"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
@@ -281,21 +285,23 @@
                         android:layout_toEndOf="@id/rs_hide_ip_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <!-- @string/rethink_plus_hide_ip_title -->
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
                             android:paddingEnd="5dp"
-                            android:text="@string/rethink_plus_hide_ip_title"
+                            android:text=""
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <!-- @string/rethink_plus_hide_ip_desc -->
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
                             android:paddingEnd="5dp"
-                            android:text="@string/rethink_plus_hide_ip_desc"
+                            android:text=""
                             android:textColor="?attr/primaryLightColorText"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
@@ -375,6 +381,7 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- @string/rethink_plus_troubleshoot_title -->
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/troubleshoot_heading"
             style="@style/TextAppearance.AppCompat.Subhead"
@@ -386,7 +393,7 @@
             android:fontFamily="sans-serif-smallcaps"
             android:lineSpacingExtra="5dp"
             android:padding="5dp"
-            android:text="@string/rethink_plus_troubleshoot_title"
+            android:text=""
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
@@ -432,22 +439,24 @@
                         android:layout_toEndOf="@id/ping_test_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <!-- @string/rethink_plus_perform_test -->
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/ping_test_heading"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="10dp"
-                            android:text="@string/rethink_plus_perform_test"
+                            android:text=""
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <!-- @string/rethink_plus_test_desc -->
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/ping_test_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
-                            android:text="@string/rethink_plus_test_desc"
+                            android:text=""
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
@@ -491,22 +500,24 @@
                         android:layout_toEndOf="@id/manage_subs_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <!-- @string/manage_subscription_title -->
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/manage_subs_heading"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="10dp"
-                            android:text="@string/manage_subscription_title"
+                            android:text=""
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <!-- @string/manage_subscription_title -->
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/manage_subs_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
-                            android:text="@string/manage_subscription_title"
+                            android:text=""
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
@@ -550,22 +561,24 @@
                         android:layout_toEndOf="@id/payment_history_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <!-- @string/payment_history_title -->
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/payment_history_heading"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="10dp"
-                            android:text="@string/payment_history_title"
+                            android:text=""
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <!-- @string/payment_history_title -->
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/payment_history_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
-                            android:text="@string/payment_history_title"
+                            android:text=""
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
@@ -609,22 +622,24 @@
                         android:layout_toEndOf="@id/report_issue_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <!-- @string/rethink_plus_report_issue -->
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/report_issue_heading"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="10dp"
-                            android:text="@string/rethink_plus_report_issue"
+                            android:text=""
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <!-- @string/rethink_plus_report_desc -->
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/report_issue_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
-                            android:text="@string/rethink_plus_report_desc"
+                            android:text=""
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
