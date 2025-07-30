@@ -9,7 +9,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.10.1'
+        classpath 'com.android.tools.build:gradle:8.11.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -23,6 +23,14 @@ allprojects {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+        /*maven {
+            name = 'GitHubPackages'
+            url = uri("https://maven.pkg.github.com/celzero/firestack")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME_GITHUB")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN_GITHUB")
+            }
+        }*/
     }
 }
 
