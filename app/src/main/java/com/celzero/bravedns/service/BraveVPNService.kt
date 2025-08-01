@@ -142,10 +142,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.io.FileDescriptor
 import java.io.IOException
 import java.net.InetAddress
 import java.net.Socket
@@ -460,19 +462,19 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val split = ipOrUrl.split(":")
             val scheme = split.firstOrNull() ?: ConnectionMonitor.SCHEME_HTTPS
             val protocol = split.getOrNull(1) ?: ConnectionMonitor.PROTOCOL_V4
+            val defaultIps = persistentState.pingv4Ips.split(",").map { it.trim() }
             if (nws.isEmpty()) {
-                val res = ConnectivityCheckHelper.probeConnectivityInAutoMode(scheme = scheme, protocol = protocol)
+                val res = ConnectivityCheckHelper.probeConnectivityInAutoMode(scheme = scheme, protocol = protocol, ipOrUrl = defaultIps, useKotlinChecks = ConnectionMonitor.USE_KOTLIN_REACHABILITY_CHECKS)
                 return ConnectionMonitor.ProbeResult("", res, null)
             }
             nws.forEach { nwprop ->
-                val res = ConnectivityCheckHelper.probeConnectivityInAutoMode(nwprop.network, scheme,  protocol)
+                val res = ConnectivityCheckHelper.probeConnectivityInAutoMode(nwprop.network, scheme,  protocol, defaultIps,  ConnectionMonitor.USE_KOTLIN_REACHABILITY_CHECKS)
                 if (res) {
                     return ConnectionMonitor.ProbeResult("", res, nwprop.capabilities)
                 }
             }
             return ConnectionMonitor.ProbeResult("", false, null)
         } else {
-
             val activeCap = cm.getNetworkCapabilities(cm.activeNetwork) // can be null
             val useKotlinConnectivityChecks = ConnectionMonitor.USE_KOTLIN_REACHABILITY_CHECKS
             return ConnectivityCheckHelper.probeIpOrUrl(
@@ -1218,7 +1220,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private suspend fun newBuilder(): Builder {
         var builder = Builder()
 
-        if (canAllowBypass()) {
+        if (!isPlayStoreFlavour() && canAllowBypass()) {
             Logger.i(LOG_TAG_VPN, "allow apps to bypass vpn on-demand")
             builder = builder.allowBypass()
             // TODO: should allowFamily be set?
@@ -2457,11 +2459,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 // when persistent-state "thinks" vpn is disabled, stop the service, especially when
                 // we could be here via onStartCommand -> isNewVpn -> restartVpn while both,
                 // vpn-service & conn-monitor exists & vpn-enabled state goes out of sync
-                logAndToastIfNeeded(
-                    "$why, stop-vpn(restartVpn), tracking vpn is out of sync",
-                    Log.ERROR
-                )
                 io("outOfSyncRestart") {
+                    logAndToastIfNeeded("$why, stop-vpn(restartVpn), tracking vpn is out of sync", Log.ERROR)
                     signalStopService("outOfSyncRestart", userInitiated = false)
                 }
                 return@withContext
@@ -2482,12 +2481,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // attempt seamless hand-off as described in VpnService.Builder.establish() docs
             val tunFd = establishVpn(nws, mtu)
             if (tunFd == null) {
-                logAndToastIfNeeded("$why, cannot restart-vpn, no tun-fd", Log.ERROR)
-                io("noTunRestart1") { signalStopService("noTunRestart1", userInitiated = false) }
+                io("noTunRestart1") {
+                    logAndToastIfNeeded("$why, cannot restart-vpn, no tun-fd", Log.ERROR)
+                    signalStopService("noTunRestart1", userInitiated = false)
+                }
                 return@withContext
             }
 
             testFd.set(tunFd.fd) // save the fd for testing purposes
+
             val ok =
                 makeOrUpdateVpnAdapter(
                     ctx,
@@ -2497,11 +2499,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     builderRoutes
                 ) // builderRoutes set in establishVpn()
             if (!ok) {
-                logAndToastIfNeeded("$why, cannot restart-vpn, no vpn-adapter", Log.ERROR)
-                io("noTunnelRestart2") { signalStopService("noTunRestart2", userInitiated = false) }
+                io("noTunnelRestart2") {
+                    logAndToastIfNeeded("$why, cannot restart-vpn, no vpn-adapter", Log.ERROR)
+                    signalStopService("noTunRestart2", userInitiated = false)
+                }
                 return@withContext
             } else {
-                logAndToastIfNeeded("$why, vpn restarted", Log.INFO)
+                io("restarted") { logAndToastIfNeeded("$why, vpn restarted", Log.INFO) }
             }
             Logger.i(
                 LOG_TAG_VPN,
@@ -2511,6 +2515,16 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             notifyConnectionStateChangeIfNeeded()
             informVpnControllerForProtoChange(builderRoutes)
         }
+
+    private suspend fun isFileDescriptorValid(fd: FileDescriptor): Boolean {
+        try {
+            fd.valid()
+            return true
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "invalid file descriptor: ${e.message}", e)
+            return false
+        }
+    }
 
     private suspend fun logAndToastIfNeeded(msg: String, logLevel: Int = Log.WARN) {
         when (logLevel) {
@@ -2557,13 +2571,16 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             try {
                 if (vpnAdapter == null) {
                     // create a new vpn adapter
+                    val validFd = isFileDescriptorValid(tunFd.fileDescriptor)
+                    Logger.i(LOG_TAG_VPN, "vpn-adapter doesn't exists, create one, valid fd? $validFd, fd: ${tunFd.fd}")
                     vpnAdapter = GoVpnAdapter(ctx, vpnScope, tunFd, mtu, opts) // may throw
                     GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
                     vpnAdapter?.initResolverProxiesPcap(opts)
                     //checkForPlusSubscription()
                     return@withContext ok
                 } else {
-                    Logger.i(LOG_TAG_VPN, "vpn-adapter exists, use it")
+                    val validFd = isFileDescriptorValid(tunFd.fileDescriptor)
+                    Logger.i(LOG_TAG_VPN, "vpn-adapter exists, use it, valid fd? $validFd, fd: ${tunFd.fd}")
                     // in case, if vpn-adapter exists, update the existing vpn-adapter
                     if (vpnAdapter?.updateLinkAndRoutes(tunFd, mtu, protos) == false) {
                         Logger.e(LOG_TAG_VPN, "err update vpn-adapter")
