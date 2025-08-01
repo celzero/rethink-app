@@ -751,7 +751,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun updateUiWithDnsStates(dnsName: String) {
         var dns = dnsName
-        val preferredId = if (appConfig.isSystemDns()) Backend.System else Backend.Preferred
+        val preferredId = if (appConfig.isSystemDns()) {
+            Backend.System
+        } else if (appConfig.isSmartDnsEnabled()) {
+            Backend.Plus
+        } else {
+            Backend.Preferred
+        }
         // get the status from go to check if the dns transport is added or not
         val id =
             if (WireguardManager.oneWireGuardEnabled()) {
