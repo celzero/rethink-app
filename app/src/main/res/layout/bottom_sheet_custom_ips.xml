@@ -29,8 +29,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            app:chipIcon="@drawable/ic_delete_small"
+            app:chipIconEnabled="true"
+            app:chipIconTint="?attr/chipTextNegative"
             android:layout_marginEnd="15dp"
             android:padding="5dp"
+            android:gravity="center"
             android:text="@string/lbl_delete"
             android:textColor="?attr/chipTextNegative"
             android:textSize="@dimen/large_font_text_view"
@@ -42,6 +46,39 @@
             app:shapeAppearance="@style/ShapeAppearance.LargeComponent" />
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_marginBottom="10dp">
+
+        <ImageView
+            android:id="@+id/custom_ip_app_icon_iv"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:alpha="0.4"
+            android:layout_marginStart="5dp"
+            android:contentDescription="@string/apps_icon_content_desc"
+            android:maxWidth="48dp"
+            android:maxHeight="48dp"
+            android:src="@drawable/default_app_icon" />
+
+        <TextView
+            android:id="@+id/custom_ip_app_name_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:padding="5dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textIsSelectable="true"
+            android:textSize="@dimen/default_font_text_view" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/custom_ip_tv"
@@ -63,17 +100,10 @@
         android:ellipsize="end"
         android:fontFamily="sans-serif"
         android:gravity="center"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/small_font_subheading_text" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:padding="16dp"
-        android:text="@string/custom_rules_firewall_title"
-        android:textColor="?attr/primaryTextColor"
-        android:textSize="@dimen/extra_large_font_text_view" />
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/custom_ip_toggle_group"

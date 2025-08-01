@@ -5,27 +5,33 @@ import Logger.LOG_TAG_UI
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.BottomSheetCustomDomainsBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.wireguard.Config
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -86,55 +92,32 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
         Logger.v(LOG_TAG_UI, "$TAG, view created for ${cd.domain}")
         init()
         initClickListeners()
-
-        b.chooseProxyCard.setOnClickListener {
-            val ctx = requireContext()
-            var v: MutableList<WgConfigFilesImmutable?> = mutableListOf()
-            io {
-                v.add(null)
-                v.addAll(WireguardManager.getAllMappings())
-                if (v.isEmpty()) {
-                    Logger.v(LOG_TAG_UI, "$TAG no wireguard configs found")
-                    uiCtx {
-                        Utilities.showToastUiCentered(
-                            ctx,
-                            getString(R.string.wireguard_no_config_msg),
-                            Toast.LENGTH_SHORT
-                        )
-                    }
-                    return@io
-                }
-                uiCtx {
-                    Logger.v(LOG_TAG_UI, "$TAG show wg list(${v.size} for ${cd.domain}")
-                    showWgListBtmSheet(v)
-                }
-            }
-        }
-
-        /*b.chooseCountryCard.setOnClickListener {
-            io {
-                val ctrys = RpnProxyManager.getProtonUniqueCC()
-                if (ctrys.isEmpty()) {
-                    Logger.v(LOG_TAG_UI, "$TAG no country codes found")
-                    uiCtx {
-                        Utilities.showToastUiCentered(
-                            requireContext(),
-                            "No ProtonVPN country codes found",
-                            Toast.LENGTH_SHORT
-                        )
-                    }
-                    return@io
-                }
-                uiCtx {
-                    Logger.v(LOG_TAG_UI, "$TAG show countries(${ctrys.size} for ${cd.domain}")
-                    showProxyCountriesBtmSheet(ctrys)
-                }
-            }
-        }*/
     }
 
     private fun init() {
         val uid = cd.uid
+        io {
+            if (uid == UID_EVERYBODY) {
+                b.customDomainAppNameTv.text =
+                    getString(R.string.firewall_act_universal_tab).replaceFirstChar(Char::titlecase)
+                b.customDomainAppIconIv.visibility = View.GONE
+            } else {
+                val appNames = FirewallManager.getAppNamesByUid(cd.uid)
+                val appName = getAppName(cd.uid, appNames)
+                val appInfo = FirewallManager.getAppInfoByUid(cd.uid)
+                uiCtx {
+                    b.customDomainAppNameTv.text = appName
+                    displayIcon(
+                        Utilities.getIcon(
+                            requireContext(),
+                            appInfo?.packageName ?: "",
+                            appInfo?.appName ?: ""
+                        ),
+                        b.customDomainAppIconIv
+                    )
+                }
+            }
+        }
         Logger.v(LOG_TAG_UI, "$TAG, init for ${cd.domain}, uid: $uid")
         val rules = DomainRulesManager.getDomainRule(cd.domain, uid)
         b.customDomainTv.text = cd.domain
@@ -144,6 +127,35 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
         )
         b.customDomainToggleGroup.tag = 1
         updateToggleGroup(rules.id)
+    }
+
+    private fun getAppName(uid: Int, appNames: List<String>): String {
+        if (uid == UID_EVERYBODY) {
+            return getString(R.string.firewall_act_universal_tab)
+                .replaceFirstChar(Char::titlecase)
+        }
+
+        if (appNames.isEmpty()) {
+            return getString(R.string.network_log_app_name_unknown) + " ($uid)"
+        }
+
+        val packageCount = appNames.count()
+        return if (packageCount >= 2) {
+            getString(
+                R.string.ctbs_app_other_apps,
+                appNames[0],
+                packageCount.minus(1).toString()
+            )
+        } else {
+            appNames[0]
+        }
+    }
+
+    private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
+        Glide.with(requireContext())
+            .load(drawable)
+            .error(Utilities.getDefaultIcon(requireContext()))
+            .into(mIconImageView)
     }
 
     private fun updateStatusUi(status: DomainRulesManager.Status, modifiedTs: Long) {
@@ -193,6 +205,51 @@ class CustomDomainRulesBtmSheet(private var cd: CustomDomain) :
         b.customDomainDeleteChip.setOnClickListener {
             showDialogForDelete()
         }
+
+        /*b.chooseProxyCard.setOnClickListener {
+            val ctx = requireContext()
+            val v: MutableList<WgConfigFilesImmutable?> = mutableListOf()
+            io {
+                v.add(null)
+                v.addAll(WireguardManager.getAllMappings())
+                if (v.isEmpty()) {
+                    Logger.v(LOG_TAG_UI, "$TAG no wireguard configs found")
+                    uiCtx {
+                        Utilities.showToastUiCentered(
+                            ctx,
+                            getString(R.string.wireguard_no_config_msg),
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                    return@io
+                }
+                uiCtx {
+                    Logger.v(LOG_TAG_UI, "$TAG show wg list(${v.size} for ${cd.domain}")
+                    showWgListBtmSheet(v)
+                }
+            }
+        }
+
+        b.chooseCountryCard.setOnClickListener {
+            io {
+                val ctrys = RpnProxyManager.getProtonUniqueCC()
+                if (ctrys.isEmpty()) {
+                    Logger.v(LOG_TAG_UI, "$TAG no country codes found")
+                    uiCtx {
+                        Utilities.showToastUiCentered(
+                            requireContext(),
+                            "No ProtonVPN country codes found",
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                    return@io
+                }
+                uiCtx {
+                    Logger.v(LOG_TAG_UI, "$TAG show countries(${ctrys.size} for ${cd.domain}")
+                    showProxyCountriesBtmSheet(ctrys)
+                }
+            }
+        }*/
     }
 
     private val domainRulesGroupListener =
