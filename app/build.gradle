@@ -260,17 +260,25 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // from: https://jitpack.io/#celzero/firestack
-    download 'com.github.celzero:firestack:d6edee17c8@aar'
-    websiteImplementation 'com.github.celzero:firestack:d6edee17c8@aar'
-    fdroidImplementation 'com.github.celzero:firestack:d6edee17c8@aar'
+    /*download 'com.github.celzero:firestack:1fbdeed641@aar'
+    websiteImplementation 'com.github.celzero:firestack:1fbdeed641@aar'
+    fdroidImplementation 'com.github.celzero:firestack:1fbdeed641@aar'
     // debug symbols
-    playImplementation 'com.github.celzero:firestack:d6edee17c8:debug@aar'
+    playImplementation 'com.github.celzero:firestack:1fbdeed641:debug@aar'*/
 
     // from github packages
     // ref: docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#using-a-published-package
-    //websiteImplementation 'com.github.celzero:firestack:664941a70b'
-    //fdroidImplementation 'com.github.celzero:firestack:664941a70b'
-    //playImplementation 'com.github.celzero:firestack:664941a70b'
+    /*download 'com.celzero:firestack:1fbdeed641'
+    websiteImplementation 'com.github.celzero:firestack:1fbdeed641'
+    fdroidImplementation 'com.github.celzero:firestack:1fbdeed641'
+    playImplementation 'com.github.celzero:firestack:1fbdeed641'*/
+
+
+    // ossrh
+    websiteImplementation 'com.celzero:firestack:1fbdeed641@aar'
+    fdroidImplementation 'com.celzero:firestack:1fbdeed641@aar'
+    playImplementation 'com.celzero:firestack:1fbdeed641@aar'
+    download 'com.celzero:firestack:1fbdeed641@aar'
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.10.2') {
