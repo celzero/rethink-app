@@ -142,7 +142,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -2059,8 +2058,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
                         AppConfig.DnsType.SMART_DNS -> {
                             // no need to add multiple DoH as smart dns as it is expected to be
-                            // added by the vpn adapter while starting
-                            // vpnAdapter?.addMultipleDoHAsPlus()
+                            // added by the vpn adapter while starting, but add it if it is missing
+                            if(getDnsStatus(Backend.Plus) == null) addTransport()
                         }
 
                         AppConfig.DnsType.DOT -> {
@@ -2118,7 +2117,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     logd(
                         "default transport server changed, change: ${persistentState.defaultDnsUrl}"
                     )
-                    if (persistentState.defaultDnsUrl.isNotEmpty()) {
+                    if (!isDefaultDnsNone()) {
                         vpnAdapter?.addDefaultTransport(persistentState.defaultDnsUrl)
                     } else {
                         setNetworkAndDefaultDnsIfNeeded()
@@ -2144,6 +2143,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 io("routeRethinkInRethink") {
                     restartVpnWithNewAppConfig(reason = "routeRethinkInRethink")
                     vpnAdapter?.notifyLoopback()
+                    setNetworkAndDefaultDnsIfNeeded()
                 }
             }
 
@@ -2886,10 +2886,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val currNet = underlyingNetworks
             // get dns servers from the first network or active network
             val active = cm.activeNetwork
-            val dnsServers: MutableSet<InetAddress> = if (cm
-                    .getNetworkCapabilities(active)
-                    ?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true
-            ) {
+            val dnsServers: MutableSet<InetAddress> =
+            if (cm.getNetworkCapabilities(active)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true) {
                 Logger.i(LOG_TAG_VPN, "active network is vpn, so no need get dns servers")
                 mutableSetOf()
             } else {
@@ -2936,7 +2934,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 }
             }
             io("setSystemAndDefaultDns") {
-                val same = areDnsEqual(prevDns, dnsServers)
+                val same = if (prevDns == null) {
+                    false
+                } else {
+                    // ref: kotlinlang.org/docs/equality.html#structural-equality
+                    dnsServers == prevDns
+                }
                 Logger.i(
                     LOG_TAG_VPN,
                     "dns: $dnsServers, existing: $prevDns, force: $forceUpdate, same? $same"
@@ -2952,34 +2955,20 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     val dnsCsv = dns.joinToString(",")
                     vpnAdapter?.addDefaultTransport(dnsCsv)
                 }
-                // special case, check if preferred/plus is available, if not add again
-                if (appConfig.isSmartDnsEnabled()) {
-                    val isPlusOk = vpnAdapter?.getDnsStatus(Backend.Plus)
-                    if (isPlusOk == null) {
-                        Logger.i(LOG_TAG_VPN, "plus dns is not set, set it again")
-                        vpnAdapter?.addMultipleDnsAsPlus()
-                    } else {
-                        Logger.i(LOG_TAG_VPN, "plus dns is already set, no need to set again")
-                    }
-                } else {
-                    val isPrefOk = vpnAdapter?.getDnsStatus(Backend.Preferred)
-                    if (isPrefOk == null) {
-                        Logger.i(LOG_TAG_VPN, "preferred dns is not set, set it again")
+
+                    val maindnsOK = vpnAdapter?.getDnsStatus(Backend.Preferred) != null ||
+                        vpnAdapter?.getDnsStatus(Backend.Plus) != null
+                Logger.i(LOG_TAG_VPN, "preferred/plus set? ${maindnsOK}, if not set it again")
+
+                    if (!maindnsOK) {
                         vpnAdapter?.addTransport()
-                    } else {
-                        Logger.i(LOG_TAG_VPN, "preferred dns is already set, no need to set again")
                     }
-                }
             }
         }
     }
 
     private fun areDnsEqual(prevDns: Set<InetAddress>?, dnsServers: Set<InetAddress>): Boolean {
         if (prevDns == null) {
-            return false
-        }
-
-        if (prevDns.size != dnsServers.size) {
             return false
         }
 

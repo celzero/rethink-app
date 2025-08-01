@@ -77,7 +77,7 @@ internal constructor(
 
         private const val ORBOT_DNS = "Orbot"
 
-        const val FALLBACK_DNS = "8.8.4.4,2001:4860:4860::8844"
+        const val FALLBACK_DNS_IF_NET_DNS_EMPTY = "8.8.4.4,2001:4860:4860::8844"
 
         // used to add index to the transport ids added as part of Plus transport
         // for now only DOH, DoT are supported

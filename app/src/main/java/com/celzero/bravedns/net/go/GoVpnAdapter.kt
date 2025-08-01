@@ -36,12 +36,11 @@ import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.Companion.DOH_INDEX
 import com.celzero.bravedns.data.AppConfig.Companion.DOT_INDEX
-import com.celzero.bravedns.data.AppConfig.Companion.FALLBACK_DNS
+import com.celzero.bravedns.data.AppConfig.Companion.FALLBACK_DNS_IF_NET_DNS_EMPTY
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
 import com.celzero.bravedns.service.PersistentState
@@ -49,7 +48,6 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
@@ -81,7 +79,6 @@ import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.backend.Proxies
 import com.celzero.firestack.backend.RDNS
 import com.celzero.firestack.backend.RouterStats
-import com.celzero.firestack.backend.RpnProxy
 import com.celzero.firestack.intra.Controller
 import com.celzero.firestack.intra.DefaultDNS
 import com.celzero.firestack.intra.Intra
@@ -147,7 +144,7 @@ class GoVpnAdapter : KoinComponent {
         // opts itself.
         setRDNS()
         addTransport()
-        addMultipleDnsAsPlus()
+        if(getDnsStatus(Backend.Plus) == null) addMultipleDnsAsPlus()
         setWireguardTunnelModeIfNeeded(opts.tunProxyMode)
         setSocks5TunnelModeIfNeeded(opts.tunProxyMode)
         setHttpProxyIfNeeded(opts.tunProxyMode)
@@ -256,8 +253,7 @@ class GoVpnAdapter : KoinComponent {
             }
 
             AppConfig.DnsType.SMART_DNS -> {
-                // no-op; it is expected to be set during the init of the tunnel
-                // addMultipleDnsAsPlus() // treat Plus as SMART
+                addMultipleDnsAsPlus()
             }
 
             AppConfig.DnsType.RETHINK_REMOTE -> {
@@ -1151,24 +1147,13 @@ class GoVpnAdapter : KoinComponent {
             Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing resolvers")
             return
         }
-        // if preferred/plus is not available, then add explicitly
-        if (appConfig.isSmartDnsEnabled()) {
-            val isPlusOk = getResolver()?.get(Backend.Plus.togs())
-            if (isPlusOk == null) {
-                Logger.i(LOG_TAG_VPN, "plus dns is not set, set it again")
-                addMultipleDnsAsPlus()
-            } else {
-                Logger.i(LOG_TAG_VPN, "plus dns is already set, no need to set again")
-            }
-        } else {
-            val isPrefOk = getResolver()?.get(Backend.Preferred.togs())
-            if (isPrefOk == null) {
-                Logger.i(LOG_TAG_VPN, "preferred dns is not set, set it again")
-                addTransport()
-            } else {
-                Logger.i(LOG_TAG_VPN, "preferred dns is already set, no need to set again")
-            }
+        val maindnsOK = getDnsStatus(Backend.Preferred) != null || getDnsStatus(Backend.Plus) != null
+        Logger.i(LOG_TAG_VPN, "preferred/plus set? ${maindnsOK}, if not set it again")
+
+        if (!maindnsOK) {
+            addTransport()
         }
+
         Logger.i(LOG_TAG_VPN, "$TAG refresh resolvers")
         getResolver()?.refresh()
     }
@@ -1188,17 +1173,17 @@ class GoVpnAdapter : KoinComponent {
     }
 
     private fun newDefaultTransport(url: String): DefaultDNS? {
-        val defaultDns = getDefaultFallbackDns()
+        val fallbackDns = getDefaultFallbackDns()
         try {
             // when the url is empty, set the default transport to 8.8.4.4, 2001:4860:4860::8844 or
             // null based on the value of SKIP_DEFAULT_DNS_ON_INIT
             if (url.isEmpty()) { // empty url denotes default dns set to none (system dns)
-                if (SKIP_DEFAULT_DNS_ON_INIT) {
+                if (SKIP_DEFAULT_DNS_ON_INIT && !persistentState.routeRethinkInRethink) {
                     Logger.i(LOG_TAG_VPN, "$TAG set default dns to null, as url is empty")
                     return null
                 }
-                Logger.i(LOG_TAG_VPN, "$TAG set default dns to $defaultDns, as url is empty")
-                return Intra.newDefaultDNS(Backend.DNS53.togs(), defaultDns.togs(), "".togs())
+                Logger.i(LOG_TAG_VPN, "$TAG set default dns to $fallbackDns, as url is empty")
+                return Intra.newDefaultDNS(Backend.DNS53.togs(), fallbackDns.togs(), "".togs())
             }
             val ips: String = getIpString(context, url)
             Logger.d(LOG_TAG_VPN, "$TAG default dns url: $url ips: $ips")
@@ -1215,10 +1200,10 @@ class GoVpnAdapter : KoinComponent {
             // most of the android devices have google dns, so add it as default transport
             // TODO: notify the user that the default transport could not be set
             try {
-                Logger.i(LOG_TAG_VPN, "$TAG; fallback; set default dns to $defaultDns")
-                return Intra.newDefaultDNS(Backend.DNS53.togs(), defaultDns.togs(), "".togs())
+                Logger.i(LOG_TAG_VPN, "$TAG; fallback; set default dns to $fallbackDns")
+                return Intra.newDefaultDNS(Backend.DNS53.togs(), fallbackDns.togs(), "".togs())
             } catch (e: Exception) {
-                Logger.crash(LOG_TAG_VPN, "$TAG err add $defaultDns dns: ${e.message}", e)
+                Logger.crash(LOG_TAG_VPN, "$TAG err add $fallbackDns dns: ${e.message}", e)
                 return null
             }
         }
@@ -1235,10 +1220,10 @@ class GoVpnAdapter : KoinComponent {
             } else if (netDns2?.isNotEmpty() == true) {
                 netDns2
             } else {
-                FALLBACK_DNS
+                FALLBACK_DNS_IF_NET_DNS_EMPTY
             }
         } catch (ignored: Exception) {
-            FALLBACK_DNS
+            FALLBACK_DNS_IF_NET_DNS_EMPTY
         }
     }
 
@@ -1248,14 +1233,14 @@ class GoVpnAdapter : KoinComponent {
             return
         }
         var type = Backend.DNS53
-        var fallbackUrl = getDefaultFallbackDns()
+        val fallbackUrl = getDefaultFallbackDns()
 
         val usingSysDnsAsDefaultDns = isDefaultDnsNone()
-        var usingGoos = fallbackUrl.isEmpty()
+        var usingGoos = fallbackUrl.isEmpty() // always false here, as fallbackUrl is not empty
         // make the tun to use goos as default transport if the system dns is set as none in
         // persistent state and not in rinr mode, as in that case the system dns
-        if (SET_SYS_DNS_AS_DEFAULT_IFF_LOOPBACK && !persistentState.routeRethinkInRethink && usingSysDnsAsDefaultDns) {
-            usingGoos = true
+        if (SET_SYS_DNS_AS_DEFAULT_IFF_LOOPBACK && !persistentState.routeRethinkInRethink) {
+            usingGoos = usingSysDnsAsDefaultDns
         }
 
         // default transport is always sent to Ipn.Exit in the go code and so dns

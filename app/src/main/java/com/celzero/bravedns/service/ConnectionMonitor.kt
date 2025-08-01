@@ -36,6 +36,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -258,7 +259,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         scope.launch(CoroutineName("nwhdl") + serializer) {
             for (m in channel) {
                 // process the message in a coroutine context
-                hdl.handleMessage(m)
+                val deferred = async  { hdl.handleMessage(m) }
+                deferred.await()
                 // add a delay to avoid processing multiple network changes in quick succession
                 delay(TimeUnit.SECONDS.toMillis(3)) // adjust the delay as needed
             }
@@ -429,20 +431,27 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             val newNetworks = createNetworksSet(newActiveNetwork, opPrefs.networkSet)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
             val vpnRoutes = determineVpnProtos(opPrefs.networkSet)
+            val isDnsChanged = hasNwDnsChanged(currentNetworks, newNetworks)
 
             Logger.i(
                 LOG_TAG_CONNECTION,
                 "Connected network: ${newActiveNetwork?.networkHandle} ${
                     networkType(newActiveNetworkCap)
                 }, netid: ${netId(newActiveNetwork?.networkHandle)}, new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}," +
-                 "cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered"
+                 "cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged"
             )
 
-            if (isNewNetwork || opPrefs.isForceUpdate) {
+            if (isNewNetwork || opPrefs.isForceUpdate || isDnsChanged) {
                 currentNetworks = newNetworks
                 repopulateTrackedNetworks(opPrefs, currentNetworks)
                 informListener(true, isActiveNetworkMetered, isActiveNetworkCellular, vpnRoutes)
             }
+        }
+
+        private suspend fun hasNwDnsChanged(currNws: Set<NetworkProperties>, newNws: Set<NetworkProperties>): Boolean {
+            val currDnsServers = currNws.map { it.linkProperties }.mapNotNull { it?.dnsServers }.flatMap { it }.map { it.hostAddress }.toSet()
+            val newDnsServers = newNws.map { it.linkProperties }.mapNotNull { it?.dnsServers }.flatMap { it }.map { it.hostAddress }.toSet()
+            return newDnsServers == currDnsServers
         }
 
         /** Adds all the available network to the underlying network. */
