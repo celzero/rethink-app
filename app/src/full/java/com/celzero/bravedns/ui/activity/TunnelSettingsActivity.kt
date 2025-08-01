@@ -86,9 +86,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
     private fun initView() {
         b.settingsActivityAllowBypassProgress.visibility = View.GONE
-        // allow apps part of the vpn to request networks outside of it, effectively letting it
-        // bypass the vpn itself
-        b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowBypass
+        displayAllowBypassUi()
         // use multiple networks
         b.settingsActivityAllNetworkSwitch.isChecked = persistentState.useMultipleNetworks
         // route lan traffic
@@ -113,6 +111,24 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         displayInternetProtocolUi()
         displayRethinkInRethinkUi()
+    }
+
+    private fun displayAllowBypassUi() {
+        // allow apps part of the vpn to request networks outside of it, effectively letting it
+        // bypass the vpn itself
+        if (!Utilities.isPlayStoreFlavour()) {
+            b.settingsActivityAllowBypassRl.visibility = View.VISIBLE
+            b.settingsActivityAllowBypassDesc.visibility = View.VISIBLE
+            b.settingsActivityAllowBypassSwitch.visibility = View.VISIBLE
+            b.settingsActivityAllowBypassProgress.visibility = View.GONE
+
+            b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowBypass
+        } else {
+            b.settingsActivityAllowBypassRl.visibility = View.GONE
+            b.settingsActivityAllowBypassDesc.visibility = View.GONE
+            b.settingsActivityAllowBypassSwitch.visibility = View.GONE
+            b.settingsActivityAllowBypassProgress.visibility = View.GONE
+        }
     }
 
     private fun setupClickListeners() {
@@ -183,6 +199,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityAllowBypassSwitch.setOnCheckedChangeListener {
             _: CompoundButton,
             checked: Boolean ->
+            if (Utilities.isPlayStoreFlavour()) return@setOnCheckedChangeListener
+
             persistentState.allowBypass = checked
             b.settingsActivityAllowBypassSwitch.isEnabled = false
             b.settingsActivityAllowBypassSwitch.visibility = View.INVISIBLE
