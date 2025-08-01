@@ -138,6 +138,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             return
         }
 
+        b.hopBtn.text = getString(R.string.two_argument_space, getString(R.string.hop_lbl), getString(R.string.lbl_experimental))
+
         b.editBtn.text = getString(R.string.rt_edit_dialog_positive).lowercase()
         b.globalLockdownTitleTv.text =
             getString(
@@ -150,6 +152,12 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 R.string.two_argument_space,
                 getString(R.string.catch_all_wg_dialog_title),
                 getString(R.string.symbol_lightening)
+            )
+        b.useMobileTitleTv.text =
+            getString(
+                R.string.two_argument_space,
+                getString(R.string.wg_setting_use_on_mobile),
+                getString(R.string.symbol_mobile)
             )
         if (wgType.isDefault()) {
             b.wgHeaderTv.text = getString(R.string.lbl_advanced).replaceFirstChar(Char::titlecase)
@@ -470,7 +478,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         b.hopBtn.setOnClickListener {
             val mapping = WireguardManager.getConfigFilesById(configId)
             if (mapping == null) {
-                Utilities.showToastUiCentered(this, getString(R.string.mapping_not_available), Toast.LENGTH_SHORT)
+                showInvalidConfigDialog()
                 return@setOnClickListener
             }
 
