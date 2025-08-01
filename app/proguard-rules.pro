@@ -55,6 +55,15 @@
 -dontwarn org.bouncycastle.**
 -dontwarn org.openjsse.**
 
+# Keep Gson classes and attributes for JSON serialization/deserialization
+# FileTag class uses Gson with custom deserializer (FileTagDeserializer) to handle
+# dynamic JSON formats where "url" field can be either a string or JsonArray
+# Without these rules, obfuscation would break the reflection-based JSON parsing
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.google.gson.** { *; }
+-keep class com.celzero.bravedns.data.FileTag { *; }
+
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
