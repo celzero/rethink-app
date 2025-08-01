@@ -25,13 +25,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.SEC_WARP_FILE_NAME
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.SEC_WARP_NAME
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_FILE_NAME
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_NAME
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
-import java.io.File
 
 @Database(
     entities =
@@ -55,7 +49,9 @@ import java.io.File
         DoTEndpoint::class,
         ODoHEndpoint::class,
         RpnProxy::class,
-        WgHopMap::class
+        WgHopMap::class,
+        SubscriptionStatus::class,
+        SubscriptionStateHistory::class
     ],
     version = 25,
     exportSchema = false
@@ -103,9 +99,6 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_22_23)
                 .addMigrations(MIGRATION_23_24)
                 .addMigrations(MIGRATION_24_25)
-                //.addMigrations(MIGRATION_25_26) // should remove this, part of 24_25
-                //.addMigrations(MIGRATION_26_27) // should remove this, part of 24_25
-                //.addMigrations(MIGRATION_27_28) // should remove this, part of 24_25
                 .build()
 
         private val roomCallback: Callback =
@@ -720,24 +713,6 @@ abstract class AppDatabase : RoomDatabase() {
                         execSQL(
                             "CREATE TABLE WgConfigFiles('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'configPath' TEXT NOT NULL, 'serverResponse' TEXT NOT NULL, 'isActive' INTEGER NOT NULL, 'isDeletable' INTEGER NOT NULL, PRIMARY KEY (id))"
                         )
-                        val secWarpPath =
-                            context.filesDir.absolutePath +
-                                    File.separator +
-                                    WIREGUARD_FOLDER_NAME +
-                                    File.separator +
-                                    SEC_WARP_FILE_NAME
-                        execSQL(
-                            "INSERT INTO WgConfigFiles(id, name, configPath, serverResponse, isActive, isDeletable) VALUES(0, '$SEC_WARP_NAME', '$secWarpPath', '', 0, 0)"
-                        )
-                        val path =
-                            context.filesDir.absolutePath +
-                                    File.separator +
-                                    WIREGUARD_FOLDER_NAME +
-                                    File.separator +
-                                    WARP_FILE_NAME
-                        execSQL(
-                            "INSERT INTO WgConfigFiles(id, name, configPath, serverResponse, isActive, isDeletable) VALUES(1, '$WARP_NAME', '$path', '', 0, 0)"
-                        )
                         execSQL(
                             "CREATE TABLE ProxyApplicationMapping('uid' INTEGER NOT NULL, 'packageName' TEXT NOT NULL, 'appName' TEXT NOT NULL, 'proxyName' TEXT NOT NULL, 'isActive' INTEGER NOT NULL, 'proxyId' TEXT NOT NULL ,PRIMARY KEY (uid, packageName, proxyId))"
                         )
@@ -987,76 +962,101 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
+        // migration part of v055o
         private val MIGRATION_24_25: Migration =
             object : Migration(24, 25) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL(
-                        "CREATE TABLE 'RpnProxy' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'configPath' TEXT NOT NULL, 'serverResPath' TEXT NOT NULL, 'isActive' INTEGER NOT NULL, 'isLockdown' INTEGER NOT NULL, 'createdTs' INTEGER NOT NULL, 'modifiedTs' INTEGER NOT NULL, 'misc' TEXT NOT NULL, 'tunId' TEXT NOT NULL, 'latency' INTEGER NOT NULL, PRIMARY KEY (id))"
+                        """
+                        CREATE TABLE 'RpnProxy' (
+                            'id' INTEGER NOT NULL,
+                            'name' TEXT NOT NULL,
+                            'configPath' TEXT NOT NULL,
+                            'serverResPath' TEXT NOT NULL,
+                            'isActive' INTEGER NOT NULL,
+                            'isLockdown' INTEGER NOT NULL,
+                            'createdTs' INTEGER NOT NULL,
+                            'modifiedTs' INTEGER NOT NULL,
+                            'lastRefreshTime' INTEGER NOT NULL DEFAULT 0,
+                            'misc' TEXT NOT NULL,
+                            'tunId' TEXT NOT NULL,
+                            'latency' INTEGER NOT NULL,
+                            PRIMARY KEY (id)
+                        )
+                        """.trimIndent()
                     )
                     db.execSQL(
-                        "CREATE TABLE 'WgHopMap' ('id' INTEGER NOT NULL, 'src' TEXT NOT NULL, 'via' TEXT NOT NULL, 'isActive' INTEGER NOT NULL, 'status' TEXT NOT NULL, primary key (id))"
+                        """
+                        CREATE TABLE 'WgHopMap' (
+                            'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                            'src' TEXT NOT NULL,
+                            'hop' TEXT NOT NULL,
+                            'isActive' INTEGER NOT NULL,
+                            'status' TEXT NOT NULL
+                        )
+                        """.trimIndent()
                     )
-                    db.execSQL(
-                        "ALTER TABLE CustomDomain ADD COLUMN proxyId TEXT NOT NULL DEFAULT ''"
-                    )
-                    db.execSQL(
-                        "ALTER TABLE CustomDomain ADD COLUMN proxyCC TEXT NOT NULL DEFAULT ''"
-                    )
-                    db.execSQL(
-                        "ALTER TABLE CustomIp ADD COLUMN proxyId TEXT NOT NULL DEFAULT ''"
-                    )
-                    db.execSQL(
-                        "ALTER TABLE CustomIp ADD COLUMN proxyCC TEXT NOT NULL DEFAULT ''"
-                    )
-                }
-            }
 
-        private val MIGRATION_25_26: Migration =
-            object : Migration(25, 26) {
-                override fun migrate(db: SupportSQLiteDatabase) {
-                    /*db.execSQL(
-                        "CREATE TABLE 'WgHopMap' ('id' INTEGER NOT NULL, 'src' TEXT NOT NULL, 'via' TEXT NOT NULL, 'isActive' INTEGER NOT NULL, 'status' TEXT NOT NULL, primary key (id))"
-                    )*/
-                }
-            }
-
-        private val MIGRATION_26_27: Migration =
-            object : Migration(26, 27) {
-                override fun migrate(db: SupportSQLiteDatabase) {
                     try {
-                        db.execSQL(
-                            "ALTER TABLE CustomDomain ADD COLUMN proxyId TEXT NOT NULL DEFAULT ''"
-                        )
-                        db.execSQL(
-                            "ALTER TABLE CustomDomain ADD COLUMN proxyCC TEXT NOT NULL DEFAULT ''"
-                        )
-                        db.execSQL(
-                            "ALTER TABLE CustomIp ADD COLUMN proxyId TEXT NOT NULL DEFAULT ''"
-                        )
-                        db.execSQL(
-                            "ALTER TABLE CustomIp ADD COLUMN proxyCC TEXT NOT NULL DEFAULT ''"
-                        )
-                    } catch (e: Exception) {
-                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: columns already exist, ignore")
+                        db.execSQL("ALTER TABLE CustomDomain ADD COLUMN proxyId TEXT NOT NULL DEFAULT ''")
+                        db.execSQL("ALTER TABLE CustomDomain ADD COLUMN proxyCC TEXT NOT NULL DEFAULT ''")
+                    } catch (ignored: Exception) {
+                        Logger.i(LOG_TAG_APP_DB, "proxyId, proxyCC; columns already exist, ignore")
                     }
+
+                    try {
+                        db.execSQL("ALTER TABLE CustomIp ADD COLUMN proxyId TEXT NOT NULL DEFAULT ''")
+                        db.execSQL("ALTER TABLE CustomIp ADD COLUMN proxyCC TEXT NOT NULL DEFAULT ''")
+                    } catch (ignored: Exception) {
+                        Logger.i(LOG_TAG_APP_DB, "proxyId, proxyCC; columns already exist, ignore")
+                    }
+
+                    try {
+                        db.execSQL("ALTER TABLE AppInfo ADD COLUMN tombstoneTs INTEGER NOT NULL DEFAULT 0")
+                    } catch (ignored: Exception) {
+                        Logger.i(LOG_TAG_APP_DB, "tombstoneTs: column already exists, ignore")
+                    }
+
+                    try {
+                        db.execSQL("ALTER TABLE WgConfigFiles ADD COLUMN useOnlyOnMetered INTEGER NOT NULL DEFAULT 0")
+                    } catch (ignored: Exception) {
+                        Logger.i(LOG_TAG_APP_DB, "useOnlyOnMetered: column already exists, ignore")
+                    }
+
+                    db.execSQL(
+                        """
+                            CREATE TABLE IF NOT EXISTS SubscriptionStatus (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                            accountId TEXT NOT NULL,
+                            purchaseToken TEXT NOT NULL,
+                            productId TEXT NOT NULL,
+                            planId TEXT NOT NULL,
+                            sessionToken TEXT NOT NULL,
+                            productTitle TEXT NOT NULL,
+                            state INTEGER NOT NULL DEFAULT 0,
+                            status INTEGER NOT NULL DEFAULT -1,
+                            lastUpdatedTs INTEGER NOT NULL DEFAULT 0,
+                            purchaseTime INTEGER NOT NULL DEFAULT 0,
+                            accountExpiry INTEGER NOT NULL DEFAULT 0,
+                            billingExpiry INTEGER NOT NULL DEFAULT 0,
+                            developerPayload TEXT NOT NULL
+                            )""".trimIndent()
+                    )
+
+                    db.execSQL(
+                    """
+                            CREATE TABLE IF NOT EXISTS SubscriptionStateHistory (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                            subscriptionId INTEGER NOT NULL,
+                            fromState INTEGER NOT NULL,
+                            toState INTEGER NOT NULL,
+                            timestamp INTEGER NOT NULL DEFAULT 0,
+                            reason TEXT)
+                         """.trimIndent()
+                    )
                 }
             }
 
-        private val MIGRATION_27_28: Migration =
-            object : Migration(27, 28) {
-                override fun migrate(db: SupportSQLiteDatabase) {
-                    try {
-                        db.execSQL(
-                            "ALTER TABLE CustomIp ADD COLUMN proxyId TEXT NOT NULL DEFAULT ''"
-                        )
-                        db.execSQL(
-                            "ALTER TABLE CustomIp ADD COLUMN proxyCC TEXT NOT NULL DEFAULT ''"
-                        )
-                    } catch (e: Exception) {
-                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_27_28: columns already exist, ignore")
-                    }
-                }
-            }
 
         // ref: stackoverflow.com/a/57204285
         private fun doesColumnExistInTable(
@@ -1123,6 +1123,10 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun wgHopMapDao(): WgHopMapDao
 
+    abstract fun subscriptionStatusDao(): SubscriptionStatusDao
+
+    abstract fun subscriptionStateHistoryDao(): SubscriptionStateHistoryDao
+
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
 
     fun dohEndpointRepository() = DoHEndpointRepository(dohEndpointsDAO())
@@ -1165,4 +1169,7 @@ abstract class AppDatabase : RoomDatabase() {
     fun rpnProxyRepository() = RpnProxyRepository(rpnProxyDao())
 
     fun wgHopMapRepository() = WgHopMapRepository(wgHopMapDao())
+
+    fun subscriptionStatusRepository() = SubscriptionStatusRepository(subscriptionStatusDao())
+
 }
