@@ -33,11 +33,16 @@ import android.widget.ScrollView
 import android.widget.SeekBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.marginEnd
+import androidx.core.view.marginStart
+import androidx.core.view.marginTop
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.databinding.ActivityAdvancedSettingBinding
 import com.celzero.bravedns.scheduler.BugReportZipper.BUG_REPORT_DIR_NAME
 import com.celzero.bravedns.scheduler.BugReportZipper.BUG_REPORT_ZIP_FILE_NAME
@@ -62,10 +67,6 @@ import java.io.File
 class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_setting) {
     private val persistentState by inject<PersistentState>()
     private val b by viewBinding(ActivityAdvancedSettingBinding::bind)
-
-    // Handler to update the dialer timeout value when the seekbar is moved
-    private val handler = Handler(Looper.getMainLooper())
-    private var updateRunnable: Runnable? = null
 
     companion object {
         private const val TAG = "AdvSetAct"
@@ -106,13 +107,21 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         b.dvTcpKeepAliveSwitch.isChecked = persistentState.tcpKeepAlive
         b.settingsActivitySlowdownSwitch.isChecked = persistentState.slowdownMode
 
-        b.dvExperimentalSwitch.isChecked = persistentState.nwEngExperimentalFeatures
-        b.dvAutoDialSwitch.isChecked = persistentState.autoDialsParallel
+        if (DEBUG) {
+            b.settingsExperimentalRl.visibility = View.VISIBLE
+            b.dvExperimentalSwitch.isChecked = persistentState.nwEngExperimentalFeatures
+            b.settingsAutoDialRl.visibility = View.VISIBLE
+            b.dvAutoDialSwitch.isChecked = persistentState.autoDialsParallel
+        } else {
+            b.settingsExperimentalRl.visibility = View.GONE
+            b.settingsAutoDialRl.visibility = View.GONE
+        }
+
         b.dvIpInfoSwitch.isChecked = persistentState.downloadIpInfo
-        updateDialerTimeOutUi()
+        updateDialerTimeOutUi(persistentState.dialTimeoutSec)
     }
 
-    private fun updateDialerTimeOutUi() {
+    /*private fun updateDialerTimeOutUi() {
         val valueMin = persistentState.dialTimeoutSec / 60
         Logger.d(LOG_TAG_UI, "$TAG; dialer timeout value: $valueMin, persistentState: ${persistentState.dialTimeoutSec}")
         val displayText = if (valueMin == 0) {
@@ -124,11 +133,31 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         Logger.d(LOG_TAG_UI, "$TAG; dialer timeout value: $valueMin, progress: ${b.dvTimeoutSeekbar.progress}")
         if (valueMin == b.dvTimeoutSeekbar.progress) return
         b.dvTimeoutSeekbar.progress = valueMin
+    }*/
+
+    private fun updateDialerTimeOutUi(progressSec: Int) {
+        val displayText = formatTimeShort(progressSec)
+        b.dvTimeoutValue.text = displayText
+    }
+
+    private fun formatTimeShort(totalSeconds: Int): String {
+        val hours = totalSeconds / 3600
+        val minutes = (totalSeconds % 3600) / 60
+        val seconds = totalSeconds % 60
+
+        val parts = mutableListOf<String>()
+
+        if (hours > 0) parts.add("${hours}h")
+        if (minutes > 0) parts.add("${minutes}m")
+        if (seconds > 0) parts.add("${seconds}s")
+
+        return if (parts.isEmpty()) "0m" else parts.joinToString(" ")
     }
 
     private fun updateDialerTimeOut(valueMin: Int) {
-        persistentState.dialTimeoutSec = valueMin * 60
-        updateDialerTimeOutUi()
+        val inSec = valueMin * 60
+        persistentState.dialTimeoutSec = inSec
+        updateDialerTimeOutUi(inSec)
     }
 
     private fun setupClickListeners() {
@@ -214,23 +243,20 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
 
         b.dvTimeoutSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                handler.removeCallbacks(updateRunnable ?: Runnable {})
-
-                updateRunnable = Runnable {
-                    updateDialerTimeOut(progress)
-                }
-
-                handler.postDelayed(updateRunnable!!, ONE_SEC)
+                updateDialerTimeOut(progress)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                handler.removeCallbacks(updateRunnable ?: Runnable {})
+                // No action needed on start tracking
+                // This can be used to show a toast or a message if needed
+                // For now, we will just log the start of tracking
+                Logger.d(LOG_TAG_UI, "$TAG; Dialer timeout seekbar tracking started")
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                updateRunnable?.let {
-                    handler.removeCallbacks(it)
-                    handler.post(it)
+                // When the user stops dragging the seekbar, update the dialer timeout
+                seekBar?.progress?.let { progress ->
+                    updateDialerTimeOut(progress)
                 }
             }
         })
@@ -360,19 +386,27 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
     }
 
     fun showAppTriggerPackageDialog(context: Context, onPackageSet: (String) -> Unit) {
-        val editText = EditText(context).apply {
+        val editText = AppCompatEditText(context).apply {
             hint = context.getString(R.string.adv_tasker_dialog_edit_hint)
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-            setLines(6)
-            setHorizontallyScrolling(false)
+            setHorizontallyScrolling(true)
             if (persistentState.appTriggerPackages.isNotEmpty()) {
                 setText(persistentState.appTriggerPackages)
             }
+            setPadding(50, 40, 50, 0)
             gravity = Gravity.TOP or Gravity.START
+            android.R.style.Widget_Material_EditText
         }
 
         val selectableTextView = AppCompatTextView(context).apply {
             text = context.getString(R.string.adv_tasker_dialog_msg)
+            setTextIsSelectable(true)
+            setPadding(50, 40, 50, 0)
+            textSize = 16f
+        }
+
+        val instructionsTextView = AppCompatTextView(context).apply {
+            text = context.getString(R.string.adv_tasker_dialog_instructions)
             setTextIsSelectable(true)
             setPadding(50, 40, 50, 0)
             textSize = 16f
@@ -384,6 +418,7 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
             orientation = LinearLayout.VERTICAL
             addView(selectableTextView)
             addView(editText)
+            addView(instructionsTextView)
         }
 
         val scrollView = ScrollView(context).apply {
@@ -392,7 +427,7 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         }
 
         AlertDialog.Builder(context)
-            .setTitle(context.getString(R.string.adv_tasker_dialog_title))
+            .setTitle(context.getString(R.string.adv_taster_title))
             .setView(scrollView)
             .setPositiveButton(context.getString(R.string.lbl_save)) { dialog, _ ->
                 val pkgName = editText.text.toString().trim()

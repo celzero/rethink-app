@@ -239,22 +239,48 @@
                         android:layout_toEndOf="@id/dv_timeout_icon"
                         android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/dv_timeout_txt"
-                            style="@style/TextAppearance.AppCompat.Subhead"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/adv_set_dial_timeout_title"
-                            android:textSize="@dimen/large_font_text_view" />
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
 
-                        <TextView
-                            android:id="@+id/dv_timeout_desc"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="10dp"
-                            android:paddingTop="5dp"
-                            android:text="@string/adv_set_dial_timeout_desc"
-                            android:textSize="@dimen/default_font_text_view" />
+                            <LinearLayout
+                                android:id="@+id/dv_timeout_ll"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentStart="true"
+                                android:layout_toStartOf="@id/dv_timeout_value"
+                                android:orientation="vertical">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/dv_timeout_txt"
+                                    style="@style/TextAppearance.AppCompat.Subhead"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/adv_set_dial_timeout_title"
+                                    android:textSize="@dimen/large_font_text_view" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/dv_timeout_desc"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="10dp"
+                                    android:paddingTop="5dp"
+                                    android:text="@string/adv_set_dial_timeout_desc"
+                                    android:textSize="@dimen/default_font_text_view" />
+
+                            </LinearLayout>
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/dv_timeout_value"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:layout_marginEnd="10dp"
+                                android:text="1 mins 10 sec"
+                                android:textSize="@dimen/default_font_text_view" />
+
+                        </RelativeLayout>
 
                         <androidx.appcompat.widget.AppCompatSeekBar
                             android:id="@+id/dv_timeout_seekbar"
