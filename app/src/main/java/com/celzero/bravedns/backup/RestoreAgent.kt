@@ -49,6 +49,7 @@ import androidx.core.net.toUri
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.RemoteFileTagUtil
+import com.celzero.bravedns.util.Utilities.deleteRecursive
 
 class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), KoinComponent {
@@ -149,6 +150,9 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
 
             // update app version after the restore process
             updateLatestVersion()
+
+            // clean up the temp directory
+            deleteRecursive(tempDir)
 
             return true
         } catch (e: Exception) {
