@@ -8,8 +8,8 @@
         android:id="@+id/wg_hop_list_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="4dp"
         android:background="?attr/selectedCardBg"
+        app:cardCornerRadius="4dp"
         app:cardElevation="4dp"
         app:cardUseCompatPadding="true">
 
@@ -24,9 +24,9 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="10dp"
-                android:layout_alignParentStart="true"
                 android:layout_toStartOf="@id/wg_hop_list_checkbox"
                 android:orientation="vertical">
 
@@ -35,9 +35,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:padding="5dp"
                     android:ellipsize="end"
                     android:fontFamily="sans-serif-medium"
+                    android:padding="5dp"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
@@ -57,8 +57,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="5dp"
-                    android:visibility="visible"
-                    android:padding="5dp">
+                    android:padding="5dp"
+                    android:visibility="visible">
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_ipv4"
@@ -67,11 +67,11 @@
                         android:layout_height="wrap_content"
                         android:alpha="0.8"
                         android:checked="true"
-                        android:visibility="gone"
                         android:text="@string/settings_ip_text_ipv4"
                         android:textAlignment="center"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
                         app:chipStrokeColor="?attr/accentGood"
                         app:chipStrokeWidth="1.5dp" />
 
@@ -82,11 +82,11 @@
                         android:layout_height="wrap_content"
                         android:alpha="0.8"
                         android:checked="true"
-                        android:visibility="gone"
                         android:text="@string/settings_ip_text_ipv6"
                         android:textAlignment="center"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
                         app:chipStrokeColor="?attr/accentGood"
                         app:chipStrokeWidth="1.5dp" />
 
@@ -97,11 +97,11 @@
                         android:layout_height="wrap_content"
                         android:alpha="0.8"
                         android:checked="true"
-                        android:visibility="gone"
                         android:text="@string/lbl_split"
                         android:textAlignment="center"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
                         app:chipStrokeColor="?attr/accentGood"
                         app:chipStrokeWidth="1.5dp" />
 
@@ -112,11 +112,11 @@
                         android:layout_height="wrap_content"
                         android:alpha="0.8"
                         android:checked="true"
-                        android:visibility="gone"
                         android:text="@string/lbl_amnezia"
                         android:textAlignment="center"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
                         app:chipStrokeColor="?attr/accentGood"
                         app:chipStrokeWidth="1.5dp" />
 
@@ -127,11 +127,11 @@
                         android:layout_height="wrap_content"
                         android:alpha="0.8"
                         android:checked="true"
-                        android:visibility="gone"
                         android:text="@string/hop_lbl"
                         android:textAlignment="center"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
                         app:chipStrokeColor="?attr/accentGood"
                         app:chipStrokeWidth="1.5dp" />
 
@@ -142,11 +142,11 @@
                         android:layout_height="wrap_content"
                         android:alpha="0.8"
                         android:checked="true"
-                        android:visibility="gone"
                         android:text="@string/lbl_hopping"
                         android:textAlignment="center"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
                         app:chipStrokeColor="?attr/accentGood"
                         app:chipStrokeWidth="1.5dp" />
 
@@ -165,6 +165,22 @@
                 android:foregroundTint="?attr/accentGood" />
 
         </RelativeLayout>
+
     </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/wg_hop_list_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/wg_hop_list_card"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:indeterminate="true"
+        android:indeterminateTint="?chipTextPositive"
+        android:visibility="gone"
+        app:indicatorColor="?attr/chipTextPositive"
+        app:trackColor="?attr/background"
+        app:trackCornerRadius="4dp"
+        app:trackThickness="2dp" />
 
 </RelativeLayout>

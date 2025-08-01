@@ -35,7 +35,6 @@ import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgHopManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -80,8 +79,6 @@ class WgHopAdapter(
 
     inner class HopViewHolder(private val b: ListItemWgHopBinding) :
         RecyclerView.ViewHolder(b.root) {
-
-        private var processingDialog: androidx.appcompat.app.AlertDialog? = null
 
         fun update(config: Config) {
             val mapping = WireguardManager.getConfigFilesById(config.getId()) ?: return
@@ -246,7 +243,7 @@ class WgHopAdapter(
                 return
             }
             uiCtx {
-                showProcessingDialog(context)
+                showProgressIndicator()
             }
             Logger.d(LOG_TAG_UI, "$TAG; init, hop: ${srcConfig.getId()} -> ${config.getId()}, isChecked? $isChecked")
             val src = ID_WG_BASE + srcConfig.getId()
@@ -275,7 +272,7 @@ class WgHopAdapter(
                     uiCtx {
                         if (!isAttached) return@uiCtx
 
-                        dismissProcessingDialog()
+                        dismissProgressIndicator()
                         b.wgHopListCheckbox.isChecked = false
                         Utilities.showToastUiCentered(
                             context,
@@ -297,35 +294,32 @@ class WgHopAdapter(
             uiCtx {
                 if (!isAttached) return@uiCtx
 
-                dismissProcessingDialog()
+                dismissProgressIndicator()
                 Utilities.showToastUiCentered(context, res.second, Toast.LENGTH_LONG)
                 if (!res.first) {
                     b.wgHopListCheckbox.isChecked = false
-                    setCardStroke(false, false)
+                    setCardStroke(isSelected = false, isActive = false)
                 } else {
                     b.wgHopListCheckbox.isChecked = true
-                    setCardStroke(true, isActive)
+                    setCardStroke(isSelected = true, isActive)
                 }
                 notifyDataSetChanged()
             }
         }
 
-        fun showProcessingDialog(context: Context) {
+        fun showProgressIndicator() {
             if (!isAttached) return
 
-            val dialogBuilder = MaterialAlertDialogBuilder(context)
-            dialogBuilder.setTitle(context.getString(R.string.processing_dialog_title))
-            dialogBuilder.setMessage(context.getString(R.string.processing_dialog_desc))
-            dialogBuilder.setCancelable(true)
-            processingDialog = dialogBuilder.create()
-            processingDialog?.show()
+            b.wgHopListCheckbox.isEnabled = false
+            b.wgHopListProgress.visibility = View.VISIBLE
+            b.wgHopListCard.isEnabled = false
         }
 
-        fun dismissProcessingDialog() {
+        fun dismissProgressIndicator() {
             if (!isAttached) return
 
-            processingDialog?.dismiss()
-            processingDialog = null
+            b.wgHopListCheckbox.isEnabled = true
+            b.wgHopListProgress.visibility = View.GONE
         }
 
         private fun setCardStroke(isSelected: Boolean, isActive: Boolean) {
