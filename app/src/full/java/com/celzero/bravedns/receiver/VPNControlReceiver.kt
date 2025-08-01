@@ -52,7 +52,7 @@ class VpnControlReceiver: BroadcastReceiver(), KoinComponent {
             return
         }
 
-        var callerPkg = getCallerPkg(context, intent)
+        val callerPkg = getCallerPkg(context, intent)
         if (callerPkg == null) {
             Logger.w(LOG_TAG_VPN, "$TAG Received intent with null package name")
             return

@@ -394,7 +394,7 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
             if (persistentState.appTriggerPackages.isNotEmpty()) {
                 setText(persistentState.appTriggerPackages)
             }
-            setPadding(50, 40, 50, 0)
+            setPadding(50, 40, 50, 40)
             gravity = Gravity.TOP or Gravity.START
             android.R.style.Widget_Material_EditText
         }
