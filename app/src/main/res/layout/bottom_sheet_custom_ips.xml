@@ -206,6 +206,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
+        android:visibility="gone"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/rectangle_border_background">
