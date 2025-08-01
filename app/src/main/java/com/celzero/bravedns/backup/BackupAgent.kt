@@ -84,6 +84,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             "completed backup process, is backup successful? $isBackupSucceed"
         )
         if (isBackupSucceed) {
+            startVpn(context)
             return Result.success()
         }
         return Result.failure()
