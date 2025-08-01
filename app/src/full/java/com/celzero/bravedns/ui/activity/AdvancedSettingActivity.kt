@@ -119,6 +119,7 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
 
         b.dvIpInfoSwitch.isChecked = persistentState.downloadIpInfo
         updateDialerTimeOutUi(persistentState.dialTimeoutSec)
+        b.dvTimeoutSeekbar.progress = persistentState.dialTimeoutSec / 60
     }
 
     /*private fun updateDialerTimeOutUi() {
