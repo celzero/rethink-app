@@ -2053,7 +2053,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                         }
 
                         AppConfig.DnsType.SYSTEM_DNS -> {
-                            setNetworkAndDefaultDnsIfNeeded()
+                            setNetworkAndDefaultDnsIfNeeded(forceUpdate = true)
                         }
 
                         AppConfig.DnsType.SMART_DNS -> {
@@ -2120,7 +2120,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     if (!isDefaultDnsNone()) {
                         vpnAdapter?.addDefaultTransport(persistentState.defaultDnsUrl)
                     } else {
-                        setNetworkAndDefaultDnsIfNeeded()
+                        setNetworkAndDefaultDnsIfNeeded(forceUpdate = true)
                     }
                 }
             }
@@ -2143,7 +2143,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 io("routeRethinkInRethink") {
                     restartVpnWithNewAppConfig(reason = "routeRethinkInRethink")
                     vpnAdapter?.notifyLoopback()
-                    setNetworkAndDefaultDnsIfNeeded()
+                    setNetworkAndDefaultDnsIfNeeded(forceUpdate = true)
                 }
             }
 

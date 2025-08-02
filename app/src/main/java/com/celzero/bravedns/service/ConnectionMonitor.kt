@@ -259,10 +259,10 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         scope.launch(CoroutineName("nwhdl") + serializer) {
             for (m in channel) {
                 // process the message in a coroutine context
-                val deferred = async  { hdl.handleMessage(m) }
+                val deferred = async { hdl.handleMessage(m) }
                 deferred.await()
                 // add a delay to avoid processing multiple network changes in quick succession
-                delay(TimeUnit.SECONDS.toMillis(3)) // adjust the delay as needed
+                delay(TimeUnit.SECONDS.toMillis(3))
             }
         }
 
@@ -463,12 +463,13 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
             val vpnRoutes = determineVpnProtos(opPrefs.networkSet)
             val isActiveNetworkCellular = isActiveConnectionCellular(newActiveNetwork)
+            val isDnsChanged = hasNwDnsChanged(currentNetworks, newNetworks)
 
             Logger.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, currNws: $currentNetworks ; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered")
 
             Logger.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, newNws: $newNetworks \n ; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered")
 
-            if (isNewNetwork || opPrefs.isForceUpdate) {
+            if (isNewNetwork || opPrefs.isForceUpdate || isDnsChanged) {
                 currentNetworks = newNetworks
                 repopulateTrackedNetworks(opPrefs, currentNetworks)
                 informListener(false, isActiveNetworkMetered, isActiveNetworkCellular, vpnRoutes)
@@ -619,7 +620,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             val sz = trackedIpv4Networks.size + trackedIpv6Networks.size
             Logger.i(
                 LOG_TAG_CONNECTION,
-                "inform network change: ${sz}, all? $useActiveNetwork, metered? $isActiveNetworkMetered"
+                "inform network change: ${sz}, useActive? $useActiveNetwork, metered? $isActiveNetworkMetered"
             )
             // maintain a map of dns servers for ipv4 and ipv6 networks
             val dns4 = getDnsServers(trackedIpv4Networks)
@@ -874,7 +875,6 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                 val isValidated = isValidated(network)
                 val hasInternet = hasInternet(network)
                 Logger.d(LOG_TAG_CONNECTION, "processing: ${network.networkHandle}, netid: ${netId(network.networkHandle)}, active? $isActive, activeNull? $isActiveNull, internet? $hasInternet, captive? $isCaptive, validated? $isValidated")
-                var fallthrough = true
                 // TODO: case: CAPTIVE_PORTAL, should we not test reachability?
                 if (testReachability) {
                     // for active network, ICMP echo is additionally used with TCP and UDP checks
@@ -886,16 +886,11 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                     if (has6) trackedIpv6Networks.add(prop)
                     Logger.i(LOG_TAG_CONNECTION, "url probe, nw(${network.networkHandle}, netid: ${netId(network.networkHandle)}): has4? $has4, has6? $has6, $prop")
                     if (has4 && has6) {
-                        fallthrough = false
-                        return
+                        return@outer
                     }
                     // else: fall-through to check reachability with ips or network capabilities
                 }
-                // this is to mitigate the limitation of return inside the withContext block
-                // so that we can continue with the outer loop
-                if (!fallthrough) return@outer
 
-                fallthrough = true
                 val nwHas4 = trackedIpv4Networks.any { it.network == network }
                 val nwHas6 = trackedIpv6Networks.any { it.network == network }
                 // if either of the trackedIpv4Networks or trackedIpv6Networks has the network,
@@ -903,20 +898,15 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                 if (testReachability && (!nwHas4 && !nwHas6)) {
                     // both the ipv4 and ipv6 networks are not reachable, so try to check
                     // for ip reachability
-                    withContext(Dispatchers.IO) {
-                        val has4 = probeConnectivity(opPrefs.useAutoConnectivityChecks, network, SCHEME_IP, PROTOCOL_V4)
-                        val has6 = probeConnectivity(opPrefs.useAutoConnectivityChecks, network, SCHEME_IP, PROTOCOL_V6)
-                        if (has4) trackedIpv4Networks.add(prop)
-                        if (has6) trackedIpv6Networks.add(prop)
-                        Logger.i(LOG_TAG_CONNECTION, "ip probe, nw(${network.networkHandle}, netid: ${netId(network.networkHandle)}): has4? $has4, has6? $has6, $prop")
-                        if (has4 && has6) {
-                            fallthrough = false
-                            return@withContext
-                        }
+                    val has4 = probeConnectivity(opPrefs.useAutoConnectivityChecks, network, SCHEME_IP, PROTOCOL_V4)
+                    val has6 = probeConnectivity(opPrefs.useAutoConnectivityChecks, network, SCHEME_IP, PROTOCOL_V6)
+                    if (has4) trackedIpv4Networks.add(prop)
+                    if (has6) trackedIpv6Networks.add(prop)
+                    Logger.i(LOG_TAG_CONNECTION, "ip probe, nw(${network.networkHandle}, netid: ${netId(network.networkHandle)}): has4? $has4, has6? $has6, $prop")
+                    if (has4 && has6) {
+                        return@outer
                     }
                 }
-
-                if (!fallthrough) return@outer
 
                 val nwHas4AfterProbe = trackedIpv4Networks.any { it.network == network }
                 val nwHas6AfterProbe = trackedIpv6Networks.any { it.network == network }
