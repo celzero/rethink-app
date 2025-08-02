@@ -17,9 +17,12 @@ package com.celzero.bravedns.ui.fragment
 
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
@@ -250,10 +253,35 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
                 handleInsertIp(dBind, IpRulesManager.IpRuleStatus.TRUST)
             }
         }
-
+        adjustButtonLayoutOrientation(dBind.dialogButtonsContainer)
         dBind.daciCancelBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
+
+    fun adjustButtonLayoutOrientation(buttonContainer: LinearLayout) {
+        buttonContainer.post {
+            val totalButtonsWidth = (0 until buttonContainer.childCount).sumOf { index ->
+                val child = buttonContainer.getChildAt(index)
+                val margins = (child.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+                        it.marginStart + it.marginEnd
+                } ?: 0
+                child.measuredWidth + margins
+            }
+
+            val availableWidth = buttonContainer.width - buttonContainer.paddingStart - buttonContainer.paddingEnd
+
+            // If buttons don't fit horizontally, switch to vertical
+            if (totalButtonsWidth > availableWidth) {
+                buttonContainer.orientation = LinearLayout.VERTICAL
+                // Optional: center buttons vertically
+                buttonContainer.gravity = Gravity.CENTER_HORIZONTAL
+            } else {
+                buttonContainer.orientation = LinearLayout.HORIZONTAL
+                buttonContainer.gravity = Gravity.END
+            }
+        }
+    }
+
 
     private fun handleInsertIp(
         dBind: DialogAddCustomIpBinding,
