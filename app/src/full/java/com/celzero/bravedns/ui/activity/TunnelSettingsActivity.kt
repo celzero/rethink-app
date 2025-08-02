@@ -328,7 +328,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     private fun showNwReachabilityCheckDialog() {
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         val nwReachabilityDialog = NetworkReachabilityDialog(this, persistentState, themeId)
-        nwReachabilityDialog.setCanceledOnTouchOutside(false)
+        nwReachabilityDialog.setCanceledOnTouchOutside(true)
         nwReachabilityDialog.show()
     }
 
