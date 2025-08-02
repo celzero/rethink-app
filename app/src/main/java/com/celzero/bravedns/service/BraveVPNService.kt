@@ -187,6 +187,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private var preflowDispatcher = Daemons.ioDispatcher("preflow", PreMark(), vpnScope)
     private var dnsQueryDispatcher = Daemons.ioDispatcher("onQuery", DNSOpts(), vpnScope)
 
+    @kotlin.concurrent.Volatile
     private var builderStats: String = ""
     private var testFd: AtomicInteger = AtomicInteger(-1)
 
@@ -1276,7 +1277,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val appName =
                 socks5ProxyEndpoint?.proxyAppName
                     ?: getString(R.string.settings_app_list_default_app)
-            if (isExcludePossible(appName)) {
+            if (canExcludeProxyApps(appName)) {
                 Logger.i(LOG_TAG_VPN, "exclude app for socks5, pkg: $appName")
                 addDisallowedApplication(builder, appName)
             } else {
@@ -1284,7 +1285,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             }
         }
 
-        if (appConfig.isOrbotProxyEnabled() && isExcludePossible(getString(R.string.orbot))) {
+        if (appConfig.isOrbotProxyEnabled() && canExcludeProxyApps(getString(R.string.orbot))) {
             Logger.i(LOG_TAG_VPN, "exclude orbot app")
             addDisallowedApplication(builder, OrbotHelper.ORBOT_PACKAGE_NAME)
         }
@@ -1294,7 +1295,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val httpProxyEndpoint = appConfig.getConnectedHttpProxy()
             val appName =
                 httpProxyEndpoint?.proxyAppName ?: getString(R.string.settings_app_list_default_app)
-            if (isExcludePossible(appName)) {
+            if (canExcludeProxyApps(appName)) {
                 Logger.i(LOG_TAG_VPN, "exclude app for http proxy, pkg: $appName")
                 addDisallowedApplication(builder, appName)
             } else {
@@ -1307,7 +1308,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val dnsProxyEndpoint = appConfig.getSelectedDnsProxyDetails()
             val appName =
                 dnsProxyEndpoint?.proxyAppName ?: getString(R.string.settings_app_list_default_app)
-            if (isExcludePossible(appName)) {
+            if (canExcludeProxyApps(appName)) {
                 Logger.i(LOG_TAG_VPN, "exclude app for dns proxy, pkg: $appName")
                 addDisallowedApplication(builder, appName)
             } else {
@@ -1318,7 +1319,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return builder
     }
 
-    private fun isExcludePossible(appName: String?): Boolean {
+    private fun canExcludeProxyApps(appName: String?): Boolean {
         // user settings to exclude apps in proxy mode
         if (!persistentState.excludeAppsInProxy) {
             Logger.i(LOG_TAG_VPN, "exclude apps in proxy is disabled")
