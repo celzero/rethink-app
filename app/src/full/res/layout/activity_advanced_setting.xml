@@ -277,7 +277,7 @@
                                 android:layout_alignParentEnd="true"
                                 android:layout_centerVertical="true"
                                 android:layout_marginEnd="10dp"
-                                android:text="1 mins 10 sec"
+                                android:text=""
                                 android:textSize="@dimen/default_font_text_view" />
 
                         </RelativeLayout>
@@ -286,12 +286,10 @@
                             android:id="@+id/dv_timeout_seekbar"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
                             android:layout_marginTop="5dp"
-                            android:layout_marginEnd="5dp"
                             android:layout_marginBottom="5dp"
                             android:max="120"
-                            android:padding="10dp"
+                            android:padding="5dp"
                             android:progress="0" />
                     </LinearLayout>
 
