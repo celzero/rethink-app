@@ -277,7 +277,7 @@ interface StatsSummaryDao {
                 AND duration = 0
                 AND synack = 0
                 AND message = ''
-                AND timeStamp > :to
+                AND timeStamp >= :to
             GROUP BY appName
             ORDER BY count DESC
             """
@@ -298,7 +298,7 @@ interface StatsSummaryDao {
                                0 as uploadBytes,
                                0 as totalBytes
                            FROM ConnectionTracker as ct
-                           INNER JOIN IpInfo as asn ON ct.ipAddress = asn.ip
+                           LEFT JOIN IpInfo as asn ON ct.ipAddress = asn.ip
                            WHERE downloadBytes = 0
                                AND uploadBytes = 0
                                AND isBlocked = 0
@@ -306,7 +306,7 @@ interface StatsSummaryDao {
                                AND synack = 0
                                AND message = ''
                                AND uid = :uid
-                               AND timeStamp > :to
+                               AND timeStamp >= :to
                            GROUP BY ipAddress
                            ORDER BY count DESC
                    LIMIT 3
@@ -327,7 +327,7 @@ interface StatsSummaryDao {
             0 as uploadBytes,
             0 as totalBytes
         FROM ConnectionTracker as ct
-        INNER JOIN IpInfo as asn ON ct.ipAddress = asn.ip
+        LEFT JOIN IpInfo as asn ON ct.ipAddress = asn.ip
         WHERE downloadBytes = 0
             AND uploadBytes = 0
             AND isBlocked = 0
@@ -335,7 +335,7 @@ interface StatsSummaryDao {
             AND synack = 0
             AND message = ''
             AND uid = :uid
-            AND timeStamp > :to
+            AND timeStamp >= :to
             AND ct.ipAddress LIKE :query
         GROUP BY ipAddress
         ORDER BY count DESC

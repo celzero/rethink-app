@@ -445,6 +445,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         b.aadActiveConnsRv.layoutManager = layoutManager
         val adapter = AppWiseDomainsAdapter(this, this, uid, isRethinkApp, isActiveConn = true)
         val uptime = VpnController.uptimeMs()
+        Logger.i(LOG_TAG_UI, "app-info-act, active conns, uptime: $uptime ms")
         networkLogsViewModel.fetchTopActiveConnections(uid, uptime).observe(this) {
             adapter.submitData(this.lifecycle, it)
         }

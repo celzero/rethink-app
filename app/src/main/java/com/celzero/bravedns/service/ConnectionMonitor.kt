@@ -27,6 +27,8 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import com.celzero.bravedns.util.ConnectivityCheckHelper
+import com.celzero.bravedns.util.Daemons
+import com.celzero.bravedns.util.Factory
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
@@ -35,12 +37,10 @@ import com.google.common.collect.Sets
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.Inet4Address
@@ -162,7 +162,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                     )
                 }"
             )
-            handleNetworkChange()
+            sendNetworkChanges()
         }
     }
 
@@ -178,7 +178,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                     )
                 }"
             )
-            handleNetworkChange()
+            sendNetworkChanges()
         }
     }
 
@@ -194,7 +194,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                 networkSet.add(network) // re-add to ensure the latest network is used
             }
 
-            handleNetworkChange(isForceUpdate = false)
+            sendNetworkChanges(isForceUpdate = false)
         }
     }
 
@@ -209,7 +209,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                 networkSet.remove(network)
                 networkSet.add(network) // re-add to ensure the latest network is used
             }
-            handleNetworkChange()
+            sendNetworkChanges()
         }
     }
 
@@ -219,7 +219,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
      */
     fun onUserPreferenceChanged() {
         Logger.d(LOG_TAG_CONNECTION, "onUserPreferenceChanged")
-        scope.launch(CoroutineName("cmPref") + serializer) { handleNetworkChange() }
+        scope.launch(CoroutineName("cmPref") + serializer) { sendNetworkChanges() }
     }
 
     /**
@@ -238,6 +238,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         cm = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         channel = Channel(Channel.CONFLATED)
         try {
+            // TODO: use a custom Looper(HandlerThread) to avoid blocking the main thread
             cm.registerNetworkCallback(networkRequest, this)
         } catch (e: Exception) {
             Logger.w(LOG_TAG_CONNECTION, "Exception while registering network callback", e)
@@ -254,7 +255,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         )
 
         val hdl = NetworkRequestHandler(cm,  networkListener, ips)
-        handleNetworkChange(isForceUpdate = true)
+        sendNetworkChanges(isForceUpdate = true)
 
         scope.launch(CoroutineName("nwhdl") + serializer) {
             for (m in channel) {
@@ -271,22 +272,25 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
 
 
     // Always called from the main thread
-    fun onVpnStop() {
-        try {
-            networkSet.clear()
-            if (::channel.isInitialized) {
-                channel.close()
+    suspend fun onVpnStop() {
+        val nwCallback = this
+        scope.launch(CoroutineName("cmStop") + serializer) {
+            try {
+                // check if connectivity manager is initialized as it is lazy initialized
+                if (::cm.isInitialized) {
+                    cm.unregisterNetworkCallback(nwCallback)
+                }
+                networkSet.clear()
+                if (::channel.isInitialized) {
+                    channel.close()
+                }
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_CONNECTION, "err while unregistering", e)
             }
-            // check if connectivity manager is initialized as it is lazy initialized
-            if (::cm.isInitialized) {
-                cm.unregisterNetworkCallback(this)
-            }
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_CONNECTION, "ConnectionMonitor: err while unregistering", e)
         }
     }
 
-    private suspend fun handleNetworkChange(isForceUpdate: Boolean = true) {
+    private suspend fun sendNetworkChanges(isForceUpdate: Boolean = true) {
         val dualStack =
             InternetProtocol.getInternetProtocol(persistentState.internetProtocolType).isIPv46()
         val testReachability = dualStack && persistentState.connectivityChecks
