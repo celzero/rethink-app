@@ -3063,7 +3063,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         persistentState.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
 
         // onVpnStart is also called from the main thread (ui)
-        connectionMonitor.onVpnStop()
+        io("cmVpnStop") { connectionMonitor.onVpnStop() }
         VpnController.onVpnDestroyed()
         // stop the inapp billing handler if it exists
         //InAppBillingHandler.endConnection()
