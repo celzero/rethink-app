@@ -71,42 +71,50 @@
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/daci_text_input_layout" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/daci_block_btn"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/dialog_button_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/block"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/daci_failure_text_view" />
+        app:layout_constraintTop_toBottomOf="@id/daci_failure_text_view"
+        android:padding="10dp">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/daci_trust_btn"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:gravity="center"
-        android:text="@string/ci_trust_rule"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view"
-        app:layout_constraintEnd_toStartOf="@id/daci_block_btn"
-        app:layout_constraintTop_toBottomOf="@id/daci_failure_text_view" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/daci_cancel_btn"
+            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fapps_info_dialog_positive_btn"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view"
+            android:layout_alignParentStart="true"
+            android:gravity="start|center"
+            android:layout_toStartOf="@id/daci_trust_btn"
+            android:layout_centerVertical="true" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/daci_cancel_btn"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:gravity="center"
-        android:text="@string/fapps_info_dialog_positive_btn"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/daci_failure_text_view" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/daci_block_btn"
+            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/block"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/daci_trust_btn"
+            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ci_trust_rule"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view"
+            android:layout_toStartOf="@id/daci_block_btn"
+            android:layout_marginEnd="8dp"
+            android:layout_centerVertical="true" />
+    </RelativeLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
