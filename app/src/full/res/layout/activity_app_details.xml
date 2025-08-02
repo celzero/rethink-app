@@ -515,10 +515,10 @@
                 android:layout_gravity="end"
                 android:layout_marginEnd="5dp"
                 android:text="@string/close_all"
-                android:textColor="?attr/chipTextPositive"
+                android:textColor="?attr/chipTextNegative"
                 android:textSize="@dimen/large_font_text_view"
                 android:visibility="visible"
-                app:chipBackgroundColor="?attr/chipBgColorPositive"
+                app:chipBackgroundColor="?attr/chipBgColorNegative"
                 app:chipSurfaceColor="@null" />
 
             <com.google.android.material.chip.Chip
