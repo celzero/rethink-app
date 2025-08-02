@@ -53,11 +53,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:alpha="0.7"
-                    android:textIsSelectable="true"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
                     android:paddingBottom="5dp"
                     android:textColor="?primaryTextColor"
+                    android:textIsSelectable="true"
                     android:textSize="@dimen/default_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -76,11 +76,11 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_marginEnd="10dp"
+                    android:layout_toStartOf="@id/aad_proxy_details"
+                    android:alpha="0.7"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
                     android:paddingBottom="5dp"
-                    android:layout_toStartOf="@id/aad_proxy_details"
-                    android:alpha="0.7"
                     android:textColor="?primaryTextColor"
                     android:textSize="@dimen/default_font_text_view" />
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -107,6 +107,31 @@
 
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/aad_aap_firewall_new_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:fontFamily="sans-serif-smallcaps"
+                android:gravity="center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/ada_firewall_title"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/extra_large_font_text_view" />
+
+        </RelativeLayout>
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/aad_app_settings_card"
             android:layout_width="match_parent"
@@ -122,28 +147,8 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
                 android:orientation="vertical"
-                android:paddingTop="5dp"
+                android:paddingTop="15dp"
                 android:paddingBottom="15dp">
-
-                <RelativeLayout
-                    android:id="@+id/aad_aap_firewall_new_card"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="10dp">
-
-                    <TextView
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:gravity="center_vertical"
-                        android:padding="5dp"
-                        android:text="@string/ada_firewall_title"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:textSize="@dimen/large_font_text_view"
-                        android:textStyle="bold" />
-
-                </RelativeLayout>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/aad_app_settings_ll"
@@ -259,6 +264,164 @@
 
                     </androidx.appcompat.widget.LinearLayoutCompat>
                 </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/aad_ip_block_card"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:layout_marginStart="5dp"
+                        android:clipToPadding="true"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="8dp"
+                        app:cardUseCompatPadding="true">
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:orientation="vertical"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp">
+
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/aad_ip_block_header"
+                                style="@style/TextAppearance.AppCompat.Subhead"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-smallcaps"
+                                android:gravity="center"
+                                android:paddingTop="5dp"
+                                android:paddingBottom="5dp"
+                                android:textColor="?attr/secondaryTextColor"
+                                android:textSize="@dimen/heading_font_text_view"
+                                android:textStyle="bold" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:drawablePadding="5dp"
+                                android:paddingTop="2dp"
+                                android:paddingBottom="2dp"
+                                android:text="@string/lbl_ip_rules"
+                                android:textSize="@dimen/default_font_text_view" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/aad_domain_block_card"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:clipToPadding="true"
+                        app:cardCornerRadius="8dp"
+                        android:layout_marginEnd="10dp"
+                        app:cardElevation="8dp"
+                        app:cardUseCompatPadding="true">
+
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:orientation="vertical"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/aad_domain_block_header"
+                                style="@style/TextAppearance.AppCompat.Subhead"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-smallcaps"
+                                android:gravity="center"
+                                android:paddingTop="5dp"
+                                android:paddingBottom="5dp"
+                                android:textColor="?attr/secondaryTextColor"
+                                android:textSize="@dimen/heading_font_text_view"
+                                android:textStyle="bold" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:drawablePadding="5dp"
+                                android:paddingTop="2dp"
+                                android:paddingBottom="2dp"
+                                android:text="@string/lbl_domain_rules"
+                                android:textSize="@dimen/default_font_text_view" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+                    </com.google.android.material.card.MaterialCardView>
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <RelativeLayout
+                    android:id="@+id/exclude_proxy_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:paddingTop="10dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/exclude_proxy_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_proxy_white" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/exclude_proxy_switch"
+                        android:layout_toEndOf="@id/exclude_proxy_icon"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/exclude_proxy_txt"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/exclude_apps_from_proxy"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/aad_proxy_details"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.7"
+                            android:textSize="@dimen/default_font_text_view"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/exclude_proxy_switch"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:padding="10dp" />
+                </RelativeLayout>
+
             </androidx.appcompat.widget.LinearLayoutCompat>
         </com.google.android.material.card.MaterialCardView>
 
@@ -330,163 +493,10 @@
         </com.google.android.material.card.MaterialCardView>
 
         <RelativeLayout
-            android:id="@+id/exclude_proxy_rl"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/exclude_proxy_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
-                android:padding="10dp"
-                android:src="@drawable/ic_proxy_white" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/exclude_proxy_switch"
-                android:layout_toEndOf="@id/exclude_proxy_icon"
-                android:orientation="vertical">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/exclude_proxy_txt"
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/exclude_apps_from_proxy"
-                    android:textSize="@dimen/large_font_text_view" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/aad_proxy_details"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:alpha="0.7"
-                    android:textSize="@dimen/default_font_text_view" />
-
-            </LinearLayout>
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/exclude_proxy_switch"
-                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:padding="10dp" />
-        </RelativeLayout>
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="1">
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/aad_ip_block_card"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:clipToPadding="true"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
-                app:cardUseCompatPadding="true">
-
-                <androidx.appcompat.widget.LinearLayoutCompat
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:orientation="vertical"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp">
-
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/aad_ip_block_header"
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:gravity="center"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:textSize="@dimen/heading_font_text_view"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:drawablePadding="5dp"
-                        android:paddingTop="2dp"
-                        android:paddingBottom="2dp"
-                        android:text="@string/lbl_ip_rules"
-                        android:textSize="@dimen/default_font_text_view" />
-
-                </androidx.appcompat.widget.LinearLayoutCompat>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/aad_domain_block_card"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:clipToPadding="true"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
-                app:cardUseCompatPadding="true">
-
-                <androidx.appcompat.widget.LinearLayoutCompat
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:orientation="vertical"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/aad_domain_block_header"
-                        style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-smallcaps"
-                        android:gravity="center"
-                        android:paddingTop="5dp"
-                        android:paddingBottom="5dp"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:textSize="@dimen/heading_font_text_view"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:drawablePadding="5dp"
-                        android:paddingTop="2dp"
-                        android:paddingBottom="2dp"
-                        android:text="@string/lbl_domain_rules"
-                        android:textSize="@dimen/default_font_text_view" />
-
-                </androidx.appcompat.widget.LinearLayoutCompat>
-            </com.google.android.material.card.MaterialCardView>
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <RelativeLayout
             android:id="@+id/aad_active_conns_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:visibility="visible">
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -510,10 +520,10 @@
                 style="@style/ThinnerChip.Action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toStartOf="@id/aad_active_conns_chip"
                 android:layout_centerInParent="true"
                 android:layout_gravity="end"
                 android:layout_marginEnd="5dp"
+                android:layout_toStartOf="@id/aad_active_conns_chip"
                 android:text="@string/close_all"
                 android:textColor="?attr/chipTextNegative"
                 android:textSize="@dimen/large_font_text_view"
