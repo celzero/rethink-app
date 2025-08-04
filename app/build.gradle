@@ -184,6 +184,22 @@ configurations {
     }
 }
 
+def firestackRepo = project.findProperty("firestackRepo") ?: "github"
+def firestackCommit = project.findProperty("firestackCommit") ?: "main"
+
+def firestackDependency = { suffix = "" ->
+    switch (firestackRepo) {
+        case "jitpack":
+            return "com.github.celzero:firestack:$firestackCommit${suffix}@aar"
+        case "github":
+            return "com.github.celzero:firestack:$firestackCommit${suffix}"
+        case "ossrh":
+            return "com.celzero:firestack:$firestackCommit${suffix}@aar"
+        default:
+            throw new GradleException("Unknown firestackRepo: $firestackRepo")
+    }
+}
+
 dependencies {
     def room_version = "2.6.1"
     def paging_version = "3.3.6"
@@ -224,8 +240,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.12.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.1.0'
 
-    fullImplementation 'com.squareup.okhttp3:okhttp:5.0.0'
-    fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.0.0'
+    fullImplementation 'com.squareup.okhttp3:okhttp:5.1.0'
+    fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.1.0'
 
     fullImplementation 'com.squareup.retrofit2:retrofit:3.0.0'
     fullImplementation 'com.squareup.retrofit2:converter-gson:3.0.0'
@@ -259,26 +275,11 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.9'
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
-    // from: https://jitpack.io/#celzero/firestack
-    /*download 'com.github.celzero:firestack:1fbdeed641@aar'
-    websiteImplementation 'com.github.celzero:firestack:1fbdeed641@aar'
-    fdroidImplementation 'com.github.celzero:firestack:1fbdeed641@aar'
-    // debug symbols
-    playImplementation 'com.github.celzero:firestack:1fbdeed641:debug@aar'*/
-
-    // from github packages
-    // ref: docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#using-a-published-package
-    /*download 'com.celzero:firestack:1fbdeed641'
-    websiteImplementation 'com.github.celzero:firestack:1fbdeed641'
-    fdroidImplementation 'com.github.celzero:firestack:1fbdeed641'
-    playImplementation 'com.github.celzero:firestack:1fbdeed641'*/
-
-
-    // ossrh
-    websiteImplementation 'com.celzero:firestack:1fbdeed641@aar'
-    fdroidImplementation 'com.celzero:firestack:1fbdeed641@aar'
-    playImplementation 'com.celzero:firestack:1fbdeed641@aar'
-    download 'com.celzero:firestack:1fbdeed641@aar'
+    // add ":debug" suffix to the dependency to include debug symbols
+    download firestackDependency()
+    websiteImplementation firestackDependency()
+    fdroidImplementation firestackDependency()
+    playImplementation firestackDependency()
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.10.2') {

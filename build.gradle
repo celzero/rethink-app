@@ -22,15 +22,26 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        //maven { url 'https://jitpack.io' }
-        /*maven {
-            name = 'GitHubPackages'
-            url = uri("https://maven.pkg.github.com/celzero/firestack")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME_GITHUB")
-                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN_GITHUB")
+
+        def firestackRepo = project.findProperty("firestackRepo") ?: "github"
+
+        if (firestackRepo == "jitpack") {
+            // jitpack.io/#celzero/firestack
+            maven { url 'https://jitpack.io' }
+        } else if (firestackRepo == "github") {
+            // maven.pkg.github.com/celzero/firestack
+            maven {
+                name = 'GitHubPackages'
+                url = uri("https://maven.pkg.github.com/celzero/firestack")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME_GITHUB")
+                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN_GITHUB")
+                }
             }
-        }*/
+        } else {
+            // ossrh: https://central.sonatype.com/artifact/com.celzero/firestack/
+            // no-op; mavenCentral is already included
+        }
     }
 }
 
