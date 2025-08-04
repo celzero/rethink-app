@@ -53,8 +53,8 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:padding="5dp"
             android:text="@string/bypasses_network_restrictions"
@@ -64,9 +64,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="8dp"
             android:orientation="horizontal"
-            android:layout_marginTop="10dp"
             android:paddingTop="5dp"
             android:paddingBottom="5dp">
 
@@ -254,9 +254,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="8dp"
             android:orientation="horizontal"
-            android:layout_marginTop="10dp"
             android:paddingTop="5dp"
             android:paddingBottom="5dp">
 
@@ -421,26 +421,23 @@
             android:layout_margin="5dp"
             android:padding="5dp" />
 
-        <LinearLayout
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="25dp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/test_button"
+            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:orientation="horizontal">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/test_button"
-                android:background="@drawable/rectangle_border_background"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:gravity="center"
-                android:padding="10dp"
-                android:textColor="?attr/accentGood"
-                android:layout_marginStart="5dp"
-                android:layout_weight="0.5"
-                android:text="@string/lbl_save" />
-
-        </LinearLayout>
+            android:layout_margin="20dp"
+            android:background="@drawable/rectangle_border_background"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/lbl_test"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/extra_large_font_text_view" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -49,7 +49,6 @@ class NetworkReachabilityDialog(activity: Activity,
     private lateinit var binding: DialogInputIpsBinding
     private val urlSegment4 = "#ipv4"
     private val urlSegment6 = "#ipv6"
-    private var useAuto = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,18 +78,16 @@ class NetworkReachabilityDialog(activity: Activity,
 
     private fun setupListeners() {
         binding.autoToggleBtn.setOnClickListener {
-            useAuto = true
+            persistentState.performAutoNetworkConnectivityChecks = true
             updateAutoModeUi()
             selectToggleBtnUi(binding.autoToggleBtn)
             unselectToggleBtnUi(binding.manualToggleBtn)
-            persistentState.performAutoNetworkConnectivityChecks = true
         }
         binding.manualToggleBtn.setOnClickListener {
-            useAuto = false
+            persistentState.performAutoNetworkConnectivityChecks = false
             updateManualModeUi()
             selectToggleBtnUi(binding.manualToggleBtn)
             unselectToggleBtnUi(binding.autoToggleBtn)
-            persistentState.performAutoNetworkConnectivityChecks = false
         }
         binding.resetChip.setOnClickListener { resetToDefaults() }
         binding.testButton.setOnClickListener { testConnections() }
@@ -185,6 +182,7 @@ class NetworkReachabilityDialog(activity: Activity,
         binding.errorMessage.visibility = View.GONE
 
         io {
+            val useAuto = persistentState.performAutoNetworkConnectivityChecks
             try {
                 val results = mutableMapOf<String, ConnectionMonitor.ProbeResult?>()
                 val v41 =
@@ -229,6 +227,7 @@ class NetworkReachabilityDialog(activity: Activity,
 
     private suspend fun probeIpOrUrl(ipOrUrl: String): ConnectionMonitor.ProbeResult? {
         return try {
+            val useAuto = persistentState.performAutoNetworkConnectivityChecks
             VpnController.probeIpOrUrl(ipOrUrl, useAuto)
         } catch (e: Exception) {
             Logger.d(LOG_TAG_UI, "NwReachability; probeIpOrUrl err: ${e.message}")
@@ -293,6 +292,7 @@ class NetworkReachabilityDialog(activity: Activity,
     private fun saveIps() {
         val defaultDrawable = ContextCompat.getDrawable(context, R.drawable.edittext_default)
         val errorDrawable = ContextCompat.getDrawable(context, R.drawable.edittext_error)
+        val useAuto = persistentState.performAutoNetworkConnectivityChecks
         if (!useAuto) {
             val valid41 = isValidIp(binding.ipv4Address1.text.toString(), IPVersion.IPV4)
             val valid42 = isValidIp(binding.ipv4Address2.text.toString(), IPVersion.IPV4)
