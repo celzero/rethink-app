@@ -58,7 +58,7 @@ class NetworkReachabilityDialog(activity: Activity,
         binding = DialogInputIpsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setCancelable(false)
+        setCancelable(true)
         initViews()
         setupListeners()
     }
@@ -66,7 +66,6 @@ class NetworkReachabilityDialog(activity: Activity,
     private fun initViews() {
         binding.saveChip.text =
             context.getString(R.string.lbl_save).replaceFirstChar(Char::titlecase)
-        binding.cancelButton.text = context.getString(R.string.lbl_cancel).uppercase()
         binding.testButton.text = context.getString(R.string.lbl_test).uppercase()
 
         if (persistentState.performAutoNetworkConnectivityChecks) {
@@ -85,7 +84,6 @@ class NetworkReachabilityDialog(activity: Activity,
             selectToggleBtnUi(binding.autoToggleBtn)
             unselectToggleBtnUi(binding.manualToggleBtn)
             persistentState.performAutoNetworkConnectivityChecks = true
-            binding.chosenMode.text = "Reachability checks are performed with auto mode"
         }
         binding.manualToggleBtn.setOnClickListener {
             useAuto = false
@@ -93,11 +91,9 @@ class NetworkReachabilityDialog(activity: Activity,
             selectToggleBtnUi(binding.manualToggleBtn)
             unselectToggleBtnUi(binding.autoToggleBtn)
             persistentState.performAutoNetworkConnectivityChecks = false
-            binding.chosenMode.text = "Reachability checks are performed with manual mode"
         }
         binding.resetChip.setOnClickListener { resetToDefaults() }
         binding.testButton.setOnClickListener { testConnections() }
-        binding.cancelButton.setOnClickListener { dismiss() }
         binding.saveChip.setOnClickListener { saveIps() }
     }
 
@@ -107,25 +103,23 @@ class NetworkReachabilityDialog(activity: Activity,
 
         selectToggleBtnUi(binding.autoToggleBtn)
         unselectToggleBtnUi(binding.manualToggleBtn)
-        binding.chosenMode.text = "Reachability checks are performed with auto mode"
 
         val autoTxt = context.getString(R.string.lbl_auto)
         val v4 = listOf(
             ConnectionMonitor.SCHEME_IP + ConnectionMonitor.PROTOCOL_V4 + autoTxt,
-            ConnectionMonitor.SCHEME_HTTP + ConnectionMonitor.PROTOCOL_V4 + autoTxt,
             ConnectionMonitor.SCHEME_HTTPS + ConnectionMonitor.PROTOCOL_V4 + autoTxt
         )
         val v6 = listOf(
             ConnectionMonitor.SCHEME_IP + ConnectionMonitor.PROTOCOL_V6 + autoTxt,
-            ConnectionMonitor.SCHEME_HTTP + ConnectionMonitor.PROTOCOL_V6 + autoTxt,
             ConnectionMonitor.SCHEME_HTTPS + ConnectionMonitor.PROTOCOL_V6 + autoTxt
         )
         binding.ipv4Address1.apply { isEnabled = false; setText(v4[0]) }
         binding.ipv4Address2.apply { isEnabled = false; setText(v4[1]) }
-        binding.ipv4Address3.apply { isEnabled = false; setText(v4[2]) }
         binding.ipv6Address1.apply { isEnabled = false; setText(v6[0]) }
         binding.ipv6Address2.apply { isEnabled = false; setText(v6[1]) }
-        binding.ipv6Address3.apply { isEnabled = false; setText(v6[2]) }
+
+        binding.ipv43Layout.visibility = View.GONE
+        binding.ipv63Layout.visibility = View.GONE
         binding.urlV4Layout.visibility = View.GONE
         binding.urlV6Layout.visibility = View.GONE
 
@@ -139,7 +133,6 @@ class NetworkReachabilityDialog(activity: Activity,
         binding.saveChip.visibility = View.VISIBLE
         selectToggleBtnUi(binding.manualToggleBtn)
         unselectToggleBtnUi(binding.autoToggleBtn)
-        binding.chosenMode.text = "Reachability checks are performed with manual mode"
 
         val itemsIp4 = persistentState.pingv4Ips.split(",").toTypedArray()
         val itemsIp6 = persistentState.pingv6Ips.split(",").toTypedArray()
@@ -148,8 +141,11 @@ class NetworkReachabilityDialog(activity: Activity,
         val itemsUrl6 =
             persistentState.pingv6Url.split(urlSegment6).firstOrNull() ?: Constants.urlV6probe
 
+        binding.ipv43Layout.visibility = View.VISIBLE
+        binding.ipv63Layout.visibility = View.VISIBLE
         binding.urlV4Layout.visibility = View.VISIBLE
         binding.urlV6Layout.visibility = View.VISIBLE
+
         binding.ipv4Address1.apply { isEnabled = true; setText(itemsIp4.getOrNull(0) ?: "") }
         binding.ipv4Address2.apply { isEnabled = true; setText(itemsIp4.getOrNull(1) ?: "") }
         binding.ipv4Address3.apply { isEnabled = true; setText(itemsIp4.getOrNull(2) ?: "") }
@@ -188,33 +184,30 @@ class NetworkReachabilityDialog(activity: Activity,
         setAllStatusIconsVisibility(View.GONE)
         binding.errorMessage.visibility = View.GONE
 
-        // You must set your fragment/activity's own lifecycleScope or pass it via constructor
         io {
             try {
                 val results = mutableMapOf<String, ConnectionMonitor.ProbeResult?>()
                 val v41 =
                     if (useAuto) ConnectionMonitor.SCHEME_IP + ":" + ConnectionMonitor.PROTOCOL_V4 else binding.ipv4Address1.text.toString()
                 val v42 =
-                    if (useAuto) ConnectionMonitor.SCHEME_HTTP + ":" + ConnectionMonitor.PROTOCOL_V4 else binding.ipv4Address2.text.toString()
-                val v43 =
-                    if (useAuto) ConnectionMonitor.SCHEME_HTTPS + ":" + ConnectionMonitor.PROTOCOL_V4 else binding.ipv4Address3.text.toString()
+                    if (useAuto) ConnectionMonitor.SCHEME_HTTPS + ":" + ConnectionMonitor.PROTOCOL_V4 else binding.ipv4Address2.text.toString()
                 val v61 =
                     if (useAuto) ConnectionMonitor.SCHEME_IP + ":" + ConnectionMonitor.PROTOCOL_V6 else binding.ipv6Address1.text.toString()
                 val v62 =
-                    if (useAuto) ConnectionMonitor.SCHEME_HTTP + ":" + ConnectionMonitor.PROTOCOL_V6 else binding.ipv6Address2.text.toString()
-                val v63 =
-                    if (useAuto) ConnectionMonitor.SCHEME_HTTPS + ":" + ConnectionMonitor.PROTOCOL_V6 else binding.ipv6Address3.text.toString()
+                    if (useAuto) ConnectionMonitor.SCHEME_HTTPS + ":" + ConnectionMonitor.PROTOCOL_V6 else binding.ipv6Address2.text.toString()
 
                 results["ipv4_1"] = probeIpOrUrl(v41)
                 results["ipv4_2"] = probeIpOrUrl(v42)
-                results["ipv4_3"] = probeIpOrUrl(v43)
-                if (!useAuto) results["url4"] =
-                    probeIpOrUrl(binding.urlV4Address.text.toString() + urlSegment4)
+                if (!useAuto) {
+                    results["ipv4_3"] = probeIpOrUrl(binding.ipv4Address3.text.toString())
+                    results["url4"] = probeIpOrUrl(binding.urlV4Address.text.toString() + urlSegment4)
+                }
                 results["ipv6_1"] = probeIpOrUrl(v61)
                 results["ipv6_2"] = probeIpOrUrl(v62)
-                results["ipv6_3"] = probeIpOrUrl(v63)
-                if (!useAuto) results["url6"] =
-                    probeIpOrUrl(binding.urlV6Address.text.toString() + urlSegment6)
+                if (!useAuto) {
+                    results["ipv6_3"] = probeIpOrUrl(binding.ipv6Address3.text.toString())
+                    results["url6"] = probeIpOrUrl(binding.urlV6Address.text.toString() + urlSegment6)
+                }
 
                 uiCtx {
                     setAllProgressBarsVisibility(View.GONE)
@@ -295,7 +288,6 @@ class NetworkReachabilityDialog(activity: Activity,
     private fun setButtonsEnabled(enabled: Boolean) {
         binding.testButton.isEnabled = enabled
         binding.saveChip.isEnabled = enabled
-        binding.cancelButton.isEnabled = enabled
     }
 
     private fun saveIps() {
