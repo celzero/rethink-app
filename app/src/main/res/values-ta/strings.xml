@@ -148,8 +148,8 @@
     <string name="network_log_app_name_unknown" translatable="true">தெரியவில்லை</string>
     <string name="socks5_proxy_toast_parameter" translatable="true">சாக்ச் 5 பதிலாள்</string>
     <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><i> அளவிடப்படாத </i> நெட்வொர்க்கில் இணைக்க முயற்சிக்கும்போது ஒரு பயனர்-செட் ஃபயர்வால் விதி இதைத் தடுத்தது <i> பயன்பாடு </i><br/><br/> To change go to <i>All Apps</i>தாவல்.</string>
-    <string name="firewall_rule_block_http_desc" translatable="true">இந்த இணைப்பு தடுக்கப்பட்டது, ஏனெனில் இது <i> பாதுகாப்பற்ற http </i> ஐப் பயன்படுத்தலாம்.</string>
-    <string name="firewall_rule_unknown_desc" translatable="true"><i> மூல பயன்பாடு </i> ஐ தீர்மானிக்க முடியாததால் இந்த இணைப்பு ஃபயர்வால் செய்யப்பட்டது.</string>
+    <string name="firewall_rule_block_http_desc" translatable="true">இந்த இணைப்பு <i>பாதுகாப்பற்ற HTTP</i> ஐப் பயன்படுத்தியிருக்கலாம் என்பதால் தடுக்கப்பட்டது.<br/><br/> மாற்ற <i>யுனிவர்சல்</i> தாவலுக்குச் செல்லவும்.</string>
+    <string name="firewall_rule_unknown_desc" translatable="true"><i> மூல பயன்பாடு </i> ஐ தீர்மானிக்க முடியாததால் இந்த இணைப்பு ஃபயர்வால் செய்யப்பட்டது.<br/><br/>இந்த நடத்தையை மாற்ற <i>யுனிவர்சல்</i> தாவலுக்குச் செல்லவும்.</string>
     <string name="notif_channel_proxy_failure" translatable="true">பதிலாள் எச்சரிக்கைகள்</string>
     <string name="ada_noapp_dialog_title" translatable="true">அத்தகைய பயன்பாடு இல்லை</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">யுனிவர்சல் டிஎன்எச் மற்றும் ஃபயர்வால் விதிகளை புறக்கணிக்கும்</string>
@@ -268,7 +268,7 @@
     <string name="cloudflare_dns_desc" translatable="true">எந்த டிஎன்எச் கோரிக்கைகளையும் தடுக்காது. கிளவுட்ஃப்ளேர் 1.1.1.1 டிஎன்எச் எண்ட்பாயிண்ட் பயன்படுத்தவும்.</string>
     <string name="cloudflare_family_dns_desc" translatable="true">தீம்பொருள் மற்றும் வயதுவந்த உள்ளடக்கத்தைத் தடுக்கிறது. கிளவுட்ஃப்ளேரின் 1.1.1.3 டிஎன்எச் எண்ட்பாயிண்ட் பயன்படுத்துகிறது.</string>
     <string name="quad9_dns_desc" translatable="true">உலகெங்கிலும் உள்ள சேவையகங்களின் பாதுகாப்பான பிணையம் மூலம் உங்கள் டிஎன்எச் வினவல்களை குவாட் 9 வழிவகுக்கிறது.</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">இந்த இணைப்பு தடுக்கப்பட்டது, ஏனெனில் <i> டொமைன் </i> பயனர்-வழங்கப்பட்ட டி.என்.எச் மூலம் தடுக்கப்பட்டுள்ளது.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">பயனர் விரும்பும் DNS ஆல் <i>டொமைன்</i> தடுக்கப்பட்டுள்ளதால் இந்த இணைப்பு தடுக்கப்பட்டது.<br/><br/> இந்த நடத்தையை மாற்ற <i>DNS ஐ உள்ளமைக்கவும்</i> தாவலுக்குச் செல்லவும்.</string>
     <string name="new_app_bulk_notification_title" translatable="true">கவனம்</string>
     <string name="new_app_bulk_notification_content" translatable="true">ரீடிங்க் தடுக்கப்பட்டது %1$s புதிய பயன்பாடுகள். பார்க்க அல்லது மாற்ற தட்டவும்.</string>
     <string name="new_app_notification_action_deny" translatable="true">தொடர்ந்து தடுத்திரு</string>
@@ -404,7 +404,7 @@
     <string name="firewall_rule_no_rule_desc" translatable="true">இந்த இணைப்புடன் எந்த ஃபயர்வால் விதிகளும் பொருந்தவில்லை.</string>
     <string name="firewall_rule_isolate_desc" translatable="true">பயனர் அமைத்த ஃபயர்வால் விதி இந்த <i>ஆப்பை</i> <i>பைபாஸ் செய்யப்பட்ட ஐபிகள்</i> தவிர மற்றவற்றுடன் இணைப்பதைத் தடுத்தது.<br/><br/> மாற்ற, <i>எல்லா ஆப்ஸ்</i> தாவலுக்குச் செல்லவும்.</string>
     <string name="firewall_rule_block_ip_univ_desc" translatable="true">ஒரு பயனர்-செட் ஃபயர்வால் விதி <i> இலக்கு ஐபி/போர்ட் </i> ஐத் தடுத்தது. <br/> <br/> மாற்ற <i> யுனிவர்சல் </i> தாவலுக்குச் செல்லவும்.</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">ஒரு பயனர்-செட் ஃபயர்வால் விதி <i> டொமைன் </i> ஐத் தடுத்தது.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">பயனர் அமைத்த ஃபயர்வால் விதி <i>டொமைனைத்</i> தடுத்தது.<br/><br/> மாற்ற <i>பயன்பாட்டு சார்ந்த ஃபயர்வால்</i> திரைக்குச் செல்லவும்.</string>
     <string name="lbl_action_required" translatable="true">நடவடிக்கை தேவை</string>
     <string name="lbl_configure" translatable="true">உள்ளமைக்கவும்</string>
     <string name="lbl_logs" translatable="true">பதிவுகள்</string>
@@ -445,7 +445,7 @@
     <string name="pause_text" translatable="true">இடைநிறுத்தப்பட்டது</string>
     <string name="hs_btm_sheet_lock_down" translatable="true">VPN <i> பூட்டுதல் </i> ஆக இருக்கும்போது முறைகளை மாற்ற முடியாது. <u>VPN அமைப்புகளைத் திருத்து </u> ஐத் தட்டவும்.</string>
     <string name="firewall_rule_trusted_ip" translatable="true">நம்பகமான ஐபி</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true"><i> மூல பயன்பாடு </i> <i> பைபாச் யுனிவர்சல் </i> ஃபயர்வால் விதிகளுக்கு அமைக்கப்பட்டிருப்பதால் இந்த இணைப்பு அனுமதிக்கப்பட்டது. /i&gt; திரை.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true"><i>மூல பயன்பாடு</i> <i>உலகளாவிய ஃபயர்வால் விதிகளைத் தவிர்த்து</i> அமைக்கப்பட்டுள்ளதால் இந்த இணைப்பு அனுமதிக்கப்பட்டது.<br/><br/> மாற்ற <i>பயன்பாட்டு சார்ந்த ஃபயர்வால்</i> திரைக்குச் செல்லவும்.</string>
     <string name="build__flavor_website" translatable="true">இணையதளம்</string>
     <string name="ci_dialog_added_success" translatable="true">பட்டியலில் ஐபி சேர்க்கப்பட்டது</string>
     <string name="ci_no_rules_text" translatable="true">ஐபி அல்லது துறைமுகம் விதிகள் இல்லை.</string>
@@ -538,13 +538,13 @@
     <string name="fapps_info_unmetered_msg" translatable="true">அளவிடப்படாத (வைஃபை) நெட்வொர்க்கில் அனுமதிக்கவும் / தடுக்கவும்.</string>
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">பைபாச் பயன்பாடுகள்</string>
     <string name="firewall_rule_block_app_new_install" translatable="true">புதிய பயன்பாடு</string>
-    <string name="firewall_rule_device_lock_desc" translatable="true">இந்த இணைப்பு ஃபயர்வால் செய்யப்பட்டது, ஏனெனில் <i> சாதனம் பூட்டப்பட்டிருந்தது </i> அந்த நேரத்தில்.</string>
-    <string name="firewall_rule_global_lockdown_desc" translatable="true">உலகளாவிய பூட்டுதல் அமைக்கப்பட்டிருப்பதால் இந்த இணைப்பு தடுக்கப்பட்டது.</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">இந்த இணைப்பு தடுக்கப்பட்டது, ஏனெனில் <i> டொமைன் </i> உலகளாவிய டொமைன் விதிகளில் தடுக்கப்பட்டதாக அமைக்கப்பட்டுள்ளது.</string>
+    <string name="firewall_rule_device_lock_desc" translatable="true">இந்த இணைப்பு ஃபயர்வால் செய்யப்பட்டது, ஏனெனில் <i> சாதனம் பூட்டப்பட்டிருந்தது </i> அந்த நேரத்தில்.<br/><br/>இந்த நடத்தையை மாற்ற <i>யுனிவர்சல்</i> தாவலுக்குச் செல்லவும்.</string>
+    <string name="firewall_rule_global_lockdown_desc" translatable="true">உலகளாவிய பூட்டுதல் அமைக்கப்பட்டிருப்பதால் இந்த இணைப்பு தடுக்கப்பட்டது.<br/><br/> மாற்ற <i>யுனிவர்சல்</i> தாவலுக்குச் செல்லவும்.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">யுனிவர்சல் டொமைன் விதிகளில் <i>டொமைன்</i> தடுக்கப்பட்டதாக அமைக்கப்பட்டிருப்பதால் இந்த இணைப்பு தடுக்கப்பட்டது.<br/><br/> இந்த நடத்தையை மாற்ற <i>DNS ஐ உள்ளமைக்கவும்</i> தாவலுக்குச் செல்லவும்.</string>
     <string name="notif_dialog_pause_dialog_positive" translatable="true">தற்குறிப்பு</string>
     <string name="notif_channel_desc_proxy_failure" translatable="true">பதிலாள் பிழைகள் மற்றும் முரண்பாடுகள் குறித்து எச்சரிக்கை</string>
     <string name="category_name_non_app_sys" translatable="true">கணினி சேவைகள்</string>
-    <string name="ci_dialog_desc" translatable="true">ஐபி முகவரி, ஐபி சப்நெட் (வரம்பு), துறைமுகம் அனுமதிக்கவும் (பைபாச்) அல்லது தடுக்கவும். எடுத்துக்காட்டு: 10.10.10.10, 10.1.1.</string>
+    <string name="ci_dialog_desc" translatable="true">ஐபி முகவரி, ஐபி சப்நெட் (வரம்பு), போர்ட் ஆகியவற்றை அனுமதிக்கவும் (பைபாஸ்) அல்லது தடுக்கவும். எடுத்துக்காட்டு: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
     <string name="ci_dialog_error_invalid_ip" translatable="true">தவறான ஐபி முகவரி, சப்நெட் அல்லது துறைமுகம்.</string>
     <string name="ci_dialog_title" translatable="true">ஐபி / துறைமுகம் விதியைச் சேர்க்கவும்</string>
     <string name="ci_no_rule_txt" translatable="true">விதி இல்லை</string>
@@ -695,9 +695,9 @@
     <string name="firewall_rule_new_app_desc" translatable="true">இந்த பயன்பாடு <i> முதல் </i> நேரத்திற்கான இணைப்பை ஏற்படுத்தியது. <br/> <br/> மாற்ற <i> யுனிவர்சல் </i> தாவலுக்குச் செல்லவும்.</string>
     <string name="firewall_rule_block_app_mobile_desc" translatable="true"><i> மீட்டர் </i> நெட்வொர்க்கில் இணைக்க முயற்சிக்கும்போது ஒரு பயனர்-செட் ஃபயர்வால் விதி இந்த <i> பயன்பாடு </i> ஐத் தடுத்தது. .<br/><br/> To change go to <i>All Apps</i> தாவல்.</string>
     <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><i> மீட்டர் </i> (மொபைல்) நெட்வொர்க்கில் இணைக்க முயற்சிக்கும்போது ஒரு பயனர்-செட் யுனிவர்சல் ஃபயர்வால் விதி இந்த <i> பயன்பாடு </i> ஐத் தடுத்தது. <br/> <br/> மாற்றச் செல்லவும் <i> யுனிவர்சல் </i> தாவல்.</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">&lt;i&gt; மூல பயன்பாடு &lt;/i&gt; &lt;i&gt; பைபாச் டி.என்.எச் மற்றும் ஃபயர்வால் &lt;/i&gt; விதிகள் என அமைக்கப்பட்டிருப்பதால் இந்த இணைப்பு அனுமதிக்கப்பட்டது. &lt;/i&gt; திரை.</string>
-    <string name="firewall_rule_block_ip_desc" translatable="true">ஒரு பயனர்-செட் ஃபயர்வால் விதி <i> இலக்கு ஐபி </i> ஐத் தடுத்தது.</string>
-    <string name="firewall_rule_trusted_ip_desc" translatable="true">இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் <i> இலக்கு ஐபி </i> நம்பகமான ஐபி என அமைக்கப்பட்டுள்ளது.</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><i>மூல பயன்பாடு</i> <i>dns மற்றும் firewall ஐத்</i> தவிர்த்து அமைக்கப்பட்டுள்ளதால் இந்த இணைப்பு அனுமதிக்கப்பட்டது.<br/><br/> மாற்ற <i>பயன்பாட்டு சார்ந்த firewall</i> திரைக்குச் செல்லவும்.</string>
+    <string name="firewall_rule_block_ip_desc" translatable="true">பயனர் அமைத்த ஃபயர்வால் விதி, <i>இலக்கு ஐபியைத்</i> தடுத்துள்ளது.<br/><br/> மாற்ற, <i>பயன்பாட்டு சார்ந்த ஃபயர்வால்</i> திரைக்குச் செல்லவும்.</string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true">இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் <i> இலக்கு ஐபி </i> நம்பகமான ஐபி என அமைக்கப்பட்டுள்ளது.<br/><br/>மாற்ற <i>பயன்பாட்டு சார்ந்த ஃபயர்வால்</i> திரைக்குச் செல்லவும்.</string>
     <string name="lbl_apply" translatable="true">இடு</string>
     <string name="lbl_allowed" translatable="true">அனுமதிக்கப்படுகிறது</string>
     <string name="lbl_blocked" translatable="true">தடுக்கப்பட்டது</string>
@@ -749,7 +749,7 @@
     <string name="blocklist_update_check_not_required" translatable="true">பிளாக்லிச்ட்கள் ஏற்கனவே அண்மைக் கால பதிப்பில் உள்ளன.</string>
     <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast -->பயன்பாட்டு பட்டியல் மறு ஒத்திசைவு முடிந்தது.</string>
     <string name="show_logs_disabled_network_message" translatable="true">இணைப்புப் பதிவு முடக்கப்பட்டுள்ளது. மீண்டும் இயக்க, கோட்டோ <i> அமைப்புகள் </i> மற்றும் இயக்கத்தில் <i>பதிவை இயக்கவும்.</i></string>
-    <string name="show_logs_disabled_dns_message" translatable="true">டிஎன்எச் கோரிக்கை பதிவு முடக்கப்பட்டுள்ளது. மீண்டும் இயக்க, <i> அமைப்புகள் </i> சென்று <i>இயக்கத்தில் பதிவை</i> இயக்கவும்.</string>
+    <string name="show_logs_disabled_dns_message" translatable="true">டிஎன்எச் கோரிக்கை பதிவு முடக்கப்பட்டுள்ளது. மீண்டும் இயக்க, <i> அமைப்புகள் </i> சென்று <i>இயக்கத்தில் பதிவை</i> இயக்கவும்</string>
     <string name="configure_dns_connected_doh_status" translatable="true">Https க்கு மேல் dns</string>
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">Dnscrypt</string>
     <string name="configure_dns_connected_dns_proxy_status" translatable="true">டி.என்.எச் பதிலாள்</string>
@@ -799,12 +799,12 @@
     <string name="settings_notification_dialog_option_1" translatable="true">\nஇடைநிறுத்தம் / நிறுத்தம் (இயல்புநிலை)\n இரண்டு பொத்தான்களைக் காட்டுகிறது, விரைவாக இடைநிறுத்தவும், மறுபரிசீலனை செய்யவும்.</string>
     <string name="firewall_rule_foreground_desc" translatable="true">இந்த இணைப்பு ஃபயர்வால் செய்யப்பட்டது, ஏனெனில் மூல பயன்பாடு <i> முன்புறத்தில் இல்லை </i>. <br/> <br/> இந்த நடத்தை மாற்ற <i> யுனிவர்சல் </i> தாவலுக்குச் செல்லவும்.</string>
     <string name="firewall_rule_block_udp_ntp_desc" translatable="true">ஒரு பயனர் செட் ஃபயர்வால் விதி இதைத் தடுத்தது <i> udp </i> இணைப்பை. <br/> <br/> மாற்ற <i> யுனிவர்சல் </i> தாவலுக்குச் செல்லவும்.</string>
-    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">இந்த இணைப்பு தடுக்கப்பட்டது, ஏனெனில் <i> மூல பயன்பாடு </i> பயனர்-வழங்கப்பட்ட டி.என்.எச்.</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">இந்த டிஎன்எச் இணைப்பு அருகாமையில் இருந்து பயனர்-வழங்கப்பட்ட டிஎன்எச் இறுதிப் புள்ளிக்கு அனுப்பப்பட்டது.</string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true"><i>மூல பயன்பாடு</i> பயனர் விருப்பமான DNS ஐத் தவிர்த்துவிட்டதால் இந்த இணைப்பு தடுக்கப்பட்டது.<br/><br/> இந்த நடத்தையை மாற்ற <i>யுனிவர்சல்</i> தாவலுக்குச் செல்லவும்.</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">இந்த DNS இணைப்பு ப்ராக்ஸி செய்யப்பட்டு பயனர் விருப்பமான DNS எண்ட்பாயிண்டிற்கு அனுப்பப்பட்டது.<br/><br/> மாற்ற, DNS <i>Configure</i> திரையிலிருந்து <i>DNS கசிவுகளைத் தடு</i> என்பதை முடக்கவும்.</string>
     <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true">இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் <i> ஒரு சொடுக்கு டோர்-அச்-எ-பிராக்சி </i> ஆர்போட் வழியாக அமைவு நடந்து கொண்டிருந்தது.</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் <i> டொமைன் </i> நம்பகமான களமாக அமைக்கப்பட்டுள்ளது.</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் <i> டொமைன் </i> உலகளாவிய டொமைன் விதிகளில் நம்பகமானதாக அமைக்கப்பட்டுள்ளது.</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">இந்த இணைப்பு பயனர்-வழங்கப்பட்ட ப்ராக்சிக்கு அனுப்பப்பட்டது.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true"><i>டொமைன்</i> நம்பகமான டொமைனாக அமைக்கப்பட்டுள்ளதால் இந்த இணைப்பு அனுமதிக்கப்பட்டது.<br/><br/> மாற்ற <i>பயன்பாட்டு சார்ந்த ஃபயர்வால்</i> திரைக்குச் செல்லவும்.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் <i>டொமைன்</i> யுனிவர்சல் டொமைன் விதிகளில் நம்பகமானதாக அமைக்கப்பட்டுள்ளது.<br/><br/> இந்த நடத்தையை மாற்ற <i>DNS ஐ உள்ளமைக்கவும்</i> தாவலுக்குச் செல்லவும்.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">இந்த இணைப்பு பயனர் விருப்பமான ப்ராக்ஸிக்கு அனுப்பப்பட்டது.<br/><br/> மாற்ற <i>கட்டமைக்கவும்</i> திரையில் இருந்து <i>ப்ராக்ஸி</i>க்குச் செல்லவும்.</string>
     <string name="notif_dialog_pause_dialog_neutral" translatable="true">காட்டு</string>
     <string name="ci_trust_initial" translatable="true">டி</string>
     <string name="notif_channel_vpn_notification" translatable="true">செயலில் VPN</string>
@@ -965,7 +965,7 @@
     <string name="crypt_cleanbrowsing_family_desc" translatable="true">அனைத்து வயதுவந்த, ஆபாச மற்றும் வெளிப்படையான தளங்களுக்கும் அணுகலைத் தடுக்கிறது. வடிப்பான்களைத் தவிர்ப்பதற்குப் பயன்படுத்தப்படும் பதிலாள் மற்றும் விபிஎன் களங்களையும் இது தடுக்கிறது. கலப்பு உள்ளடக்க தளங்களும் (ரெடிட் போன்றவை) தடுக்கப்படுகின்றன. கூகிள், பிங் மற்றும் யூடியூப் ஆகியவை பாதுகாப்பான பயன்முறையில் அமைக்கப்பட்டுள்ளன.</string>
     <string name="crypt_relay_netherlands" translatable="true">அநாமதேயப்படுத்தப்பட்ட டி.என்.எச் ரிலே நெதர்லாந்தில் வழங்கப்பட்டது</string>
     <string name="crypt_relay_france" translatable="true">பிரான்சின் பாரிசில் வழங்கப்பட்ட அநாமதேய டி.என்.எச் ரிலே https://cryptostrom.is/ வழங்கியது.</string>
-    <string name="dns_btm_sheet_dialog_ips" translatable="true">"  &lt;Tata&gt; &lt;!  "</string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="memory_notification_text">ரீடிங்க் குறைந்த நினைவகத்தை அனுபவிக்கிறது. கணினி நடவடிக்கைகள் குறைவாக இருக்கலாம்.</string>
     <string name="lbl_notification" translatable="true">அறிவிப்பு</string>
     <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s தடுபட்டியல்(கள்)</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
