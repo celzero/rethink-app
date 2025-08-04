@@ -201,7 +201,11 @@ internal constructor(
                 dnsLog.flag = context.getString(R.string.unicode_check_sign) // green check mark
             }
         } else if (transaction.status == Transaction.Status.START) {
-            dnsLog.response = transaction.status.name
+            if (transaction.response.isNotEmpty()) {
+                dnsLog.response = transaction.response.take(RDATA_MAX_LENGTH)
+            } else {
+                dnsLog.response = transaction.status.name
+            }
             dnsLog.flag = context.getString(R.string.unicode_start_sign) // start sign
         } else {
             // error
