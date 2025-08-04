@@ -181,14 +181,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     @Volatile
     private var vpnAdapter: GoVpnAdapter? = null
 
-
     private var flowDispatcher = Daemons.ioDispatcher("flow", Mark(),  vpnScope)
     private var inflowDispatcher = Daemons.ioDispatcher("inflow", Mark(), vpnScope)
     private var preflowDispatcher = Daemons.ioDispatcher("preflow", PreMark(), vpnScope)
     private var dnsQueryDispatcher = Daemons.ioDispatcher("onQuery", DNSOpts(), vpnScope)
 
-    @kotlin.concurrent.Volatile
+    @Volatile
     private var builderStats: String = ""
+    @Volatile
+    private var tunDnsStat: String = ""
+    @Volatile
+    private var tunUnderlyingNetworks: String? = null
     private var testFd: AtomicInteger = AtomicInteger(-1)
 
     companion object {
@@ -1227,7 +1230,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // family must be either AF_INET (for IPv4) or AF_INET6 (for IPv6)
         }
 
-        builder.setUnderlyingNetworks(getUnderlays())
+        val underlyingNws = getUnderlays()
+        builder.setUnderlyingNetworks(underlyingNws)
+        tunUnderlyingNetworks = underlyingNws?.joinToString()
+        Logger.d(LOG_TAG_VPN, "builder: set underlying networks: $underlyingNws")
 
         // Fix - Cloud Backups were failing thinking that the VPN connection is metered.
         // The below code will fix that.
@@ -2202,11 +2208,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     undelegatedDomains()
                 }
             }
-            PersistentState.SLOWDOWN_MODE -> {
-                io("slowdownMode") {
-                    setSlowdownMode()
-                }
-            }
             PersistentState.NETWORK_ENGINE_EXPERIMENTAL -> {
                 io("networkEngineExperimental") {
                     setExperimentalSettings(persistentState.nwEngExperimentalFeatures)
@@ -2261,11 +2262,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private suspend fun setAutoDialsParallel() {
         Logger.d(LOG_TAG_VPN, "set auto dials parallel: ${persistentState.autoDialsParallel}")
         vpnAdapter?.setAutoDialsParallel()
-    }
-
-    private suspend fun setSlowdownMode() {
-        Logger.d(LOG_TAG_VPN, "set slowdown mode: ${persistentState.slowdownMode}")
-        vpnAdapter?.setSlowdownMode()
     }
 
     private suspend fun setTransparency() {
@@ -2605,19 +2601,23 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     // failing.
     override suspend fun onNetworkDisconnected(networks: ConnectionMonitor.UnderlyingNetworks) {
         withContext(serializer) {
+            val old = underlyingNetworks
             underlyingNetworks = networks
             Logger.i(
                 LOG_TAG_VPN,
                 "onNetworkDisconnected: state: z, $networks, updatedTs: ${networks.lastUpdated}, underlying: ${networks.ipv4Net.size} ipv4, ${networks.ipv6Net.size} ipv6"
             )
             // TODO: if getUnderlays() is empty array, set empty routes on tun using vpn builder
-            setUnderlyingNetworks(getUnderlays())
+            val underlyingNws = getUnderlays()
+            setUnderlyingNetworks(underlyingNws)
+            tunUnderlyingNetworks = underlyingNws?.joinToString()
+            Logger.d(LOG_TAG_VPN, "onNetworkDisconnected; underlying networks set: $underlyingNws")
             // always restart, because global var builderRoutes is set to only in builder, also
             // need to set routes as well based on the protos
             // TODO: do we need to restart if the network is not changed?
             io("nwDisconnect") {
                 Logger.i(LOG_TAG_VPN, "$TAG; nw disconnect, routes/net/mtu changed, restart vpn")
-                val interestingChanges = interestingNetworkChanges(networks)
+                val interestingChanges = interestingNetworkChanges(old = old, _new = networks)
                 // if there is no changes, then already a disconnection restart happened, no need to
                 // restart again, this will avoid unnecessary restarts
                 // some cases, onLost is called multiple times, so avoid restarting
@@ -2665,7 +2665,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         // add ipv4/ipv6 networks to the tunnel
         val allNetworks = networks.ipv4Net.map { it.network } + networks.ipv6Net.map { it.network }
-        val hasUnderlyingNetwork = !allNetworks.isEmpty()
+        val hasUnderlyingNetwork = allNetworks.isNotEmpty()
         val underlays = if (hasUnderlyingNetwork) {
             if (networks.useActive) {
                 null // null denotes active network
@@ -2704,7 +2704,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // always reset the system dns server ip of the active network with the tunnel
             setNetworkAndDefaultDnsIfNeeded(prevDns, (isRoutesChanged || isBoundNetworksChanged))
 
-            setUnderlyingNetworks(getUnderlays())
+            val underlyingNws = getUnderlays()
+            setUnderlyingNetworks(underlyingNws)
+            tunUnderlyingNetworks = underlyingNws?.joinToString()
+            Logger.d(LOG_TAG_VPN, "onNetworkConnected: set underlying networks: $underlyingNws")
 
             logd(
                 "mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}), tun: ${tunMtu()}; routes? $isRoutesChanged, bound-nws? $isBoundNetworksChanged, updatedTs: ${networks.lastUpdated}"
@@ -2950,6 +2953,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 }
                 // set system dns whenever there is a change in network
                 val dns = dnsServers.map { it.hostAddress }
+                tunDnsStat = dns.joinToString()
                 vpnAdapter?.setSystemDns(dns)
                 // set default dns server for the tunnel if none is set
                 if (isDefaultDnsNone()) {
@@ -2957,13 +2961,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     vpnAdapter?.addDefaultTransport(dnsCsv)
                 }
 
-                    val maindnsOK = vpnAdapter?.getDnsStatus(Backend.Preferred) != null ||
-                        vpnAdapter?.getDnsStatus(Backend.Plus) != null
+                val maindnsOK = vpnAdapter?.getDnsStatus(Backend.Preferred) != null || vpnAdapter?.getDnsStatus(Backend.Plus) != null
                 Logger.i(LOG_TAG_VPN, "preferred/plus set? ${maindnsOK}, if not set it again")
 
-                    if (!maindnsOK) {
-                        vpnAdapter?.addTransport()
-                    }
+                if (!maindnsOK) {
+                    vpnAdapter?.addTransport()
+                }
             }
         }
     }
@@ -5064,8 +5067,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     }
 
     private fun dnsStats(): String {
-        // TODO: add dns stats
-        return ""
+        return tunDnsStat
     }
 /*
     private fun rpnStats(): String {
@@ -5138,7 +5140,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         sb.append("  $builderStats\n")
         sb.append("   builderRoutes: ${builderRoutes}\n")
         sb.append("   fd: ${testFd.get()}\n")
-        sb.append("   Underlying\n")
+        sb.append("   dns: ${dnsStats()}\n")
+        sb.append("   builderUnderlay: $tunUnderlyingNetworks\n")
+        sb.append("   Underlay\n")
         sb.append("      4: ${n.underlyingNws?.ipv4Net?.size}\n")
         sb.append("      6: ${n.underlyingNws?.ipv6Net?.size}\n")
         sb.append("      vpnRoutes: ${n.underlyingNws?.vpnRoutes}\n")
@@ -5150,7 +5154,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         sb.append("      mtu:${n.overlayNws.mtu}\n")
         sb.append("      determine4: $route4\n")
         sb.append("      determine6: $route6\n")
-        sb.append("   Network Handle\n")
+        sb.append("   Net ID\n")
         sb.append("      4: $ipv4NwHandles\n")
         sb.append("      6: $ipv6NwHandles\n")
         sb.append("   Link Addresses\n")

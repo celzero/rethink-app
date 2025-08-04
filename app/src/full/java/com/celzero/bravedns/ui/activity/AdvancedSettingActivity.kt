@@ -105,7 +105,6 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         }
 
         b.dvTcpKeepAliveSwitch.isChecked = persistentState.tcpKeepAlive
-        b.settingsActivitySlowdownSwitch.isChecked = persistentState.slowdownMode
 
         if (DEBUG) {
             b.settingsExperimentalRl.visibility = View.VISIBLE
@@ -203,14 +202,6 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         }
 
         b.dvTcpKeepAliveRl.setOnClickListener { b.dvTcpKeepAliveSwitch.isChecked = !b.dvTcpKeepAliveSwitch.isChecked }
-
-        b.settingsActivitySlowdownRl.setOnClickListener {
-            b.settingsActivitySlowdownSwitch.isChecked = !b.settingsActivitySlowdownSwitch.isChecked
-        }
-
-        b.settingsActivitySlowdownSwitch.setOnCheckedChangeListener { _, isChecked ->
-            persistentState.slowdownMode = isChecked
-        }
 
         b.dvExperimentalSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.nwEngExperimentalFeatures = isChecked

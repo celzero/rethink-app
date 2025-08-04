@@ -68,7 +68,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val ENDPOINT_INDEPENDENCE = "endpoint_independence"
         const val TCP_KEEP_ALIVE = "tcp_keep_alive"
         const val USE_SYSTEM_DNS_FOR_UNDELEGATED_DOMAINS = "use_system_dns_for_undelegated_domains"
-        const val SLOWDOWN_MODE = "slowdown_mode"
         const val NETWORK_ENGINE_EXPERIMENTAL = "network_engine_experimental"
         const val USE_RPN = "rpn_state"
         const val RPN_MODE = "rpn_mode"
@@ -336,8 +335,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // use system dns for undelegatedDomains
     var useSystemDnsForUndelegatedDomains by booleanPref("use_system_dns_for_undelegated_domains").withDefault<Boolean>(false)
-
-    var slowdownMode by booleanPref("slowdown_mode").withDefault<Boolean>(false)
 
     // different modes the rpn proxy can function, see enum RpnMode
     var rpnMode by intPref("rpn_mode").withDefault<Int>(1)

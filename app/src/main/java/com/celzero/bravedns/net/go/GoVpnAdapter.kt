@@ -1678,19 +1678,6 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun setSlowdownMode(slowdown: Boolean = persistentState.slowdownMode) {
-        if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip slowdown mode")
-            return
-        }
-        try {
-            Intra.slowdown(slowdown)
-            Logger.i(LOG_TAG_VPN, "$TAG set slowdown mode: $slowdown")
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_VPN, "$TAG err slowdown mode: ${e.message}")
-        }
-    }
-
     /*suspend fun getRpnProps(rpnType: RpnProxyManager.RpnType): Pair<RpnProxyManager.RpnProps?, String?> {
         try {
             var errMsg: String? = ""
