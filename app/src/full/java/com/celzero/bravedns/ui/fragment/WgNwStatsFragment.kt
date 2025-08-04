@@ -31,6 +31,7 @@ import com.celzero.bravedns.databinding.FragmentDnsCryptListBinding
 import com.celzero.bravedns.databinding.FragmentWgNwStatsBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
 import com.celzero.bravedns.util.UIUtils
@@ -228,9 +229,9 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
     private fun showErrorDialog() {
         // Show error dialog
         val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.invalid_wireguard_dialog_title))
-            .setMessage(getString(R.string.invalid_wireguard_dialog_desc))
-            .setPositiveButton(R.string.dns_info_positive) { _, _ ->
+            .setTitle(getString(R.string.lbl_wireguard))
+            .setMessage(getString(R.string.config_invalid_desc))
+            .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { _, _ ->
                 requireActivity().onBackPressedDispatcher
             }
             .setCancelable(false)

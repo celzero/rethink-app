@@ -84,7 +84,7 @@
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"
                         android:visibility="gone"
-                        app:chipStrokeColor="?attr/accentGood"
+                        app:chipStrokeColor="?attr/colorPrimary"
                         app:chipStrokeWidth="1.5dp" />
 
                     <com.google.android.material.chip.Chip
@@ -99,7 +99,7 @@
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"
                         android:visibility="gone"
-                        app:chipStrokeColor="?attr/accentGood"
+                        app:chipStrokeColor="?attr/colorPrimary"
                         app:chipStrokeWidth="1.5dp" />
 
                     <com.google.android.material.chip.Chip
@@ -114,7 +114,7 @@
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"
                         android:visibility="gone"
-                        app:chipStrokeColor="?attr/accentGood"
+                        app:chipStrokeColor="?attr/colorPrimary"
                         app:chipStrokeWidth="1.5dp" />
 
                     <com.google.android.material.chip.Chip
@@ -129,7 +129,7 @@
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"
                         android:visibility="gone"
-                        app:chipStrokeColor="?attr/accentGood"
+                        app:chipStrokeColor="?attr/colorPrimary"
                         app:chipStrokeWidth="1.5dp" />
 
                     <com.google.android.material.chip.Chip
@@ -144,7 +144,7 @@
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"
                         android:visibility="gone"
-                        app:chipStrokeColor="?attr/accentGood"
+                        app:chipStrokeColor="?attr/colorPrimary"
                         app:chipStrokeWidth="1.5dp" />
 
                     <com.google.android.material.chip.Chip

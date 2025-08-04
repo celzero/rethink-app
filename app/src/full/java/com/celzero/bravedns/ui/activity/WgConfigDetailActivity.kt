@@ -138,7 +138,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             return
         }
 
-        b.hopBtn.text = getString(R.string.two_argument_space, getString(R.string.lbl_hop), getString(R.string.lbl_experimental))
+        b.hopBtn.text = getString(R.string.two_argument_space, getString(R.string.hop_add_remove_title), getString(R.string.lbl_experimental))
 
         b.editBtn.text = getString(R.string.rt_edit_dialog_positive).lowercase()
         b.globalLockdownTitleTv.text =

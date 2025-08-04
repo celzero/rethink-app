@@ -102,7 +102,7 @@ class WireguardListBtmSheet(val type: InputType, val obj: Any?, val confs: List<
     }
 
     private fun init() {
-        b.title.text = getString(R.string.select_wireguard_proxy)
+        //b.title.text = getString(R.string.select_wireguard_proxy)
         when (type) {
             InputType.DOMAIN -> {
                 b.ipDomainInfo.visibility = View.VISIBLE
