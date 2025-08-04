@@ -27,7 +27,7 @@
             android:fontFamily="sans-serif"
             android:isScrollContainer="true"
             app:iconifiedByDefault="false"
-            app:queryHint="@string/search_console_log_hint" />
+            app:queryHint="@string/lbl_search" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/search_filter_icon"

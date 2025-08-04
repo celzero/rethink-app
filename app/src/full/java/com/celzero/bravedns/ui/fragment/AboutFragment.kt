@@ -304,7 +304,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 val descText = dialogBinding.infoRulesDialogRulesDesc
                 dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
 
-                heading.text = getString(R.string.stats_title)
+                heading.text = getString(R.string.title_statistics)
                 heading.setCompoundDrawablesWithIntrinsicBounds(
                     ContextCompat.getDrawable(requireContext(), R.drawable.ic_log_level),
                     null,

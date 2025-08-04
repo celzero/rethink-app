@@ -299,7 +299,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             )
         )
 
-        TooltipCompat.setTooltipText(b.aadCloseConnsChip, getString(R.string.close_conn_tool_tip))
+        TooltipCompat.setTooltipText(b.aadCloseConnsChip, getString(R.string.close_conns_dialog_title))
 
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
             // show the tooltip only once when app is not bypassed (dns + firewall) earlier

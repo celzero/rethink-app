@@ -304,11 +304,8 @@ class AppWiseIpLogsActivity :
     private fun updateAppNameInSearchHint(appName: String) {
         val appNameTruncated = appName.substring(0, appName.length.coerceAtMost(10))
         val hint = if (isAsn) {
-            getString(
-                R.string.two_argument_colon,
-                appNameTruncated,
-                getString(R.string.search_universal_asn)
-            )
+            val txt = getString(R.string.two_argument_space, getString(R.string.lbl_search), getString(R.string.lbl_service_providers))
+            getString(R.string.two_argument_colon, appNameTruncated, txt)
         } else {
             getString(
                 R.string.two_argument_colon,

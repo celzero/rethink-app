@@ -139,7 +139,7 @@
                         android:layout_height="wrap_content"
                         android:alpha="0.8"
                         android:checked="true"
-                        android:text="@string/hop_lbl"
+                        android:text="@string/lbl_hop"
                         android:textAlignment="center"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"

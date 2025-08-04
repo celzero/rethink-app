@@ -211,7 +211,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 b.protocolInfoChipGroup.visibility = View.VISIBLE
                 b.chipHopSrc.visibility = View.VISIBLE
                 b.chipHopSrc.text = context.getString(
-                    R.string.two_argument_colon, context.getString(R.string.hop_lbl),
+                    R.string.two_argument_colon, context.getString(R.string.lbl_hop),
                     hop.joinToString { it.hop })
             } else {
                 b.chipHopSrc.visibility = View.GONE

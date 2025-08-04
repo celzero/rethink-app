@@ -463,7 +463,7 @@
                         android:foreground="?attr/selectableItemBackground"
                         android:gravity="center"
                         android:padding="15dp"
-                        android:text="@string/hop_lbl"
+                        android:text="@string/lbl_hop"
                         android:textColor="?attr/secondaryTextColor"
                         android:textSize="@dimen/large_font_text_view"
                         app:rippleColor="?attr/secondaryTextColor" />

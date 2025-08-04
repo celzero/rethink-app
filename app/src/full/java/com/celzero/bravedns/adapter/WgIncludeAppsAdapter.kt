@@ -106,7 +106,7 @@ class WgIncludeAppsAdapter(
                 b.wgIncludeAppListCheckbox.isClickable = false
                 b.wgIncludeAppListCheckbox.isFocusable = false
                 b.wgIncludeAppAppDescTv.visibility = View.VISIBLE
-                b.wgIncludeAppAppDescTv.text = context.getString(R.string.excluded_from_proxy)
+                b.wgIncludeAppAppDescTv.text = context.getString(R.string.exclude_apps_from_proxy)
             } else {
                 b.wgIncludeAppListContainer.isEnabled = true
                 b.wgIncludeCard.isClickable = true
@@ -127,7 +127,7 @@ class WgIncludeAppsAdapter(
                     b.wgIncludeAppAppDescTv.text =
                         context.getString(R.string.wireguard_apps_proxy_map_desc, mapping.proxyName)
                 } else {
-                    b.wgIncludeAppAppDescTv.text = context.getString(R.string.excluded_from_proxy)
+                    b.wgIncludeAppAppDescTv.text = context.getString(R.string.exclude_apps_from_proxy)
                 }
                 b.wgIncludeAppAppDescTv.visibility = View.VISIBLE
                 b.wgIncludeAppListCheckbox.isChecked = false
