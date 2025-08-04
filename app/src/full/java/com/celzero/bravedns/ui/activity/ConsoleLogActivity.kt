@@ -178,27 +178,18 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
         }
 
         b.consoleLogDelete.setOnClickListener {
-            MaterialAlertDialogBuilder(this)
-                .setTitle(getString(R.string.console_log_delete_title))
-                .setMessage(getString(R.string.console_log_delete_desc))
-                .setPositiveButton(getString(R.string.lbl_delete)) { _, _ ->
-                    io {
-                        Logger.i(LOG_TAG_BUG_REPORT, "deleting all console logs")
-                        consoleLogRepository.deleteAllLogs()
-                        uiCtx {
-                            showToastUiCentered(
-                                this,
-                                getString(R.string.console_log_delete_toast),
-                                Toast.LENGTH_SHORT
-                            )
-                            finish()
-                        }
-                    }
+            io {
+                Logger.i(LOG_TAG_BUG_REPORT, "deleting all console logs")
+                consoleLogRepository.deleteAllLogs()
+                uiCtx {
+                    showToastUiCentered(
+                        this,
+                        getString(R.string.config_add_success_toast),
+                        Toast.LENGTH_SHORT
+                    )
+                    finish()
                 }
-                .setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
+            }
         }
 
         b.searchFilterIcon.setOnClickListener {

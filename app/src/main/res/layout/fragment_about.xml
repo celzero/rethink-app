@@ -631,7 +631,7 @@
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:text="@string/about_stats"
+                android:text="@string/title_statistics"
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView

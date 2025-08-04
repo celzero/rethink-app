@@ -314,7 +314,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
                 descText.movementMethod = LinkMovementMethod.getInstance()
                 if (formatedStat == null) {
-                    descText.text = "Stats not available"
+                    descText.text = "No Stats"
                 } else {
                     descText.text = formatedStat + vpnStats
                 }

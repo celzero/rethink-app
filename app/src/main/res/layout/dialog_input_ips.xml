@@ -50,6 +50,17 @@
                 app:cornerRadius="16dp" />
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:padding="5dp"
+            android:text="@string/bypasses_network_restrictions"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -173,6 +184,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/ipv43_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -334,6 +346,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/ipv63_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -415,19 +428,6 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/cancel_button"
-                android:background="@drawable/rectangle_border_background"
-                android:layout_width="0dp"
-                android:gravity="center"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:padding="10dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:layout_marginEnd="5dp"
-                android:textColor="?attr/primaryTextColor"
-                android:text="@string/lbl_cancel" />
-
-            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/test_button"
                 android:background="@drawable/rectangle_border_background"
                 android:layout_width="0dp"
@@ -441,27 +441,6 @@
                 android:text="@string/lbl_save" />
 
         </LinearLayout>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:padding="5dp"
-            android:text="@string/bypasses_network_restrictions"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="14sp" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/chosen_mode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:padding="5dp"
-            android:text="@string/bypasses_network_restrictions"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="14sp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -336,6 +336,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
         }
 
+        // reset the local blocklist download from android download manager to custom in v055o
+        persistentState.useCustomDownloadManager = true
+
         // delete residue wgs from database, remove this post v055o
         io { WireguardManager.deleteResidueWgs() }
     }
