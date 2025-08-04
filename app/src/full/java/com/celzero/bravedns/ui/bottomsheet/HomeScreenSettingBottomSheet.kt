@@ -16,7 +16,10 @@
 package com.celzero.bravedns.ui.bottomsheet
 
 import Logger
+import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.SystemClock
@@ -33,9 +36,13 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.activity.ProxySettingsActivity
+import com.celzero.bravedns.ui.activity.WgMainActivity
+import com.celzero.bravedns.ui.fragment.HomeScreenFragment.ScreenType
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
@@ -60,6 +67,11 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
+    }
+
+    companion object {
+        const val SCREEN_WG = "screen_wireguard"
+        const val SCREEN_PROXY = "screen_proxy"
     }
 
     override fun onCreateView(
@@ -161,7 +173,32 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
             handleDnsFirewallMode(checked)
         }
 
-        b.bsHomeScreenVpnLockdownDesc.setOnClickListener { openVpnProfile(requireContext()) }
+        b.bsHomeScreenVpnLockdownDesc.setOnClickListener {
+            if (VpnController.isVpnLockdown()) {
+                openVpnProfile(requireContext())
+            } else if (appConfig.isProxyEnabled()) {
+                // show proxy settings
+                if (appConfig.isWireGuardEnabled()) {
+                    openProxySettings(SCREEN_WG)
+                } else {
+                    openProxySettings(SCREEN_PROXY)
+                }
+            } else {
+                // do nothing
+            }
+        }
+    }
+
+    private fun openProxySettings(screen: String) {
+        val intent = if (screen == SCREEN_WG) {
+            Logger.d(LOG_TAG_UI, "hmbs; invoke wireguard settings screen")
+            Intent(requireContext(), WgMainActivity::class.java)
+        } else {
+            Logger.d(LOG_TAG_UI, "hmbs; invoke proxy settings screen")
+            Intent(requireContext(), ProxySettingsActivity::class.java)
+        }
+        startActivity(intent)
+        this.dismiss()
     }
 
     // disable dns and firewall mode, show user that vpn in lockdown mode indicator if needed
@@ -169,12 +206,13 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         val isLockdown = VpnController.isVpnLockdown()
         val isProxyEnabled = appConfig.isProxyEnabled()
         if (isLockdown) {
+            b.bsHomeScreenVpnLockdownDesc.text = updateHtmlEncodedText(getString(R.string.hs_btm_sheet_lock_down))
             b.bsHomeScreenVpnLockdownDesc.visibility = View.VISIBLE
             b.bsHsDnsRl.alpha = 0.5f
             b.bsHsFirewallRl.alpha = 0.5f
             setRadioButtonsEnabled(false)
         } else if (isProxyEnabled) {
-            b.bsHomeScreenVpnLockdownDesc.text = getString(R.string.mode_change_error_proxy_enabled)
+            b.bsHomeScreenVpnLockdownDesc.text = updateHtmlEncodedText(getString(R.string.mode_change_error_proxy_enabled))
             b.bsHomeScreenVpnLockdownDesc.visibility = View.VISIBLE
             b.bsHsDnsRl.alpha = 0.5f
             b.bsHsFirewallRl.alpha = 0.5f
