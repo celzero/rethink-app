@@ -121,10 +121,10 @@ class ConnectionTrackerFragment :
         } else {
             b.connectionCardViewTop.visibility = View.VISIBLE
         }
+        b.connectionSearch.setOnQueryTextListener(this)
 
         setupRecyclerView()
 
-        b.connectionSearch.setOnQueryTextListener(this)
         b.connectionSearch.setOnClickListener {
             showParentChipsUi()
             showChildChipsIfNeeded()
@@ -199,7 +199,7 @@ class ConnectionTrackerFragment :
         // some ROMs kill or freeze the keyboard/IME process to save memory or battery,
         // causing SearchView to stop receiving input events
         // this is a workaround to restart the IME process
-        b.connectionSearch.setQuery("", false)
+        //b.connectionSearch.setQuery("", false)
         b.connectionSearch.clearFocus()
 
         val imm = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager

@@ -549,13 +549,24 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             if (WireguardManager.canDisableConfig(cfg)) {
                 WireguardManager.disableConfig(cfg)
             } else {
-                uiCtx {
-                    Utilities.showToastUiCentered(
-                        context,
-                        context.getString(R.string.wireguard_disable_failure),
-                        Toast.LENGTH_LONG
-                    )
-                    b.interfaceSwitch.isChecked = true
+                if (cfg.isCatchAll) {
+                    uiCtx {
+                        Utilities.showToastUiCentered(
+                            context,
+                            context.getString(R.string.wireguard_disable_failure),
+                            Toast.LENGTH_LONG
+                        )
+                        b.interfaceSwitch.isChecked = true
+                    }
+                } else {
+                    uiCtx {
+                        Utilities.showToastUiCentered(
+                            context,
+                            context.getString(R.string.wireguard_disable_failure_relay),
+                            Toast.LENGTH_LONG
+                        )
+                        b.interfaceSwitch.isChecked = true
+                    }
                 }
             }
 

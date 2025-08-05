@@ -20,7 +20,7 @@
         android:layout_below="@id/img_logo"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
-        android:text="@string/welcome_title"
+        android:text="@string/slide_2_title"
         android:textColor="?attr/primaryTextColor"
         android:textSize="28sp"
         android:textStyle="bold" />
@@ -34,7 +34,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="32dp"
         android:gravity="center"
-        android:text="@string/welcome_desc"
+        android:text="@string/slide_2_desc"
         android:textColor="?attr/primaryTextColor"
         android:textSize="16sp" />
 

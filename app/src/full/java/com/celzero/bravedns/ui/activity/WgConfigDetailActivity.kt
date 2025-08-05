@@ -490,7 +490,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                         uiCtx {
                             Utilities.showToastUiCentered(
                                 this,
-                                getString(R.string.hop_error_toast_msg_1),
+                                getString(R.string.hop_error_toast_msg_1, getString(R.string.lbl_hop)),
                                 Toast.LENGTH_SHORT
                             )
                         }
@@ -513,7 +513,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                     }
                 }
             } else {
-                Utilities.showToastUiCentered(this, getString(R.string.wireguard_not_active_toast), Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(this, getString(R.string.wireguard_no_config_msg), Toast.LENGTH_SHORT)
             }
         }
     }

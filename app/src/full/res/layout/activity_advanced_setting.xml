@@ -729,6 +729,7 @@
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
+                    android:visibility="gone"
                     android:paddingBottom="15dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
@@ -757,7 +758,7 @@
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/clear_residue_dialog_heading"
+                            android:text=""
                             android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
@@ -765,7 +766,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
-                            android:text="@string/clear_residue_setting_desc"
+                            android:text=""
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 

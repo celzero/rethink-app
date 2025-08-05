@@ -47,6 +47,7 @@ import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.viewmodel.WgConfigViewModel
+import com.celzero.bravedns.wireguard.WgHopManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.qrcode.QRCodeReader
@@ -388,12 +389,23 @@ class WgMainActivity :
                             }
                         }
                     } else {
-                        uiCtx {
-                            Utilities.showToastUiCentered(
-                                this,
-                                getString(R.string.wireguard_disable_failure),
-                                Toast.LENGTH_LONG
-                            )
+                        val configs = WireguardManager.getActiveCatchAllConfig()
+                        if (configs.isNotEmpty()) {
+                            uiCtx {
+                                Utilities.showToastUiCentered(
+                                    this,
+                                    getString(R.string.wireguard_disable_failure),
+                                    Toast.LENGTH_LONG
+                                )
+                            }
+                        } else {
+                            uiCtx {
+                                Utilities.showToastUiCentered(
+                                    this,
+                                    getString(R.string.wireguard_disable_failure_relay),
+                                    Toast.LENGTH_LONG
+                                )
+                            }
                         }
                     }
                 }

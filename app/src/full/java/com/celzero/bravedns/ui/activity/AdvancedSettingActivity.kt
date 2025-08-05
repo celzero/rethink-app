@@ -92,6 +92,9 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
     }
 
     private fun initView() {
+        // add ipInfo inc to the desc
+        b.genSettingsIpInfoDesc.text = getString(R.string.download_ip_info_desc, getString(R.string.lbl_ipinfo_inc))
+
         b.dvWgListenPortSwitch.isChecked = !persistentState.randomizeListenPort
         // Auto start app after reboot
         b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
@@ -208,7 +211,8 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         }
 
         b.settingsClearResidueRl.setOnClickListener {
-            clearResidueAfterConfirmation()
+            // TODO: show list of files to be deleted and confirm deletion
+            // clearResidueAfterConfirmation()
         }
 
         b.settingsAutoDialRl.setOnClickListener {
@@ -254,7 +258,7 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
         })
     }
 
-    private fun clearResidueAfterConfirmation() {
+    /*private fun clearResidueAfterConfirmation() {
         val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.clear_residue_dialog_heading))
         alertBuilder.setMessage(getString(R.string.clear_residue_dialog_desc))
@@ -267,7 +271,7 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
             dialog.dismiss()
         }
         alertBuilder.create().show()
-    }
+    }*/
 
     private fun clearResidue() {
         // when app is in play store version delete the local blocklists
