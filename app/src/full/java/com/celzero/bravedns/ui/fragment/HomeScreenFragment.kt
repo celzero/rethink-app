@@ -1795,6 +1795,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 b.fhsProtectionLevelTxt.setText(statusId)
             }
         }
+        val isUnderlyingVpnNwEmpty = VpnController.isUnderlyingVpnNetworkEmpty()
+        if (isUnderlyingVpnNwEmpty) {
+            b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.color.accentBad))
+            b.fhsProtectionLevelTxt.text = getString(R.string.status_no_network)
+        }
     }
 
     private fun isAnotherVpnActive(): Boolean {

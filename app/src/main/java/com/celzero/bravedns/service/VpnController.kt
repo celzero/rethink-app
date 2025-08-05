@@ -427,6 +427,10 @@ object VpnController : KoinComponent {
         braveVpnService?.screenLock()
     }
 
+    fun isUnderlyingVpnNetworkEmpty(): Boolean {
+        return braveVpnService?.isUnderlyingVpnNetworkEmpty() ?: false
+    }
+
     fun screenUnlock() {
         braveVpnService?.screenUnlock()
     }

@@ -2615,7 +2615,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // always restart, because global var builderRoutes is set to only in builder, also
             // need to set routes as well based on the protos
             // TODO: do we need to restart if the network is not changed?
-            io("nwDisconnect") {
+            ioCtx("nwDisconnect") {
                 Logger.i(LOG_TAG_VPN, "$TAG; nw disconnect, routes/net/mtu changed, restart vpn")
                 val interestingChanges = interestingNetworkChanges(old = old, _new = networks)
                 // if there is no changes, then already a disconnection restart happened, no need to
@@ -2716,7 +2716,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // restart vpn if the routes or when mtu changes
             if (isMtuChanged || isRoutesChanged) {
                 Logger.i(LOG_TAG_VPN, "$TAG; mtu/routes changed,  restart vpn")
-                io("nwConnect") {
+                ioCtx("nwConnect") {
                     restartVpnWithNewAppConfig(reason = "mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}); routes? $isRoutesChanged")
                     // not needed as the refresh is done in go, TODO: remove below code later
                     // only after set links and routes, wg can be refreshed
@@ -3259,7 +3259,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 "$TAG; establish vpn, mtu: $mtu, has4: $has4, has6: $has6, noRoutes: $noRoutes, dnsMode? $dnsMode, firewallMode? $firewallMode"
             )
 
-            s.append("mtu: $mtu\n   has4: $has4\n   has6: $has6\n   noRoutes: $noRoutes\n   dnsMode? $dnsMode\n   firewallMode? $firewallMode\n")
+            s.append("mtu: $mtu\n   has4: $has4\n   has6: $has6\n   noRoutes: $noRoutes\n   dnsMode? $dnsMode\n   firewallMode? $firewallMode")
             builderStats = s.toString()
 
             return builder.establish()
@@ -3542,6 +3542,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // runBlocking blocks the current thread until all coroutines within it are complete
         // an call a suspending function from a non-suspending context and obtain the result.
         return@runBlocking co.tryDispatch(f)
+    }
+
+    private suspend fun ioCtx(s: String, f: suspend () -> Unit) {
+        withContext(CoroutineName(s) + Dispatchers.IO) { f() }
     }
 
     private fun io(s: String, f: suspend () -> Unit) =
@@ -5141,7 +5145,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         sb.append("   builderRoutes: ${builderRoutes}\n")
         sb.append("   fd: ${testFd.get()}\n")
         sb.append("   dns: ${dnsStats()}\n")
-        sb.append("   builderUnderlay: $tunUnderlyingNetworks\n")
+        sb.append("   setUnderlyingNws: $tunUnderlyingNetworks\n")
         sb.append("   Underlay\n")
         sb.append("      4: ${n.underlyingNws?.ipv4Net?.size}\n")
         sb.append("      6: ${n.underlyingNws?.ipv6Net?.size}\n")
@@ -5161,6 +5165,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         sb.append("      4: $linkAddr4String\n")
         sb.append("      6: $linkAddr6String\n")
         return sb.toString()
+    }
+
+    fun isUnderlyingVpnNetworkEmpty(): Boolean {
+        val tunUnderlyingNetworks = tunUnderlyingNetworks ?: return false
+        // return the current underlying networks in the vpn adapter
+        return tunUnderlyingNetworks.isEmpty()
     }
 
     /*override fun onUnbind(intent: Intent?): Boolean {
