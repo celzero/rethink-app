@@ -47,8 +47,15 @@ class NetworkReachabilityDialog(activity: Activity,
 ) : androidx.appcompat.app.AppCompatDialog(activity, themeId) {
 
     private lateinit var binding: DialogInputIpsBinding
-    private val urlSegment4 = "#ipv4"
-    private val urlSegment6 = "#ipv6"
+
+    private var useAuto: Boolean = false
+
+    companion object {
+        private const val URL4 = "IPv4"
+        private const val URL6 = "IPv6"
+        private const val URL_SEGMENT4 = "#ipv4"
+        private const val URL_SEGMENT6 = "#ipv6"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,24 +74,41 @@ class NetworkReachabilityDialog(activity: Activity,
             context.getString(R.string.lbl_save).replaceFirstChar(Char::titlecase)
         binding.testButton.text = context.getString(R.string.lbl_test).uppercase()
 
-        if (persistentState.performAutoNetworkConnectivityChecks) {
+        useAuto = persistentState.performAutoNetworkConnectivityChecks
+        if (useAuto) {
             updateAutoModeUi()
         } else {
             updateManualModeUi()
         }
         setAllStatusIconsVisibility(View.GONE)
         setAllProgressBarsVisibility(View.GONE)
+        setProtocolsUi()
+    }
+
+    private fun setProtocolsUi() {
+        val protocols = VpnController.protocols()
+        if (protocols.contains(URL4)) {
+            binding.protocolV4.setImageResource(R.drawable.ic_tick)
+        } else {
+            binding.protocolV4.setImageResource(R.drawable.ic_cross)
+        }
+
+        if (protocols.contains(URL6)) {
+            binding.protocolV6.setImageResource(R.drawable.ic_tick)
+        } else {
+            binding.protocolV6.setImageResource(R.drawable.ic_cross)
+        }
     }
 
     private fun setupListeners() {
         binding.autoToggleBtn.setOnClickListener {
-            persistentState.performAutoNetworkConnectivityChecks = true
+            useAuto = true
             updateAutoModeUi()
             selectToggleBtnUi(binding.autoToggleBtn)
             unselectToggleBtnUi(binding.manualToggleBtn)
         }
         binding.manualToggleBtn.setOnClickListener {
-            persistentState.performAutoNetworkConnectivityChecks = false
+            useAuto = false
             updateManualModeUi()
             selectToggleBtnUi(binding.manualToggleBtn)
             unselectToggleBtnUi(binding.autoToggleBtn)
@@ -103,12 +127,12 @@ class NetworkReachabilityDialog(activity: Activity,
 
         val autoTxt = context.getString(R.string.lbl_auto)
         val v4 = listOf(
-            ConnectionMonitor.SCHEME_IP + ConnectionMonitor.PROTOCOL_V4 + autoTxt,
-            ConnectionMonitor.SCHEME_HTTPS + ConnectionMonitor.PROTOCOL_V4 + autoTxt
+            ConnectionMonitor.SCHEME_IP + ConnectionMonitor.PROTOCOL_V4 + " " + autoTxt,
+            ConnectionMonitor.SCHEME_HTTPS + ConnectionMonitor.PROTOCOL_V4 + " " + autoTxt
         )
         val v6 = listOf(
-            ConnectionMonitor.SCHEME_IP + ConnectionMonitor.PROTOCOL_V6 + autoTxt,
-            ConnectionMonitor.SCHEME_HTTPS + ConnectionMonitor.PROTOCOL_V6 + autoTxt
+            ConnectionMonitor.SCHEME_IP + ConnectionMonitor.PROTOCOL_V6 + " " + autoTxt,
+            ConnectionMonitor.SCHEME_HTTPS + ConnectionMonitor.PROTOCOL_V6 + " " + autoTxt
         )
         binding.ipv4Address1.apply { isEnabled = false; setText(v4[0]) }
         binding.ipv4Address2.apply { isEnabled = false; setText(v4[1]) }
@@ -134,9 +158,9 @@ class NetworkReachabilityDialog(activity: Activity,
         val itemsIp4 = persistentState.pingv4Ips.split(",").toTypedArray()
         val itemsIp6 = persistentState.pingv6Ips.split(",").toTypedArray()
         val itemsUrl4 =
-            persistentState.pingv4Url.split(urlSegment4).firstOrNull() ?: Constants.urlV4probe
+            persistentState.pingv4Url.split(URL_SEGMENT4).firstOrNull() ?: Constants.urlV4probe
         val itemsUrl6 =
-            persistentState.pingv6Url.split(urlSegment6).firstOrNull() ?: Constants.urlV6probe
+            persistentState.pingv6Url.split(URL_SEGMENT6).firstOrNull() ?: Constants.urlV6probe
 
         binding.ipv43Layout.visibility = View.VISIBLE
         binding.ipv63Layout.visibility = View.VISIBLE
@@ -162,10 +186,10 @@ class NetworkReachabilityDialog(activity: Activity,
         binding.ipv4Address2.setText(Constants.ip4probes[1])
         binding.ipv4Address3.setText(Constants.ip4probes[2])
         binding.urlV4Address.setText(
-            Constants.urlV4probe.split(urlSegment4).firstOrNull() ?: Constants.urlV4probe
+            Constants.urlV4probe.split(URL_SEGMENT4).firstOrNull() ?: Constants.urlV4probe
         )
         binding.urlV6Address.setText(
-            Constants.urlV6probe.split(urlSegment6).firstOrNull() ?: Constants.urlV6probe
+            Constants.urlV6probe.split(URL_SEGMENT6).firstOrNull() ?: Constants.urlV6probe
         )
         binding.ipv6Address1.setText(Constants.ip6probes[0])
         binding.ipv6Address2.setText(Constants.ip6probes[1])
@@ -182,7 +206,6 @@ class NetworkReachabilityDialog(activity: Activity,
         binding.errorMessage.visibility = View.GONE
 
         io {
-            val useAuto = persistentState.performAutoNetworkConnectivityChecks
             try {
                 val results = mutableMapOf<String, ConnectionMonitor.ProbeResult?>()
                 val v41 =
@@ -198,13 +221,13 @@ class NetworkReachabilityDialog(activity: Activity,
                 results["ipv4_2"] = probeIpOrUrl(v42)
                 if (!useAuto) {
                     results["ipv4_3"] = probeIpOrUrl(binding.ipv4Address3.text.toString())
-                    results["url4"] = probeIpOrUrl(binding.urlV4Address.text.toString() + urlSegment4)
+                    results["url4"] = probeIpOrUrl(binding.urlV4Address.text.toString() + URL_SEGMENT4)
                 }
                 results["ipv6_1"] = probeIpOrUrl(v61)
                 results["ipv6_2"] = probeIpOrUrl(v62)
                 if (!useAuto) {
                     results["ipv6_3"] = probeIpOrUrl(binding.ipv6Address3.text.toString())
-                    results["url6"] = probeIpOrUrl(binding.urlV6Address.text.toString() + urlSegment6)
+                    results["url6"] = probeIpOrUrl(binding.urlV6Address.text.toString() + URL_SEGMENT6)
                 }
 
                 uiCtx {
@@ -227,7 +250,6 @@ class NetworkReachabilityDialog(activity: Activity,
 
     private suspend fun probeIpOrUrl(ipOrUrl: String): ConnectionMonitor.ProbeResult? {
         return try {
-            val useAuto = persistentState.performAutoNetworkConnectivityChecks
             VpnController.probeIpOrUrl(ipOrUrl, useAuto)
         } catch (e: Exception) {
             Logger.d(LOG_TAG_UI, "NwReachability; probeIpOrUrl err: ${e.message}")
@@ -292,7 +314,6 @@ class NetworkReachabilityDialog(activity: Activity,
     private fun saveIps() {
         val defaultDrawable = ContextCompat.getDrawable(context, R.drawable.edittext_default)
         val errorDrawable = ContextCompat.getDrawable(context, R.drawable.edittext_error)
-        val useAuto = persistentState.performAutoNetworkConnectivityChecks
         if (!useAuto) {
             val valid41 = isValidIp(binding.ipv4Address1.text.toString(), IPVersion.IPV4)
             val valid42 = isValidIp(binding.ipv4Address2.text.toString(), IPVersion.IPV4)
@@ -328,15 +349,15 @@ class NetworkReachabilityDialog(activity: Activity,
             binding.ipv6Address2.text.toString(),
             binding.ipv6Address3.text.toString()
         )
-        val url4Txt = if (binding.urlV4Address.text.toString().contains(urlSegment4)) {
+        val url4Txt = if (binding.urlV4Address.text.toString().contains(URL_SEGMENT4)) {
             binding.urlV4Address.text.toString()
         } else {
-            binding.urlV4Address.text.toString() + urlSegment4
+            binding.urlV4Address.text.toString() + URL_SEGMENT4
         }
-        val url6Txt = if (binding.urlV6Address.text.toString().contains(urlSegment6)) {
+        val url6Txt = if (binding.urlV6Address.text.toString().contains(URL_SEGMENT6)) {
             binding.urlV6Address.text.toString()
         } else {
-            binding.urlV6Address.text.toString() + urlSegment6
+            binding.urlV6Address.text.toString() + URL_SEGMENT6
         }
         val isSame = persistentState.pingv4Ips == ip4.joinToString(",") &&
                 persistentState.pingv6Ips == ip6.joinToString(",") &&

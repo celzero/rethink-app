@@ -30,10 +30,10 @@
                 android:layout_height="wrap_content"
                 android:minWidth="100dp"
                 android:tag="0"
-                android:text="Auto"
+                android:text="@string/settings_ip_text_ipv46"
                 android:textAllCaps="false"
                 android:textColor="?attr/defaultToggleBtnTxt"
-                android:textSize="@dimen/default_font_text_view"
+                android:textSize="@dimen/extra_large_font_text_view"
                 app:cornerRadius="16dp" />
 
             <com.google.android.material.button.MaterialButton
@@ -43,10 +43,10 @@
                 android:layout_height="wrap_content"
                 android:minWidth="100dp"
                 android:tag="2"
-                android:text="Manual"
+                android:text="@string/lbl_manual"
                 android:textAllCaps="false"
                 android:textColor="?attr/defaultToggleBtnTxt"
-                android:textSize="@dimen/default_font_text_view"
+                android:textSize="@dimen/extra_large_font_text_view"
                 app:cornerRadius="16dp" />
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
