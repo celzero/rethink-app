@@ -189,9 +189,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     @Volatile
     private var builderStats: String = ""
     @Volatile
-    private var tunDnsStat: String = ""
-    @Volatile
     private var tunUnderlyingNetworks: String? = null
+    @Volatile
+    private var prevDns:  MutableSet<InetAddress> = mutableSetOf()
     private var testFd: AtomicInteger = AtomicInteger(-1)
 
     companion object {
@@ -1233,7 +1233,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val underlyingNws = getUnderlays()
         builder.setUnderlyingNetworks(underlyingNws)
         tunUnderlyingNetworks = underlyingNws?.joinToString()
-        Logger.d(LOG_TAG_VPN, "builder: set underlying networks: $underlyingNws")
+        logd("builder: set underlying networks: $underlyingNws")
 
         // Fix - Cloud Backups were failing thinking that the VPN connection is metered.
         // The below code will fix that.
@@ -2236,6 +2236,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             PersistentState.FAIL_OPEN_ON_NO_NETWORK -> {
                 io("failOpenOnNoNetwork") {
                     notifyConnectionMonitor()
+                    restartVpnWithNewAppConfig(reason = "failOpenOnNoNetwork")
                 }
             }
         }
@@ -2603,15 +2604,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         withContext(serializer) {
             val old = underlyingNetworks
             underlyingNetworks = networks
-            Logger.i(
-                LOG_TAG_VPN,
-                "onNetworkDisconnected: state: z, $networks, updatedTs: ${networks.lastUpdated}, underlying: ${networks.ipv4Net.size} ipv4, ${networks.ipv6Net.size} ipv6"
-            )
-            // TODO: if getUnderlays() is empty array, set empty routes on tun using vpn builder
+
             val underlyingNws = getUnderlays()
             setUnderlyingNetworks(underlyingNws)
             tunUnderlyingNetworks = underlyingNws?.joinToString()
-            Logger.d(LOG_TAG_VPN, "onNetworkDisconnected; underlying networks set: $underlyingNws")
+            Logger.i(LOG_TAG_VPN, "onNetworkDisconnected: state: z, $networks, setUnderlying: ${underlyingNws?.joinToString()}, updatedTs: ${networks.lastUpdated}, underlying: ${networks.ipv4Net.size} ipv4, ${networks.ipv6Net.size} ipv6")
+
             // always restart, because global var builderRoutes is set to only in builder, also
             // need to set routes as well based on the protos
             // TODO: do we need to restart if the network is not changed?
@@ -2627,7 +2625,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                         "$TAG; nw disconnect, routes/net/mtu changed, restart vpn"
                     )
                     restartVpnWithNewAppConfig( reason = "nwDisconnect")
-                    setNetworkAndDefaultDnsIfNeeded(emptySet(), true)
+                    // remove the system dns
+                    prevDns = mutableSetOf()
+                    setNetworkAndDefaultDnsIfNeeded(true)
                     VpnController.onConnectionStateChanged(null)
                 } else {
                     Logger.i(
@@ -2648,10 +2648,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val networks = underlyingNetworks
         val failOpenOnNoNetwork = persistentState.failOpenOnNoNetwork
         if (networks == null) {
-            Logger.i(
-                LOG_TAG_VPN,
-                "getUnderlays: networks is null; fail-open? $failOpenOnNoNetwork"
-            )
+            Logger.w(LOG_TAG_VPN, "getUnderlays: null nws; fail-open? $failOpenOnNoNetwork")
             return if (failOpenOnNoNetwork) { // failing open on no nw
                 null // use whichever network is active, whenever it becomes active
             } else {
@@ -2665,13 +2662,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         // add ipv4/ipv6 networks to the tunnel
         val allNetworks = networks.ipv4Net.map { it.network } + networks.ipv6Net.map { it.network }
-        val hasUnderlyingNetwork = allNetworks.isNotEmpty()
+        // remove duplicates, as the same network can be both ipv4 and ipv6
+        val distinctNetworks = allNetworks.distinctBy { it.networkHandle }
+        val hasUnderlyingNetwork = distinctNetworks.isNotEmpty()
         val underlays = if (hasUnderlyingNetwork) {
             if (networks.useActive) {
                 null // null denotes active network
             } else {
-                // remove duplicates, as the same network can be both ipv4 and ipv6
-                allNetworks.distinct().toTypedArray() // use all networks
+                distinctNetworks.toTypedArray() // use all networks
             }
         } else {
             if (failOpenOnNoNetwork) { // failing open on no nw
@@ -2685,8 +2683,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             LOG_TAG_VPN,
             "getUnderlays: use active? ${networks.useActive}; fail-open? $failOpenOnNoNetwork; networks: ${underlays?.size}; null-underlay? ${underlays == null}"
         )
-        underlays?.forEach {
-            Logger.i(LOG_TAG_VPN, "underlay network: ${it.networkHandle}, netId: ${netid(it.networkHandle)}")
+        if (!hasUnderlyingNetwork) {
+            Logger.w(LOG_TAG_VPN, "getUnderlays: no underlying networks found")
+        } else {
+            underlays?.forEach {
+                Logger.i(
+                    LOG_TAG_VPN,
+                    "underlay network: ${it.networkHandle}, netId: ${netid(it.networkHandle)}"
+                )
+            }
         }
         return underlays
     }
@@ -2698,19 +2703,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val isRoutesChanged = hasRouteChangedInAutoMode(out)
             val isBoundNetworksChanged = out.netChanged
             val isMtuChanged = out.mtuChanged
-            val prevDns = underlyingNetworks?.dnsServers?.keys ?: emptySet()
             underlyingNetworks = networks
 
             // always reset the system dns server ip of the active network with the tunnel
-            setNetworkAndDefaultDnsIfNeeded(prevDns, (isRoutesChanged || isBoundNetworksChanged))
+            setNetworkAndDefaultDnsIfNeeded(isRoutesChanged || isBoundNetworksChanged)
 
             val underlyingNws = getUnderlays()
             setUnderlyingNetworks(underlyingNws)
             tunUnderlyingNetworks = underlyingNws?.joinToString()
-            Logger.d(LOG_TAG_VPN, "onNetworkConnected: set underlying networks: $underlyingNws")
 
             logd(
-                "mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}), tun: ${tunMtu()}; routes? $isRoutesChanged, bound-nws? $isBoundNetworksChanged, updatedTs: ${networks.lastUpdated}"
+                "underyiny: ${underlyingNws?.joinToString()}, mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}), tun: ${tunMtu()}; routes? $isRoutesChanged, bound-nws? $isBoundNetworksChanged, updatedTs: ${networks.lastUpdated}"
             )
 
             // restart vpn if the routes or when mtu changes
@@ -2881,10 +2884,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return NetworkChanges(routesChanged, netChanged, mtuChanged)
     }
 
-    private suspend fun setNetworkAndDefaultDnsIfNeeded(
-        prevDns: Set<InetAddress>? = null,
-        forceUpdate: Boolean = false
-    ) {
+    private suspend fun setNetworkAndDefaultDnsIfNeeded(forceUpdate: Boolean = false) {
         val ctx = this
         withContext(serializer) {
             val currNet = underlyingNetworks
@@ -2938,7 +2938,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 }
             }
             io("setSystemAndDefaultDns") {
-                val same = if (prevDns == null) {
+                val same = if (prevDns.isEmpty()) {
                     false
                 } else {
                     // ref: kotlinlang.org/docs/equality.html#structural-equality
@@ -2952,8 +2952,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     return@io
                 }
                 // set system dns whenever there is a change in network
+                prevDns = dnsServers
                 val dns = dnsServers.map { it.hostAddress }
-                tunDnsStat = dns.joinToString()
                 vpnAdapter?.setSystemDns(dns)
                 // set default dns server for the tunnel if none is set
                 if (isDefaultDnsNone()) {
@@ -5071,12 +5071,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     }
 
     private fun dnsStats(): String {
-        return tunDnsStat
+        return prevDns.joinToString()
     }
-/*
-    private fun rpnStats(): String {
+
+    /* private fun rpnStats(): String {
         return RpnProxyManager.stats()
-    }*/
+    } */
 
     private fun generalStats(): String {
         return appConfig.stats()
@@ -5130,7 +5130,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val linkAddresses4 = n.underlyingNws?.ipv4Net?.map { it.linkProperties?.linkAddresses?.filter { IPAddressString(it.address.hostAddress).isIPv4 } } ?: emptyList()
         val linkAddresses6 = n.underlyingNws?.ipv6Net?.map { it.linkProperties?.linkAddresses?.filter { IPAddressString(it.address.hostAddress).isIPv6 } } ?: emptyList()
 
-        val linkAddr4String = if (linkAddresses6.isEmpty()) {
+        val linkAddr4String = if (linkAddresses4.isEmpty()) {
             "N/A"
         } else {
             linkAddresses4.joinToString(", ") { it?.joinToString(", ") { addr -> addr.address.hostAddress } ?: "N/A" }
