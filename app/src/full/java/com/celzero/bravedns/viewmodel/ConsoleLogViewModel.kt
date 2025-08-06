@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.viewmodel
 
+import Logger
+import Logger.LOG_TAG_UI
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -28,6 +30,8 @@ import androidx.paging.liveData
 import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.database.ConsoleLogDAO
 import com.celzero.bravedns.util.Constants
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class ConsoleLogViewModel(private val dao: ConsoleLogDAO) : ViewModel() {
     private var filter: MutableLiveData<String> = MutableLiveData()
@@ -40,21 +44,34 @@ class ConsoleLogViewModel(private val dao: ConsoleLogDAO) : ViewModel() {
 
     private fun getLogs(filter: String): LiveData<PagingData<ConsoleLog>> {
         val query = "%$filter%"
-        return Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) { dao.getLogs(query) }
+        return Pager(pagingConfig) { dao.getLogs(query) }
             .liveData
             .cachedIn(viewModelScope)
     }
+    
+    val pagingConfig = PagingConfig(
+        pageSize = Constants.LIVEDATA_PAGE_SIZE,
+        enablePlaceholders = false,  // Prevents position issues
+        prefetchDistance = 10
+    )
 
     suspend fun sinceTime(): Long {
-        return dao.sinceTime()
+        return try {
+            dao.sinceTime()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "err getting since time: ${e.message}")
+            0L
+        }
     }
 
     fun setLogLevel(level: Long) {
-
         logLevel = level
     }
 
     fun setFilter(filter: String) {
-        this.filter.postValue(filter)
+        viewModelScope.launch {
+            delay(100) // Prevent rapid updates
+            this@ConsoleLogViewModel.filter.postValue(filter)
+        }
     }
 }

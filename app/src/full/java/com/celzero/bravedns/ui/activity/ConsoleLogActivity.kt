@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui.activity
 
 import Logger
 import Logger.LOG_TAG_BUG_REPORT
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -31,6 +32,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.WorkInfo
@@ -140,20 +142,55 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
     var recyclerAdapter: ConsoleLogAdapter? = null
 
     private fun setAdapter() {
-        b.consoleLogList.setHasFixedSize(true)
-        layoutManager = LinearLayoutManager(this@ConsoleLogActivity)
-        b.consoleLogList.layoutManager = layoutManager
-        recyclerAdapter = ConsoleLogAdapter(this)
-        b.consoleLogList.adapter = recyclerAdapter
-        viewModel.setLogLevel(Logger.uiLogLevel)
-        observeLog()
+        try {
+            b.consoleLogList.setHasFixedSize(true)
+            // disable all animations to prevent state inconsistencies
+            b.consoleLogList.itemAnimator = null
+
+            // Set a custom layout manager that handles errors gracefully
+            layoutManager = object : LinearLayoutManager(this@ConsoleLogActivity) {
+                override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State?) {
+                    try {
+                        super.onLayoutChildren(recycler, state)
+                    } catch (e: IndexOutOfBoundsException) {
+                        Logger.w(LOG_TAG_UI, "err(console) layout children: ${e.message}")
+                    }
+                }
+            }
+
+            b.consoleLogList.layoutManager = layoutManager
+            recyclerAdapter = ConsoleLogAdapter(this)
+            b.consoleLogList.adapter = recyclerAdapter
+            viewModel.setLogLevel(Logger.uiLogLevel)
+            observeLog()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "err setting up console, recycler: ${e.message}")
+        }
     }
 
     private fun observeLog() {
-        viewModel.logs.observe(this) { l ->
+        viewModel.logs.observe(this) { pagingData ->
             lifecycleScope.launch {
-                recyclerAdapter?.submitData(l)
+                try {
+                    recyclerAdapter?.submitData(pagingData)
+                } catch (e: Exception) {
+                    Logger.e(LOG_TAG_UI, "err submitting data: ${e.message}")
+                    // Optionally recreate adapter if needed
+                    if (e is IndexOutOfBoundsException) {
+                        recreateAdapter()
+                    }
+                }
             }
+        }
+    }
+
+    private fun recreateAdapter() {
+        try {
+            recyclerAdapter = ConsoleLogAdapter(this)
+            b.consoleLogList.adapter = recyclerAdapter
+            Logger.i(LOG_TAG_UI, "adapter recreated due to consistency error")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "err; recreate adapter: ${e.message}")
         }
     }
 
@@ -178,6 +215,9 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
         }
 
         b.consoleLogDelete.setOnClickListener {
+            lifecycleScope.launch {
+                recyclerAdapter?.submitData(PagingData.empty())
+            }
             io {
                 Logger.i(LOG_TAG_BUG_REPORT, "deleting all console logs")
                 consoleLogRepository.deleteAllLogs()
@@ -314,7 +354,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
             }
             return file.absolutePath
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_BUG_REPORT, "error creating log file, ${e.message}")
+            Logger.w(LOG_TAG_BUG_REPORT, "err creating log file, ${e.message}")
             null
         }
     }
@@ -340,6 +380,10 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
 
     private suspend fun uiCtx(f: () -> Unit) {
         withContext(Dispatchers.Main) { f() }
+    }
+
+    private fun ui(f: () -> Unit) {
+        lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 
     val searchQuery = MutableStateFlow("")

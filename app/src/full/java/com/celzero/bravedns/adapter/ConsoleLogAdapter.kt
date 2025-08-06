@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.adapter
 
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -52,49 +53,70 @@ class ConsoleLogAdapter(private val context: Context) :
     }
 
     override fun onBindViewHolder(holder: ConsoleLogViewHolder, position: Int) {
-        val logInfo = getItem(position) ?: return
-        holder.update(logInfo)
+        // Prevent IndexOutOfBoundsException
+        if (position < 0 || position >= itemCount) {
+            return
+        }
+
+        try {
+            val logInfo = getItem(position) ?: return
+            holder.update(logInfo)
+        } catch (e: IndexOutOfBoundsException) {
+            Logger.w(LOG_TAG_UI, "err invalid pos: $position, itemCount: $itemCount")
+        }
     }
 
     inner class ConsoleLogViewHolder(private val b: ListItemConsoleLogBinding) :
         RecyclerView.ViewHolder(b.root) {
 
         fun update(log: ConsoleLog) {
-            // update the textview color with the first letter of the log level
-            val logLevel = log.message.firstOrNull() ?: 'V'
-            when (logLevel) {
-                'V' ->
-                    b.logDetail.setTextColor(
-                        UIUtils.fetchColor(context, R.attr.primaryLightColorText)
-                    )
-                'D' ->
-                    b.logDetail.setTextColor(
-                        UIUtils.fetchColor(context, R.attr.primaryLightColorText)
-                    )
-                'I' ->
-                    b.logDetail.setTextColor(
-                        UIUtils.fetchColor(context, R.attr.defaultToggleBtnTxt)
-                    )
-                'W' ->
-                    b.logDetail.setTextColor(
-                        UIUtils.fetchColor(context, R.attr.firewallWhiteListToggleBtnTxt)
-                    )
-                'E' ->
-                    b.logDetail.setTextColor(
-                        UIUtils.fetchColor(context, R.attr.firewallBlockToggleBtnTxt)
-                    )
-                else ->
-                    b.logDetail.setTextColor(
-                        UIUtils.fetchColor(context, R.attr.primaryLightColorText)
-                    )
-            }
-            b.logDetail.text = log.message
-            if (DEBUG) {
-                b.logTimestamp.text =
-                    "${log.id}\n${Utilities.convertLongToTime(log.timestamp, TIME_FORMAT_1)}"
-            } else {
-                b.logTimestamp.text = Utilities.convertLongToTime(log.timestamp, TIME_FORMAT_1)
+            try {
+                // SAFETY CHECK: Verify log data is valid
+                if (log.message.isEmpty()) return
+
+                // update the textview color with the first letter of the log level
+                val logLevel = log.message.firstOrNull() ?: 'V'
+                when (logLevel) {
+                    'V' ->
+                        b.logDetail.setTextColor(
+                            UIUtils.fetchColor(context, R.attr.primaryLightColorText)
+                        )
+
+                    'D' ->
+                        b.logDetail.setTextColor(
+                            UIUtils.fetchColor(context, R.attr.primaryLightColorText)
+                        )
+
+                    'I' ->
+                        b.logDetail.setTextColor(
+                            UIUtils.fetchColor(context, R.attr.defaultToggleBtnTxt)
+                        )
+
+                    'W' ->
+                        b.logDetail.setTextColor(
+                            UIUtils.fetchColor(context, R.attr.firewallWhiteListToggleBtnTxt)
+                        )
+
+                    'E' ->
+                        b.logDetail.setTextColor(
+                            UIUtils.fetchColor(context, R.attr.firewallBlockToggleBtnTxt)
+                        )
+
+                    else ->
+                        b.logDetail.setTextColor(
+                            UIUtils.fetchColor(context, R.attr.primaryLightColorText)
+                        )
+                }
+                b.logDetail.text = log.message
+                if (DEBUG) {
+                    b.logTimestamp.text = "${log.id}\n${Utilities.convertLongToTime(log.timestamp, TIME_FORMAT_1)}"
+                } else {
+                    b.logTimestamp.text = Utilities.convertLongToTime(log.timestamp, TIME_FORMAT_1)
+                }
+            } catch (e: Exception) {
+                Logger.w("ConsoleLogAdapter", "Error updating view holder: ${e.message}")
             }
         }
+    }
     }
 }
