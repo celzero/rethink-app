@@ -33,14 +33,21 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.LocaleList
 import android.provider.Settings
+import android.text.InputType
+import android.view.Gravity
 import android.view.View
 import android.widget.CompoundButton
+import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.AppCompatEditText
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.biometric.BiometricManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -136,6 +143,10 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             b.settingsActivityCheckUpdateRl.visibility = View.GONE
         }
 
+        // add ipInfo inc to the desc
+        b.genSettingsIpInfoDesc.text =
+            getString(R.string.download_ip_info_desc, getString(R.string.lbl_ipinfo_inc))
+
         // enable logs
         b.settingsActivityEnableLogsSwitch.isChecked = persistentState.logsEnabled
         // check for app updates
@@ -170,6 +181,10 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         } else {
             b.settingsBiometricRl.visibility = View.GONE
         }
+
+        // Auto start app after reboot
+        b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
+        b.dvIpInfoSwitch.isChecked = persistentState.downloadIpInfo
 
         displayPcapUi()
         displayAppThemeUi()
@@ -559,6 +574,33 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             // check for the permission and enable the switch
             handleAccessibilityPermission()
         }
+
+        b.settingsConsoleLogRl.setOnClickListener { openConsoleLogActivity() }
+
+        b.settingsActivityAutoStartRl.setOnClickListener {
+            b.settingsActivityAutoStartSwitch.isChecked =
+                !b.settingsActivityAutoStartSwitch.isChecked
+        }
+
+        b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean
+            ->
+            persistentState.prefAutoStartBootUp = b
+        }
+
+        b.settingsTaskerRl.setOnClickListener {
+            showAppTriggerPackageDialog(this , onPackageSet = { packageName ->
+                persistentState.appTriggerPackages = packageName
+            })
+        }
+
+        b.settingsIpInfoRl.setOnClickListener {
+            b.dvIpInfoSwitch.isChecked = !b.dvIpInfoSwitch.isChecked
+        }
+
+        b.dvIpInfoSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.downloadIpInfo = isChecked
+        }
+
     }
 
     private fun showGoLoggerDialog() {
@@ -811,6 +853,71 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         val bottomSheetFragment = BackupRestoreBottomSheet()
         bottomSheetFragment.show(this.supportFragmentManager, bottomSheetFragment.tag)
     }
+
+    private fun openConsoleLogActivity() {
+        try {
+            val intent = Intent(this, ConsoleLogActivity::class.java)
+            startActivity(intent)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "err opening console log activity ${e.message}", e)
+        }
+    }
+
+    fun showAppTriggerPackageDialog(context: Context, onPackageSet: (String) -> Unit) {
+        val editText = AppCompatEditText(context).apply {
+            hint = context.getString(R.string.adv_tasker_dialog_edit_hint)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            setHorizontallyScrolling(true)
+            if (persistentState.appTriggerPackages.isNotEmpty()) {
+                setText(persistentState.appTriggerPackages)
+            }
+            setPadding(50, 40, 50, 40)
+            gravity = Gravity.TOP or Gravity.START
+            android.R.style.Widget_Material_EditText
+        }
+
+        val selectableTextView = AppCompatTextView(context).apply {
+            text = context.getString(R.string.adv_tasker_dialog_msg)
+            setTextIsSelectable(true)
+            setPadding(50, 40, 50, 0)
+            textSize = 16f
+        }
+
+        val instructionsTextView = AppCompatTextView(context).apply {
+            text = context.getString(R.string.adv_tasker_dialog_instructions)
+            setTextIsSelectable(true)
+            setPadding(50, 40, 50, 0)
+            textSize = 16f
+        }
+
+        // add a LinearLayout as the single child of the ScrollView, then add the text view and
+        // edit text to the LinearLayout.
+        val linearLayout = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(selectableTextView)
+            addView(editText)
+            addView(instructionsTextView)
+        }
+
+        val scrollView = ScrollView(context).apply {
+            setPadding(40, 10, 40, 0)
+            addView(linearLayout)
+        }
+
+        AlertDialog.Builder(context)
+            .setTitle(context.getString(R.string.adv_taster_title))
+            .setView(scrollView)
+            .setPositiveButton(context.getString(R.string.lbl_save)) { dialog, _ ->
+                val pkgName = editText.text.toString().trim()
+                if (pkgName.isNotEmpty()) {
+                    onPackageSet(pkgName)
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(context.getString(R.string.lbl_cancel)) { dialog, _ -> dialog.cancel() }
+            .show()
+    }
+
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==

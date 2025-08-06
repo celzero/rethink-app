@@ -54,6 +54,8 @@ object VpnController : KoinComponent {
     private val persistentState by inject<PersistentState>()
     private var states: Channel<BraveVPNService.State?>? = null
     private var protocol: Pair<Boolean, Boolean> = Pair(false, false)
+    private const val URL4 = "IPv4"
+    private const val URL6 = "IPv6"
 
     // usually same as vpnScope from BraveVPNService
     var externalScope: CoroutineScope? = null
@@ -255,15 +257,15 @@ object VpnController : KoinComponent {
         val ipv6 = protocol.second
         Logger.d(LOG_TAG_VPN, "protocols => ipv4: $ipv4, ipv6: $ipv6")
         return if (ipv4 && ipv6) {
-            "IPv4, IPv6"
+            "$URL4, $URL6"
         } else if (ipv6) {
-            "IPv6"
+            URL6
         } else if (ipv4) {
-            "IPv4"
+            URL4
         } else {
             // if both are false, then return based on the FAIL_OPEN_ON_NO_NETWORK value
             if (persistentState.failOpenOnNoNetwork) {
-                "IPv4, IPv6"
+                "$URL4, $URL6"
             } else {
                 ""
             }

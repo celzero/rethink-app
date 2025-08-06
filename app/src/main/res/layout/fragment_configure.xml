@@ -345,7 +345,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/fs_advanced_card"
+            android:id="@+id/fs_anti_censorship_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="8dp"
@@ -358,27 +358,28 @@
                 android:padding="20dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_advanced_icon"
+                    android:id="@+id/fs_anti_censorship_icon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:alpha="0.8"
                     android:layout_alignParentStart="true"
                     android:layout_centerInParent="true"
-                    android:src="@drawable/ic_advanced_settings" />
+                    android:tint="?attr/accentGood"
+                    android:alpha="0.8"
+                    android:src="@drawable/ic_anti_dpi" />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/fs_advanced_tv"
+                    android:id="@+id/fs_anti_censorship_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
-                    android:layout_toStartOf="@id/fs_advanced_iv"
-                    android:layout_toEndOf="@id/fs_advanced_icon"
-                    android:text="@string/lbl_advanced"
+                    android:layout_toStartOf="@id/fs_anti_censorship_iv"
+                    android:layout_toEndOf="@id/fs_anti_censorship_icon"
+                    android:text="@string/anti_censorship_title"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="16sp" />
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/fs_advanced_iv"
+                    android:id="@+id/fs_anti_censorship_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"

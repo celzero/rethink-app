@@ -148,7 +148,7 @@
                 android:layout_marginEnd="5dp"
                 android:orientation="vertical"
                 android:paddingTop="15dp"
-                android:paddingBottom="15dp">
+                android:paddingBottom="10dp">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/aad_app_settings_ll"
@@ -276,8 +276,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5"
-                        android:layout_marginStart="5dp"
                         android:clipToPadding="true"
+                        android:layout_marginStart="10dp"
                         app:cardCornerRadius="8dp"
                         app:cardElevation="8dp"
                         app:cardUseCompatPadding="true">
@@ -323,9 +323,9 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5"
+                        android:layout_marginEnd="10dp"
                         android:clipToPadding="true"
                         app:cardCornerRadius="8dp"
-                        android:layout_marginEnd="10dp"
                         app:cardElevation="8dp"
                         app:cardUseCompatPadding="true">
 
@@ -371,7 +371,9 @@
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:gravity="center"
-                    android:paddingTop="10dp">
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:paddingTop="5dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/exclude_proxy_icon"

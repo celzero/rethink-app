@@ -19,22 +19,18 @@ import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.Configuration
-import android.graphics.drawable.Drawable
-import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityTunnelSettingsBinding
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.service.ConnectionMonitor
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.dialog.NetworkReachabilityDialog
@@ -44,14 +40,9 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import inet.ipaddr.IPAddress.IPVersion
-import inet.ipaddr.IPAddressString
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
 
@@ -85,14 +76,14 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     }
 
     private fun initView() {
+        b.settingsActivityWireguardText.text = getString(R.string.lbl_wireguard).lowercase()
+
         b.settingsActivityAllowBypassProgress.visibility = View.GONE
         displayAllowBypassUi()
         // use multiple networks
         b.settingsActivityAllNetworkSwitch.isChecked = persistentState.useMultipleNetworks
         // route lan traffic
         b.settingsActivityLanTrafficSwitch.isChecked = persistentState.privateIps
-        // connectivity check
-        b.settingsActivityConnectivityChecksSwitch.isChecked = persistentState.connectivityChecks
         // show ping ips
         b.settingsActivityPingIpsBtn.visibility = if (persistentState.connectivityChecks) View.VISIBLE else View.GONE
         // exclude apps in proxy
@@ -109,8 +100,49 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.settingsFailOpenSwitch.isChecked = persistentState.failOpenOnNoNetwork
 
+        b.dvWgListenPortSwitch.isChecked = !persistentState.randomizeListenPort
+
+        // check if the device is running on Android 12 or above for EIMF
+        if (isAtleastS()) {
+            // endpoint independent mapping (eim) / endpoint independent filtering (eif)
+            b.dvEimfRl.visibility = View.VISIBLE
+            b.dvEimfSwitch.isChecked = persistentState.endpointIndependence
+        } else {
+            b.dvEimfRl.visibility = View.GONE
+        }
+
+        b.dvTcpKeepAliveSwitch.isChecked = persistentState.tcpKeepAlive
+        b.dvTimeoutSeekbar.progress = persistentState.dialTimeoutSec / 60
+
+        displayDialerTimeOutUi(persistentState.dialTimeoutSec)
         displayInternetProtocolUi()
         displayRethinkInRethinkUi()
+    }
+
+
+    private fun displayDialerTimeOutUi(progressSec: Int) {
+        val displayText = formatTimeShort(progressSec)
+        b.dvTimeoutValue.text = displayText
+    }
+
+    private fun formatTimeShort(totalSeconds: Int): String {
+        val hours = totalSeconds / 3600
+        val minutes = (totalSeconds % 3600) / 60
+        val seconds = totalSeconds % 60
+
+        val parts = mutableListOf<String>()
+
+        if (hours > 0) parts.add("${hours}h")
+        if (minutes > 0) parts.add("${minutes}m")
+        if (seconds > 0) parts.add("${seconds}s")
+
+        return if (parts.isEmpty()) "0m" else parts.joinToString(" ")
+    }
+
+    private fun updateDialerTimeOut(valueMin: Int) {
+        val inSec = valueMin * 60
+        persistentState.dialTimeoutSec = inSec
+        displayDialerTimeOutUi(inSec)
     }
 
     private fun displayAllowBypassUi() {
@@ -256,17 +288,11 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityDefaultDnsRl.setOnClickListener { showDefaultDnsDialog() }
 
         b.settingsActivityConnectivityChecksRl.setOnClickListener {
-            b.settingsActivityConnectivityChecksSwitch.isChecked =
-                !b.settingsActivityConnectivityChecksSwitch.isChecked
+            showConnectivityChecksOptionsDialog()
         }
 
-        b.settingsActivityConnectivityChecksSwitch.setOnCheckedChangeListener { _, isChecked ->
-            persistentState.connectivityChecks = isChecked
-            if (isChecked) {
-                b.settingsActivityPingIpsBtn.visibility = View.VISIBLE
-            } else {
-                b.settingsActivityPingIpsBtn.visibility = View.GONE
-            }
+        b.settingsActivityConnectivityChecksImg.setOnClickListener {
+            showConnectivityChecksOptionsDialog()
         }
 
         b.settingsActivityPingIpsBtn.setOnClickListener {
@@ -297,6 +323,53 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsFailOpenRl.setOnClickListener {
             b.settingsFailOpenSwitch.isChecked = !b.settingsFailOpenSwitch.isChecked
         }
+
+        b.dvWgListenPortSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.randomizeListenPort = !isChecked
+        }
+
+        b.dvWgListenPortRl.setOnClickListener {
+            b.dvWgListenPortSwitch.isChecked = !b.dvWgListenPortSwitch.isChecked
+        }
+
+        b.dvEimfSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (!isAtleastS()) {
+                return@setOnCheckedChangeListener
+            }
+
+            persistentState.endpointIndependence = isChecked
+        }
+
+        b.dvEimfRl.setOnClickListener { b.dvEimfSwitch.isChecked = !b.dvEimfSwitch.isChecked }
+
+        b.dvTcpKeepAliveSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.tcpKeepAlive = isChecked
+        }
+
+        b.dvTcpKeepAliveRl.setOnClickListener {
+            b.dvTcpKeepAliveSwitch.isChecked = !b.dvTcpKeepAliveSwitch.isChecked
+        }
+
+        b.dvTimeoutSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                updateDialerTimeOut(progress)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                // No action needed on start tracking
+                // This can be used to show a toast or a message if needed
+                // For now, we will just log the start of tracking
+                Logger.v(LOG_TAG_UI, "Dialer timeout seekbar tracking started")
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                // When the user stops dragging the seekbar, update the dialer timeout
+                seekBar?.progress?.let { progress ->
+                    updateDialerTimeOut(progress)
+                }
+            }
+        })
+
     }
 
     private fun showDefaultDnsDialog() {
@@ -416,6 +489,51 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         alertBuilder.create().show()
     }
 
+    private fun showConnectivityChecksOptionsDialog() {
+        val alertBuilder = MaterialAlertDialogBuilder(this)
+        alertBuilder.setTitle(getString(R.string.settings_connectivity_checks))
+        val items = arrayOf(
+            getString(R.string.settings_app_list_default_app),
+            getString(R.string.settings_ip_text_ipv46),
+            getString(R.string.lbl_manual)
+        )
+        val type = persistentState.performAutoNetworkConnectivityChecks
+        val enabled = persistentState.connectivityChecks
+        val checkedItem = if (!enabled) {
+            0 // none
+        } else {
+            when (type) {
+                true -> 1 // auto
+                false -> 2 // manual
+            }
+        }
+
+        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
+            dialog.dismiss()
+            when (which) {
+                0 -> {
+                    // none
+                    persistentState.performAutoNetworkConnectivityChecks = true
+                    persistentState.connectivityChecks = false
+                    b.settingsActivityPingIpsBtn.visibility = View.GONE
+                }
+                1 -> {
+                    // auto
+                    persistentState.performAutoNetworkConnectivityChecks = true
+                    persistentState.connectivityChecks = true
+                    b.settingsActivityPingIpsBtn.visibility = View.VISIBLE
+                }
+                2 -> {
+                    // manual
+                    persistentState.performAutoNetworkConnectivityChecks = false
+                    persistentState.connectivityChecks = true
+                    b.settingsActivityPingIpsBtn.visibility = View.VISIBLE
+                }
+            }
+        }
+        alertBuilder.create().show()
+    }
+
     private fun handleLockdownModeIfNeeded() {
         val isLockdown = VpnController.isVpnLockdown()
         if (isLockdown) {
@@ -438,9 +556,5 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         for (v in views) v.isEnabled = false
 
         Utilities.delay(ms, lifecycleScope) { for (v in views) v.isEnabled = true }
-    }
-
-    private fun io(fn: suspend () -> Unit) {
-        lifecycleScope.launch(Dispatchers.IO) { fn() }
     }
 }
