@@ -118,5 +118,4 @@ class ConsoleLogAdapter(private val context: Context) :
             }
         }
     }
-    }
 }
