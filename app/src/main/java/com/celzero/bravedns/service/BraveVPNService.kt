@@ -139,9 +139,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -1448,7 +1451,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
                 Logger.i(LOG_TAG_VPN, "excluded-apps list changed, restart vpn")
 
-                io("excludeApps") { restartVpnWithNewAppConfig(reason = "excludeApps") }
+                val reason = "excludeApps: ${latestExcludedApps.size} apps"
+                vpnRestartTrigger.value = reason
             } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
                 Logger.e(
                     LOG_TAG_VPN,
@@ -1655,6 +1659,22 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return FirewallManager.userId(rethinkUid) == PRIMARY_USER
     }
 
+    private val vpnRestartTrigger: MutableStateFlow<String> = MutableStateFlow("init")
+    @OptIn(FlowPreview::class)
+    private fun observeVpnRestartRequests() {
+        vpnScope.launch {
+            Logger.i(LOG_TAG_VPN, "start restart manager flow with debounce")
+            // create a state flow with debounce to avoid multiple calls in quick succession
+            // this should wait for 3 seconds before starting the restart manager flow
+            vpnRestartTrigger
+                .debounce(TimeUnit.MILLISECONDS.toMillis(1500))
+                .collect { reason ->
+                    Logger.v(LOG_TAG_VPN, "RESTART; new restart request: $reason")
+                    restartVpnWithNewAppConfig(reason)
+                }
+        }
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         rethinkUid = getRethinkUid()
         val pid = Process.myPid()
@@ -1666,6 +1686,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         VpnController.onConnectionStateChanged(State.NEW)
 
+        observeVpnRestartRequests()
         ui {
             // Initialize the value whenever the vpn is started.
             accessibilityHearbeatTimestamp = INIT_TIME_MS
@@ -1998,7 +2019,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 io("braveModeChange") {
                     // change in brave mode, requires restart of the vpn (to set routes in vpn),
                     // tunMode (to set the tun mode), and dnsAlg (to update the dns alg) in go
-                    restartVpnWithNewAppConfig(reason = "braveMode")
+                    val reason = "braveMode: ${appConfig.getBraveMode()}"
+                    vpnRestartTrigger.value = reason
                     setTunMode()
                     updateDnsAlg()
                 }
@@ -2051,7 +2073,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                         }
 
                         AppConfig.DnsType.DNS_PROXY -> {
-                            restartVpnWithNewAppConfig(reason = "dnsProxy")
+                            val reason = "dnsProxy: ${appConfig.getSelectedDnsProxyDetails()?.id}"
+                            vpnRestartTrigger.value = reason
                             addTransport()
                         }
 
@@ -2085,7 +2108,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             }
 
             PersistentState.ALLOW_BYPASS -> {
-                io("allowBypass") { restartVpnWithNewAppConfig(reason = "allowBypass") }
+                val reason = "allowBypass: ${persistentState.allowBypass}"
+                vpnRestartTrigger.value = reason
             }
 
             PersistentState.PROXY_TYPE -> {
@@ -2142,13 +2166,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
             PersistentState.PRIVATE_IPS -> {
                 // restart vpn to enable/disable route lan traffic
-                io("routeLanTraffic") { restartVpnWithNewAppConfig(reason = "routeLanTraffic") }
+                val reason = "routeLanTraffic: ${persistentState.privateIps}"
+                vpnRestartTrigger.value = reason
             }
 
             PersistentState.RETHINK_IN_RETHINK -> {
                 // restart vpn to allow/disallow rethink traffic in rethink
                 io("routeRethinkInRethink") {
-                    restartVpnWithNewAppConfig(reason = "routeRethinkInRethink")
+                    val reason = "routeRethinkInRethink: ${persistentState.routeRethinkInRethink}"
+                    vpnRestartTrigger.value = reason
                     vpnAdapter?.notifyLoopback()
                     setNetworkAndDefaultDnsIfNeeded(forceUpdate = true)
                 }
@@ -2174,9 +2200,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             PersistentState.EXCLUDE_APPS_IN_PROXY -> {
                 // restart vpn to exclude apps if either proxy or dns proxy is enabled
                 if (appConfig.isProxyEnabled() || appConfig.isDnsProxyActive()) {
-                    io("excludeAppsInProxy") {
-                        restartVpnWithNewAppConfig(reason = "excludeAppsInProxy")
-                    }
+                    val reason = "excludeAppsInProxy: ${persistentState.excludeAppsInProxy}"
+                    vpnRestartTrigger.value = reason
                 } else {
                     // no-op, no need to restart vpn as no proxy/dns proxy is enabled
                 }
@@ -2236,8 +2261,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             PersistentState.FAIL_OPEN_ON_NO_NETWORK -> {
                 io("failOpenOnNoNetwork") {
                     notifyConnectionMonitor()
-                    restartVpnWithNewAppConfig(reason = "failOpenOnNoNetwork")
                 }
+                val reason = "failOpenOnNoNetwork: ${persistentState.failOpenOnNoNetwork}"
+                vpnRestartTrigger.value = reason
             }
         }
     }
@@ -2337,7 +2363,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // route changes as informed by the connection monitor
             notifyConnectionMonitor()
         }
-        restartVpnWithNewAppConfig(reason = "handleIPProtoChanges")
+        val reason = "ipProto: ${persistentState.internetProtocolType}"
+        vpnRestartTrigger.value = reason
         setRoute()
     }
 
@@ -2361,14 +2388,21 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             AppConfig.ProxyProvider.ORBOT -> {
                 // update orbot config, its treated as SOCKS5 or HTTP proxy internally
                 // orbot proxy requires app to be excluded from vpn, so restart vpn
-                restartVpnWithNewAppConfig(reason = "orbotProxy")
+                val reason = "orbotProxy: ${appConfig.isOrbotProxyEnabled()}"
+                vpnRestartTrigger.value = reason
                 vpnAdapter?.setCustomProxy(tunProxyMode)
             }
 
             AppConfig.ProxyProvider.CUSTOM -> {
                 // custom either means socks5 or http proxy
                 // socks5 proxy requires app to be excluded from vpn, so restart vpn
-                restartVpnWithNewAppConfig(reason = "customProxy")
+                val isSocks5 = tunProxyMode == AppConfig.TunProxyMode.SOCKS5
+                val reason = if (isSocks5) {
+                    "customProxy: ${appConfig.getSocks5ProxyDetails()}"
+                } else {
+                    "customProxy: ${appConfig.getHttpProxyDetails()}"
+                }
+                vpnRestartTrigger.value = reason
                 vpnAdapter?.setCustomProxy(tunProxyMode)
             }
         }
@@ -2463,55 +2497,66 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 }
                 return@withContext
             }
-            Logger.i(
-                LOG_TAG_VPN,
-                "---------------------------RESTART-INIT----------------------------"
-            )
-            // In vpn lockdown mode, unlink the adapter to close the previous file descriptor (fd)
-            // and use a new fd after creation. This should only be done in lockdown mode,
-            // as leaks are not possible.
-            // doing so also fixes 'endpoint closed' errors which are frequent in lockdown mode
-            if (VpnController.isVpnLockdown()) {
-               vpnAdapter?.unlink()
-            }
-            val nws = Networks(underlyingNetworks, overlayNetworks)
-            val mtu = mtu()
-            // attempt seamless hand-off as described in VpnService.Builder.establish() docs
-            val tunFd = establishVpn(nws, mtu)
-            if (tunFd == null) {
-                io("noTunRestart1") {
-                    logAndToastIfNeeded("$why, cannot restart-vpn, no tun-fd", Log.ERROR)
-                    signalStopService("noTunRestart1", userInitiated = false)
+            try {
+                Logger.i(
+                    LOG_TAG_VPN,
+                    "---------------------------RESTART-INIT----------------------------"
+                )
+                // In vpn lockdown mode, unlink the adapter to close the previous file descriptor (fd)
+                // and use a new fd after creation. This should only be done in lockdown mode,
+                // as leaks are not possible.
+                // doing so also fixes 'endpoint closed' errors which are frequent in lockdown mode
+                if (VpnController.isVpnLockdown()) {
+                    vpnAdapter?.unlink()
                 }
-                return@withContext
-            }
-
-            testFd.set(tunFd.fd) // save the fd for testing purposes
-
-            val ok =
-                makeOrUpdateVpnAdapter(
-                    ctx,
-                    tunFd,
-                    mtu,
-                    opts,
-                    builderRoutes
-                ) // builderRoutes set in establishVpn()
-            if (!ok) {
-                io("noTunnelRestart2") {
-                    logAndToastIfNeeded("$why, cannot restart-vpn, no vpn-adapter", Log.ERROR)
-                    signalStopService("noTunRestart2", userInitiated = false)
+                val nws = Networks(underlyingNetworks, overlayNetworks)
+                val mtu = mtu()
+                // attempt seamless hand-off as described in VpnService.Builder.establish() docs
+                val tunFd = establishVpn(nws, mtu)
+                if (tunFd == null) {
+                    io("noTunRestart1") {
+                        Logger.i(LOG_TAG_VPN, "-------------------------RESTART-ERR1----------------------")
+                        logAndToastIfNeeded("$why, cannot restart-vpn, no tun-fd", Log.ERROR)
+                        signalStopService("noTunRestart1", userInitiated = false)
+                    }
+                    return@withContext
                 }
-                return@withContext
-            } else {
-                io("restarted") { logAndToastIfNeeded("$why, vpn restarted", Log.INFO) }
-            }
-            Logger.i(
-                LOG_TAG_VPN,
-                "---------------------------RESTART-OK----------------------------"
-            )
 
-            notifyConnectionStateChangeIfNeeded()
-            informVpnControllerForProtoChange(builderRoutes)
+                testFd.set(tunFd.fd) // save the fd for testing purposes
+
+                val ok =
+                    makeOrUpdateVpnAdapter(
+                        ctx,
+                        tunFd,
+                        mtu,
+                        opts,
+                        builderRoutes
+                    ) // builderRoutes set in establishVpn()
+                if (!ok) {
+                    io("noTunnelRestart2") {
+                        Logger.i(LOG_TAG_VPN, "----------------------RESTART-ERR2----------------------")
+                        logAndToastIfNeeded("$why, cannot restart-vpn, no vpn-adapter", Log.ERROR)
+                        signalStopService("noTunRestart2", userInitiated = false)
+                    }
+                    return@withContext
+                } else {
+                    io("restarted") { logAndToastIfNeeded("$why, vpn restarted", Log.INFO) }
+                }
+                Logger.i(
+                    LOG_TAG_VPN,
+                    "---------------------------RESTART-OK----------------------------"
+                )
+
+                notifyConnectionStateChangeIfNeeded()
+                informVpnControllerForProtoChange(builderRoutes)
+            } catch (e: Exception) {
+                Logger.i(LOG_TAG_VPN, "----------------------RESTART-ERR0----------------------")
+                Logger.e(LOG_TAG_VPN, "restart-vpn failed: ${e.message}", e)
+                io("restartVpnError") {
+                    logAndToastIfNeeded("$why, restart-vpn failed: ${e.message}", Log.ERROR)
+                    signalStopService("restartVpnError", userInitiated = false)
+                }
+            }
         }
 
     private suspend fun isFileDescriptorValid(fd: FileDescriptor): Boolean {
@@ -2624,7 +2669,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                         LOG_TAG_VPN,
                         "$TAG; nw disconnect, routes/net/mtu changed, restart vpn"
                     )
-                    restartVpnWithNewAppConfig( reason = "nwDisconnect")
+                    val reason = "nwDisconnect, routes: ${interestingChanges.routesChanged}, net: ${interestingChanges.netChanged}, mtu: ${interestingChanges.mtuChanged}"
+                    vpnRestartTrigger.value = reason
                     // remove the system dns
                     prevDns = mutableSetOf()
                     setNetworkAndDefaultDnsIfNeeded(true)
@@ -2720,7 +2766,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             if (isMtuChanged || isRoutesChanged) {
                 Logger.i(LOG_TAG_VPN, "$TAG; mtu/routes changed,  restart vpn")
                 ioCtx("nwConnect") {
-                    restartVpnWithNewAppConfig(reason = "mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}); routes? $isRoutesChanged")
+                    val reason = "nwConnect, mtu: $isMtuChanged, routes: $isRoutesChanged, bound-nws: $isBoundNetworksChanged"
+                    vpnRestartTrigger.value = reason
                     // not needed as the refresh is done in go, TODO: remove below code later
                     // only after set links and routes, wg can be refreshed
                     // if (isRoutesChanged) {
@@ -2991,7 +3038,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         Logger.i(LOG_TAG_VPN, "vpn lockdown mode change, restarting")
         io("lockdownSync") {
-            restartVpnWithNewAppConfig(reason = "lockdownEnabled? ${isLockDownPrevious.get()}")
+            val reason = "lockdown: ${isLockdownEnabled}"
+            vpnRestartTrigger.value = reason
             vpnAdapter?.notifyLoopback()
         }
     }
@@ -3072,6 +3120,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // stop the inapp billing handler if it exists
         //InAppBillingHandler.endConnection()
         try {
+            // this will also cancels the restarter state flow
             vpnScope.cancel("vpnDestroy")
         } catch (ignored: IllegalStateException) {
         } catch (ignored: CancellationException) {
@@ -3121,7 +3170,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     }
 
     private fun handleVpnServiceOnAppStateChange() { // paused or resumed
-        io("pauseOrResumed") { restartVpnWithNewAppConfig(reason = "pauseOrResumed") }
+        val reason = if (isAppPaused()) "pause" else "resume"
+        vpnRestartTrigger.value = reason
         ui { notificationManager.notify(SERVICE_ID, updateNotificationBuilder()) }
     }
 
@@ -3343,7 +3393,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 // considered
                 // only for overlay network changes. Therefore, the VPN needs to be restarted
                 // to recalculate the decision of adding routes.
-                restartVpnWithNewAppConfig(reason = "overlayNwChanged")
+                val reason = "overlayNwChanged, routes: $isRoutesChanged, mtu: $isMtuChanged"
+                vpnRestartTrigger.value = reason
             } else {
                 Logger.i(LOG_TAG_VPN, "overlay routes or mtu not changed, no restart needed")
             }
@@ -3544,18 +3595,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return@runBlocking co.tryDispatch(f)
     }
 
-    private suspend fun ioCtx(s: String, f: suspend () -> Unit) {
+    private suspend fun ioCtx(s: String, f: suspend () -> Unit) =
         withContext(CoroutineName(s) + Dispatchers.IO) { f() }
-    }
+
 
     private fun io(s: String, f: suspend () -> Unit) =
         vpnScope.launch(CoroutineName(s) + Dispatchers.IO) { f() }
 
     private fun ui(f: suspend () -> Unit) = vpnScope.launch(Dispatchers.Main) { f() }
 
-    private suspend fun uiCtx(s: String, f: suspend () -> Unit) {
+    private suspend fun uiCtx(s: String, f: suspend () -> Unit) =
         withContext(CoroutineName(s) + Dispatchers.Main) { f() }
-    }
 
     private suspend fun <T> ioAsync(s: String, f: suspend () -> T): Deferred<T> {
         return vpnScope.async(CoroutineName(s) + Dispatchers.IO) { f() }
