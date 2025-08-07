@@ -296,11 +296,7 @@ class WgMainActivity :
         val activeConfigs = WireguardManager.getActiveConfigs()
         if (WireguardManager.oneWireGuardEnabled()) {
             val dnsName = activeConfigs.firstOrNull()?.getName() ?: return
-            if (isAtleastQ()) {
-                b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsName)
-            } else {
-                b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer_below_android_Q)
-            }
+            b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsName)
             // remove the observer if any config is active
             appConfig.getConnectedDnsObservable().removeObservers(this)
         } else {
@@ -308,17 +304,11 @@ class WgMainActivity :
                 var dnsNames: String = dns.ifEmpty { "" }
                 if (persistentState.splitDns) {
                     if (activeConfigs.isNotEmpty()) {
-                        dnsNames += ","
+                        dnsNames += ", "
                     }
                     dnsNames += activeConfigs.joinToString(",") { it.getName() }
                 }
-                if (isAtleastQ()) {
-                    b.wgWireguardDisclaimer.text =
-                        getString(R.string.wireguard_disclaimer, dnsNames)
-                } else {
-                    b.wgWireguardDisclaimer.text =
-                        getString(R.string.wireguard_disclaimer_below_android_Q)
-                }
+                b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsNames)
             }
         }
     }
