@@ -41,6 +41,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.Inet4Address
@@ -226,48 +227,57 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
      * Force updates the VPN's underlying network based on the preference. Will be initiated when
      * the VPN start is completed. Always called from the main thread
      */
-    suspend fun onVpnStart(context: Context): Boolean {
-        val isNewVpn = !::cm.isInitialized
+    suspend fun onVpnStart(context: Context): Boolean  {
+        val callback = this
+        val deferred = scope.async {
+            val isNewVpn = !::cm.isInitialized
 
-        if (!isNewVpn) {
-            Logger.w(LOG_TAG_CONNECTION, "connection monitor is already running")
-            return false
-        }
-
-        Logger.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
-        cm = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        channel = Channel(Channel.CONFLATED)
-        try {
-            // TODO: use a custom Looper(HandlerThread) to avoid blocking the main thread
-            cm.registerNetworkCallback(networkRequest, this)
-        } catch (e: Exception) {
-            Logger.w(LOG_TAG_CONNECTION, "Exception while registering network callback", e)
-            networkListener.onNetworkRegistrationFailed()
-            return isNewVpn
-        }
-
-        // Filter out empty strings from probe IPs to avoid unnecessary probe attempts
-        val ips = IpsAndUrlToProbe(
-            persistentState.pingv4Ips.split(",").map { it.trim() }.filter { it.isNotEmpty() },
-            persistentState.pingv6Ips.split(",").map { it.trim() }.filter { it.isNotEmpty() },
-            persistentState.pingv4Url.trim(),
-            persistentState.pingv6Url.trim()
-        )
-
-        val hdl = NetworkRequestHandler(cm,  networkListener, ips)
-        sendNetworkChanges(isForceUpdate = true)
-
-        scope.launch(CoroutineName("nwhdl") + serializer) {
-            for (m in channel) {
-                // process the message in a coroutine context
-                val deferred = async { hdl.handleMessage(m) }
-                deferred.await()
-                // add a delay to avoid processing multiple network changes in quick succession
-                delay(TimeUnit.SECONDS.toMillis(3))
+            if (!isNewVpn) {
+                Logger.w(LOG_TAG_CONNECTION, "connection monitor is already running")
+                return@async false
             }
+
+            Logger.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
+            cm =
+                context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+            try {
+                // TODO: use a custom Looper(HandlerThread) to avoid blocking the main thread
+                cm.registerNetworkCallback(networkRequest, callback)
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_CONNECTION, "Exception while registering network callback", e)
+                networkListener.onNetworkRegistrationFailed()
+                return@async isNewVpn
+            }
+            channel = Channel(Channel.CONFLATED)
+
+            scope.launch(CoroutineName("nwHdl") + serializer) {
+
+                // Filter out empty strings from probe IPs to avoid unnecessary probe attempts
+                val ips = IpsAndUrlToProbe(
+                    persistentState.pingv4Ips.split(",").map { it.trim() }
+                        .filter { it.isNotEmpty() },
+                    persistentState.pingv6Ips.split(",").map { it.trim() }
+                        .filter { it.isNotEmpty() },
+                    persistentState.pingv4Url.trim(),
+                    persistentState.pingv6Url.trim()
+                )
+
+                val hdl = NetworkRequestHandler(cm, networkListener, ips)
+                sendNetworkChanges(isForceUpdate = true)
+                for (m in channel) {
+                    // process the message in a coroutine context
+                    val deferred = async { hdl.handleMessage(m) }
+                    deferred.await()
+                    // add a delay to avoid processing multiple network changes in quick succession
+                    delay(TimeUnit.SECONDS.toMillis(2))
+                }
+            }
+
+            return@async isNewVpn
         }
 
-        return isNewVpn
+        return deferred.await()
     }
 
 
@@ -437,6 +447,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             val vpnRoutes = determineVpnProtos(opPrefs.networkSet)
             val isDnsChanged = hasNwDnsChanged(currentNetworks, newNetworks)
 
+            Logger.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, currNws: $currentNetworks ; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered")
             Logger.i(
                 LOG_TAG_CONNECTION,
                 "Connected network: ${newActiveNetwork?.networkHandle} ${
@@ -470,7 +481,6 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             val isDnsChanged = hasNwDnsChanged(currentNetworks, newNetworks)
 
             Logger.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, currNws: $currentNetworks ; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered")
-
             Logger.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, newNws: $newNetworks \n ; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered")
 
             if (isNewNetwork || opPrefs.isForceUpdate || isDnsChanged) {
