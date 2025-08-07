@@ -391,7 +391,7 @@
                             android:layout_toStartOf="@id/use_mobile_check"
                             android:orientation="vertical">
 
-                            <TextView
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/use_mobile_title_tv"
                                 style="@style/TextAppearance.AppCompat.Subhead"
                                 android:layout_width="wrap_content"
@@ -399,7 +399,7 @@
                                 android:text="@string/wg_setting_use_on_mobile"
                                 android:textSize="@dimen/large_font_text_view" />
 
-                            <TextView
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="5dp"

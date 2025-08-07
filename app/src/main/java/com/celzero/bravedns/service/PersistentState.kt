@@ -20,7 +20,6 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
@@ -304,9 +303,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     var pingv6Ips by stringPref("ping_ipv6_ips").withDefault<String>(Constants.ip6probes.joinToString(","))
 
-    var pingv4Url by stringPref("ping_ipv4_url").withDefault<String>(Constants.urlV4probe)
+    var pingv4Url by stringPref("ping_ipv4_url").withDefault<String>(Constants.urlV4probes.joinToString(","))
 
-    var pingv6Url by stringPref("ping_ipv6_url").withDefault<String>(Constants.urlV6probe)
+    var pingv6Url by stringPref("ping_ipv6_url").withDefault<String>(Constants.urlV6probes.joinToString(","))
 
     // camera and mic access
     var micCamAccess by booleanPref("mic_camera_access").withDefault<Boolean>(false)
@@ -376,6 +375,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // last grace period reminder time, when rethinkdns+ is enabled and user is cancelled/expired
     // this is used to show a reminder to the user to renew the subscription with grace period
     var lastGracePeriodReminderTime by longPref("last_grace_period_reminder_time").withDefault<Long>(INIT_TIME_MS)
+
+    var newSettings by stringPref("new_settings").withDefault<String>("")
+    var newSettingsSeen by stringPref("new_settings_seen").withDefault<String>("")
+    var appUpdateTimeTs by longPref("app_update_time_ts").withDefault<Long>(INIT_TIME_MS)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()

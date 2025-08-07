@@ -72,6 +72,7 @@ import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
+import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
@@ -144,6 +145,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         observeAppState()
 
         handleOnBackPressed()
+
+        NewSettingsManager.handleNewSettings()
 
         // enable in-app messaging, will be used to show in-app messages in case of billing issues
         //enableInAppMessaging()
@@ -376,6 +379,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         Logger.i(LOG_TAG_UI, "new version detected, updating the app version, version: $version")
         persistentState.appVersion = version
         persistentState.showWhatsNewChip = true
+        persistentState.appUpdateTimeTs = System.currentTimeMillis()
+        NewSettingsManager.initializeNewSettings()
 
         // FIXME: remove this post v054
         removeThisMethod()

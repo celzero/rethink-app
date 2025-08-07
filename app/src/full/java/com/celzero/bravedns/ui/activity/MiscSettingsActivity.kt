@@ -90,6 +90,8 @@ import androidx.core.net.toUri
 import com.celzero.bravedns.ui.LauncherSwitcher
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
+import com.celzero.bravedns.util.NewSettingsManager
+import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 
 
 class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) {
@@ -1032,6 +1034,17 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         // app notification permission android 13
         showEnableNotificationSettingIfNeeded()
         checkMicCamAccessRule()
+        showNewBadgeIfNeeded()
+    }
+
+    private fun showNewBadgeIfNeeded() {
+        val providerInfo = NewSettingsManager.shouldShowBadge(NewSettingsManager.PROVIDER_INFO)
+        val appLogs = NewSettingsManager.shouldShowBadge(NewSettingsManager.APP_LOGS)
+        val automation = NewSettingsManager.shouldShowBadge(NewSettingsManager.AUTOMATION)
+
+        b.genSettingsIpInfoTxt.setBadgeDotVisible(this, providerInfo)
+        b.genSettingsConsoleLogTxt.setBadgeDotVisible(this, appLogs)
+        b.genSettingsTaskerTxt.setBadgeDotVisible(this, automation)
     }
 
     private fun registerForActivityResult() {

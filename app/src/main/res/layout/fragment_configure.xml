@@ -375,6 +375,7 @@
                     android:layout_toEndOf="@id/fs_anti_censorship_icon"
                     android:text="@string/anti_censorship_title"
                     android:gravity="start|center"
+                    android:layout_centerVertical="true"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="16sp" />
 

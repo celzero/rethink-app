@@ -80,6 +80,8 @@ class AntiCensorshipActivity : AppCompatActivity(R.layout.activity_anti_censorsh
     private fun initView() {
         updateDialStrategy(persistentState.dialStrategy)
         updateRetryStrategy(persistentState.retryStrategy)
+
+        b.settingsActivityVpnHeadingText.text = getString(R.string.anti_censorship_title).lowercase()
     }
 
     private fun updateDialStrategy(selectedState: Int) {

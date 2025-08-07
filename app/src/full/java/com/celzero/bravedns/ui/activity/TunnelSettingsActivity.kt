@@ -36,8 +36,10 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.dialog.NetworkReachabilityDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.InternetProtocol
+import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
@@ -73,10 +75,32 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     override fun onResume() {
         super.onResume()
         handleLockdownModeIfNeeded()
+        showNewBadgeIfNeeded()
+    }
+
+    private fun showNewBadgeIfNeeded() {
+        val tcpKeepAlive = NewSettingsManager.shouldShowBadge(NewSettingsManager.TCP_KEEP_ALIVE)
+        val idleTimeout = NewSettingsManager.shouldShowBadge(NewSettingsManager.TCP_IDLE_TIMEOUT)
+        val loopback = NewSettingsManager.shouldShowBadge(NewSettingsManager.LOOP_BACK_PROXY_FORWARDER)
+        val eimf = NewSettingsManager.shouldShowBadge(NewSettingsManager.ENDPOINT_INDEPENDENT)
+        val doNotStall = NewSettingsManager.shouldShowBadge(NewSettingsManager.DO_NOT_STALL)
+        val performConnectionCheck = NewSettingsManager.shouldShowBadge(NewSettingsManager.PERFORM_CONNECTION_CHECK)
+        val randomizeWgPort = NewSettingsManager.shouldShowBadge(NewSettingsManager.RANDOMIZE_WG_PORT)
+        val mobileMetered = NewSettingsManager.shouldShowBadge(NewSettingsManager.MARK_MOBILE_METERED)
+
+        b.dvTcpKeepAliveTxt.setBadgeDotVisible(this, tcpKeepAlive)
+        b.dvTimeoutTxt.setBadgeDotVisible(this, idleTimeout)
+        b.genSettingsExcludeProxyAppsTxt.setBadgeDotVisible(this, loopback)
+        b.dvEimfTxt.setBadgeDotVisible(this, eimf)
+        b.genFailOpenTxt.setBadgeDotVisible(this, doNotStall)
+        b.genSettingsConnectivityChecksTxt.setBadgeDotVisible(this, performConnectionCheck)
+        b.dvWgListenPortTxt.setBadgeDotVisible(this, randomizeWgPort)
+        b.genSettingsMobileMeteredTxt.setBadgeDotVisible(this, mobileMetered)
     }
 
     private fun initView() {
-        b.settingsActivityWireguardText.text = getString(R.string.lbl_wireguard).lowercase()
+        b.settingsActivityWireguardText.text = getString(R.string.settings_proxy_header).lowercase()
+        b.settingsActivityTcpText.text = getString(R.string.orbot_status_arg_2).lowercase()
 
         b.settingsActivityAllowBypassProgress.visibility = View.GONE
         displayAllowBypassUi()
@@ -136,7 +160,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         if (minutes > 0) parts.add("${minutes}m")
         if (seconds > 0) parts.add("${seconds}s")
 
-        return if (parts.isEmpty()) "0m" else parts.joinToString(" ")
+        return if (parts.isEmpty()) getString(R.string.lbl_disabled) else parts.joinToString(" ")
     }
 
     private fun updateDialerTimeOut(valueMin: Int) {
@@ -180,6 +204,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         }
 
         b.settingsActivityExcludeProxyAppsSwitch.setOnCheckedChangeListener { _, isChecked ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.LOOP_BACK_PROXY_FORWARDER)
             persistentState.excludeAppsInProxy = !isChecked
         }
 
@@ -288,10 +313,12 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityDefaultDnsRl.setOnClickListener { showDefaultDnsDialog() }
 
         b.settingsActivityConnectivityChecksRl.setOnClickListener {
+            NewSettingsManager.markSettingSeen(NewSettingsManager.PERFORM_CONNECTION_CHECK)
             showConnectivityChecksOptionsDialog()
         }
 
         b.settingsActivityConnectivityChecksImg.setOnClickListener {
+            NewSettingsManager.markSettingSeen(NewSettingsManager.PERFORM_CONNECTION_CHECK)
             showConnectivityChecksOptionsDialog()
         }
 
@@ -308,6 +335,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         }
 
         b.settingsActivityMobileMeteredSwitch.setOnCheckedChangeListener { _, isChecked ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.MARK_MOBILE_METERED)
             persistentState.treatOnlyMobileNetworkAsMetered = isChecked
         }
 
@@ -317,6 +345,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         }
 
         b.settingsFailOpenSwitch.setOnCheckedChangeListener { _, isChecked ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.DO_NOT_STALL)
             persistentState.failOpenOnNoNetwork = isChecked
         }
 
@@ -325,6 +354,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         }
 
         b.dvWgListenPortSwitch.setOnCheckedChangeListener { _, isChecked ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.RANDOMIZE_WG_PORT)
             persistentState.randomizeListenPort = !isChecked
         }
 
@@ -333,6 +363,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         }
 
         b.dvEimfSwitch.setOnCheckedChangeListener { _, isChecked ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.ENDPOINT_INDEPENDENT)
             if (!isAtleastS()) {
                 return@setOnCheckedChangeListener
             }
@@ -343,6 +374,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.dvEimfRl.setOnClickListener { b.dvEimfSwitch.isChecked = !b.dvEimfSwitch.isChecked }
 
         b.dvTcpKeepAliveSwitch.setOnCheckedChangeListener { _, isChecked ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.TCP_KEEP_ALIVE)
             persistentState.tcpKeepAlive = isChecked
         }
 
@@ -352,6 +384,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.dvTimeoutSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                NewSettingsManager.markSettingSeen(NewSettingsManager.TCP_IDLE_TIMEOUT)
                 updateDialerTimeOut(progress)
             }
 

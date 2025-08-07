@@ -78,6 +78,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
                     android:layout_marginBottom="10dp">
@@ -531,7 +532,7 @@
                         android:layout_toEndOf="@id/dc_split_dns_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_split_dns_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -539,7 +540,7 @@
                             android:text="@string/cd_split_dns_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_split_dns_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -587,7 +588,7 @@
                         android:layout_toEndOf="@id/dv_bypass_dns_block_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dv_bypass_dns_block_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -595,7 +596,7 @@
                             android:text="@string/cd_treat_dns_rules_firewall_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dv_bypass_dns_block_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -898,7 +899,7 @@
                         android:layout_toEndOf="@id/dc_undelegated_domains_img"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dc_undelegated_domains_heading"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -907,7 +908,7 @@
                             android:text="@string/dc_use_sys_dns_undelegated_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"

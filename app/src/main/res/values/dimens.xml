@@ -25,6 +25,8 @@
     <dimen name="rethink_header_text">24sp</dimen>
     <dimen name="sponsor_usage_text">72sp</dimen>
 
+    <dimen name="badge_dot_padding">10dp</dimen>
+
     <dimen name="standard_0">0dp</dimen>
     <dimen name="standard_55">70dp</dimen>
     <dimen name="standard_105">140dp</dimen>

@@ -51,9 +51,11 @@ import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.ui.dialog.WgHopDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.tos
@@ -118,6 +120,15 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         super.onResume()
         init()
         setupClickListeners()
+        showNewBadgeIfNeeded()
+    }
+
+    private fun showNewBadgeIfNeeded() {
+        val hop = NewSettingsManager.shouldShowBadge(NewSettingsManager.WG_HOP_SETTING)
+        val mobile = NewSettingsManager.shouldShowBadge(NewSettingsManager.WG_MOBILE_SETTING)
+
+        b.hopBtn.setBadgeDotVisible(this, hop)
+        b.useMobileTitleTv.setBadgeDotVisible(this, mobile)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -469,13 +480,17 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
         b.catchAllCheck.setOnClickListener { updateCatchAll(b.catchAllCheck.isChecked) }
 
-        b.useMobileCheck.setOnClickListener { updateUseOnMobileNetwork(b.useMobileCheck.isChecked) }
+        b.useMobileCheck.setOnClickListener {
+            NewSettingsManager.markSettingSeen(NewSettingsManager.WG_MOBILE_SETTING)
+            updateUseOnMobileNetwork(b.useMobileCheck.isChecked)
+        }
 
         b.logsBtn.setOnClickListener {
             startActivity(ID_WG_BASE + configId)
         }
 
         b.hopBtn.setOnClickListener {
+            NewSettingsManager.markSettingSeen(NewSettingsManager.WG_HOP_SETTING)
             val mapping = WireguardManager.getConfigFilesById(configId)
             if (mapping == null) {
                 showInvalidConfigDialog()

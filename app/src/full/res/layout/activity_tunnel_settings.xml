@@ -150,7 +150,7 @@
                         android:layout_toEndOf="@id/settings_activity_exclude_proxy_apps_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_exclude_proxy_apps_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -158,7 +158,7 @@
                             android:text="@string/settings_exclude_proxy_apps_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
@@ -308,7 +308,7 @@
                         android:layout_marginBottom="5dp"
                         android:alpha="0.5"
                         android:padding="10dp"
-                        android:src="@drawable/ic_private_network" />
+                        android:src="@drawable/ic_timeout" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -318,7 +318,7 @@
                         android:layout_toEndOf="@id/settings_activity_mobile_metered_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_mobile_metered_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -326,7 +326,7 @@
                             android:text="@string/settings_mobile_metered_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
@@ -432,7 +432,7 @@
                         android:layout_toEndOf="@id/settings_fail_open_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_fail_open_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -440,7 +440,7 @@
                             android:text="@string/fail_open_network_title"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_fail_open_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -666,7 +666,7 @@
                         android:layout_toEndOf="@id/settings_activity_connectivity_checks_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_connectivity_checks_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -674,7 +674,7 @@
                             android:text="@string/settings_connectivity_checks"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
@@ -724,7 +724,7 @@
             android:fontFamily="sans-serif-smallcaps"
             android:lineSpacingExtra="5dp"
             android:padding="5dp"
-            android:text="@string/lbl_wireguard"
+            android:text="@string/settings_proxy_header"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
@@ -772,7 +772,7 @@
                         android:layout_toEndOf="@id/dv_wg_listen_port_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dv_wg_listen_port_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -780,7 +780,7 @@
                             android:text="@string/do_not_randomize_listen_port_title"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dv_wg_listen_port_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -828,7 +828,7 @@
                         android:layout_toEndOf="@id/dv_eimf_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dv_eimf_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -836,7 +836,7 @@
                             android:text="@string/endpoint_independent_mapping_title"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dv_eimf_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -904,11 +904,12 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="5dp"
+                        android:alpha="0.5"
                         android:layout_marginTop="5dp"
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
                         android:padding="10dp"
-                        android:src="@drawable/ic_ip_address" />
+                        android:src="@drawable/ic_tcp_keep_alive" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -918,7 +919,7 @@
                         android:layout_toEndOf="@id/dv_tcp_keep_alive_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dv_tcp_keep_alive_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -926,7 +927,7 @@
                             android:text="@string/tcp_keep_alive_title"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dv_tcp_keep_alive_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -965,7 +966,7 @@
                         android:layout_marginBottom="5dp"
                         android:alpha="0.5"
                         android:padding="10dp"
-                        android:src="@drawable/ic_timeout" />
+                        android:src="@drawable/ic_idle_timeout" />
 
                     <LinearLayout
                         android:layout_width="match_parent"

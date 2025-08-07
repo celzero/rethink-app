@@ -182,7 +182,7 @@
                         android:layout_toEndOf="@id/settings_ip_info_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_ip_info_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -190,7 +190,7 @@
                             android:text="@string/download_ip_info_title"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_ip_info_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -441,7 +441,7 @@
                         android:layout_toEndOf="@id/settings_console_log_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_console_log_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -449,7 +449,7 @@
                             android:text="@string/console_log_title"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_console_log_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -898,7 +898,7 @@
                         android:layout_toEndOf="@id/settings_tasker_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_tasker_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -906,7 +906,7 @@
                             android:text="@string/adv_taster_title"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_tasker_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
