@@ -26,7 +26,7 @@
             android:fontFamily="sans-serif-smallcaps"
             android:lineSpacingExtra="5dp"
             android:padding="5dp"
-            android:text="@string/ac_title"
+            android:text="@string/anti_censorship_title"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
@@ -105,14 +105,12 @@
                             android:padding="5dp"
                             android:text="@string/settings_app_list_default_app"
                             android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/large_font_text_view"
-                            app:drawableEndCompat="@drawable/dot_accent" />
+                            android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
-                            android:paddingTop="5dp"
                             android:paddingEnd="5dp"
                             android:paddingBottom="5dp"
                             android:text="@string/ac_never_split_desc"
@@ -160,14 +158,12 @@
                             android:padding="5dp"
                             android:text="@string/settings_ip_text_ipv46"
                             android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/large_font_text_view"
-                            app:drawableEndCompat="@drawable/dot_accent" />
+                            android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
-                            android:paddingTop="5dp"
                             android:paddingEnd="5dp"
                             android:paddingBottom="5dp"
                             android:text="@string/ac_split_auto_desc"
@@ -215,14 +211,12 @@
                             android:padding="5dp"
                             android:text="@string/ac_split_tcp"
                             android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/large_font_text_view"
-                            app:drawableEndCompat="@drawable/dot_yellow" />
+                            android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
-                            android:paddingTop="5dp"
                             android:paddingEnd="5dp"
                             android:paddingBottom="5dp"
                             android:text="@string/ac_split_tcp_desc"
@@ -273,14 +267,12 @@
                             android:paddingBottom="5dp"
                             android:text="@string/ac_split_tls"
                             android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/large_font_text_view"
-                            app:drawableEndCompat="@drawable/dot_green" />
+                            android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
-                            android:paddingTop="5dp"
                             android:paddingEnd="5dp"
                             android:paddingBottom="5dp"
                             android:text="@string/ac_split_tls_desc"
@@ -331,14 +323,12 @@
                             android:paddingBottom="5dp"
                             android:text="@string/ac_desync"
                             android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/large_font_text_view"
-                            app:drawableEndCompat="@drawable/dot_red" />
+                            android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
-                            android:paddingTop="5dp"
                             android:paddingEnd="5dp"
                             android:paddingBottom="5dp"
                             android:text="@string/ac_desync_desc"
@@ -447,7 +437,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
-                            android:paddingTop="5dp"
                             android:paddingEnd="5dp"
                             android:paddingBottom="5dp"
                             android:text="@string/ac_retry_options_never_desc"
@@ -493,7 +482,7 @@
                             android:layout_gravity="center_vertical"
                             android:drawablePadding="10dp"
                             android:padding="5dp"
-                            android:text="@string/ac_retry_options_with_split"
+                            android:text="@string/settings_ip_text_ipv46"
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
@@ -501,7 +490,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
-                            android:paddingTop="5dp"
                             android:paddingEnd="5dp"
                             android:paddingBottom="5dp"
                             android:text="@string/ac_retry_options_with_split_desc"
@@ -546,7 +534,7 @@
                             android:layout_gravity="center_vertical"
                             android:drawablePadding="10dp"
                             android:padding="5dp"
-                            android:text="@string/ac_retry_options_after_split"
+                            android:text="@string/lbl_always"
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
@@ -554,7 +542,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
-                            android:paddingTop="5dp"
                             android:paddingEnd="5dp"
                             android:paddingBottom="5dp"
                             android:text="@string/ac_retry_options_after_split_desc"
@@ -566,64 +553,6 @@
 
             </RadioGroup>
         </com.google.android.material.card.MaterialCardView>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="30dp"
-            android:alpha="0.9"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:drawableStart="@drawable/dot_red"
-                android:drawablePadding="2dp"
-                android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center"
-                android:padding="5dp"
-                android:text="@string/lbl_fast" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:drawableStart="@drawable/dot_yellow"
-                android:drawablePadding="2dp"
-                android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center"
-                android:padding="5dp"
-                android:text="@string/lbl_private" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:drawableStart="@drawable/dot_green"
-                android:drawablePadding="2dp"
-                android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center"
-                android:padding="5dp"
-                android:text="@string/lbl_secure" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:drawableStart="@drawable/dot_accent"
-                android:drawablePadding="2dp"
-                android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center"
-                android:padding="5dp"
-                android:text="@string/lbl_anonymous" />
-
-        </LinearLayout>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
