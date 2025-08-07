@@ -105,6 +105,12 @@
     <string name="lbl_reddit" translatable="false">Reddit</string>
     <string name="lbl_test" translatable="true">test</string>
     <string name="lbl_protos" translatable="true">protos</string>
+    <string name="lbl_experimental" translatable="true">(experimental)</string>
+    <string name="lbl_service_providers" translatable="true">Service Providers</string>
+    <string name="lbl_search" translatable="false">Search</string>
+    <string name="lbl_hop" translatable="true">Relay</string>
+    <string name="lbl_ipinfo_inc" translatable="false">IPinfo Inc.</string>
+    <string name="lbl_manual" translatable="true">Manual</string>
 
     <string name="memory_notification_text">Rethink is experiencing low memory. System actions may be limited.</string>
 
@@ -126,6 +132,9 @@
     <string name="symbol_key" translatable="false">🗝️</string>
     <string name="symbol_global" translatable="false">🌐</string>
     <string name="symbol_clock" translatable="false">🕒</string>
+    <string name="symbol_rocket" translatable="false">🚀</string>
+    <string name="symbol_bunny" translatable="false">🐇</string>
+    <string name="symbol_sparkle" translatable="false">✨</string>
     <string name="symbol_hyphen" translatable="false">-</string>
     <string name="symbol_slash" translatable="false">/</string>
     <string name="symbol_black_down" translatable="false">\u25be</string>
@@ -135,6 +144,11 @@
     <string name="symbol_ps" translatable="false">%1$s/S</string>
     <string name="symbol_mb" translatable="false">MB</string>
     <string name="symbol_dollar" translatable="false">$</string>
+    <string name="symbol_star" translatable="false">★</string>
+    <string name="symbol_sky" translatable="false">⛅</string>
+    <string name="symbol_max" translatable="false">🪂</string>
+    <string name="symbol_duck" translatable="false">🦆</string>
+    <string name="symbol_mobile" translatable="false">📶</string>
 
     <string name="numeric_one" translatable="false">1</string>
     <string name="numeric_twenty_four" translatable="false">24</string>
@@ -145,6 +159,15 @@
 
     <string name="slide_1_title" translatable="true">Free and Open Source</string>
     <string name="slide_1_desc" translatable="true">Rethink is an open source software backed by Mozilla Builders MVP program, FOSS United Foundation.</string>
+
+    <string name="wireguard_title" translatable="true">Secure Internet with WireGuard</string>
+    <string name="wireguard_desc" translatable="true">Encrypt your Internet traffic with WireGuard. Choose different routes for different apps.</string>
+
+    <string name="firewall_title" translatable="true">Protect your Android with Firewall</string>
+    <string name="firewall_desc" translatable="true">Control app internet use; restrict connections based on app or network activity.</string>
+
+    <string name="dns_title" translatable="true">Block Ads &amp; Malware with DNS</string>
+    <string name="dns_desc" translatable="true">Choose from 190+ lists to stop ads, trackers, and malware.</string>
 
     <string name="rdns_plus" translatable="false">RDNS Plus</string>
 
@@ -214,6 +237,8 @@
     <string name="status_dns_server_down" translatable="true">dns server down</string>
 
     <string name="status_no_internet" translatable="true">no internet</string>
+
+    <string name="status_no_network" translatable="true">no network</string>
 
     <string name="status_protected_with_tor" translatable="true">protected with tor</string>
 
@@ -441,6 +466,10 @@
     <string name="settings_allow_lan_heading" translatable="true">Do not route Private IPs (experimental)</string>
     <string name="settings_allow_lan_desc" translatable="true">Exclude LAN, loopback, multicast, link-local routes from Rethink\'s VPN tunnel.</string>
 
+
+    <string name="settings_mobile_metered_heading" translatable="true">Meter mobile networks</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Always treat mobile networks as metered.</string>
+
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback proxy forwarder apps</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">When disabled, excludes proxy (SOCKS5, HTTP, DNS) forwarder apps from Rethink\'s VPN tunnel.</string>
 
@@ -593,6 +622,8 @@
     <string name="settings_theme_dialog_themes_2" translatable="true">Light</string>
     <string name="settings_theme_dialog_themes_3" translatable="true">Dark</string>
     <string name="settings_theme_dialog_themes_4" translatable="true">True Black</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">Light Plus</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">Dark Plus</string>
 
     <string name="settings_ip_dialog_title" translatable="true">Choose IP version</string>
     <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (default)</string>
@@ -756,7 +787,7 @@
     <string name="dc_proxy_dns_desc" translatable="true">Do not proxy DNS over Always-on WireGuard, SOCKS5, HTTP proxies.</string>
 
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Use System DNS for undelegated domains</string>
-    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Use System DNS for undelgated domains like .lan, .internal, etc.</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Use System DNS for undelgated domains like <i>.lan</i>, <i>.internal</i>, etc.</string>
 
     <string name="dc_filtering_heading" translatable="true">filtering</string>
 
@@ -808,6 +839,8 @@
     <string name="about_foss_link" translatable="false">https://fossunited.org/grants</string>
     <string name="about_translate_link" translatable="false">https://svc.rethinkdns.com/r/translate</string>
     <string name="about_privacy_policy_link" translatable="false">https://www.rethinkdns.com/privacy</string>
+    <string name="about_terms_link" translatable="false">https://rethinkdns.com/terms</string>
+    <string name="about_license_link" translatable="false">https://github.com/celzero/rethink-app/blob/main/LICENSE</string>
     <string name="about_mastodom_handle" translatable="false">https://mastodon.social/@rdns</string>
     <string name="about_reddit_handle" translatable="false">https://www.reddit.com/r/rethinkdns</string>
     <string name="about_matrix_handle" translatable="false">https://matrix.to/#/!jrTSpJiEkFNNBMhSaE:matrix.org</string>
@@ -830,63 +863,63 @@
     <string name="contributors_dialog_title" translatable="true">Authors</string>
     <string name="contributors_list" translatable="true"><![CDATA[The <i>Rethink Open Source Project</i> owes its existence to these volunteers who devote countless hours on its development.<br/>
                                               <br/>🛡️ Android app <br/>
-                                              <a href="https://github.com/BayLee4">BayLee4</a><br/>
-                                              <a href="https://github.com/Ch4t4r">Ch4t4r</a><br/>
-                                              <a href="https://github.com/HrBDev">HrBDev</a><br/>
-                                              <a href="https://github.com/hussainmohd-a">hussainmohd-a</a><br/>
-                                              <a href="https://github.com/ignoramous">ignoramous</a><br/>
-                                              <a href="https://github.com/markwmuller">markwmuller</a><br/>
-                                              <a href="https://github.com/Mygod">Mygod</a><br/>
-                                              <a href="https://github.com/Uldiniad">Uldiniad</a><br/>
-                                              <a href="https://github.com/Poussinou">Poussinou</a><br/>
-                                              <a href="https://github.com/pjosingh">pjosingh</a><br/>
+                                              <a href="https://github.com/BayLee4">BayLee4</a> /
+                                              <a href="https://github.com/Ch4t4r">Ch4t4r</a> /
+                                              <a href="https://github.com/HrBDev">HrBDev</a> /
+                                              <a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /
+                                              <a href="https://github.com/ignoramous">ignoramous</a> /
+                                              <a href="https://github.com/markwmuller">markwmuller</a> /
+                                              <a href="https://github.com/Mygod">Mygod</a> /
+                                              <a href="https://github.com/Uldiniad">Uldiniad</a> /
+                                              <a href="https://github.com/Poussinou">Poussinou</a> /
+                                              <a href="https://github.com/pjosingh">pjosingh</a> /
                                               <a href="https://github.com/RohitSurwase">RohitSurwase</a><br/>
                                               <br/>🚂 Network engine <br/>
-                                              <a href="https://github.com/alalamav">alalamav</a><br/>
-                                              <a href="https://github.com/bemasc">bemasc</a><br/>
-                                              <a href="https://github.com/dmcardle">dmcardle</a><br/>
-                                              <a href="https://github.com/fortuna">fortuna</a><br/>
-                                              <a href="https://github.com/ignoramous">ignoramous</a><br/>
-                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a><br/>
-                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a><br/>
+                                              <a href="https://github.com/alalamav">alalamav</a> /
+                                              <a href="https://github.com/bemasc">bemasc</a> /
+                                              <a href="https://github.com/dmcardle">dmcardle</a> /
+                                              <a href="https://github.com/fortuna">fortuna</a> /
+                                              <a href="https://github.com/ignoramous">ignoramous</a> /
+                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
+                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
                                               <a href="https://github.com/SeanBurford">SeanBurford</a><br/>
                                               <br/>📚 Resolver <br/>
-                                              <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a><br/>
-                                              <a href="https://github.com/amithm7">amithm7</a><br/>
-                                              <a href="https://github.com/arfshl">arfshl</a><br/>
-                                              <a href="https://github.com/badmojr">badmojr</a><br/>
-                                              <a href="https://github.com/bongochong">bongochong</a><br/>
-                                              <a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a><br/>
-                                              <a href="https://github.com/georgyo">georgyo</a><br/>
-                                              <a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a><br/>
-                                              <a href="https://github.com/Harish-Narayan">Harish-Narayan</a><br/>
-                                              <a href="https://github.com/ignoramous">ignoramous</a><br/>
-                                              <a href="https://github.com/JakeChampion">JakeChampion</a><br/>
-                                              <a href="https://github.com/MasterKia">MasterKia</a><br/>
-                                              <a href="https://github.com/mtxadmin">mtxadmin</a><br/>
-                                              <a href="https://github.com/neneeen">neneeen</a><br/>
-                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a><br/>
-                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a><br/>
-                                              <a href="https://github.com/shruuub">shruuub</a><br/>
+                                              <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /
+                                              <a href="https://github.com/amithm7">amithm7</a> /
+                                              <a href="https://github.com/arfshl">arfshl</a> /
+                                              <a href="https://github.com/badmojr">badmojr</a> /
+                                              <a href="https://github.com/bongochong">bongochong</a> /
+                                              <a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> /
+                                              <a href="https://github.com/georgyo">georgyo</a> /
+                                              <a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> /
+                                              <a href="https://github.com/Harish-Narayan">Harish-Narayan</a> /
+                                              <a href="https://github.com/ignoramous">ignoramous</a> /
+                                              <a href="https://github.com/JakeChampion">JakeChampion</a> /
+                                              <a href="https://github.com/MasterKia">MasterKia</a> /
+                                              <a href="https://github.com/mtxadmin">mtxadmin</a> /
+                                              <a href="https://github.com/neneeen">neneeen</a> /
+                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
+                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
+                                              <a href="https://github.com/shruuub">shruuub</a> /
                                               <a href="https://github.com/shuvashish76">shuvashish76</a><br/>
                                               <br/>⚜ Community mods <br/>
-                                              <a href="https://t.me/amithm7">amithm7</a><br/>
-                                              <a href="https://t.me/TronSlayer">Andersen</a><br/>
-                                              <a href="https://t.me/ppatra">ppatra</a><br/>
-                                               <a href="https://t.me/InFamous23">InFamous23</a><br/>
-                                              <a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a><br/>
-                                              <a href="https://t.me/Ch4t4r">Ch4t4r</a><br/>
-                                              <a href="https://t.me/Billi_ance">Billi_ance</a><br/>
-                                              <a href="https://t.me/kaliangel">kaliangel</a><br/>
+                                              <a href="https://t.me/amithm7">amithm7</a> /
+                                              <a href="https://t.me/TronSlayer">Andersen</a> /
+                                              <a href="https://t.me/ppatra">ppatra</a> /
+                                               <a href="https://t.me/InFamous23">InFamous23</a> /
+                                              <a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> /
+                                              <a href="https://t.me/Ch4t4r">Ch4t4r</a> /
+                                              <a href="https://t.me/Billi_ance">Billi_ance</a> /
+                                              <a href="https://t.me/kaliangel">kaliangel</a> /
                                               <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
                                               <br/>📌 Geo-IP <br/>
-                                              <a href="https://db-ip.com">db-ip.com</a><br/>
+                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IpInfo Lite</a><br/>
                                               <br/>❇ Translations <br/>
                                               <a href="https://weblate.org/en/">Weblate</a><br/>
                                               <br/>🦆 Icons <br/>
                                               <a href="https://github.com/celzero/rethink-app/issues/346">Icons</a><br/>
                                               <br/>📦 Build servers <br/>
-                                              <a href="https://jitpack.io/">JitPack</a><br/>
+                                              <a href="https://jitpack.io/">JitPack</a> /
                                               <a href="https://github.com/">GitHub</a><br/>
                                               ]]></string>
     <!-- Configure DNS Fragment string == cd -->
@@ -925,10 +958,10 @@
     <string name="cd_dnscrypt_relay_heading" translatable="true">Relays</string>
 
     <string name="cd_dns_alg_heading" translatable="true">Advanced DNS filtering (experimental)</string>
-    <string name="cd_dns_alg_desc" translatable="true">Assign unique IP per DNS request</string>
+    <string name="cd_dns_alg_desc" translatable="true">Assign unique IP per DNS request.</string>
 
     <string name="cd_split_dns_heading" translatable="true">Split DNS (experimental)</string>
-    <string name="cd_split_dns_desc" translatable="true">Use fixed DNS servers for specific apps</string>
+    <string name="cd_split_dns_desc" translatable="true">Forward DNS queries from proxied apps to the proxy\'s DNS servers.</string>
 
     <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Treat DNS rules as firewall rules (experimental)</string>
     <string name="cd_treat_dns_rules_firewall_desc" translatable="true">DNS blocking will be bypassed during resolution; the decision will be made at connection time.</string>
@@ -958,11 +991,11 @@
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">No Answer</string>
 
     <!-- DNS log bottom sheet -->
-    <string name="dns_btm_resolved_crypt" translatable="true">resolved <u>anonymously</u> %1$s by %2$s via %3$s</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">resolved &lt;u&gt;anonymously&lt;/u&gt; %1$s by %2$s via %3$s</string>
     <string name="dns_btm_resolved_doh" translatable="true">resolved %1$s by %2$s</string>
     <string name="dns_btm_resolved_doh_no_server" translatable="true">resolved %1$s</string>
 
-    <string name="dns_btm_latency_ms" translatable="true">%1$sms</string>
+    <string name="dns_btm_latency_ms" translatable="true">%1$ss</string>
 
     <string name="dns_btm_record_type" translatable="true">Query type: %1$s</string>
 
@@ -985,6 +1018,7 @@
     <string name="univ_firewall_rule_8" translatable="true">Block port 80 (insecure HTTP) traffic</string>
     <string name="univ_firewall_rule_9" translatable="true">Block on metered (mobile) network</string>
     <string name="univ_firewall_rule_10" translatable="true">Block all except bypassed apps and IPs</string>
+    <string name="univ_firewall_rule_11" translatable="true">Block all local host connections</string>
 
     <string name="univ_view_blocked_ip" translatable="true">IP &amp; Port rules</string>
     <string name="univ_view_blocked_ip_desc" translatable="true">Modify blocked or trusted Domain, IP / Port rules.</string>
@@ -1085,6 +1119,7 @@
     <string name="unicode_x_sign" translatable="false">\u274c</string>
     <string name="unicode_question_sign" translatable="false">\u2754</string>
     <string name="unicode_check_sign" translatable="false">\u2705</string>
+    <string name="unicode_start_sign" translatable="false">\u25b6</string>
     <string name="fav_icon" translatable="false">fav_icon</string>
 
     <!-- BraveVPN service rules failure -->
@@ -1131,7 +1166,7 @@
     <string name="other_dns_list_tab3" translatable="true">Dns Proxy</string>
 
     <!-- Home screen bottom sheet -->
-    <string name="hs_btm_sheet_lock_down" translatable="true">Cannot change modes when VPN is <i>lockdown</i>. Tap to <u>edit VPN settings</u>.</string>
+    <string name="hs_btm_sheet_lock_down" translatable="true">Cannot change modes when VPN is <i>lockdown</i>. Tap to &lt;u&gt;edit VPN settings&lt;/u&gt;.</string>
 
     <!-- Firewall rules -->
     <string name="firewall_rule_no_rule" translatable="true">No Rule</string>
@@ -1165,6 +1200,8 @@
     <string name="firewall_rule_proxied" translatable="true">Proxied</string>
     <string name="firewall_rule_private_dns" translatable="true">Private DNS</string>
     <string name="firewall_rule_bypass_proxy" translatable="true">Bypass Proxy</string>
+    <string name="firewall_rule_paused_app" translatable="true">App Paused</string>
+    <string name="firewall_rule_lockdown_wg" translatable="true">Lockdown Proxy</string>
 
     <string name="firewall_rule_no_rule_desc" translatable="true">No firewall rules matched this connection.</string>
     <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[A user-set firewall rule blocked this <i>app</i>.<br/><br/> To change go to <i>All Apps</i> tab.]]></string>
@@ -1196,6 +1233,8 @@
     <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[This connection was forwarded to user-preferred Proxy.<br/><br/> To change go to <i>Proxy</i> from <i>Configure</i> screen.]]></string>
     <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[This connection is looking for a <i>Private DNS</i> server that doesn\'t exist.]]></string>
     <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[This connection was allowed because the <i>source app</i> is set to <i>bypass proxy</i> rules.<br/><br/> To change go to <i>App-specific Firewall</i> screen.]]></string>
+    <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[This connection was allowed because the <i>app</i> is in <i>paused</i> state.]]></string>
+    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[This connection was blocked because WireGuard is in <i>lockdown</i> mode.<br/><br/> To change go to <i>WireGuard</i> screen.]]></string>
 
     <!-- New app install Notification -->
     <string name="new_app_bulk_notification_title" translatable="true">Attention</string>
@@ -1536,6 +1575,7 @@
 
     <string name="wireguard_enabled_failure" translatable="true">Stop other active proxies to enable WireGuard</string>
     <string name="wireguard_disable_failure" translatable="true">\"Always-on WireGuard\" cannot be turned off</string>
+    <string name="wireguard_disable_failure_relay" translatable="true">\"Relay WireGuard\" cannot be turned off</string>
 
     <string name="wireguard_apps_proxy_map_desc" translatable="true">part of %1$s</string>
     <string name="wg_apps_dialog_title_include" translatable="true">Include %1$s apps</string>
@@ -1543,7 +1583,7 @@
 
     <string name="wireguard_no_config_msg" translatable="true">No WireGuard VPNs. Add some to get started.</string>
     <string name="wireguard_connection_error" translatable="true">WireGuard VPN failing to connect</string>
-    <string name="wireguard_disclaimer" translatable="true">DNS is forwarded to %1$s, ICMP (ex: ping) is sent to the underlying network.</string>
+    <string name="wireguard_disclaimer" translatable="true">DNS forwarded to %1$s.</string>
 
     <string name="wireguard_disable_title" translatable="true">Stop WireGuard</string>
     <string name="wireguard_disable_message" translatable="true">Stop all active WireGuard VPNs?</string>
@@ -1579,58 +1619,139 @@
     <string name="crypt_relay_singapore" translatable="true">Anonymized DNS relay hosted in Singapore.</string>
 
     <!-- console logs -->
-    <string name="console_log_title" translatable="true">App Log</string>
+    <string name="console_log_title" translatable="true">App Logs</string>
     <string name="console_log_desc" translatable="true">Logs may contain sensitive information.</string>
-    <string name="console_log_delete_title" translatable="true">Delete logs?</string>
-    <string name="console_log_delete_desc" translatable="true">Delete all logs from this app?</string>
-    <string name="console_log_delete_toast" translatable="true">Logs deleted</string>
-
 
     <!-- advanced settings -->
-    <string name="do_not_randomize_listen_port_title" translatable="true">Do not randomize listen port</string>
-    <string name="do_not_randomize_listen_port_desc" translatable="true">Do not randomize the WireGuard listen port on Advanced mode.</string>
+    <string name="do_not_randomize_listen_port_title" translatable="true">Do not randomize WireGuard listen port</string>
+    <string name="do_not_randomize_listen_port_desc" translatable="true">Keep WireGuard listen ports fixed (no randomization) in Advanced mode.</string>
 
-    <string name="endpoint_independent_mapping_title" translatable="true">Endpoint independent mapping</string>
-    <string name="endpoint_independent_mapping_desc" translatable="true">Allow incoming packets to be forwarded to the same endpoint, regardless of the source IP address.</string>
+    <string name="endpoint_independent_mapping_title" translatable="true">Endpoint-Independent mapping</string>
+    <string name="endpoint_independent_mapping_desc" translatable="true">When enabled, UDP sockets maintain a fixed address and port for all destinations.</string>
 
     <string name="anti_censorship_title" translatable="true">Anti-censorship</string>
-    <string name="anti_censorship_desc" translatable="true">Use anti-censorship techniques to bypass network restrictions.</string>
+    <string name="anti_censorship_desc" translatable="true">Choose from various Anti-censorship technique.</string>
 
-    <string name="tcp_keep_alive_title" translatable="true">TCP keep alive</string>
-    <string name="tcp_keep_alive_desc" translatable="true">Send keep alive packets to prevent the connection from being closed.</string>
+    <string name="tcp_keep_alive_title" translatable="true">Shorter TCP keep alive</string>
+    <string name="tcp_keep_alive_desc" translatable="true">Quickly close TCP sockets with no recent activity.</string>
 
     <!-- anti-censorship -->
     <string name="ac_title" translatable="true">anti-censorship</string>
-    <string name="ac_desc" translatable="true">Anti-Censorship mode is a feature that helps you bypass censorship and access the internet freely. It is recommended to use this feature only if you are in a country where the internet is censored.</string>
+    <string name="ac_desc" translatable="true">Anti-censorship tools can grant internet freedom, but they may not work everywhere.</string>
 
-    <string name="ac_never_split" translatable="true">Never split</string>
-    <string name="ac_never_split_desc" translatable="true">Do not split packets when sending them to the server.</string>
+    <string name="ac_never_split_desc" translatable="true">Do not alter packets.</string>
 
-    <string name="ac_split_auto" translatable="true">Split auto</string>
-    <string name="ac_split_auto_desc" translatable="true">Automatically split packets when sending them to the server.</string>
+    <string name="ac_split_auto_desc" translatable="true">Alter packets as necessary.</string>
 
-    <string name="ac_split_tcp" translatable="true">Split TCP</string>
-    <string name="ac_split_tcp_desc" translatable="true">Split TCP packets when sending them to the server.</string>
+    <string name="ac_split_tcp" translatable="true">TCP</string>
+    <string name="ac_split_tcp_desc" translatable="true">Alter TCP packets.</string>
 
-    <string name="ac_split_tls" translatable="true">Split TLS</string>
-    <string name="ac_split_tls_desc" translatable="true">Split TLS packets when sending them to the server.</string>
+    <string name="ac_split_tls" translatable="true">TLS</string>
+    <string name="ac_split_tls_desc" translatable="true">Alter TLS packets.</string>
 
-    <string name="ac_desync" translatable="true">Desync (experimental)</string>
-    <string name="ac_desync_desc" translatable="true">Desynchronize packets when sending them to the server.</string>
+    <string name="ac_desync" translatable="true">Desync</string>
+    <string name="ac_desync_desc" translatable="true">Send decoy packets as necessary.</string>
 
-    <string name="ac_retry_options_title" translatable="true">retry options</string>
-    <string name="ac_retry_options_desc" translatable="true">Retry options will help you bypass censorship and access the internet freely. It is recommended to use this feature only if you are in a country where the internet is censored.</string>
+    <string name="ac_retry_options_title" translatable="true">strategy</string>
+    <string name="ac_retry_options_desc" translatable="true">Set how retries work for censored connections.</string>
 
-    <string name="ac_retry_options_never" translatable="true">Never</string>
-    <string name="ac_retry_options_never_desc" translatable="true">Never retry sending packets.</string>
+    <string name="ac_retry_options_never_desc" translatable="true">Do not retry.</string>
 
-    <string name="ac_retry_options_with_split" translatable="true">Retry with Split</string>
-    <string name="ac_retry_options_with_split_desc" translatable="true">Retry sending packets with split.</string>
+    <string name="ac_retry_options_with_split_desc" translatable="true">Apply anti-censorship technique when necessary.</string>
 
-    <string name="ac_retry_options_after_split" translatable="true">Retry after Split</string>
-    <string name="ac_retry_options_after_split_desc" translatable="true">Retry sending packets after split.</string>
+    <string name="lbl_always" translatable="true">Always</string>
+    <string name="ac_retry_options_after_split_desc" translatable="true">Always apply anti-censorship techniques.</string>
 
-    <string name="ac_toast_retry_disabled" translatable="true">Retry strategy is disabled for never split mode</string>
+    <string name="ac_toast_retry_disabled" translatable="true">Pick any anti-censorship option to choose strategy.</string>
+
+    <string name="exclude_no_package_err_toast" translatable="true">Excluding apps requires a package name.</string>
+
+    <string name="hop_error_toast_msg_1" translatable="true">Cannot relay, already %1$s</string>
+    <string name="hop_error_toast_msg_2" translatable="true">No WireGuard available for relay; please add more.</string>
+
+    <string name="mode_change_error_proxy_enabled" translatable="true">Cannot change modes when proxies are in use. Tap to &lt;u&gt;edit proxy settings&lt;/u&gt;.</string>
+
+    <string name="blocklist_not_available_toast" translatable="true">To update blocklists, download the latest app version.</string>
+
+    <string name="lbl_ultra_secure" translatable="true">ultra secure</string>
+
+    <string name="adv_set_dial_timeout_title" translatable="true">Idle timeout</string>
+    <string name="adv_set_dial_timeout_desc" translatable="true">Close idle TCP and UDP sockets after this duration.</string>
+
+    <string name="adv_set_experimental_title" translatable="false">Experimental</string>
+    <string name="adv_set_experimental_desc" translatable="false">Experimental features in network engine.</string>
+
+    <string name="select_wg_proxy_desc" translatable="false">Select WireGuard proxy</string>
+
+    <string name="no_stats_available" translatable="true">No stats</string>
+
+    <string name="hop_failure_toast" translatable="true">Relay error: %1$s -> %2$s</string>
+    <string name="hop_failure_notification_title" translatable="false">Relay Failure Notifications</string>
+
+    <string name="wg_setting_use_on_mobile" translatable="true">Mobile only</string>
+    <string name="wg_setting_use_on_mobile_desc" translatable="true">Use this WireGuard exclusively over mobile data.</string>
+
+    <string name="hop_add_remove_title" translatable="true">Add / Remove Relay</string>
+
+    <string name="about_terms_of_service" translatable="true">Terms of Service</string>
+
+    <string name="lbl_amnezia" translatable="false">Amnezia</string>
+
+    <string name="lbl_hopping" translatable="false">MPR</string>
+
+    <string name="bypasses_network_restrictions" translatable="true">Reachability checks bypass all network restrictions. In <i>Auto</i> mode, Rethink randomly uses previously connected IPs and hostnames.</string>
+
+    <string name="most_contacted_asn" translatable="true">most contacted providers</string>
+    <string name="most_blocked_asn" translatable="true">most blocked providers</string>
+
+    <string name="adv_tasker_dialog_msg" translatable="true">Enter package names (comma-separated) allowed to start or stop Rethink.</string>
+    <string name="adv_tasker_dialog_instructions" translatable="true">Instructions:\n
+        Required extras in the broadcast:\n
+        • Key: "sender"\n
+        • Value: The package name of the calling app\n\n
+
+        Example: key:"sender" value:"com.termux"\n\n
+
+        Supported actions:\n
+        • Start VPN – com.celzero.bravedns.intent.action.VPN_START\n
+        • Stop VPN – com.celzero.bravedns.intent.action.VPN_STOP
+    </string>
+    <string name="adv_tasker_dialog_edit_hint" translatable="true">Enter package name (example: net.dinglisch.android.taskerm)</string>
+
+    <string name="set_auto_dial_title" translatable="false">Set Auto Dial</string>
+    <string name="set_auto_dial_desc" translatable="false">Use parallel dialing to connect to multiple servers at once.</string>
+
+    <string name="download_ip_info_title" translatable="true">Show provider information</string>
+    <string name="download_ip_info_desc" translatable="true">Fetches service provider details for websites from <i>rethinkdns.com</i>, powered by <i>%1$s</i></string>
+
+    <string name="adv_taster_title" translatable="true">Automation</string>
+    <string name="adv_taster_desc" translatable="true">Configure apps that can start or stop Rethink.</string>
+
+    <string name="top_active_conns" translatable="true">top active connections</string>
+
+    <string name="load_more" translatable="true">Load All</string>
+    <string name="close_conns_dialog_title" translatable="true">Close Connections</string>
+    <string name="close_conns_dialog_desc" translatable="true">Close all connections for %1$s?</string>
+
+    <string name="local_blocklist_delete_desc" translatable="true">Delete on-device blocklists?</string>
+
+    <string name="fail_open_network_title" translatable="true">Do not stall on network loss</string>
+    <string name="fail_open_network_desc" translatable="true">When disabled, Rethink stalls all data when no connectivity is available, like in <i>Airplane Mode</i>.</string>
+
+    <string name="about_license" translatable="true">Licensed under APLv2</string>
+
+    <string name="close_all" translatable="true">Close All</string>
+
+    <string name="smart_dns" translatable="true">Smart DNS</string>
+
+    <string name="processing_dialog_title" translatable="true">Processing</string>
+    <string name="processing_dialog_desc" translatable="true">Please wait while we process your request.</string>
+
+    <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> randomly uses any among these DNS resolvers:</string>
+
+
+    <string name="custom_rules_proxy_title" translatable="false">Proxy rules</string>
+    <string name="custom_rules_proxy_desc" translatable="false">Select a proxy to use for this rule.</string>
 
     <!-- alert, commenting out for now in v055b -->
 
