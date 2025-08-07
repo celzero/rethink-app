@@ -27,6 +27,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -72,9 +73,10 @@ class NetLogBatcher<T, V>(
 
     fun begin(scope: CoroutineScope) {
         // launch suspend fns sig and consume asynchronously
-        scope.async { sig() }
-        scope.async { consumeAdd() }
-        scope.async { consumeUpdate() }
+        // exceptions with async will close the scope, with launch only job is cancelled
+        scope.launch { sig() }
+        scope.launch { consumeAdd() }
+        scope.launch { consumeUpdate() }
     }
 
     // stackoverflow.com/a/68905423
