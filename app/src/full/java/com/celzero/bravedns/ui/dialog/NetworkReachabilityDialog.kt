@@ -30,6 +30,8 @@ import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.DialogInputIpsBinding
 import com.celzero.bravedns.service.ConnectionMonitor
+import com.celzero.bravedns.service.ConnectionMonitor.Companion.SCHEME_HTTP
+import com.celzero.bravedns.service.ConnectionMonitor.Companion.SCHEME_HTTPS
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
@@ -40,6 +42,8 @@ import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.MalformedURLException
+import java.net.URL
 
 class NetworkReachabilityDialog(activity: Activity,
     private val persistentState: PersistentState,
@@ -70,8 +74,7 @@ class NetworkReachabilityDialog(activity: Activity,
     }
 
     private fun initViews() {
-        binding.saveChip.text =
-            context.getString(R.string.lbl_save).replaceFirstChar(Char::titlecase)
+        binding.saveButton.text = context.getString(R.string.lbl_save).uppercase()
         binding.testButton.text = context.getString(R.string.lbl_test).uppercase()
 
         useAuto = persistentState.performAutoNetworkConnectivityChecks
@@ -90,13 +93,13 @@ class NetworkReachabilityDialog(activity: Activity,
         if (protocols.contains(URL4)) {
             binding.protocolV4.setImageResource(R.drawable.ic_tick)
         } else {
-            binding.protocolV4.setImageResource(R.drawable.ic_cross)
+            binding.protocolV4.setImageResource(R.drawable.ic_cross_accent)
         }
 
         if (protocols.contains(URL6)) {
             binding.protocolV6.setImageResource(R.drawable.ic_tick)
         } else {
-            binding.protocolV6.setImageResource(R.drawable.ic_cross)
+            binding.protocolV6.setImageResource(R.drawable.ic_cross_accent)
         }
     }
 
@@ -115,12 +118,12 @@ class NetworkReachabilityDialog(activity: Activity,
         }
         binding.resetChip.setOnClickListener { resetToDefaults() }
         binding.testButton.setOnClickListener { testConnections() }
-        binding.saveChip.setOnClickListener { saveIps() }
+        binding.saveButton.setOnClickListener { saveIps() }
     }
 
     private fun updateAutoModeUi() {
         binding.resetChip.visibility = View.GONE
-        binding.saveChip.visibility = View.GONE
+        binding.saveButton.visibility = View.GONE
 
         selectToggleBtnUi(binding.autoToggleBtn)
         unselectToggleBtnUi(binding.manualToggleBtn)
@@ -139,10 +142,10 @@ class NetworkReachabilityDialog(activity: Activity,
         binding.ipv6Address1.apply { isEnabled = false; setText(v6[0]) }
         binding.ipv6Address2.apply { isEnabled = false; setText(v6[1]) }
 
-        binding.ipv43Layout.visibility = View.GONE
-        binding.ipv63Layout.visibility = View.GONE
-        binding.urlV4Layout.visibility = View.GONE
-        binding.urlV6Layout.visibility = View.GONE
+        binding.urlV4Layout1.visibility = View.GONE
+        binding.urlV6Layout1.visibility = View.GONE
+        binding.urlV4Layout2.visibility = View.GONE
+        binding.urlV6Layout2.visibility = View.GONE
 
         setAllStatusIconsVisibility(View.GONE)
         setAllProgressBarsVisibility(View.GONE)
@@ -151,30 +154,29 @@ class NetworkReachabilityDialog(activity: Activity,
 
     private fun updateManualModeUi() {
         binding.resetChip.visibility = View.VISIBLE
-        binding.saveChip.visibility = View.VISIBLE
+        binding.saveButton.visibility = View.VISIBLE
         selectToggleBtnUi(binding.manualToggleBtn)
         unselectToggleBtnUi(binding.autoToggleBtn)
 
         val itemsIp4 = persistentState.pingv4Ips.split(",").toTypedArray()
         val itemsIp6 = persistentState.pingv6Ips.split(",").toTypedArray()
-        val itemsUrl4 =
-            persistentState.pingv4Url.split(URL_SEGMENT4).firstOrNull() ?: Constants.urlV4probe
-        val itemsUrl6 =
-            persistentState.pingv6Url.split(URL_SEGMENT6).firstOrNull() ?: Constants.urlV6probe
+        val itemsUrl4 = persistentState.pingv4Url.split(",").toTypedArray()
+        val itemsUrl6 = persistentState.pingv6Url.split(",").toTypedArray()
 
-        binding.ipv43Layout.visibility = View.VISIBLE
-        binding.ipv63Layout.visibility = View.VISIBLE
-        binding.urlV4Layout.visibility = View.VISIBLE
-        binding.urlV6Layout.visibility = View.VISIBLE
+
+        binding.urlV4Layout1.visibility = View.VISIBLE
+        binding.urlV6Layout1.visibility = View.VISIBLE
+        binding.urlV4Layout2.visibility = View.VISIBLE
+        binding.urlV6Layout2.visibility = View.VISIBLE
 
         binding.ipv4Address1.apply { isEnabled = true; setText(itemsIp4.getOrNull(0) ?: "") }
         binding.ipv4Address2.apply { isEnabled = true; setText(itemsIp4.getOrNull(1) ?: "") }
-        binding.ipv4Address3.apply { isEnabled = true; setText(itemsIp4.getOrNull(2) ?: "") }
-        binding.urlV4Address.apply { isEnabled = true; setText(itemsUrl4) }
+        binding.urlV4Address1.apply { isEnabled = true; setText(itemsUrl4.getOrNull(0)?.split(URL_SEGMENT4)?.firstOrNull() ?: Constants.urlV4probes[0]) }
+        binding.urlV4Address2.apply { isEnabled = true; setText(itemsUrl4.getOrNull(1)?.split(URL_SEGMENT4)?.firstOrNull() ?: Constants.urlV4probes[0]) }
         binding.ipv6Address1.apply { isEnabled = true; setText(itemsIp6.getOrNull(0) ?: "") }
         binding.ipv6Address2.apply { isEnabled = true; setText(itemsIp6.getOrNull(1) ?: "") }
-        binding.ipv6Address3.apply { isEnabled = true; setText(itemsIp6.getOrNull(2) ?: "") }
-        binding.urlV6Address.apply { isEnabled = true; setText(itemsUrl6) }
+        binding.urlV6Address1.apply { isEnabled = true; setText(itemsUrl6.getOrNull(0)?.split(URL_SEGMENT6)?.firstOrNull() ?: Constants.urlV6probes[0]) }
+        binding.urlV6Address2.apply { isEnabled = true; setText(itemsUrl6.getOrNull(1)?.split(URL_SEGMENT6)?.firstOrNull() ?: Constants.urlV6probes[1]) }
 
         setAllStatusIconsVisibility(View.GONE)
         setAllProgressBarsVisibility(View.GONE)
@@ -184,16 +186,13 @@ class NetworkReachabilityDialog(activity: Activity,
     private fun resetToDefaults() {
         binding.ipv4Address1.setText(Constants.ip4probes[0])
         binding.ipv4Address2.setText(Constants.ip4probes[1])
-        binding.ipv4Address3.setText(Constants.ip4probes[2])
-        binding.urlV4Address.setText(
-            Constants.urlV4probe.split(URL_SEGMENT4).firstOrNull() ?: Constants.urlV4probe
-        )
-        binding.urlV6Address.setText(
-            Constants.urlV6probe.split(URL_SEGMENT6).firstOrNull() ?: Constants.urlV6probe
-        )
+        binding.urlV4Address1.setText(Constants.urlV4probes[0].split(URL_SEGMENT4).firstOrNull() ?: Constants.urlV4probes[0])
+        binding.urlV4Address2.setText(Constants.urlV4probes[1].split(URL_SEGMENT4).firstOrNull() ?: Constants.urlV4probes[1])
+
         binding.ipv6Address1.setText(Constants.ip6probes[0])
         binding.ipv6Address2.setText(Constants.ip6probes[1])
-        binding.ipv6Address3.setText(Constants.ip6probes[2])
+        binding.urlV6Address1.setText(Constants.urlV6probes[0].split(URL_SEGMENT6).firstOrNull() ?: Constants.urlV6probes[0])
+        binding.urlV6Address2.setText(Constants.urlV6probes[1].split(URL_SEGMENT6).firstOrNull() ?: Constants.urlV6probes[1])
         binding.errorMessage.visibility = View.GONE
         setAllStatusIconsVisibility(View.GONE)
         setAllProgressBarsVisibility(View.GONE)
@@ -220,14 +219,14 @@ class NetworkReachabilityDialog(activity: Activity,
                 results["ipv4_1"] = probeIpOrUrl(v41)
                 results["ipv4_2"] = probeIpOrUrl(v42)
                 if (!useAuto) {
-                    results["ipv4_3"] = probeIpOrUrl(binding.ipv4Address3.text.toString())
-                    results["url4"] = probeIpOrUrl(binding.urlV4Address.text.toString() + URL_SEGMENT4)
+                    results["url4_1"] = probeIpOrUrl(binding.urlV4Address1.text.toString() + URL_SEGMENT4)
+                    results["url4_2"] = probeIpOrUrl(binding.urlV4Address2.text.toString() + URL_SEGMENT4)
                 }
                 results["ipv6_1"] = probeIpOrUrl(v61)
                 results["ipv6_2"] = probeIpOrUrl(v62)
                 if (!useAuto) {
-                    results["ipv6_3"] = probeIpOrUrl(binding.ipv6Address3.text.toString())
-                    results["url6"] = probeIpOrUrl(binding.urlV6Address.text.toString() + URL_SEGMENT6)
+                    results["url6_1"] = probeIpOrUrl(binding.urlV6Address1.text.toString() + URL_SEGMENT6)
+                    results["url6_2"] = probeIpOrUrl(binding.urlV6Address2.text.toString() + URL_SEGMENT6)
                 }
 
                 uiCtx {
@@ -260,12 +259,12 @@ class NetworkReachabilityDialog(activity: Activity,
     private fun updateStatusIcons(results: Map<String, ConnectionMonitor.ProbeResult?>) {
         binding.statusIpv41.setImageDrawable(getDrawableForProbeResult(results["ipv4_1"]))
         binding.statusIpv42.setImageDrawable(getDrawableForProbeResult(results["ipv4_2"]))
-        binding.statusIpv43.setImageDrawable(getDrawableForProbeResult(results["ipv4_3"]))
-        binding.statusUrlV4.setImageDrawable(getDrawableForProbeResult(results["url4"]))
+        binding.statusUrlV41.setImageDrawable(getDrawableForProbeResult(results["url4_1"]))
+        binding.statusUrlV42.setImageDrawable(getDrawableForProbeResult(results["url4_2"]))
         binding.statusIpv61.setImageDrawable(getDrawableForProbeResult(results["ipv6_1"]))
         binding.statusIpv62.setImageDrawable(getDrawableForProbeResult(results["ipv6_2"]))
-        binding.statusIpv63.setImageDrawable(getDrawableForProbeResult(results["ipv6_3"]))
-        binding.statusUrlV6.setImageDrawable(getDrawableForProbeResult(results["url6"]))
+        binding.statusUrlV61.setImageDrawable(getDrawableForProbeResult(results["url6_1"]))
+        binding.statusUrlV62.setImageDrawable(getDrawableForProbeResult(results["url6_2"]))
         setAllStatusIconsVisibility(View.VISIBLE)
     }
 
@@ -287,28 +286,28 @@ class NetworkReachabilityDialog(activity: Activity,
     private fun setAllStatusIconsVisibility(visibility: Int) {
         binding.statusIpv41.visibility = visibility
         binding.statusIpv42.visibility = visibility
-        binding.statusIpv43.visibility = visibility
-        binding.statusUrlV4.visibility = visibility
+        binding.statusUrlV41.visibility = visibility
+        binding.statusUrlV42.visibility = visibility
         binding.statusIpv61.visibility = visibility
         binding.statusIpv62.visibility = visibility
-        binding.statusIpv63.visibility = visibility
-        binding.statusUrlV6.visibility = visibility
+        binding.statusUrlV61.visibility = visibility
+        binding.statusUrlV62.visibility = visibility
     }
 
     private fun setAllProgressBarsVisibility(visibility: Int) {
         binding.progressIpv41.visibility = visibility
         binding.progressIpv42.visibility = visibility
-        binding.progressIpv43.visibility = visibility
-        binding.progressUrlV4.visibility = visibility
+        binding.progressUrlV41.visibility = visibility
+        binding.progressUrlV42.visibility = visibility
         binding.progressIpv61.visibility = visibility
         binding.progressIpv62.visibility = visibility
-        binding.progressIpv63.visibility = visibility
-        binding.progressUrlV6.visibility = visibility
+        binding.progressUrlV61.visibility = visibility
+        binding.progressUrlV62.visibility = visibility
     }
 
     private fun setButtonsEnabled(enabled: Boolean) {
         binding.testButton.isEnabled = enabled
-        binding.saveChip.isEnabled = enabled
+        binding.saveButton.isEnabled = enabled
     }
 
     private fun saveIps() {
@@ -317,23 +316,23 @@ class NetworkReachabilityDialog(activity: Activity,
         if (!useAuto) {
             val valid41 = isValidIp(binding.ipv4Address1.text.toString(), IPVersion.IPV4)
             val valid42 = isValidIp(binding.ipv4Address2.text.toString(), IPVersion.IPV4)
-            val valid43 = isValidIp(binding.ipv4Address3.text.toString(), IPVersion.IPV4)
-            val url4Valid = binding.urlV4Address.text?.isNotEmpty() == true
+            val validUrl41 = isValidUrl(binding.urlV4Address1.text.toString())
+            val validUrl42 = isValidUrl(binding.urlV4Address2.text.toString())
             val valid61 = isValidIp(binding.ipv6Address1.text.toString(), IPVersion.IPV6)
             val valid62 = isValidIp(binding.ipv6Address2.text.toString(), IPVersion.IPV6)
-            val valid63 = isValidIp(binding.ipv6Address3.text.toString(), IPVersion.IPV6)
-            val url6Valid = binding.urlV6Address.text?.isNotEmpty() == true
+            val validUrl61 = isValidUrl(binding.urlV6Address1.text.toString())
+            val validUrl62 = isValidUrl(binding.urlV6Address2.text.toString())
 
             binding.ipv4Address1.background = if (valid41) defaultDrawable else errorDrawable
             binding.ipv4Address2.background = if (valid42) defaultDrawable else errorDrawable
-            binding.ipv4Address3.background = if (valid43) defaultDrawable else errorDrawable
-            binding.urlV4Address.background = if (url4Valid) defaultDrawable else errorDrawable
+            binding.urlV4Address1.background = if (validUrl41) defaultDrawable else errorDrawable
+            binding.urlV4Address2.background = if (validUrl42) defaultDrawable else errorDrawable
             binding.ipv6Address1.background = if (valid61) defaultDrawable else errorDrawable
             binding.ipv6Address2.background = if (valid62) defaultDrawable else errorDrawable
-            binding.ipv6Address3.background = if (valid63) defaultDrawable else errorDrawable
-            binding.urlV6Address.background = if (url6Valid) defaultDrawable else errorDrawable
+            binding.urlV6Address1.background = if (validUrl61) defaultDrawable else errorDrawable
+            binding.urlV6Address2.background = if (validUrl62) defaultDrawable else errorDrawable
 
-            if (!valid41 || !valid42 || !valid43 || !valid61 || !valid62 || !valid63 || !url4Valid || !url6Valid) {
+            if (!valid41 || !valid42 || !validUrl41 || !validUrl42 || !valid61 || !valid62 || !validUrl61  || !validUrl62) {
                 binding.errorMessage.text = context.getString(R.string.cd_dns_proxy_error_text_1)
                 binding.errorMessage.visibility = View.VISIBLE
                 return
@@ -341,36 +340,46 @@ class NetworkReachabilityDialog(activity: Activity,
         }
         val ip4 = listOf(
             binding.ipv4Address1.text.toString(),
-            binding.ipv4Address2.text.toString(),
-            binding.ipv4Address3.text.toString()
+            binding.ipv4Address2.text.toString()
         )
         val ip6 = listOf(
             binding.ipv6Address1.text.toString(),
-            binding.ipv6Address2.text.toString(),
-            binding.ipv6Address3.text.toString()
+            binding.ipv6Address2.text.toString()
         )
-        val url4Txt = if (binding.urlV4Address.text.toString().contains(URL_SEGMENT4)) {
-            binding.urlV4Address.text.toString()
+        val url4Txt1 = if (binding.urlV4Address1.text.toString().contains(URL_SEGMENT4)) {
+            binding.urlV4Address1.text.toString()
         } else {
-            binding.urlV4Address.text.toString() + URL_SEGMENT4
+            binding.urlV4Address1.text.toString() + URL_SEGMENT4
         }
-        val url6Txt = if (binding.urlV6Address.text.toString().contains(URL_SEGMENT6)) {
-            binding.urlV6Address.text.toString()
+        val url4Txt2 = if (binding.urlV4Address2.text.toString().contains(URL_SEGMENT4)) {
+            binding.urlV4Address2.text.toString()
         } else {
-            binding.urlV6Address.text.toString() + URL_SEGMENT6
+            binding.urlV4Address2.text.toString() + URL_SEGMENT4
         }
+        val url6Txt1 = if (binding.urlV6Address1.text.toString().contains(URL_SEGMENT6)) {
+            binding.urlV6Address1.text.toString()
+        } else {
+            binding.urlV6Address1.text.toString() + URL_SEGMENT6
+        }
+        val url6Txt2 = if (binding.urlV6Address2.text.toString().contains(URL_SEGMENT6)) {
+            binding.urlV6Address2.text.toString()
+        } else {
+            binding.urlV6Address2.text.toString() + URL_SEGMENT6
+        }
+        val url4Txt = listOf(url4Txt1, url4Txt2)
+        val url6Txt = listOf(url6Txt1, url6Txt2)
         val isSame = persistentState.pingv4Ips == ip4.joinToString(",") &&
                 persistentState.pingv6Ips == ip6.joinToString(",") &&
-                persistentState.pingv4Url == url4Txt &&
-                persistentState.pingv6Url == url6Txt
+                persistentState.pingv4Url == url4Txt.joinToString(",") &&
+                persistentState.pingv6Url == url6Txt.joinToString(",")
         if (isSame) {
             dismiss()
             return
         }
         persistentState.pingv4Ips = ip4.joinToString(",")
         persistentState.pingv6Ips = ip6.joinToString(",")
-        persistentState.pingv4Url = url4Txt
-        persistentState.pingv6Url = url6Txt
+        persistentState.pingv4Url = url4Txt.joinToString(",")
+        persistentState.pingv6Url = url6Txt.joinToString(",")
         Toast.makeText(
             context,
             context.getString(R.string.config_add_success_toast),
@@ -399,6 +408,18 @@ class NetworkReachabilityDialog(activity: Activity,
                 else -> false
             }
         } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun isValidUrl(url: String): Boolean {
+        return try {
+            val parsed = URL(url)
+            (parsed.protocol == SCHEME_HTTPS || parsed.protocol == SCHEME_HTTP) &&
+                    parsed.host.isNotEmpty() &&
+                    parsed.query == null &&
+                    parsed.ref == null
+        } catch (e: MalformedURLException) {
             false
         }
     }

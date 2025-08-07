@@ -259,8 +259,10 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                         .filter { it.isNotEmpty() },
                     persistentState.pingv6Ips.split(",").map { it.trim() }
                         .filter { it.isNotEmpty() },
-                    persistentState.pingv4Url.trim(),
-                    persistentState.pingv6Url.trim()
+                    persistentState.pingv4Url.split(",").map { it.trim() }
+                        .filter { it.isNotEmpty() },
+                    persistentState.pingv6Url.split(",").map { it.trim() }
+                        .filter { it.isNotEmpty() }
                 )
 
                 val hdl = NetworkRequestHandler(cm, networkListener, ips)
@@ -355,8 +357,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
     data class IpsAndUrlToProbe(
         val ip4probes: Collection<String>,
         val ip6probes: Collection<String>,
-        val url4Probe: String,
-        val url6Probe: String
+        val url4Probe: Collection<String>,
+        val url6Probe: Collection<String>
     )
 
     /**
@@ -1040,16 +1042,16 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         private suspend fun probeConnectivity(useAuto: Boolean, network: Network, scheme: String, protocol: String): Boolean {
             // TODO: add http url probes for ipv4 and ipv6
             val ipOrUrls = if (protocol == PROTOCOL_V4 && scheme == SCHEME_HTTPS) {
-                listOf(url4Probe) as Collection<String>
+                url4Probe
             } else if (protocol == PROTOCOL_V6 && scheme == SCHEME_HTTPS) {
-                listOf(url6Probe) as Collection<String>
+                url6Probe
             } else if (protocol == PROTOCOL_V4 && scheme == SCHEME_IP) {
                 ip4probes
             } else if (protocol == PROTOCOL_V6 && scheme == SCHEME_IP) {
                 ip6probes
             } else {
                 Logger.w(LOG_TAG_CONNECTION, "unknown protocol: $protocol, scheme: $scheme")
-                listOf(url4Probe) as Collection<String>
+                url4Probe
             }
             return if (useAuto) {
                 ConnectivityCheckHelper.probeConnectivityInAutoMode(

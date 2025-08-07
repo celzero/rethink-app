@@ -334,7 +334,6 @@ class Constants {
             listOf(
                 "216.239.32.27", // google org
                 "104.16.132.229", // cloudflare
-                "31.13.79.53" // whatsapp.net
             )
 
 
@@ -342,12 +341,15 @@ class Constants {
             listOf(
                 "2001:4860:4802:32::1b", // google org
                 "2606:4700::6810:84e5", // cloudflare
-                "2606:4700:3033::ac43:a21b" // rethinkdns
             )
 
         // URLs to check IPv4 and IPv6 connectivity
-        val urlV4probe = "https://example.com#ipv4" // a service to check IPv4 connectivity
+        // a service to check IPv4 connectivity
+        val urlV4probes = listOf("https://www.ietf.org#ipv4",
+            "https://letsencrypt.org#ipv4")
 
-        val urlV6probe = "https://example.com#ipv6" // a service to check IPv6 connectivity
+        // a service to check IPv6 connectivity
+        val urlV6probes = listOf("https://www.gnu.org#ipv6",
+            " https://www.mozilla.org#ipv6")
     }
 }

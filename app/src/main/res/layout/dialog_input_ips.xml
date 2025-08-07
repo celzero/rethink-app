@@ -101,20 +101,6 @@
                 app:chipBackgroundColor="?attr/chipBgColorPositive"
                 app:chipSurfaceColor="@null" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/save_chip"
-                style="@style/ThinnerChip.Action"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|center"
-                android:layout_marginEnd="10dp"
-                android:text="@string/lbl_save"
-                android:textColor="?attr/chipTextPositive"
-                android:textSize="@dimen/large_font_text_view"
-                android:visibility="visible"
-                app:chipBackgroundColor="?attr/chipBgColorPositive"
-                app:chipSurfaceColor="@null" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -184,14 +170,14 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/ipv43_layout"
+            android:id="@+id/url_v4_layout_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/ipv4_address_3"
+                android:id="@+id/url_v4_address_1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -199,7 +185,7 @@
                 android:inputType="text" />
 
             <ProgressBar
-                android:id="@+id/progress_ipv4_3"
+                android:id="@+id/progress_url_v4_1"
                 style="?android:attr/progressBarStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -208,7 +194,7 @@
                 android:visibility="gone" />
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/status_ipv4_3"
+                android:id="@+id/status_url_v4_1"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="center"
@@ -218,14 +204,14 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/url_v4_layout"
+            android:id="@+id/url_v4_layout_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/url_v4_address"
+                android:id="@+id/url_v4_address_2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -233,7 +219,7 @@
                 android:inputType="text" />
 
             <ProgressBar
-                android:id="@+id/progress_url_v4"
+                android:id="@+id/progress_url_v4_2"
                 style="?android:attr/progressBarStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -242,7 +228,7 @@
                 android:visibility="gone" />
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/status_url_v4"
+                android:id="@+id/status_url_v4_2"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="center"
@@ -346,14 +332,14 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/ipv63_layout"
+            android:id="@+id/url_v6_layout_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/ipv6_address_3"
+                android:id="@+id/url_v6_address_1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -361,7 +347,7 @@
                 android:inputType="text" />
 
             <ProgressBar
-                android:id="@+id/progress_ipv6_3"
+                android:id="@+id/progress_url_v6_1"
                 style="?android:attr/progressBarStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -370,7 +356,7 @@
                 android:visibility="gone" />
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/status_ipv6_3"
+                android:id="@+id/status_url_v6_1"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="center"
@@ -380,14 +366,14 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/url_v6_layout"
+            android:id="@+id/url_v6_layout_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/url_v6_address"
+                android:id="@+id/url_v6_address_2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -395,7 +381,7 @@
                 android:inputType="text" />
 
             <ProgressBar
-                android:id="@+id/progress_url_v6"
+                android:id="@+id/progress_url_v6_2"
                 style="?android:attr/progressBarStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -404,7 +390,7 @@
                 android:visibility="gone" />
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/status_url_v6"
+                android:id="@+id/status_url_v6_2"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="center"
@@ -425,19 +411,42 @@
             android:layout_width="match_parent"
             android:layout_height="25dp" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/test_button"
-            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:background="@drawable/rectangle_border_background"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="@string/lbl_test"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/extra_large_font_text_view" />
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/save_button"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                android:layout_width="0dp"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/rectangle_border_background"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="@string/lbl_save"
+                android:textColor="?attr/accentGood"
+                android:textSize="@dimen/extra_large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/test_button"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                android:layout_width="0dp"
+                android:layout_weight="0.5"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/rectangle_border_background"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="@string/lbl_test"
+                android:textColor="?attr/accentGood"
+                android:textSize="@dimen/extra_large_font_text_view" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
