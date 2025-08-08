@@ -282,6 +282,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_whats_new"
                 android:drawablePadding="20dp"
+                android:visibility="gone"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"

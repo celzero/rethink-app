@@ -438,7 +438,7 @@
 
     <string name="app_mode_choose" translatable="true">Choose mode</string>
 
-    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Don\'t Panic 2</b><br/><br/>
+    <string name="whats_new_version_update" translatable="false"><![CDATA[<b>Don\'t Panic 2</b><br/><br/>
         1. New: Capture network engine errors in user bug reports.<br/>
         2. New: use System DNS for "undelegated" domain names iff Prevent DNS leaks is ON.<br/>
         3. Improvement: Dual-stack (IPv4 + IPv6) WireGuard connectivity.<br/>
