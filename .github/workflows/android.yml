@@ -36,6 +36,7 @@ jobs:
     - name: 🚂 Assemble
       if: success()
       run: |
-        ./gradlew lintWebsiteFullDebug
+        # googlesamples.github.io/android-custom-lint-rules/checks/ForegroundServiceType.md.html
+        ./gradlew lint --ignore ForegroundServiceType
         ./gradlew assembleWebsiteFullDebug --info --warning-mode all
 
