@@ -2008,6 +2008,10 @@ class GoVpnAdapter : KoinComponent {
             var url: String? = null
             try {
                 url = dot.url
+                // skip mullvad dots
+                if (url.contains("mullvad.net") || url.contains("mullvad.org")) {
+                    return@forEach
+                }
                 // if tls is present, remove it and pass it to getIpString
                 val ips: String = getIpString(context, url.replace("tls://", ""))
                 if (ips.isEmpty()) {
