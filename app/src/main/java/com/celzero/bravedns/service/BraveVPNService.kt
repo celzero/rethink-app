@@ -23,6 +23,7 @@ import Logger.LOG_BATCH_LOGGER
 import Logger.LOG_GO_LOGGER
 import Logger.LOG_TAG_CONNECTION
 import Logger.LOG_TAG_VPN
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.ForegroundServiceStartNotAllowedException
 import android.app.InvalidForegroundServiceTypeException
@@ -1883,6 +1884,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         handleRpnProxies()
     }*/
 
+    @SuppressLint("ForegroundServiceType")
     @RequiresApi(VERSION_CODES.UPSIDE_DOWN_CAKE)
     private fun startForegroundService(serviceType: Int): Boolean {
         Logger.vv(LOG_TAG_VPN, "startForegroundService, api: ${VERSION.SDK_INT}")
@@ -1910,6 +1912,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return false
     }
 
+    @SuppressLint("ForegroundServiceType")
     private fun startForegroundService(): Boolean {
         Logger.vv(LOG_TAG_VPN, "startForegroundService, api: ${VERSION.SDK_INT}")
         if (isAtleastS()) {
