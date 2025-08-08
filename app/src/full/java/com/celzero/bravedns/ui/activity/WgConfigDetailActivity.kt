@@ -99,7 +99,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         fun isDefault() = this == DEFAULT
 
         companion object {
-            fun fromInt(value: Int) = entries.firstOrNull { it.value == value } ?: DEFAULT
+            fun fromInt(value: Int): WgType {
+                return entries.firstOrNull { it.value == value }
+                    ?: throw IllegalArgumentException("Invalid WgType value: $value")
+            }
         }
     }
 
