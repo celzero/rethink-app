@@ -152,7 +152,9 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         // enable logs
         b.settingsActivityEnableLogsSwitch.isChecked = persistentState.logsEnabled
         // set log level name in the  description
-        b.genSettingsGoLogTxt.text = Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt()).name
+        b.genSettingsGoLogDesc.text =
+            Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt()).name.lowercase()
+                .replaceFirstChar(Char::titlecase).replace("_", " ")
 
         // check for app updates
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
