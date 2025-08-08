@@ -36,6 +36,6 @@ jobs:
     - name: 🚂 Assemble
       if: success()
       run: |
-        ./gradlew lint
+        ./gradlew lintWebsiteFullDebug
         ./gradlew assembleWebsiteFullDebug --info --warning-mode all
 
