@@ -205,23 +205,26 @@ class AntiCensorshipActivity : AppCompatActivity(R.layout.activity_anti_censorsh
             disableRadioButtons(mode)
             if (mode == DialStrategies.NEVER_SPLIT.mode) {
                 // disable retry radio buttons for never split
-                handleRetryMode(true, RetryStrategies.RETRY_NEVER.mode)
+                handleRetryMode(true, RetryStrategies.RETRY_NEVER.mode, showToast = false)
             }
         } else {
             // no-op
         }
     }
 
-    private fun handleRetryMode(isSelected: Boolean, mode: Int) {
+    private fun handleRetryMode(isSelected: Boolean, mode: Int, showToast: Boolean = true) {
         var m = mode
-        if (DialStrategies.NEVER_SPLIT.mode == persistentState.dialStrategy) {
+        var shouldShowToast = false
+        if (DialStrategies.NEVER_SPLIT.mode == persistentState.dialStrategy && mode != RetryStrategies.RETRY_NEVER.mode) {
             m = RetryStrategies.RETRY_NEVER.mode
-            Utilities.showToastUiCentered(this, getString(R.string.ac_toast_retry_disabled), Toast.LENGTH_LONG)
+            shouldShowToast = showToast && isSelected
         }
 
         if (isSelected) {
             persistentState.retryStrategy = m
+            updateRetryStrategy(m)
             disableRetryRadioButtons(m)
+            if (shouldShowToast) Utilities.showToastUiCentered(this, getString(R.string.ac_toast_retry_disabled), Toast.LENGTH_LONG)
         } else {
             // no-op
         }
