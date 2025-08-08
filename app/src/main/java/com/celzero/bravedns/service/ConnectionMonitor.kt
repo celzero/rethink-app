@@ -26,11 +26,11 @@ import android.net.NetworkRequest
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import androidx.annotation.RequiresApi
 import com.celzero.bravedns.util.ConnectivityCheckHelper
-import com.celzero.bravedns.util.Daemons
-import com.celzero.bravedns.util.Factory
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isNetworkSame
 import com.google.common.collect.Sets
@@ -41,7 +41,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.Inet4Address
@@ -54,7 +53,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class ConnectionMonitor(private val networkListener: NetworkListener, private val serializer: CoroutineDispatcher, private val scope: CoroutineScope) :
-    ConnectivityManager.NetworkCallback(), KoinComponent {
+    ConnectivityManager.NetworkCallback(), KoinComponent, DiagnosticsManager.DiagnosticsListener {
 
     private val networkSet: MutableSet<Network> = ConcurrentHashMap.newKeySet()
 
@@ -64,16 +63,21 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
     // add cellular, wifi, bluetooth, ethernet, vpn, wifi aware, low pan
     private val networkRequest: NetworkRequest =
         NetworkRequest.Builder()
+            // ref: github.com/celzero/rethink-app/issues/347
+            .apply { if (isAtleastR()) clearCapabilities() else removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN) }
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .apply { if (isAtleastS()) setIncludeOtherUidNetworks(true) }
             // api27: .addTransportType(NetworkCapabilities.TRANSPORT_WIFI_AWARE)
             // api26: .addTransportType(NetworkCapabilities.TRANSPORT_LOWPAN)
             .build()
 
+
     //private var serviceHandler: NetworkRequestHandler? = null
     private val persistentState by inject<PersistentState>()
 
     private lateinit var cm: ConnectivityManager
+
+    private var diagsMgr: DiagnosticsManager? = null
 
     companion object {
         // add active network as underlying vpn network
@@ -145,6 +149,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         suspend fun onNetworkConnected(networks: UnderlyingNetworks)
 
         suspend fun onNetworkRegistrationFailed()
+
+        suspend fun maybeNetworkStall()
     }
 
     override fun onAvailable(network: Network) {
@@ -238,8 +244,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             }
 
             Logger.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
-            cm =
-                context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            cm = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
             try {
                 // TODO: use a custom Looper(HandlerThread) to avoid blocking the main thread
@@ -249,6 +254,12 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                 networkListener.onNetworkRegistrationFailed()
                 return@async isNewVpn
             }
+
+            // register for diagnostics manager if the android version is R or above
+            if (isAtleastR()) {
+                registerDiags(context)
+            }
+
             channel = Channel(Channel.CONFLATED)
 
             scope.launch(CoroutineName("nwHdl") + serializer) {
@@ -282,6 +293,31 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         return deferred.await()
     }
 
+    @RequiresApi(30)
+    fun registerDiags(context: Context) {
+        if (isAtleastR()) {
+            try {
+                val diagnosticMgr = DiagnosticsManager(context, scope, this)
+                diagnosticMgr.register()
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_CONNECTION, "DiagnosticsManager; err while getting connectivity diagnostics manager")
+            }
+        }
+    }
+
+    @RequiresApi(30)
+    fun unregisterDiags() {
+        if (isAtleastR()) {
+            // unregister the diag network callback
+            try {
+                diagsMgr?.unregister()
+                diagsMgr = null
+            } catch (e: Exception) {
+                Logger.w(LOG_TAG_CONNECTION, "DiagnosticsManager; err while unregistering diag network callback", e)
+            }
+        }
+    }
+
 
     // Always called from the main thread
     suspend fun onVpnStop() {
@@ -292,13 +328,18 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                 if (::cm.isInitialized) {
                     cm.unregisterNetworkCallback(nwCallback)
                 }
+                if (isAtleastR()) {
+                    unregisterDiags()
+                }
                 networkSet.clear()
                 if (::channel.isInitialized) {
                     channel.close()
                 }
+
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_CONNECTION, "err while unregistering", e)
             }
+
         }
     }
 
@@ -333,6 +374,11 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         useAutoConnectivityChecks: Boolean
     ): OpPrefs {
         return OpPrefs(what, networkSet.toSet(), isForceUpdate, testReachability, failOpenOnNoNetwork, useAutoConnectivityChecks)
+    }
+
+    override suspend fun maybeNetworkStall() {
+        Logger.i(LOG_TAG_CONNECTION, "onNetworkStallDetected")
+        networkListener.maybeNetworkStall()
     }
 
     data class NetworkProperties(
@@ -448,6 +494,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
             val vpnRoutes = determineVpnProtos(opPrefs.networkSet)
             val isDnsChanged = hasNwDnsChanged(currentNetworks, newNetworks)
+            val isLinkAddressChanged = hasLinkAddrChanged(currentNetworks, newNetworks)
 
             Logger.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, currNws: $currentNetworks ; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered")
             Logger.i(
@@ -458,7 +505,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                  "cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged"
             )
 
-            if (isNewNetwork || opPrefs.isForceUpdate || isDnsChanged) {
+            if (isNewNetwork || opPrefs.isForceUpdate || isDnsChanged || isLinkAddressChanged) {
                 currentNetworks = newNetworks
                 repopulateTrackedNetworks(opPrefs, currentNetworks)
                 informListener(true, isActiveNetworkMetered, isActiveNetworkCellular, vpnRoutes)
@@ -466,9 +513,16 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         }
 
         private suspend fun hasNwDnsChanged(currNws: Set<NetworkProperties>, newNws: Set<NetworkProperties>): Boolean {
-            val currDnsServers = currNws.map { it.linkProperties }.mapNotNull { it?.dnsServers }.flatMap { it }.map { it.hostAddress }.toSet()
-            val newDnsServers = newNws.map { it.linkProperties }.mapNotNull { it?.dnsServers }.flatMap { it }.map { it.hostAddress }.toSet()
+            // check equality on addr bytes and not on string representation to avoid issues with IPv4-mapped IPv6 addresses
+            val currDnsServers = currNws.map { it.linkProperties }.mapNotNull { it?.dnsServers }.flatMap { it }.map { it.address }.toSet()
+            val newDnsServers = newNws.map { it.linkProperties }.mapNotNull { it?.dnsServers }.flatMap { it }.map { it.address }.toSet()
             return newDnsServers == currDnsServers
+        }
+
+        private suspend fun hasLinkAddrChanged(currNws: Set<NetworkProperties>, newNws: Set<NetworkProperties>): Boolean {
+            val currLinkAddresses = currNws.map { it.linkProperties }.mapNotNull { it?.linkAddresses }.flatMap { it }.map { it.address.address }.toSet()
+            val newLinkAddresses = newNws.map { it.linkProperties }.mapNotNull { it?.linkAddresses }.flatMap { it }.map { it.address.address }.toSet()
+            return newLinkAddresses == currLinkAddresses
         }
 
         /** Adds all the available network to the underlying network. */
@@ -506,12 +560,12 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
          *         Returns null if no VPN network is found in the provided set.
          */
         private suspend fun determineVpnProtos(nws: Set<Network?>): Pair<Boolean, Boolean>? {
-            var vpnNw = nws.firstOrNull { isVPN(it) == true }
-            if (vpnNw == null) {
+            val vpnNw = nws.firstOrNull { isVPN(it) == true }
+            /*if (vpnNw == null) {
                 // fallback to the active network if the vpn network is not found
                 val allNws = cm.allNetworks
                 vpnNw = allNws.firstOrNull { isVPN(it) == true }
-            }
+            }*/
             if (vpnNw == null) {
                 // vpn routes is just the suggestion to mitigate the discrepancy between
                 // actual vpn routes and the ones handled by BraveVpnService, in that case

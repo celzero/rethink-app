@@ -194,7 +194,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     @Volatile
     private var tunUnderlyingNetworks: String? = null
     @Volatile
-    private var prevDns:  MutableSet<InetAddress> = mutableSetOf()
+    private var prevDns: MutableSet<InetAddress> = mutableSetOf()
+    @Volatile
+    private var lastFlowRealtime: Long = elapsedRealtime() // tracks last flow()
     private var testFd: AtomicInteger = AtomicInteger(-1)
 
     companion object {
@@ -240,6 +242,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         // win last connected threshold in milliseconds
         private const val WIN_LAST_CONNECTED_THRESHOLD_MS = 60 * 60 * 1000L // 60 minutes
+
+        private const val FLOW_STALL_THRESHOLD_MS = 30 * 1000L // 30 seconds
     }
 
     private var lastSubscriptionCheckTime: Long = 0
@@ -1233,6 +1237,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // family must be either AF_INET (for IPv4) or AF_INET6 (for IPv6)
         }
 
+        // fixme: remove this when the issue is fixed
+        builder.allowBypass()
+
         val underlyingNws = getUnderlays()
         builder.setUnderlyingNetworks(underlyingNws)
         tunUnderlyingNetworks = underlyingNws?.joinToString()
@@ -1665,7 +1672,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         vpnScope.launch {
             Logger.i(LOG_TAG_VPN, "start restart manager flow with debounce")
             // create a state flow with debounce to avoid multiple calls in quick succession
-            // this should wait for 3 seconds before starting the restart manager flow
+            // this should wait for 1.5 seconds before starting the restart manager flow
             vpnRestartTrigger
                 .debounce(TimeUnit.MILLISECONDS.toMillis(1500))
                 .collect { reason ->
@@ -2690,6 +2697,19 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         signalStopService("nwRegFail", userInitiated = false)
     }
 
+    override suspend fun maybeNetworkStall() {
+        // these calls are not fool proof, just a mitigation mechanism
+        // see if there is no flow call for 30 seconds and this is called, then restart the vpn
+        val elapsed = elapsedRealtime()
+        if (elapsed >= lastFlowRealtime + FLOW_STALL_THRESHOLD_MS) {
+            Logger.w(LOG_TAG_VPN, "nwStall; no flow call for 30 seconds, restarting vpn")
+            val reason = "nwStall, time: $elapsed"
+            vpnRestartTrigger.value = reason
+        } else {
+            Logger.d(LOG_TAG_VPN, "nwStall; flow call recd, no restart needed")
+        }
+    }
+
     private fun getUnderlays(): Array<Network>? {
         val networks = underlyingNetworks
         val failOpenOnNoNetwork = persistentState.failOpenOnNoNetwork
@@ -3018,15 +3038,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         }
     }
 
-    private fun areDnsEqual(prevDns: Set<InetAddress>?, dnsServers: Set<InetAddress>): Boolean {
-        if (prevDns == null) {
-            return false
-        }
-
-        // ref: kotlinlang.org/docs/equality.html#structural-equality
-        return dnsServers == prevDns
-    }
-
     private fun isDefaultDnsNone(): Boolean {
         // if none is set then the url will either be empty or will not be one of the default dns
         return persistentState.defaultDnsUrl.isEmpty() ||
@@ -3038,7 +3049,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         Logger.i(LOG_TAG_VPN, "vpn lockdown mode change, restarting")
         io("lockdownSync") {
-            val reason = "lockdown: ${isLockdownEnabled}"
+            val reason = "lockdown: ${VpnController.isVpnLockdown()}"
             vpnRestartTrigger.value = reason
             vpnAdapter?.notifyLoopback()
         }
@@ -4355,6 +4366,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     ): Mark = go2kt(flowDispatcher) {
         logd("flow: $_uid, $src, $dest, $realIps, $d, $blocklists")
         handleVpnLockdownStateAsync()
+
+        lastFlowRealtime = elapsedRealtime()
 
         // in case of double loopback, all traffic will be part of rinr instead of just rethink's
         // own traffic. flip the doubleLoopback flag to true if we need that behavior
