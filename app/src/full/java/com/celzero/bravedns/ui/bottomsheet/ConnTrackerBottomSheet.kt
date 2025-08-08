@@ -56,7 +56,7 @@ import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -137,9 +137,9 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         b.bsConnConnectionTypeHeading.text = info!!.ipAddress
         b.bsConnConnectionFlag.text = info!!.flag
 
-        b.bsConnBlockAppTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block))
-        b.bsConnBlockConnAllTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_ip))
-        b.bsConnDomainTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_domain))
+        b.bsConnBlockAppTxt.text = htmlToSpannedText(getString(R.string.bsct_block))
+        b.bsConnBlockConnAllTxt.text = htmlToSpannedText(getString(R.string.bsct_block_ip))
+        b.bsConnDomainTxt.text = htmlToSpannedText(getString(R.string.bsct_block_domain))
 
         // updates the application name and other details
         updateAppDetails()
@@ -672,7 +672,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                     val tempDesc =
                         getFirewallRule(FirewallRuleset.RULE2G.id)?.let { getString(it.desc) }
                             ?: getString(R.string.firewall_rule_no_rule_desc)
-                    descText = updateHtmlEncodedText(tempDesc)
+                    descText = htmlToSpannedText(tempDesc)
                     getFirewallRule(FirewallRuleset.RULE2G.id)?.let { getString(it.title) }
                         ?: getString(R.string.firewall_rule_no_rule)
                 }
@@ -683,7 +683,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             val tempDesc =
                 getFirewallRule(blockedRule)?.let { getString(it.desc) }
                     ?: getString(R.string.firewall_rule_no_rule_desc)
-            descText = updateHtmlEncodedText(tempDesc)
+            descText = htmlToSpannedText(tempDesc)
         }
 
         desc.text = descText
@@ -712,7 +712,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                 )
         }
         text = text.replace(",", ", ")
-        return updateHtmlEncodedText(text)
+        return htmlToSpannedText(text)
     }
 
     private suspend fun applyFirewallRule(

@@ -41,7 +41,7 @@ import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -146,8 +146,8 @@ class AppIpRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmSheet
         updateAppDetails()
         b.bsacIpAddressTv.text = ipAddress
 
-        b.bsacIpRuleTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_ip))
-        b.bsacDomainRuleTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_domain))
+        b.bsacIpRuleTxt.text = htmlToSpannedText(getString(R.string.bsct_block_ip))
+        b.bsacDomainRuleTxt.text = htmlToSpannedText(getString(R.string.bsct_block_domain))
 
         setupRecycler()
     }

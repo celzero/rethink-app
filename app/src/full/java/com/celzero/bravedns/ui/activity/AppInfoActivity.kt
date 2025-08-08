@@ -53,7 +53,7 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -233,7 +233,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         connectionStatus: FirewallManager.ConnectionStatus
     ) {
         b.aadFirewallStatus.text =
-            updateHtmlEncodedText(
+            htmlToSpannedText(
                 getString(
                     R.string.ada_firewall_status,
                     getFirewallText(firewallStatus, connectionStatus)

@@ -56,7 +56,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -137,7 +137,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             return
         }
 
-        b.bsdlDomainRuleDesc.text = updateHtmlEncodedText(getString(R.string.bsdl_block_desc))
+        b.bsdlDomainRuleDesc.text = htmlToSpannedText(getString(R.string.bsdl_block_desc))
         b.dnsBlockUrl.text = log!!.queryStr + "      ❯"
         b.dnsBlockIpAddress.text = getResponseIp()
         b.dnsBlockConnectionFlag.text = log!!.flag
@@ -491,7 +491,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             text +=
                 getString(R.string.dns_btm_sheet_dialog_ips, Utilities.getFlag(it.slice(0..2)), it)
         }
-        return updateHtmlEncodedText(text)
+        return htmlToSpannedText(text)
     }
 
     private fun formatText(groupNames: Multimap<String, String>): Spanned {
@@ -510,7 +510,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                 )
         }
         text = text.replace(",", ", ")
-        return updateHtmlEncodedText(text)
+        return htmlToSpannedText(text)
     }
 
     private fun displayDescription() {
@@ -558,7 +558,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                 log!!.relayIP
             }
             val text = getString(R.string.dns_btm_resolved_crypt, uptime, log!!.serverIP, p)
-            b.dnsBlockBlockedDesc.text = updateHtmlEncodedText(text)
+            b.dnsBlockBlockedDesc.text = htmlToSpannedText(text)
         } else if (log!!.isLocallyAnswered()) { // usually happens when there is a network failure
             b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server, uptime)
         } else {

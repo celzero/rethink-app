@@ -45,7 +45,7 @@ import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -132,9 +132,9 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         }
         b.bsConnConnectionFlag.text = info!!.flag
 
-        b.bsConnBlockAppTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block))
-        b.bsConnBlockConnAllTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_ip))
-        b.bsConnDomainTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_domain))
+        b.bsConnBlockAppTxt.text = htmlToSpannedText(getString(R.string.bsct_block))
+        b.bsConnBlockConnAllTxt.text = htmlToSpannedText(getString(R.string.bsct_block_ip))
+        b.bsConnDomainTxt.text = htmlToSpannedText(getString(R.string.bsct_block_domain))
 
         // updates the application name and other details
         updateAppDetails()

@@ -39,7 +39,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -139,7 +139,7 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmS
         // making use of the same layout used for ip rules, so changing the text and
         // removing the recycler related changes
         b.bsacIpAddressTv.text = domain
-        b.bsacIpRuleTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_domain))
+        b.bsacIpRuleTxt.text = htmlToSpannedText(getString(R.string.bsct_block_domain))
 
         b.bsacDomainRuleTxt.visibility = View.GONE
         b.bsacDomainLl.visibility = View.GONE

@@ -61,7 +61,7 @@ import com.celzero.bravedns.util.Constants.Companion.RETHINK_STAMP_VERSION
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities.getRemoteBlocklistStamp
 import com.celzero.bravedns.util.Utilities.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.hasRemoteBlocklists
@@ -228,12 +228,12 @@ class RethinkBlocklistFragment :
     private fun updateFilteredTxtUi(filter: Filters) {
         if (filter.subGroups.isEmpty()) {
             b.lbAdvancedFilterLabelTv.text =
-                updateHtmlEncodedText(
+                htmlToSpannedText(
                     getString(R.string.rt_filter_desc, filter.filterSelected.name.lowercase())
                 )
         } else {
             b.lbAdvancedFilterLabelTv.text =
-                updateHtmlEncodedText(
+                htmlToSpannedText(
                     getString(
                         R.string.rt_filter_desc_subgroups,
                         filter.filterSelected.name.lowercase(),

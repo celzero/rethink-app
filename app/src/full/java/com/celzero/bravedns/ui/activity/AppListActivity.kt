@@ -27,7 +27,6 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
-import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -233,14 +232,14 @@ class AppListActivity :
         val firewallLabel = filter.firewallFilter.getLabel(this)
         if (filter.categoryFilters.isEmpty()) {
             b.firewallAppLabelTv.text =
-                UIUtils.updateHtmlEncodedText(
+                UIUtils.htmlToSpannedText(
                     getString(
                         R.string.fapps_firewall_filter_desc,
                         firewallLabel.lowercase(),
                         filterLabel))
         } else {
             b.firewallAppLabelTv.text =
-                UIUtils.updateHtmlEncodedText(
+                UIUtils.htmlToSpannedText(
                     getString(
                         R.string.fapps_firewall_filter_desc_category,
                         firewallLabel.lowercase(),

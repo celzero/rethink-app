@@ -44,12 +44,10 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import com.celzero.firestack.backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -57,7 +55,6 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
@@ -81,7 +78,7 @@ import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openNetworkSettings
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.isAtleastN
@@ -93,7 +90,6 @@ import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -1090,7 +1086,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setTitle(R.string.always_on_dialog_stop_heading)
         if (VpnController.isVpnLockdown()) {
             builder.setMessage(
-                updateHtmlEncodedText(getString(R.string.always_on_dialog_lockdown_stop_message))
+                htmlToSpannedText(getString(R.string.always_on_dialog_lockdown_stop_message))
             )
         } else {
             builder.setMessage(R.string.always_on_dialog_stop_message)

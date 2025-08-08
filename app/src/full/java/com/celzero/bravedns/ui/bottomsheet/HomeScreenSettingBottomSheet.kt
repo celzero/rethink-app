@@ -18,11 +18,9 @@ package com.celzero.bravedns.ui.bottomsheet
 import Logger
 import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.os.SystemClock
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -31,24 +29,21 @@ import android.widget.CompoundButton
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.ProxySettingsActivity
 import com.celzero.bravedns.ui.activity.WgMainActivity
-import com.celzero.bravedns.ui.fragment.HomeScreenFragment.ScreenType
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import kotlin.math.abs
 
 class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetHomeScreenBinding? = null
@@ -206,13 +201,13 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         val isLockdown = VpnController.isVpnLockdown()
         val isProxyEnabled = appConfig.isProxyEnabled()
         if (isLockdown) {
-            b.bsHomeScreenVpnLockdownDesc.text = updateHtmlEncodedText(getString(R.string.hs_btm_sheet_lock_down))
+            b.bsHomeScreenVpnLockdownDesc.text = htmlToSpannedText(getString(R.string.hs_btm_sheet_lock_down))
             b.bsHomeScreenVpnLockdownDesc.visibility = View.VISIBLE
             b.bsHsDnsRl.alpha = 0.5f
             b.bsHsFirewallRl.alpha = 0.5f
             setRadioButtonsEnabled(false)
         } else if (isProxyEnabled) {
-            b.bsHomeScreenVpnLockdownDesc.text = updateHtmlEncodedText(getString(R.string.mode_change_error_proxy_enabled))
+            b.bsHomeScreenVpnLockdownDesc.text = htmlToSpannedText(getString(R.string.mode_change_error_proxy_enabled))
             b.bsHomeScreenVpnLockdownDesc.visibility = View.VISIBLE
             b.bsHsDnsRl.alpha = 0.5f
             b.bsHsFirewallRl.alpha = 0.5f

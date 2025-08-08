@@ -32,7 +32,6 @@ import android.text.Spanned
 import android.text.format.DateUtils
 import android.util.TypedValue
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
@@ -221,7 +220,7 @@ object UIUtils {
         clipboard?.setPrimaryClip(clip)
     }
 
-    fun updateHtmlEncodedText(text: String): Spanned {
+    fun htmlToSpannedText(text: String): Spanned {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
         } else {

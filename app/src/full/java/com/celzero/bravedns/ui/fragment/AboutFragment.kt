@@ -47,13 +47,11 @@ import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogViewLogsBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.BugReportZipper.FILE_PROVIDER_NAME
 import com.celzero.bravedns.scheduler.BugReportZipper.getZipFileName
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
@@ -63,7 +61,7 @@ import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.sendEmailIntent
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
@@ -365,7 +363,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         val binding =
             DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
         binding.desc.movementMethod = LinkMovementMethod.getInstance()
-        binding.desc.text = updateHtmlEncodedText(getString(R.string.whats_new_version_update))
+        binding.desc.text = htmlToSpannedText(getString(R.string.whats_new_version_update))
         // replace the version name in the title
         val v = getVersionName().slice(0..6)
         val title = getString(R.string.about_whats_new, v)
@@ -489,7 +487,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         descText.gravity = Gravity.CENTER
 
         descText.movementMethod = LinkMovementMethod.getInstance()
-        descText.text = updateHtmlEncodedText(getString(R.string.contributors_list))
+        descText.text = htmlToSpannedText(getString(R.string.contributors_list))
 
         okBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
