@@ -152,7 +152,6 @@
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_gravity="center"
-                        android:layout_toStartOf="@id/smart_dns_info"
                         android:enabled="true"
                         android:minHeight="48dp"
                         android:padding="10dp"

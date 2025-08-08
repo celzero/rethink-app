@@ -1638,7 +1638,7 @@
 
     <!-- anti-censorship -->
     <string name="ac_title" translatable="true">anti-censorship</string>
-    <string name="ac_desc" translatable="true">Anti-censorship tools can grant internet freedom, but they may not work everywhere.</string>
+    <string name="ac_desc" translatable="true">Anti-censorship tools can grant internet freedom, but they may not work everywhere. Only attempted on non-proxied connections</string>
 
     <string name="ac_never_split_desc" translatable="true">Do not alter packets.</string>
 
@@ -1647,8 +1647,8 @@
     <string name="ac_split_tcp" translatable="true">TCP</string>
     <string name="ac_split_tcp_desc" translatable="true">Alter TCP packets.</string>
 
-    <string name="ac_split_tls" translatable="true">TLS</string>
-    <string name="ac_split_tls_desc" translatable="true">Alter TLS packets.</string>
+    <string name="ac_split_tls" translatable="true">TCP/TLS</string>
+    <string name="ac_split_tls_desc" translatable="true">Alter TCP or TLS packets.</string>
 
     <string name="ac_desync" translatable="true">Desync</string>
     <string name="ac_desync_desc" translatable="true">Send decoy packets as necessary.</string>
