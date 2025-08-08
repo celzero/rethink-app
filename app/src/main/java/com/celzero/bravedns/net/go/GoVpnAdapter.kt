@@ -41,6 +41,7 @@ import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint
+import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
 import com.celzero.bravedns.service.PersistentState
@@ -144,7 +145,9 @@ class GoVpnAdapter : KoinComponent {
         // opts itself.
         setRDNS()
         addTransport()
-        if(getDnsStatus(Backend.Plus) == null) addMultipleDnsAsPlus()
+        // Plus do not throw exception if the dns is not added, so check the status for client err
+        val plusDnsStatus = getDnsStatus(Backend.Plus)
+        if(plusDnsStatus == null || plusDnsStatus == Transaction.Status.CLIENT_ERROR.id) addMultipleDnsAsPlus()
         setWireguardTunnelModeIfNeeded(opts.tunProxyMode)
         setSocks5TunnelModeIfNeeded(opts.tunProxyMode)
         setHttpProxyIfNeeded(opts.tunProxyMode)
