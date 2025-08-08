@@ -149,6 +149,7 @@
     <string name="symbol_max" translatable="false">🪂</string>
     <string name="symbol_duck" translatable="false">🦆</string>
     <string name="symbol_mobile" translatable="false">📶</string>
+    <string name="symbol_satellite" translatable="false">📡</string>
 
     <string name="numeric_one" translatable="false">1</string>
     <string name="numeric_twenty_four" translatable="false">24</string>

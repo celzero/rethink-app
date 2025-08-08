@@ -329,7 +329,7 @@
                         android:layout_toEndOf="@id/settings_activity_enable_logs_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_enable_logs_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -337,7 +337,7 @@
                             android:text="@string/settings_enable_logs"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
@@ -384,7 +384,7 @@
                         android:layout_toEndOf="@id/settings_go_log_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_go_log_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -392,7 +392,7 @@
                             android:text="@string/settings_go_log_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_go_log_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

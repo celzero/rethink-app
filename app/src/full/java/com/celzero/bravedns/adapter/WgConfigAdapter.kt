@@ -210,6 +210,11 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             if (hop.isNotEmpty()) {
                 b.protocolInfoChipGroup.visibility = View.VISIBLE
                 b.chipHopSrc.visibility = View.VISIBLE
+                b.chipHopSrc.text = context.getString(
+                    R.string.two_argument_space,
+                    context.getString(R.string.symbol_bunny),
+                    context.getString(R.string.lbl_hopping)
+                )
             } else {
                 b.chipHopSrc.visibility = View.GONE
             }
@@ -221,9 +226,14 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             if (hops.isNotEmpty()) {
                 b.protocolInfoChipGroup.visibility = View.VISIBLE
                 b.chipHopping.visibility = View.VISIBLE
-                b.chipHopping.text = context.getString(
+                val hopContentTxt = context.getString(
                     R.string.two_argument_colon, context.getString(R.string.lbl_hop),
                     hops.joinToString { it.src })
+                b.chipHopping.text = context.getString(
+                    R.string.two_argument_space,
+                    context.getString(R.string.symbol_satellite),
+                    hopContentTxt
+                )
             } else {
                 b.chipHopping.visibility = View.GONE
             }

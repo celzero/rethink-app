@@ -151,6 +151,9 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
         // enable logs
         b.settingsActivityEnableLogsSwitch.isChecked = persistentState.logsEnabled
+        // set log level name in the  description
+        b.genSettingsGoLogTxt.text = Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt()).name
+
         // check for app updates
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
         // camera and microphone access
