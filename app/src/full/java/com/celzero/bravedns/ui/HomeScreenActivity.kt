@@ -375,12 +375,16 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun updateNewVersion() {
         if (!isNewVersion()) return
 
+        if (persistentState.appVersion != 0) {
+            // if app version is not 0, then it means the app is updated
+            NewSettingsManager.initializeNewSettings()
+            Logger.i(LOG_TAG_UI, "app version already set, so its update, showing new settings")
+        }
         val version = getLatestVersion()
         Logger.i(LOG_TAG_UI, "new version detected, updating the app version, version: $version")
         persistentState.appVersion = version
         persistentState.showWhatsNewChip = true
         persistentState.appUpdateTimeTs = System.currentTimeMillis()
-        NewSettingsManager.initializeNewSettings()
 
         // FIXME: remove this post v054
         removeThisMethod()

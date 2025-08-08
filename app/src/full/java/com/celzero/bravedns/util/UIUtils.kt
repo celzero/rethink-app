@@ -697,20 +697,7 @@ object UIUtils {
 
     fun AppCompatTextView.setBadgeDotVisible(context: Context, visible: Boolean) {
         if (visible) {
-            val badge = ContextCompat.getDrawable(context, R.drawable.dot_red)
-            setCompoundDrawablesWithIntrinsicBounds(null, null, badge, null)
-            // set gravity to center to align the dot with the text
-            gravity = android.view.Gravity.CENTER_VERTICAL
-            // drawable padding to align the dot with the text
-            compoundDrawablePadding = context.resources.getDimensionPixelSize(R.dimen.badge_dot_padding)
-        } else {
-            setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
-        }
-    }
-
-    fun AppCompatButton.setBadgeDotVisible(context: Context, visible: Boolean) {
-        if (visible) {
-            val badge = ContextCompat.getDrawable(context, R.drawable.dot_red)
+            val badge = ContextCompat.getDrawable(context, R.drawable.ic_new_badge)
             setCompoundDrawablesWithIntrinsicBounds(null, null, badge, null)
             // set gravity to center to align the dot with the text
             gravity = android.view.Gravity.CENTER_VERTICAL
@@ -723,7 +710,7 @@ object UIUtils {
 
     fun MaterialRadioButton.setBadgeDotVisible(context: Context, visible: Boolean) {
         if (visible) {
-            val badge = ContextCompat.getDrawable(context, R.drawable.dot_red)
+            val badge = ContextCompat.getDrawable(context, R.drawable.ic_new_badge)
             setCompoundDrawablesWithIntrinsicBounds(null, null, badge, null)
             // set gravity to center to align the dot with the text
             gravity = android.view.Gravity.CENTER_VERTICAL
