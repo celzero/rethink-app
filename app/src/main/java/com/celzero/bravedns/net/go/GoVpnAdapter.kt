@@ -133,7 +133,7 @@ class GoVpnAdapter : KoinComponent {
     suspend fun initResolverProxiesPcap(opts: TunnelOptions) {
         Logger.v(LOG_TAG_VPN, "$TAG initResolverProxiesPcap")
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip init resolver proxies")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip init resolver proxies")
             return
         }
 
@@ -167,7 +167,7 @@ class GoVpnAdapter : KoinComponent {
     suspend fun setPcapMode(pcapFilePath: String) {
         Logger.v(LOG_TAG_VPN, "$TAG setPcapMode")
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip set pcap mode")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set pcap mode")
             return
         }
         try {
@@ -195,7 +195,7 @@ class GoVpnAdapter : KoinComponent {
     private suspend fun setRoute(tunnelOptions: TunnelOptions) {
         Logger.v(LOG_TAG_VPN, "$TAG setRoute")
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip set route")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set route")
             return
         }
         try {
@@ -218,7 +218,7 @@ class GoVpnAdapter : KoinComponent {
     suspend fun addTransport() {
         Logger.v(LOG_TAG_VPN, "$TAG addTransport")
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip add transport")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip add transport")
             return
         }
 
@@ -447,7 +447,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun unlink() {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip unlink")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip unlink")
             return
         }
         try {
@@ -490,7 +490,7 @@ class GoVpnAdapter : KoinComponent {
 
     fun setTunMode(tunnelOptionsWithoutMtu: TunnelOptions) {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip set-tun-mode")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set-tun-mode")
             return
         }
         try {
@@ -577,7 +577,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun addDnscryptRelay(relay: DnsCryptRelayEndpoint) {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip add dnscrypt relay")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip add dnscrypt relay")
             return
         }
         try {
@@ -596,7 +596,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun removeDnscryptRelay(relay: DnsCryptRelayEndpoint) {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip remove dnscrypt relay")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip remove dnscrypt relay")
             return
         }
         try {
@@ -906,7 +906,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun removeWgProxy(id: Int) {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing wg")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing wg")
             return
         }
         try {
@@ -921,7 +921,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun addWgProxy(id: String, force: Boolean = false) {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip add wg")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip add wg")
             return
         }
         try {
@@ -984,7 +984,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun closeConnections(connIds: List<String>, isUid: Boolean = false) {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip closeConns")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip closeConns")
             return
         }
 
@@ -1023,7 +1023,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun refreshOrReAddProxies() {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing proxies")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing proxies")
             return
         }
         try {
@@ -1147,7 +1147,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun refreshResolvers() {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing resolvers")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing resolvers")
             return
         }
         val maindnsOK = getDnsStatus(Backend.Preferred) != null || getDnsStatus(Backend.Plus) != null
@@ -1232,7 +1232,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun addDefaultTransport(url: String?) {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip add default dns")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip add default dns")
             return
         }
         var type = Backend.DNS53
@@ -1313,7 +1313,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun setSystemDns(systemDns: List<String?>) {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip setting system-dns")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip setting system-dns")
             return
         }
         // for Rethink within rethink mode, the system dns is system dns is always set to Ipn.Base
@@ -1638,7 +1638,7 @@ class GoVpnAdapter : KoinComponent {
         timeoutSec: Int = persistentState.dialTimeoutSec
     ) {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip set dial strategy")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set dial strategy")
             return
         }
         try {
@@ -1654,7 +1654,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun setTransparency(eim: Boolean = persistentState.endpointIndependence) {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip transparency")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip transparency")
             return
         }
         if (!isAtleastS()) {
@@ -1670,7 +1670,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun undelegatedDomains(useSystemDns: Boolean = persistentState.useSystemDnsForUndelegatedDomains) {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip undelegated domains")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip undelegated domains")
             return
         }
         try {
@@ -1737,7 +1737,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun registerAndFetchWinIfNeeded(prevBytes: ByteArray? = null): ByteArray? {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip register win(rpn)")
+            Logger.e(LOG_TAG_PROXY, "$TAG no tunnel, skip register win(rpn)")
             return null
         }
         try {
@@ -1896,7 +1896,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun setExperimentalSettings(value: Boolean = persistentState.nwEngExperimentalFeatures) {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip set experimental settings")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set experimental settings")
             return
         }
         try {
@@ -1911,7 +1911,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun setAutoDialsParallel(value: Boolean = persistentState.autoDialsParallel) {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip set auto dial option")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set auto dial option")
             return
         }
         try {
@@ -1924,7 +1924,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun createHop(origin: String, hop: String): Pair<Boolean, String> {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG createHop; no tunnel, skip create hop")
+            Logger.e(LOG_TAG_VPN, "$TAG createHop; no tunnel, skip create hop")
             return Pair(false, "no tunnel")
         }
         // to remove hop there is a separate method, so no need to check for empty
@@ -1968,7 +1968,7 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun addMultipleDnsAsPlus() {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG; smart-dns; no tunnel, skip set multi dns as plus")
+            Logger.e(LOG_TAG_VPN, "$TAG; smart-dns; no tunnel, skip set multi dns as plus")
             return
         }
 
@@ -2057,12 +2057,12 @@ class GoVpnAdapter : KoinComponent {
 
     suspend fun getPlusTransportById(id: String): DNSTransport? {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip get plus transport by id")
+            Logger.w(LOG_TAG_VPN, "$TAG no tunnel, skip get plus transport by id")
             return null
         }
         return try {
             val transport = tunnel.resolver.getMult(Backend.Plus.togs()).get(id.togs())
-            Logger.i(LOG_TAG_VPN, "$TAG get plus transport by id($id): ${transport.addr}")
+            Logger.d(LOG_TAG_VPN, "$TAG get plus transport by id($id): ${transport.addr}")
             transport
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "$TAG err get plus transport by id($id): ${e.message}")
@@ -2072,7 +2072,7 @@ class GoVpnAdapter : KoinComponent {
 
     fun performConnectivityCheck(controller: Controller, id: String, addrPort: String): Boolean {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip connectivity check")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip connectivity check")
             return false
         }
         try {
@@ -2089,7 +2089,7 @@ class GoVpnAdapter : KoinComponent {
 
     fun performAutoConnectivityCheck(controller: Controller, id: String, mode: String): Boolean {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip auto connectivity check")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip auto connectivity check")
             return false
         }
         try {
@@ -2114,7 +2114,7 @@ class GoVpnAdapter : KoinComponent {
 
     private suspend fun panicAtRandom(shouldPanic: Boolean) {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip panic at random")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip panic at random")
             return
         }
         try {
@@ -2127,7 +2127,7 @@ class GoVpnAdapter : KoinComponent {
 
     fun tunMtu(): Int {
         if (!tunnel.isConnected) {
-            Logger.i(LOG_TAG_VPN, "$TAG no tunnel, skip tun mtu")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip tun mtu")
             return 0
         }
         return try {
