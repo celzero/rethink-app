@@ -41,74 +41,128 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/interface_name_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginStart="3dp"
-                        android:layout_marginEnd="3dp"
                         android:ellipsize="end"
-                        android:maxLength="15"
+                        android:maxLength="16"
                         android:padding="5dp"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        android:textColor="?attr/secondaryTextColor" />
+                        android:textAppearance="?attr/textAppearanceHeadline6" />
 
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/protocol_info_chip_group"
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/interface_id_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginStart="3dp"
-                        android:layout_marginEnd="5dp"
-                        android:paddingBottom="2dp"
-                        android:visibility="gone">
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/protocol_info_chip_ipv4"
-                            style="@style/ThinnerChip.Action"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.8"
-                            android:checked="true"
-                            android:text="@string/settings_ip_text_ipv4"
-                            android:textAlignment="center"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/small_font_text_view"
-                            app:chipStrokeColor="?attr/accentGood"
-                            app:chipStrokeWidth="1.5dp" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/protocol_info_chip_ipv6"
-                            style="@style/ThinnerChip.Action"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.8"
-                            android:checked="true"
-                            android:text="@string/settings_ip_text_ipv6"
-                            android:textAlignment="center"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/small_font_text_view"
-                            app:chipStrokeColor="?attr/accentGood"
-                            app:chipStrokeWidth="1.5dp" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_split_tunnel"
-                            style="@style/ThinnerChip.Action"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:alpha="0.8"
-                            android:checked="true"
-                            android:text="@string/lbl_split"
-                            android:textAlignment="center"
-                            android:textColor="?attr/primaryTextColor"
-                            android:textSize="@dimen/small_font_text_view"
-                            app:chipStrokeColor="?attr/accentGood"
-                            app:chipStrokeWidth="1.5dp" />
-
-                    </com.google.android.material.chip.ChipGroup>
+                        android:layout_marginEnd="3dp"
+                        android:alpha="0.7"
+                        android:maxLength="5" />
 
                 </LinearLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/protocol_info_chip_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginEnd="5dp"
+                    android:paddingBottom="2dp"
+                    android:visibility="gone">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/protocol_info_chip_ipv4"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.8"
+                        android:checked="true"
+                        android:text="@string/settings_ip_text_ipv4"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
+                        app:chipStrokeColor="?attr/colorPrimary"
+                        app:chipStrokeWidth="1.5dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/protocol_info_chip_ipv6"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.8"
+                        android:checked="true"
+                        android:text="@string/settings_ip_text_ipv6"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
+                        app:chipStrokeColor="?attr/colorPrimary"
+                        app:chipStrokeWidth="1.5dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_split_tunnel"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.8"
+                        android:checked="true"
+                        android:text="@string/lbl_split"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
+                        app:chipStrokeColor="?attr/colorPrimary"
+                        app:chipStrokeWidth="1.5dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_amnezia"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.8"
+                        android:checked="true"
+                        android:text="@string/lbl_amnezia"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
+                        app:chipStrokeColor="?attr/colorPrimary"
+                        app:chipStrokeWidth="1.5dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_hop_src"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.8"
+                        android:checked="true"
+                        android:text="@string/lbl_hopping"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
+                        app:chipStrokeColor="?attr/accentGood"
+                        app:chipStrokeWidth="1.5dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_hopping"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.8"
+                        android:checked="true"
+                        android:text="@string/lbl_hop"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
+                        app:chipStrokeColor="?attr/colorPrimary"
+                        app:chipStrokeWidth="1.5dp" />
+
+                </com.google.android.material.chip.ChipGroup>
 
                 <TextView
                     android:id="@+id/interface_status"
@@ -186,7 +240,7 @@
                 android:layout_centerVertical="true"
                 android:clickable="true"
                 android:focusable="true"
-                android:padding="5dp"
+                android:padding="15dp"
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp" />
 

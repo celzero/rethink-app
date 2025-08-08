@@ -36,10 +36,12 @@ import androidx.core.net.toUri
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ProxyEndpoint
+import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Constants.Companion.HTTP_PROXY_PORT
 import com.celzero.bravedns.util.Constants.Companion.SOCKS_DEFAULT_PORT
 import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
@@ -87,7 +89,7 @@ class OrbotHelper(
         private const val STATUS_STOPPING = "STOPPING"
         private const val STATUS_OFF = "OFF"
 
-        private const val orbot = "ORBOT"
+        private const val ORBOT = "ORBOT"
 
         const val ORBOT_NOTIFICATION_ACTION_TEXT = "OPEN_ORBOT_INTENT"
 
@@ -278,8 +280,8 @@ class OrbotHelper(
         val pendingIntent =
             getActivityPendingIntent(
                 context,
-                Intent(context, HomeScreenActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT,
+                Intent(context, AppLockActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                 mutable = false
             )
 
@@ -432,9 +434,9 @@ class OrbotHelper(
 
         return ProxyEndpoint(
             id,
-            orbot,
+            ORBOT,
             proxyMode.value,
-            proxyType = "NONE",
+            proxyType = DEFAULT_PROXY_TYPE,
             ORBOT_PACKAGE_NAME,
             ip,
             port,

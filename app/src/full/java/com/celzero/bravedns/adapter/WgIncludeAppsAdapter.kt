@@ -19,6 +19,7 @@ import Logger
 import Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.content.DialogInterface
+import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
@@ -54,6 +55,7 @@ class WgIncludeAppsAdapter(
     PagingDataAdapter<ProxyApplicationMapping, WgIncludeAppsAdapter.IncludedAppInfoViewHolder>(
         DIFF_CALLBACK
     ) {
+    private val packageManager: PackageManager = context.packageManager
 
     companion object {
 
@@ -74,8 +76,7 @@ class WgIncludeAppsAdapter(
                     oldConnection: ProxyApplicationMapping,
                     newConnection: ProxyApplicationMapping
                 ): Boolean {
-                    return (oldConnection.proxyId == newConnection.proxyId &&
-                        oldConnection.uid == newConnection.uid)
+                    return oldConnection == newConnection
                 }
             }
     }
@@ -104,6 +105,8 @@ class WgIncludeAppsAdapter(
                 b.wgIncludeCard.isFocusable = false
                 b.wgIncludeAppListCheckbox.isClickable = false
                 b.wgIncludeAppListCheckbox.isFocusable = false
+                b.wgIncludeAppAppDescTv.visibility = View.VISIBLE
+                b.wgIncludeAppAppDescTv.text = context.getString(R.string.exclude_apps_from_proxy)
             } else {
                 b.wgIncludeAppListContainer.isEnabled = true
                 b.wgIncludeCard.isClickable = true
@@ -124,14 +127,12 @@ class WgIncludeAppsAdapter(
                     b.wgIncludeAppAppDescTv.text =
                         context.getString(R.string.wireguard_apps_proxy_map_desc, mapping.proxyName)
                 } else {
-                    b.wgIncludeAppAppDescTv.text = ""
+                    b.wgIncludeAppAppDescTv.text = context.getString(R.string.exclude_apps_from_proxy)
                 }
                 b.wgIncludeAppAppDescTv.visibility = View.VISIBLE
                 b.wgIncludeAppListCheckbox.isChecked = false
                 setCardBackground(false)
             } else {
-                b.wgIncludeAppAppDescTv.text = ""
-                b.wgIncludeAppAppDescTv.visibility = View.GONE
                 b.wgIncludeAppListCheckbox.isChecked =
                     mapping.proxyId == proxyId && !isProxyExcluded
                 setCardBackground(mapping.proxyId == proxyId && !isProxyExcluded)
@@ -139,6 +140,14 @@ class WgIncludeAppsAdapter(
 
             val isIncluded = mapping.proxyId == proxyId && mapping.proxyId != ""
             ui { displayIcon(getIcon(context, mapping.packageName, mapping.appName)) }
+            // set the alpha based on internet permission
+            if (mapping.hasInternetPermission(packageManager)) {
+                b.wgIncludeAppListApkLabelTv.alpha = 1f
+                b.wgIncludeAppListApkIconIv.alpha = 1f
+            } else {
+                b.wgIncludeAppListApkLabelTv.alpha = 0.4f
+                b.wgIncludeAppListApkIconIv.alpha = 0.4f
+            }
             setupClickListeners(mapping, isIncluded)
         }
 

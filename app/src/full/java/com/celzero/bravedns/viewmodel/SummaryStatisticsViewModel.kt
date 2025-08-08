@@ -23,30 +23,31 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.DataUsageSummary
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
-import com.celzero.bravedns.database.DnsLogDAO
+import com.celzero.bravedns.database.StatsSummaryDao
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 
 class SummaryStatisticsViewModel(
     private val connectionTrackerDAO: ConnectionTrackerDAO,
-    private val dnsLogDAO: DnsLogDAO,
-    private val appConfig: AppConfig
+    private val statsDao: StatsSummaryDao
 ) : ViewModel() {
+    private var topActiveConns: MutableLiveData<Long> = MutableLiveData()
     private var networkActivity: MutableLiveData<String> = MutableLiveData()
+    private var asn: MutableLiveData<String> = MutableLiveData()
     private var countryActivities: MutableLiveData<String> = MutableLiveData()
     private var domains: MutableLiveData<String> = MutableLiveData()
     private var ips: MutableLiveData<String> = MutableLiveData()
     private var timeCategory: TimeCategory = TimeCategory.ONE_HOUR
     private var startTime: MutableLiveData<Long> = MutableLiveData()
+    private var loadMoreClicked: Boolean = false
 
     companion object {
         private const val ONE_HOUR_MILLIS = 1 * 60 * 60 * 1000L
         private const val ONE_DAY_MILLIS = 24 * ONE_HOUR_MILLIS
         private const val ONE_WEEK_MILLIS = 7 * ONE_DAY_MILLIS
-        private const val IS_APP_BYPASSED = "true"
     }
 
     enum class TimeCategory(val value: Int) {
@@ -62,17 +63,24 @@ class SummaryStatisticsViewModel(
     init {
         // set from and to time to current and 1 hr before
         startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
+        topActiveConns.value = VpnController.uptimeMs()
         networkActivity.value = ""
-        domains.postValue("")
-        countryActivities.value = ""
-        ips.value = ""
+        asn.value = ""
     }
 
     fun getTimeCategory(): TimeCategory {
         return timeCategory
     }
 
-    fun timeCategoryChanged(tc: TimeCategory, isAppBypassed: Boolean) {
+    fun setLoadMoreClicked(b: Boolean) {
+        loadMoreClicked = b
+        // initialise the live data to trigger the switchMap
+        domains.value = ""
+        countryActivities.value = ""
+        ips.value = ""
+    }
+
+    fun timeCategoryChanged(tc: TimeCategory) {
         timeCategory = tc
         when (tc) {
             TimeCategory.ONE_HOUR -> {
@@ -86,21 +94,30 @@ class SummaryStatisticsViewModel(
             }
         }
         networkActivity.value = ""
-        if (isAppBypassed) {
-            domains.postValue(IS_APP_BYPASSED)
-        } else {
-            domains.postValue("")
+        asn.value = ""
+        if (loadMoreClicked) {
+            countryActivities.value = ""
+            ips.value = ""
+            domains.value = ""
         }
-        countryActivities.value = ""
-        ips.value = ""
     }
+
+    val getTopActiveConns =
+        topActiveConns.switchMap { it ->
+            val to = System.currentTimeMillis() - it
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                statsDao.getTopActiveConns(to)
+            }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
 
     val getAllowedAppNetworkActivity =
         networkActivity.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     // use dnsQuery as appName
                     val to = startTime.value ?: 0L
-                    connectionTrackerDAO.getAllowedAppNetworkActivity(to)
+                    statsDao.getMostAllowedApps(to)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
@@ -111,82 +128,73 @@ class SummaryStatisticsViewModel(
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     // use dnsQuery as appName
                     val to = startTime.value ?: 0L
-                    connectionTrackerDAO.getBlockedAppNetworkActivity(to)
+                    statsDao.getMostBlockedApps(to)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         }
 
-    val getMostContactedDomains =
-        domains.switchMap { _ ->
-            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    if (appConfig.getBraveMode().isDnsMode()) {
-                        val to = startTime.value ?: 0L
-                        dnsLogDAO.getMostContactedDomains(to)
-                    } else {
-                        val to = startTime.value ?: 0L
-                        connectionTrackerDAO.getMostContactedDomains(to)
-                    }
-                }
-                .liveData
-                .cachedIn(viewModelScope)
-        }
-
-    val getMostBlockedDomains =
-        domains.switchMap { isAppBypassed ->
-            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    if (appConfig.getBraveMode().isDnsMode()) {
-                        val to = startTime.value ?: 0L
-                        dnsLogDAO.getMostBlockedDomains(to)
-                    } else {
-                        // if any app bypasses the dns, then the decision made in flow() call
-                        val to = startTime.value ?: 0L
-                        if (isAppBypassed.isNotEmpty()) {
-                            connectionTrackerDAO.getMostBlockedDomains(to)
-                        } else {
-                            dnsLogDAO.getMostBlockedDomains(to)
-                        }
-                    }
-                }
-                .liveData
-                .cachedIn(viewModelScope)
-        }
-
-    val getMostContactedIps =
-        ips.switchMap { _ ->
+    val getMostConnectedASN =
+        asn.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     val to = startTime.value ?: 0L
-                    connectionTrackerDAO.getMostContactedIps(to)
+                    statsDao.getMostConnectedASN(to)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         }
 
-    val getMostBlockedIps =
-        ips.switchMap { _ ->
+    val getMostBlockedASN =
+        asn.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     val to = startTime.value ?: 0L
-                    connectionTrackerDAO.getMostBlockedIps(to)
+                    statsDao.getMostBlockedASN(to)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         }
+
+    val mbd = domains.switchMap {
+        Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+            val to = startTime.value ?: 0L
+            statsDao.getMostBlockedDomains(to)
+        }
+        .liveData
+        .cachedIn(viewModelScope)
+    }
+
+    val mcd = domains.switchMap {
+        Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+            val to = startTime.value ?: 0L
+            statsDao.getMostContactedDomains(to)
+        }
+        .liveData
+        .cachedIn(viewModelScope)
+    }
+
+    val getMostContactedIps = ips.switchMap { _ ->
+        Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+            val to = startTime.value ?: 0L
+            connectionTrackerDAO.getMostContactedIps(to)
+        }
+        .liveData
+        .cachedIn(viewModelScope)
+    }
+
+    val getMostBlockedIps = ips.switchMap { _ ->
+        Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+            val to = startTime.value ?: 0L
+            connectionTrackerDAO.getMostBlockedIps(to)
+        }
+        .liveData
+        .cachedIn(viewModelScope)
+    }
 
     val getMostContactedCountries =
         countryActivities.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     val to = startTime.value ?: 0L
-                    connectionTrackerDAO.getMostContactedCountries(to)
-                }
-                .liveData
-                .cachedIn(viewModelScope)
-        }
-
-    val getMostBlockedCountries =
-        countryActivities.switchMap { _ ->
-            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val to = startTime.value ?: 0L
-                    connectionTrackerDAO.getMostBlockedCountries(to)
+                    statsDao.getMostContactedCountries(to)
                 }
                 .liveData
                 .cachedIn(viewModelScope)

@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.9.23'
+    ext.kotlin_version = '2.1.0'
     repositories {
         google()
         // https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/
@@ -9,24 +9,39 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.3.1'
+        classpath 'com.android.tools.build:gradle:8.11.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-        classpath 'com.google.gms:google-services:4.4.1'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.1'
     }
 }
 
 plugins {
-    id 'com.google.devtools.ksp' version '1.9.23-1.0.20' apply false
+    id 'com.google.devtools.ksp' version '2.1.0-1.0.28' apply false
 }
 
 allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
+
+        def firestackRepo = project.findProperty("firestackRepo") ?: "github"
+
+        if (firestackRepo == "jitpack") {
+            // jitpack.io/#celzero/firestack
+            maven { url 'https://jitpack.io' }
+        } else if (firestackRepo == "github") {
+            // maven.pkg.github.com/celzero/firestack
+            maven {
+                name = 'GitHubPackages'
+                url = uri("https://maven.pkg.github.com/celzero/firestack")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME_GITHUB")
+                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN_GITHUB")
+                }
+            }
+        } else {
+            // ossrh: https://central.sonatype.com/artifact/com.celzero/firestack/
+            // no-op; mavenCentral is already included
+        }
     }
 }
 

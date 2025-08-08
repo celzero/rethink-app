@@ -19,215 +19,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <LinearLayout
-                android:id="@+id/new_conf_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:src="@drawable/new_conf_illustrator" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="30dp"
-                    android:padding="10dp"
-                    android:text="@string/new_warp_config_desc"
-                    android:textColor="?attr/secondaryTextColor"
-                    android:textSize="@dimen/extra_large_font_text_view" />
-
-                <ProgressBar
-                    android:id="@+id/new_conf_progress_bar"
-                    style="@android:style/Widget.DeviceDefault.ProgressBar.Large"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:visibility="gone" />
-
-            </LinearLayout>
-
-            <RelativeLayout
-                android:id="@+id/wg_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="45dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:id="@+id/wg_header_tv"
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:lineSpacingExtra="5dp"
-                    android:padding="5dp"
-                    android:text="@string/lbl_wireguard"
-                    android:textColor="?attr/accentGood"
-                    android:textSize="@dimen/extra_large_font_text_view"
-                    android:textStyle="bold" />
-
-            </RelativeLayout>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/other_settings_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
-                app:cardUseCompatPadding="true"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/wg_header">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="20dp">
-
-                    <RelativeLayout
-                        android:id="@+id/lockdown_rl"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginEnd="15dp"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_centerVertical="true"
-                            android:layout_toStartOf="@id/lockdown_check"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/global_lockdown_title_tv"
-                                style="@style/TextAppearance.AppCompat.Subhead"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/firewall_rule_global_lockdown"
-                                android:textSize="@dimen/large_font_text_view" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:paddingTop="5dp"
-                                android:text="@string/wg_lockdown_dialog_desc"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="@dimen/default_font_text_view" />
-                        </LinearLayout>
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/lockdown_check"
-                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true" />
-
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:id="@+id/catch_all_rl"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginEnd="15dp"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_centerVertical="true"
-                            android:layout_toStartOf="@id/catch_all_check"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/catch_all_title_tv"
-                                style="@style/TextAppearance.AppCompat.Subhead"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/catch_all_wg_dialog_title"
-                                android:textSize="@dimen/large_font_text_view" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:paddingTop="5dp"
-                                android:text="@string/catch_all_wg_dialog_desc"
-                                android:textColor="?attr/primaryLightColorText"
-                                android:textSize="@dimen/default_font_text_view" />
-                        </LinearLayout>
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/catch_all_check"
-                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true" />
-
-                    </RelativeLayout>
-
-                    <TextView
-                        android:id="@+id/one_wg_info_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="15dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
-                        android:text="@string/one_wg_dialog_desc"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/applications_btn"
-                        style="@style/Widget.AppCompat.Button"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="30dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="30dp"
-                        android:alpha="0.75"
-                        android:background="@drawable/rectangle_border_background"
-                        android:foreground="?attr/selectableItemBackground"
-                        android:gravity="center"
-                        android:padding="15dp"
-                        android:text="@string/add_remove_apps"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:textSize="@dimen/large_font_text_view"
-                        app:rippleColor="?attr/secondaryTextColor" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/interface_detail_card"
                 android:layout_width="match_parent"
@@ -235,21 +26,22 @@
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp"
                 app:cardUseCompatPadding="true"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/other_settings_card">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
-                    android:paddingTop="15dp"
+                    android:paddingTop="10dp"
                     android:paddingEnd="15dp"
                     android:paddingBottom="20dp">
 
-                    <RelativeLayout
+                    <LinearLayout
                         android:id="@+id/config_title_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:orientation="horizontal"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
@@ -257,31 +49,32 @@
                             android:id="@+id/config_name_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_centerVertical="true"
-                            android:layout_toStartOf="@id/interface_edit"
+                            android:paddingTop="5dp"
                             android:text=""
                             android:textAppearance="?attr/textAppearanceHeadline6"
-                            android:textColor="?attr/secondaryTextColor" />
+                            android:textColor="?attr/primaryTextColor" />
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/interface_edit"
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/config_id_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginEnd="20dp"
-                            android:layout_toStartOf="@id/interface_delete"
-                            android:src="@drawable/ic_edit_icon_grey" />
+                            android:layout_gravity="center"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginEnd="3dp"
+                            android:alpha="0.7"
+                            android:maxLength="5" />
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/interface_delete"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:src="@drawable/ic_delete" />
+                    </LinearLayout>
 
-                    </RelativeLayout>
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/status_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:paddingTop="5dp"
+                        android:textStyle="italic"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/config_title_layout" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/public_key_label"
@@ -290,8 +83,9 @@
                         android:layout_marginTop="8dp"
                         android:labelFor="@+id/config_public_key_text"
                         android:text="@string/lbl_public_key"
+                        android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/config_title_layout" />
+                        app:layout_constraintTop_toBottomOf="@id/status_text" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/public_key_text"
@@ -300,6 +94,7 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:singleLine="true"
+                        android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/public_key_label" />
 
@@ -310,6 +105,7 @@
                         android:layout_marginTop="8dp"
                         android:labelFor="@+id/config_addresses_text"
                         android:text="@string/lbl_addresses"
+                        android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/public_key_text" />
 
@@ -317,6 +113,7 @@
                         android:id="@+id/addresses_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/addresses_label" />
 
@@ -410,10 +207,289 @@
                         app:layout_constraintTop_toBottomOf="@+id/mtu_label"
                         tools:text="1500" />
 
+                    <LinearLayout
+                        android:id="@+id/edit_delete_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:orientation="horizontal"
+                        android:weightSum="1"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/mtu_text">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/edit_btn"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="0.5"
+                            android:background="@drawable/rectangle_border_background"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:gravity="center"
+                            android:padding="10dp"
+                            android:text="@string/rt_edit_dialog_positive"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textSize="@dimen/heading_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/delete_btn"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="0.5"
+                            android:background="@drawable/rectangle_border_background"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:gravity="center"
+                            android:padding="10dp"
+                            android:text="@string/ci_delete"
+                            android:textColor="?attr/accentBad"
+                            android:textSize="@dimen/heading_font_text_view" />
+
+                    </LinearLayout>
+
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/other_settings_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp"
+                app:cardUseCompatPadding="true"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/interface_detail_card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="20dp">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/wg_header_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:paddingTop="15dp"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textColor="?attr/primaryTextColor" />
+
+                    <RelativeLayout
+                        android:id="@+id/lockdown_rl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@id/lockdown_check"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/global_lockdown_title_tv"
+                                style="@style/TextAppearance.AppCompat.Subhead"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/firewall_rule_global_lockdown"
+                                android:textSize="@dimen/large_font_text_view" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="5dp"
+                                android:text="@string/wg_lockdown_dialog_desc"
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="@dimen/default_font_text_view" />
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/lockdown_check"
+                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/catch_all_rl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@id/catch_all_check"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/catch_all_title_tv"
+                                style="@style/TextAppearance.AppCompat.Subhead"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/catch_all_wg_dialog_title"
+                                android:textSize="@dimen/large_font_text_view" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="5dp"
+                                android:text="@string/catch_all_wg_dialog_desc"
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="@dimen/default_font_text_view" />
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/catch_all_check"
+                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/use_mobile_rl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@id/use_mobile_check"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/use_mobile_title_tv"
+                                style="@style/TextAppearance.AppCompat.Subhead"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/wg_setting_use_on_mobile"
+                                android:textSize="@dimen/large_font_text_view" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="5dp"
+                                android:text="@string/wg_setting_use_on_mobile_desc"
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="@dimen/default_font_text_view" />
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/use_mobile_check"
+                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true" />
+
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/one_wg_info_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:text="@string/one_wg_dialog_desc"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/applications_btn"
+                        style="@style/Widget.AppCompat.Button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="30dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="30dp"
+                        android:alpha="0.75"
+                        android:background="@drawable/rectangle_border_background"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center"
+                        android:padding="15dp"
+                        android:text="@string/add_remove_apps"
+                        android:textColor="?attr/secondaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        app:rippleColor="?attr/secondaryTextColor" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/hop_btn"
+                        style="@style/Widget.AppCompat.Button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="30dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="30dp"
+                        android:alpha="0.75"
+                        android:background="@drawable/rectangle_border_background"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center"
+                        android:padding="15dp"
+                        android:text="@string/hop_add_remove_title"
+                        android:textColor="?attr/secondaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        app:rippleColor="?attr/secondaryTextColor" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/logs_btn"
+                        style="@style/Widget.AppCompat.Button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="30dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="30dp"
+                        android:alpha="0.75"
+                        android:background="@drawable/rectangle_border_background"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center"
+                        android:padding="15dp"
+                        android:text="@string/lbl_logs"
+                        android:textColor="?attr/secondaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        app:rippleColor="?attr/secondaryTextColor" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/peers_list"
@@ -421,7 +497,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/interface_detail_card" />
+                app:layout_constraintTop_toBottomOf="@+id/other_settings_card" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -433,7 +509,9 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="25dp"
         android:layout_marginBottom="40dp"
+        android:clickable="true"
         android:contentDescription="@string/add_peer"
+        android:focusable="true"
         android:text="@string/add_peer"
         android:textColor="?attr/primaryTextColor"
         app:backgroundTint="?attr/chipColorBgNormal"
@@ -441,8 +519,6 @@
         app:icon="@drawable/ic_add"
         app:iconTint="@android:color/transparent"
         app:iconTintMode="add"
-        android:clickable="true"
-        android:focusable="true"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

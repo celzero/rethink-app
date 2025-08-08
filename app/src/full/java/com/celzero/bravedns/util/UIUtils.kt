@@ -23,6 +23,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.TypedArray
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -31,15 +32,19 @@ import android.text.Spanned
 import android.text.format.DateUtils
 import android.util.TypedValue
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.DnsLogTracker
+import com.celzero.firestack.backend.NetStat
+import com.google.android.material.radiobutton.MaterialRadioButton
 import java.util.Calendar
 import java.util.Date
 import java.util.regex.Matcher
@@ -81,7 +86,7 @@ object UIUtils {
         }
     }
 
-    fun getProxyStatusStringRes(statusId: Long): Int {
+    fun getProxyStatusStringRes(statusId: Long?): Int {
         return when (statusId) {
             Backend.TUP -> {
                 R.string.lbl_starting
@@ -105,6 +110,15 @@ object UIUtils {
                 R.string.rt_filter_parent_selected
             }
         }
+    }
+
+    enum class ProxyStatus(val id: Long) {
+        TOK(Backend.TOK),
+        TUP(Backend.TUP),
+        TZZ(Backend.TZZ),
+        TNT(Backend.TNT),
+        TKO(Backend.TKO),
+        END(Backend.END)
     }
 
     fun formatToRelativeTime(context: Context, timestamp: Long): String {
@@ -206,7 +220,7 @@ object UIUtils {
         clipboard?.setPrimaryClip(clip)
     }
 
-    fun updateHtmlEncodedText(text: String): Spanned {
+    fun htmlToSpannedText(text: String): Spanned {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
         } else {
@@ -217,7 +231,7 @@ object UIUtils {
     fun sendEmailIntent(context: Context) {
         val intent =
             Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse(context.getString(R.string.about_mail_to_string))
+                data = context.getString(R.string.about_mail_to_string).toUri()
                 putExtra(Intent.EXTRA_EMAIL, arrayOf(context.getString(R.string.about_mail_to)))
                 putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.about_mail_subject))
             }
@@ -233,6 +247,7 @@ object UIUtils {
         try {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.data = Uri.fromParts("package", packageName, null)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(intent)
         } catch (e: Exception) { // ActivityNotFoundException | NullPointerException
             Logger.w(Logger.LOG_TAG_FIREWALL, "Failure calling app info: ${e.message}", e)
@@ -254,44 +269,64 @@ object UIUtils {
 
     fun fetchToggleBtnColors(context: Context, attr: Int): Int {
         val attributeFetch =
-            if (attr == R.color.firewallNoRuleToggleBtnTxt) {
-                R.attr.firewallNoRuleToggleBtnTxt
-            } else if (attr == R.color.firewallNoRuleToggleBtnBg) {
-                R.attr.firewallNoRuleToggleBtnBg
-            } else if (attr == R.color.firewallBlockToggleBtnTxt) {
-                R.attr.firewallBlockToggleBtnTxt
-            } else if (attr == R.color.firewallBlockToggleBtnBg) {
-                R.attr.firewallBlockToggleBtnBg
-            } else if (attr == R.color.firewallWhiteListToggleBtnTxt) {
-                R.attr.firewallWhiteListToggleBtnTxt
-            } else if (attr == R.color.firewallWhiteListToggleBtnBg) {
-                R.attr.firewallWhiteListToggleBtnBg
-            } else if (attr == R.color.firewallExcludeToggleBtnBg) {
-                R.attr.firewallExcludeToggleBtnBg
-            } else if (attr == R.color.firewallExcludeToggleBtnTxt) {
-                R.attr.firewallExcludeToggleBtnTxt
-            } else if (attr == R.color.defaultToggleBtnBg) {
-                R.attr.defaultToggleBtnBg
-            } else if (attr == R.color.defaultToggleBtnTxt) {
-                R.attr.defaultToggleBtnTxt
-            } else if (attr == R.color.accentGood) {
-                R.attr.accentGood
-            } else if (attr == R.color.accentBad) {
-                R.attr.accentBad
-            } else if (attr == R.color.chipBgNeutral) {
-                R.attr.chipBgColorNeutral
-            } else if (attr == R.color.chipBgNegative) {
-                R.attr.chipBgColorNegative
-            } else if (attr == R.color.chipBgPositive) {
-                R.attr.chipBgColorPositive
-            } else if (attr == R.color.chipTextNeutral) {
-                R.attr.chipTextNeutral
-            } else if (attr == R.color.chipTextNegative) {
-                R.attr.chipTextNegative
-            } else if (attr == R.color.chipTextPositive) {
-                R.attr.chipTextPositive
-            } else {
-                R.attr.chipBgColorPositive
+            when (attr) {
+                R.color.firewallNoRuleToggleBtnTxt -> {
+                    R.attr.firewallNoRuleToggleBtnTxt
+                }
+                R.color.firewallNoRuleToggleBtnBg -> {
+                    R.attr.firewallNoRuleToggleBtnBg
+                }
+                R.color.firewallBlockToggleBtnTxt -> {
+                    R.attr.firewallBlockToggleBtnTxt
+                }
+                R.color.firewallBlockToggleBtnBg -> {
+                    R.attr.firewallBlockToggleBtnBg
+                }
+                R.color.firewallWhiteListToggleBtnTxt -> {
+                    R.attr.firewallWhiteListToggleBtnTxt
+                }
+                R.color.firewallWhiteListToggleBtnBg -> {
+                    R.attr.firewallWhiteListToggleBtnBg
+                }
+                R.color.firewallExcludeToggleBtnBg -> {
+                    R.attr.firewallExcludeToggleBtnBg
+                }
+                R.color.firewallExcludeToggleBtnTxt -> {
+                    R.attr.firewallExcludeToggleBtnTxt
+                }
+                R.color.defaultToggleBtnBg -> {
+                    R.attr.defaultToggleBtnBg
+                }
+                R.color.defaultToggleBtnTxt -> {
+                    R.attr.defaultToggleBtnTxt
+                }
+                R.color.accentGood -> {
+                    R.attr.accentGood
+                }
+                R.color.accentBad -> {
+                    R.attr.accentBad
+                }
+                R.color.chipBgNeutral -> {
+                    R.attr.chipBgColorNeutral
+                }
+                R.color.chipBgNegative -> {
+                    R.attr.chipBgColorNegative
+                }
+                R.color.chipBgPositive -> {
+                    R.attr.chipBgColorPositive
+                }
+                R.color.chipTextNeutral -> {
+                    R.attr.chipTextNeutral
+                }
+                R.color.chipTextNegative -> {
+                    R.attr.chipTextNegative
+                }
+                R.color.chipTextPositive -> {
+                    R.attr.chipTextPositive
+                }
+                else -> {
+                    R.attr.chipBgColorPositive
+                }
             }
         return fetchColor(context, attributeFetch)
     }
@@ -301,7 +336,7 @@ object UIUtils {
 
         if (isDgaDomain(dnsLog.queryStr)) return
 
-        Logger.d(Logger.LOG_TAG_UI, "Glide - fetchFavIcon():${dnsLog.queryStr}")
+        Logger.d(LOG_TAG_UI, "Glide - fetchFavIcon():${dnsLog.queryStr}")
 
         // fetch fav icon in background using glide
         FavIconDownloader(context, dnsLog.queryStr).run()
@@ -631,5 +666,57 @@ object UIUtils {
         }
 
         return result.toString().trim()
+    }
+
+    fun formatNetStat(stat: NetStat?): String? {
+        if (stat == null) return null
+
+        val ip = stat.ip()?.toString()
+        val udp = stat.udp()?.toString()
+        val tcp = stat.tcp()?.toString()
+        val fwd = stat.fwd()?.toString()
+        val icmp = stat.icmp()?.toString()
+        val nic = stat.nic()?.toString()
+        val rdnsInfo = stat.rdnsinfo()?.toString()
+        val nicInfo = stat.nicinfo()?.toString()
+        val go = stat.go()?.toString()
+        val tun = stat.tun()?.toString()
+
+        var stats = nic + nicInfo + tun + fwd + ip + icmp + tcp + udp + rdnsInfo + go
+        stats = stats.replace("{", "\n")
+        stats = stats.replace("}", "\n\n")
+        stats = stats.replace(",", "\n")
+
+        return stats
+    }
+
+    fun AppCompatTextView.underline() {
+        paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
+    }
+
+    fun AppCompatTextView.setBadgeDotVisible(context: Context, visible: Boolean) {
+        if (visible) {
+            val badge = ContextCompat.getDrawable(context, R.drawable.ic_new_badge)
+            setCompoundDrawablesWithIntrinsicBounds(null, null, badge, null)
+            // set gravity to center to align the dot with the text
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            // drawable padding to align the dot with the text
+            compoundDrawablePadding = context.resources.getDimensionPixelSize(R.dimen.badge_dot_padding)
+        } else {
+            setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
+        }
+    }
+
+    fun MaterialRadioButton.setBadgeDotVisible(context: Context, visible: Boolean) {
+        if (visible) {
+            val badge = ContextCompat.getDrawable(context, R.drawable.ic_new_badge)
+            setCompoundDrawablesWithIntrinsicBounds(null, null, badge, null)
+            // set gravity to center to align the dot with the text
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            // drawable padding to align the dot with the text
+            compoundDrawablePadding = context.resources.getDimensionPixelSize(R.dimen.badge_dot_padding)
+        } else {
+            setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
+        }
     }
 }

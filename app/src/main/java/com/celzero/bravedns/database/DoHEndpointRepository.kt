@@ -49,4 +49,8 @@ class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
     suspend fun getCount(): Int {
         return doHEndpointDAO.getCount()
     }
+
+    suspend fun getAllDefaultDoHEndpoints(): List<DoHEndpoint> {
+        return doHEndpointDAO.getAllDefaultDoHEndpoints()
+    }
 }

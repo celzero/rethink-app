@@ -62,7 +62,7 @@
                 app:hintTextColor="?attr/accentGood"
                 app:layout_constraintTop_toBottomOf="@id/dialog_dns_proxy_radio_group">
 
-                <EditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/dialog_dns_crypt_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
                 app:hintTextColor="?attr/accentGood"
                 app:layout_constraintTop_toBottomOf="@id/text_input_layout1">
 
-                <EditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/dialog_dns_crypt_url"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
                 app:hintTextColor="?attr/accentGood"
                 app:layout_constraintTop_toBottomOf="@id/text_input_layout2">
 
-                <EditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/dialog_dns_crypt_desc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -30,7 +30,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoHEndpoint
@@ -53,6 +53,7 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
 
     companion object {
         private const val ONE_SEC = 1000L
+        private const val TAG = "DohEndpointAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<DoHEndpoint>() {
                 override fun areItemsTheSame(
@@ -112,7 +113,7 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
                     )
             }
             b.endpointCheck.isChecked = endpoint.isSelected
-            if (endpoint.isSelected && VpnController.hasTunnel()) {
+            if (endpoint.isSelected && VpnController.hasTunnel() && !appConfig.isSmartDnsEnabled()) {
                 keepSelectedStatusUpdated()
             } else if (endpoint.isSelected) {
                 b.endpointDesc.text = context.getString(R.string.rt_filter_parent_selected)
@@ -174,10 +175,7 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
         }
 
         private fun updateConnection(endpoint: DoHEndpoint) {
-            Logger.d(
-                LOG_TAG_DNS,
-                "on doh change - ${endpoint.dohName}, ${endpoint.dohURL}, ${endpoint.isSelected}"
-            )
+            Logger.d(LOG_TAG_DNS, "$TAG update doh; ${endpoint.dohName}, ${endpoint.dohURL}, ${endpoint.isSelected}")
             io {
                 endpoint.isSelected = true
                 appConfig.handleDoHChanges(endpoint)
@@ -186,6 +184,7 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
 
         private fun deleteEndpoint(id: Int) {
             io {
+                Logger.i(LOG_TAG_DNS, "$TAG delete endpoint; $id")
                 appConfig.deleteDohEndpoint(id)
                 uiCtx {
                     Utilities.showToastUiCentered(
@@ -207,12 +206,10 @@ class DohEndpointAdapter(private val context: Context, private val appConfig: Ap
             builder.setTitle(title)
             builder.setMessage(url + "\n\n" + getDnsDesc(message))
             builder.setCancelable(true)
-            builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface,
-                                                                                       _ ->
+            builder.setPositiveButton(context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
-            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface,
-                                                                                     _: Int ->
+            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
                 clipboardCopy(context, url, context.getString(R.string.copy_clipboard_label))
                 Utilities.showToastUiCentered(
                     context,

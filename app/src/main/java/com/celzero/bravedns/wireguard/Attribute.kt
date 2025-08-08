@@ -21,7 +21,6 @@ package com.celzero.bravedns.wireguard
 import java.util.Optional
 import java.util.regex.Pattern
 
-@NonNullForAll
 class Attribute private constructor(val key: String, val value: String) {
 
     companion object {
@@ -36,7 +35,7 @@ class Attribute private constructor(val key: String, val value: String) {
             val sb = StringBuilder()
             sb.append(it.next())
             while (it.hasNext()) {
-                sb.append(", ")
+                sb.append(",")
                 sb.append(it.next())
             }
             return sb.toString()

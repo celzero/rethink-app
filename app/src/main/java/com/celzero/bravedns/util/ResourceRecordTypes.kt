@@ -94,7 +94,7 @@ enum class ResourceRecordTypes(val value: Int, val desc: String) {
     UNKNOWN(-1, "Unknown");
 
     companion object {
-        private val map = values().associateBy(ResourceRecordTypes::value)
+        private val map = entries.associateBy(ResourceRecordTypes::value)
 
         fun getTypeName(value: Int): ResourceRecordTypes {
             return map[value.hashCode()] ?: UNKNOWN

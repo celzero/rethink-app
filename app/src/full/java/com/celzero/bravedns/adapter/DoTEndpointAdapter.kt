@@ -30,7 +30,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoTEndpoint
@@ -113,7 +113,7 @@ class DoTEndpointAdapter(private val context: Context, private val appConfig: Ap
             }
             b.endpointCheck.isChecked = endpoint.isSelected
 
-            if (endpoint.isSelected && VpnController.hasTunnel()) {
+            if (endpoint.isSelected && VpnController.hasTunnel() && !appConfig.isSmartDnsEnabled()) {
                 keepSelectedStatusUpdated()
             } else if (endpoint.isSelected) {
                 b.endpointDesc.text = context.getString(R.string.rt_filter_parent_selected)

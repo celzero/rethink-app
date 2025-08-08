@@ -21,28 +21,48 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.celzero.firestack.backend.RouterStats
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.adapter.WgPeersAdapter
 import com.celzero.bravedns.databinding.ActivityWgDetailBinding
+import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
+import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
 import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
+import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
+import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
+import com.celzero.bravedns.ui.dialog.WgHopDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.tos
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
+import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -79,13 +99,22 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         fun isDefault() = this == DEFAULT
 
         companion object {
-            fun fromInt(value: Int) = entries.first { it.value == value }
+            fun fromInt(value: Int): WgType {
+                return entries.firstOrNull { it.value == value }
+                    ?: throw IllegalArgumentException("Invalid WgType value: $value")
+            }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
         configId = intent.getIntExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, INVALID_CONF_ID)
         wgType = WgType.fromInt(intent.getIntExtra(INTENT_EXTRA_WG_TYPE, WgType.DEFAULT.value))
     }
@@ -94,6 +123,15 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         super.onResume()
         init()
         setupClickListeners()
+        showNewBadgeIfNeeded()
+    }
+
+    private fun showNewBadgeIfNeeded() {
+        val hop = NewSettingsManager.shouldShowBadge(NewSettingsManager.WG_HOP_SETTING)
+        val mobile = NewSettingsManager.shouldShowBadge(NewSettingsManager.WG_MOBILE_SETTING)
+
+        b.hopBtn.setBadgeDotVisible(this, hop)
+        b.useMobileTitleTv.setBadgeDotVisible(this, mobile)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -102,6 +140,21 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun init() {
+        if (!VpnController.hasTunnel()) {
+            Logger.i(LOG_TAG_PROXY, "VPN not active, config may not be available")
+            Utilities.showToastUiCentered(
+                this,
+                ERR_CODE_VPN_NOT_ACTIVE +
+                        getString(R.string.settings_socks5_vpn_disabled_error),
+                Toast.LENGTH_LONG
+            )
+            finish()
+            return
+        }
+
+        b.hopBtn.text = getString(R.string.two_argument_space, getString(R.string.hop_add_remove_title), getString(R.string.lbl_experimental))
+
+        b.editBtn.text = getString(R.string.rt_edit_dialog_positive).lowercase()
         b.globalLockdownTitleTv.text =
             getString(
                 R.string.two_argument_space,
@@ -114,18 +167,28 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 getString(R.string.catch_all_wg_dialog_title),
                 getString(R.string.symbol_lightening)
             )
+        b.useMobileTitleTv.text =
+            getString(
+                R.string.two_argument_space,
+                getString(R.string.wg_setting_use_on_mobile),
+                getString(R.string.symbol_mobile)
+            )
         if (wgType.isDefault()) {
             b.wgHeaderTv.text = getString(R.string.lbl_advanced).replaceFirstChar(Char::titlecase)
             b.lockdownRl.visibility = View.VISIBLE
             b.catchAllRl.visibility = View.VISIBLE
             b.oneWgInfoTv.visibility = View.GONE
+            b.hopBtn.visibility = View.VISIBLE
+            b.useMobileRl.visibility = View.VISIBLE
         } else if (wgType.isOneWg()) {
             b.wgHeaderTv.text =
                 getString(R.string.rt_list_simple_btn_txt).replaceFirstChar(Char::titlecase)
             b.lockdownRl.visibility = View.GONE
             b.catchAllRl.visibility = View.GONE
+            b.hopBtn.visibility = View.GONE
             b.oneWgInfoTv.visibility = View.VISIBLE
             b.applicationsBtn.isEnabled = false
+            b.useMobileRl.visibility = View.GONE
             b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
         } else {
             // invalid wireguard type, finish the activity
@@ -136,11 +199,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         val mapping = WireguardManager.getConfigFilesById(configId)
 
         if (config == null) {
-            finish()
+            showInvalidConfigDialog()
             return
         }
 
-        // handleWarpConfigView()
         if (mapping != null) {
             // if catch all is enabled, disable the add apps button and lockdown
             b.catchAllCheck.isChecked = mapping.isCatchAll
@@ -150,6 +212,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
             }
             b.lockdownCheck.isChecked = mapping.isLockdown
+            b.useMobileCheck.isChecked = mapping.useOnlyOnMetered
         }
 
         if (shouldObserveAppsCount()) {
@@ -159,12 +222,140 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             // texts are updated based on the catch all and one-wg
         }
 
-        /*if (config == null && configId == WARP_ID) {
-            showNewWarpConfigLayout()
-            return@uiCtx
-        }*/
-
+        io { updateStatusUi(config.getId()) }
         prefillConfig(config)
+    }
+
+    private suspend fun updateStatusUi(id: Int) {
+        val config = WireguardManager.getConfigFilesById(id)
+        val cid = ID_WG_BASE + id
+        if (config?.isActive == true) {
+            val statusPair = VpnController.getProxyStatusById(cid)
+            val stats = VpnController.getProxyStats(cid)
+            val ps = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first }
+            val dnsStatusId = if (persistentState.splitDns) {
+                VpnController.getDnsStatus(cid)
+            } else {
+                null
+            }
+            uiCtx {
+                if (dnsStatusId != null && isDnsError(dnsStatusId)) {
+                    // check for dns failure cases and update the UI
+                    b.interfaceDetailCard.strokeColor = fetchColor(this, R.attr.chipTextNegative)
+                    b.statusText.text = getString(R.string.status_failing)
+                        .replaceFirstChar(Char::titlecase)
+                } else if (statusPair.first != null) {
+                    val handshakeTime = getHandshakeTime(stats).toString()
+                    val statusText = getIdleStatusText(ps, stats)
+                        .ifEmpty { getStatusText(ps, handshakeTime, stats, statusPair.second) }
+                    b.statusText.text = statusText
+                } else {
+                    if (statusPair.second.isEmpty()) {
+                        b.statusText.text =
+                            getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
+                    } else {
+                        val txt =
+                            getString(R.string.status_waiting).replaceFirstChar(Char::titlecase) + "(${statusPair.second})"
+                        b.statusText.text = txt
+                    }
+                }
+                val strokeColor = getStrokeColorForStatus(ps, stats)
+                b.interfaceDetailCard.strokeWidth = 2
+                b.interfaceDetailCard.strokeColor = fetchColor(this, strokeColor)
+            }
+        } else {
+            uiCtx {
+                b.interfaceDetailCard.strokeWidth = 0
+                b.statusText.text =
+                    getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
+            }
+        }
+    }
+
+    private fun isDnsError(statusId: Long?): Boolean {
+        if (statusId == null) return true
+
+        val s = Transaction.Status.fromId(statusId)
+        return s == Transaction.Status.BAD_QUERY || s == Transaction.Status.BAD_RESPONSE || s == Transaction.Status.NO_RESPONSE || s == Transaction.Status.SEND_FAIL || s == Transaction.Status.CLIENT_ERROR || s == Transaction.Status.INTERNAL_ERROR || s == Transaction.Status.TRANSPORT_ERROR
+    }
+
+    private fun getStatusText(
+        status: UIUtils.ProxyStatus?,
+        handshakeTime: String? = null,
+        stats: RouterStats?,
+        errMsg: String? = null
+    ): String {
+        if (status == null) {
+            val txt = if (!errMsg.isNullOrEmpty()) {
+                getString(R.string.status_waiting) + " ($errMsg)"
+            } else {
+                getString(R.string.status_waiting)
+            }
+            return txt.replaceFirstChar(Char::titlecase)
+        }
+
+        val now = System.currentTimeMillis()
+        val lastOk = stats?.lastOK ?: 0L
+        val since = stats?.since ?: 0L
+        if (now - since > WG_UPTIME_THRESHOLD && lastOk == 0L) {
+            return getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
+        }
+
+        val baseText = getString(UIUtils.getProxyStatusStringRes(status.id))
+            .replaceFirstChar(Char::titlecase)
+
+        return if (stats?.lastOK != 0L && handshakeTime != null) {
+            getString(R.string.about_version_install_source, baseText, handshakeTime)
+        } else {
+            baseText
+        }
+    }
+
+    private fun getIdleStatusText(status: UIUtils.ProxyStatus?, stats: RouterStats?): String {
+        if (status != UIUtils.ProxyStatus.TZZ && status != UIUtils.ProxyStatus.TNT) return ""
+        if (stats == null || stats.lastOK == 0L) return ""
+        if (System.currentTimeMillis() - stats.since >= WG_HANDSHAKE_TIMEOUT) return ""
+
+        return getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
+    }
+
+    private fun getHandshakeTime(stats: RouterStats?): CharSequence {
+        if (stats == null) {
+            return ""
+        }
+        if (stats.lastOK == 0L) {
+            return ""
+        }
+        val now = System.currentTimeMillis()
+        // returns a string describing 'time' as a time relative to 'now'
+        return DateUtils.getRelativeTimeSpanString(
+            stats.lastOK,
+            now,
+            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        )
+    }
+
+    private fun getStrokeColorForStatus(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
+        return when (status) {
+            UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) return R.attr.chipTextNeutral else R.attr.accentGood
+            UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ -> R.attr.chipTextNeutral
+            else -> R.attr.chipTextNegative // TNT, TKO, TEND
+        }
+    }
+
+    private fun showInvalidConfigDialog() {
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setTitle(getString(R.string.lbl_wireguard))
+        builder.setMessage(getString(R.string.config_invalid_desc))
+        builder.setCancelable(false)
+        builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { _, _ ->
+            finish()
+        }
+        builder.setNeutralButton(getString(R.string.lbl_delete)) { _, _ ->
+            WireguardManager.deleteConfig(configId)
+        }
+        builder.create().show()
     }
 
     private fun shouldObserveAppsCount(): Boolean {
@@ -178,15 +369,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         if (wgInterface == null) {
             return
         }
+        b.configNameText.visibility = View.VISIBLE
         b.configNameText.text = config.getName()
-        b.publicKeyText.text = wgInterface?.getKeyPair()?.getPublicKey()?.base64()
+        b.configIdText.text = getString(R.string.single_argument_parenthesis, config.getId().toString())
 
-        if (wgInterface?.getAddresses()?.isEmpty() == true) {
-            b.addressesLabel.visibility = View.GONE
-            b.addressesText.visibility = View.GONE
-        } else {
-            b.addressesText.text = wgInterface?.getAddresses()?.joinToString { it.toString() }
-        }
         setPeersAdapter()
         // show dns servers if in one-wg mode
         if (wgType.isOneWg()) {
@@ -202,11 +388,23 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 }
             b.dnsServersText.text = dns
         } else {
+            b.publicKeyLabel.visibility = View.VISIBLE
+            b.publicKeyText.visibility = View.VISIBLE
+            b.publicKeyText.text = wgInterface?.getKeyPair()?.getPublicKey()?.base64().tos()
             b.dnsServersLabel.visibility = View.GONE
             b.dnsServersText.visibility = View.GONE
         }
 
-        // uncomment this if we want to show the dns servers, listen port and mtu
+        // uncomment this if we want to show the public key, addresses, listen port and mtu
+        /*b.publicKeyText.text = wgInterface?.getKeyPair()?.getPublicKey()?.base64()
+
+        if (wgInterface?.getAddresses()?.isEmpty() == true) {
+            b.addressesLabel.visibility = View.GONE
+            b.addressesText.visibility = View.GONE
+        } else {
+            b.addressesText.text = wgInterface?.getAddresses()?.joinToString { it.toString() }
+        }*/
+
         /*if (wgInterface?.dnsServers?.isEmpty() == true) {
                     b.dnsServersText.visibility = View.GONE
               b.dnsServersLabel.visibility = View.GONE
@@ -228,93 +426,21 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }*/
     }
 
-    /*private suspend fun createConfigOrShowErrorLayout() {
-        val works = isWarpWorking()
-        if (works) {
-            fetchWarpConfigFromServer()
-        } else {
-            showConfigCreationError()
-        }
-    }
-
-    private suspend fun showConfigCreationError() {
-        uiCtx {
-            Toast.makeText(this, getString(R.string.new_warp_error_toast), Toast.LENGTH_LONG).show()
-        }
-    }*/
-
-    /*private suspend fun fetchWarpConfigFromServer() {
-        val config = WireguardManager.getNewWarpConfig(WARP_ID)
-        Log.i(LOG_TAG_PROXY, "new config from server: ${config?.getName()}")
-        if (config == null) {
-            showConfigCreationError()
-            return
-        }
-        uiCtx {
-            showWarpConfig()
-            prefillWarpConfig(config)
-        }
-    }*/
-
-    /* private suspend fun handleWarpConfigView() {
-        if (configId == WARP_ID) {
-            if (isWarpConfAvailable()) {
-                if (DEBUG) Log.d(LOG_TAG_PROXY, "warp config already available")
-                showWarpConfig()
-            } else {
-                if (DEBUG) Log.d(LOG_TAG_PROXY, "warp config not found, show new config layout")
-                showNewWarpConfigLayout()
-            }
-        } else {
-            b.interfaceEdit.visibility = View.VISIBLE
-            b.interfaceDelete.visibility = View.VISIBLE
-            b.interfaceRefresh.visibility = View.GONE
-            b.addPeerFab.visibility = View.VISIBLE
-        }
-    }
-
-    private suspend fun isWarpConfAvailable(): Boolean {
-        return WireguardManager.getWarpConfig() != null
-    }*/
-
-    /*private fun showNewWarpConfigLayout() {
-            b.interfaceDetailCard.visibility = View.GONE
-            b.peersList.visibility = View.GONE
-            b.addPeerFab.visibility = View.GONE
-            b.newConfLayout.visibility = View.VISIBLE
-        }
-
-        private fun showWarpConfig() {
-            b.interfaceDetailCard.visibility = View.VISIBLE
-            b.peersList.visibility = View.VISIBLE
-            b.addPeerFab.visibility = View.GONE
-            b.interfaceEdit.visibility = View.GONE
-            b.interfaceDelete.visibility = View.GONE
-            b.interfaceRefresh.visibility = View.VISIBLE
-            hideNewWarpConfLayout()
-        }
-
-        private fun hideNewWarpConfLayout() {
-            b.newConfLayout.visibility = View.GONE
-            b.interfaceDetailCard.visibility = View.VISIBLE
-            b.peersList.visibility = View.VISIBLE
-        }
-    */
     private fun handleAppsCount() {
-        val id = ProxyManager.ID_WG_BASE + configId
+        val id = ID_WG_BASE + configId
         b.applicationsBtn.isEnabled = true
         mappingViewModel.getAppCountById(id).observe(this) {
             if (it == 0) {
-                b.applicationsBtn.setTextColor(UIUtils.fetchColor(this, R.attr.accentBad))
+                b.applicationsBtn.setTextColor(fetchColor(this, R.attr.accentBad))
             } else {
-                b.applicationsBtn.setTextColor(UIUtils.fetchColor(this, R.attr.accentGood))
+                b.applicationsBtn.setTextColor(fetchColor(this, R.attr.accentGood))
             }
             b.applicationsBtn.text = getString(R.string.add_remove_apps, it.toString())
         }
     }
 
     private fun setupClickListeners() {
-        b.interfaceEdit.setOnClickListener {
+        b.editBtn.setOnClickListener {
             val intent = Intent(this, WgConfigEditorActivity::class.java)
             intent.putExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, configId)
             intent.putExtra(INTENT_EXTRA_WG_TYPE, wgType.value)
@@ -328,7 +454,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             openAppsDialog(proxyName)
         }
 
-        b.interfaceDelete.setOnClickListener { showDeleteInterfaceDialog() }
+        b.deleteBtn.setOnClickListener { showDeleteInterfaceDialog() }
 
         /*b.newConfLayout.setOnClickListener {
             b.newConfProgressBar.visibility = View.VISIBLE
@@ -356,66 +482,187 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         b.lockdownCheck.setOnClickListener { updateLockdown(b.lockdownCheck.isChecked) }
 
         b.catchAllCheck.setOnClickListener { updateCatchAll(b.catchAllCheck.isChecked) }
+
+        b.useMobileCheck.setOnClickListener {
+            NewSettingsManager.markSettingSeen(NewSettingsManager.WG_MOBILE_SETTING)
+            updateUseOnMobileNetwork(b.useMobileCheck.isChecked)
+        }
+
+        b.logsBtn.setOnClickListener {
+            startActivity(ID_WG_BASE + configId)
+        }
+
+        b.hopBtn.setOnClickListener {
+            NewSettingsManager.markSettingSeen(NewSettingsManager.WG_HOP_SETTING)
+            val mapping = WireguardManager.getConfigFilesById(configId)
+            if (mapping == null) {
+                showInvalidConfigDialog()
+                return@setOnClickListener
+            }
+
+            if (mapping.isActive || mapping.isLockdown || mapping.isCatchAll) {
+                io {
+                    val sid = ID_WG_BASE + configId
+                    val isVia = WgHopManager.isAlreadyHop(sid)
+                    if (isVia) {
+                        uiCtx {
+                            Utilities.showToastUiCentered(
+                                this,
+                                getString(R.string.hop_error_toast_msg_1, getString(R.string.lbl_hop)),
+                                Toast.LENGTH_SHORT
+                            )
+                        }
+                        return@io
+                    }
+                    val hopId = WgHopManager.getHop(configId)
+                    Logger.d(LOG_TAG_PROXY, "hop result: $hopId")
+                    val iid = convertStringIdToId(hopId)
+                    val hopables = WgHopManager.getHopableWgs(configId)
+                    uiCtx {
+                        if (hopables.isEmpty()) {
+                            Utilities.showToastUiCentered(
+                                this,
+                                getString(R.string.hop_error_toast_msg_2),
+                                Toast.LENGTH_SHORT
+                            )
+                        } else {
+                            openHopDialog(hopables, iid)
+                        }
+                    }
+                }
+            } else {
+                Utilities.showToastUiCentered(this, getString(R.string.wireguard_no_config_msg), Toast.LENGTH_SHORT)
+            }
+        }
+    }
+
+    private fun convertStringIdToId(id: String): Int {
+        return try {
+            val configId = id.substring(ID_WG_BASE.length)
+            configId.toIntOrNull() ?: INVALID_CONF_ID
+        } catch (ignored: Exception) {
+            Logger.i(LOG_TAG_PROXY, "err converting string id to int: $id")
+            INVALID_CONF_ID
+        }
+    }
+
+    private fun startActivity(searchParam: String?) {
+        val intent = Intent(this, NetworkLogsActivity::class.java)
+        val query = RULES_SEARCH_ID_WIREGUARD + searchParam
+        intent.putExtra(Constants.SEARCH_QUERY, query)
+        startActivity(intent)
     }
 
     private fun updateLockdown(enabled: Boolean) {
         io { WireguardManager.updateLockdownConfig(configId, enabled) }
     }
 
-    /* private fun updateOneWireGuard(enabled: Boolean) {
-        io {
-            WireguardManager.updateOneWireGuardConfig(configId, enabled)
-            uiCtx {
-                // disable add apps button
-                b.applicationsBtn.isEnabled = !enabled
-                b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
-                Toast.makeText(this, getString(R.string.one_wg_success_toast), Toast.LENGTH_SHORT)
-                    .show()
-            }
-        }
-    }*/
+    private fun updateUseOnMobileNetwork(enabled: Boolean) {
+        io { WireguardManager.updateUseOnMobileNetworkConfig(configId, enabled) }
+    }
 
     private fun updateCatchAll(enabled: Boolean) {
         io {
-            val config = WireguardManager.getConfigFilesById(configId)
-            if (config == null) {
-                Logger.e(LOG_TAG_PROXY, "updateCatchAll: config not found for $configId")
-                return@io
-            }
-            if (WireguardManager.canEnableConfig(config)) {
-                WireguardManager.updateCatchAllConfig(configId, enabled)
-                uiCtx {
-                    b.lockdownCheck.isEnabled = !enabled
-                    b.applicationsBtn.isEnabled = !enabled
-                    if (enabled) {
-                        b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
-                    } else {
-                        handleAppsCount()
-                    }
-                }
-            } else {
+            if (!VpnController.hasTunnel()) {
                 uiCtx {
                     Utilities.showToastUiCentered(
                         this,
-                        getString(R.string.wireguard_enabled_failure),
+                        ERR_CODE_VPN_NOT_ACTIVE + getString(R.string.settings_socks5_vpn_disabled_error),
                         Toast.LENGTH_LONG
                     )
-                    b.catchAllCheck.isChecked = false
+                    b.catchAllCheck.isChecked = !enabled
                 }
                 return@io
+            }
+
+            if (!WireguardManager.canEnableProxy()) {
+                Logger.i(
+                    LOG_TAG_PROXY,
+                    "not in DNS+Firewall mode, cannot enable WireGuard"
+                )
+                uiCtx {
+                    // reset the check box
+                    b.catchAllCheck.isChecked = false
+                    Utilities.showToastUiCentered(
+                        this,
+                        ERR_CODE_VPN_NOT_FULL + getString(R.string.wireguard_enabled_failure),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return@io
+            }
+
+            if (WireguardManager.oneWireGuardEnabled()) {
+                // this should not happen, ui is disabled if one wireGuard is enabled
+                Logger.w(LOG_TAG_PROXY, "one wireGuard is already enabled")
+                uiCtx {
+                    // reset the check box
+                    b.catchAllCheck.isChecked = false
+                    Utilities.showToastUiCentered(
+                        this,
+                        ERR_CODE_OTHER_WG_ACTIVE + getString(
+                            R.string.wireguard_enabled_failure
+                        ),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return@io
+            }
+
+
+            val config = WireguardManager.getConfigFilesById(configId)
+            if (config == null) {
+                Logger.e(LOG_TAG_PROXY, "updateCatchAll: config not found for $configId")
+                uiCtx {
+                    // reset the check box
+                    b.catchAllCheck.isChecked = false
+                    Utilities.showToastUiCentered(
+                        this,
+                        ERR_CODE_WG_INVALID + getString(R.string.wireguard_enabled_failure),
+                        Toast.LENGTH_LONG
+                    )
+                }
+                return@io
+            }
+
+            WireguardManager.updateCatchAllConfig(configId, enabled)
+            uiCtx {
+                b.lockdownCheck.isEnabled = !enabled
+                b.applicationsBtn.isEnabled = !enabled
+                if (enabled) {
+                    b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
+                } else {
+                    handleAppsCount()
+                }
             }
         }
     }
 
     private fun openAppsDialog(proxyName: String) {
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        val proxyId = ProxyManager.ID_WG_BASE + configId
+        val proxyId = ID_WG_BASE + configId
         val appsAdapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
         mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
         val includeAppsDialog =
             WgIncludeAppsDialog(this, appsAdapter, mappingViewModel, themeId, proxyId, proxyName)
         includeAppsDialog.setCanceledOnTouchOutside(false)
         includeAppsDialog.show()
+    }
+
+    private fun openHopDialog(hopables: List<Config>, selectedId: Int) {
+        val curr = WireguardManager.getConfigById(configId)
+        if (curr == null) {
+            Utilities.showToastUiCentered(
+                this,
+                getString(R.string.config_invalid_desc),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        val hopDialog = WgHopDialog(this, themeId, configId, hopables, selectedId)
+        hopDialog.setCanceledOnTouchOutside(false)
+        hopDialog.show()
     }
 
     private fun showDeleteInterfaceDialog() {

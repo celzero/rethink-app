@@ -22,14 +22,13 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.os.SystemClock
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.text.method.LinkMovementMethod
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -57,10 +56,12 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.openAppInfo
+import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.sendEmailIntent
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
@@ -73,11 +74,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import java.io.File
-import java.io.FileInputStream
 import java.util.concurrent.TimeUnit
-import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import java.util.zip.ZipInputStream
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
@@ -85,16 +83,23 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private var lastAppExitInfoDialogInvokeTime = INIT_TIME_MS
     private val workScheduler by inject<WorkScheduler>()
 
+    companion object {
+        private const val SCHEME_PACKAGE = "package"
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
     }
 
     private fun initView() {
-
         if (isFdroidFlavour()) {
             b.aboutAppUpdate.visibility = View.GONE
         }
+
+        updateVersionInfo()
+
+        updateSponsorInfo()
 
         b.aboutSponsor.setOnClickListener(this)
         b.aboutWebsite.setOnClickListener(this)
@@ -102,12 +107,16 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutGithub.setOnClickListener(this)
         b.aboutBlog.setOnClickListener(this)
         b.aboutPrivacyPolicy.setOnClickListener(this)
+        b.aboutTermsOfService.setOnClickListener(this)
+        b.aboutLicense.setOnClickListener(this)
         b.aboutMail.setOnClickListener(this)
         b.aboutTelegram.setOnClickListener(this)
+        b.aboutReddit.setOnClickListener(this)
+        b.aboutMastodon.setOnClickListener(this)
+        b.aboutElement.setOnClickListener(this)
         b.aboutFaq.setOnClickListener(this)
         b.mozillaImg.setOnClickListener(this)
         b.fossImg.setOnClickListener(this)
-        b.osomImg.setOnClickListener(this)
         b.aboutAppUpdate.setOnClickListener(this)
         b.aboutWhatsNew.setOnClickListener(this)
         b.aboutAppInfo.setOnClickListener(this)
@@ -117,19 +126,36 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppVersion.setOnClickListener(this)
         b.aboutAppContributors.setOnClickListener(this)
         b.aboutAppTranslate.setOnClickListener(this)
+        b.aboutStats.setOnClickListener(this)
+    }
 
+    private fun updateVersionInfo() {
         try {
-            val version = getVersionName() ?: ""
+            val version = getVersionName()
             // take first 7 characters of the version name, as the version has build number
             // appended to it, which is not required for the user to see.
-            val slicedVersion = version.slice(0..6) ?: ""
+            val slicedVersion = version.slice(0..6)
             b.aboutWhatsNew.text = getString(R.string.about_whats_new, slicedVersion)
-            // show the complete version name along with the source of installation
-            b.aboutAppVersion.text =
-                getString(R.string.about_version_install_source, version, getDownloadSource())
+
+            // complete version name along with the source of installation
+            val v = getString(R.string.about_version_install_source, version, getDownloadSource())
+
+            val build = VpnController.goBuildVersion(false)
+            b.aboutAppVersion.text = "$v\n$build"
+
         } catch (e: PackageManager.NameNotFoundException) {
-            Logger.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
+            Logger.w(LOG_TAG_UI, "err-version-info; pkg name not found: ${e.message}", e)
         }
+    }
+
+    private fun updateSponsorInfo() {
+        /*if (RpnProxyManager.isRpnEnabled()) {
+            b.sponsorInfoUsage.visibility = View.GONE
+            b.aboutSponsor.visibility = View.GONE
+            return
+        }*/
+
+        b.sponsorInfoUsage.text = getSponsorInfo()
     }
 
     private fun getVersionName(): String {
@@ -139,6 +165,23 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 requireContext().packageName
             )
         return pInfo?.versionName ?: ""
+    }
+
+    private fun getSponsorInfo(): String {
+        val installTime = requireContext().packageManager.getPackageInfo(
+            requireContext().packageName,
+            0
+        ).firstInstallTime
+        val timeDiff = System.currentTimeMillis() - installTime
+        val days = (timeDiff / (1000 * 60 * 60 * 24)).toDouble()
+        val month = days / 30
+        val amount = month * (0.60 + 0.20)
+        val msg = getString(
+            R.string.sponser_dialog_usage_msg,
+            days.toInt().toString(),
+            "%.2f".format(amount)
+        )
+        return msg
     }
 
     private fun getDownloadSource(): String {
@@ -152,16 +195,16 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     override fun onClick(view: View?) {
         when (view) {
             b.aboutTelegram -> {
-                openActionViewIntent(getString(R.string.about_telegram_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_telegram_link))
             }
             b.aboutBlog -> {
-                openActionViewIntent(getString(R.string.about_docs_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_docs_link))
             }
             b.aboutFaq -> {
-                openActionViewIntent(getString(R.string.about_faq_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_faq_link))
             }
             b.aboutGithub -> {
-                openActionViewIntent(getString(R.string.about_github_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_github_link))
             }
             b.aboutCrashLog -> {
                 if (isAtleastO()) {
@@ -174,22 +217,19 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 sendEmailIntent(requireContext())
             }
             b.aboutTwitter -> {
-                openActionViewIntent(getString(R.string.about_twitter_handle).toUri())
+                openUrl(requireContext(), getString(R.string.about_twitter_handle))
             }
             b.aboutWebsite -> {
-                openActionViewIntent(getString(R.string.about_website_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_website_link))
             }
             b.aboutSponsor -> {
-                openActionViewIntent(RETHINKDNS_SPONSOR_LINK.toUri())
+                openUrl(requireContext(), RETHINKDNS_SPONSOR_LINK)
             }
             b.mozillaImg -> {
-                openActionViewIntent(getString(R.string.about_mozilla_alumni_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_mozilla_alumni_link))
             }
             b.fossImg -> {
-                openActionViewIntent(getString(R.string.about_foss_link).toUri())
-            }
-            b.osomImg -> {
-                openActionViewIntent(getString(R.string.about_osom_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_foss_link))
             }
             b.aboutAppUpdate -> {
                 (requireContext() as HomeScreenActivity).checkForUpdate(
@@ -212,10 +252,74 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 showContributors()
             }
             b.aboutAppTranslate -> {
-                openActionViewIntent(getString(R.string.about_translate_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_translate_link))
             }
             b.aboutPrivacyPolicy -> {
-                openActionViewIntent(getString(R.string.about_privacy_policy_link).toUri())
+                openUrl(requireContext(), getString(R.string.about_privacy_policy_link))
+            }
+            b.aboutTermsOfService -> {
+                openUrl(requireContext(), getString(R.string.about_terms_link))
+            }
+            b.aboutLicense -> {
+                openUrl(requireContext(), getString(R.string.about_license_link))
+            }
+            b.aboutReddit -> {
+                openUrl(requireContext(), getString(R.string.about_reddit_handle))
+            }
+            b.aboutMastodon -> {
+                openUrl(requireContext(), getString(R.string.about_mastodom_handle))
+            }
+            b.aboutElement -> {
+                openUrl(requireContext(), getString(R.string.about_matrix_handle))
+            }
+            b.aboutStats -> {
+                openStatsDialog()
+            }
+        }
+    }
+
+    private fun openStatsDialog() {
+        io {
+            val stat = VpnController.getNetStat()
+            val formatedStat = UIUtils.formatNetStat(stat)
+            val vpnStats = VpnController.vpnStats()
+            uiCtx {
+                val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
+                val builder =
+                    MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+                val lp = WindowManager.LayoutParams()
+                val dialog = builder.create()
+                dialog.show()
+                lp.copyFrom(dialog.window?.attributes)
+                lp.width = WindowManager.LayoutParams.MATCH_PARENT
+                lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+
+                dialog.setCancelable(true)
+                dialog.window?.attributes = lp
+
+                val heading = dialogBinding.infoRulesDialogRulesTitle
+                val okBtn = dialogBinding.infoRulesDialogCancelImg
+                val descText = dialogBinding.infoRulesDialogRulesDesc
+                dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
+
+                heading.text = getString(R.string.title_statistics)
+                heading.setCompoundDrawablesWithIntrinsicBounds(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_log_level),
+                    null,
+                    null,
+                    null
+                )
+
+                descText.movementMethod = LinkMovementMethod.getInstance()
+                if (formatedStat == null) {
+                    descText.text = "No Stats"
+                } else {
+                    descText.text = formatedStat + vpnStats
+                }
+
+                okBtn.setOnClickListener { dialog.dismiss() }
+
+                dialog.show()
             }
         }
     }
@@ -232,20 +336,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         builder.create().show()
     }
 
-    private fun openActionViewIntent(uri: Uri) {
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        try {
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            showToastUiCentered(
-                requireContext(),
-                getString(R.string.intent_launch_error, intent.data),
-                Toast.LENGTH_SHORT
-            )
-            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
-        }
-    }
-
     private fun openNotificationSettings() {
         val packageName = requireContext().packageName
         try {
@@ -256,7 +346,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             } else {
                 intent.action = ACTION_APPLICATION_DETAILS_SETTINGS
                 intent.addCategory(Intent.CATEGORY_DEFAULT)
-                intent.data = Uri.parse("package:$packageName")
+                intent.data = "$SCHEME_PACKAGE:$packageName".toUri()
             }
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
@@ -273,7 +363,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         val binding =
             DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
         binding.desc.movementMethod = LinkMovementMethod.getInstance()
-        binding.desc.text = updateHtmlEncodedText(getString(R.string.whats_new_version_update))
+        binding.desc.text = htmlToSpannedText(getString(R.string.whats_new_version_update))
         // replace the version name in the title
         val v = getVersionName().slice(0..6)
         val title = getString(R.string.about_whats_new, v)
@@ -299,12 +389,14 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun emailBugReport() {
         try {
             // get the rethink.tombstone file
-            val tombstoneFile = EnhancedBugReport.getTombstoneZipFile(requireContext())
-            // Get the bug_report.zip file
+            val tombstoneFile:File? = EnhancedBugReport.getTombstoneZipFile(requireContext())
+
+            // get the bug_report.zip file
             val dir = requireContext().filesDir
             val file = File(getZipFileName(dir))
-            val uri = getFileUri(file)
+            val uri = getFileUri(file) ?: throw Exception("file uri is null")
 
+            // create an intent for sending email with or without multiple attachments
             val emailIntent = if (tombstoneFile != null) {
                 Intent(Intent.ACTION_SEND_MULTIPLE)
             } else {
@@ -316,14 +408,19 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 Intent.EXTRA_SUBJECT,
                 getString(R.string.about_mail_bugreport_subject)
             )
-            emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.about_mail_bugreport_text))
 
-            // attach extra as list or single file based on the availability
+            // attach extra files (either as a list or single file based on availability)
             if (tombstoneFile != null) {
-                val tombstoneUri = getFileUri(tombstoneFile)
+                val tombstoneUri =
+                    getFileUri(tombstoneFile) ?: throw Exception("tombstoneUri is null")
+                val uriList = arrayListOf<Uri>(uri, tombstoneUri)
                 // send multiple attachments
-                emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, arrayListOf(uri, tombstoneUri))
+                emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriList)
             } else {
+                // ensure EXTRA_TEXT is passed correctly as an ArrayList<CharSequence>
+                val bugReportText = getString(R.string.about_mail_bugreport_text)
+                val bugReportTextList = arrayListOf<CharSequence>(bugReportText)
+                emailIntent.putCharSequenceArrayListExtra(Intent.EXTRA_TEXT, bugReportTextList)
                 emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
             }
             Logger.i(LOG_TAG_UI, "email with attachment: $uri, ${tombstoneFile?.path}")
@@ -386,8 +483,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             null
         )
 
+        heading.gravity = Gravity.CENTER
+        descText.gravity = Gravity.CENTER
+
         descText.movementMethod = LinkMovementMethod.getInstance()
-        descText.text = updateHtmlEncodedText(getString(R.string.contributors_list))
+        descText.text = htmlToSpannedText(getString(R.string.contributors_list))
 
         okBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
@@ -418,26 +518,38 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         }
 
         io {
-            var fin: FileInputStream? = null
-            var zin: ZipInputStream? = null
             // load only 20k characters to avoid ANR
             val maxLength = 20000
             try {
-                fin = FileInputStream(zipPath)
-                zin = ZipInputStream(fin)
-                var ze: ZipEntry?
-                var inputString: String? = ""
-                // don't load more than 20k characters to avoid ANR
-                // TODO: use recycler view instead of textview
-                while (zin.nextEntry.also { ze = it } != null) {
-                    val inStream = zipFile.getInputStream(ze)
-                    inputString += inStream?.bufferedReader().use { it?.readText() }
-                    if (inputString?.length!! > maxLength) break
+                val inputString = StringBuilder(maxLength)
+                val entries = zipFile.entries()
+                val buffer = CharArray(4096) // Read in smaller chunks
+                var shouldBreak = false
+                while (entries.hasMoreElements() && !shouldBreak) {
+                    val entry = entries.nextElement()
+                    zipFile.getInputStream(entry).use { inputStream ->
+                        val reader = inputStream.bufferedReader()
+                        var charsRead: Int
+                        while (reader.read(buffer).also { charsRead = it } > 0 && !shouldBreak) {
+                            if (charsRead + inputString.length > maxLength) {
+                                // add only what we need to reach maxLength
+                                inputString.append(buffer, 0, maxLength - inputString.length)
+                                shouldBreak = true
+                                break
+                            } else {
+                                inputString.append(buffer, 0, charsRead)
+                            }
+                        }
+                    }
+                    if (inputString.length >= maxLength) {
+                        break
+                    }
                 }
+                Logger.d(LOG_TAG_UI, "bug report content size: ${inputString.length}, $zipPath, ${zipFile.size()}")
                 uiCtx {
                     if (!isAdded) return@uiCtx
                     binding.info.visibility = View.VISIBLE
-                    if (inputString == null) {
+                    if (inputString.isEmpty()) {
                         binding.logs.text = getString(R.string.error_loading_log_file)
                         return@uiCtx
                     }
@@ -458,8 +570,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                     binding.logs.text = getString(R.string.error_loading_log_file)
                 }
             } finally {
-                fin?.close()
-                zin?.close()
                 zipFile.close()
             }
 

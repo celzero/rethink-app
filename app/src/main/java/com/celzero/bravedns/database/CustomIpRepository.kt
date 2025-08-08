@@ -58,4 +58,16 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
     suspend fun deleteAllAppsRules() {
         customIpDao.deleteAllAppsRules()
     }
+
+    suspend fun deleteRules(list: List<CustomIp>) {
+        customIpDao.deleteAll(list)
+    }
+
+    suspend fun getRulesCount(): Int {
+        return customIpDao.getRulesCount()
+    }
+
+    suspend fun getRulesCountByCC(cc: String): Int {
+        return customIpDao.getRulesCountByCC(cc)
+    }
 }

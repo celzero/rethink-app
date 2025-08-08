@@ -23,12 +23,16 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.FragmentConfigureBinding
 import com.celzero.bravedns.ui.activity.AppListActivity
+import com.celzero.bravedns.ui.activity.AdvancedSettingActivity
+import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
 import com.celzero.bravedns.ui.activity.DnsDetailActivity
 import com.celzero.bravedns.ui.activity.FirewallActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.activity.ProxySettingsActivity
 import com.celzero.bravedns.ui.activity.TunnelSettingsActivity
+import com.celzero.bravedns.util.NewSettingsManager
+import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 
 class ConfigureFragment : Fragment(R.layout.fragment_configure) {
 
@@ -41,18 +45,35 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
         PROXY,
         VPN,
         OTHERS,
-        LOGS
+        LOGS,
+        ANTI_CENSORSHIP
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        setupClickListeners()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        showNewBadgeIfNeeded()
     }
 
     private fun initView() {
         b.fsNetworkTv.text = getString(R.string.lbl_network).replaceFirstChar(Char::titlecase)
         b.fsLogsTv.text = getString(R.string.lbl_logs).replaceFirstChar(Char::titlecase)
+        b.fsAntiCensorshipTv.text = getString(R.string.anti_censorship_title).replaceFirstChar(Char::titlecase)
+    }
 
+    private fun showNewBadgeIfNeeded() {
+        val antiCensorship = NewSettingsManager.shouldShowBadge(NewSettingsManager.ANTI_CENSORSHIP)
+        if (antiCensorship) {
+            b.fsAntiCensorshipTv.setBadgeDotVisible(requireContext(), true)
+        }
+    }
+
+    private fun setupClickListeners() {
         b.fsAppsCard.setOnClickListener {
             // open apps configuration
             startActivity(ScreenType.APPS)
@@ -87,6 +108,12 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
             // open logs configuration
             startActivity(ScreenType.LOGS)
         }
+
+        b.fsAntiCensorshipCard.setOnClickListener {
+            // open developer options configuration
+            startActivity(ScreenType.ANTI_CENSORSHIP)
+            NewSettingsManager.markSettingSeen(NewSettingsManager.ANTI_CENSORSHIP)
+        }
     }
 
     private fun startActivity(type: ScreenType) {
@@ -99,8 +126,8 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
                 ScreenType.VPN -> Intent(requireContext(), TunnelSettingsActivity::class.java)
                 ScreenType.OTHERS -> Intent(requireContext(), MiscSettingsActivity::class.java)
                 ScreenType.LOGS -> Intent(requireContext(), NetworkLogsActivity::class.java)
+                ScreenType.ANTI_CENSORSHIP -> Intent(requireContext(), AntiCensorshipActivity::class.java)
             }
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
     }
 }

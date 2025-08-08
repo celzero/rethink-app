@@ -31,8 +31,8 @@ class ProxyAppMappingRepository(
         return proxyApplicationMappingDAO.insertAll(pams)
     }
 
-    suspend fun deleteApp(pam: ProxyApplicationMapping) {
-        proxyApplicationMappingDAO.deleteApp(pam.uid, pam.packageName)
+    suspend fun deleteApp(uid: Int, packageName: String) {
+        proxyApplicationMappingDAO.deleteApp(uid, packageName)
     }
 
     suspend fun deleteAll() {
@@ -65,5 +65,9 @@ class ProxyAppMappingRepository(
 
     suspend fun updateProxyForUnselectedApps(proxyId: String, proxyName: String) {
         return proxyApplicationMappingDAO.updateProxyForUnselectedApps(proxyId, proxyName)
+    }
+
+    suspend fun updateUidForApp(uid: Int, packageName: String) {
+        proxyApplicationMappingDAO.updateUidForApp(uid, packageName)
     }
 }

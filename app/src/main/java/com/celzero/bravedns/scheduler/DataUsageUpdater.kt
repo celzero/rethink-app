@@ -22,6 +22,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTrackerRepository
+import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import org.koin.core.component.KoinComponent
@@ -30,6 +31,7 @@ import org.koin.core.component.inject
 class DataUsageUpdater(context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), KoinComponent {
     private val connTrackRepository by inject<ConnectionTrackerRepository>()
+    private val rethinkDb by inject<RethinkLogRepository>()
     private val appInfoRepository by inject<AppInfoRepository>()
     private val persistentState by inject<PersistentState>()
 
@@ -48,16 +50,45 @@ class DataUsageUpdater(context: Context, workerParams: WorkerParameters) :
             if (it.uid == Constants.INVALID_UID) return@forEach
 
             try {
-                val currentDataUsage = appInfoRepository.getDataUsageByUid(it.uid)
+                val currentDataUsage = appInfoRepository.getDataUsageByUid(it.uid) ?: return@forEach
+
                 val upload = currentDataUsage.uploadBytes + it.uploadBytes
                 val download = currentDataUsage.downloadBytes + it.downloadBytes
                 Logger.d(LOG_TAG_SCHEDULER, "Data usage for ${it.uid}, $upload, $download")
                 appInfoRepository.updateDataUsageByUid(it.uid, upload, download)
             } catch (e: Exception) {
-                Logger.e(LOG_TAG_SCHEDULER, "Exception in data usage updater: ${e.message}", e)
+                Logger.e(LOG_TAG_SCHEDULER, "err in data usage updater: ${e.message}", e)
             }
         }
+
+        updateRethinkDataUsage(previousTimestamp, currentTimestamp)
+
         persistentState.prevDataUsageCheck = currentTimestamp
         Logger.i(LOG_TAG_SCHEDULER, "Data usage updated for all apps at $currentTimestamp")
+    }
+
+    private suspend fun updateRethinkDataUsage(prev: Long, curr: Long) {
+        try {
+            // get rethink's uid from the database
+            val uid =
+                appInfoRepository.getAppInfoUidForPackageName(Constants.RETHINK_PACKAGE)
+
+            val prevDataUsage = rethinkDb.getDataUsage(prev, curr) ?: return
+            val currDataUsage = appInfoRepository.getDataUsageByUid(uid) ?: return
+
+            if (currDataUsage.uploadBytes == 0L && currDataUsage.downloadBytes == 0L) {
+                // if the data usage is 0, then no need to update the database
+                Logger.d(LOG_TAG_SCHEDULER, "rinr, data usage is 0 for $uid")
+                return
+            }
+
+            val upload = currDataUsage.uploadBytes + prevDataUsage.uploadBytes
+            val download = currDataUsage.downloadBytes + prevDataUsage.downloadBytes
+
+            Logger.d(LOG_TAG_SCHEDULER, "rinr, data usage:($uid), $upload, $download")
+            appInfoRepository.updateDataUsageByUid(uid, upload, download)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_SCHEDULER, "err in rinr data usage updater: ${e.message}", e)
+        }
     }
 }

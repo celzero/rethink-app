@@ -19,7 +19,6 @@
 package com.celzero.bravedns.wireguard
 
 /**  */
-@NonNullForAll
 class ParseException
 @JvmOverloads
 constructor(

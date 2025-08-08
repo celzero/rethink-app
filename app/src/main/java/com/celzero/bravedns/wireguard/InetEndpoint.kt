@@ -29,7 +29,6 @@ import java.util.regex.Pattern
  *
  * Instances of this class are externally immutable.
  */
-@NonNullForAll
 class InetEndpoint
 private constructor(val host: String, private val isResolved: Boolean, val port: Int) {
     private val lock = Any()
@@ -38,8 +37,7 @@ private constructor(val host: String, private val isResolved: Boolean, val port:
 
     override fun equals(obj: Any?): Boolean {
         if (obj !is InetEndpoint) return false
-        val other = obj
-        return host == other.host && port == other.port
+        return host == obj.host && port == obj.port
     }
 
     /**

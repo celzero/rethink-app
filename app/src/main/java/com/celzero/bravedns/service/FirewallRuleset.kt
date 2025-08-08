@@ -200,7 +200,30 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
         R.string.firewall_rule_block_app_desc,
         R.integer.stall
     ),
-    ;
+    RULE14(
+        "Private DNS",
+        R.string.firewall_rule_private_dns,
+        R.string.firewall_rule_private_dns_desc,
+        R.integer.stall
+    ),
+    RULE15(
+        "Bypass Proxy",
+        R.string.firewall_rule_bypass_proxy,
+        R.string.firewall_rule_bypass_proxy_desc,
+        R.integer.allow
+    ),
+    RULE16(
+        "App paused",
+        R.string.firewall_rule_paused_app,
+        R.string.firewall_rule_paused_app_desc,
+        R.integer.allow
+    ),
+    RULE17(
+        "Lockdown Proxy",
+        R.string.firewall_rule_lockdown_wg,
+        R.string.firewall_rule_lockdown_wg_desc,
+        R.integer.stall
+    );
 
     companion object {
         fun getFirewallRule(ruleId: String): FirewallRuleset? {
@@ -234,6 +257,11 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE10.id -> RULE10
                 RULE11.id -> RULE11
                 RULE12.id -> RULE12
+                RULE13.id -> RULE13
+                RULE14.id -> RULE14
+                RULE15.id -> RULE15
+                RULE16.id -> RULE16
+                RULE17.id -> RULE17
                 else -> null
             }
         }
@@ -270,20 +298,31 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE10.id -> R.drawable.ic_http
                 RULE11.id -> R.drawable.ic_global_lockdown
                 RULE12.id -> R.drawable.ic_proxy_white
+                RULE13.id -> R.drawable.ic_proxy_white
+                RULE14.id -> R.drawable.bs_dns_home_screen
+                RULE15.id -> R.drawable.ic_bypass
+                RULE16.id -> R.drawable.ic_proxy_white
+                RULE17.id -> R.drawable.ic_proxy_white
                 else -> R.drawable.bs_dns_home_screen
             }
         }
 
         fun getAllowedRules(): List<FirewallRuleset> {
-            return values().toList().filter { it.act == R.integer.allow }
+            return entries.filter { it.act == R.integer.allow }
         }
 
         fun getBlockedRules(): List<FirewallRuleset> {
-            return values().toList().filter { it.act != R.integer.allow }
+            return entries.filter { it.act != R.integer.allow }
         }
 
         fun ground(rule: FirewallRuleset): Boolean {
             return rule.act != R.integer.allow
+        }
+
+        fun isBypassRule(rule: FirewallRuleset): Boolean {
+            return rule.id == RULE1H.id || rule.id == RULE2B.id || rule.id == RULE2C.id ||
+                rule.id == RULE2F.id || rule.id == RULE2H.id || rule.id == RULE2I.id ||
+                rule.id == RULE8.id || rule.id == RULE9B.id
         }
 
         fun isProxied(rule: FirewallRuleset): Boolean {
@@ -303,7 +342,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE2C.id -> true
                 RULE2F.id -> true
                 RULE2I.id -> true
-                RULE12.id -> true
+                RULE15.id -> true
                 else -> false
             }
         }

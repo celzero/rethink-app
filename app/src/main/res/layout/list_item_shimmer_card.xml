@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.facebook.shimmer.ShimmerFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/shimmer_view_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:background="?android:attr/selectableItemBackground">
+
+            <View
+                android:id="@+id/shimmer_title"
+                android:layout_width="160dp"
+                android:layout_height="10dp"
+                android:background="#DDDDDD"
+                android:layout_alignParentStart="true" />
+
+            <View
+                android:id="@+id/shimmer_offer_price"
+                android:layout_width="80dp"
+                android:layout_height="10dp"
+                android:background="#CCCCCC"
+                android:layout_below="@id/shimmer_title"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="4dp"/>
+
+            <View
+                android:id="@+id/shimmer_original_price"
+                android:layout_width="40dp"
+                android:layout_height="10dp"
+                android:background="#EEEEEE"
+                android:layout_below="@id/shimmer_offer_price"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="4dp"/>
+
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+</com.facebook.shimmer.ShimmerFrameLayout>

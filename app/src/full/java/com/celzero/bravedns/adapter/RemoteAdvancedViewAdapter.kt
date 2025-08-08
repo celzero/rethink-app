@@ -55,8 +55,7 @@ class RemoteAdvancedViewAdapter(val context: Context) :
                     oldConnection: RethinkRemoteFileTag,
                     newConnection: RethinkRemoteFileTag
                 ): Boolean {
-                    return (oldConnection.value == newConnection.value &&
-                        oldConnection.isSelected == newConnection.isSelected)
+                    return oldConnection == newConnection
                 }
             }
     }

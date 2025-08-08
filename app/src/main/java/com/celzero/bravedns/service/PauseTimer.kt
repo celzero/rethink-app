@@ -51,7 +51,9 @@ object PauseTimer {
                 }
             } finally {
                 Logger.d(LOG_TAG_VPN, "pause timer complete")
-                VpnController.resumeApp()
+                if (VpnController.isAppPaused()) {
+                    VpnController.resumeApp()
+                }
                 setCountdown(INIT_TIME_MS)
             }
         }

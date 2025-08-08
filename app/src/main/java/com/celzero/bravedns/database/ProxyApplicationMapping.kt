@@ -15,7 +15,10 @@
  */
 package com.celzero.bravedns.database
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.room.Entity
+import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 
 @Entity(tableName = "ProxyApplicationMapping", primaryKeys = ["uid", "packageName", "proxyId"])
 class ProxyApplicationMapping {
@@ -29,11 +32,15 @@ class ProxyApplicationMapping {
 
     override fun equals(other: Any?): Boolean {
         if (other !is ProxyApplicationMapping) return false
-        return packageName == other.packageName
+        if (packageName != other.packageName) return false
+        if (uid != other.uid) return false
+        return true
     }
 
     override fun hashCode(): Int {
-        return this.packageName.hashCode()
+        var result = this.uid.hashCode()
+        result += result * 31 + this.packageName.hashCode()
+        return result
     }
 
     constructor(
@@ -50,5 +57,15 @@ class ProxyApplicationMapping {
         this.proxyName = proxyName
         this.isActive = isActive
         this.proxyId = proxyId
+    }
+
+    fun hasInternetPermission(packageManager: PackageManager): Boolean {
+        if (packageName.startsWith(NO_PACKAGE_PREFIX)) return true
+
+        // INTERNET permission if defined, can not be denied so this is safe to use
+        return packageManager.checkPermission(
+            Manifest.permission.INTERNET,
+            packageName
+        ) == PackageManager.PERMISSION_GRANTED
     }
 }

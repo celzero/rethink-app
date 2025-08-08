@@ -86,6 +86,19 @@
                         android:text="@string/about_bravedns_whoarewe"
                         android:textSize="@dimen/large_font_text_view" />
 
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/sponsor_info_usage"
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:gravity="center_vertical"
+                        android:lineSpacingExtra="5dp"
+                        android:paddingTop="10dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:textSize="@dimen/large_font_text_view" />
+
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
 
@@ -212,7 +225,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/rectangle_border_background"
                     android:clickable="true"
-                    android:drawableStart="@drawable/report_bug_icon"
+                    android:drawableStart="@drawable/ic_android_icon"
                     android:drawablePadding="-15dp"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
@@ -269,6 +282,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:drawableStart="@drawable/ic_whats_new"
                 android:drawablePadding="20dp"
+                android:visibility="gone"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
@@ -427,6 +441,23 @@
                 android:text="@string/about_privacy_policy"
                 android:textSize="@dimen/large_font_text_view" />
 
+            <!-- add terms of service and license text -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_terms_of_service"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_terms_service"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_terms_of_service"
+                android:textSize="@dimen/large_font_text_view" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -451,6 +482,22 @@
                 android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_twitter"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_twitter"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_twitter"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_mail"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
@@ -466,21 +513,54 @@
                 android:text="@string/about_email"
                 android:textSize="@dimen/large_font_text_view" />
 
+
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/about_twitter"
+                android:id="@+id/about_reddit"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="5dp"
                 android:background="?android:attr/selectableItemBackground"
-                android:drawableStart="@drawable/ic_twitter"
+                android:drawableStart="@drawable/ic_reddit"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:text="@string/about_twitter"
+                android:text="@string/lbl_reddit"
+                android:textSize="@dimen/large_font_text_view" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_element"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_element"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/lbl_matrix"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_mastodon"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_mastodon"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/lbl_mastodon"
                 android:textSize="@dimen/large_font_text_view" />
 
 
@@ -540,6 +620,22 @@
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_stats"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_log_level"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/title_statistics"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_app_notification"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
@@ -582,14 +678,6 @@
                 android:contentDescription="@string/about_mozilla"
                 app:srcCompat="@drawable/foss_logo" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/osom_img"
-                android:layout_width="160dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:contentDescription="@string/about_mozilla"
-                android:src="@drawable/osom_logos_horizontal" />
-
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -608,12 +696,27 @@
             android:id="@+id/about_app_version"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
+            android:alpha="0.75"
+            android:paddingTop="20dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textIsSelectable="true"
+            android:textSize="@dimen/small_font_text_view"
+            android:typeface="monospace" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/about_license"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:paddingBottom="40dp"
             android:layout_marginBottom="50dp"
             android:gravity="center"
-            android:paddingTop="20dp"
-            android:paddingBottom="40dp"
-            android:textIsSelectable="true"
-            android:textSize="@dimen/default_font_text_view"
+            android:text="@string/about_license"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/small_font_text_view"
             android:typeface="monospace" />
 
     </LinearLayout>

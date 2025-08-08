@@ -16,11 +16,14 @@
 package com.celzero.bravedns.customdownloader
 
 import Logger
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import okhttp3.Dns
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import retrofit2.Retrofit
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit
@@ -36,41 +39,45 @@ class RetrofitManager {
             FALLBACK_DNS
         }
 
-        fun getBlocklistBaseBuilder(dnsId: Int): Retrofit.Builder {
+        fun getBlocklistBaseBuilder(isRinRActive: Boolean): Retrofit.Builder {
             return Retrofit.Builder()
                 .baseUrl(Constants.DOWNLOAD_BASE_URL)
-                .client(okHttpClient(dnsId))
+                .client(okHttpClient(isRinRActive))
         }
 
-        fun getWarpBaseBuilder(dnsId: Int): Retrofit.Builder {
-            return Retrofit.Builder()
-                .baseUrl(Constants.DOWNLOAD_BASE_URL)
-                .client(okHttpClient(dnsId))
-        }
-
-        fun getTcpProxyBaseBuilder(dnsId: Int): Retrofit.Builder {
+        fun getTcpProxyBaseBuilder(isRinRActive: Boolean): Retrofit.Builder {
             return Retrofit.Builder()
                 .baseUrl(Constants.TCP_PROXY_BASE_URL)
-                .client(okHttpClient(dnsId))
+                .client(okHttpClient(isRinRActive))
         }
 
-        fun okHttpClient(dnsId: Int = 0): OkHttpClient {
+        fun getIpInfoBaseBuilder(isRinRActive: Boolean): Retrofit.Builder {
+            return Retrofit.Builder()
+                .baseUrl(Constants.IP_INFO_BASE_URL)
+                .client(okHttpClient(isRinRActive))
+        }
+
+        fun okHttpClient(isRinRActive: Boolean): OkHttpClient {
             val b = OkHttpClient.Builder()
             b.connectTimeout(1, TimeUnit.MINUTES)
             b.readTimeout(20, TimeUnit.MINUTES)
             b.writeTimeout(5, TimeUnit.MINUTES)
             b.retryOnConnectionFailure(true)
             // If unset, the system-wide default DNS will be used.
-            customDns(dnsId, b.build())?.let { b.dns(it) }
+            // no need to add custom dns if rinr is not active, as the connections will be routed
+            // through the default dns
+            if (isRinRActive) {
+                customDns(b.build())?.let { b.dns(it) }
+            }
             return b.build()
         }
 
         // As of now, quad9 is used as default dns in okhttp client.
-        private fun customDns(dnsId: Int, bootstrapClient: OkHttpClient): Dns? {
-            enumValues<OkHttpDnsType>().forEach { _ ->
+        private fun customDns(bootstrapClient: OkHttpClient): Dns? {
+            enumValues<OkHttpDnsType>().forEach { it ->
                 try {
-                    when (dnsId) {
-                        OkHttpDnsType.DEFAULT.ordinal -> {
+                    when (it) {
+                        OkHttpDnsType.DEFAULT -> {
                             return DnsOverHttps.Builder()
                                 .client(bootstrapClient)
                                 .url("https://dns.quad9.net/dns-query".toHttpUrl())
@@ -83,7 +90,7 @@ class RetrofitManager {
                                 .includeIPv6(true)
                                 .build()
                         }
-                        OkHttpDnsType.CLOUDFLARE.ordinal -> {
+                        OkHttpDnsType.CLOUDFLARE -> {
                             return DnsOverHttps.Builder()
                                 .client(bootstrapClient)
                                 .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
@@ -96,7 +103,7 @@ class RetrofitManager {
                                 .includeIPv6(true)
                                 .build()
                         }
-                        OkHttpDnsType.GOOGLE.ordinal -> {
+                        OkHttpDnsType.GOOGLE -> {
                             return DnsOverHttps.Builder()
                                 .client(bootstrapClient)
                                 .url("https://dns.google/dns-query".toHttpUrl())
@@ -109,20 +116,16 @@ class RetrofitManager {
                                 .includeIPv6(true)
                                 .build()
                         }
-                        OkHttpDnsType.SYSTEM_DNS.ordinal -> {
+                        OkHttpDnsType.SYSTEM_DNS -> {
                             return Dns.SYSTEM
                         }
-                        OkHttpDnsType.FALLBACK_DNS.ordinal -> {
+                        OkHttpDnsType.FALLBACK_DNS -> {
                             // todo: return retrieved system dns
                             return null
                         }
                     }
                 } catch (e: Exception) {
-                    Logger.crash(
-                        Logger.LOG_TAG_DOWNLOAD,
-                        "err while getting custom dns: ${e.message}",
-                        e
-                    )
+                    Logger.crash(Logger.LOG_TAG_DOWNLOAD, "err; custom dns: ${e.message}", e)
                 }
             }
             return null

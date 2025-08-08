@@ -16,6 +16,7 @@
 package com.celzero.bravedns.ui.activity
 
 import Logger
+import Logger.LOG_TAG_APP_OPS
 import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import Logger.updateConfigLevel
@@ -32,19 +33,26 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.LocaleList
 import android.provider.Settings
+import android.text.InputType
+import android.view.Gravity
 import android.view.View
 import android.widget.CompoundButton
+import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.AppCompatEditText
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.biometric.BiometricManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -54,13 +62,16 @@ import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.bottomsheet.BackupRestoreBottomSheet
+import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
@@ -75,6 +86,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import androidx.core.net.toUri
+import com.celzero.bravedns.ui.LauncherSwitcher
+import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
+import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
+import com.celzero.bravedns.util.NewSettingsManager
+import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
+
 
 class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) {
     private val b by viewBinding(ActivityMiscSettingsBinding::bind)
@@ -84,6 +102,23 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
 
+    enum class BioMetricType(val action: Int, val mins: Long) {
+        OFF(0, -1L),
+        IMMEDIATE(1, 0L),
+        FIVE_MIN(2, 5L),
+        FIFTEEN_MIN(3, 15L);
+
+        companion object {
+            fun fromValue(action: Int): BioMetricType {
+                return entries.firstOrNull { it.action == action } ?: OFF
+            }
+        }
+
+        fun enabled(): Boolean {
+            return this != OFF
+        }
+    }
+
     companion object {
         private const val SCHEME_PACKAGE = "package"
         private const val STORAGE_PERMISSION_CODE = 23
@@ -92,6 +127,13 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
+
         registerForActivityResult()
         initView()
         setupClickListeners()
@@ -103,12 +145,21 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             b.settingsActivityCheckUpdateRl.visibility = View.GONE
         }
 
+        // add ipInfo inc to the desc
+        b.genSettingsIpInfoDesc.text =
+            getString(R.string.download_ip_info_desc, getString(R.string.lbl_ipinfo_inc))
+
         // enable logs
         b.settingsActivityEnableLogsSwitch.isChecked = persistentState.logsEnabled
-        // Auto start app after reboot
-        b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
+        // set log level name in the  description
+        b.genSettingsGoLogDesc.text =
+            Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt()).name.lowercase()
+                .replaceFirstChar(Char::titlecase).replace("_", " ")
+
         // check for app updates
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
+        // camera and microphone access
+        b.settingsMicCamAccessSwitch.isChecked = persistentState.micCamAccess
 
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {
@@ -127,14 +178,24 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) ==
             BiometricManager.BIOMETRIC_SUCCESS
         ) {
-            b.settingsBiometricSwitch.isChecked = persistentState.biometricAuth
+            val txt =
+                getString(
+                    R.string.two_argument_colon,
+                    getString(R.string.settings_biometric_desc),
+                    BioMetricType.fromValue(persistentState.biometricAuthType).name
+                )
+            b.settingsBiometricDesc.text = txt
         } else {
             b.settingsBiometricRl.visibility = View.GONE
         }
 
+        // Auto start app after reboot
+        b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
+        b.dvIpInfoSwitch.isChecked = persistentState.downloadIpInfo
+
+        displayPcapUi()
         displayAppThemeUi()
         displayNotificationActionUi()
-        displayPcapUi()
     }
 
     private fun displayNotificationActionUi() {
@@ -168,21 +229,186 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         }
     }
 
-    private fun displayPcapUi() {
-        b.settingsActivityPcapRl.isEnabled = true
-        when (PcapMode.getPcapType(persistentState.pcapMode)) {
-            PcapMode.NONE -> {
-                b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_1)
-            }
+    private fun showFileCreationErrorToast() {
+        showToastUiCentered(this, getString(R.string.pcap_failure_toast), Toast.LENGTH_SHORT)
+        // reset the pcap mode to NONE
+        persistentState.pcapMode = PcapMode.NONE.id
+        displayPcapUi()
+    }
 
-            PcapMode.LOGCAT -> {
-                b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_2)
+    private fun makePcapFile(): File? {
+        return try {
+            val sdf = SimpleDateFormat(BackupHelper.BACKUP_FILE_NAME_DATETIME, Locale.ROOT)
+            // create folder in DOWNLOADS
+            val dir =
+                if (isAtleastR()) {
+                    val downloadsDir =
+                        Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_DOWNLOADS
+                        )
+                    // create folder in DOWNLOADS/Rethink
+                    File(downloadsDir, Constants.PCAP_FOLDER_NAME)
+                } else {
+                    val downloadsDir = Environment.getExternalStorageDirectory()
+                    // create folder in DOWNLOADS/Rethink
+                    File(downloadsDir, Constants.PCAP_FOLDER_NAME)
+                }
+            if (!dir.exists()) {
+                dir.mkdirs()
             }
+            // filename format (rethink_pcap_<DATE_FORMAT>.pcap)
+            val pcapFileName: String =
+                Constants.PCAP_FILE_NAME_PART + sdf.format(Date()) + Constants.PCAP_FILE_EXTENSION
+            val file = File(dir, pcapFileName)
+            // just in case, create the parent dir if it doesn't exist
+            if (file.parentFile?.exists() != true) file.parentFile?.mkdirs()
+            // create the file if it doesn't exist
+            if (!file.exists()) {
+                file.createNewFile()
+            }
+            file
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "error creating pcap file ${e.message}", e)
+            null
+        }
+    }
 
-            PcapMode.EXTERNAL_FILE -> {
-                b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_3)
+    private fun createAndSetPcapFile() {
+        // check for storage permissions
+        if (!checkStoragePermissions()) {
+            // request for storage permissions
+            Logger.i(LOG_TAG_VPN, "requesting for storage permissions")
+            requestForStoragePermissions()
+            return
+        }
+
+        Logger.i(LOG_TAG_VPN, "storage permission granted, creating pcap file")
+        try {
+            val file = makePcapFile()
+            if (file == null) {
+                showFileCreationErrorToast()
+                return
+            }
+            // set the file descriptor instead of fd, need to close the file descriptor
+            // after tunnel creation
+            appConfig.setPcap(PcapMode.EXTERNAL_FILE.id, file.absolutePath)
+        } catch (ignored: Exception) {
+            showFileCreationErrorToast()
+        }
+    }
+
+    private val storageActivityResultLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (isAtleastR()) {
+                // version 11 (R) or above
+                if (Environment.isExternalStorageManager()) {
+                    createAndSetPcapFile()
+                } else {
+                    showFileCreationErrorToast()
+                }
+            } else {
+                // below ver 11 (R), the permission is handled via onRequestPermissionsResult
             }
         }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty()) {
+                val write = grantResults[0] == PackageManager.PERMISSION_GRANTED
+                val read = grantResults[1] == PackageManager.PERMISSION_GRANTED
+                if (read && write) {
+                    createAndSetPcapFile()
+                } else {
+                    showFileCreationErrorToast()
+                }
+            }
+        }
+    }
+
+    private fun requestForStoragePermissions() {
+        // version 11 (R) or above
+        if (isAtleastR()) {
+            try {
+                val intent = Intent()
+                intent.action = Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
+                val uri = Uri.fromParts(SCHEME_PACKAGE, this.packageName, null)
+                intent.data = uri
+                storageActivityResultLauncher.launch(intent)
+            } catch (ignored: Exception) {
+                val intent = Intent()
+                intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+                storageActivityResultLauncher.launch(intent)
+            }
+        } else {
+            // below version 11
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                ),
+                STORAGE_PERMISSION_CODE,
+            )
+        }
+    }
+
+
+    private fun checkStoragePermissions(): Boolean {
+        return if (isAtleastR()) {
+            // version 11 (R) or above
+            Environment.isExternalStorageManager()
+        } else {
+            // below version 11
+            val write =
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            val read =
+                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+            read == PackageManager.PERMISSION_GRANTED && write == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    private fun showPcapOptionsDialog() {
+        val alertBuilder = MaterialAlertDialogBuilder(this)
+        alertBuilder.setTitle(getString(R.string.settings_pcap_dialog_title))
+        val items =
+            arrayOf(
+                getString(R.string.settings_pcap_dialog_option_1),
+                getString(R.string.settings_pcap_dialog_option_2),
+                getString(R.string.settings_pcap_dialog_option_3),
+            )
+        val checkedItem = persistentState.pcapMode
+        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
+            dialog.dismiss()
+            if (persistentState.pcapMode == which) {
+                return@setSingleChoiceItems
+            }
+
+            when (PcapMode.getPcapType(which)) {
+                PcapMode.NONE -> {
+                    b.settingsActivityPcapDesc.text =
+                        getString(R.string.settings_pcap_dialog_option_1)
+                    appConfig.setPcap(PcapMode.NONE.id)
+                }
+
+                PcapMode.LOGCAT -> {
+                    b.settingsActivityPcapDesc.text =
+                        getString(R.string.settings_pcap_dialog_option_2)
+                    appConfig.setPcap(PcapMode.LOGCAT.id, PcapMode.ENABLE_PCAP_LOGCAT)
+                }
+
+                PcapMode.EXTERNAL_FILE -> {
+                    b.settingsActivityPcapDesc.text =
+                        getString(R.string.settings_pcap_dialog_option_3)
+                    createAndSetPcapFile()
+                }
+            }
+        }
+        alertBuilder.create().show()
     }
 
     private fun displayAppThemeUi() {
@@ -212,12 +438,53 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     )
             }
 
+            Themes.TRUE_BLACK.id -> {
+                b.genSettingsThemeDesc.text =
+                    getString(
+                        R.string.settings_selected_theme,
+                        getString(R.string.settings_theme_dialog_themes_4)
+                    )
+            }
+
+            Themes.LIGHT_PLUS.id -> {
+                b.genSettingsThemeDesc.text =
+                    getString(
+                        R.string.settings_selected_theme,
+                        getString(R.string.settings_theme_dialog_themes_5)
+                    )
+            }
+
+            Themes.DARK_PLUS.id -> {
+                b.genSettingsThemeDesc.text =
+                    getString(
+                        R.string.settings_selected_theme,
+                        getString(R.string.settings_theme_dialog_themes_6)
+                    )
+            }
+
             else -> {
                 b.genSettingsThemeDesc.text =
                     getString(
                         R.string.settings_selected_theme,
                         getString(R.string.settings_theme_dialog_themes_4)
                     )
+            }
+        }
+    }
+
+    private fun displayPcapUi() {
+        b.settingsActivityPcapRl.isEnabled = true
+        when (PcapMode.getPcapType(persistentState.pcapMode)) {
+            PcapMode.NONE -> {
+                b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_1)
+            }
+
+            PcapMode.LOGCAT -> {
+                b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_2)
+            }
+
+            PcapMode.EXTERNAL_FILE -> {
+                b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_3)
             }
         }
     }
@@ -233,16 +500,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             persistentState.logsEnabled = b
         }
 
-        b.settingsActivityAutoStartRl.setOnClickListener {
-            b.settingsActivityAutoStartSwitch.isChecked =
-                !b.settingsActivityAutoStartSwitch.isChecked
-        }
-
-        b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean
-            ->
-            persistentState.prefAutoStartBootUp = b
-        }
-
         b.settingsActivityCheckUpdateRl.setOnClickListener {
             b.settingsActivityCheckUpdateSwitch.isChecked =
                 !b.settingsActivityCheckUpdateSwitch.isChecked
@@ -253,14 +510,22 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             persistentState.checkForAppUpdate = b
         }
 
-        b.settingsActivityThemeRl.setOnClickListener {
-            enableAfterDelay(500, b.settingsActivityThemeRl)
-            showThemeDialog()
-        }
 
         b.settingsGoLogRl.setOnClickListener {
             enableAfterDelay(500, b.settingsGoLogRl)
             showGoLoggerDialog()
+        }
+
+
+        b.settingsActivityPcapRl.setOnClickListener {
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityPcapRl)
+            showPcapOptionsDialog()
+        }
+
+
+        b.settingsActivityThemeRl.setOnClickListener {
+            enableAfterDelay(500, b.settingsActivityThemeRl)
+            showThemeDialog()
         }
 
         // Ideally this property should be part of VPN category / section.
@@ -282,11 +547,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             persistentState.persistentNotification = b
         }
 
-        b.settingsActivityPcapRl.setOnClickListener {
-            enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityPcapRl)
-            showPcapOptionsDialog()
-        }
-
         b.settingsActivityImportExportRl.setOnClickListener { invokeImportExport() }
 
         b.settingsActivityAppNotificationSwitch.setOnClickListener {
@@ -298,14 +558,238 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         b.settingsLocaleRl.setOnClickListener { invokeChangeLocaleDialog() }
 
         b.settingsBiometricRl.setOnClickListener {
-            b.settingsBiometricSwitch.isChecked = !b.settingsBiometricSwitch.isChecked
+            showBiometricDialog()
         }
 
-        b.settingsBiometricSwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean
+        b.settingsBiometricImg.setOnClickListener {
+            showBiometricDialog()
+        }
+
+
+        b.settingsMicCamAccessRl.setOnClickListener {
+            b.settingsMicCamAccessSwitch.isChecked = !b.settingsMicCamAccessSwitch.isChecked
+        }
+
+        b.settingsMicCamAccessSwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean
             ->
-            persistentState.biometricAuth = checked
-            // Reset the biometric auth time
-            persistentState.biometricAuthTime = Constants.INIT_TIME_MS
+            if (!checked) {
+                b.settingsMicCamAccessSwitch.isChecked = false
+                persistentState.micCamAccess = false
+                return@setOnCheckedChangeListener
+            }
+
+            // check for the permission and enable the switch
+            handleAccessibilityPermission()
+        }
+
+        b.settingsConsoleLogRl.setOnClickListener { openConsoleLogActivity() }
+
+        b.settingsActivityAutoStartRl.setOnClickListener {
+            b.settingsActivityAutoStartSwitch.isChecked =
+                !b.settingsActivityAutoStartSwitch.isChecked
+        }
+
+        b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean
+            ->
+            persistentState.prefAutoStartBootUp = b
+        }
+
+        b.settingsTaskerRl.setOnClickListener {
+            showAppTriggerPackageDialog(this , onPackageSet = { packageName ->
+                persistentState.appTriggerPackages = packageName
+            })
+        }
+
+        b.settingsIpInfoRl.setOnClickListener {
+            b.dvIpInfoSwitch.isChecked = !b.dvIpInfoSwitch.isChecked
+        }
+
+        b.dvIpInfoSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.downloadIpInfo = isChecked
+        }
+
+    }
+
+    private fun showGoLoggerDialog() {
+        // show dialog with logger options, change log level in GoVpnAdapter based on selection
+        val alertBuilder = MaterialAlertDialogBuilder(this)
+        alertBuilder.setTitle(getString(R.string.settings_go_log_heading))
+        val items =
+            arrayOf(
+                getString(R.string.settings_gologger_dialog_option_0),
+                getString(R.string.settings_gologger_dialog_option_1),
+                getString(R.string.settings_gologger_dialog_option_2),
+                getString(R.string.settings_gologger_dialog_option_3),
+                getString(R.string.settings_gologger_dialog_option_4),
+                getString(R.string.settings_gologger_dialog_option_5),
+                getString(R.string.settings_gologger_dialog_option_6),
+                getString(R.string.settings_gologger_dialog_option_7),
+            )
+        val checkedItem = persistentState.goLoggerLevel.toInt()
+        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
+            dialog.dismiss()
+            if (checkedItem == which) {
+                return@setSingleChoiceItems
+            }
+
+            persistentState.goLoggerLevel = which.toLong()
+            GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
+            updateConfigLevel(persistentState.goLoggerLevel)
+        }
+        alertBuilder.create().show()
+    }
+
+
+    private fun showBiometricDialog() {
+        val alertBuilder = MaterialAlertDialogBuilder(this)
+        alertBuilder.setTitle(getString(R.string.settings_biometric_dialog_heading))
+        // show an list of options disable, enable immediate, ask after 5 min, ask after 15 min
+        val item0 = getString(R.string.settings_biometric_dialog_option_0)
+        val item1 = getString(R.string.settings_biometric_dialog_option_1)
+        val item2 = getString(R.string.settings_biometric_dialog_option_2)
+        val item3 = getString(R.string.settings_biometric_dialog_option_3)
+        val items = arrayOf(item0, item1, item2, item3)
+
+        val checkedItem = persistentState.biometricAuthType
+        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
+            dialog.dismiss()
+            if (persistentState.biometricAuthType == which) {
+                return@setSingleChoiceItems
+            }
+            val bioMetricType = BioMetricType.fromValue(which)
+            when (bioMetricType) {
+                BioMetricType.OFF -> {
+                    val txt = getString(R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_0))
+                    b.settingsBiometricDesc.text = txt
+                    persistentState.biometricAuthType = BioMetricType.OFF.action
+                    persistentState.biometricAuthTime = Constants.INIT_TIME_MS
+                }
+
+                BioMetricType.IMMEDIATE -> {
+                    val txt = getString(R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_1))
+                    b.settingsBiometricDesc.text = txt
+                    persistentState.biometricAuthType = BioMetricType.IMMEDIATE.action
+                    persistentState.biometricAuthTime = Constants.INIT_TIME_MS
+                }
+
+                BioMetricType.FIVE_MIN -> {
+                    val txt = getString(R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_2))
+                    b.settingsBiometricDesc.text = txt
+                    persistentState.biometricAuthType = BioMetricType.FIVE_MIN.action
+                    persistentState.biometricAuthTime = System.currentTimeMillis()
+                }
+
+                BioMetricType.FIFTEEN_MIN -> {
+                    val txt = getString(R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_3))
+                    b.settingsBiometricDesc.text = txt
+                    persistentState.biometricAuthType = BioMetricType.FIFTEEN_MIN.action
+                    persistentState.biometricAuthTime = System.currentTimeMillis()
+                }
+            }
+            if (bioMetricType.enabled()) {
+                Logger.i(LOG_TAG_UI, "biometric auth enabled, switching to app lock alias")
+                LauncherSwitcher.switchLauncherAlias(applicationContext, APP_LOCK_ALIAS, HOME_ALIAS)
+            } else {
+                Logger.i(LOG_TAG_UI, "biometric auth disabled, switching to home alias")
+                LauncherSwitcher.switchLauncherAlias(applicationContext, HOME_ALIAS, APP_LOCK_ALIAS)
+            }
+        }
+        alertBuilder.create().show()
+    }
+
+    private fun handleAccessibilityPermission() {
+        try {
+            val isAccessibilityServiceRunning =
+                Utilities.isAccessibilityServiceEnabled(
+                    this,
+                    BackgroundAccessibilityService::class.java
+                )
+            val isAccessibilityServiceEnabled =
+                Utilities.isAccessibilityServiceEnabledViaSettingsSecure(
+                    this,
+                    BackgroundAccessibilityService::class.java
+                )
+            val isAccessibilityServiceFunctional =
+                isAccessibilityServiceRunning && isAccessibilityServiceEnabled
+
+            if (isAccessibilityServiceFunctional) {
+                persistentState.micCamAccess = true
+                b.settingsMicCamAccessSwitch.isChecked = true
+                return
+            }
+
+            showPermissionAlert()
+            b.settingsMicCamAccessSwitch.isChecked = false
+            persistentState.micCamAccess = false
+        } catch (e: PackageManager.NameNotFoundException) {
+            Logger.e(LOG_TAG_APP_OPS, "error checking usage stats permission ${e.message}", e)
+            return
+        }
+    }
+
+    private fun checkMicCamAccessRule() {
+        if (!persistentState.micCamAccess) return
+
+        val running =
+            Utilities.isAccessibilityServiceEnabled(
+                this,
+                BackgroundAccessibilityService::class.java
+            )
+        val enabled =
+            Utilities.isAccessibilityServiceEnabledViaSettingsSecure(
+                this,
+                BackgroundAccessibilityService::class.java
+            )
+
+        Logger.d(LOG_TAG_APP_OPS, "cam/mic access - running: $running, enabled: $enabled")
+
+        val isAccessibilityServiceFunctional = running && enabled
+
+        if (!isAccessibilityServiceFunctional) {
+            persistentState.micCamAccess = false
+            b.settingsMicCamAccessSwitch.isChecked = false
+            showToastUiCentered(
+                this,
+                getString(R.string.accessibility_failure_toast),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+
+        if (running) {
+            b.settingsMicCamAccessSwitch.isChecked = persistentState.micCamAccess
+            return
+        }
+    }
+
+    private fun showPermissionAlert() {
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setTitle(R.string.alert_permission_accessibility)
+        builder.setMessage(R.string.alert_firewall_accessibility_explanation)
+        builder.setPositiveButton(getString(R.string.univ_accessibility_dialog_positive)) { _, _ ->
+            openAccessibilitySettings()
+        }
+        builder.setNegativeButton(getString(R.string.univ_accessibility_dialog_negative)) { _, _ ->
+        }
+        builder.setCancelable(false)
+        builder.create().show()
+    }
+
+    private fun openAccessibilitySettings() {
+        try {
+            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            showToastUiCentered(
+                this,
+                getString(R.string.alert_firewall_accessibility_exception),
+                Toast.LENGTH_SHORT
+            )
+            Logger.e(LOG_TAG_APP_OPS, "Failure accessing accessibility settings: ${e.message}", e)
         }
     }
 
@@ -325,29 +809,14 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             dialog.dismiss()
             val item = items[which]
             // https://developer.android.com/guide/topics/resources/app-languages#app-language-settings
-            val locale = languages.getOrDefault(item, "en-US")
-            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(locale))
+            val locale = Locale.forLanguageTag(languages.getOrDefault(item, "en-US"))
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(locale))
         }
-        alertBuilder.setNeutralButton(getString(R.string.settings_locale_dialog_neutral)) { dialog,
-                                                                                            _ ->
+        alertBuilder.setNeutralButton(getString(R.string.settings_locale_dialog_neutral)) { dialog, _ ->
             dialog.dismiss()
-            openActionViewIntent(getString(R.string.about_translate_link).toUri())
+            openUrl(this, getString(R.string.about_translate_link))
         }
         alertBuilder.create().show()
-    }
-
-    private fun openActionViewIntent(uri: Uri) {
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        try {
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            showToastUiCentered(
-                this,
-                getString(R.string.intent_launch_error, intent.data),
-                Toast.LENGTH_SHORT
-            )
-            Logger.w(LOG_TAG_UI, "activity not found ${e.message}", e)
-        }
     }
 
     // read the list of supported languages from locale_config.xml
@@ -392,6 +861,71 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         bottomSheetFragment.show(this.supportFragmentManager, bottomSheetFragment.tag)
     }
 
+    private fun openConsoleLogActivity() {
+        try {
+            val intent = Intent(this, ConsoleLogActivity::class.java)
+            startActivity(intent)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "err opening console log activity ${e.message}", e)
+        }
+    }
+
+    fun showAppTriggerPackageDialog(context: Context, onPackageSet: (String) -> Unit) {
+        val editText = AppCompatEditText(context).apply {
+            hint = context.getString(R.string.adv_tasker_dialog_edit_hint)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            setHorizontallyScrolling(true)
+            if (persistentState.appTriggerPackages.isNotEmpty()) {
+                setText(persistentState.appTriggerPackages)
+            }
+            setPadding(50, 40, 50, 40)
+            gravity = Gravity.TOP or Gravity.START
+            android.R.style.Widget_Material_EditText
+        }
+
+        val selectableTextView = AppCompatTextView(context).apply {
+            text = context.getString(R.string.adv_tasker_dialog_msg)
+            setTextIsSelectable(true)
+            setPadding(50, 40, 50, 0)
+            textSize = 16f
+        }
+
+        val instructionsTextView = AppCompatTextView(context).apply {
+            text = context.getString(R.string.adv_tasker_dialog_instructions)
+            setTextIsSelectable(true)
+            setPadding(50, 40, 50, 0)
+            textSize = 16f
+        }
+
+        // add a LinearLayout as the single child of the ScrollView, then add the text view and
+        // edit text to the LinearLayout.
+        val linearLayout = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(selectableTextView)
+            addView(editText)
+            addView(instructionsTextView)
+        }
+
+        val scrollView = ScrollView(context).apply {
+            setPadding(40, 10, 40, 0)
+            addView(linearLayout)
+        }
+
+        AlertDialog.Builder(context)
+            .setTitle(context.getString(R.string.adv_taster_title))
+            .setView(scrollView)
+            .setPositiveButton(context.getString(R.string.lbl_save)) { dialog, _ ->
+                val pkgName = editText.text.toString().trim()
+                if (pkgName.isNotEmpty()) {
+                    onPackageSet(pkgName)
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(context.getString(R.string.lbl_cancel)) { dialog, _ -> dialog.cancel() }
+            .show()
+    }
+
+
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
                 Configuration.UI_MODE_NIGHT_YES
@@ -405,7 +939,9 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 getString(R.string.settings_theme_dialog_themes_1),
                 getString(R.string.settings_theme_dialog_themes_2),
                 getString(R.string.settings_theme_dialog_themes_3),
-                getString(R.string.settings_theme_dialog_themes_4)
+                getString(R.string.settings_theme_dialog_themes_4),
+                getString(R.string.settings_theme_dialog_themes_5),
+                getString(R.string.settings_theme_dialog_themes_6)
             )
         val checkedItem = persistentState.theme
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
@@ -423,48 +959,22 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                         setThemeRecreate(R.style.AppThemeWhite)
                     }
                 }
-
                 Themes.LIGHT.id -> {
                     setThemeRecreate(R.style.AppThemeWhite)
                 }
-
                 Themes.DARK.id -> {
                     setThemeRecreate(R.style.AppTheme)
                 }
-
                 Themes.TRUE_BLACK.id -> {
                     setThemeRecreate(R.style.AppThemeTrueBlack)
                 }
+                Themes.LIGHT_PLUS.id -> {
+                    setThemeRecreate(R.style.AppThemeWhitePlus)
+                }
+                Themes.DARK_PLUS.id -> {
+                    setThemeRecreate(R.style.AppThemeTrueBlackPlus)
+                }
             }
-        }
-        alertBuilder.create().show()
-    }
-
-    private fun showGoLoggerDialog() {
-        // show dialog with logger options, change log level in GoVpnAdapter based on selection
-        val alertBuilder = MaterialAlertDialogBuilder(this)
-        alertBuilder.setTitle(getString(R.string.settings_go_log_heading))
-        val items =
-            arrayOf(
-                getString(R.string.settings_gologger_dialog_option_0),
-                getString(R.string.settings_gologger_dialog_option_1),
-                getString(R.string.settings_gologger_dialog_option_2),
-                getString(R.string.settings_gologger_dialog_option_3),
-                getString(R.string.settings_gologger_dialog_option_4),
-                getString(R.string.settings_gologger_dialog_option_5),
-                getString(R.string.settings_gologger_dialog_option_6),
-                getString(R.string.settings_gologger_dialog_option_7)
-            )
-        val checkedItem = persistentState.goLoggerLevel.toInt()
-        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
-            dialog.dismiss()
-            if (checkedItem == which) {
-                return@setSingleChoiceItems
-            }
-
-            persistentState.goLoggerLevel = which.toLong()
-            GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
-            updateConfigLevel(persistentState.goLoggerLevel)
         }
         alertBuilder.create().show()
     }
@@ -472,45 +982,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     private fun setThemeRecreate(theme: Int) {
         setTheme(theme)
         recreate()
-    }
-
-    private fun showPcapOptionsDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this)
-        alertBuilder.setTitle(getString(R.string.settings_pcap_dialog_title))
-        val items =
-            arrayOf(
-                getString(R.string.settings_pcap_dialog_option_1),
-                getString(R.string.settings_pcap_dialog_option_2),
-                getString(R.string.settings_pcap_dialog_option_3)
-            )
-        val checkedItem = persistentState.pcapMode
-        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
-            dialog.dismiss()
-            if (persistentState.pcapMode == which) {
-                return@setSingleChoiceItems
-            }
-
-            when (PcapMode.getPcapType(which)) {
-                PcapMode.NONE -> {
-                    b.settingsActivityPcapDesc.text =
-                        getString(R.string.settings_pcap_dialog_option_1)
-                    appConfig.setPcap(PcapMode.NONE.id)
-                }
-
-                PcapMode.LOGCAT -> {
-                    b.settingsActivityPcapDesc.text =
-                        getString(R.string.settings_pcap_dialog_option_2)
-                    appConfig.setPcap(PcapMode.LOGCAT.id, PcapMode.ENABLE_PCAP_LOGCAT)
-                }
-
-                PcapMode.EXTERNAL_FILE -> {
-                    b.settingsActivityPcapDesc.text =
-                        getString(R.string.settings_pcap_dialog_option_3)
-                    createAndSetPcapFile()
-                }
-            }
-        }
-        alertBuilder.create().show()
     }
 
     private fun showNotificationActionDialog() {
@@ -567,6 +1038,18 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         super.onResume()
         // app notification permission android 13
         showEnableNotificationSettingIfNeeded()
+        checkMicCamAccessRule()
+        showNewBadgeIfNeeded()
+    }
+
+    private fun showNewBadgeIfNeeded() {
+        val providerInfo = NewSettingsManager.shouldShowBadge(NewSettingsManager.PROVIDER_INFO)
+        val appLogs = NewSettingsManager.shouldShowBadge(NewSettingsManager.APP_LOGS)
+        val automation = NewSettingsManager.shouldShowBadge(NewSettingsManager.AUTOMATION)
+
+        b.genSettingsIpInfoTxt.setBadgeDotVisible(this, providerInfo)
+        b.genSettingsConsoleLogTxt.setBadgeDotVisible(this, appLogs)
+        b.genSettingsTaskerTxt.setBadgeDotVisible(this, automation)
     }
 
     private fun registerForActivityResult() {
@@ -588,148 +1071,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     invokeAndroidNotificationSetting()
                 }
             }
-    }
-
-    private val storageActivityResultLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (isAtleastR()) {
-                // version 11 (R) or above
-                if (Environment.isExternalStorageManager()) {
-                    createAndSetPcapFile()
-                } else {
-                    showFileCreationErrorToast()
-                }
-            } else {
-                // below ver 11 (R), the permission is handled via onRequestPermissionsResult
-            }
-        }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.isNotEmpty()) {
-                val write = grantResults[0] == PackageManager.PERMISSION_GRANTED
-                val read = grantResults[1] == PackageManager.PERMISSION_GRANTED
-                if (read && write) {
-                    createAndSetPcapFile()
-                } else {
-                    showFileCreationErrorToast()
-                }
-            }
-        }
-    }
-
-    private fun requestForStoragePermissions() {
-        // version 11 (R) or above
-        if (isAtleastR()) {
-            try {
-                val intent = Intent()
-                intent.action = Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
-                val uri = Uri.fromParts(SCHEME_PACKAGE, this.packageName, null)
-                intent.data = uri
-                storageActivityResultLauncher.launch(intent)
-            } catch (e: Exception) {
-                val intent = Intent()
-                intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-                storageActivityResultLauncher.launch(intent)
-            }
-        } else {
-            // below version 11
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ),
-                STORAGE_PERMISSION_CODE
-            )
-        }
-    }
-
-    private fun showFileCreationErrorToast() {
-        showToastUiCentered(this, getString(R.string.pcap_failure_toast), Toast.LENGTH_SHORT)
-        // reset the pcap mode to NONE
-        persistentState.pcapMode = PcapMode.NONE.id
-        displayPcapUi()
-    }
-
-    private fun createAndSetPcapFile() {
-        // check for storage permissions
-        if (!checkStoragePermissions()) {
-            // request for storage permissions
-            Logger.i(LOG_TAG_VPN, "requesting for storage permissions")
-            requestForStoragePermissions()
-            return
-        }
-
-        Logger.i(LOG_TAG_VPN, "storage permission granted, creating pcap file")
-        try {
-            val file = makePcapFile()
-            if (file == null) {
-                showFileCreationErrorToast()
-                return
-            }
-            // set the file descriptor instead of fd, need to close the file descriptor
-            // after tunnel creation
-            appConfig.setPcap(PcapMode.EXTERNAL_FILE.id, file.absolutePath)
-        } catch (e: Exception) {
-            showFileCreationErrorToast()
-        }
-    }
-
-    private fun makePcapFile(): File? {
-        return try {
-            val sdf = SimpleDateFormat(BackupHelper.BACKUP_FILE_NAME_DATETIME, Locale.ROOT)
-            // create folder in DOWNLOADS
-            val dir =
-                if (isAtleastR()) {
-                    val downloadsDir =
-                        Environment.getExternalStoragePublicDirectory(
-                            Environment.DIRECTORY_DOWNLOADS
-                        )
-                    // create folder in DOWNLOADS/Rethink
-                    File(downloadsDir, Constants.PCAP_FOLDER_NAME)
-                } else {
-                    val downloadsDir = Environment.getExternalStorageDirectory()
-                    // create folder in DOWNLOADS/Rethink
-                    File(downloadsDir, Constants.PCAP_FOLDER_NAME)
-                }
-            if (!dir.exists()) {
-                dir.mkdirs()
-            }
-            // filename format (rethink_pcap_<DATE_FORMAT>.pcap)
-            val pcapFileName: String =
-                Constants.PCAP_FILE_NAME_PART + sdf.format(Date()) + Constants.PCAP_FILE_EXTENSION
-            val file = File(dir, pcapFileName)
-            // just in case, create the parent dir if it doesn't exist
-            if (file.parentFile?.exists() != true) file.parentFile?.mkdirs()
-            // create the file if it doesn't exist
-            if (!file.exists()) {
-                file.createNewFile()
-            }
-            file
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "error creating pcap file ${e.message}", e)
-            null
-        }
-    }
-
-    private fun checkStoragePermissions(): Boolean {
-        return if (isAtleastR()) {
-            // version 11 (R) or above
-            Environment.isExternalStorageManager()
-        } else {
-            // below version 11
-            val write =
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            val read =
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-            read == PackageManager.PERMISSION_GRANTED && write == PackageManager.PERMISSION_GRANTED
-        }
     }
 
     private fun invokeNotificationPermission() {
@@ -757,7 +1098,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             } else {
                 intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                 intent.addCategory(Intent.CATEGORY_DEFAULT)
-                intent.data = Uri.parse("package:$packageName")
+                intent.data = "$SCHEME_PACKAGE:$packageName".toUri()
             }
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {

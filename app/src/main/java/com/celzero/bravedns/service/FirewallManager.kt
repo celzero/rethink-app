@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfos
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfosLiveData
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.foregroundUids
@@ -43,9 +44,13 @@ import org.koin.core.component.inject
 object FirewallManager : KoinComponent {
 
     private val db by inject<AppInfoRepository>()
+    private val persistentState by inject<PersistentState>()
     private val mutex = Mutex()
 
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
+
+    // max time to keep the tombstone entry in the database
+    const val TOMBSTONE_EXPIRY_TIME_MS = 7 * 24 * 60 * 60 * 1000L // 7 days
 
     // androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/os/UserHandle.java
     private const val PER_USER_RANGE = 100000
@@ -149,6 +154,7 @@ object FirewallManager : KoinComponent {
             return this == ISOLATE
         }
 
+        // even invalid uids are considered as untracked
         fun isUntracked(): Boolean {
             return this == UNTRACKED
         }
@@ -277,6 +283,29 @@ object FirewallManager : KoinComponent {
         }
         // Delete the uninstalled apps from database
         packagesToDelete.forEach { tuple -> db.deletePackage(tuple.uid, tuple.packageName) }
+    }
+
+    suspend fun tombstoneApp(uid: Int, packageName: String?) {
+        val currentTime = System.currentTimeMillis()
+        mutex.withLock {
+            appInfos
+                .values()
+                .filter { it.packageName == packageName && it.uid == uid }
+                .forEach { it.tombstoneTs = currentTime }
+        }
+        // delete the uninstalled apps from database
+        db.tombstoneApp(uid, packageName, currentTime)
+    }
+
+    suspend fun resetTombstoneTs(uid: Int, packageName: String?) {
+        mutex.withLock {
+            appInfos
+                .values()
+                .filter { it.packageName == packageName && it.uid == uid }
+                .forEach { it.tombstoneTs = 0 }
+        }
+        // delete the uninstalled apps from database
+        db.tombstoneApp(uid, packageName, 0)
     }
 
     suspend fun deletePackage(uid: Int, packageName: String?) {
@@ -449,6 +478,7 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun updateUid(olduid: Int, uid: Int, pkg: String) {
+        // while updating the package reset the tombstone timestamp
         var cacheok = false
         // FIXME: review once again
         mutex.withLock {
@@ -456,6 +486,7 @@ object FirewallManager : KoinComponent {
                 if (ai.packageName == pkg) {
                     appInfos.remove(olduid, ai) // remove the old uid entry
                     ai.uid = uid // update the uid in-place
+                    ai.tombstoneTs = 0 // remove the tombstone timestamp
                     appInfos.put(uid, ai) // add the updated ai entry
                     cacheok = true
                     return@withLock
@@ -549,6 +580,11 @@ object FirewallManager : KoinComponent {
             LOG_TAG_FIREWALL,
             "Apply firewall rule for uid: ${uid}, ${firewallStatus.name}, ${connectionStatus.name}"
         )
+        if (isUnknownPackage(uid) && firewallStatus.isExclude()) {
+            Logger.w(LOG_TAG_FIREWALL, "Cannot exclude unknown package: $uid")
+            return
+        }
+
         invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
         db.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
     }
@@ -562,6 +598,14 @@ object FirewallManager : KoinComponent {
         }
     }
 
+    suspend fun getTotalAppsCount(): Int {
+        return getAppInfos().size
+    }
+
+    suspend fun isUnknownPackage(uid: Int): Boolean {
+        return getAppInfoByUid(uid)?.packageName?.startsWith(NO_PACKAGE_PREFIX) ?: false
+    }
+
     private suspend fun informObservers() {
         val v = getAppInfos()
         v.let { appInfosLiveData.postValue(v) }
@@ -572,13 +616,23 @@ object FirewallManager : KoinComponent {
         return context.resources.getStringArray(R.array.firewall_rules)
     }
 
-    fun getLabelForStatus(firewallStatus: FirewallStatus, connectionStatus: ConnectionStatus): Int {
+    fun getLabelForStatus(firewallStatus: FirewallStatus, connectionStatus: ConnectionStatus, prevConnStatus: ConnectionStatus): Int {
         return when (firewallStatus) {
             FirewallStatus.NONE -> {
                 when (connectionStatus) {
                     ConnectionStatus.BOTH -> R.string.block
-                    ConnectionStatus.METERED -> R.string.block
-                    ConnectionStatus.UNMETERED -> R.string.block
+                    ConnectionStatus.METERED ->
+                        if (prevConnStatus == ConnectionStatus.UNMETERED || prevConnStatus == ConnectionStatus.ALLOW) {
+                            R.string.block
+                        } else {
+                            R.string.allow
+                        }
+                    ConnectionStatus.UNMETERED ->
+                        if (prevConnStatus == ConnectionStatus.METERED || prevConnStatus == ConnectionStatus.ALLOW) {
+                            R.string.block
+                        } else {
+                            R.string.allow
+                        }
                     ConnectionStatus.ALLOW -> R.string.allow
                 }
             }
@@ -614,6 +668,32 @@ object FirewallManager : KoinComponent {
 
     fun isAppExcludedFromProxy(uid: Int): Boolean {
         return appInfos.get(uid).firstOrNull()?.isProxyExcluded ?: false
+    }
+
+    fun stats(): String {
+        // add count of apps in each firewall status
+        val statusCount = HashMap<FirewallStatus, Int>()
+        appInfos.values().forEach {
+            val status = FirewallStatus.getStatus(it.firewallStatus)
+            statusCount[status] = (statusCount[status] ?: 0) + 1
+        }
+        val sb = StringBuilder()
+        sb.append("Apps\n")
+        statusCount.forEach { (status, count) ->
+            sb.append("   ${status.name}: $count\n")
+        }
+        sb.append("Universal firewall\n")
+        sb.append("   block_http_connections: ${persistentState.getBlockHttpConnections()}\n")
+        sb.append("   block_metered_connections: ${persistentState.getBlockMeteredConnections()}\n")
+        sb.append("   universal_lockdown: ${persistentState.getUniversalLockdown()}\n")
+        sb.append("   block_newly_installed_app: ${persistentState.getBlockNewlyInstalledApp()}\n")
+        sb.append("   disallow_dns_bypass: ${persistentState.getDisallowDnsBypass()}\n")
+        sb.append("   udp_blocked: ${persistentState.getUdpBlocked()}\n")
+        sb.append("   block_unknown_connections: ${persistentState.getBlockUnknownConnections()}\n")
+        sb.append("   block_app_when_background: ${persistentState.getBlockAppWhenBackground()}\n")
+        sb.append("   block_when_device_locked: ${persistentState.getBlockWhenDeviceLocked()}\n")
+
+        return sb.toString()
     }
 
     private fun io(f: suspend () -> Unit) {

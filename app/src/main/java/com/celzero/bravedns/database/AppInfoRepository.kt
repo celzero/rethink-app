@@ -22,7 +22,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
 
     companion object {
         // No package applications
-        const val NO_PACKAGE = "no_package"
+        const val NO_PACKAGE_PREFIX = "no_package_"
     }
 
     suspend fun delete(appInfo: AppInfo) {
@@ -34,8 +34,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     }
 
     suspend fun updateUid(oldUid: Int, uid: Int, pkg: String): Int {
-        val isExist = appInfoDAO.isUidPkgExist(uid, pkg)
-        if (isExist != null) {
+        val isExist = appInfoDAO.isUidPkgExist(uid, pkg) != null
+        if (isExist) {
             // already app is present with the new uid, so no need to update
             // in that case, old uid with same pkg should be deleted as we intend to update the uid
             appInfoDAO.deletePackage(oldUid, pkg)
@@ -55,6 +55,14 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         } else {
             appInfoDAO.deletePackage(uid, packageName)
         }
+    }
+
+    suspend fun tombstoneApp(uid: Int, packageName: String?, tombstoneTs: Long) {
+        if (packageName == null) {
+            appInfoDAO.tombstoneApp(uid, tombstoneTs)
+            return
+        }
+        appInfoDAO.tombstoneApp(uid, packageName, tombstoneTs)
     }
 
     suspend fun getAppInfo(): List<AppInfo> {
@@ -86,15 +94,23 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.deleteByUid(uid)
     }
 
-    fun getDataUsageByUid(uid: Int): DataUsage {
+    suspend fun getDataUsageByUid(uid: Int): DataUsage? {
         return appInfoDAO.getDataUsageByUid(uid)
     }
 
-    fun updateDataUsageByUid(uid: Int, uploadBytes: Long, downloadBytes: Long) {
+    suspend fun updateDataUsageByUid(uid: Int, uploadBytes: Long, downloadBytes: Long) {
         appInfoDAO.updateDataUsageByUid(uid, uploadBytes, downloadBytes)
     }
 
-    fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
+    suspend fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean) {
         appInfoDAO.updateProxyExcluded(uid, isProxyExcluded)
+    }
+
+    suspend fun resetRethinkAppFirewallMode() {
+        appInfoDAO.resetRethinkAppFirewallMode()
+    }
+
+    suspend fun getAppInfoUidForPackageName(packageName: String): Int {
+        return appInfoDAO.getAppInfoUidForPackageName(packageName)
     }
 }

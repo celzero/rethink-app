@@ -24,7 +24,7 @@ import android.os.SystemClock
 import androidx.preference.PreferenceManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_WG_DIR
 import com.celzero.bravedns.backup.BackupHelper.Companion.CREATED_TIME
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_BACKUP_URI
 import com.celzero.bravedns.backup.BackupHelper.Companion.METADATA_FILENAME
@@ -37,7 +37,9 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.getFileNameFromPath
 import com.celzero.bravedns.backup.BackupHelper.Companion.getRethinkDatabase
 import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
 import com.celzero.bravedns.backup.BackupHelper.Companion.startVpn
+import com.celzero.bravedns.service.EncryptedFileManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.copyWithStream
 import org.koin.core.component.KoinComponent
@@ -47,13 +49,13 @@ import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.FileWriter
 import java.io.IOException
 import java.io.InputStream
 import java.io.ObjectOutputStream
 import java.io.OutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import androidx.core.net.toUri
 
 // ref:
 // https://gavingt.medium.com/refactoring-my-backup-and-restore-feature-to-comply-with-scoped-storage-e2b6c792c3b
@@ -68,7 +70,12 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     override fun doWork(): Result {
-        val backupFileUri = Uri.parse(inputData.getString(DATA_BUILDER_BACKUP_URI))
+        val backupFileUri = inputData.getString(DATA_BUILDER_BACKUP_URI)?.toUri()
+        if (backupFileUri == null) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "backup file uri is null, return failure")
+            return Result.failure()
+        }
+
         Logger.d(LOG_TAG_BACKUP_RESTORE, "begin backup process with file uri: $backupFileUri")
         val isBackupSucceed = startBackupProcess(backupFileUri)
 
@@ -77,7 +84,6 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             "completed backup process, is backup successful? $isBackupSucceed"
         )
         if (isBackupSucceed) {
-            // start vpn on backup success
             startVpn(context)
             return Result.success()
         }
@@ -119,6 +125,10 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                 return false
             }
 
+            // no need to check the return value, we can proceed even if the wireguard config backup
+            // fails
+            backupWireGuardConfig(tempDir)
+
             processCompleted = createMetaData(tempDir)
 
             if (processCompleted) {
@@ -145,6 +155,43 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         }
     }
 
+    private fun backupWireGuardConfig(tempDir: File): Boolean {
+        // get all the wireguard config from the database,
+        // loop through them and get the path from the database
+        // create a copy of a encrypted file to normal file in the temp dir
+        // add the file to the zip list
+
+        Logger.d(LOG_TAG_BACKUP_RESTORE, "init backup wireguard configs")
+        val dir = File(tempDir, BACKUP_WG_DIR)
+        if (!dir.exists()) {
+            Logger.d(LOG_TAG_BACKUP_RESTORE, "creating wireguard backup dir, ${dir.path}")
+            dir.mkdirs()
+        }
+
+        try {
+            val mappings = WireguardManager.getAllMappings()
+            mappings.forEach { m ->
+                val file = File(m.configPath)
+                val content = EncryptedFileManager.read(context, file)
+                if (content.isNotEmpty()) {
+                    val tmpWgFile = File(dir, "${m.id}.conf")
+                    tmpWgFile.writer().use {
+                        writer -> writer.write(content)
+                        writer.flush()
+                    }
+                    filesPathToZip.add(tmpWgFile.absolutePath)
+                    Logger.v(LOG_TAG_BACKUP_RESTORE, "wg ${m.id}.conf added to backup, path: ${tmpWgFile.path}")
+                } else {
+                    Logger.w(LOG_TAG_BACKUP_RESTORE, "empty config for ${m.id}, ${m.configPath}")
+                }
+            }
+            return true
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_BACKUP_RESTORE, "err while backing up wg config, ${e.message}", e)
+        }
+        return false
+    }
+
     private fun createMetaData(backupDir: File): Boolean {
         Logger.d(LOG_TAG_BACKUP_RESTORE, "creating meta data file, path: ${backupDir.path}")
         // check if the file exists already, if yes, delete it
@@ -154,14 +201,13 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             file.delete()
             filesPathToZip.remove(file.absolutePath)
         }
-        var writer: FileWriter? = null
         val metadata = backupMetadata()
         try {
             val metadataFile = File(backupDir, METADATA_FILENAME)
-            writer = FileWriter(metadataFile)
-            writer.append(metadata)
-            writer.flush()
-            writer.close()
+            metadataFile.writer().use {
+                writer -> writer.write(metadata)
+                writer.flush()
+            }
             // add the metadata file to the list of files to be zipped
             filesPathToZip.add(metadataFile.absolutePath)
             return true
@@ -172,15 +218,6 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                 e
             )
             return false
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.flush()
-                    writer.close()
-                }
-            } catch (ignored: IOException) {
-                // no-op
-            }
         }
     }
 

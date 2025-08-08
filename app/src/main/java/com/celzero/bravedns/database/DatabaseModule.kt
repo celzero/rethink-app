@@ -22,13 +22,12 @@ object DatabaseModule {
     private val databaseModule = module {
         single { AppDatabase.buildDatabase(androidContext()) }
         single { LogDatabase.buildDatabase(androidContext()) }
+        single { ConsoleLogDatabase.buildDatabase(androidContext()) }
     }
     private val daoModule = module {
         single { get<AppDatabase>().appInfoDAO() }
-        single { get<LogDatabase>().connectionTrackerDAO() }
         single { get<AppDatabase>().dnsCryptEndpointDAO() }
         single { get<AppDatabase>().dnsCryptRelayEndpointDAO() }
-        single { get<LogDatabase>().dnsLogDAO() }
         single { get<AppDatabase>().dnsProxyEndpointDAO() }
         single { get<AppDatabase>().dohEndpointsDAO() }
         single { get<AppDatabase>().proxyEndpointDAO() }
@@ -44,14 +43,25 @@ object DatabaseModule {
         single { get<AppDatabase>().tcpProxyEndpointDao() }
         single { get<AppDatabase>().dotEndpointDao() }
         single { get<AppDatabase>().odohEndpointDao() }
+        single { get<AppDatabase>().rpnProxyDao() }
+        single { get<AppDatabase>().wgHopMapDao() }
+        single { get<AppDatabase>().subscriptionStatusDao() }
+        single { get<AppDatabase>().subscriptionStateHistoryDao()}
+
+        single { get<LogDatabase>().connectionTrackerDAO() }
+        single { get<LogDatabase>().dnsLogDAO() }
         single { get<LogDatabase>().rethinkConnectionLogDAO() }
+        single { get<LogDatabase>().statsSummaryDAO() }
+        single { get<LogDatabase>().ipInfoDao() }
+
+        single { get<ConsoleLogDatabase>().consoleLogDAO() }
+
     }
     private val repositoryModule = module {
         single { get<AppDatabase>().appInfoRepository() }
-        single { get<LogDatabase>().connectionTrackerRepository() }
+
         single { get<AppDatabase>().dnsCryptEndpointRepository() }
         single { get<AppDatabase>().dnsCryptRelayEndpointRepository() }
-        single { get<LogDatabase>().dnsLogRepository() }
         single { get<AppDatabase>().dnsProxyEndpointRepository() }
         single { get<AppDatabase>().dohEndpointRepository() }
         single { get<AppDatabase>().proxyEndpointRepository() }
@@ -67,7 +77,17 @@ object DatabaseModule {
         single { get<AppDatabase>().tcpProxyEndpointRepository() }
         single { get<AppDatabase>().dotEndpointRepository() }
         single { get<AppDatabase>().odohEndpointRepository() }
+        single { get<AppDatabase>().rpnProxyRepository() }
+        single { get<AppDatabase>().wgHopMapRepository() }
+        single { get<AppDatabase>().subscriptionStatusRepository() }
+        single { get<AppDatabase>().subscriptionStateHistoryDao() }
+
         single { get<LogDatabase>().rethinkConnectionLogRepository() }
+        single { get<LogDatabase>().connectionTrackerRepository() }
+        single { get<LogDatabase>().dnsLogRepository() }
+        single { get<LogDatabase>().ipInfoRepository() }
+
+        single { get<ConsoleLogDatabase>().consoleLogRepository() }
     }
 
     val modules = listOf(databaseModule, daoModule, repositoryModule)

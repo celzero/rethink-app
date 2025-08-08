@@ -23,8 +23,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.celzero.bravedns.service.WireguardManager.SEC_WARP_ID
-import com.celzero.bravedns.service.WireguardManager.WARP_ID
 
 @Dao
 interface WgConfigFilesDAO {
@@ -37,20 +35,25 @@ interface WgConfigFilesDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(wgConfigFiles: WgConfigFiles): Long
 
     @Query(
-        "select * from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID order by isActive desc"
+        "select * from WgConfigFiles order by isActive desc"
     )
     fun getWgConfigsLiveData(): PagingSource<Int, WgConfigFiles>
 
     @Query(
-        "select * from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID order by isActive desc"
+        "select * from WgConfigFiles order by isActive desc"
     )
     fun getWgConfigs(): List<WgConfigFiles>
+
+    // TODO: should remove this query post v055o
+    // sometimes the db update does not delete the entry, so adding this as precaution
+    @Query("select * from WgConfigFiles where id in (0, 1)")
+    fun getWarpSecWarpConfig(): List<WgConfigFiles>
 
     @Query("select max(id) from WgConfigFiles") fun getLastAddedConfigId(): Int
 
     @Delete fun delete(wgConfigFiles: WgConfigFiles)
 
-    @Query("delete from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID")
+    @Query("delete from WgConfigFiles")
     fun deleteOnAppRestore(): Int
 
     @Query("delete from WgConfigFiles where id = :id") fun deleteConfig(id: Int)
@@ -66,9 +69,10 @@ interface WgConfigFilesDAO {
 
     @Query("select * from WgConfigFiles where id = :id") fun isConfigAdded(id: Int): WgConfigFiles?
 
-    @Query("select count(id) from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID")
+    @Query("select count(id) from WgConfigFiles")
     fun getConfigCount(): LiveData<Int>
 
     @Query("update WgConfigFiles set isActive = 0, oneWireGuard = 0 where id = :id")
     fun disableConfig(id: Int)
+
 }

@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.util
 
-import settings.Settings
+import com.celzero.firestack.settings.Settings
 
 enum class InternetProtocol(val id: Int) {
     IPv4(0),

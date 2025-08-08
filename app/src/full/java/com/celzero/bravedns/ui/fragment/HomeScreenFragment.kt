@@ -38,23 +38,27 @@ import android.os.SystemClock
 import android.provider.Settings
 import android.text.format.DateUtils
 import android.util.TypedValue
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
+import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.*
+import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
+import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.activity.AlertsActivity
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
@@ -72,12 +76,14 @@ import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openNetworkSettings
+import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.isAtleastN
 import com.celzero.bravedns.util.Utilities.isAtleastP
+import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastU
 import com.celzero.bravedns.util.Utilities.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
@@ -107,6 +113,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private lateinit var startForResult: ActivityResultLauncher<Intent>
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
 
+    companion object {
+        private const val TAG = "HSFragment"
+        private const val GRACE_DIALOG_REMIND_AFTER_DAYS = 1 // days to remind again
+    }
+
     enum class ScreenType {
         DNS,
         FIREWALL,
@@ -125,14 +136,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Logger.v(LOG_TAG_UI, "$TAG: init view in home screen fragment")
         initializeValues()
         initializeClickListeners()
         observeVpnState()
     }
 
     private fun initializeValues() {
-        isVpnActivated = VpnController.state().activationRequested
-
         themeNames =
             arrayOf(
                 getString(R.string.settings_theme_dialog_themes_1),
@@ -143,20 +153,37 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         appConfig.getBraveModeObservable().postValue(appConfig.getBraveMode().mode)
         b.fhsCardLogsTv.text = getString(R.string.lbl_logs).replaceFirstChar(Char::titlecase)
+
+        // do not show the sponsor card if the rethink plus is enabled
+        /*if (RpnProxyManager.isRpnEnabled()) {
+            b.fhsSponsor.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_rethink_plus_sparkle))
+            b.fhsSponsor.visibility = View.VISIBLE
+        } else {
+            b.fhsSponsor.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_heart_accent))
+            b.fhsSponsor.visibility = View.VISIBLE
+        }*/
+        b.fhsSponsor.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_heart_accent))
+        b.fhsSponsor.visibility = View.VISIBLE
     }
 
     private fun initializeClickListeners() {
         b.fhsCardFirewallLl.setOnClickListener {
+            Logger.v(LOG_TAG_UI, "$TAG: click event on firewall card")
             startFirewallActivity(FirewallActivity.Tabs.UNIVERSAL.screen)
         }
 
-        b.fhsCardAppsCv.setOnClickListener { startAppsActivity() }
+        b.fhsCardAppsCv.setOnClickListener {
+            Logger.v(LOG_TAG_UI, "$TAG: click event on apps card")
+            startAppsActivity()
+        }
 
         b.fhsCardDnsLl.setOnClickListener {
+            Logger.v(LOG_TAG_UI, "$TAG: click event on dns card")
             startDnsActivity(DnsDetailActivity.Tabs.CONFIGURE.screen)
         }
 
         b.homeFragmentBottomSheetIcon.setOnClickListener {
+            Logger.v(LOG_TAG_UI, "$TAG: click event on bottom sheet icon")
             b.homeFragmentBottomSheetIcon.isEnabled = false
             openBottomSheet()
             delay(TimeUnit.MILLISECONDS.toMillis(500), lifecycleScope) {
@@ -164,9 +191,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
 
-        b.homeFragmentPauseIcon.setOnClickListener { handlePause() }
+        b.homeFragmentPauseIcon.setOnClickListener {
+            Logger.v(LOG_TAG_UI, "$TAG: click event on pause icon")
+            handlePause()
+        }
 
         b.fhsDnsOnOffBtn.setOnClickListener {
+            Logger.v(LOG_TAG_UI, "$TAG: click event on main button")
             handleMainScreenBtnClickEvent()
             delay(TimeUnit.MILLISECONDS.toMillis(500), lifecycleScope) {
                 if (isAdded) {
@@ -176,15 +207,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         appConfig.getBraveModeObservable().observe(viewLifecycleOwner) {
+            Logger.v(LOG_TAG_UI, "$TAG: brave mode changed to $it")
             updateCardsUi()
             syncDnsStatus()
         }
 
         b.fhsCardLogsLl.setOnClickListener {
+            Logger.v(LOG_TAG_UI, "$TAG: click event on logs card")
             startActivity(ScreenType.LOGS, NetworkLogsActivity.Tabs.NETWORK_LOGS.screen)
         }
 
         b.fhsCardProxyLl.setOnClickListener {
+            Logger.v(LOG_TAG_UI, "$TAG: click event on proxy card")
             if (appConfig.isWireGuardEnabled()) {
                 startActivity(ScreenType.PROXY_WIREGUARD)
             } else {
@@ -193,17 +227,69 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         b.fhsSponsor.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
-            startActivity(intent)
+            Logger.v(LOG_TAG_UI, "$TAG: click event on sponsor card")
+            /*if (RpnProxyManager.isRpnEnabled()) {
+                Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
+                return@setOnClickListener
+            }*/
+            promptForAppSponsorship()
+        }
+
+        b.fhsSponsorBottom.setOnClickListener {
+            Logger.v(LOG_TAG_UI, "$TAG: click event on sponsor card")
+            /*if (RpnProxyManager.isRpnEnabled()) {
+                Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
+                return@setOnClickListener
+            }*/
+            promptForAppSponsorship()
         }
 
         b.fhsTitleRethink.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
-            startActivity(intent)
+            Logger.v(LOG_TAG_UI, "$TAG: click event on rethink card")
+            /*if (RpnProxyManager.isRpnEnabled()) {
+                Logger.d(LOG_TAG_UI, "RPlus is enabled, not showing sponsor dialog")
+                return@setOnClickListener
+            }*/
+            promptForAppSponsorship()
         }
 
         // comment out the below code to disable the alerts card (v0.5.5b)
         // b.fhsCardAlertsLl.setOnClickListener { startActivity(ScreenType.ALERTS) }
+    }
+
+    private fun promptForAppSponsorship() {
+        val installTime = requireContext().packageManager.getPackageInfo(
+            requireContext().packageName,
+            0
+        ).firstInstallTime
+        val timeDiff = System.currentTimeMillis() - installTime
+        // convert it to month
+        val days = (timeDiff / (1000 * 60 * 60 * 24)).toDouble()
+        val month = days / 30
+        // multiply the month with 0.60$ + 0.20$ for every month
+        val amount = month * (0.60 + 0.20)
+        Logger.d(LOG_TAG_UI, "Sponsor: $installTime, days/month: $days/$month, amount: $amount")
+        val alertBuilder = MaterialAlertDialogBuilder(requireContext())
+        val inflater = LayoutInflater.from(requireContext())
+        val dialogView = inflater.inflate(R.layout.dialog_sponsor_info, null)
+        alertBuilder.setView(dialogView)
+        alertBuilder.setCancelable(true)
+
+        val amountTxt = dialogView.findViewById<AppCompatTextView>(R.id.dialog_sponsor_info_amount)
+        val usageTxt = dialogView.findViewById<AppCompatTextView>(R.id.dialog_sponsor_info_usage)
+        val sponsorBtn = dialogView.findViewById<AppCompatTextView>(R.id.dialog_sponsor_info_sponsor)
+
+        val dialog = alertBuilder.create()
+
+        val msg = getString(R.string.sponser_dialog_usage_msg, days.toInt().toString(), "%.2f".format(amount))
+        amountTxt.text = getString(R.string.two_argument_no_space, getString(R.string.symbol_dollar), "%.2f".format(amount))
+        usageTxt.text = msg
+
+        sponsorBtn.setOnClickListener {
+            openUrl(requireContext(), RETHINKDNS_SPONSOR_LINK)
+        }
+
+        dialog.show()
     }
 
     private fun handlePause() {
@@ -379,11 +465,24 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             b.fhsCardAlertsApps.isSelected = true
         }
     } */
+    private var proxyStateListenerJob: Job? = null
 
     private fun observeProxyStates() {
         persistentState.getProxyStatus().observe(viewLifecycleOwner) {
+            Logger.vv(LOG_TAG_UI, "$TAG proxy state changed to $it")
             if (it != -1) {
-                updateUiWithProxyStates(it)
+                if (proxyStateListenerJob?.isActive == true) {
+                    Logger.vv(LOG_TAG_UI, "$TAG cancel prev proxy state listener job")
+                    proxyStateListenerJob?.cancel()
+                    proxyStateListenerJob = null
+                }
+                proxyStateListenerJob = ui("proxyStates") {
+                    while (isVisible && isAdded) {
+                        updateUiWithProxyStates(it)
+                        kotlinx.coroutines.delay(2500L)
+                    }
+                    proxyStateListenerJob?.cancel()
+                }
             } else {
                 b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
                 b.fhsCardOtherProxyCount.visibility = View.VISIBLE
@@ -393,21 +492,72 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun updateUiWithProxyStates(resId: Int) {
+        if (
+            !viewLifecycleOwner
+                .lifecycle
+                .currentState
+                .isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)
+        ) {
+            proxyStateListenerJob?.cancel()
+            return
+        }
+
+        if (!isVpnActivated) {
+            disableProxyCard()
+            return
+        }
+
         // get proxy type from app config
         val proxyType = AppConfig.ProxyType.of(appConfig.getProxyType())
 
         if (proxyType.isProxyTypeWireguard()) {
             io {
-                val proxies = WireguardManager.getEnabledConfigs()
+                val proxies = WireguardManager.getActiveConfigs()
                 var active = 0
                 var failing = 0
+                var idle = 0
+                val now = System.currentTimeMillis()
+                Logger.v(LOG_TAG_UI, "$TAG wg active proxies: ${proxies.size}")
                 proxies.forEach {
                     val proxyId = "${ProxyManager.ID_WG_BASE}${it.getId()}"
-                    val status = VpnController.getProxyStatusById(proxyId)
+                    Logger.vv(LOG_TAG_UI, "$TAG init stats check for $proxyId")
+                    val stats = VpnController.getProxyStats(proxyId)
+                    // check for dns status of the wg if splitDns is enabled
+                    val dnsStats = if (isSplitDns()) {
+                        VpnController.getDnsStatus(proxyId)
+                    } else {
+                        null
+                    }
+
+                    if (stats == null) {
+                        failing++
+                        return@forEach
+                    }
+                    if (dnsStats != null && isDnsError(dnsStats)) {
+                        failing++
+                        return@forEach
+                    } // else proceed
+
+                    val lastOk = stats.lastOK
+                    val since = stats.since
+                    if (now - since > WG_UPTIME_THRESHOLD && lastOk == 0L) {
+                        failing++
+                        return@forEach
+                    }
+                    val status = VpnController.getProxyStatusById(proxyId).first
                     if (status != null) {
                         // consider starting and up as active
-                        if (status == Backend.TOK || status == Backend.TUP || status == Backend.TZZ) {
-                            active++
+                        if (status == Backend.TZZ) {
+                          idle++
+                        } else if (status == Backend.TOK || status == Backend.TUP) {
+                            val isUp = System.currentTimeMillis() - stats.lastOK < WG_HANDSHAKE_TIMEOUT
+                            if (isUp) {
+                                active++
+                            } else {
+                                // some wg conns like free proton, reply to handshakes but do not
+                                // reply to data msgs, in that case the status will be TZZ
+                                failing++
+                            }
                         } else {
                             failing++
                         }
@@ -416,30 +566,46 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     }
                 }
                 uiCtx {
+                    if (!isVisible || !isAdded) return@uiCtx
                     b.fhsCardOtherProxyCount.visibility = View.VISIBLE
-                    // show as 3 active 1 failing, if failing is 0 show as 4 active
+                    var text = ""
+                    // show as 3 active 1 failing 1 idle, if failing is 0 show as 4 active
+                    if (active > 0) {
+                        text = getString(
+                            R.string.two_argument_space,
+                            active.toString(),
+                            getString(R.string.lbl_active)
+                        )
+                    }
                     if (failing > 0) {
-                        b.fhsCardProxyCount.text =
-                            getString(
-                                R.string.orbot_stop_dialog_message_combo,
-                                getString(
-                                    R.string.two_argument_space,
-                                    active.toString(),
-                                    getString(R.string.lbl_active)
-                                ),
-                                getString(
-                                    R.string.two_argument_space,
-                                    failing.toString(),
-                                    getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
-                                )
-                            )
+                        text += if (text.isNotEmpty()) {
+                            "\n"
+                        } else {
+                            ""
+                        }
+                        text += getString(
+                            R.string.two_argument_space,
+                            failing.toString(),
+                            getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
+                        )
+                    }
+                    if (idle > 0) {
+                        text += if (text.isNotEmpty()) {
+                            "\n"
+                        } else {
+                            ""
+                        }
+                        text += getString(
+                            R.string.two_argument_space,
+                            idle.toString(),
+                            getString(R.string.lbl_idle).replaceFirstChar(Char::titlecase)
+                        )
+                    }
+                    Logger.v(LOG_TAG_UI, "$TAG overall wg proxy status: $text")
+                    if (text.isEmpty()) {
+                        b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
                     } else {
-                        b.fhsCardProxyCount.text =
-                            getString(
-                                R.string.two_argument_space,
-                                active.toString(),
-                                getString(R.string.lbl_active)
-                            )
+                        b.fhsCardProxyCount.text = text
                     }
                 }
             }
@@ -449,6 +615,22 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
         b.fhsCardOtherProxyCount.text = getString(resId)
     }
+
+    private fun isSplitDns(): Boolean {
+        // by default, the split dns is enabled for android R and above, as we know the app
+        // which sends dns queries
+        if (isAtleastR()) return true
+
+        return persistentState.splitDns
+    }
+
+    private fun isDnsError(statusId: Long?): Boolean {
+        if (statusId == null) return true
+
+        val s = Transaction.Status.fromId(statusId)
+        return s == Transaction.Status.BAD_QUERY || s == Transaction.Status.BAD_RESPONSE || s == Transaction.Status.NO_RESPONSE || s == Transaction.Status.SEND_FAIL || s == Transaction.Status.CLIENT_ERROR || s == Transaction.Status.INTERNAL_ERROR || s == Transaction.Status.TRANSPORT_ERROR
+    }
+
 
     private fun unobserveProxyStates() {
         persistentState.getProxyStatus().removeObservers(viewLifecycleOwner)
@@ -461,6 +643,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun disableProxyCard() {
+        proxyStateListenerJob?.cancel()
         b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
         b.fhsCardOtherProxyCount.text = getString(R.string.lbl_disabled)
@@ -492,45 +675,85 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * are register to update the UI in the home screen
      */
     private fun observeDnsStates() {
-        persistentState.median.observe(viewLifecycleOwner) {
-            // show status as very fast, fast, slow, and very slow based on the latency
-            if (it in 0L..19L) {
-                val string =
-                    getString(
-                        R.string.ci_desc,
-                        getString(R.string.lbl_very),
-                        getString(R.string.lbl_fast)
-                    )
-                        .replaceFirstChar(Char::titlecase)
-                b.fhsCardDnsLatency.text = string
-            } else if (it in 20L..50L) {
-                b.fhsCardDnsLatency.text =
-                    getString(R.string.lbl_fast).replaceFirstChar(Char::titlecase)
-            } else if (it in 50L..100L) {
-                b.fhsCardDnsLatency.text =
-                    getString(R.string.lbl_slow).replaceFirstChar(Char::titlecase)
+        io {
+            val dnsId = if (WireguardManager.oneWireGuardEnabled()) {
+                val id = WireguardManager.getOneWireGuardProxyId()
+                if (id == null) {
+                    if (appConfig.isSmartDnsEnabled()) {
+                        Backend.Plus
+                    } else {
+                        Backend.Preferred
+                    }
+                } else {
+                    "${ProxyManager.ID_WG_BASE}${id}"
+                }
             } else {
-                val string =
-                    getString(
-                        R.string.ci_desc,
-                        getString(R.string.lbl_very),
-                        getString(R.string.lbl_slow)
-                    )
-                        .replaceFirstChar(Char::titlecase)
-                b.fhsCardDnsLatency.text = string
+                if (appConfig.isSmartDnsEnabled()) {
+                    Backend.Plus
+                } else {
+                    Backend.Preferred
+                }
             }
+            val p50 = VpnController.p50(dnsId)
+            uiCtx {
+                when (p50) {
+                    in 0L..19L -> {
+                        val string =
+                            getString(
+                                R.string.ci_desc,
+                                getString(R.string.lbl_very),
+                                getString(R.string.lbl_fast)
+                            )
+                                .replaceFirstChar(Char::titlecase)
+                        b.fhsCardDnsLatency.text = string
+                    }
 
-            b.fhsCardDnsLatency.isSelected = true
+                    in 20L..50L -> {
+                        b.fhsCardDnsLatency.text =
+                            getString(R.string.lbl_fast).replaceFirstChar(Char::titlecase)
+                    }
+
+                    in 50L..100L -> {
+                        b.fhsCardDnsLatency.text =
+                            getString(R.string.lbl_slow).replaceFirstChar(Char::titlecase)
+                    }
+
+                    else -> {
+                        val string =
+                            getString(
+                                R.string.ci_desc,
+                                getString(R.string.lbl_very),
+                                getString(R.string.lbl_slow)
+                            )
+                                .replaceFirstChar(Char::titlecase)
+                        b.fhsCardDnsLatency.text = string
+                    }
+                }
+
+                b.fhsCardDnsLatency.isSelected = true
+            }
         }
 
         appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
             updateUiWithDnsStates(it)
         }
+
+        VpnController.getRegionLiveData().observe(viewLifecycleOwner) {
+            if (it != null) {
+                b.fhsCardRegion.text = it.uppercase()
+            }
+        }
     }
 
     private fun updateUiWithDnsStates(dnsName: String) {
         var dns = dnsName
-        val preferredId = if (appConfig.isSystemDns()) Backend.System else Backend.Preferred
+        val preferredId = if (appConfig.isSystemDns()) {
+            Backend.System
+        } else if (appConfig.isSmartDnsEnabled()) {
+            Backend.Plus
+        } else {
+            Backend.Preferred
+        }
         // get the status from go to check if the dns transport is added or not
         val id =
             if (WireguardManager.oneWireGuardEnabled()) {
@@ -542,30 +765,38 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     "${ProxyManager.ID_WG_BASE}${id}"
                 }
             } else {
+                if (persistentState.splitDns && WireguardManager.isAdvancedWgActive()) {
+                    dns += ", " + resources.getString(R.string.lbl_wireguard)
+                }
+
                 preferredId
             }
 
         if (VpnController.isOn()) {
-            ui("dnsStatusCheck") {
+            io {
                 var failing = false
                 repeat(5) {
                     val status = VpnController.getDnsStatus(id)
                     if (status != null) {
                         failing = false
-                        if (isAdded) {
-                            b.fhsCardDnsLatency.visibility = View.VISIBLE
-                            b.fhsCardDnsFailure.visibility = View.GONE
+                        uiCtx {
+                            if (isAdded) {
+                                b.fhsCardDnsLatency.visibility = View.VISIBLE
+                                b.fhsCardDnsFailure.visibility = View.INVISIBLE
+                            }
                         }
-                        return@ui
+                        return@io
                     }
                     // status null means the dns transport is not active / different id is used
                     kotlinx.coroutines.delay(1000L)
                     failing = true
                 }
-                if (failing && isAdded) {
-                    b.fhsCardDnsLatency.visibility = View.GONE
-                    b.fhsCardDnsFailure.visibility = View.VISIBLE
-                    b.fhsCardDnsFailure.text = getString(R.string.failed_using_default)
+                uiCtx {
+                    if (failing && isAdded) {
+                        b.fhsCardDnsLatency.visibility = View.INVISIBLE
+                        b.fhsCardDnsFailure.visibility = View.VISIBLE
+                        b.fhsCardDnsFailure.text = getString(R.string.failed_using_default)
+                    }
                 }
             }
         }
@@ -619,8 +850,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     // unregister all dns related observers
     private fun unobserveDnsStates() {
-        persistentState.median.removeObservers(viewLifecycleOwner)
         appConfig.getConnectedDnsObservable().removeObservers(viewLifecycleOwner)
+        VpnController.getRegionLiveData().removeObservers(viewLifecycleOwner)
     }
 
     private fun observeUniversalStates() {
@@ -855,7 +1086,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setTitle(R.string.always_on_dialog_stop_heading)
         if (VpnController.isVpnLockdown()) {
             builder.setMessage(
-                updateHtmlEncodedText(getString(R.string.always_on_dialog_lockdown_stop_message))
+                htmlToSpannedText(getString(R.string.always_on_dialog_lockdown_stop_message))
             )
         } else {
             builder.setMessage(R.string.always_on_dialog_stop_message)
@@ -913,12 +1144,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     override fun onResume() {
         super.onResume()
+        isVpnActivated = VpnController.state().activationRequested
         handleShimmer()
         maybeAutoStartVpn()
         updateCardsUi()
         syncDnsStatus()
         handleLockdownModeIfNeeded()
         startTrafficStats()
+        //maybeShowGracePeriodDialog()
+        b.fhsSponsorBottom.bringToFront()
     }
 
     private lateinit var trafficStatsTicker: Job
@@ -926,15 +1160,60 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun startTrafficStats() {
         trafficStatsTicker =
             ui("trafficStatsTicker") {
+                var counter = 0
                 while (true) {
-                    fetchTrafficStats()
-                    kotlinx.coroutines.delay(1500L)
+                    // make it as 3 options and add the protos
+                    if (!isAdded) return@ui
+
+                    if (counter % 3 == 0) {
+                        displayTrafficStatsRate()
+                    } else if (counter % 3 == 1) {
+                        displayTrafficStatsBW()
+                    } else {
+                        displayProtos()
+                    }
+                    // show protos
+                    kotlinx.coroutines.delay(2500L)
+                    counter++
                 }
             }
     }
 
+    private fun displayProtos() {
+        b.fhsInternetSpeed.visibility = View.VISIBLE
+        b.fhsInternetSpeedUnit.visibility = View.VISIBLE
+        b.fhsInternetSpeed.text = VpnController.protocols()
+        b.fhsInternetSpeedUnit.text = getString(R.string.lbl_protos)
+    }
+
+    private fun displayTrafficStatsBW() {
+        val txRx = convertToCommonUnit(txRx.tx, txRx.rx)
+
+        b.fhsInternetSpeed.visibility = View.VISIBLE
+        b.fhsInternetSpeedUnit.visibility = View.VISIBLE
+        b.fhsInternetSpeed.text =
+            getString(
+                R.string.two_argument_space,
+                getString(
+                    R.string.two_argument_space,
+                    txRx.first,
+                    getString(R.string.symbol_black_up)
+                ),
+                getString(
+                    R.string.two_argument_space,
+                    txRx.second,
+                    getString(R.string.symbol_black_down)
+                )
+            )
+        b.fhsInternetSpeedUnit.text = getCommonUnit(this.txRx.tx, this.txRx.rx)
+    }
+
     private fun stopTrafficStats() {
-        trafficStatsTicker.cancel()
+        try {
+            trafficStatsTicker.cancel()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "error stopping traffic stats ticker", e)
+        }
     }
 
     data class TxRx(
@@ -945,7 +1224,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private var txRx = TxRx()
 
-    private fun fetchTrafficStats() {
+    private fun displayTrafficStatsRate() {
         val curr = TxRx()
         if (txRx.time <= 0L) {
             txRx = curr
@@ -960,12 +1239,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             b.fhsInternetSpeedUnit.visibility = View.GONE
             return
         }
-
         val tx = curr.tx - txRx.tx
         val rx = curr.rx - txRx.rx
         txRx = curr
-        val txBytes = String.format("%.2f", ((tx / dur) / 1000.0))
-        val rxBytes = String.format("%.2f", ((rx / dur) / 1000.0))
+        val txRx = convertToCommonUnit(tx/dur, rx/dur)
         b.fhsInternetSpeed.visibility = View.VISIBLE
         b.fhsInternetSpeedUnit.visibility = View.VISIBLE
         b.fhsInternetSpeed.text =
@@ -973,16 +1250,46 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 R.string.two_argument_space,
                 getString(
                     R.string.two_argument_space,
-                    txBytes,
+                    txRx.first,
                     getString(R.string.symbol_black_up)
                 ),
                 getString(
                     R.string.two_argument_space,
-                    rxBytes,
+                    txRx.second,
                     getString(R.string.symbol_black_down)
                 )
             )
+        b.fhsInternetSpeedUnit.text = getString(R.string.symbol_ps, getCommonUnit(tx/dur, rx/dur))
     }
+
+    // TODO: Move this to a common utility class
+    private fun getCommonUnit(bytes1: Long, bytes2: Long): String {
+        val maxBytes = maxOf(bytes1, bytes2)
+        return when {
+            maxBytes >= 1024L * 1024L * 1024L * 1024L -> "TB"
+            maxBytes >= 1024L * 1024L * 1024L -> "GB"
+            maxBytes >= 1024L * 1024L -> "MB"
+            maxBytes >= 1024L -> "KB"
+            else -> "B"
+        }
+    }
+
+    private fun convertToCommonUnit(bytes1: Long, bytes2: Long): Pair<String, String> {
+        val unit = getCommonUnit(bytes1, bytes2)
+        val v = when (unit) {
+            "TB" -> Pair(bytesToTB(bytes1), bytesToTB(bytes2))
+            "GB" -> Pair(bytesToGB(bytes1), bytesToGB(bytes2))
+            "MB" -> Pair(bytesToMB(bytes1), bytesToMB(bytes2))
+            "KB" -> Pair(bytesToKB(bytes1), bytesToKB(bytes2))
+            else -> Pair(bytes1.toDouble(), bytes2.toDouble())
+        }
+        return Pair(String.format(Locale.ROOT, "%.2f", v.first), String.format(Locale.ROOT, "%.2f", v.second))
+    }
+
+    private fun bytesToKB(bytes: Long): Double = bytes / 1024.0
+    private fun bytesToMB(bytes: Long): Double = bytes / (1024.0 * 1024.0)
+    private fun bytesToGB(bytes: Long): Double = bytes / (1024.0 * 1024.0 * 1024.0)
+    private fun bytesToTB(bytes: Long): Double = bytes / (1024.0 * 1024.0 * 1024.0 * 1024.0)
 
     /**
      * Issue fix - https://github.com/celzero/rethink-app/issues/57 When the application
@@ -1033,6 +1340,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         super.onPause()
         stopShimmer()
         stopTrafficStats()
+        proxyStateListenerJob?.cancel()
     }
 
     private fun startDnsActivity(screenToLoad: Int) {
@@ -1082,7 +1390,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // no need to check for app modes to open this activity
         // one use case: https://github.com/celzero/rethink-app/issues/611
         val intent = Intent(requireContext(), AppListActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
     }
 
@@ -1100,7 +1407,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                 ScreenType.PROXY_WIREGUARD -> Intent(requireContext(), WgMainActivity::class.java)
             }
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         if (type == ScreenType.RETHINK) {
             io {
                 val url = appConfig.getRemoteRethinkEndpoint()?.url
@@ -1138,7 +1444,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun stopVpnService() {
-        VpnController.stop(requireContext())
+        VpnController.stop("home", requireContext())
     }
 
     private fun startVpnService() {
@@ -1225,6 +1531,87 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.create().show()
     }
 
+    /*private fun maybeShowGracePeriodDialog() {
+        val now = System.currentTimeMillis()
+
+        val lastShown = persistentState.lastGracePeriodReminderTime
+        val daysSinceLastShown = TimeUnit.MILLISECONDS.toDays(now - lastShown)
+        if (daysSinceLastShown < GRACE_DIALOG_REMIND_AFTER_DAYS) return
+        Logger.d(LOG_TAG_UI, "$TAG Grace period dialog last shown $daysSinceLastShown days ago")
+        io {
+            val currentSubs = RpnProxyManager.getSubscriptionState()
+            if (currentSubs.isActive) {
+                Logger.v(LOG_TAG_UI, "$TAG Current subscription is active, skipping grace period dialog")
+                return@io
+            }
+            if (!currentSubs.isCancelled) {
+                Logger.v(LOG_TAG_UI, "$TAG Current subscription is not cancelled, skipping grace period dialog, state: ${currentSubs.state().name}")
+                return@io
+            }
+            val subsData = RpnProxyManager.getSubscriptionData()
+            if (subsData == null) {
+                Logger.v(LOG_TAG_UI, "$TAG No subscription data found, skipping grace period dialog")
+                return@io
+            }
+
+            val billingExpiry = subsData.subscriptionStatus.billingExpiry
+            val accountExpiry = subsData.subscriptionStatus.accountExpiry
+            // grace period is calculated based on billingExpiry and accountExpiry
+            val timeLeft = accountExpiry.minus(now)
+            val timeLeftDays = TimeUnit.MILLISECONDS.toDays(timeLeft)
+            val gracePeriod = accountExpiry - billingExpiry
+            val gracePeriodDays = TimeUnit.MILLISECONDS.toDays(gracePeriod)
+            if (gracePeriodDays <= 0L) {
+                Logger.v(LOG_TAG_UI, "$TAG No grace period available($gracePeriodDays), skipping grace period dialog")
+                return@io
+            }
+
+            if (timeLeftDays <= 0L) {
+                Logger.i(LOG_TAG_UI, "$TAG Grace period has ended(@$timeLeftDays), skipping grace period dialog")
+                return@io
+            }
+
+            val daysRemaining = TimeUnit.MILLISECONDS.toDays(timeLeft).toInt().coerceAtLeast(1)
+            if (daysRemaining <= 0) {
+                Logger.v(LOG_TAG_UI, "$TAG No days remaining in grace period, skipping dialog")
+                return@io
+            }
+            Logger.v(LOG_TAG_UI, "$TAG Showing grace period dialog, $daysRemaining days remaining")
+            uiCtx {
+                val dialogView = LayoutInflater.from(requireContext())
+                    .inflate(R.layout.dialog_grace_period_layout, null)
+
+                dialogView.findViewById<AppCompatTextView>(R.id.dialog_days_left).text =
+                    "\u23F3 $daysRemaining days remaining"
+
+                dialogView.findViewById<LinearProgressIndicator>(R.id.dialog_progress).apply {
+                    max = 100
+                    // should be decreased from 100 to 0
+                    progress =  100 - (timeLeftDays * 100 / gracePeriodDays).toInt()
+                    if (progress < 0) 0 else progress
+                    Logger.v(LOG_TAG_UI, "$TAG Grace period progress: $progress%")
+                }
+
+                val dialog = MaterialAlertDialogBuilder(requireContext())
+                    .setView(dialogView)
+                    .setCancelable(false)
+                    .create()
+
+                dialogView.findViewById<AppCompatButton>(R.id.button_renew).setOnClickListener {
+                    dialog.dismiss()
+                    findNavController().navigate(R.id.rethinkPlus)
+                }
+
+                dialogView.findViewById<AppCompatButton>(R.id.button_later).setOnClickListener {
+                    dialog.dismiss()
+                    persistentState.lastGracePeriodReminderTime = System.currentTimeMillis()
+                }
+                persistentState.lastGracePeriodReminderTime = System.currentTimeMillis()
+                dialog.show()
+            }
+        }
+    }*/
+
     private fun registerForActivityResult() {
         startForResult =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -1265,47 +1652,47 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     // Sets the UI DNS status on/off.
     private fun syncDnsStatus() {
-        val status = VpnController.state()
+        val vpnState = VpnController.state()
+        val isEch = vpnState.serverName?.contains(DnsLogTracker.ECH, true) == true
 
         // Change status and explanation text
         var statusId: Int
         var colorId: Int
-        // val explanationId: Int
         val privateDnsMode: Utilities.PrivateDnsMode = getPrivateDnsMode(requireContext())
 
         if (appConfig.getBraveMode().isFirewallMode()) {
-            status.connectionState = BraveVPNService.State.WORKING
+            vpnState.connectionState = BraveVPNService.State.WORKING
         }
-        if (status.on) {
+        if (vpnState.on) {
             colorId = fetchTextColor(R.color.accentGood)
             statusId =
                 when {
-                    status.connectionState == null -> {
+                    vpnState.connectionState == null -> {
                         // app's waiting here, but such a status is a cause for confusion
                         // R.string.status_waiting
-                        R.string.status_protected
+                        R.string.status_no_internet
                     }
-                    status.connectionState === BraveVPNService.State.NEW -> {
+                    vpnState.connectionState === BraveVPNService.State.NEW -> {
                         // app's starting here, but such a status confuses users
                         // R.string.status_starting
                         R.string.status_protected
                     }
-                    status.connectionState === BraveVPNService.State.WORKING -> {
+                    vpnState.connectionState === BraveVPNService.State.WORKING -> {
                         R.string.status_protected
                     }
-                    status.connectionState === BraveVPNService.State.APP_ERROR -> {
+                    vpnState.connectionState === BraveVPNService.State.APP_ERROR -> {
                         colorId = fetchTextColor(R.color.accentBad)
                         R.string.status_app_error
                     }
-                    status.connectionState === BraveVPNService.State.DNS_ERROR -> {
+                    vpnState.connectionState === BraveVPNService.State.DNS_ERROR -> {
                         colorId = fetchTextColor(R.color.accentBad)
                         R.string.status_dns_error
                     }
-                    status.connectionState === BraveVPNService.State.DNS_SERVER_DOWN -> {
+                    vpnState.connectionState === BraveVPNService.State.DNS_SERVER_DOWN -> {
                         colorId = fetchTextColor(R.color.accentBad)
                         R.string.status_dns_server_down
                     }
-                    status.connectionState === BraveVPNService.State.NO_INTERNET -> {
+                    vpnState.connectionState === BraveVPNService.State.NO_INTERNET -> {
                         colorId = fetchTextColor(R.color.accentBad)
                         R.string.status_no_internet
                     }
@@ -1393,8 +1780,21 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             b.fhsProtectionLevelTxt.setTextColor(colorId)
             b.fhsProtectionLevelTxt.text = string
         } else {
-            b.fhsProtectionLevelTxt.setTextColor(colorId)
-            b.fhsProtectionLevelTxt.setText(statusId)
+            if (isEch) {
+                val stat = getString(statusId)
+                val s  = stat.replaceFirst(getString(R.string.status_protected), getString(R.string.lbl_ultra_secure), true)
+                Logger.d(LOG_TAG_UI, "Ech status : $stat")
+                b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.color.accentGood))
+                b.fhsProtectionLevelTxt.text = s
+            } else {
+                b.fhsProtectionLevelTxt.setTextColor(colorId)
+                b.fhsProtectionLevelTxt.setText(statusId)
+            }
+        }
+        val isUnderlyingVpnNwEmpty = VpnController.isUnderlyingVpnNetworkEmpty()
+        if (isUnderlyingVpnNwEmpty) {
+            b.fhsProtectionLevelTxt.setTextColor(fetchTextColor(R.color.accentBad))
+            b.fhsProtectionLevelTxt.text = getString(R.string.status_no_network)
         }
     }
 
@@ -1412,20 +1812,28 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun fetchTextColor(attr: Int): Int {
         val attributeFetch =
-            if (attr == R.color.accentGood) {
-                R.attr.accentGood
-            } else if (attr == R.color.accentBad) {
-                R.attr.accentBad
-            } else if (attr == R.color.primaryLightColorText) {
-                R.attr.primaryLightColorText
-            } else if (attr == R.color.secondaryText) {
-                R.attr.invertedPrimaryTextColor
-            } else if (attr == R.color.primaryText) {
-                R.attr.primaryTextColor
-            } else if (attr == R.color.primaryTextLight) {
-                R.attr.primaryTextColor
-            } else {
-                R.attr.accentGood
+            when (attr) {
+                R.color.accentGood -> {
+                    R.attr.accentGood
+                }
+                R.color.accentBad -> {
+                    R.attr.accentBad
+                }
+                R.color.primaryLightColorText -> {
+                    R.attr.primaryLightColorText
+                }
+                R.color.secondaryText -> {
+                    R.attr.invertedPrimaryTextColor
+                }
+                R.color.primaryText -> {
+                    R.attr.primaryTextColor
+                }
+                R.color.primaryTextLight -> {
+                    R.attr.primaryTextColor
+                }
+                else -> {
+                    R.attr.accentGood
+                }
             }
         val typedValue = TypedValue()
         val a: TypedArray =

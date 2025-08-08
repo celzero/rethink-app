@@ -10,7 +10,6 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ui.fragment.FirewallSettingsFragment">
 
-
     <LinearLayout
         android:id="@+id/firewall_scroll_connect_check"
         android:layout_width="match_parent"
@@ -77,6 +76,52 @@
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:id="@+id/firewall_device_locked_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/firewall_device_locked_stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:alpha="0.5"
+                android:drawableEnd="@drawable/ic_right_arrow_white"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="5dp"
+                android:textColor="?attr/primaryLightColorText" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/device_locked_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="45dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_toStartOf="@id/firewall_device_locked_stats"
+                android:alpha="0.5"
+                android:padding="3dp"
+                app:indicatorColor="?attr/accentGood"
+                app:trackColor="?attr/background" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/firewall_device_locked_shimmer_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/homeScreenBtnBackground"
+                    android:padding="5dp" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+        </RelativeLayout>
+
         <LinearLayout
             android:id="@+id/firewall_background_ll"
             android:layout_width="match_parent"
@@ -109,6 +154,53 @@
                 android:padding="15dp" />
 
         </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/firewall_not_in_use_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/firewall_not_in_use_stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:alpha="0.5"
+                android:drawableEnd="@drawable/ic_right_arrow_white"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="5dp"
+                android:textColor="?attr/primaryLightColorText" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/not_in_use_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="45dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_toStartOf="@id/firewall_not_in_use_stats"
+                android:alpha="0.5"
+                android:padding="3dp"
+                app:indicatorColor="?attr/accentGood"
+                app:trackColor="?attr/background" />
+
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/firewall_not_in_use_shimmer_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/homeScreenBtnBackground"
+                    android:padding="5dp" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/firewall_unknown_connection_ll"
@@ -143,6 +235,52 @@
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:id="@+id/firewall_unknown_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/firewall_unknown_stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:alpha="0.5"
+                android:drawableEnd="@drawable/ic_right_arrow_white"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="5dp"
+                android:textColor="?attr/primaryLightColorText" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/unknown_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="45dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_toStartOf="@id/firewall_unknown_stats"
+                android:alpha="0.5"
+                android:padding="3dp"
+                app:indicatorColor="?attr/accentGood"
+                app:trackColor="?attr/background" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/firewall_unknown_shimmer_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/homeScreenBtnBackground"
+                    android:padding="5dp" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+        </RelativeLayout>
+
         <LinearLayout
             android:id="@+id/firewall_udp_connection_ll"
             android:layout_width="match_parent"
@@ -176,6 +314,52 @@
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:id="@+id/firewall_udp_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/firewall_udp_stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:alpha="0.5"
+                android:drawableEnd="@drawable/ic_right_arrow_white"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="5dp"
+                android:textColor="?attr/primaryLightColorText" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/udp_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="45dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_toStartOf="@id/firewall_udp_stats"
+                android:alpha="0.5"
+                android:padding="3dp"
+                app:indicatorColor="?attr/accentGood"
+                app:trackColor="?attr/background" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/firewall_udp_shimmer_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/homeScreenBtnBackground"
+                    android:padding="5dp" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+        </RelativeLayout>
+
         <LinearLayout
             android:id="@+id/firewall_disallow_dns_bypass_ll"
             android:layout_width="match_parent"
@@ -208,6 +392,52 @@
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:id="@+id/firewall_dns_bypass_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/firewall_dns_bypass_stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:alpha="0.5"
+                android:drawableEnd="@drawable/ic_right_arrow_white"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="5dp"
+                android:textColor="?attr/primaryLightColorText" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/dns_bypass_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="45dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_toStartOf="@id/firewall_dns_bypass_stats"
+                android:alpha="0.5"
+                android:padding="3dp"
+                app:indicatorColor="?attr/accentGood"
+                app:trackColor="?attr/background" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/firewall_dns_bypass_shimmer_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/homeScreenBtnBackground"
+                    android:padding="5dp" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+        </RelativeLayout>
+
         <LinearLayout
             android:id="@+id/firewall_block_new_app_ll"
             android:layout_width="match_parent"
@@ -239,6 +469,52 @@
                 android:padding="15dp" />
 
         </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/firewall_new_app_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/firewall_new_app_stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:alpha="0.5"
+                android:drawableEnd="@drawable/ic_right_arrow_white"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="5dp"
+                android:textColor="?attr/primaryLightColorText" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/new_app_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="45dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_toStartOf="@id/firewall_new_app_stats"
+                android:alpha="0.5"
+                android:padding="3dp"
+                app:indicatorColor="?attr/accentGood"
+                app:trackColor="?attr/background" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/firewall_new_app_shimmer_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/homeScreenBtnBackground"
+                    android:padding="5dp" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/firewall_check_ipv4_ll"
@@ -306,6 +582,52 @@
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:id="@+id/firewall_metered_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/firewall_metered_stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:alpha="0.5"
+                android:drawableEnd="@drawable/ic_right_arrow_white"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="5dp"
+                android:textColor="?attr/primaryLightColorText" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/metered_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="45dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_toStartOf="@id/firewall_metered_stats"
+                android:alpha="0.5"
+                android:padding="3dp"
+                app:indicatorColor="?attr/accentGood"
+                app:trackColor="?attr/background" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/firewall_metered_shimmer_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/homeScreenBtnBackground"
+                    android:padding="5dp" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+        </RelativeLayout>
+
         <LinearLayout
             android:id="@+id/firewall_block_http_ll"
             android:layout_width="match_parent"
@@ -339,6 +661,52 @@
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:id="@+id/firewall_http_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/firewall_http_stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:alpha="0.5"
+                android:drawableEnd="@drawable/ic_right_arrow_white"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="5dp"
+                android:textColor="?attr/primaryLightColorText" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/http_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="45dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_toStartOf="@id/firewall_http_stats"
+                android:alpha="0.5"
+                android:padding="3dp"
+                app:indicatorColor="?attr/accentGood"
+                app:trackColor="?attr/background" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/firewall_http_shimmer_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/homeScreenBtnBackground"
+                    android:padding="5dp" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+        </RelativeLayout>
+
         <LinearLayout
             android:id="@+id/firewall_univ_lockdown_ll"
             android:layout_width="match_parent"
@@ -346,7 +714,7 @@
             android:layout_marginLeft="2dp"
             android:layout_marginTop="2dp"
             android:layout_marginRight="2dp"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="2dp">
 
             <TextView
                 android:id="@+id/firewall_univ_lockdown_txt"
@@ -371,5 +739,53 @@
                 android:padding="15dp" />
 
         </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/firewall_lockdown_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/firewall_lockdown_stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:alpha="0.5"
+                android:drawableEnd="@drawable/ic_right_arrow_white"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="5dp"
+                android:textColor="?attr/primaryLightColorText" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/lockdown_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="45dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_toStartOf="@id/firewall_lockdown_stats"
+                android:alpha="0.5"
+                android:padding="3dp"
+                app:indicatorColor="?attr/accentGood"
+                app:trackColor="?attr/background" />
+
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/firewall_lockdown_shimmer_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/homeScreenBtnBackground"
+                    android:padding="5dp" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+        </RelativeLayout>
+
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -17,7 +17,7 @@ package com.celzero.bravedns.service
 
 import Logger
 import Logger.LOG_TAG_PROXY
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ProxyAppMappingRepository
 import com.celzero.bravedns.database.ProxyApplicationMapping
@@ -34,7 +34,8 @@ object ProxyManager : KoinComponent {
     const val ID_TCP_BASE = "TCP"
     const val ID_S5_BASE = "S5"
     const val ID_HTTP_BASE = "HTTP"
-    const val ID_NONE = "SYSTEM"
+    const val ID_NONE = "SYSTEM" // no proxy
+    const val ID_RPN_WIN = "RPN-WIN" // rpn win proxy
 
     const val TCP_PROXY_NAME = "Rethink-Proxy"
     const val ORBOT_PROXY_NAME = "Orbot"
@@ -153,6 +154,18 @@ object ProxyManager : KoinComponent {
         Logger.i(LOG_TAG_PROXY, "added unselected apps to interface: $proxyId")
     }
 
+    suspend fun getAllSelectedApps(): Set<ProxyAppMapTuple> {
+        // return all apps that are part of some proxy
+        return pamSet.filter { it.proxyId != "" }
+            .map { ProxyAppMapTuple(it.uid, it.packageName, it.proxyId) }
+            .toSet()
+    }
+
+    suspend fun getAppsCountForProxy(proxyId: String): Int {
+        // return the count of apps that are part of the proxy
+        return pamSet.count { it.proxyId == proxyId }
+    }
+
     suspend fun setNoProxyForApp(uid: Int) {
         val noProxy = ""
         val m = pamSet.filter { it.uid == uid }.toSet()
@@ -195,6 +208,28 @@ object ProxyManager : KoinComponent {
         m.forEach { addNewApp(it) }
     }
 
+    suspend fun addApp(appInfo: AppInfo?) {
+        addNewApp(appInfo)
+    }
+
+    suspend fun updateApp(uid: Int, packageName: String) {
+        if (pamSet.any { it.uid == uid && it.packageName == packageName }) {
+            Logger.i(LOG_TAG_PROXY, "App already exists in proxy mapping: $packageName")
+            return
+        }
+        // update the uid for the app in the database and the cache
+        // assuming pamSet will always be synced with the database
+        val m = pamSet.filter { it.packageName == packageName }.toSet()
+        if (m.isNotEmpty()) {
+            val n = m.map { ProxyAppMapTuple(uid, packageName, it.proxyId) }
+            pamSet.removeAll(m)
+            pamSet.addAll(n)
+            db.updateUidForApp(uid, packageName)
+        } else {
+            Logger.e(LOG_TAG_PROXY, "updateApp: map not found for uid $uid")
+        }
+    }
+
     suspend fun purgeDupsBeforeRefresh() {
         val visited = mutableSetOf<FirewallManager.AppInfoTuple>()
         val dups = mutableSetOf<FirewallManager.AppInfoTuple>()
@@ -223,6 +258,10 @@ object ProxyManager : KoinComponent {
             Logger.e(LOG_TAG_PROXY, "AppInfo is null, cannot add to proxy")
             return
         }
+        if (pamSet.any { it.uid == appInfo.uid && it.packageName == appInfo.packageName }) {
+            Logger.i(LOG_TAG_PROXY, "App already exists in proxy mapping: ${appInfo.appName}")
+            return
+        }
         val pam =
             ProxyApplicationMapping(
                 appInfo.uid,
@@ -238,30 +277,36 @@ object ProxyManager : KoinComponent {
         Logger.i(LOG_TAG_PROXY, "Adding app for mapping: ${pam.appName}, ${pam.uid}")
     }
 
-    private fun deleteFromCache(pam: ProxyApplicationMapping) {
+    private fun deleteFromCache(uid: Int, packageName: String) {
         pamSet.forEach {
-            if (it.uid == pam.uid && it.packageName == pam.packageName) {
+            if (it.uid == uid && it.packageName == packageName) {
                 pamSet.remove(it)
             }
         }
     }
 
-    suspend fun deleteAppMappingsByUid(uid: Int) {
-        val m = pamSet.filter { it.uid == uid }
-        m.forEach { deleteApp(it.uid, it.packageName) }
+    suspend fun deleteApp(uid: Int, packageName: String) {
+        deleteFromCache(uid, packageName)
+        db.deleteApp(uid, packageName)
+        Logger.i(LOG_TAG_PROXY, "deleting app for mapping: $uid, $packageName")
     }
 
-    private suspend fun deleteApp(uid: Int, packageName: String) {
-        val pam = ProxyApplicationMapping(uid, packageName, "", "", false, "")
-        deleteFromCache(pam)
-        db.deleteApp(pam)
-        Logger.d(LOG_TAG_PROXY, "Deleting app for mapping: ${pam.appName}, ${pam.uid}")
+    suspend fun deleteAppIfNeeded(uid: Int, packageName: String) {
+        val fm = FirewallManager.getAppInfoByPackage(packageName)
+        // if there is no app info for the package, then delete the app from the mapping
+        if (fm == null) {
+            deleteApp(uid, packageName)
+            return
+        } else {
+            // the app can be tombstoned, so do not delete the app from the mapping
+            Logger.i(LOG_TAG_PROXY, "deleteAppIfNeeded: app($uid, $packageName) is available in firewall manager, not deleting, tombstone: ${fm.tombstoneTs}")
+        }
     }
 
     suspend fun clear() {
         pamSet.clear()
         db.deleteAll()
-        Logger.d(LOG_TAG_PROXY, "Deleting all apps for mapping")
+        Logger.d(LOG_TAG_PROXY, "deleting all apps for mapping")
     }
 
     fun isAnyAppSelected(proxyId: String): Boolean {
@@ -274,28 +319,41 @@ object ProxyManager : KoinComponent {
             pid.startsWith(ID_WG_BASE) ||
             pid.startsWith(ID_TCP_BASE) ||
             pid.startsWith(ID_S5_BASE) ||
-            pid.startsWith(ID_HTTP_BASE)
+            pid.startsWith(ID_HTTP_BASE) ||
+            pid.startsWith(ID_RPN_WIN)
     }
 
     fun getAppCountForProxy(proxyId: String): Int {
         return pamSet.count { it.proxyId == proxyId }
     }
 
-    suspend fun removeWgProxies() {
-        // remove all the wg proxies from the app config mappings, during restore process
-        val noProxy = ""
-        val m = pamSet.filter { it.proxyId.startsWith(ID_WG_BASE) }.toSet()
-        val n = m.map { ProxyAppMapTuple(it.uid, it.packageName, noProxy) }
-        pamSet.removeAll(m)
-        pamSet.addAll(n)
-        db.removeAllWgProxies()
-    }
-
     fun isIpnProxy(ipnProxyId: String): Boolean {
         if (ipnProxyId.isEmpty()) return false
-        // if id is not Ipn.Base, Ipn.Block, Ipn.Exit then it is proxied
+        // check if the proxy id is not the base, block, exit, auto or ingress
+        // all these are special cases and should not be considered as proxied traffic
         return ipnProxyId != Backend.Base &&
             ipnProxyId != Backend.Block &&
-            ipnProxyId != Backend.Exit
+            ipnProxyId != Backend.Exit &&
+            ipnProxyId != Backend.Auto &&
+            ipnProxyId != Backend.Ingress &&
+            ipnProxyId != Backend.Plus &&
+            !ipnProxyId.endsWith(Backend.RPN)
+    }
+
+    fun isRpnProxy(ipnProxyId: String): Boolean {
+        if (ipnProxyId.isEmpty()) return false
+        // check if the proxy id is not the base, block, exit, auto or ingress
+        // all these are special cases and should not be considered as proxied traffic
+        return ipnProxyId.endsWith(Backend.RPN) || ipnProxyId == Backend.Auto
+    }
+
+    fun stats(): String {
+        val sb = StringBuilder()
+        sb.append("   apps: ${pamSet.size}\n")
+        sb.append("   wg: ${WireguardManager.getNumberOfMappings()}\n")
+        sb.append("   active wgs: ${WireguardManager.getActiveWgCount()}\n")
+        sb.append("   isOneWgActive: ${WireguardManager.oneWireGuardEnabled()}\n")
+
+        return sb.toString()
     }
 }

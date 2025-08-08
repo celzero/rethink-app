@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_DNS
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
@@ -31,6 +32,7 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -47,13 +49,18 @@ import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogIpDetailsLayoutBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.getIcon
+import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -62,6 +69,7 @@ import com.google.common.collect.Multimap
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import java.util.Locale
 
@@ -112,6 +120,13 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.let { window ->
+            if (isAtleastQ()) {
+                val controller = WindowInsetsControllerCompat(window, window.decorView)
+                controller.isAppearanceLightNavigationBars = false
+                window.isNavigationBarContrastEnforced = false
+            }
+        }
 
         val data = arguments?.getString(INSTANCE_STATE_DNSLOGS)
         log = Gson().fromJson(data, DnsLog::class.java)
@@ -122,18 +137,81 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             return
         }
 
-        b.bsdlDomainRuleDesc.text = updateHtmlEncodedText(getString(R.string.bsdl_block_desc))
-        b.dnsBlockUrl.text = log!!.queryStr
+        b.bsdlDomainRuleDesc.text = htmlToSpannedText(getString(R.string.bsdl_block_desc))
+        b.dnsBlockUrl.text = log!!.queryStr + "      ❯"
         b.dnsBlockIpAddress.text = getResponseIp()
         b.dnsBlockConnectionFlag.text = log!!.flag
-        b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, log!!.latency.toString())
-        b.dnsMessage.text = log!!.msg
+        b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, log!!.ttl.toString())
+        if (Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())
+                .isLessThan(Logger.LoggerLevel.DEBUG)
+        ) {
+            b.dnsMessage.text = "${log?.msg}; ${log?.proxyId}; ${log?.relayIP}"
+        } else {
+            b.dnsMessage.text = log!!.msg
+        }
 
         displayFavIcon()
         displayDnsTransactionDetails()
         displayRecordTypeChip()
         setupClickListeners()
+        updateAppDetails(log)
         updateRulesUi(log!!.queryStr)
+
+        if (log!!.region.isNotEmpty()) {
+            b.dnsRegion.visibility = View.VISIBLE
+            b.dnsRegion.text = log!!.region
+        } else {
+            b.dnsRegion.visibility = View.GONE
+        }
+    }
+
+    private fun updateAppDetails(log: DnsLog?) {
+        if (log == null) {
+            b.dnsAppNameHeader.visibility = View.GONE
+            return
+        }
+
+        if (log.appName.isNotEmpty() && log.packageName.isNotEmpty()) {
+            b.dnsAppNameHeader.visibility = View.VISIBLE
+            b.dnsAppName.text = log.appName
+            b.dnsAppIcon.setImageDrawable(getIcon(requireContext(), log.packageName, log.appName))
+            return
+        }
+
+        io {
+            val appNames = FirewallManager.getAppNamesByUid(log.uid)
+            if (appNames.isEmpty()) {
+                uiCtx {
+                    b.dnsAppNameHeader.visibility = View.GONE
+                }
+                return@io
+            }
+            val pkgName = FirewallManager.getPackageNameByAppName(appNames[0])
+
+            val appCount = appNames.count()
+            uiCtx {
+                if (appCount >= 1) {
+                    b.dnsAppName.text =
+                        if (appCount >= 2) {
+                            getString(
+                                R.string.ctbs_app_other_apps,
+                                appNames[0],
+                                appCount.minus(1).toString()
+                            )
+                        } else {
+                            appNames[0]
+                        }
+                    if (pkgName == null) return@uiCtx
+                    b.dnsAppIcon.setImageDrawable(
+                        getIcon(requireContext(), pkgName, log.appName)
+                    )
+                } else {
+                    // apps which are not available in cache are treated as non app.
+                    // TODO: check packageManager#getApplicationInfo() for appInfo
+                    b.dnsAppNameHeader.visibility = View.GONE
+                }
+            }
+        }
     }
 
     private fun getResponseIp(): String {
@@ -163,6 +241,14 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun setupClickListeners() {
+
+        b.dnsBlockHeaderContainer.setOnClickListener {
+            startDomainConnectionsActivity(log!!.queryStr)
+        }
+
+        b.dnsBlockUrl.setOnClickListener {
+            startDomainConnectionsActivity(log!!.queryStr)
+        }
 
         b.bsdlDomainRuleSpinner.adapter =
             FirewallStatusSpinnerAdapter(
@@ -346,6 +432,14 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    private fun startDomainConnectionsActivity(domain: String) {
+        val intent = Intent(requireContext(), DomainConnectionsActivity::class.java)
+        intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TYPE, DomainConnectionsActivity.InputType.DOMAIN.type)
+        intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_DOMAIN, domain)
+        intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TIME_CATEGORY, DomainConnectionsViewModel.TimeCategory.SEVEN_DAYS.value)
+        requireContext().startActivity(intent)
+    }
+
     private fun showBlocklistDialog(groupNames: Multimap<String, String>) {
         val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
         val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
@@ -397,7 +491,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             text +=
                 getString(R.string.dns_btm_sheet_dialog_ips, Utilities.getFlag(it.slice(0..2)), it)
         }
-        return updateHtmlEncodedText(text)
+        return htmlToSpannedText(text)
     }
 
     private fun formatText(groupNames: Multimap<String, String>): Spanned {
@@ -416,7 +510,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
                 )
         }
         text = text.replace(",", ", ")
-        return updateHtmlEncodedText(text)
+        return htmlToSpannedText(text)
     }
 
     private fun displayDescription() {
@@ -436,26 +530,35 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         if (log!!.isBlocked) {
             showBlockedState(uptime)
         } else {
-            showResolvedState(uptime, log!!.latency, log!!.groundedQuery())
+            showResolvedState(uptime)
         }
     }
 
-    private fun showResolvedState(uptime: String, latency: Long, isGrounded: Boolean) {
+    private fun showResolvedState(uptime: String) {
         if (log == null) {
             Logger.w(LOG_TAG_DNS, "Transaction detail missing, no need to update ui")
             return
         }
 
-        if (latency == 0L && !isGrounded) {
-            b.dnsBlockBlockedDesc.text =
+        if (log!!.isCached) {
+            val txt = if (log!!.serverIP.isEmpty()) {
                 getString(R.string.dns_btm_resolved_doh, uptime, getString(R.string.lbl_cache))
+            } else {
+                val concat = "${getString(R.string.lbl_cache)} (${log!!.resolverId}:${log!!.serverIP})"
+                getString(R.string.dns_btm_resolved_doh, uptime, concat)
+            }
+            b.dnsBlockBlockedDesc.text = txt
             return
         }
 
-        if (log!!.isAnonymized()) { // anonymized queries answered by dns-crypt
-            val text =
-                getString(R.string.dns_btm_resolved_crypt, uptime, log!!.serverIP, log!!.relayIP)
-            b.dnsBlockBlockedDesc.text = updateHtmlEncodedText(text)
+        if (log!!.isAnonymized()) { // anonymized queries answered by dns-crypt / proxies
+            val p = if (log!!.relayIP.isEmpty()) {
+                log!!.proxyId
+            } else {
+                log!!.relayIP
+            }
+            val text = getString(R.string.dns_btm_resolved_crypt, uptime, log!!.serverIP, p)
+            b.dnsBlockBlockedDesc.text = htmlToSpannedText(text)
         } else if (log!!.isLocallyAnswered()) { // usually happens when there is a network failure
             b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server, uptime)
         } else {
@@ -607,5 +710,9 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }

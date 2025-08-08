@@ -55,8 +55,7 @@ class LocalSimpleViewAdapter(val context: Context) :
                     oldConnection: LocalBlocklistPacksMap,
                     newConnection: LocalBlocklistPacksMap
                 ): Boolean {
-                    return (oldConnection.pack == newConnection.pack &&
-                        oldConnection.level == newConnection.level)
+                    return oldConnection == newConnection
                 }
             }
     }

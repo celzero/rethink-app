@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Base gradient background -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="90"
+                android:startColor="?attr/homeScreenBtnGradientStart"
+                android:endColor="?attr/homeScreenBtnGradientEnd" />
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+
+    <!-- Subtle highlight overlay (top-right) -->
+    <item android:left="0dp" android:top="0dp" android:right="0dp" android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="45"
+                android:startColor="?attr/homeScreenBtnGradientStart"
+                android:endColor="?attr/homeScreenBtnGradientEnd" />
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+
+
+</layer-list>

@@ -16,6 +16,7 @@
 package com.celzero.bravedns.ui
 
 import Logger
+import Logger.LOG_IAB
 import Logger.LOG_TAG_APP_UPDATE
 import Logger.LOG_TAG_BACKUP_RESTORE
 import Logger.LOG_TAG_DOWNLOAD
@@ -29,23 +30,26 @@ import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.os.SystemClock
+import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
 import androidx.work.BackoffPolicy
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
@@ -54,75 +58,79 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
-import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
+import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getPackageMetadata
+import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isWebsiteFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import java.util.Calendar
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
-    private val b by viewBinding(ActivityHomeScreenBinding::bind)
-
     private val persistentState by inject<PersistentState>()
-    private val appConfig by inject<AppConfig>()
+    private val appInfoDb by inject<AppInfoRepository>()
     private val appUpdateManager by inject<AppUpdater>()
     private val rdb by inject<RefreshDatabase>()
 
-    // support for biometric authentication
-    private lateinit var executor: Executor
-    private lateinit var biometricPrompt: BiometricPrompt
-    private lateinit var promptInfo: BiometricPrompt.PromptInfo
-
-    // private var biometricPromptRetryCount = 1
-    private var onResumeCalledAlready = false
-
-    companion object {
-        private const val ON_RESUME_CALLED_PREFERENCE_KEY = "onResumeCalled"
-    }
+    // TODO: see if this can be replaced with a more robust solution
+    // keep track of when app went to background
+    private var appInBackground = false
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-            UI_MODE_NIGHT_YES
+                UI_MODE_NIGHT_YES
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
 
-        // stackoverflow.com/questions/44221195/multiple-onstop-onresume-calls-in-android-activity
-        // Restore value of members from saved state
-        onResumeCalledAlready =
-            savedInstanceState?.getBoolean(ON_RESUME_CALLED_PREFERENCE_KEY) ?: false
+        if (isAtleastO_MR1()) {
+            Logger.vv(LOG_TAG_UI, "Setting up window insets for Android 27+")
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.nav_view)) { view, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                view.updatePadding(bottom = systemBars.bottom) // Add bottom padding to keep icons visible
+                insets
+                WindowInsetsCompat.CONSUMED
+            }
+        }
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
 
         // do not launch on board activity when app is running on TV
         if (persistentState.firstTimeLaunch && !isAppRunningOnTv()) {
             launchOnboardActivity()
-            rdnsRemote()
             return
         }
         updateNewVersion()
@@ -135,17 +143,46 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         initUpdateCheck()
 
         observeAppState()
+
+        handleOnBackPressed()
+
+        NewSettingsManager.handleNewSettings()
+
+        // enable in-app messaging, will be used to show in-app messages in case of billing issues
+        //enableInAppMessaging()
     }
 
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        outState.putBoolean(ON_RESUME_CALLED_PREFERENCE_KEY, onResumeCalledAlready)
-        super.onSaveInstanceState(outState, outPersistentState)
+    /*private fun enableInAppMessaging() {
+        initiateBillingIfNeeded()
+        // enable in-app messaging
+        InAppBillingHandler.enableInAppMessaging(this)
+        Logger.v(LOG_IAB, "enableInAppMessaging: enabled")
     }
+
+    private fun initiateBillingIfNeeded() {
+        if (InAppBillingHandler.isBillingClientSetup()) {
+            Logger.i(LOG_IAB, "ensureBillingSetup: billing client already setup")
+            return
+        }
+
+        InAppBillingHandler.initiate(this.applicationContext)
+        Logger.i(LOG_IAB, "ensureBillingSetup: billing client initiated")
+    }*/
+
+    /*override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        // by simply receiving and setting the new intent, we ensure that when the activity
+        // is brought back to the foreground, it uses the latest intent state
+        Logger.v(LOG_TAG_UI, "home screen activity received new intent")
+    }*/
 
     override fun onResume() {
         super.onResume()
-        if (persistentState.biometricAuth && !isAppRunningOnTv() && !onResumeCalledAlready) {
-            biometricPrompt()
+        // if app is coming from background, don't reset the activity stack
+        if (appInBackground) {
+            appInBackground = false
+            Logger.d(LOG_TAG_UI, "app restored from background, maintaining activity stack")
         }
     }
 
@@ -159,111 +196,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
     }
 
-    private fun biometricPrompt() {
-        // if the biometric authentication is already done in the last 15 minutes, then skip
-        // fixme - #324 - move the 15 minutes to a configurable value
-        if (
-            SystemClock.elapsedRealtime() - persistentState.biometricAuthTime <
-                TimeUnit.MINUTES.toMillis(15)
-        ) {
-            return
-        }
-
-        promptInfo =
-            BiometricPrompt.PromptInfo.Builder()
-                .setTitle(getString(R.string.hs_biometeric_title))
-                .setSubtitle(getString(R.string.hs_biometeric_desc))
-                .setAllowedAuthenticators(
-                    BiometricManager.Authenticators.BIOMETRIC_WEAK or
-                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
-                )
-                .setConfirmationRequired(false)
-                .build()
-
-        // ref: https://developer.android.com/training/sign-in/biometric-auth
-        executor = ContextCompat.getMainExecutor(this)
-        biometricPrompt =
-            BiometricPrompt(
-                this,
-                executor,
-                object : BiometricPrompt.AuthenticationCallback() {
-                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                        super.onAuthenticationError(errorCode, errString)
-                        Logger.i(
-                            LOG_TAG_UI,
-                            "Biometric authentication error (code: $errorCode): $errString"
-                        )
-                        // error code 5 (ERROR_CANCELED), this may happen when the device is locked
-                        // or another pending operation prevents or disables it
-                        // error code 10 (ERROR_USER_CANCELED), retry once after user cancelled
-                        // the biometric prompt. ref issuetracker.google.com/issues/145231213
-                        // commenting the code below, as the retry is buggy and not working as
-                        // expected, have to revisit this code later
-                        /* if (
-                            biometricPromptRetryCount > 0 &&
-                                (errorCode == BiometricPrompt.ERROR_CANCELED ||
-                                    errorCode == BiometricPrompt.ERROR_USER_CANCELED)
-                        ) {
-                            biometricPromptRetryCount--
-                            if (isInForeground()) biometricPrompt.authenticate(promptInfo)
-                        } else {
-                            showToastUiCentered(
-                                applicationContext,
-                                errString.toString(),
-                                Toast.LENGTH_SHORT
-                            )
-                            finish()
-                        } */
-                        showToastUiCentered(
-                            this@HomeScreenActivity,
-                            errString.toString(),
-                            Toast.LENGTH_SHORT
-                        )
-                        finish()
-                    }
-
-                    override fun onAuthenticationSucceeded(
-                        result: BiometricPrompt.AuthenticationResult
-                    ) {
-                        super.onAuthenticationSucceeded(result)
-                        // biometricPromptRetryCount = 1
-                        persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
-                        Logger.i(LOG_TAG_UI, "Biometric success @ ${System.currentTimeMillis()}")
-                    }
-
-                    override fun onAuthenticationFailed() {
-                        super.onAuthenticationFailed()
-                        showToastUiCentered(
-                            this@HomeScreenActivity,
-                            getString(R.string.hs_biometeric_failed),
-                            Toast.LENGTH_SHORT
-                        )
-                        Logger.i(LOG_TAG_UI, "Biometric authentication failed")
-                        // show the biometric prompt again only if the ui is in foreground
-                        if (isInForeground()) biometricPrompt.authenticate(promptInfo)
-                    }
-                }
-            )
-
-        // BIOMETRIC_WEAK :Any biometric (e.g. fingerprint, iris, or face) on the device that meets
-        // or exceeds the requirements for Class 2(formerly Weak), as defined by the Android CDD.
-        if (
-            BiometricManager.from(this)
-                .canAuthenticate(
-                    BiometricManager.Authenticators.BIOMETRIC_WEAK or
-                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
-                ) == BiometricManager.BIOMETRIC_SUCCESS
-        ) {
-            biometricPrompt.authenticate(promptInfo)
-        } else {
-            showToastUiCentered(
-                applicationContext,
-                getString(R.string.hs_biometeric_feature_not_supported),
-                Toast.LENGTH_SHORT
-            )
-        }
-    }
-
     private fun isInForeground(): Boolean {
         return !this.isFinishing && !this.isDestroyed
     }
@@ -272,7 +204,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         val intent = this.intent ?: return
         if (
             intent.scheme?.equals(INTENT_SCHEME) == true &&
-                intent.data?.path?.contains(BACKUP_FILE_EXTN) == true
+            intent.data?.path?.contains(BACKUP_FILE_EXTN) == true
         ) {
             handleRestoreProcess(intent.data)
         } else if (intent.scheme?.equals(INTENT_SCHEME) == true) {
@@ -356,7 +288,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 workManager.pruneWork()
             } else if (
                 WorkInfo.State.CANCELLED == workInfo.state ||
-                    WorkInfo.State.FAILED == workInfo.state
+                WorkInfo.State.FAILED == workInfo.state
             ) {
                 showToastUiCentered(
                     this,
@@ -381,6 +313,12 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun removeThisMethod() {
+        // set allowBypass to false for all versions, overriding the user's preference.
+        // the default was true for Play Store and website versions, and false for F-Droid.
+        // when allowBypass is true, some OEMs bypass the VPN service, causing connections
+        // to fail due to the "Block connections without VPN" option.
+        persistentState.allowBypass = false
+
         // change the persistent state for defaultDnsUrl, if its google.com (only for v055d)
         // fixme: remove this post v054.
         // this is to fix the default dns url, as the default dns url is changed from
@@ -390,21 +328,22 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[2].url
         }
         moveRemoteBlocklistFileFromAsset()
-        // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
-        // to SystemClock.elapsedRealtime
-        persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
-    }
-
-    private fun rdnsRemote() {
-        // enforce the dns to sky for play store build, and max for website and f-droid build
-        // on first time launch
-        io {
-            if (isPlayStoreFlavour()) {
-                appConfig.switchRethinkDnsToSky()
-            } else {
-                appConfig.switchRethinkDnsToMax()
-            }
+        // set the rethink app in firewall mode as allowed by default
+        io { appInfoDb.resetRethinkAppFirewallMode() }
+        // if biometric auth is enabled, then set the biometric auth type to 3 (15 minutes)
+        if (persistentState.biometricAuth) {
+            persistentState.biometricAuthType =
+                MiscSettingsActivity.BioMetricType.FIFTEEN_MIN.action
+            // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
+            // to SystemClock.elapsedRealtime
+            persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
         }
+
+        // reset the local blocklist download from android download manager to custom in v055o
+        persistentState.useCustomDownloadManager = true
+
+        // delete residue wgs from database, remove this post v055o
+        io { WireguardManager.deleteResidueWgs() }
     }
 
     // fixme: find a cleaner way to implement this, move this to some other place
@@ -413,7 +352,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             // already there is a remote blocklist file available
             if (
                 persistentState.remoteBlocklistTimestamp >
-                    Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
+                Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
             ) {
                 RethinkBlocklistManager.readJson(
                     this,
@@ -429,7 +368,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun launchOnboardActivity() {
         val intent = Intent(this, WelcomeActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
         finish()
     }
@@ -437,13 +375,18 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun updateNewVersion() {
         if (!isNewVersion()) return
 
+        if (persistentState.appVersion != 0) {
+            // if app version is not 0, then it means the app is updated
+            NewSettingsManager.initializeNewSettings()
+            Logger.i(LOG_TAG_UI, "app version already set, so its update, showing new settings")
+        }
         val version = getLatestVersion()
-        Logger.i(LOG_TAG_UI, "New version detected, updating the app version, version: $version")
+        Logger.i(LOG_TAG_UI, "new version detected, updating the app version, version: $version")
         persistentState.appVersion = version
         persistentState.showWhatsNewChip = true
+        persistentState.appUpdateTimeTs = System.currentTimeMillis()
 
         // FIXME: remove this post v054
-        // this is to fix the local blocklist default download location
         removeThisMethod()
     }
 
@@ -455,7 +398,15 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun getLatestVersion(): Int {
         val pInfo: PackageInfo? = getPackageMetadata(this.packageManager, this.packageName)
-        return pInfo?.versionCode ?: 0
+        // TODO: modify this to use the latest version code api
+        val v = pInfo?.versionCode ?: 0
+        // latest version has apk variant (baseAbiVersionCode * 10000000 + variant.versionCode)
+        // so we need to mod the version code by 10000000 to get the actual version code
+        // for example: 10000000 + 45 = 10000045, so the version code is 1
+        // see build.gradle (:app), #project.ext.versionCodes
+        val latestVersionCode = v % 10000000 // 10000000 is the base version code
+        Logger.i(LOG_TAG_UI, "latest version code: $latestVersionCode")
+        return latestVersionCode
     }
 
     // FIXME - Move it to Android's built-in WorkManager
@@ -475,7 +426,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         val calendar: Calendar = Calendar.getInstance()
         val day: Int = calendar.get(Calendar.DAY_OF_WEEK)
         return (day == Calendar.FRIDAY || day == Calendar.SATURDAY) &&
-            persistentState.checkForAppUpdate
+                persistentState.checkForAppUpdate
     }
 
     fun checkForUpdate(
@@ -533,7 +484,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // status.
         // TODO: prompt dialog to user that Playservice is disabled, so switch to update
         // check for website
-        return Utilities.getApplicationInfo(this, PKG_NAME_PLAY_STORE)?.enabled ?: false
+        return Utilities.getApplicationInfo(this, PKG_NAME_PLAY_STORE)?.enabled == true
     }
 
     private val installStateUpdatedListener =
@@ -545,6 +496,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         // CHECK THIS if AppUpdateType.FLEXIBLE, otherwise you can skip
                         showUpdateCompleteSnackbar()
                     }
+
                     else -> {
                         appUpdateManager.unregisterListener(this)
                     }
@@ -603,17 +555,22 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
 
     private fun showUpdateCompleteSnackbar() {
-        val snack =
-            Snackbar.make(
-                b.container,
-                getString(R.string.update_complete_snack_message),
-                Snackbar.LENGTH_INDEFINITE
-            )
-        snack.setAction(getString(R.string.update_complete_action_snack)) {
-            appUpdateManager.completeUpdate()
+        try {
+            val container: View = findViewById(R.id.container)
+            val snack =
+                Snackbar.make(
+                    container,
+                    getString(R.string.update_complete_snack_message),
+                    Snackbar.LENGTH_INDEFINITE
+                )
+            snack.setAction(getString(R.string.update_complete_action_snack)) {
+                appUpdateManager.completeUpdate()
+            }
+            snack.setActionTextColor(ContextCompat.getColor(this, R.color.primaryLightColorText))
+            snack.show()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "err showing update complete snackbar: ${e.message}", e)
         }
-        snack.setActionTextColor(ContextCompat.getColor(this, R.color.primaryLightColorText))
-        snack.show()
     }
 
     private fun showDownloadDialog(
@@ -629,33 +586,25 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         builder.setCancelable(false)
         if (
             message == getString(R.string.download_update_dialog_message_ok) ||
-                message == getString(R.string.download_update_dialog_failure_message) ||
-                message == getString(R.string.download_update_dialog_trylater_message)
+            message == getString(R.string.download_update_dialog_failure_message) ||
+            message == getString(R.string.download_update_dialog_trylater_message)
         ) {
-            builder.setPositiveButton(getString(R.string.hs_download_positive_default)) {
-                dialogInterface,
-                _ ->
+            builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
         } else {
             if (source == AppUpdater.InstallSource.STORE) {
-                builder.setPositiveButton(getString(R.string.hs_download_positive_play_store)) {
-                    dialogInterface,
-                    _ ->
+                builder.setPositiveButton(getString(R.string.hs_download_positive_play_store)) { dialogInterface, _ ->
                     appUpdateManager.completeUpdate()
                     dialogInterface.dismiss()
                 }
             } else {
-                builder.setPositiveButton(getString(R.string.hs_download_positive_website)) {
-                    dialogInterface,
-                    _ ->
+                builder.setPositiveButton(getString(R.string.hs_download_positive_website)) { dialogInterface, _ ->
                     initiateDownload()
                     dialogInterface.dismiss()
                 }
             }
-            builder.setNegativeButton(getString(R.string.hs_download_negative_default)) {
-                dialogInterface,
-                _ ->
+            builder.setNegativeButton(getString(R.string.hs_download_negative_default)) { dialogInterface, _ ->
                 persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                 dialogInterface.dismiss()
             }
@@ -667,7 +616,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun initiateDownload() {
         try {
             val url = Constants.RETHINK_APP_DOWNLOAD_LINK
-            val uri = Uri.parse(url)
+            val uri = url.toUri()
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = uri
             intent.addCategory(Intent.CATEGORY_BROWSABLE)
@@ -675,7 +624,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             showToastUiCentered(this, getString(R.string.no_browser_error), Toast.LENGTH_SHORT)
-            Logger.w(Logger.LOG_TAG_VPN, "Failure opening rethink download link: ${e.message}", e)
+            Logger.w(Logger.LOG_TAG_VPN, "err opening rethink download link: ${e.message}", e)
         }
     }
 
@@ -686,14 +635,114 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         } catch (e: IllegalArgumentException) {
             Logger.w(LOG_TAG_DOWNLOAD, "Unregister receiver exception")
         }
+        // mark that app is going to background
+        appInBackground = true
+        Logger.v(LOG_TAG_UI, "home screen activity is stopped, app going to background")
     }
 
-    private fun setupNavigationItemSelectedListener() {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
-        val navController = navHostFragment.navController
+    private fun handleOnBackPressed() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val navHostFragment =
+                        supportFragmentManager.findFragmentById(R.id.fragment_container) as? NavHostFragment
+                    val navController = navHostFragment?.navController
+                    val homeId = R.id.homeScreenFragment
+                    if (navController?.currentDestination?.id != homeId) {
+                        val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
+                        btmNavView.selectedItemId = homeId
+                        navController?.navigate(
+                            homeId,
+                            null,
+                            NavOptions.Builder().setPopUpTo(homeId, true).build()
+                        )
+                    } else {
+                        finish()
+                    }
+                }
+            }
+        )
+    }
+
+    /*private fun updateRethinkPlusHighlight() {
         val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
-        btmNavView.setupWithNavController(navController)
+        val rethinkPlusItem = btmNavView.menu.findItem(R.id.rethinkPlus)
+        rethinkPlusItem.setIcon(R.drawable.ic_rethink_plus_sparkle)
+        btmNavView.removeBadge(R.id.rethinkPlus)
+    }*/
+
+    private fun setupNavigationItemSelectedListener() {
+        val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as? NavHostFragment
+        val navController = navHostFragment?.navController
+
+        btmNavView.setOnItemSelectedListener { item ->
+            val homeId = R.id.homeScreenFragment
+
+            when (item.itemId) {
+                R.id.rethinkPlus -> {
+                    showToastUiCentered(this, "Coming soon!", Toast.LENGTH_SHORT)
+                    true
+                    /*if (RpnProxyManager.hasValidSubscription()) {
+                        // Navigate to rethinkPlusDashboardFragment
+                        if (navController?.currentDestination?.id != R.id.rethinkPlusDashboardFragment) {
+                            navController?.navigate(
+                                R.id.rethinkPlusDashboardFragment,
+                                null,
+                                NavOptions.Builder().setPopUpTo(homeId, false).build()
+                            )
+                        }
+                        btmNavView.menu.findItem(R.id.rethinkPlus)?.isChecked = true
+                        true
+                    } else {
+                        // Navigate to rethinkPlus fragment
+                        if (navController?.currentDestination?.id != R.id.rethinkPlus) {
+                            navController?.navigate(
+                                R.id.rethinkPlus,
+                                null,
+                                NavOptions.Builder().setPopUpTo(homeId, false).build()
+                            )
+                        }
+                        btmNavView.menu.findItem(R.id.rethinkPlus)?.isChecked = true
+                        true
+                    }*/
+                }
+
+                homeId -> {
+                    if (navController != null && navController.currentDestination?.id != homeId) {
+                        navController.navigate(
+                            homeId,
+                            null,
+                            NavOptions.Builder().setPopUpTo(homeId, true).build()
+                        )
+                        true
+                    } else {
+                        false
+                    }
+                }
+
+                else -> {
+                    if (navController != null && navController.currentDestination?.id != item.itemId) {
+                        navController.navigate(
+                            item.itemId,
+                            null,
+                            NavOptions.Builder().setPopUpTo(homeId, false).build()
+                        )
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
+        }
+
+        // Optionally sync the bottom nav highlight with nav changes
+        /*navController?.addOnDestinationChangedListener { _, destination, _ ->
+            // Update Rethink Plus badge or icon here if needed
+            updateRethinkPlusHighlight()
+        }*/
     }
 
     private fun io(f: suspend () -> Unit) {

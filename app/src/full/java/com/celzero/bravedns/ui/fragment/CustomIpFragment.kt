@@ -15,9 +15,14 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
@@ -30,6 +35,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.CustomIpAdapter
 import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
 import com.celzero.bravedns.databinding.FragmentCustomIpBinding
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
@@ -51,6 +57,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     private val viewModel: CustomIpViewModel by viewModel()
     private var uid = UID_EVERYBODY
     private var rules = CustomRulesActivity.RULES.APP_SPECIFIC_RULES
+    private lateinit var adapter: CustomIpAdapter
 
     companion object {
         fun newInstance(uid: Int, rules: CustomRulesActivity.RULES): CustomIpFragment {
@@ -66,6 +73,19 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // fix for #1939, OEM-specific bug, especially on heavily customized Android
+        // some ROMs kill or freeze the keyboard/IME process to save memory or battery,
+        // causing SearchView to stop receiving input events
+        // this is a workaround to restart the IME process
+        b.cipSearchView.setQuery("", false)
+        b.cipSearchView.clearFocus()
+
+        val imm = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.restartInput(b.cipSearchView)
     }
 
     private fun initView() {
@@ -140,16 +160,34 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
         if (rules == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
             b.cipAddFab.visibility = View.VISIBLE
             setupAdapterForApp()
+            io {
+                val appName = FirewallManager.getAppNameByUid(uid)
+                if (!appName.isNullOrEmpty()) {
+                    uiCtx { updateAppNameInSearchHint(appName) }
+                }
+            }
         } else {
             b.cipAddFab.visibility = View.GONE
             setupAdapterForAllApps()
         }
     }
 
+    private fun updateAppNameInSearchHint(appName: String) {
+        val appNameTruncated = appName.substring(0, appName.length.coerceAtMost(10))
+        val hint = getString(
+            R.string.two_argument_colon,
+            appNameTruncated,
+            getString(R.string.search_universal_ips)
+        )
+        b.cipSearchView.queryHint = hint
+        b.cipSearchView.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text).textSize =
+            14f
+        return
+    }
+
     private fun setupAdapterForApp() {
         observeAppSpecificRules()
-        val adapter =
-            CustomIpAdapter(requireContext(), CustomRulesActivity.RULES.APP_SPECIFIC_RULES)
+        adapter = CustomIpAdapter(requireContext(), CustomRulesActivity.RULES.APP_SPECIFIC_RULES)
         viewModel.setUid(uid)
         viewModel.customIpDetails.observe(viewLifecycleOwner) {
             adapter.submitData(this.lifecycle, it)
@@ -159,7 +197,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
 
     private fun setupAdapterForAllApps() {
         observeAllAppsRules()
-        val adapter = CustomIpAdapter(requireContext(), CustomRulesActivity.RULES.ALL_RULES)
+        adapter = CustomIpAdapter(requireContext(), CustomRulesActivity.RULES.ALL_RULES)
         viewModel.allIpRules.observe(viewLifecycleOwner) { adapter.submitData(this.lifecycle, it) }
         b.cipRecycler.adapter = adapter
     }
@@ -215,10 +253,35 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
                 handleInsertIp(dBind, IpRulesManager.IpRuleStatus.TRUST)
             }
         }
-
+        adjustButtonLayoutOrientation(dBind.dialogButtonsContainer)
         dBind.daciCancelBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
+
+    fun adjustButtonLayoutOrientation(buttonContainer: LinearLayout) {
+        buttonContainer.post {
+            val totalButtonsWidth = (0 until buttonContainer.childCount).sumOf { index ->
+                val child = buttonContainer.getChildAt(index)
+                val margins = (child.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+                        it.marginStart + it.marginEnd
+                } ?: 0
+                child.measuredWidth + margins
+            }
+
+            val availableWidth = buttonContainer.width - buttonContainer.paddingStart - buttonContainer.paddingEnd
+
+            // If buttons don't fit horizontally, switch to vertical
+            if (totalButtonsWidth > availableWidth) {
+                buttonContainer.orientation = LinearLayout.VERTICAL
+                // Optional: center buttons vertically
+                buttonContainer.gravity = Gravity.CENTER_HORIZONTAL
+            } else {
+                buttonContainer.orientation = LinearLayout.HORIZONTAL
+                buttonContainer.gravity = Gravity.END
+            }
+        }
+    }
+
 
     private fun handleInsertIp(
         dBind: DialogAddCustomIpBinding,
@@ -228,7 +291,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
             val input = dBind.daciIpEditText.text.toString()
             val ipString = Utilities.removeLeadingAndTrailingDots(input)
             var ip: IPAddress? = null
-            var port: Int = 0
+            var port = 0
 
             // chances of creating NetworkOnMainThread exception, handling with io operation
             ioCtx {
@@ -251,7 +314,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     private fun insertCustomIp(ip: IPAddress?, port: Int?, status: IpRulesManager.IpRuleStatus) {
         if (ip == null) return
 
-        io { IpRulesManager.addIpRule(uid, ip, port, status) }
+        io { IpRulesManager.addIpRule(uid, ip, port, status, proxyId = "", proxyCC = "") }
         Utilities.showToastUiCentered(
             requireContext(),
             getString(R.string.ci_dialog_added_success),
@@ -265,10 +328,16 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
             io {
-                if (rules == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
-                    IpRulesManager.deleteRulesByUid(uid)
+                val selectedItems = adapter.getSelectedItems()
+                if (selectedItems.isNotEmpty()) {
+                    IpRulesManager.deleteRules(selectedItems)
+                    uiCtx { adapter.clearSelection() }
                 } else {
-                    IpRulesManager.deleteAllAppsRules()
+                    if (rules == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
+                        IpRulesManager.deleteRulesByUid(uid)
+                    } else {
+                        IpRulesManager.deleteAllAppsRules()
+                    }
                 }
             }
             Utilities.showToastUiCentered(
@@ -279,7 +348,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
         }
 
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
-            // no-op
+            adapter.clearSelection()
         }
 
         builder.setCancelable(true)
@@ -288,6 +357,10 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 
     private fun io(f: suspend () -> Unit) {

@@ -17,7 +17,6 @@ package com.celzero.bravedns.database
 
 import Logger
 import android.content.Context
-import android.content.pm.PackageInfo
 import android.database.Cursor
 import android.database.sqlite.SQLiteException
 import androidx.room.Database
@@ -27,11 +26,12 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.celzero.bravedns.util.Constants.Companion.EMPTY_PACKAGE_NAME
 import com.celzero.bravedns.util.Utilities
 
 @Database(
-    entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class],
-    version = 7,
+    entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class, IpInfo::class],
+    version = 11,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -68,6 +68,10 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_4_5)
                 .addMigrations(MIGRATION_5_6)
                 .addMigrations(MIGRATION_6_7)
+                .addMigrations(MIGRATION_7_8)
+                .addMigrations(Migration_8_9)
+                .addMigrations(Migration_9_10)
+                .addMigrations(MIGRATION_10_11)
                 .fallbackToDestructiveMigration() // recreate the database if no migration is found
                 .build()
         }
@@ -262,6 +266,49 @@ abstract class LogDatabase : RoomDatabase() {
                     )
                 }
             }
+
+        private val MIGRATION_7_8: Migration =
+            object : Migration(7, 8) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    // add a new column region to DNS log table with default as empty string
+                    db.execSQL(
+                        "ALTER TABLE DnsLogs ADD COLUMN region TEXT DEFAULT '' NOT NULL"
+                    )
+                }
+            }
+
+        private val Migration_8_9: Migration = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_ConnectionTracker_connId ON ConnectionTracker(connId)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_RethinkLog_connId ON RethinkLog(connId)")
+            }
+        }
+
+        private val Migration_9_10: Migration = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_ConnectionTracker_proxyDetails ON ConnectionTracker(proxyDetails)")
+            }
+        }
+
+        private val MIGRATION_10_11: Migration = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE ConnectionTracker ADD COLUMN rpid TEXT DEFAULT '' NOT NULL")
+                db.execSQL("ALTER TABLE RethinkLog ADD COLUMN rpid TEXT DEFAULT '' NOT NULL")
+
+                db.execSQL("ALTER TABLE DnsLogs ADD COLUMN uid INTEGER DEFAULT -1 NOT NULL")
+
+                // add packageName to ConnectionTracker table
+                db.execSQL("ALTER TABLE ConnectionTracker ADD COLUMN packageName TEXT DEFAULT $EMPTY_PACKAGE_NAME NOT NULL")
+                // add package name and appName to DnsLogs table
+                db.execSQL("ALTER TABLE DnsLogs ADD COLUMN packageName TEXT DEFAULT $EMPTY_PACKAGE_NAME NOT NULL")
+                db.execSQL("ALTER TABLE DnsLogs ADD COLUMN appName TEXT DEFAULT '' NOT NULL")
+                db.execSQL("ALTER TABLE DnsLogs ADD COLUMN proxyId TEXT DEFAULT '' NOT NULL")
+                db.execSQL("ALTER TABLE DnsLogs ADD COLUMN ttl INTEGER DEFAULT 0 NOT NULL")
+                db.execSQL("CREATE TABLE IF NOT EXISTS IpInfo (ip TEXT PRIMARY KEY NOT NULL, asn TEXT NOT NULL, asName TEXT NOT NULL, asDomain TEXT NOT NULL, countryCode TEXT NOT NULL, country TEXT NOT NULL, continentCode TEXT NOT NULL, continent TEXT NOT NULL, createdTs INTEGER NOT NULL)".trimIndent())
+                db.execSQL("ALTER TABLE DnsLogs ADD COLUMN isCached INTEGER DEFAULT 0 NOT NULL")
+            }
+        }
+
     }
 
     fun checkPoint() {
@@ -277,9 +324,15 @@ abstract class LogDatabase : RoomDatabase() {
 
     abstract fun logsDao(): LogDatabaseRawQueryDao
 
+    abstract fun statsSummaryDAO(): StatsSummaryDao
+
+    abstract fun ipInfoDao(): IpInfoDAO
+
     fun connectionTrackerRepository() = ConnectionTrackerRepository(connectionTrackerDAO())
 
     fun rethinkConnectionLogRepository() = RethinkLogRepository(rethinkConnectionLogDAO())
 
     fun dnsLogRepository() = DnsLogRepository(dnsLogDAO())
+
+    fun ipInfoRepository() = IpInfoRepository(ipInfoDao())
 }

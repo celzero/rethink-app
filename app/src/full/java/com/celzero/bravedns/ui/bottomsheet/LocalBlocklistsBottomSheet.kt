@@ -29,6 +29,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -44,19 +45,24 @@ import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.fragment.DnsSettingsFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_SEARCH_URL
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.blocklistCanonicalPath
 import com.celzero.bravedns.util.Utilities.convertLongToTime
+import com.celzero.bravedns.util.Utilities.deleteRecursive
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.io.File
 
 class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetLocalBlocklistsBinding? = null
@@ -107,6 +113,13 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.window?.let { window ->
+            if (isAtleastQ()) {
+                val controller = WindowInsetsControllerCompat(window, window.decorView)
+                controller.isAppearanceLightNavigationBars = false
+                window.isNavigationBarContrastEnforced = false
+            }
+        }
         updateLocalBlocklistUi()
         init()
         initializeObservers()
@@ -124,7 +137,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         b.lbbsVersion.text =
             getString(
                 R.string.settings_local_blocklist_version,
-                Utilities.convertLongToTime(
+                convertLongToTime(
                     persistentState.localBlocklistTimestamp,
                     Constants.TIME_FORMAT_2
                 )
@@ -255,6 +268,20 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         alertDialog.show()
     }
 
+    private fun showDeleteDialog() {
+        val builder = MaterialAlertDialogBuilder(requireContext())
+        builder.setTitle(R.string.lbl_delete)
+        builder.setMessage(getString(R.string.local_blocklist_delete_desc))
+        builder.setCancelable(false)
+        builder.setPositiveButton(getString(R.string.settings_local_blocklist_dialog_positive)) {
+            _: DialogInterface, _: Int ->
+            deleteLocalBlocklist()
+        }
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ -> dialog.dismiss() }
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.show()
+    }
+
     private fun downloadLocalBlocklist(isRedownload: Boolean) {
         ui {
             var status = AppDownloadManager.DownloadManagerStatus.NOT_STARTED
@@ -264,6 +291,34 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
             ioCtx { status = appDownloadManager.downloadLocalBlocklist(currentTs, isRedownload) }
 
             handleDownloadStatus(status)
+        }
+    }
+
+    private fun deleteLocalBlocklist() {
+        ui {
+            b.lbbsDelete.isEnabled = false
+            b.lbbsDownload.isEnabled = false
+            b.lbbsRedownload.isEnabled = false
+            b.lbbsCheckDownload.isEnabled = false
+
+            ioCtx {
+                // delete the whole local blocklist folder
+                val path =
+                    blocklistCanonicalPath(requireContext(), LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME)
+                val dir = File(path)
+                deleteRecursive(dir)
+                persistentState.localBlocklistTimestamp = INIT_TIME_MS
+                persistentState.localBlocklistStamp = ""
+                persistentState.newestLocalBlocklistTimestamp = INIT_TIME_MS
+            }
+
+            updateLocalBlocklistUi()
+            showCheckUpdateUi()
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.config_add_success_toast),
+                Toast.LENGTH_SHORT
+            )
         }
     }
 
@@ -323,7 +378,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
                 // TODO: prompt user for app update
                 Utilities.showToastUiCentered(
                     requireContext(),
-                    "Download latest version to update the blocklists",
+                    getString(R.string.blocklist_not_available_toast),
                     Toast.LENGTH_SHORT
                 )
             }
@@ -366,7 +421,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         b.lbbsEnable.text = getString(R.string.lbl_disabled)
         b.lbbsEnable.setTextColor(fetchToggleBtnColors(requireContext(), R.color.accentBad))
         b.lbbsHeading.text = getString(R.string.lbbs_heading)
-        setDrawable(R.drawable.ic_cross, b.lbbsEnable)
+        setDrawable(R.drawable.ic_cross_accent, b.lbbsEnable)
 
         b.lbbsConfigure.isEnabled = false
         b.lbbsCopy.isEnabled = false
@@ -411,6 +466,8 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         }
 
         b.lbbsRedownload.setOnClickListener { showDownloadDialog(isRedownload = true) }
+
+        b.lbbsDelete.setOnClickListener { showDeleteDialog() }
     }
 
     private fun isBlocklistUpdateAvailable() {

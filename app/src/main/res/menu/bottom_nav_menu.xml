@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/homeScreenFragment"
         android:icon="@drawable/ic_home_black_24dp"
@@ -8,6 +9,13 @@
         android:id="@+id/summaryStatisticsFragment"
         android:icon="@drawable/ic_statistics"
         android:title="@string/title_statistics" />
+
+   <!-- <item
+        android:id="@+id/rethinkPlus"
+        android:icon="@drawable/ic_rethink_plus_sparkle"
+        app:showAsAction="always"
+        android:title="@string/rethink_plus_title" />-->
+
     <item
         android:id="@+id/configureFragment"
         android:icon="@drawable/ic_settings"

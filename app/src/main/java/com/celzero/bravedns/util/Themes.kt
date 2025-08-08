@@ -22,11 +22,13 @@ enum class Themes(val id: Int) {
     SYSTEM_DEFAULT(0),
     LIGHT(1),
     DARK(2),
-    TRUE_BLACK(3);
+    TRUE_BLACK(3),
+    LIGHT_PLUS(4),
+    DARK_PLUS(5);
 
     companion object {
         fun getThemeCount(): Int {
-            return values().count()
+            return entries.count()
         }
 
         fun getTheme(id: Int): Int {
@@ -35,6 +37,8 @@ enum class Themes(val id: Int) {
                 LIGHT.id -> R.style.AppThemeWhite
                 DARK.id -> R.style.AppTheme
                 TRUE_BLACK.id -> R.style.AppThemeTrueBlack
+                LIGHT_PLUS.id -> R.style.AppThemeWhitePlus
+                DARK_PLUS.id -> R.style.AppThemeTrueBlackPlus
                 else -> 0
             }
         }
@@ -45,6 +49,8 @@ enum class Themes(val id: Int) {
                 LIGHT.id -> R.style.BottomSheetDialogThemeWhite
                 DARK.id -> R.style.BottomSheetDialogTheme
                 TRUE_BLACK.id -> R.style.BottomSheetDialogThemeTrueBlack
+                LIGHT_PLUS.id -> R.style.BottomSheetDialogThemeWhitePlus
+                DARK_PLUS.id -> R.style.BottomSheetDialogThemeTrueBlackPlus
                 else -> 0
             }
         }
@@ -59,6 +65,10 @@ enum class Themes(val id: Int) {
             } else if (theme == LIGHT.id) {
                 getTheme(theme)
             } else if (theme == DARK.id) {
+                getTheme(theme)
+            } else if (theme == LIGHT_PLUS.id) {
+                getTheme(theme)
+            } else if (theme == DARK_PLUS.id) {
                 getTheme(theme)
             } else {
                 getTheme(TRUE_BLACK.id)
@@ -75,6 +85,10 @@ enum class Themes(val id: Int) {
             } else if (theme == LIGHT.id) {
                 getBottomSheetTheme(theme)
             } else if (theme == DARK.id) {
+                getBottomSheetTheme(theme)
+            } else if (theme == LIGHT_PLUS.id) {
+                getBottomSheetTheme(theme)
+            } else if (theme == DARK_PLUS.id) {
                 getBottomSheetTheme(theme)
             } else {
                 getBottomSheetTheme(TRUE_BLACK.id)

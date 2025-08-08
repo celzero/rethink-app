@@ -37,7 +37,7 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
 import kotlin.math.log2
 
-class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner, val uid: Int) :
+class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner, val uid: Int, val isRethink: Boolean, val isAsn: Boolean = false) :
     PagingDataAdapter<AppConnection, AppWiseIpsAdapter.ConnectionDetailsViewHolder>(DIFF_CALLBACK),
     AppIpRulesBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
@@ -51,24 +51,19 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
 
                 override fun areContentsTheSame(old: AppConnection, new: AppConnection) = old == new
             }
+        private const val TAG = "AppWiseIpsAdapter"
     }
 
     private lateinit var adapter: AppWiseIpsAdapter
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): AppWiseIpsAdapter.ConnectionDetailsViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionDetailsViewHolder {
         val itemBinding =
             ListItemAppIpDetailsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         adapter = this
         return ConnectionDetailsViewHolder(itemBinding)
     }
 
-    override fun onBindViewHolder(
-        holder: AppWiseIpsAdapter.ConnectionDetailsViewHolder,
-        position: Int
-    ) {
+    override fun onBindViewHolder(holder: ConnectionDetailsViewHolder, position: Int) {
         val appConnection: AppConnection = getItem(position) ?: return
         // updates the app-wise connections from network log to AppInfo screen
         holder.update(appConnection)
@@ -108,10 +103,15 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
 
         private fun openBottomSheet(conn: AppConnection) {
             if (context !is AppCompatActivity) {
-                Logger.w(LOG_TAG_UI, "err opening the app conn bottom sheet")
+                Logger.w(LOG_TAG_UI, "$TAG err opening the app conn bottom sheet")
                 return
             }
 
+            if (isRethink || isAsn) {
+                return
+            }
+
+            Logger.vv(LOG_TAG_UI, "$TAG open bottom sheet for uid: $uid, ip: ${conn.ipAddress}, domain: ${conn.appOrDnsName}")
             val bottomSheetFragment = AppIpRulesBottomSheet()
             // Fix: free-form window crash
             // all BottomSheetDialogFragment classes created must have a public, no-arg constructor.
@@ -131,13 +131,27 @@ class AppWiseIpsAdapter(val context: Context, val lifecycleOwner: LifecycleOwner
 
         private fun displayTransactionDetails(conn: AppConnection) {
             b.acdCount.text = conn.count.toString()
-            b.acdIpAddress.text = conn.ipAddress
-            b.acdFlag.text = conn.flag
-            if (!conn.appOrDnsName.isNullOrEmpty()) {
-                b.acdDomainName.visibility = View.VISIBLE
-                b.acdDomainName.text = beautifyDomainString(conn.appOrDnsName)
+            if (isAsn) {
+                b.acdIpAddress.text = conn.appOrDnsName
+                b.acdDomainName.text = conn.ipAddress
+                // in case of ASN, flag consists of country code, extract flag from it
+                val cc = Utilities.getFlag(conn.flag)
+                if (cc.isEmpty()) {
+                    b.acdFlag.text = "--"
+                } else {
+                    b.acdFlag.text = cc
+                }
+                b.acdDownArrowIv.visibility = View.INVISIBLE
             } else {
-                b.acdDomainName.visibility = View.GONE
+                b.acdFlag.text = conn.flag
+                b.acdIpAddress.text = conn.ipAddress
+                if (!conn.appOrDnsName.isNullOrEmpty()) {
+                    b.acdDomainName.visibility = View.VISIBLE
+                    b.acdDomainName.text = beautifyDomainString(conn.appOrDnsName)
+                } else {
+                    b.acdDomainName.visibility = View.GONE
+                }
+                b.acdDownArrowIv.visibility = View.VISIBLE
             }
             updateStatusUi(conn)
         }

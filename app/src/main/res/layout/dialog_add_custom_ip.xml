@@ -71,42 +71,50 @@
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/daci_text_input_layout" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/daci_block_btn"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/dialog_buttons_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/block"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/daci_failure_text_view" />
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="10dp"
+        android:baselineAligned="false"
+        app:layout_constraintTop_toBottomOf="@id/daci_failure_text_view"
+        android:clipToPadding="false"
+        android:measureWithLargestChild="true">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/daci_trust_btn"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:gravity="center"
-        android:text="@string/ci_trust_rule"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view"
-        app:layout_constraintEnd_toStartOf="@id/daci_block_btn"
-        app:layout_constraintTop_toBottomOf="@id/daci_failure_text_view" />
+        <!-- Neutral button on the left -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/daci_cancel_btn"
+            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            android:layout_width="0dp"
+            android:layout_weight="0.3"
+            android:gravity="start|center"
+            android:layout_height="wrap_content"
+            android:text="@string/fapps_info_dialog_positive_btn"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/daci_cancel_btn"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:gravity="center"
-        android:text="@string/fapps_info_dialog_positive_btn"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/daci_failure_text_view" />
+        <!-- Trust button -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/daci_trust_btn"
+            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ci_trust_rule"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view" />
+
+        <!-- Block button -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/daci_block_btn"
+            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/block"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

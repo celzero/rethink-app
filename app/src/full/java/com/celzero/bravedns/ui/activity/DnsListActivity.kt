@@ -20,8 +20,8 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
@@ -32,6 +32,8 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.firestack.backend.Backend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -46,6 +48,13 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
+
         setupClickListeners()
     }
 
@@ -142,7 +151,12 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
     private fun updateSelectedStatus() {
         io {
             // always use the id as Dnsx.Preffered as it is the primary dns id for now
-            val state = VpnController.getDnsStatus(Backend.Preferred)
+            val id = if (appConfig.isSmartDnsEnabled()) {
+                Backend.Plus
+            } else {
+                Backend.Preferred
+            }
+            val state = VpnController.getDnsStatus(id)
             val working =
                 if (state == null) {
                     false

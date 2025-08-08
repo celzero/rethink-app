@@ -31,7 +31,6 @@ import java.util.*
  *
  * Instances of this class are immutable.
  */
-@NonNullForAll
 class Config private constructor(builder: Builder) {
     private val id: Int
     private val name: String
@@ -117,15 +116,13 @@ class Config private constructor(builder: Builder) {
      *
      * @return the `Config` represented as a series of "key=value" lines
      */
-    fun toWgUserspaceString(isOneWg: Boolean = false): String {
-        // Skip the listen port if we're in advanced mode.
-        // In advanced mode, the port may already be in use by another interface.
-        val skipListenPort = !isOneWg
+    fun toWgUserspaceString(skipListenPort: Boolean = false, isAmz: Boolean = false): String {
+        // Skip the listen port if we're in advanced mode or randomize (adv) setting is enabled.
         val sb = StringBuilder()
         sb.append(wgInterface?.toWgUserspaceString(skipListenPort) ?: "")
         sb.append("replace_peers=true\n")
         if (peers != null) {
-            for (peer in peers) sb.append(peer.toWgUserspaceString())
+            for (peer in peers) sb.append(peer.toWgUserspaceString(isAmz))
         }
         return sb.toString()
     }

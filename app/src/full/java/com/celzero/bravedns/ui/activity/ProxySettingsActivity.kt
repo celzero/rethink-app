@@ -17,7 +17,6 @@ package com.celzero.bravedns.ui.activity
 
 import Logger
 import Logger.LOG_TAG_PROXY
-import Logger.LOG_TAG_UI
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -37,13 +36,16 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ProxyEndpoint
+import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
 import com.celzero.bravedns.databinding.DialogSetProxyBinding
 import com.celzero.bravedns.databinding.FragmentProxyConfigureBinding
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
@@ -62,11 +64,11 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isValidPort
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configure) {
     private val b by viewBinding(FragmentProxyConfigureBinding::bind)
@@ -94,6 +96,13 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        if (isAtleastQ()) {
+            val controller = WindowInsetsControllerCompat(window, window.decorView)
+            controller.isAppearanceLightNavigationBars = false
+            window.isNavigationBarContrastEnforced = false
+        }
+
         initAnimation()
         initView()
         initClickListeners()
@@ -126,17 +135,27 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         b.orbotTitle.text = getString(R.string.orbot).lowercase()
         b.otherTitle.text = getString(R.string.category_name_others).lowercase()
 
-        observeCustomProxy()
-        displayTcpProxyUi()
+        /*if (RpnProxyManager.isRpnEnabled()) {
+            b.rpnTitle.visibility = View.VISIBLE
+            b.settingsActivityRpnContainer.visibility = View.VISIBLE
+        } else {
+            b.rpnTitle.visibility = View.GONE
+            b.settingsActivityRpnContainer.visibility = View.GONE
+        }*/
+        b.rpnTitle.visibility = View.GONE
+        b.settingsActivityRpnContainer.visibility = View.GONE
+
         displayHttpProxyUi()
         displaySocks5Ui()
     }
 
     private fun initClickListeners() {
 
-        b.wgRefresh.setOnClickListener { refresh() }
+        b.settingsActivityRpnContainer.setOnClickListener {
+            // create an empty activity and load RethinkPlusDashboard fragment
+        }
 
-        b.settingsActivityTcpProxyContainer.setOnClickListener { handleTcpProxy() }
+        b.wgRefresh.setOnClickListener { refresh() }
 
         b.settingsActivitySocks5Rl.setOnClickListener {
             b.settingsActivitySocks5Switch.isChecked = !b.settingsActivitySocks5Switch.isChecked
@@ -248,74 +267,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         b.wgRefresh.isEnabled = false
         b.wgRefresh.animation = animation
         b.wgRefresh.startAnimation(animation)
-        VpnController.refreshProxies()
+        VpnController.refreshOrReAddProxies()
         delay(REFRESH_TIMEOUT, lifecycleScope) {
             b.wgRefresh.isEnabled = true
             b.wgRefresh.clearAnimation()
             showToastUiCentered(this, getString(R.string.dc_refresh_toast), Toast.LENGTH_SHORT)
         }
-    }
-
-    private fun handleTcpProxy() {
-        // disable the click event until below coroutine is completed.
-        disableTcpProxyUi()
-
-        io {
-            when (TcpProxyHelper.getTcpProxyPaymentStatus()) {
-                TcpProxyHelper.PaymentStatus.PAID -> {
-                    uiCtx {
-                        enableTcpProxyUi()
-                        val intent = Intent(this, TcpProxyMainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-                        startActivity(intent)
-                    }
-                }
-                TcpProxyHelper.PaymentStatus.INITIATED -> {
-                    uiCtx {
-                        enableTcpProxyUi()
-                        val intent = Intent(this, CheckoutActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-                        startActivity(intent)
-                    }
-                }
-                else -> {
-                    val isTcpWorking = TcpProxyHelper.publicKeyUsable()
-                    uiCtx {
-                        if (isTcpWorking) {
-                            enableTcpProxyUi()
-                            val intent = Intent(this, CheckoutActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-                            startActivity(intent)
-                        } else {
-                            showTcpProxyErrorDialog()
-                            enableTcpProxyUi()
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun disableTcpProxyUi() {
-        b.settingsActivityTcpProxyContainer.isClickable = false
-        b.settingsActivityTcpProxyProgress.visibility = View.VISIBLE
-        b.settingsActivityTcpProxyImg.visibility = View.GONE
-    }
-
-    private fun enableTcpProxyUi() {
-        b.settingsActivityTcpProxyContainer.isClickable = true
-        b.settingsActivityTcpProxyProgress.visibility = View.GONE
-        b.settingsActivityTcpProxyImg.visibility = View.VISIBLE
-    }
-
-    private fun showTcpProxyErrorDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle("Rethink Proxy")
-        builder.setMessage(
-            "Issue checking for Rethink Proxy. There may be a problem with your network or the proxy server. Please try again later."
-        )
-        builder.setPositiveButton("Okay") { dialog, _ -> dialog.dismiss() }
-        builder.create().show()
     }
 
     /** Prompt user to download the Orbot app based on the current BUILDCONFIG flavor. */
@@ -415,10 +372,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun displayHttpProxyUi() {
-        if (!isAtleastQ()) {
-            b.settingsActivityHttpProxyContainer.visibility = View.GONE
-            return
-        }
         val isCustomHttpProxyEnabled = appConfig.isCustomHttpProxyEnabled()
         b.settingsActivityHttpProxyContainer.visibility = View.VISIBLE
         b.settingsActivityHttpProxySwitch.isChecked = isCustomHttpProxyEnabled
@@ -442,28 +395,9 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         }
     }
 
-    private fun displayTcpProxyUi() {
-        // v055f, no-op
-        return
-
-        val tcpProxies = TcpProxyHelper.getActiveTcpProxy()
-        if (tcpProxies == null || !tcpProxies.isActive) {
-            b.settingsActivityTcpProxyDesc.text =
-                "Not active" // getString(R.string.tcp_proxy_description)
-            return
-        }
-
-        Logger.i(
-            LOG_TAG_UI,
-            "displayTcpProxyUi: ${tcpProxies?.isActive}, ${tcpProxies?.name}, ${tcpProxies?.url}"
-        )
-        b.settingsActivityTcpProxyDesc.text =
-            "Active" // getString(R.string.tcp_proxy_description_active)
-    }
-
     private fun displayWireguardUi() {
 
-        val activeWgs = WireguardManager.getEnabledConfigs()
+        val activeWgs = WireguardManager.getActiveConfigs()
 
         if (activeWgs.isEmpty()) {
             b.settingsActivityWireguardDesc.text = getString(R.string.wireguard_description)
@@ -473,10 +407,10 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             var wgStatus = ""
             activeWgs.forEach {
                 val id = ProxyManager.ID_WG_BASE + it.getId()
-                val statusId = VpnController.getProxyStatusById(id)
+                val statusPair = VpnController.getProxyStatusById(id)
                 uiCtx {
-                    if (statusId != null) {
-                        val resId = UIUtils.getProxyStatusStringRes(statusId)
+                    if (statusPair.first != null) {
+                        val resId = UIUtils.getProxyStatusStringRes(statusPair.first)
                         val s = getString(resId).replaceFirstChar(Char::titlecase)
                         wgStatus += getString(
                             R.string.ci_ip_label,
@@ -558,22 +492,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 }
             }
         }
-    }
-
-    private fun observeCustomProxy() {
-        /*appConfig.connectedProxy.observe(this) {
-            proxyEndpoint = it
-            if (proxyEndpoint == null) return@observe
-
-            val m = ProxyManager.ProxyMode.get(proxyEndpoint!!.proxyMode) ?: return@observe
-            if (m.isCustomSocks5()) {
-                displaySocks5Ui()
-            } else if (m.isCustomHttp()) {
-                displayHttpProxyUi()
-            } else {
-                // no-op
-            }
-        }*/
     }
 
     private fun refreshOrbotUi() {
@@ -745,7 +663,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     if (Utilities.isLanIpv4(ip)) {
                         Utilities.isValidLocalPort(port)
                     } else {
-                        Utilities.isValidPort(port)
+                        isValidPort(port)
                     }
                 if (!isValid) {
                     errorTxt.text = getString(R.string.settings_http_proxy_error_text1)
@@ -807,7 +725,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.settingsActivityOrbotContainer.alpha = 1f
             b.settingsActivityVpnLockdownDesc.visibility = View.GONE
             b.settingsActivityWireguardContainer.alpha = 1f
-            b.settingsActivityTcpProxyContainer.alpha = 1f
             b.settingsActivitySocks5Rl.alpha = 1f
             b.settingsActivityHttpProxyContainer.alpha = 1f
             b.wgRefresh.visibility = View.VISIBLE
@@ -815,7 +732,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.settingsActivityOrbotContainer.alpha = 0.5f
             b.settingsActivityWireguardContainer.alpha = 0.5f
             b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
-            b.settingsActivityTcpProxyContainer.alpha = 0.5f
             b.settingsActivitySocks5Rl.alpha = 0.5f
             b.settingsActivityHttpProxyContainer.alpha = 0.5f
             b.wgRefresh.visibility = View.GONE
@@ -824,9 +740,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         // Wireguard
         b.settingsActivityWireguardImg.isEnabled = canEnableProxy
         b.settingsActivityWireguardContainer.isEnabled = canEnableProxy
-        // TCP Proxy
-        b.settingsActivityTcpProxyIcon.isEnabled = canEnableProxy
-        b.settingsActivityTcpProxyContainer.isEnabled = canEnableProxy
         // Orbot
         b.settingsActivityOrbotImg.isEnabled = canEnableProxy
         b.settingsActivityOrbotContainer.isEnabled = canEnableProxy
@@ -1062,7 +975,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             id,
             name,
             mode.value,
-            proxyType = "NONE",
+            proxyType = DEFAULT_PROXY_TYPE,
             appName,
             ip,
             port,

@@ -30,6 +30,9 @@ class Constants {
         // rethink base url for tcp proxy
         const val TCP_PROXY_BASE_URL = "https://redir.nile.workers.dev"
 
+        // base url for ipinfo download
+        const val IP_INFO_BASE_URL = "https://dl.rethinkdns.com/ip/"
+
         const val FILE_TAG = "filetag.json"
 
         // file names which are downloaded as part of on-device blocklists
@@ -129,8 +132,8 @@ class Constants {
 
         const val RETHINK_SEARCH_URL = "https://rethinkdns.com/search?s="
 
-        // default filetag.json for remote blocklist (stored in assets folder) (v055i)
-        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1713995763912
+        // default filetag.json for remote blocklist (stored in assets folder) (v055o)
+        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1753394162186
 
         // rethinkdns sponsor link
         const val RETHINKDNS_SPONSOR_LINK = "https://svc.rethinkdns.com/r/sponsor"
@@ -259,6 +262,7 @@ class Constants {
         const val TIME_FORMAT_1 = "HH:mm:ss"
         const val TIME_FORMAT_2 = "yy.MM (dd)"
         const val TIME_FORMAT_3 = "dd MMMM yyyy, HH:mm:ss"
+        const val TIME_FORMAT_4 = "dd/MM/yy, HH:mm:ss"
 
         // play services package name
         const val PKG_NAME_PLAY_STORE = "com.android.vending"
@@ -289,7 +293,7 @@ class Constants {
         // all fallback dns servers should have the corresponding ip address in servers.xml
         val DEFAULT_DNS_LIST =
             listOf(
-                DefaultDnsServer(0, "None", "", "None"),
+                DefaultDnsServer(0, "System", "", "None"),
                 DefaultDnsServer(1, "Rethink", "https://zero.rethinkdns.com/dns-query", "DoH"),
                 DefaultDnsServer(2, "Google", "https://dns.google/dns-query", "DoH"),
                 DefaultDnsServer(3, "Cloudflare", "https://cloudflare-dns.com/dns-query", "DoH")
@@ -310,6 +314,12 @@ class Constants {
         // wireguard folder name
         const val WIREGUARD_FOLDER_NAME = "wireguard"
 
+        // rpn proxy folder name
+        const val RPN_PROXY_FOLDER_NAME = "rpnproxy"
+
+        // constant used to identify empty package names in dns log and connection tracker
+        const val EMPTY_PACKAGE_NAME = "empty_package_name"
+
         val DEFAULT_RDNS_REMOTE_DNS_NAMES =
             listOf(
                 "RDNS Default",
@@ -319,5 +329,27 @@ class Constants {
                 "RDNS Security",
                 "RDNS Privacy"
             )
+
+        val ip4probes =
+            listOf(
+                "216.239.32.27", // google org
+                "104.16.132.229", // cloudflare
+            )
+
+
+        val ip6probes =
+            listOf(
+                "2001:4860:4802:32::1b", // google org
+                "2606:4700::6810:84e5", // cloudflare
+            )
+
+        // URLs to check IPv4 and IPv6 connectivity
+        // a service to check IPv4 connectivity
+        val urlV4probes = listOf("https://www.ietf.org#ipv4",
+            "https://letsencrypt.org#ipv4")
+
+        // a service to check IPv6 connectivity
+        val urlV6probes = listOf("https://www.gnu.org#ipv6",
+            " https://www.mozilla.org#ipv6")
     }
 }

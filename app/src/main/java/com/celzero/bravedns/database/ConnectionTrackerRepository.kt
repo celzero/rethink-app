@@ -16,12 +16,15 @@
 package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
-import com.celzero.bravedns.RethinkDnsApplication
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.data.DataUsage
+import com.celzero.bravedns.service.PersistentState
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO) {
+class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO): KoinComponent {
+
+    private val persistentState by inject<PersistentState>()
 
     suspend fun insert(connectionTracker: ConnectionTracker) {
         connectionTrackerDAO.insert(connectionTracker)
@@ -33,15 +36,16 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
 
     suspend fun updateBatch(summary: List<ConnectionSummary>) {
         summary.forEach {
-            // update the flag and target ip if in debug mode
-            if (DEBUG && !it.targetIp.isNullOrEmpty()) {
+            if (!it.targetIp.isNullOrEmpty()) {
                 val flag = it.flag ?: ""
                 connectionTrackerDAO.updateSummary(
                     it.connId,
+                    it.pid,
+                    it.rpid,
                     it.downloadBytes,
                     it.uploadBytes,
                     it.duration,
-                    it.synack,
+                    it.rtt,
                     it.message,
                     it.targetIp,
                     flag
@@ -49,10 +53,12 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
             } else {
                 connectionTrackerDAO.updateSummary(
                     it.connId,
+                    it.pid,
+                    it.rpid,
                     it.downloadBytes,
                     it.uploadBytes,
                     it.duration,
-                    it.synack,
+                    it.rtt,
                     it.message
                 )
             }
@@ -75,11 +81,27 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         return connectionTrackerDAO.getLeastLoggedTime()
     }
 
+    suspend fun getConnIdByUidIpAddress(uid: Int, ipAddress: String, to: Long): List<String> {
+        return connectionTrackerDAO.getConnIdByUidIpAddress(uid, ipAddress, to)
+    }
+
     suspend fun clearLogsByUid(uid: Int) {
         connectionTrackerDAO.clearLogsByUid(uid)
     }
 
     suspend fun getDataUsage(before: Long, current: Long): List<DataUsage> {
         return connectionTrackerDAO.getDataUsage(before, current)
+    }
+
+    suspend fun getBlockedUniversalRulesCount(): List<ConnectionTracker> {
+        return connectionTrackerDAO.getBlockedUniversalRulesCount()
+    }
+
+    suspend fun closeConnections( connIds: List<String>) {
+        connectionTrackerDAO.closeConnections(connIds)
+    }
+
+    suspend fun closeConnectionForUids( uids: List<Int> ) {
+        connectionTrackerDAO.closeConnectionForUids(uids)
     }
 }

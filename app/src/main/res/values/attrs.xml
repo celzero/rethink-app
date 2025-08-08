@@ -44,4 +44,6 @@
     <attr name="defaultToggleBtnBg" format="reference" />
     <attr name="selectedCardBg" format="reference" />
     <attr name="background" format="reference" />
+    <attr name="homeScreenBtnGradientStart" format="reference" />
+    <attr name="homeScreenBtnGradientEnd" format="reference" />
 </resources>

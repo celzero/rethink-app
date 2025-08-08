@@ -61,7 +61,7 @@ import com.celzero.bravedns.util.Constants.Companion.RETHINK_STAMP_VERSION
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities.getRemoteBlocklistStamp
 import com.celzero.bravedns.util.Utilities.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.hasRemoteBlocklists
@@ -170,6 +170,7 @@ class RethinkBlocklistFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Logger.v(LOG_TAG_UI, "init Rethink blocklist fragment")
         init()
         initObservers()
         initClickListeners()
@@ -227,12 +228,12 @@ class RethinkBlocklistFragment :
     private fun updateFilteredTxtUi(filter: Filters) {
         if (filter.subGroups.isEmpty()) {
             b.lbAdvancedFilterLabelTv.text =
-                updateHtmlEncodedText(
+                htmlToSpannedText(
                     getString(R.string.rt_filter_desc, filter.filterSelected.name.lowercase())
                 )
         } else {
             b.lbAdvancedFilterLabelTv.text =
-                updateHtmlEncodedText(
+                htmlToSpannedText(
                     getString(
                         R.string.rt_filter_desc_subgroups,
                         filter.filterSelected.name.lowercase(),
@@ -266,14 +267,6 @@ class RethinkBlocklistFragment :
             hasLocalBlocklists(requireContext(), persistentState.localBlocklistTimestamp)
         } else {
             hasRemoteBlocklists(requireContext(), persistentState.remoteBlocklistTimestamp)
-        }
-    }
-
-    private fun currentBlocklistTimeStamp(): Long {
-        return if (type.isLocal()) {
-            persistentState.localBlocklistTimestamp
-        } else {
-            persistentState.remoteBlocklistTimestamp
         }
     }
 
@@ -373,12 +366,15 @@ class RethinkBlocklistFragment :
             } else { // remote blocklist
                 // default remote download will happen from rethink-dns list screen
                 // check RethinkListFragment.kt
+                // if it enters this block, download the blocklist regardless of the timestamp
                 ioCtx {
                     appDownloadManager.downloadRemoteBlocklist(
                         persistentState.remoteBlocklistTimestamp,
-                        isRedownload = false
+                        isRedownload = true
                     )
                 }
+                b.lbDownloadProgressRemote.visibility = View.GONE
+                hasBlocklist()
             }
         }
     }
@@ -853,7 +849,7 @@ class RethinkBlocklistFragment :
             ->
             if (workInfoList != null && workInfoList.isNotEmpty()) {
                 val workInfo = workInfoList[0]
-                if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
+                if (workInfo.state == WorkInfo.State.SUCCEEDED) {
                     Logger.i(
                         Logger.LOG_TAG_DOWNLOAD,
                         "AppDownloadManager Work Manager completed - $FILE_TAG"
@@ -861,9 +857,7 @@ class RethinkBlocklistFragment :
                     onDownloadSuccess()
                     workManager.pruneWork()
                 } else if (
-                    workInfo != null &&
-                        (workInfo.state == WorkInfo.State.CANCELLED ||
-                            workInfo.state == WorkInfo.State.FAILED)
+                    workInfo.state == WorkInfo.State.CANCELLED || workInfo.state == WorkInfo.State.FAILED
                 ) {
                     onDownloadFail()
                     workManager.pruneWork()

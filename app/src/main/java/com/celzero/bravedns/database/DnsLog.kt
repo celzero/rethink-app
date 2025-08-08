@@ -19,8 +19,10 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -39,15 +41,20 @@ import java.util.Locale
 class DnsLog {
 
     @PrimaryKey(autoGenerate = true) var id: Int = 0
+    var uid: Int = INVALID_UID
+    var appName: String = ""
+    var packageName: String = ""
     var queryStr: String = ""
     var time: Long = INIT_TIME_MS
     var flag: String = ""
     var resolver: String = ""
     var latency: Long = 0L
+    var ttl: Long = 0L
     var typeName: String = ""
     var isBlocked: Boolean = false
     var blockLists: String = ""
     var serverIP: String = ""
+    var proxyId: String = ""
     var relayIP: String = ""
     var responseTime: Long = INIT_TIME_MS
     var response: String = ""
@@ -57,6 +64,8 @@ class DnsLog {
     var resolverId: String = ""
     var msg: String = ""
     var upstreamBlock: Boolean = false
+    var region: String = ""
+    var isCached: Boolean = false
 
     override fun equals(other: Any?): Boolean {
         if (other !is DnsLog) return false
@@ -86,7 +95,7 @@ class DnsLog {
     }
 
     fun isAnonymized(): Boolean {
-        return this.relayIP.isNotEmpty()
+        return this.relayIP.isNotEmpty() || ( this.proxyId.isNotEmpty() && ProxyManager.isIpnProxy(this.proxyId))
     }
 
     fun isLocallyAnswered(): Boolean {

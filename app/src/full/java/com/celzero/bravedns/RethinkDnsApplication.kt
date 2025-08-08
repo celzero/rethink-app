@@ -1,21 +1,3 @@
-package com.celzero.bravedns
-
-import Logger
-import Logger.LOG_TAG_SCHEDULER
-import android.app.Application
-import android.content.ComponentCallbacks2
-import android.content.pm.ApplicationInfo
-import android.os.StrictMode
-import com.celzero.bravedns.scheduler.ScheduleManager
-import com.celzero.bravedns.scheduler.WorkScheduler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-import org.koin.android.ext.android.get
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
-
 /*
  * Copyright 2020 RethinkDNS and its authors
  *
@@ -31,6 +13,23 @@ import org.koin.core.context.startKoin
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.celzero.bravedns
+
+import Logger
+import Logger.LOG_TAG_SCHEDULER
+import android.app.Application
+import android.content.pm.ApplicationInfo
+import android.os.StrictMode
+import com.celzero.bravedns.scheduler.ScheduleManager
+import com.celzero.bravedns.scheduler.WorkScheduler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.get
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
+
 class RethinkDnsApplication : Application() {
     companion object {
         var DEBUG: Boolean = false
@@ -62,6 +61,7 @@ class RethinkDnsApplication : Application() {
         get<ScheduleManager>().scheduleDatabaseRefreshJob()
         get<WorkScheduler>().scheduleDataUsageJob()
         get<WorkScheduler>().schedulePurgeConnectionsLog()
+        get<WorkScheduler>().schedulePurgeConsoleLogs()
     }
 
     private fun turnOnStrictMode() {

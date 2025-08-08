@@ -48,8 +48,8 @@ import com.celzero.bravedns.util.InternetProtocol.Companion.getInternetProtocol
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import intra.Bridge
-import settings.Settings
+import com.celzero.firestack.intra.Bridge
+import com.celzero.firestack.settings.Settings
 
 class AppConfig
 internal constructor(
@@ -77,7 +77,14 @@ internal constructor(
 
         private const val ORBOT_DNS = "Orbot"
 
-        const val FALLBACK_DNS = "8.8.4.4,2001:4860:4860::8844"
+        const val FALLBACK_DNS_IF_NET_DNS_EMPTY = "8.8.4.4,2001:4860:4860::8844"
+
+        // used to add index to the transport ids added as part of Plus transport
+        // for now only DOH, DoT are supported
+        const val DOH_INDEX = '1'
+        const val DOT_INDEX = '2'
+        const val ODOH_INDEX = '3'
+        const val DNS_CRYPT_INDEX = '4'
     }
 
     init {
@@ -94,8 +101,7 @@ internal constructor(
         val ptMode: ProtoTranslationMode,
         val bridge: Bridge,
         val defaultDns: String,
-        val fakeDns: String,
-        val mtu: Int
+        val fakeDns: String
     )
 
     enum class BraveMode(val mode: Int) {
@@ -135,7 +141,7 @@ internal constructor(
         }
     }
 
-    enum class TunFirewallMode(val mode: Long) {
+    enum class TunFirewallMode(val mode: Int) {
         FILTER_ANDROID9_ABOVE(Settings.BlockModeFilter),
         SINK(Settings.BlockModeSink),
         FILTER_ANDROID8_BELOW(Settings.BlockModeFilterProc),
@@ -154,7 +160,8 @@ internal constructor(
         RETHINK_REMOTE(4),
         SYSTEM_DNS(5),
         DOT(6),
-        ODOH(7);
+        ODOH(7),
+        SMART_DNS(8); // // treat Plus as SMART
 
         fun isDnsProxy(): Boolean {
             return this == DNS_PROXY
@@ -168,6 +175,10 @@ internal constructor(
             return this == SYSTEM_DNS
         }
 
+        fun isSmartDns(): Boolean {
+            return this == SMART_DNS
+        }
+
         fun isValidDnsType(): Boolean {
             return this == DOH ||
                 this == DNSCRYPT ||
@@ -175,7 +186,8 @@ internal constructor(
                 this == RETHINK_REMOTE ||
                 this == SYSTEM_DNS ||
                 this == DOT ||
-                this == ODOH
+                this == ODOH ||
+                this == SMART_DNS
         }
 
         companion object {
@@ -188,6 +200,7 @@ internal constructor(
                     SYSTEM_DNS.type -> SYSTEM_DNS
                     DOT.type -> DOT
                     ODOH.type -> ODOH
+                    SMART_DNS.type -> SMART_DNS
                     else -> DOH
                 }
             }
@@ -195,9 +208,9 @@ internal constructor(
     }
 
     enum class TunDnsMode(val mode: Long) {
-        NONE(Settings.DNSModeNone),
-        DNS_IP(Settings.DNSModeIP),
-        DNS_PORT(Settings.DNSModePort)
+        NONE(Settings.DNSModeNone.toLong()),
+        DNS_IP(Settings.DNSModeIP.toLong()),
+        DNS_PORT(Settings.DNSModePort.toLong())
     }
 
     // TODO: untangle the mess of proxy modes and providers
@@ -335,10 +348,10 @@ internal constructor(
         }
     }
 
-    enum class ProtoTranslationMode(val id: Long) {
+    enum class ProtoTranslationMode(val id: Int) {
         PTMODEAUTO(Settings.PtModeAuto),
         PTMODEFORCE64(Settings.PtModeForce64),
-        PTMODEMAYBE46(Settings.PtModeNo46)
+        PTMODENO46(Settings.PtModeNo46)
     }
 
     fun getInternetProtocol(): InternetProtocol {
@@ -382,6 +395,7 @@ internal constructor(
             DnsType.SYSTEM_DNS.type -> DnsType.SYSTEM_DNS
             DnsType.DOT.type -> DnsType.DOT
             DnsType.ODOH.type -> DnsType.ODOH
+            DnsType.SMART_DNS.type -> DnsType.SMART_DNS
             else -> {
                 Logger.w(LOG_TAG_VPN, "Invalid dns type mode: ${persistentState.dnsType}")
                 DnsType.DOH
@@ -437,6 +451,14 @@ internal constructor(
 
     suspend fun getDOHDetails(): DoHEndpoint? {
         return doHEndpointRepository.getConnectedDoH()
+    }
+
+    suspend fun getAllDefaultDoHEndpoints(): List<DoHEndpoint> {
+        return doHEndpointRepository.getAllDefaultDoHEndpoints()
+    }
+
+    suspend fun getAllDefaultDoTEndpoints(): List<DoTEndpoint> {
+        return doTEndpointRepository.getAllDefaultDoTEndpoints()
     }
 
     suspend fun getDOTDetails(): DoTEndpoint? {
@@ -528,12 +550,19 @@ internal constructor(
             DnsType.SYSTEM_DNS -> {
                 postConnectedDnsName(context.getString(R.string.network_dns))
             }
+            DnsType.SMART_DNS -> {
+                postConnectedDnsName(context.getString(R.string.smart_dns))
+            }
         }
     }
 
     private fun postConnectedDnsName(name: String, url: String = "") {
         connectedDns.postValue(name)
-        persistentState.connectedDnsName = "$name,$url"
+        if (url.isEmpty()) {
+            persistentState.connectedDnsName = name
+        } else {
+            persistentState.connectedDnsName = "$name,$url"
+        }
     }
 
     private fun isValidDnsType(dt: DnsType): Boolean {
@@ -543,7 +572,8 @@ internal constructor(
             dt == DnsType.RETHINK_REMOTE ||
             dt == DnsType.SYSTEM_DNS ||
             dt == DnsType.DOT ||
-            dt == DnsType.ODOH)
+            dt == DnsType.ODOH ||
+            dt == DnsType.SMART_DNS)
     }
 
     suspend fun switchRethinkDnsToMax() {
@@ -591,8 +621,7 @@ internal constructor(
     fun newTunnelOptions(
         bridge: Bridge,
         fakeDns: String,
-        ptMode: ProtoTranslationMode,
-        mtu: Int
+        ptMode: ProtoTranslationMode
     ): TunnelOptions {
         return TunnelOptions(
             getDnsMode(),
@@ -601,8 +630,7 @@ internal constructor(
             ptMode,
             bridge,
             getDefaultDns(),
-            fakeDns,
-            mtu
+            fakeDns
         )
     }
 
@@ -766,8 +794,20 @@ internal constructor(
         onDnsChange(DnsType.SYSTEM_DNS)
     }
 
+    suspend fun enableSmartDns() {
+        if (getDnsType() != DnsType.SMART_DNS) {
+            removeConnectionStatus()
+        }
+
+        onDnsChange(DnsType.SMART_DNS)
+    }
+
     fun isSystemDns(): Boolean {
         return getDnsType().isSystemDns()
+    }
+
+    fun isSmartDnsEnabled(): Boolean {
+        return getDnsType().isSmartDns()
     }
 
     suspend fun isDnscryptRelaySelectable(): Boolean {
@@ -800,6 +840,9 @@ internal constructor(
                 rethinkDnsEndpointRepository.removeConnectionStatus()
             }
             DnsType.SYSTEM_DNS -> {
+                // no-op, no need to remove connection status
+            }
+            DnsType.SMART_DNS -> {
                 // no-op, no need to remove connection status
             }
         }
@@ -1013,6 +1056,11 @@ internal constructor(
         return proxyProvider.isProxyProviderOrbot()
     }
 
+    fun isWgEnabled(): Boolean {
+        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
+        return proxyProvider.isProxyProviderWireguard()
+    }
+
     fun isProxyEnabled(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
         if (proxyProvider.isProxyProviderNone()) return false
@@ -1082,6 +1130,21 @@ internal constructor(
 
     suspend fun updateOrbotHttpProxy(proxyEndpoint: ProxyEndpoint) {
         proxyEndpointRepository.update(proxyEndpoint)
+    }
+
+    fun stats(): String {
+        val sb = StringBuilder()
+        sb.append("   Brave mode: ${getBraveMode()}\n")
+        sb.append("   DNS type: ${getDnsType()}\n")
+        sb.append("   Proxy type: ${ProxyType.of(getProxyType()).name}\n")
+        sb.append("   Proxy provider: ${getProxyProvider()}\n")
+        sb.append("   Pcap mode: ${getPcapFilePath()}\n")
+        sb.append("   Connected DNS: ${persistentState.connectedDnsName}\n")
+        sb.append("   Prevent DNS leaks: ${persistentState.preventDnsLeaks}\n")
+        sb.append("   Internet protocol: ${getInternetProtocol()}\n")
+        sb.append("   Protocol translation mode: ${getProtocolTranslationMode()}\n")
+
+        return sb.toString()
     }
 
     suspend fun getLeastLoggedNetworkLogs(): Long {

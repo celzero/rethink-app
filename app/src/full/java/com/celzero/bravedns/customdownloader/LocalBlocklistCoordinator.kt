@@ -35,7 +35,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.download.BlocklistDownloadHelper
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
@@ -80,6 +80,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
         private const val DOWNLOAD_NOTIFICATION_TAG = "DOWNLOAD_ALERTS"
         private const val DOWNLOAD_NOTIFICATION_ID = 110
+        private const val MAX_RETRY_COUNT = 3
     }
 
     override suspend fun doWork(): Result {
@@ -251,7 +252,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         try {
             // create okhttp client with base url
             val retrofit =
-                getBlocklistBaseBuilder(retryCount).build().create(IBlocklistDownload::class.java)
+                getBlocklistBaseBuilder(persistentState.routeRethinkInRethink).build().create(IBlocklistDownload::class.java)
             Logger.i(LOG_TAG_DOWNLOAD, "Downloading file: $fileName, url: $url")
             val response = retrofit.downloadLocalBlocklistFile(url, persistentState.appVersion, "")
             if (response?.isSuccessful == true) {
@@ -276,7 +277,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
     private fun isRetryRequired(retryCount: Int): Boolean {
         Logger.i(LOG_TAG_DOWNLOAD, "Retry count: $retryCount")
-        return retryCount < RetrofitManager.Companion.OkHttpDnsType.entries.size - 1
+        return retryCount < MAX_RETRY_COUNT
     }
 
     private fun downloadFile(context: Context, body: ResponseBody?, fileName: String): Boolean {
@@ -478,8 +479,8 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
     private fun getPendingIntent(context: Context): PendingIntent {
         return Utilities.getActivityPendingIntent(
             context,
-            Intent(context, HomeScreenActivity::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT,
+            Intent(context, AppLockActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             mutable = false
         )
     }

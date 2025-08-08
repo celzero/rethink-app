@@ -18,15 +18,14 @@
  */
 package com.celzero.bravedns.wireguard
 
-import backend.Backend
-import backend.WgKey
+import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.backend.WgKey
 
 /**
  * Represents a Curve25519 key pair as used by WireGuard.
  *
  * Instances of this class are immutable.
  */
-@NonNullForAll
 class KeyPair @JvmOverloads constructor(key: WgKey = Backend.newWgPrivateKey()) {
     private val privateKey: WgKey
     private val publicKey: WgKey

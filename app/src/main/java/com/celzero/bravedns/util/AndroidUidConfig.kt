@@ -148,7 +148,7 @@ enum class AndroidUidConfig(val uid: Int) {
     OTHER(Constants.INVALID_UID);
 
     companion object {
-        private val map = values().associateBy(AndroidUidConfig::uid)
+        private val map = entries.associateBy(AndroidUidConfig::uid)
 
         fun fromFileSystemUid(uid: Int): AndroidUidConfig {
             return map[uid.hashCode()] ?: OTHER

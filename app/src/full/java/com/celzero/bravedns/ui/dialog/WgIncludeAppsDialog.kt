@@ -36,7 +36,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.databinding.WgAppsIncludeDialogBinding
+import com.celzero.bravedns.databinding.DialogWgAppsBinding
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
@@ -56,7 +56,7 @@ class WgIncludeAppsDialog(
     private val proxyName: String
 ) : Dialog(activity, themeID), SearchView.OnQueryTextListener, KoinComponent {
 
-    private lateinit var b: WgAppsIncludeDialogBinding
+    private lateinit var b: DialogWgAppsBinding
 
     private lateinit var animation: Animation
     private val refreshDatabase by inject<RefreshDatabase>()
@@ -91,7 +91,7 @@ class WgIncludeAppsDialog(
         super.onCreate(savedInstanceState)
 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        b = WgAppsIncludeDialogBinding.inflate(layoutInflater)
+        b = DialogWgAppsBinding.inflate(layoutInflater)
         setContentView(b.root)
         setCancelable(false)
         addAnimation()

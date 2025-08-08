@@ -26,7 +26,6 @@ import java.net.UnknownHostException
 import java.util.regex.Pattern
 
 /** Utility methods for creating instances of [InetAddress]. */
-@NonNullForAll
 object InetAddresses {
     private var PARSER_METHOD: Method? = null
     private val WONT_TOUCH_RESOLVER =
@@ -63,7 +62,7 @@ object InetAddresses {
      * Parses a numeric IPv4 or IPv6 address without performing any DNS lookups.
      *
      * @param address a string representing the IP address
-     * @return an instance of [Inet4Address] or [Inet6Address], as appropriate
+     * @return an instance of Inet4Address or Inet6Address, as appropriate
      */
     @Throws(ParseException::class)
     fun parse(address: String): InetAddress {

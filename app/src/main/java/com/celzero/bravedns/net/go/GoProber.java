@@ -27,10 +27,8 @@ import com.celzero.bravedns.net.doh.Prober;
 public class GoProber extends Prober {
 
     private static final String PROBER_TAG = "Prober";
-    private final Context context;
 
     public GoProber(Context context) {
-        this.context = context;
     }
 
     @Override

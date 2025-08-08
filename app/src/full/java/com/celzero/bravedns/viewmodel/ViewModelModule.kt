@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 object ViewModelModule {
@@ -33,9 +33,9 @@ object ViewModelModule {
         viewModel { AppCustomIpViewModel(get()) }
         viewModel { RethinkRemoteFileTagViewModel(get()) }
         viewModel { RethinkLocalFileTagViewModel(get()) }
-        viewModel { AppConnectionsViewModel(get()) }
-        viewModel { SummaryStatisticsViewModel(get(), get(), get()) }
-        viewModel { DetailedStatisticsViewModel(get(), get(), get()) }
+        viewModel { AppConnectionsViewModel(get(), get(), get()) }
+        viewModel { SummaryStatisticsViewModel(get(), get()) }
+        viewModel { DetailedStatisticsViewModel(get(), get()) }
         viewModel { LocalBlocklistPacksMapViewModel(get()) }
         viewModel { RemoteBlocklistPacksMapViewModel(get()) }
         viewModel { ProxyAppsMappingViewModel(get()) }
@@ -44,6 +44,9 @@ object ViewModelModule {
         viewModel { ODoHEndpointViewModel(get()) }
         viewModel { RethinkLogViewModel(get()) }
         viewModel { AlertsViewModel(get(), get()) }
+        viewModel { ConsoleLogViewModel(get()) }
+        viewModel { DomainConnectionsViewModel(get()) }
+        viewModel { WgNwActivityViewModel(get()) }
     }
 
     val modules = listOf(viewModelModule)

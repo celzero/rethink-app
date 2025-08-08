@@ -29,11 +29,15 @@ import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.ui.fragment.ConnectionTrackerFragment
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTrackerDAO) :
     ViewModel() {
 
-    private var filterString: MutableLiveData<String> = MutableLiveData()
+    private val _filterString = MutableLiveData<String>()
+    private var filterString: LiveData<String> = _filterString
     private var filterRules: MutableSet<String> = mutableSetOf()
     private var filterType: TopLevelFilter = TopLevelFilter.ALL
 
@@ -46,7 +50,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     private val pagingConfig: PagingConfig
 
     init {
-        filterString.value = ""
+        _filterString.value = ""
         pagingConfig =
             PagingConfig(
                 enablePlaceholders = true,
@@ -60,14 +64,28 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
 
     val connectionTrackerList = filterString.switchMap { input -> fetchNetworkLogs(input) }
 
+    private fun setFilterWithDebounce(searchString: String) {
+        viewModelScope.launch {
+            debounceFilter(searchString)
+        }
+    }
+
+    private var debounceJob: Job? = null
+    private fun debounceFilter(searchString: String) {
+        debounceJob?.cancel()
+        debounceJob = viewModelScope.launch {
+            delay(300) // 300ms debounce delay
+            _filterString.value = searchString
+        }
+    }
+
     fun setFilter(searchString: String, filter: Set<String>, type: TopLevelFilter) {
         filterRules.clear()
 
         filterRules.addAll(filter)
         filterType = type
 
-        if (searchString.isNotBlank()) filterString.value = searchString
-        else filterString.value = ""
+        setFilterWithDebounce(searchString)
     }
 
     private fun fetchNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {

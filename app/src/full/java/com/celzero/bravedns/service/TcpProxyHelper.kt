@@ -10,13 +10,15 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import backend.Backend
+import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.customdownloader.ITcpProxy
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.TcpProxyEndpoint
 import com.celzero.bravedns.database.TcpProxyRepository
 import com.celzero.bravedns.scheduler.PaymentWorker
+import com.celzero.bravedns.util.Utilities.togs
+import com.celzero.firestack.backend.IpTree
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,9 +38,10 @@ object TcpProxyHelper : KoinComponent {
 
     private val tcpProxies = mutableSetOf<TcpProxyEndpoint>()
 
-    private var cfIpTrie: backend.IpTree = Backend.newIpTree()
+    private var cfIpTrie: IpTree = Backend.newIpTree()
 
     private const val DEFAULT_ID = 0
+    private const val MAX_RETRY_COUNT = 3
     const val PAYMENT_WORKER_TAG = "payment_worker_tag"
 
     private const val JSON_MIN_VERSION_CODE = "minvcode"
@@ -47,6 +50,7 @@ object TcpProxyHelper : KoinComponent {
 
     private const val STATUS_OK = "ok"
     private var publicKey: String = ""
+    private var publicKeyJWK: ByteArray = ByteArray(0)
     const val TCP_FOLDER_NAME = "tcp"
     const val PIP_KEY_FILE_NAME = "pip.key"
 
@@ -104,7 +108,7 @@ object TcpProxyHelper : KoinComponent {
 
     private fun loadTrie() {
         cfIpTrie = Backend.newIpTree()
-        cfIpAddresses.forEach { cfIpTrie.set(it, "") }
+        cfIpAddresses.forEach { cfIpTrie.set(it.togs(), "".togs()) }
         Logger.d(LOG_TAG_PROXY, "loadTrie: loading trie for cloudflare ips")
     }
 
@@ -112,7 +116,7 @@ object TcpProxyHelper : KoinComponent {
         // do not check for cloudflare ips for now
         // return false
         return try {
-            cfIpTrie.hasAny(ip)
+            cfIpTrie.hasAny(ip.togs())
         } catch (e: Exception) {
             Logger.w(LOG_TAG_PROXY, "isCloudflareIp: exception while checking ip: $ip")
             false
@@ -126,11 +130,11 @@ object TcpProxyHelper : KoinComponent {
         return dateFormat.format(date)
     }
 
-    suspend fun publicKeyUsable(retryCount: Int = 0): Boolean {
+    private suspend fun publicKeyUsable(retryCount: Int = 0): Boolean {
         var works = false
         try {
             val retrofit =
-                RetrofitManager.getTcpProxyBaseBuilder(retryCount)
+                RetrofitManager.getTcpProxyBaseBuilder(persistentState.routeRethinkInRethink)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(ITcpProxy::class.java)
@@ -141,11 +145,15 @@ object TcpProxyHelper : KoinComponent {
                 "new tcp config: ${response?.headers()}, ${response?.message()}, ${response?.raw()?.request?.url}"
             )
 
+            // response: {"minvcode":"30","pubkey":"{\"key_ops\":[\"verify\"],\"ext\":true,\"kty\":\"RSA\",\"n\":\"zON5Gyeeg1QaV_CoFImhWF9TykAZo5pJm9NWd5IPTiYtlhb0WMpFm_-IotJn7ZCGszhl4NMxMHV8odyRbBhPg440qucudBkm0T460f2Id3HBtzoJVLI0SvOmSqm5kY41Zdkxcb_fkpKm-D6c_RnMsmEHvP7WI-YlK108PIpp5ZBvoY3oOA3yktGAm3uaWkjSsw6FmNq34AL3oMA-5MFER-uAq0faXMo8_yEOVcI6Rik_e8wxe4GSnPpndODApzbGyhlORJQSCWbnO6Va-1yeGgkOQ3RFICXrsyyngQbVVOSg9UcAuICzQSW-nlUNF99l_NdrHAaxHpexSSnfdFJ4IQ\",\"e\":\"AQAB\",\"alg\":\"PS384\"}","status":"ok"}
+
             if (response?.isSuccessful == true) {
                 val jsonObject = JSONObject(response.body().toString())
                 works = jsonObject.optString(JSON_STATUS, "") == STATUS_OK
                 val minVersionCode = jsonObject.optString(JSON_MIN_VERSION_CODE, "")
                 publicKey = jsonObject.optString(JSON_PUB_KEY, "")
+                val json = JSONObject(publicKey)
+                publicKeyJWK = json.toString().toByteArray(Charsets.UTF_8)
                 Logger.i(
                     LOG_TAG_PROXY,
                     "tcp response for ${response.raw().request.url}, works? $works, minVersionCode: $minVersionCode, publicKey: $publicKey"
@@ -175,7 +183,7 @@ object TcpProxyHelper : KoinComponent {
     }
 
     private fun isRetryRequired(retryCount: Int): Boolean {
-        return retryCount < RetrofitManager.Companion.OkHttpDnsType.entries.size - 1
+        return retryCount < MAX_RETRY_COUNT
     }
 
     suspend fun isPaymentInitiated(): Boolean {
@@ -202,17 +210,17 @@ object TcpProxyHelper : KoinComponent {
             Logger.w(LOG_TAG_PROXY, "getTcpProxyPaymentStatus: tcpProxy not found")
             return PaymentStatus.NOT_PAID
         }
-        return PaymentStatus.values().find { it.value == tcpProxy.paymentStatus }
+        return PaymentStatus.entries.find { it.value == tcpProxy.paymentStatus }
             ?: PaymentStatus.NOT_PAID
     }
 
-    suspend fun getPublicKey(): String {
-        if (publicKey.isEmpty()) {
+    suspend fun getPublicKey(): ByteArray {
+        if (publicKeyJWK.isEmpty()) {
             publicKeyUsable()
         } else {
             Logger.i(LOG_TAG_PROXY, "getPublicKey: returning cached public key")
         }
-        return publicKey
+        return publicKeyJWK
     }
 
     suspend fun updatePaymentStatus(paymentStatus: PaymentStatus) {

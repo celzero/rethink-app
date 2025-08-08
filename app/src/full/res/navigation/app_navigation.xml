@@ -12,6 +12,14 @@
         android:name="com.celzero.bravedns.ui.fragment.AboutFragment"
         android:label="AboutFragment" />
     <fragment
+        android:id="@+id/rethinkPlus"
+        android:name="com.celzero.bravedns.ui.fragment.RethinkPlusFragment"
+        android:label="RethinkPlusFragment">
+        <action
+            android:id="@+id/action_switch_to_rethinkPlusDashboardFragment"
+            app:destination="@id/rethinkPlusDashboardFragment" />
+    </fragment>
+    <fragment
         android:id="@+id/summaryStatisticsFragment"
         android:name="com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment"
         android:label="SummaryStatisticsFragment" />
@@ -19,4 +27,11 @@
         android:id="@+id/configureFragment"
         android:name="com.celzero.bravedns.ui.fragment.ConfigureFragment"
         android:label="ConfigureFragment" />
+    <fragment
+        android:id="@+id/rethinkPlusDashboardFragment"
+        android:name="com.celzero.bravedns.ui.fragment.RethinkPlusDashboardFragment"
+        android:label="RethinkPlusDashboardFragment" />
+    <action
+        android:id="@+id/action_switch_to_homeScreenFragment"
+        app:destination="@id/homeScreenFragment" />
 </navigation>
