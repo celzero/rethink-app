@@ -264,7 +264,7 @@ object WireguardManager : KoinComponent {
         val catchAll = !map.isCatchAll
         // do not allow if the config is either hop or via
         val isHopOrVia = WgHopManager.isWgEitherHopOrSrc(map.id)
-        return !catchAll || !isHopOrVia
+        return !catchAll && !isHopOrVia
     }
 
     fun canDisableAllActiveConfigs(): Boolean {
@@ -507,6 +507,11 @@ object WireguardManager : KoinComponent {
                     "catch-all config is active: ${it.id}, ${it.name} => add ${ID_WG_BASE + it.id}"
                 )
             }
+        }
+
+        if (proxyIds.isEmpty()) {
+            Logger.i(LOG_TAG_PROXY, "no proxy ids found for $uid, $ip, $port, $domain; returning empty list")
+            return emptyList()
         }
 
         // add the default proxy to the end, will not be true for lockdown but lockdown is handled
