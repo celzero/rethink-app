@@ -261,7 +261,7 @@ object WireguardManager : KoinComponent {
 
     fun canDisableConfig(map: WgConfigFilesImmutable): Boolean {
         // do not allow to disable the proxy if it is catch-all
-        val catchAll = !map.isCatchAll
+        val catchAll = map.isCatchAll
         // do not allow if the config is either hop or via
         val isHopOrVia = WgHopManager.isWgEitherHopOrSrc(map.id)
         return !catchAll && !isHopOrVia
