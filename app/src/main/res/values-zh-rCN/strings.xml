@@ -596,13 +596,7 @@
     <string name="dns_explanation_dns_connected">已连接至 RethinkDNS</string>
     <string name="universal_firewall_explanation">根据设备事件应用防火墙规则，如在设备被锁定时或未使用某一应用程序时拦截。</string>
     <string name="notification_action_resume_vpn">恢复</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>：阻止某应用连接至互联网。
-\n <u>#2</u>：阻止任意应用连接至某特定 IP 。
-\n <u>#3</u>：在设备锁定时阻止所有连接（通用拦截规则）。
-\n <u>#4</u>：阻止任意未使用的应用连接（通用拦截规则）。
-\n <u>#5</u>：阻止未知应用的连接（通用拦截规则）。
-\n <u>#6</u>：拦截除 DNS 外的所有 UDP 流量（通用拦截规则）。
-\n <u>#7</u>：拦截被绕过 DNS 的流量（通用拦截规则）。</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>：阻止某应用连接至互联网。 \n <u>#2</u>：阻止任意应用连接至某特定 IP 。 \n <u>#3</u>：在设备锁定时阻止所有连接（通用拦截规则）。 \n <u>#4</u>：阻止任意未使用的应用连接（通用拦截规则）。 \n <u>#5</u>：阻止未知应用的连接（通用拦截规则）。 \n <u>#6</u>：拦截除 DNS 外的所有 UDP 流量（通用拦截规则）。 \n <u>#7</u>：拦截被绕过 DNS 的流量（通用拦截规则）。</string>
     <string name="alert_firewall_accessibility_regrant_explanation">Rethink 的无障碍服务已停止或崩溃。为继续使用<i>拦截来使用应用</i>功能，<i><b>请至系统设置，强制停止并再次启动</b></i> RethinkDNS 。
 \n
 \nRethink 使用无障碍服务来关注正在使用的应用（前台）与未使用的应用（后台）。</string>
@@ -633,10 +627,7 @@
     <string name="refresh_complete"><!-- use dc_refresh_toast --> 应用列表已重新同步完毕。</string>
     <string name="show_logs_disabled_dns_message">DNS 请求日志已被禁用。若您想要重新启用，请至<i>设置</i>并打开<i>启用本地日志</i>。</string>
     <string name="search_firewall_all_apps"><font size="12">以 UID / 应用名搜索应用</font></string>
-    <string name="orbot_explanation">Orbot 是一款能让其他程序更<u>安全</u>地连接到互联网的免费代理应用。
-\nOrbot 使用 <u>Tor</u> 来加密您的网络流量，帮您<u>绕过网络审查</u>，并抵御威胁个人自由及隐私的<u>网络监视</u>。
-\n<u>TCP 代理</u>： Rethink 只将<i>包含的</i>应用的 TCP 连接转发至 Orbot 。
-\n<u>HTTP 代理</u>： Rethink 向 Orbot <i>建立</i> HTTP CONNECT 隧道，並只转发<i>包含的</i>应用程序的 TCP 连接。</string>
+    <string name="orbot_explanation">Orbot 是一款能让其他程序更<u>安全</u>地连接到互联网的免费代理应用。 \nOrbot 使用 <u>Tor</u> 来加密您的网络流量，帮您<u>绕过网络审查</u>，并抵御威胁个人自由及隐私的<u>网络监视</u>。 \n<u>TCP 代理</u>： Rethink 只将<i>包含的</i>应用的 TCP 连接转发至 Orbot 。 \n<u>HTTP 代理</u>： Rethink 向 Orbot <i>建立</i> HTTP CONNECT 隧道，並只转发<i>包含的</i>应用程序的 TCP 连接。</string>
     <string name="dc_dns_leaks_heading">防止 DNS 泄漏</string>
     <string name="about_mozilla">Rethink 受来自 Mozilla Builders 、 FOSS United 基金会与 OSOM Products Inc 的支持。</string>
     <string name="http_proxy_dialog_heading">设置 HTTP(S) CONNECT 代理</string>
