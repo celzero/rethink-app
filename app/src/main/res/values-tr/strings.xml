@@ -568,13 +568,7 @@
     <string name="custom_url_error_invalid_url">Geçersiz URL</string>
     <string name="dns_query_clear_logs_message">Bu, aygıt üzerindeki DNS günlüklerini siler. Bu işlem geri döndürülemez. Devam etmek istiyor musunuz\?</string>
     <string name="always_on_dialog_neutral">Ayarlar</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>: Bir uygulamanın internete bağlanmasını engeller.
-\n <u>#2</u>: Herhangi bir uygulamanın belirli bir IP\'ye bağlanmasını engeller.
-\n <u>#3</u>: Ekran kilitlendiğinde bütün bağlantıları engeller (Genel Güvenlik Duvarı).
-\n <u>#4</u>: Kullanımda olmayan her uygulamayı engeller (Genel Güvenlik Duvarı).
-\n <u>#5</u>: Kaynak uygulaması belirsiz bütün bağlantıları engeller (Genel Güvenlik Duvarı).
-\n <u>#6</u>: DNS hariç bütün UDP trafiğini engeller(Genel Güvenlik Duvarı).
-\n <u>#7</u>: DNS atlanırsa bütün bağlantıları engeller (Genel Güvenlik Duvarı).</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>: Bir uygulamanın internete bağlanmasını engeller. \n <u>#2</u>: Herhangi bir uygulamanın belirli bir IP\'ye bağlanmasını engeller. \n <u>#3</u>: Ekran kilitlendiğinde bütün bağlantıları engeller (Genel Güvenlik Duvarı). \n <u>#4</u>: Kullanımda olmayan her uygulamayı engeller (Genel Güvenlik Duvarı). \n <u>#5</u>: Kaynak uygulaması belirsiz bütün bağlantıları engeller (Genel Güvenlik Duvarı). \n <u>#6</u>: DNS hariç bütün UDP trafiğini engeller(Genel Güvenlik Duvarı). \n <u>#7</u>: DNS atlanırsa bütün bağlantıları engeller (Genel Güvenlik Duvarı).</string>
     <string name="bsct_block_ip">Engelle, <u>bu IP\'ye</u> <u>bu uygulama</u> için güven</string>
     <string name="bsct_conn_block_desc">%1$s, %2$s tarafından engellendi</string>
     <string name="always_on_dialog">Bu cihazda \"Her Zaman Açık VPN\" etkinleştirilmiştir. Rethink\'i başlatmak için lütfen Ayarlar uygulamasına gidin ve \"Her Zaman Açık VPN \"i devre dışı bırakın.</string>
