@@ -86,6 +86,10 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
                     positionOffset: Float,
                     positionOffsetPixels: Int
                 ) {
+                    // if the scroll is after the layout count then finish the activity
+                    if (position >= layouts.count() - 1 && positionOffset > 0) {
+                        launchHomeScreen()
+                    }
                 }
 
                 override fun onPageSelected(position: Int) {
@@ -117,6 +121,15 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
                 b.viewPager.currentItem = currentItem + 1
             }
         }
+
+        // on back pressed, finish the activity and go to home screen
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : androidx.activity.OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    launchHomeScreen()
+                }
+            })
     }
 
     private fun isDarkThemeOn(): Boolean {

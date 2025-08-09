@@ -20,6 +20,7 @@
         android:layout_below="@id/img_firewall"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
+        android:gravity="center"
         android:text="@string/firewall_title"
         android:textColor="?attr/primaryTextColor"
         android:textSize="28sp"
