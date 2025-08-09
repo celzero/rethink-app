@@ -48,13 +48,7 @@
     <string name="conn_track_clear_logs_message">Taip ištrinami tik tinklo žurnalai, bet ne ugniasienės taisyklės. Ši operacija negrįžtama. Ar norite tęsti\?</string>
     <string name="dns_query_clear_logs_title">Ištrinti visus DNS žurnalus\?</string>
     <string name="dns_query_clear_logs_message">Taip ištrinami įrenginyje esantys DNS žurnalai. Ši operacija negrįžtama. Ar norite tęsti\?</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>: neleidžia programėlei prisijungti prie interneto.
-\n <u>#2</u>: blokuoja bet kurią programėlę, kad ji negalėtų prisijungti prie konkretaus IP.
-\n <u>#3</u>: blokuoja visus ryšius, kai įrenginys užrakintas (universali ugniasienė).
-\n <u>#4</u>: blokuoja bet kokią nenaudojamą programėlę (universali ugniasienė).
-\n <u>#5</u>: blokuoja ryšius, kai šaltinio programėlė nežinoma (universali ugniasienė).
-\n <u>#6</u>: blokuoja visą UDP srautą, išskyrus DNS (universali ugniasienė).
-\n <u>#7</u>: blokuoja ryšius, kai DNS apeinamas (universali ugniasienė).</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>: neleidžia programėlei prisijungti prie interneto. \n <u>#2</u>: blokuoja bet kurią programėlę, kad ji negalėtų prisijungti prie konkretaus IP. \n <u>#3</u>: blokuoja visus ryšius, kai įrenginys užrakintas (universali ugniasienė). \n <u>#4</u>: blokuoja bet kokią nenaudojamą programėlę (universali ugniasienė). \n <u>#5</u>: blokuoja ryšius, kai šaltinio programėlė nežinoma (universali ugniasienė). \n <u>#6</u>: blokuoja visą UDP srautą, išskyrus DNS (universali ugniasienė). \n <u>#7</u>: blokuoja ryšius, kai DNS apeinamas (universali ugniasienė).</string>
     <string name="always_on_dialog_heading">Išjungti nuolatinį VPN</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">Ištrinti DNSCrypt sprendiklį\?</string>
     <string name="dns_crypt_url_remove_dialog_message">Ištrinti DNSCrypt sprendiklį iš išsaugotos konfigūracijos.</string>
