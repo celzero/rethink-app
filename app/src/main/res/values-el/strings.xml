@@ -164,13 +164,7 @@
     <string name="bsct_app_info" translatable="true">Πληροφορίες εφαρμογής</string>
     <string name="bsct_block" translatable="true">Αποκλεισμός, παράκαμψη, εξαίρεση, απομόνωση <u>αυτής της εφαρμογής</u></string>
     <string name="bsct_conn_desc_allowed" translatable="true">επιτρέπεται στο %1$s %2$s</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Αποκλείει μια εφαρμογή από τη σύνδεση στο Internet.
-\n <u>#2</u>: Αποκλείει οποιαδήποτε εφαρμογή από τη σύνδεση σε μια συγκεκριμένη IP.
-\n <u>#3</u>: Αποκλείει όλες τις συνδέσεις όταν η συσκευή είναι κλειδωμένη (Universal Firewall).
-\n <u>#4</u>: Αποκλείει οποιαδήποτε εφαρμογή που δεν χρησιμοποιείται (Universal Firewall).
-\n <u>#5</u>: Μπλοκάρει τις συνδέσεις όταν η εφαρμογή προέλευσης είναι άγνωστη (Universal Firewall).
-\n <u>#6</u>: Αποκλείει όλη την κυκλοφορία UDP εκτός από το DNS (Universal Firewall).
-\n <u>#7</u>: Αποκλείει τις συνδέσεις όταν παρακάμπτεται το DNS (Universal Firewall).</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Αποκλείει μια εφαρμογή από τη σύνδεση στο Internet. \n <u>#2</u>: Αποκλείει οποιαδήποτε εφαρμογή από τη σύνδεση σε μια συγκεκριμένη IP. \n <u>#3</u>: Αποκλείει όλες τις συνδέσεις όταν η συσκευή είναι κλειδωμένη (Universal Firewall). \n <u>#4</u>: Αποκλείει οποιαδήποτε εφαρμογή που δεν χρησιμοποιείται (Universal Firewall). \n <u>#5</u>: Μπλοκάρει τις συνδέσεις όταν η εφαρμογή προέλευσης είναι άγνωστη (Universal Firewall). \n <u>#6</u>: Αποκλείει όλη την κυκλοφορία UDP εκτός από το DNS (Universal Firewall). \n <u>#7</u>: Αποκλείει τις συνδέσεις όταν παρακάμπτεται το DNS (Universal Firewall).</string>
     <string name="always_on_dialog_lockdown_stop_message" translatable="true">Το Rethink τρέχει το VPN σε κατάσταση <i>Lockdown</i>. Η διακοπή της θα είχε ως αποτέλεσμα την απώλεια της συνδεσιμότητας στο Internet για αυτό το προφίλ χρήστη. Θέλετε να συνεχίσετε ούτως ή άλλως;</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Δίκτυο</string>
     <string name="dns_act_configure_tab" translatable="true">Ρύθμιση παραμέτρων</string>
