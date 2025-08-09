@@ -755,7 +755,7 @@ object WireguardManager : KoinComponent {
             return
         }
         Logger.i(LOG_TAG_PROXY, "updating useMobileNw as $useMobileNw for config: $id, ${config.getName()}")
-        db.updateCatchAllConfig(id, useMobileNw)
+        db.updateMobileConfig(id, useMobileNw)
         val m = mappings.find { it.id == id } ?: return
         mappings.remove(m)
         val newMap =
@@ -765,15 +765,13 @@ object WireguardManager : KoinComponent {
                 m.configPath,
                 m.serverResponse,
                 m.isActive,
-                m.isCatchAll, // just updating catch all field
+                m.isCatchAll,
                 m.isLockdown,
                 m.oneWireGuard,
-                useMobileNw,
+                useMobileNw, // just updating useOnMetered field
                 m.isDeletable
             )
         mappings.add(newMap)
-
-        enableConfig(newMap) // catch all should be always enabled
     }
 
     suspend fun addPeer(id: Int, peer: Peer) {

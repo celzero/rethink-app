@@ -476,8 +476,7 @@
                             android:padding="15dp"
                             android:text="@string/hop_add_remove_title"
                             android:textColor="?attr/secondaryTextColor"
-                            android:textSize="@dimen/large_font_text_view"
-                            app:rippleColor="?attr/secondaryTextColor" />
+                            android:textSize="@dimen/large_font_text_view" />
                     </RelativeLayout>
 
                     <androidx.appcompat.widget.AppCompatTextView
