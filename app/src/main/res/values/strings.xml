@@ -1656,9 +1656,9 @@
     <string name="ac_retry_options_title" translatable="true">strategy</string>
     <string name="ac_retry_options_desc" translatable="true">Set how retries work for censored connections.</string>
 
-    <string name="ac_retry_options_never_desc" translatable="true">Do not retry.</string>
+    <string name="ac_retry_options_never_desc" translatable="true">On failure, never retry anti-censorship techniques.</string>
 
-    <string name="ac_retry_options_with_split_desc" translatable="true">Apply anti-censorship technique when necessary.</string>
+    <string name="ac_retry_options_with_split_desc" translatable="true">Apply anti-censorship techniques when necessary.</string>
 
     <string name="lbl_always" translatable="true">Always</string>
     <string name="ac_retry_options_after_split_desc" translatable="true">Always apply anti-censorship techniques.</string>
