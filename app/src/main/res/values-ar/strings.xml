@@ -660,10 +660,7 @@
     <string name="settings_ip_dialog_title">اختر إصدار IP</string>
     <string name="settings_notification_desc">تظهر أزرار الإجراءات مع إشعار Rethink: %1$s</string>
     <string name="settings_protocol_translation_dns_inactive">حول إلى وضع DNS/DNS+Firewall لتفعيل هذا الإعداد</string>
-    <string name="orbot_explanation">Orbot هو تطبيق بروكسي مجاني يمكّن التطبيقات الأخرى من استخدام الإنترنت بشكل أكثر <u>أمانًا</u>.
-\nOrbot يستخدم <u>Tor</u> لتشفير حركة مرور الإنترنت الخاصة بك مما يساعدك على <u>تجاوز الرقابة</u> والدفاع ضد أشكال <u>مراقبة الشبكة</u> التي تهدد الحرية الشخصية والخصوصية.
-\n<u>TCP وكيل</u>: يقوم Rethink بإعادة توجيه اتصالات TCP للتطبيقات <i>المضمنة</i> إلى Orbot.
-\n<u>HTTP وكيل</u>:يقوم Rethink <i>بإنشاء</i> نفقHTTP CONNECT إلى Orbot وإعادة توجيه اتصالات TCPفقط للتطبيقات <i>المضمنة</i> .</string>
+    <string name="orbot_explanation">Orbot هو تطبيق بروكسي مجاني يمكّن التطبيقات الأخرى من استخدام الإنترنت بشكل أكثر <u>أمانًا</u>. \nOrbot يستخدم <u>Tor</u> لتشفير حركة مرور الإنترنت الخاصة بك مما يساعدك على <u>تجاوز الرقابة</u> والدفاع ضد أشكال <u>مراقبة الشبكة</u> التي تهدد الحرية الشخصية والخصوصية. \n<u>TCP وكيل</u>: يقوم Rethink بإعادة توجيه اتصالات TCP للتطبيقات <i>المضمنة</i> إلى Orbot. \n<u>HTTP وكيل</u>:يقوم Rethink <i>بإنشاء</i> نفقHTTP CONNECT إلى Orbot وإعادة توجيه اتصالات TCPفقط للتطبيقات <i>المضمنة</i> .</string>
     <string name="settings_orbot_disabled_error">قم بإيقاف تشغيل HTTP (S) و / أو وكيل SOCKS5 لمتابعة إعداد Tor-as-a-proxy.</string>
     <string name="settings_import_export_heading">النسخ الاحتياطي والاستعادة</string>
     <string name="about_bravedns_explantion">Rethink هي أسهل طريقة لمراقبة نشاط التطبيقات وتجاوز الرقابة على الإنترنت وتطبيقات جدار الحماية على جهاز Android الخاص بك.</string>
