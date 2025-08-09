@@ -205,6 +205,7 @@ class AppListActivity :
             window.isNavigationBarContrastEnforced = false
         }
 
+        filters.value = Filters()
         initView()
         initObserver()
         setupClickListener()
@@ -213,13 +214,12 @@ class AppListActivity :
     override fun onResume() {
         super.onResume()
         setFirewallFilter(filters.value?.firewallFilter)
+        filters.value = filters.value ?: Filters()
         b.ffaAppList.requestFocus()
     }
 
     private fun initObserver() {
         filters.observe(this) {
-            // update the ui based on the filter
-            resetFirewallIcons(BlockType.UNMETER)
             if (it == null) return@observe
 
             appInfoViewModel.setFilter(it)
@@ -253,12 +253,6 @@ class AppListActivity :
         b.ffaSearch.clearFocus()
         b.ffaAppList.requestFocus()
         super.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        // clear the filters when the activity is stopped
-        filters.value = Filters()
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {

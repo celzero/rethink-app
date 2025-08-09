@@ -98,7 +98,14 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         }
 
         b.fsClear.setOnClickListener {
-            AppListActivity.filters.postValue(AppListActivity.Filters())
+            val new = AppListActivity.filters.value
+            if (new == null) {
+                this.dismiss()
+                return@setOnClickListener
+            }
+            new.categoryFilters.clear()
+            new.topLevelFilter = AppListActivity.TopLevelFilter.ALL
+            AppListActivity.filters.postValue(new)
             this.dismiss()
         }
     }
