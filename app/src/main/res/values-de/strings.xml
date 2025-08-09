@@ -15,7 +15,7 @@
     <string name="skip">Überspringen</string>
     <string name="finish">Fertig</string>
     <string name="slide_2_desc">Rethink ist das einfachste Mittel, um Netzwerkaktivitäten zu überwachen, Internetzensur zu umgehen und Apps auf deinem Android-Gerät mit einer Firewall einzudämmen.</string>
-    <string name="slide_1_desc">Rethink ist eine Open-Source-Software, die vom Mozilla Builders MVP-Programm unterstützt wird.</string>
+    <string name="slide_1_desc">Rethink ist eine Open-Source-Software, die vom Mozilla Builders MVP-Programm und der FOSS United Foundation unterstützt wird.</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="block">blockiert</string>
     <string name="untracked">nicht verfolgt</string>
@@ -1011,15 +1011,34 @@
     <string name="crypt_relay_sweden" translatable="true">Anonymisiertes DNS-Relay, gehostet in Schweden und bereitgestellt von https://cryptostrom.is/.</string>
     <string name="lbl_last" translatable="true">Zuletzt</string>
     <string name="lbl_test" translatable="true">Test</string>
-    <string name="lbl_hop" translatable="true">Mail-Relay</string>
+    <string name="lbl_hop" translatable="true">Relay</string>
     <string name="lbl_protos" translatable="true">protos</string>
     <string name="lbl_service_providers" translatable="true">Service Provider</string>
-    <string name="firewall_title" translatable="true">Schützen Sie Ihr Android mit Firewall</string>
+    <string name="firewall_title" translatable="true">Schütze dein Android mit einer Firewall</string>
     <string name="status_no_network" translatable="true">kein netzwerk</string>
-    <string name="settings_theme_dialog_themes_6" translatable="true">Dark Plus</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">Dunkel Plus</string>
     <string name="settings_biometric_dialog_heading" translatable="true">Biometrische Authentifizierung</string>
     <string name="settings_biometric_dialog_option_2" translatable="true">Nach 5 Minuten</string>
     <string name="settings_biometric_dialog_option_3" translatable="true">Nach 15 Minuten</string>
-    <string name="cd_split_dns_heading" translatable="true">Split DNS (experimental)</string>
-    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">DNS-Regeln als Firewall-Regeln behandeln (erfahren)</string>
+    <string name="cd_split_dns_heading" translatable="true">Split DNS (experimentell)</string>
+    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">DNS-Regeln als Firewall-Regeln behandeln (experimentell)</string>
+    <string name="lbl_experimental" translatable="true">(experimentell)</string>
+    <string name="lbl_manual" translatable="true">Anleitung</string>
+    <string name="wireguard_title" translatable="true">Internet mit WireGuard absichern</string>
+    <string name="wireguard_desc" translatable="true">Verschlüsselt deinen Internetverkehr mit WireGuard. Für unterschiedliche Apps lassen sich verschiedene Routen auswählen.</string>
+    <string name="firewall_desc" translatable="true">Kontrolliere die Internetnutzung pro App und schränke Verbindungen basierend auf der Netzwerkaktivität oder je nach App ein.</string>
+    <string name="dns_title" translatable="true">Blockiere Werbung und Malware über DNS</string>
+    <string name="dns_desc" translatable="true">Wähle aus über 190 Listen, um Werbung, Tracker und Malware zu stoppen.</string>
+    <string name="settings_mobile_metered_heading" translatable="true">Kostenpflichtiges mobiles Netz</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Mobile Netze immer als kostenpflichtig behandeln.</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">Hell Plus</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">Nie</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">Immer</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">Du nutzt Rethink nun seit <b>%1$s Tagen</b>, was Nutzungskosten von ca. <b>$%2$s</b> entspricht. Möchtest du spenden, um die Entwicklung aufrechtzuerhalten?</string>
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">DNS des Systems für undelegierte Domains nutzen</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">DNS des Systems für undelegierte Domains wie <i>.lan</i>, <i>.internal</i> etc. nutzen</string>
+    <string name="cd_split_dns_desc" translatable="true">DNS-Anfragen von geproxyten Apps zum DNS-Server des Proxys weiterleiten</string>
+    <string name="firewall_rule_private_dns" translatable="true">Privates DNS</string>
+    <string name="lbl_always" translatable="true">Immer</string>
+    <string name="hop_failure_toast" translatable="true">Relay-Fehler: %1$s -&gt; %2$s</string>
 </resources>
