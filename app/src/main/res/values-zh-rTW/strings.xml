@@ -172,13 +172,7 @@
     <string name="brave_dns_connect_mode_change_dns">選擇模式。</string>
     <string name="alert_firewall_accessibility_regrant_explanation">Rethink 的無障礙服務已停止或崩潰。為繼續使用<i>攔截未使用應用程式</i>的功能，<i><b>請至系統設定，強制停止並再次啟動</b></i> Rethink 。\n\nRethink 使用無障礙服務來追蹤正在使用的應用程式（前景）與未使用的應用程式（背景）。</string>
     <string name="bsct_conn_block_desc">由 %2$s 攔截 %1$s</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>：阻止某應用程式連線至互聯網。
-\n <u>#2</u>：阻止任意應用程式連線至某特定 IP 。
-\n <u>#3</u>：在裝置鎖定時阻止所有連線（通用攔截規則）。
-\n <u>#4</u>：阻止任意未使用的應用程式連線（通用攔截規則）。
-\n <u>#5</u>：阻止未知應用程式的連線（通用攔截規則）。
-\n <u>#6</u>：攔截除 DNS 外的所有 UDP 流量（通用攔截規則）。
-\n <u>#7</u>：攔截繞過 DNS 的流量（通用攔截規則）。</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>：阻止某應用程式連線至互聯網。 \n <u>#2</u>：阻止任意應用程式連線至某特定 IP 。 \n <u>#3</u>：在裝置鎖定時阻止所有連線（通用攔截規則）。 \n <u>#4</u>：阻止任意未使用的應用程式連線（通用攔截規則）。 \n <u>#5</u>：阻止未知應用程式的連線（通用攔截規則）。 \n <u>#6</u>：攔截除 DNS 外的所有 UDP 流量（通用攔截規則）。 \n <u>#7</u>：攔截繞過 DNS 的流量（通用攔截規則）。</string>
     <string name="always_on_dialog">「永久連線的 VPN 」已在此裝置上啟用。為啟動 Rethink ，請移步系統設定並停用「永久連線的 VPN 」。</string>
     <string name="always_on_dialog_stop_heading">永久連線的 VPN</string>
     <string name="univ_firewall_dialog_message">刪除此條規則將允許任何應用程式連線至此 IP 位址。您是否想要繼續？</string>
@@ -211,10 +205,7 @@
     <string name="orbot_bs_status_trying_connect">正在設定 Orbot ……</string>
     <string name="orbot_status_arg_3">DNS 與 TCP</string>
     <string name="orbot_stop_dialog_neutral">更改 DNS</string>
-    <string name="orbot_explanation">Orbot 是一款能讓其他程式更<u>安全</u>地連線到互聯網的免費代理應用程式。
-\nOrbot 使用 <u>Tor</u> 來加密您的網路流量，幫您<u>繞過網路審查</u>，並抵禦威脅個人自由及隱私的<u>網路監視</u>。
-\n<u>TCP 代理</u>： Rethink 只將<i>包含的</i>應用程式的 TCP 連線轉送至 Orbot 。
-\n<u>HTTP 代理</u>： Rethink 向 Orbot <i>建立</i> HTTP CONNECT 隧道，並只轉送<i>包含的</i>應用程式的 TCP 連線。</string>
+    <string name="orbot_explanation">Orbot 是一款能讓其他程式更<u>安全</u>地連線到互聯網的免費代理應用程式。 \nOrbot 使用 <u>Tor</u> 來加密您的網路流量，幫您<u>繞過網路審查</u>，並抵禦威脅個人自由及隱私的<u>網路監視</u>。 \n<u>TCP 代理</u>： Rethink 只將<i>包含的</i>應用程式的 TCP 連線轉送至 Orbot 。 \n<u>HTTP 代理</u>： Rethink 向 Orbot <i>建立</i> HTTP CONNECT 隧道，並只轉送<i>包含的</i>應用程式的 TCP 連線。</string>
     <string name="orbot_install_dialog_message">Orbot 將 Tor 的特性與功能帶入 Android 。</string>
     <string name="orbot_install_dialog_positive">安裝</string>
     <string name="orbot_install_activity_error">似乎出了一些問題，請稍後再試</string>

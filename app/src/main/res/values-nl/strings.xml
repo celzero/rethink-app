@@ -233,13 +233,7 @@
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">private dns is ingeschakeld</string>
     <string name="brave_dns_connect_mode_change_dns">Kies de modus.</string>
     <string name="conn_track_clear_logs_message">Dit verwijdert alleen netwerklogs, maar geen firewallregels. Deze operatie is niet omkeerbaar. Wilt u doorgaan\?</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>: Blokkeert een app om verbinding te maken met het internet.
-\n <u>#2</u>: Blokkeert een app om verbinding te maken met een bepaald IP-adres.
-\n <u>#3</u>: Blokkeert alle verbindingen wanneer het apparaat is vergrendeld (Universal Firewall).
-\n <u>#4</u>: Blokkeert elke app die niet in gebruik is (Universal Firewall).
-\n <u>#5</u>: Blokkeert verbindingen wanneer bron app onbekend is (Universal Firewall).
-\n <u>#6</u>: Blokkeert alle UDP verkeer behalve DNS (Universal Firewall).
-\n <u>#7</u>: Blokkeert verbindingen wanneer DNS wordt omzeild (Universal Firewall).</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>: Blokkeert een app om verbinding te maken met het internet. \n <u>#2</u>: Blokkeert een app om verbinding te maken met een bepaald IP-adres. \n <u>#3</u>: Blokkeert alle verbindingen wanneer het apparaat is vergrendeld (Universal Firewall). \n <u>#4</u>: Blokkeert elke app die niet in gebruik is (Universal Firewall). \n <u>#5</u>: Blokkeert verbindingen wanneer bron app onbekend is (Universal Firewall). \n <u>#6</u>: Blokkeert alle UDP verkeer behalve DNS (Universal Firewall). \n <u>#7</u>: Blokkeert verbindingen wanneer DNS wordt omzeild (Universal Firewall).</string>
     <string name="firewall_act_universal_tab">Universele</string>
     <string name="always_on_dialog">\"Always-On VPN\" is ingeschakeld op dit apparaat. Om Rethink te starten, ga naar Instellingen app en schakel \"Always-on VPN\" uit.</string>
     <string name="download_update_dialog_message_ok">Je zit al op de laatste versie.</string>

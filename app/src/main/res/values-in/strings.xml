@@ -596,13 +596,7 @@
     <string name="universal_firewall_explanation">Terapkan aturan firewall berdasarkan aktivitas perangkat, seperti pemblokiran saat perangkat terkunci atau aplikasi tertentu yang tidak digunakan.</string>
     <string name="notification_action_resume_vpn">LANJUTKAN</string>
     <string name="always_on_dialog_lockdown_stop_message">Rethink menjalankan VPN pada mode <i>Penguncian penuh</i>. Menghentikannya akan mengakibatkan hilangnya konektivitas Internet pada profil pengguna ini. Apakah anda masih ingin melanjutkan\?</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>: Memblokir aplikasi agar tidak terhubung ke Internet.
-\n <u>#2</u>: Memblokir aplikasi apa pun agar tidak terhubung ke IP tertentu.
-\n <u>#3</u>: Memblokir semua koneksi ketika perangkat terkunci (Universal Firewall).
-\n <u>#4</u>: Memblokir aplikasi apa pun yang tidak digunakan (Universal Firewall).
-\n <u>#5</u>: Memblokir koneksi ketika sumber aplikasi tidak diketahui (Universal Firewall).
-\n <u>#6</u>: Memblokir semua lalu lintas UDP kecuali DNS (Universal Firewall).
-\n <u>#7</u>: Memblokir koneksi ketika DNS dilewati (Universal Firewall).</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>: Memblokir aplikasi agar tidak terhubung ke Internet. \n <u>#2</u>: Memblokir aplikasi apa pun agar tidak terhubung ke IP tertentu. \n <u>#3</u>: Memblokir semua koneksi ketika perangkat terkunci (Universal Firewall). \n <u>#4</u>: Memblokir aplikasi apa pun yang tidak digunakan (Universal Firewall). \n <u>#5</u>: Memblokir koneksi ketika sumber aplikasi tidak diketahui (Universal Firewall). \n <u>#6</u>: Memblokir semua lalu lintas UDP kecuali DNS (Universal Firewall). \n <u>#7</u>: Memblokir koneksi ketika DNS dilewati (Universal Firewall).</string>
     <string name="dns_query_clear_logs_message">Ini menghapus log DNS di perangkat. Operasi ini tidak dapat dibatalkan. Apakah anda ingin melanjutkan\?</string>
     <string name="about_app_translate">Terjemahkan</string>
     <string name="cd_custom_dns_proxy_title">Proksi DNS Khusus</string>
@@ -662,10 +656,7 @@
     <string name="about_mail_bugreport_subject">[Rethink]: Laporan bug</string>
     <string name="settings_ptrans_heading">Paksa keluar IPv4</string>
     <string name="fapps_info_dialog_positive_btn">Oke</string>
-    <string name="orbot_explanation">Orbot adalah aplikasi proksi gratis yang memungkinkan sambungan internet pada aplikasi menjadi tempat yang<u>lebih aman</u>.
-\nOrbot menggunakan<u>Tor</u> untuk mengenkripsi lalu lintas internet anda, juga membantu <u>melewati penyensoran</u>dan sebagai bentuk pertahanan diri dari berbagai macam<u>pengawasan jaringan</u> yang bisa membahayakan kebebasan pribadi dan privasi.
-\n<u>Proksi TCP</u>: Rethink hanya meneruskan koneksi TCP untuk aplikasi <i>yang ada</i> menuju Orbot.
-\n<u>Proksi HTTP</u>: Rethink<i>membangun</i> terowongan HTTP CONNECT ke Orbot dan hanya meneruskan koneksi TCP untuk aplikasi <i>yang ada</i>.</string>
+    <string name="orbot_explanation">Orbot adalah aplikasi proksi gratis yang memungkinkan sambungan internet pada aplikasi menjadi tempat yang<u>lebih aman</u>. \nOrbot menggunakan<u>Tor</u> untuk mengenkripsi lalu lintas internet anda, juga membantu <u>melewati penyensoran</u>dan sebagai bentuk pertahanan diri dari berbagai macam<u>pengawasan jaringan</u> yang bisa membahayakan kebebasan pribadi dan privasi. \n<u>Proksi TCP</u>: Rethink hanya meneruskan koneksi TCP untuk aplikasi <i>yang ada</i> menuju Orbot. \n<u>Proksi HTTP</u>: Rethink<i>membangun</i> terowongan HTTP CONNECT ke Orbot dan hanya meneruskan koneksi TCP untuk aplikasi <i>yang ada</i>.</string>
     <string name="settings_autostart_bootup_heading">Mulai otomatis saat device dinyalakan (eksperimental)</string>
     <string name="settings_app_list_default_app">Tidak ada</string>
     <string name="settings_autostart_bootup_desc">Pada saat perangkat dihidupkan, Rethink akan memulai sendiri jika aplikasi ini sebelumnya tidak dimatikan.</string>

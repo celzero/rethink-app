@@ -1,1 +1,1 @@
-Rethink: DNS + Сетевой фильтр + VPN
+Rethink: DNS + Frewall + VPN

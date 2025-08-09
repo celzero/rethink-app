@@ -712,13 +712,7 @@
     <string name="bsct_conn_block_desc">bloqueado %1$s por %2$s</string>
     <string name="bsct_conn_block_desc_device">bloqueado %1$s en el dispositivo</string>
     <string name="bsct_block_ip">Bloquear, confiar en <u>esta IP</u> para <u>esta aplicación</u></string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>: Bloquea una aplicación para que no se conecte a Internet.
-\n <u>#2</u>: Bloquea cualquier aplicación para que no se conecte a una IP concreta.
-\n <u>#3</u>: Bloquea todas las conexiones cuando el dispositivo está bloqueado (Cortafuegos Universal).
-\n <u>#4</u>: Bloquea cualquier aplicación que no esté en uso (Cortafuegos Universal).
-\n <u>#5</u>: Bloquea las conexiones cuando la aplicación de origen es desconocida (Cortafuegos Universal).
-\n <u>#6</u>: Bloquea todo el tráfico UDP excepto DNS (Cortafuegos Universal).
-\n <u>#7</u>: Bloquea las conexiones cuando se omite el DNS (Cortafuegos Universal).</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>: Bloquea una aplicación para que no se conecte a Internet. \n <u>#2</u>: Bloquea cualquier aplicación para que no se conecte a una IP concreta. \n <u>#3</u>: Bloquea todas las conexiones cuando el dispositivo está bloqueado (Cortafuegos Universal). \n <u>#4</u>: Bloquea cualquier aplicación que no esté en uso (Cortafuegos Universal). \n <u>#5</u>: Bloquea las conexiones cuando la aplicación de origen es desconocida (Cortafuegos Universal). \n <u>#6</u>: Bloquea todo el tráfico UDP excepto DNS (Cortafuegos Universal). \n <u>#7</u>: Bloquea las conexiones cuando se omite el DNS (Cortafuegos Universal).</string>
     <string name="bsct_conn_desc_allowed">permitido en %1$s %2$s</string>
     <string name="bsct_conn_desc_blocked">bloqueado en %1$s %2$s</string>
     <string name="always_on_dialog">La \"VPN siempre activa\" está activada en este dispositivo. Para iniciar Rethink, dirígete a los Ajustes de la aplicación y desactiva \"VPN siempre activa\".</string>
@@ -882,10 +876,7 @@
     <string name="status_protected_with_wg" translatable="true">protegido con wireguard</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">protegido con wireguard y dns privado</string>
     <string name="public_key_copy_toast_msg" translatable="true">Clave pública copiada.</string>
-    <string name="orbot_explanation" translatable="true">Orbot es una aplicación proxy gratuita que permite a otras aplicaciones utilizar Internet de forma más <u>segura</u>.
-\nOrbot utiliza <u>Tor</u> para cifrar su tráfico de Internet, lo que le ayuda a <u>evitar la censura</u> y defenderse de las formas de <u>vigilancia de la red</u> que amenazan la libertad personal y la privacidad.
-\n<u>Proxy TCP</u>: Rethink reenvía a Orbot sólo las conexiones TCP de las aplicaciones <i>incluidas</i>.
-\n<u>Proxy HTTP</u>: Rethink <i>establece</i> un túnel de CONEXIÓN HTTP a Orbot y reenvía solo las conexiones TCP de las aplicaciones <i>incluidas</i>.</string>
+    <string name="orbot_explanation" translatable="true">Orbot es una aplicación proxy gratuita que permite a otras aplicaciones utilizar Internet de forma más <u>segura</u>. \nOrbot utiliza <u>Tor</u> para cifrar su tráfico de Internet, lo que le ayuda a <u>evitar la censura</u> y defenderse de las formas de <u>vigilancia de la red</u> que amenazan la libertad personal y la privacidad. \n<u>Proxy TCP</u>: Rethink reenvía a Orbot sólo las conexiones TCP de las aplicaciones <i>incluidas</i>. \n<u>Proxy HTTP</u>: Rethink <i>establece</i> un túnel de CONEXIÓN HTTP a Orbot y reenvía solo las conexiones TCP de las aplicaciones <i>incluidas</i>.</string>
     <string name="lbl_listen_port" translatable="true">Escuchar el puerto</string>
     <string name="logs_disclaimer" translatable="true">Mostrar los primeros 20.000 caracteres</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">No validar los certificados TLS del servidor (habilitar sólo si sabes lo que está haciendo)</string>

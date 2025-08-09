@@ -171,13 +171,7 @@
 \n
 \nRethink využíva službu dostupnosti na sledovanie, ktoré aplikácie sa používajú (v popredí) a ktoré nepoužívajú (na pozadí).</string>
     <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink používa VPN v režime <i>Uzamknutie</i>. Jeho zastavenie by viedlo k strate internetového pripojenia v tomto užívateľskom profile. Chcete napriek tomu pokračovať?</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Blokuje pripojenie aplikácie k internetu.
-\n<u>#2</u>: Blokuje pripojenie akejkoľvek aplikácie ku konkrétnej adrese IP.
-\n<u>#3</u>: Blokuje všetky pripojenia, keď je zariadenie uzamknuté (Universal Firewall).
-\n<u>#4</u>: Blokuje všetky nepoužívané aplikácie (Universal Firewall).
-\n<u>#5</u>: Blokuje pripojenia, keď je zdrojová aplikácia neznáma (Universal Firewall).
-\n<u>#6</u>: Blokuje všetku komunikáciu UDP okrem DNS (Universal Firewall).
-\n<u>#7</u>: Blokovať pripojenia pri obídení DNS (Universal Firewall).</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Blokuje pripojenie aplikácie k internetu. \n<u>#2</u>: Blokuje pripojenie akejkoľvek aplikácie ku konkrétnej adrese IP. \n<u>#3</u>: Blokuje všetky pripojenia, keď je zariadenie uzamknuté (Universal Firewall). \n<u>#4</u>: Blokuje všetky nepoužívané aplikácie (Universal Firewall). \n<u>#5</u>: Blokuje pripojenia, keď je zdrojová aplikácia neznáma (Universal Firewall). \n<u>#6</u>: Blokuje všetku komunikáciu UDP okrem DNS (Universal Firewall). \n<u>#7</u>: Blokovať pripojenia pri obídení DNS (Universal Firewall).</string>
     <string name="doh_custom_url_remove_dialog_title" translatable="true">Odstrániť DoH pripojenie?</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">Odstrániť DoT pripojenie?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Odstrániť DNS cez TLS z uložených nastavení.</string>
@@ -283,10 +277,7 @@
     <string name="orbot_bs_status_trying_connect" translatable="true">Nastavujem Orbot ..</string>
     <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink je nastavený k pre-posielaniu DNS žiadostí cez Orbot. Zmeň ako potrebuješ.</string>
     <string name="orbot_stop_dialog_negative" translatable="true">Zastav Orbot</string>
-    <string name="orbot_explanation" translatable="true">Orbot je bezplatná aplikácia proxy, ktorá iným aplikáciám umožňuje používať internet <u>bezpečnejšie</u>.
-\nOrbot používa <u>Tor</u> na šifrovanie vašej internetovej prevádzky, čo vám pomáha <u>obísť cenzúru</u> a brániť sa pred formami <u>sledovania siete</u>, ktoré ohrozujú osobnú slobodu a súkromie.
-\n<u>TCP Proxy</u>: Rethink posiela iba TCP spojenia <i>zahrnutých</i> aplikácií do Orbotu.
-\n<u>HTTP Proxy</u>: Rethink <i>vytvorí</i> tunel HTTP CONNECT do Orbotu a pošle iba TCP spojenia <i>zahrnutých</i> aplikácií.</string>
+    <string name="orbot_explanation" translatable="true">Orbot je bezplatná aplikácia proxy, ktorá iným aplikáciám umožňuje používať internet <u>bezpečnejšie</u>. \nOrbot používa <u>Tor</u> na šifrovanie vašej internetovej prevádzky, čo vám pomáha <u>obísť cenzúru</u> a brániť sa pred formami <u>sledovania siete</u>, ktoré ohrozujú osobnú slobodu a súkromie. \n<u>TCP Proxy</u>: Rethink posiela iba TCP spojenia <i>zahrnutých</i> aplikácií do Orbotu. \n<u>HTTP Proxy</u>: Rethink <i>vytvorí</i> tunel HTTP CONNECT do Orbotu a pošle iba TCP spojenia <i>zahrnutých</i> aplikácií.</string>
     <string name="orbot_status_arg_2" translatable="true">TCP</string>
     <string name="orbot_install_dialog_positive" translatable="true">Inštalovať</string>
     <string name="orbot_install_dialog_neutral" translatable="true">webstránka</string>

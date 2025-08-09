@@ -52,13 +52,7 @@
     <string name="firewall_rule_univ_block_metered" translatable="true">Naka-meter (Pangkalahatan)</string>
     <string name="firewall_rule_new_app_desc" translatable="true">Ito ang <i>unang</i> pagkakataon na nagpakabit ang app na ito ng koneksyon.<br/><br/> Upang magbago, pumunta sa tab na <i>Universal</i>.</string>
     <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">Ang isang universal na patakaran ng firewall na iniset ng user ay nag-block ng <i>app</i> na ito habang nagtatangka itong kumonekta sa <i>Metered</i> (Mobile) na network. <br/> <br/> Upang baguhin, pumunta sa tab na <i>Universal</i>.</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Nagbabawal sa isang app na kumonekta sa Internet.
-\n<u>#2</u>: Nagbabawal sa anumang app na kumonekta sa partikular na IP.
-\n<u>#3</u>: Nagbabawal sa lahat ng mga koneksyon kapag nakalock ang device (Universal Firewall).
-\n<u>#4</u>: Nagbabawal sa anumang app na hindi ginagamit (Universal Firewall).
-\n<u>#5</u>: Nagbabawal ng mga koneksyon kapag ang pinagmulan ng app ay hindi kilala (Universal Firewall).
-\n<u>#6</u>: Nagbabawal sa lahat ng UDP traffic maliban sa DNS (Universal Firewall).
-\n<u>#7</u>: Nagbabawal ng mga koneksyon kapag ang DNS ay hindi sinusunod (Universal Firewall).</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Nagbabawal sa isang app na kumonekta sa Internet. \n<u>#2</u>: Nagbabawal sa anumang app na kumonekta sa partikular na IP. \n<u>#3</u>: Nagbabawal sa lahat ng mga koneksyon kapag nakalock ang device (Universal Firewall). \n<u>#4</u>: Nagbabawal sa anumang app na hindi ginagamit (Universal Firewall). \n<u>#5</u>: Nagbabawal ng mga koneksyon kapag ang pinagmulan ng app ay hindi kilala (Universal Firewall). \n<u>#6</u>: Nagbabawal sa lahat ng UDP traffic maliban sa DNS (Universal Firewall). \n<u>#7</u>: Nagbabawal ng mga koneksyon kapag ang DNS ay hindi sinusunod (Universal Firewall).</string>
     <string name="firewall_rule_block_ip_univ_desc" translatable="true">Isang user-set na firewall rule ang nag-block sa <i>destination IP / Port</i>.<br/><br/> Upang baguhin, pumunta sa tab na <i>Universal</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">Pinapayagan ang koneksyong ito dahil ang <i>destination IP</i> ay nakatakda upang makaiwas sa lahat ng pangkalahatang patakaran ng firewall.<br/><br/> Upang baguhin, pumunta sa <i>IP Rules</i> sa tab na <i>Universal</i>.</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">protektado</string>

@@ -208,23 +208,14 @@
 \n
 \nRethink usa o serviço de acessibilidade para rastrear quais aplicativos estão em uso (primeiro plano) e aqueles que não estão em uso (segundo plano).</string>
     <string name="orbot_socks5_desc">Encaminhar todas as conexões TCP para Orbot.</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>: Impede que um aplicativo se conecte à internet.
-\n <u>#2</u>: Impede que qualquer aplicativo se conecte a um IP específico.
-\n <u>#3</u>: Bloqueia todas as conexões quando o dispositivo está bloqueado (Firewall Universal).
-\n <u>#4</u>: Bloqueia qualquer aplicativo que não esteja em uso (Firewall Universal).
-\n <u>#5</u>: Bloqueia conexões quando o aplicativo de origem for desconhecido (Firewall Universal).
-\n <u>#6</u>: Bloqueia todo o tráfego UDP, exceto DNS (Firewall Universal).
-\n <u>#7</u>: Bloqueia conexões quando o DNS é autorizado (Firewall Universal).</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>: Impede que um aplicativo se conecte à internet. \n <u>#2</u>: Impede que qualquer aplicativo se conecte a um IP específico. \n <u>#3</u>: Bloqueia todas as conexões quando o dispositivo está bloqueado (Firewall Universal). \n <u>#4</u>: Bloqueia qualquer aplicativo que não esteja em uso (Firewall Universal). \n <u>#5</u>: Bloqueia conexões quando o aplicativo de origem for desconhecido (Firewall Universal). \n <u>#6</u>: Bloqueia todo o tráfego UDP, exceto DNS (Firewall Universal). \n <u>#7</u>: Bloqueia conexões quando o DNS é autorizado (Firewall Universal).</string>
     <string name="status_protected_with_tor">protegido com tor</string>
     <string name="status_protected_with_private_dns">protegido com dns privado</string>
     <string name="status_protected_with_tor_private_dns">protegido com tor e dns privado</string>
     <string name="dns_explanation_dns_connected">Conectado ao RethinkDNS</string>
     <string name="status_protected_with_proxy_private_dns">protegido com proxy e dns privado</string>
     <string name="status_protected_with_socks5_private_dns">protegido com socks5 e dns privados</string>
-    <string name="orbot_explanation">Orbot é um aplicativo de proxy gratuito que permite que outros aplicativos usem a internet com mais <u>segurança</u>.
-\nOrbot usa o <u>Tor</u> para criptografar seu tráfego de internet, o que ajuda você a <u>ignorar a censura</u> e a se defender contra formas de <u>vigilância de rede</u> que ameaçam a liberdade e a privacidade pessoais.
-\n<u>Proxy TCP</u>: Rethink encaminha apenas conexões TCP de aplicativos <i>incluídos</i> para Orbot.
-\n<u>Proxy HTTP</u>: Rethink <i>estabelece</i> o túnel HTTP CONNECT para Orbot e encaminha apenas conexões TCP de aplicativos <i>incluídos</i>.</string>
+    <string name="orbot_explanation">Orbot é um aplicativo de proxy gratuito que permite que outros aplicativos usem a internet com mais <u>segurança</u>. \nOrbot usa o <u>Tor</u> para criptografar seu tráfego de internet, o que ajuda você a <u>ignorar a censura</u> e a se defender contra formas de <u>vigilância de rede</u> que ameaçam a liberdade e a privacidade pessoais. \n<u>Proxy TCP</u>: Rethink encaminha apenas conexões TCP de aplicativos <i>incluídos</i> para Orbot. \n<u>Proxy HTTP</u>: Rethink <i>estabelece</i> o túnel HTTP CONNECT para Orbot e encaminha apenas conexões TCP de aplicativos <i>incluídos</i>.</string>
     <string name="settings_autostart_bootup_heading">Inicialização automática ao ligar (experimental)</string>
     <string name="settings_https_disabled_error">Conectado ao %1$s. Desligue-o para continuar.</string>
     <string name="settings_general_header">geral</string>
