@@ -1021,4 +1021,14 @@
     <string name="lbl_last" translatable="true">Zuletzt</string>
     <string name="lbl_test" translatable="true">Test</string>
     <string name="lbl_hop" translatable="true">Mail-Relay</string>
+    <string name="lbl_protos" translatable="true">protos</string>
+    <string name="lbl_service_providers" translatable="true">Service Provider</string>
+    <string name="firewall_title" translatable="true">Schützen Sie Ihr Android mit Firewall</string>
+    <string name="status_no_network" translatable="true">kein netzwerk</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">Dark Plus</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">Biometrische Authentifizierung</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">Nach 5 Minuten</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">Nach 15 Minuten</string>
+    <string name="cd_split_dns_heading" translatable="true">Split DNS (experimental)</string>
+    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">DNS-Regeln als Firewall-Regeln behandeln (erfahren)</string>
 </resources>
