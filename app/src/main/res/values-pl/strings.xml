@@ -233,10 +233,7 @@
 \n%2$s</string>
     <string name="settings_theme_heading" translatable="true">Wygląd</string>
     <string name="settings_theme_desc" translatable="true">Ciemny/jasny motyw</string>
-    <string name="orbot_explanation" translatable="true">Orbot jest bezpłatną aplikacją proxy, która umożliwia innym aplikacjom korzystanie z Internetu w bardziej <u>bezpieczny sposób</u>.
-\nOrbot używa <u>Tora</u> do szyfrowania ruchu internetowego, co pomaga <u>ominąć cenzurę</u> i bronić się przed formami <u>inwigilacji</u>, które zagrażają wolności osobistej i prywatności.
-\n<u>Proxy TCP</u>: RethinkDNS przekazuje do Orbota tylko połączenia TCP wszystkich aplikacji poza wykluczonymi.
-\n<u>Proxy HTTP</u>: RethinkDNS <i>ustawia</i> proxy HTTP, ale nie wymusza używania go przez aplikacje. Zwykle używają go przeglądarki takie jak Chrome i Firefox. Aplikacje korzystające z serwera proxy HTTP(S) będą omijać zarówno reguły zapory sieciowej, jak i DNS.</string>
+    <string name="orbot_explanation" translatable="true">Orbot jest bezpłatną aplikacją proxy, która umożliwia innym aplikacjom korzystanie z Internetu w bardziej <u>bezpieczny sposób</u>. \nOrbot używa <u>Tora</u> do szyfrowania ruchu internetowego, co pomaga <u>ominąć cenzurę</u> i bronić się przed formami <u>inwigilacji</u>, które zagrażają wolności osobistej i prywatności. \n<u>Proxy TCP</u>: RethinkDNS przekazuje do Orbota tylko połączenia TCP wszystkich aplikacji poza wykluczonymi. \n<u>Proxy HTTP</u>: RethinkDNS <i>ustawia</i> proxy HTTP, ale nie wymusza używania go przez aplikacje. Zwykle używają go przeglądarki takie jak Chrome i Firefox. Aplikacje korzystające z serwera proxy HTTP(S) będą omijać zarówno reguły zapory sieciowej, jak i DNS.</string>
     <string name="settings_import_export_heading" translatable="true">Kopia zapasowa i przywracanie</string>
     <string name="settings_import_export_desc" translatable="true">Ręcznie wykonaj kopię zapasową lub przywróć dane i ustawienia aplikacji.</string>
     <string name="settings_orbot_disabled_error" translatable="true">Wyłącz proxy HTTP (S) i/lub SOCKS5, aby kontynuować konfigurację Tor-as-a-proxy.</string>
