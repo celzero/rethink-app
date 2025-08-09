@@ -103,13 +103,7 @@
     <string name="rdns_plus">RDNS Plus</string>
     <string name="isolate">izoluj</string>
     <string name="alert_permission_accessibility">Pozwolenie - Dostępność</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>: Blokuje aplikację przed połączeniem się z Internetem.
-\n <u>#2</u>: Blokuje każdej aplikacji możliwość łączenia się z określonym IP.
-\n <u>#3</u>: Blokuje wszystkie połączenia, gdy urządzenie jest zablokowane (Universal Firewall).
-\n <u>#4</u>: Blokuje każdą aplikację, która nie jest używana (Universal Firewall).
-\n <u>#5</u>: Blokuje połączenia, gdy źródło aplikacji jest nieznane (Universal Firewall).
-\n <u>#6</u>: Blokuje cały ruch UDP z wyjątkiem DNS (Universal Firewall).
-\n <u>#7</u>: Blokuje połączenia, gdy DNS jest omijany (Universal Firewall).</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>: Blokuje aplikację przed połączeniem się z Internetem. \n <u>#2</u>: Blokuje każdej aplikacji możliwość łączenia się z określonym IP. \n <u>#3</u>: Blokuje wszystkie połączenia, gdy urządzenie jest zablokowane (Universal Firewall). \n <u>#4</u>: Blokuje każdą aplikację, która nie jest używana (Universal Firewall). \n <u>#5</u>: Blokuje połączenia, gdy źródło aplikacji jest nieznane (Universal Firewall). \n <u>#6</u>: Blokuje cały ruch UDP z wyjątkiem DNS (Universal Firewall). \n <u>#7</u>: Blokuje połączenia, gdy DNS jest omijany (Universal Firewall).</string>
     <string name="always_on_dialog_neutral">Ustawienia</string>
     <string name="firewall_act_universal_tab">Uniwersalny</string>
     <string name="firewall_act_network_monitor_tab">Logi sieciowe</string>
