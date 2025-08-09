@@ -568,13 +568,7 @@
     <string name="custom_url_error_invalid_url">Geçersiz URL</string>
     <string name="dns_query_clear_logs_message">Bu, aygıt üzerindeki DNS günlüklerini siler. Bu işlem geri döndürülemez. Devam etmek istiyor musunuz\?</string>
     <string name="always_on_dialog_neutral">Ayarlar</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>: Bir uygulamanın internete bağlanmasını engeller.
-\n <u>#2</u>: Herhangi bir uygulamanın belirli bir IP\'ye bağlanmasını engeller.
-\n <u>#3</u>: Ekran kilitlendiğinde bütün bağlantıları engeller (Genel Güvenlik Duvarı).
-\n <u>#4</u>: Kullanımda olmayan her uygulamayı engeller (Genel Güvenlik Duvarı).
-\n <u>#5</u>: Kaynak uygulaması belirsiz bütün bağlantıları engeller (Genel Güvenlik Duvarı).
-\n <u>#6</u>: DNS hariç bütün UDP trafiğini engeller(Genel Güvenlik Duvarı).
-\n <u>#7</u>: DNS atlanırsa bütün bağlantıları engeller (Genel Güvenlik Duvarı).</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>: Bir uygulamanın internete bağlanmasını engeller. \n <u>#2</u>: Herhangi bir uygulamanın belirli bir IP\'ye bağlanmasını engeller. \n <u>#3</u>: Ekran kilitlendiğinde bütün bağlantıları engeller (Genel Güvenlik Duvarı). \n <u>#4</u>: Kullanımda olmayan her uygulamayı engeller (Genel Güvenlik Duvarı). \n <u>#5</u>: Kaynak uygulaması belirsiz bütün bağlantıları engeller (Genel Güvenlik Duvarı). \n <u>#6</u>: DNS hariç bütün UDP trafiğini engeller(Genel Güvenlik Duvarı). \n <u>#7</u>: DNS atlanırsa bütün bağlantıları engeller (Genel Güvenlik Duvarı).</string>
     <string name="bsct_block_ip">Engelle, <u>bu IP\'ye</u> <u>bu uygulama</u> için güven</string>
     <string name="bsct_conn_block_desc">%1$s, %2$s tarafından engellendi</string>
     <string name="always_on_dialog">Bu cihazda \"Her Zaman Açık VPN\" etkinleştirilmiştir. Rethink\'i başlatmak için lütfen Ayarlar uygulamasına gidin ve \"Her Zaman Açık VPN \"i devre dışı bırakın.</string>
@@ -600,10 +594,7 @@
     <string name="orbot_stop_dialog_title">Manuel müdahale gerekli</string>
     <string name="orbot_app_issue">Orbot başlatılamadı. Yüklü mü\?</string>
     <string name="orbot_bs_status_trying_connect">Orbot kurulumu…</string>
-    <string name="orbot_explanation">Orbot, diğer uygulamaların interneti daha <u>güvenli bir şekilde</u> kullanmasını sağlayan ücretsiz bir proxy uygulamasıdır.
-\nOrbot, İnternet trafiğinizi şifrelemek için <u>Tor</u> kullanır, bu da <u>sansürü</u> atlamanıza ve kişisel özgürlüğü ve gizliliği tehdit eden <u>ağ gözetimi</u> biçimlerine karşı savunmanıza yardımcı olur.
-\n<u>TCP Proxy</u>: RethinkDNS, hariç tutulan uygulamalar hariç tüm TCP bağlantılarını Orbot\'a iletir.
-\n<u>HTTP Proxy</u>: RethinkDNS <i>,</i> HTTP proxy\'sini ayarlar ancak uygulamaların bunu kullanmasını zorunlu kılmaz. Genellikle Chrome ve Firefox gibi tarayıcılar bunu kullanır. HTTP(S) proxy kullanan uygulamalar hem Güvenlik Duvarı hem de DNS kurallarını atlayacaktır.</string>
+    <string name="orbot_explanation">Orbot, diğer uygulamaların interneti daha <u>güvenli bir şekilde</u> kullanmasını sağlayan ücretsiz bir proxy uygulamasıdır. \nOrbot, İnternet trafiğinizi şifrelemek için <u>Tor</u> kullanır, bu da <u>sansürü</u> atlamanıza ve kişisel özgürlüğü ve gizliliği tehdit eden <u>ağ gözetimi</u> biçimlerine karşı savunmanıza yardımcı olur. \n<u>TCP Proxy</u>: RethinkDNS, hariç tutulan uygulamalar hariç tüm TCP bağlantılarını Orbot\'a iletir. \n<u>HTTP Proxy</u>: RethinkDNS <i>,</i> HTTP proxy\'sini ayarlar ancak uygulamaların bunu kullanmasını zorunlu kılmaz. Genellikle Chrome ve Firefox gibi tarayıcılar bunu kullanır. HTTP(S) proxy kullanan uygulamalar hem Güvenlik Duvarı hem de DNS kurallarını atlayacaktır.</string>
     <string name="orbot_status_arg_3">DNS ve TCP</string>
     <string name="settings_autostart_bootup_desc">Cihaz açıldığında, kapatılmadan önce çalışıyorsa Rethink’i başlatın.</string>
     <string name="settings_http_proxy_error_text2">Kapı Geçersiz</string>

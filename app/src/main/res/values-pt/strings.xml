@@ -290,10 +290,7 @@
     <string name="settings_https_desc">Encaminhar ligações para o \'endpoint\' HTTP(S) CONNECT.</string>
     <string name="orbot_http">Proxy HTTP</string>
     <string name="orbot_stop_dialog_message">Rethink parou de encaminhar ligações para Orbot, mas Orbot pode estar a ser executado em segundo plano.</string>
-    <string name="orbot_explanation">Orbot é uma aplicação proxy gratuita que permite que outras aplicações utilizem a Internet de forma mais <u>segura</u>.
-\nOrbot usa o <u>Tor</u> para cifrar o tráfego na Internet, ajudando a <u>evitar a censura</u> e a proteger contra várias formas de <u>vigilância na rede</u> que ameaçam a liberdade e a privacidade das pessoas.
-\n<u>Proxy TCP</u>: Rethink <i>encaminha para Orbot</i> apenas as ligações TCP das aplicações incluídas.
-\n<u>Proxy HTTP</u>: Rethink <i>configura</i> um proxy HTTP, mas não força as aplicações a usar. Normalmente os navegadores como o Chrome e o Firefox usam. As aplicações que usem o proxy HTTP(S) ignorarão as regras de firewall e de DNS.</string>
+    <string name="orbot_explanation">Orbot é uma aplicação proxy gratuita que permite que outras aplicações utilizem a Internet de forma mais <u>segura</u>. \nOrbot usa o <u>Tor</u> para cifrar o tráfego na Internet, ajudando a <u>evitar a censura</u> e a proteger contra várias formas de <u>vigilância na rede</u> que ameaçam a liberdade e a privacidade das pessoas. \n<u>Proxy TCP</u>: Rethink <i>encaminha para Orbot</i> apenas as ligações TCP das aplicações incluídas. \n<u>Proxy HTTP</u>: Rethink <i>configura</i> um proxy HTTP, mas não força as aplicações a usar. Normalmente os navegadores como o Chrome e o Firefox usam. As aplicações que usem o proxy HTTP(S) ignorarão as regras de firewall e de DNS.</string>
     <string name="settings_custom_downloader_heading">Utilizar gestor de descargas da aplicação</string>
     <string name="orbot_both_desc">Todas as anteriores.</string>
     <string name="orbot_none">Nenhuma (padrão)</string>

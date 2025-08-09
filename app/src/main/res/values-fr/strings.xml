@@ -41,13 +41,7 @@
     <string name="bsct_conn_block_desc_device">bloquée %1$s sur l’appareil</string>
     <string name="bsct_block_ip">Bloquer, tolérer <u>cette IP</u> pour <u>cette appli</u></string>
     <string name="always_on_dialog">L’option \"VPN permanent\" est déjà activée sur cet appareil. Pour lancer RethinkDNS, allez dans les paramètres de l’application et désactivez \"VPN permanent\".</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u> : Bloque la connexion d’une application à Internet.
-\n <u>#2</u> : Bloque la connexion d’une application à une IP particulière.
-\n <u>#3</u> : Bloque toutes les connexions lorsque l’appareil est verrouillé (Pare-feu global).
-\n <u>#4</u> : Bloque les applis non utilisées (Pare-feu global).
-\n <u>#5</u> : Bloque les connexions lorsque l’application source est inconnue (Pare-feu global).
-\n <u>#6</u> : Bloque tout le trafic UDP sauf le DNS (Pare-feu global).
-\n <u>#7</u> : Bloque les connexions lorsque le DNS est contourné (Pare-feu global).</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u> : Bloque la connexion d’une application à Internet. \n <u>#2</u> : Bloque la connexion d’une application à une IP particulière. \n <u>#3</u> : Bloque toutes les connexions lorsque l’appareil est verrouillé (Pare-feu global). \n <u>#4</u> : Bloque les applis non utilisées (Pare-feu global). \n <u>#5</u> : Bloque les connexions lorsque l’application source est inconnue (Pare-feu global). \n <u>#6</u> : Bloque tout le trafic UDP sauf le DNS (Pare-feu global). \n <u>#7</u> : Bloque les connexions lorsque le DNS est contourné (Pare-feu global).</string>
     <string name="status_protected_with_private_dns">protégé par DNS privé</string>
     <string name="allow">autoriser</string>
     <string name="bsct_block">Bloquer, contourner, exclure, confiner <u>cette application</u></string>

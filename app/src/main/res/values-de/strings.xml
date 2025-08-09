@@ -15,7 +15,7 @@
     <string name="skip">Überspringen</string>
     <string name="finish">Fertig</string>
     <string name="slide_2_desc">Rethink ist das einfachste Mittel, um Netzwerkaktivitäten zu überwachen, Internetzensur zu umgehen und Apps auf deinem Android-Gerät mit einer Firewall einzudämmen.</string>
-    <string name="slide_1_desc">Rethink ist eine Open-Source-Software, die vom Mozilla Builders MVP-Programm unterstützt wird.</string>
+    <string name="slide_1_desc">Rethink ist eine Open-Source-Software, die vom Mozilla Builders MVP-Programm und der FOSS United Foundation unterstützt wird.</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="block">blockiert</string>
     <string name="untracked">nicht verfolgt</string>
@@ -102,13 +102,7 @@
     <string name="settings_enable_logs">Geräteinteres Logging aktivieren</string>
     <string name="conn_track_clear_logs_title">Alle Netzwerk-Logs löschen?</string>
     <string name="bsct_conn_block_desc_device">blockiert %1$s auf dem Gerät</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>: Verhindert, dass sich eine App mit dem Internet verbindet.
-\n <u>#2</u>: Verhindert, dass sich eine App mit einer bestimmten IP verbindet.
-\n <u>#3</u>: Blockiert alle Verbindungen, wenn das Gerät gesperrt ist (Universal Firewall).
-\n <u>#4</u>: Blockiert jede App, die nicht verwendet wird (Universal Firewall).
-\n <u>#5</u>: Blockiert Verbindungen, wenn die Quell-App unbekannt ist (Universal Firewall).
-\n <u>#6</u>: Blockiert den gesamten UDP-Verkehr außer DNS (Universal Firewall).
-\n <u>#7</u>: Blockiert Verbindungen, wenn DNS umgangen wird (Universal Firewall).</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>: Verhindert, dass sich eine App mit dem Internet verbindet. \n <u>#2</u>: Verhindert, dass sich eine App mit einer bestimmten IP verbindet. \n <u>#3</u>: Blockiert alle Verbindungen, wenn das Gerät gesperrt ist (Universal Firewall). \n <u>#4</u>: Blockiert jede App, die nicht verwendet wird (Universal Firewall). \n <u>#5</u>: Blockiert Verbindungen, wenn die Quell-App unbekannt ist (Universal Firewall). \n <u>#6</u>: Blockiert den gesamten UDP-Verkehr außer DNS (Universal Firewall). \n <u>#7</u>: Blockiert Verbindungen, wenn DNS umgangen wird (Universal Firewall).</string>
     <string name="always_on_dialog_heading">Always-On VPN deaktivieren</string>
     <string name="always_on_dialog">\"Always-On VPN\" ist auf diesem Gerät aktiviert. Um Rethink zu starten, gehen Sie bitte zur App \"Einstellungen\" und deaktivieren Sie \"Always-on VPN\".</string>
     <string name="private_dns_dialog_heading">Private DNS ausschalten</string>
@@ -129,10 +123,7 @@
     <string name="settings_allow_bypass_desc">Anfragenden Apps erlauben, alle verfügbaren Netzwerke zu benutzen. Diese Apps könnten die RethinkDNS-Firewall bei Bedarf umgehen. Einige Audio-/Videokonferenz-Apps wie Zoom und Meet können dies erfordern, um richtig zu funktionieren.</string>
     <string name="orbot_http_desc">Baut einen HTTP-CONNECT-Tunnel zu Orbot auf.</string>
     <string name="orbot_stop_dialog_message">Rethink hat aufgehört Verbindungen zu Orbot weiterzuleiten, aber Orbot läuft vielleicht noch im Hintergrund.</string>
-    <string name="orbot_explanation">Orbot ist eine kostenlose Proxy-App, die es anderen Apps ermöglicht, das Internet sicherer zu nutzen <u/> .
-\nOrbot benutzt <u>Tor</u> um deinen Internetverkehr zu verschlüsseln, was dir hilft <u>Zensur zu umgehen</u> und dich gegen Formen der <u>Netzwerküberwachung</u> zu schützen, die deine persönliche Freiheit und Privatsphäre bedrohen.
-\n<u>TCP-Proxy</u>: Rethink leitet nur TCP-Verbindungen von allen ausgeschlossenen Anwendungen an Orbot weiter.
-\n<u>HTTP-Proxy</u>: Rethink <i>setzt</i> HTTP-Proxy ein, erzwingt aber nicht, dass die Anwendungen ihn verwenden. Normalerweise verwenden Browser wie Chrome und Firefox ihn. Anwendungen, die den HTTP(S)-Proxy verwenden, umgehen sowohl die Firewall als auch die DNS-Regeln.</string>
+    <string name="orbot_explanation">Orbot ist eine kostenlose Proxy-App, die es anderen Apps ermöglicht, das Internet sicherer zu nutzen <u/> . \nOrbot benutzt <u>Tor</u> um deinen Internetverkehr zu verschlüsseln, was dir hilft <u>Zensur zu umgehen</u> und dich gegen Formen der <u>Netzwerküberwachung</u> zu schützen, die deine persönliche Freiheit und Privatsphäre bedrohen. \n<u>TCP-Proxy</u>: Rethink leitet nur TCP-Verbindungen von allen ausgeschlossenen Anwendungen an Orbot weiter. \n<u>HTTP-Proxy</u>: Rethink <i>setzt</i> HTTP-Proxy ein, erzwingt aber nicht, dass die Anwendungen ihn verwenden. Normalerweise verwenden Browser wie Chrome und Firefox ihn. Anwendungen, die den HTTP(S)-Proxy verwenden, umgehen sowohl die Firewall als auch die DNS-Regeln.</string>
     <string name="orbot_install_dialog_title">Orbot installieren\?</string>
     <string name="settings_orbot_desc">Orbot im nicht-VPN-Modus mit HTTPS/SOCKS5.</string>
     <string name="private_dns_dialog_positive">Einstellungen öffnen</string>
@@ -1019,4 +1010,35 @@
     <string name="crypt_relay_france" translatable="true">Anonymisiertes DNS-Relay, gehostet in Paris, Frankreich und bereitgestellt von https://cryptostrom.is/.</string>
     <string name="crypt_relay_sweden" translatable="true">Anonymisiertes DNS-Relay, gehostet in Schweden und bereitgestellt von https://cryptostrom.is/.</string>
     <string name="lbl_last" translatable="true">Zuletzt</string>
+    <string name="lbl_test" translatable="true">Test</string>
+    <string name="lbl_hop" translatable="true">Relay</string>
+    <string name="lbl_protos" translatable="true">protos</string>
+    <string name="lbl_service_providers" translatable="true">Service Provider</string>
+    <string name="firewall_title" translatable="true">Schütze dein Android mit einer Firewall</string>
+    <string name="status_no_network" translatable="true">kein netzwerk</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">Dunkel Plus</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">Biometrische Authentifizierung</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">Nach 5 Minuten</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">Nach 15 Minuten</string>
+    <string name="cd_split_dns_heading" translatable="true">Split DNS (experimentell)</string>
+    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">DNS-Regeln als Firewall-Regeln behandeln (experimentell)</string>
+    <string name="lbl_experimental" translatable="true">(experimentell)</string>
+    <string name="lbl_manual" translatable="true">Anleitung</string>
+    <string name="wireguard_title" translatable="true">Internet mit WireGuard absichern</string>
+    <string name="wireguard_desc" translatable="true">Verschlüsselt deinen Internetverkehr mit WireGuard. Für unterschiedliche Apps lassen sich verschiedene Routen auswählen.</string>
+    <string name="firewall_desc" translatable="true">Kontrolliere die Internetnutzung pro App und schränke Verbindungen basierend auf der Netzwerkaktivität oder je nach App ein.</string>
+    <string name="dns_title" translatable="true">Blockiere Werbung und Malware über DNS</string>
+    <string name="dns_desc" translatable="true">Wähle aus über 190 Listen, um Werbung, Tracker und Malware zu stoppen.</string>
+    <string name="settings_mobile_metered_heading" translatable="true">Kostenpflichtiges mobiles Netz</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Mobile Netze immer als kostenpflichtig behandeln.</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">Hell Plus</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">Nie</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">Immer</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">Du nutzt Rethink nun seit <b>%1$s Tagen</b>, was Nutzungskosten von ca. <b>$%2$s</b> entspricht. Möchtest du spenden, um die Entwicklung aufrechtzuerhalten?</string>
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">DNS des Systems für undelegierte Domains nutzen</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">DNS des Systems für undelegierte Domains wie <i>.lan</i>, <i>.internal</i> etc. nutzen</string>
+    <string name="cd_split_dns_desc" translatable="true">DNS-Anfragen von geproxyten Apps zum DNS-Server des Proxys weiterleiten</string>
+    <string name="firewall_rule_private_dns" translatable="true">Privates DNS</string>
+    <string name="lbl_always" translatable="true">Immer</string>
+    <string name="hop_failure_toast" translatable="true">Relay-Fehler: %1$s -&gt; %2$s</string>
 </resources>
