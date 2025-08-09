@@ -204,13 +204,7 @@
     <string name="accessibility_service_description">Rethink utilizza i servizi di accessibilità per rilevare e filtrare le connessioni in background. Rethink non raccoglie ne vende alcuna informazione.</string>
     <string name="bsct_conn_desc_blocked">bloccato su %1$s %2$s</string>
     <string name="bsct_conn_block_desc_device">bloccato %1$s sul dispositivo</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>: Blocca un\'applicazione dal connettersi a Internet.
-\n <u>#2</u>: Blocca tutte le applicazioni dal connettersi ad un particolare IP.
-\n <u>#3</u>: Blocca tutte le connessioni quando il dispositivo è bloccato (Regole universali Firewall).
-\n <u>#4</u>: Blocca qualsiasi app non in uso (Regole universali Firewall).
-\n <u>#5</u>: Blocca le connessioni quando l\'app di origine è sconosciuta (Regole universali Firewall).
-\n <u>#6</u>: Blocca tutto il traffico UDP tranne il DNS (Regole universali Firewall).
-\n <u>#7</u>: Blocca le connessioni che aggirano il DNS (Regole universali Firewall).</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>: Blocca un\'applicazione dal connettersi a Internet. \n <u>#2</u>: Blocca tutte le applicazioni dal connettersi ad un particolare IP. \n <u>#3</u>: Blocca tutte le connessioni quando il dispositivo è bloccato (Regole universali Firewall). \n <u>#4</u>: Blocca qualsiasi app non in uso (Regole universali Firewall). \n <u>#5</u>: Blocca le connessioni quando l\'app di origine è sconosciuta (Regole universali Firewall). \n <u>#6</u>: Blocca tutto il traffico UDP tranne il DNS (Regole universali Firewall). \n <u>#7</u>: Blocca le connessioni che aggirano il DNS (Regole universali Firewall).</string>
     <string name="always_on_dialog_stop_message">Hai impostato Rethink come \"VPN sempre attiva\" dalle Impostazioni del dispositivo. Sei sicuro di voler comunque arrestare Rethink\?</string>
     <string name="alert_firewall_accessibility_regrant_explanation">Il servizio di accessibilità Rethink si è arrestato o si è bloccato. <i><b>Andare in Impostazioni e forzare l\'arresto di</b></i> Rethink e avviarlo nuovamente per utilizzare la funzione <i>Blocca le app non in uso</i> .
 \n
