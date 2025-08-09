@@ -31,10 +31,7 @@
     <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
     <string name="dns_mode_info_title">DNS</string>
     <string name="firewall_rules">網絡規則</string>
-    <string name="orbot_explanation">Orbot 係一款能夠畀其他程式更<u>安全</u>咁連線去互聯網嘅免費代理應用程式。
-\nOrbot 會用到 <u>Tor</u> 嚟加密您嘅網絡流量，幫您<u>繞過網絡審查</u>，同埋抵禦威脅個人自由同隱私嘅<u>網絡監視</u>。
-\n<u>TCP 代理</u>：Rethink 只會將<i>包含嘅</i>應用程式嘅 TCP 連線轉發去 Orbot。
-\n<u>HTTP 代理</u>：Rethink 會同 Orbot <i>起一條</i> HTTP CONNECT 隧道，並且只會轉發<i>包含嘅</i>應用程式嘅 TCP 連線。</string>
+    <string name="orbot_explanation">Orbot 係一款能夠畀其他程式更<u>安全</u>咁連線去互聯網嘅免費代理應用程式。 \nOrbot 會用到 <u>Tor</u> 嚟加密您嘅網絡流量，幫您<u>繞過網絡審查</u>，同埋抵禦威脅個人自由同隱私嘅<u>網絡監視</u>。 \n<u>TCP 代理</u>：Rethink 只會將<i>包含嘅</i>應用程式嘅 TCP 連線轉發去 Orbot。 \n<u>HTTP 代理</u>：Rethink 會同 Orbot <i>起一條</i> HTTP CONNECT 隧道，並且只會轉發<i>包含嘅</i>應用程式嘅 TCP 連線。</string>
     <string name="settings_custom_downloader_desc">如果禁用，就會用 Android 內置嘅<i>下載管理器</i></string>
     <string name="settings_import_export_heading">備份同恢復</string>
     <string name="settings_import_export_desc">手動備份或者恢復程式資料同設定。</string>
@@ -46,13 +43,7 @@
     <string name="status_protected_with_private_dns">被私人 DNS 保護住</string>
     <string name="status_protected_with_tor_private_dns">被 Tor 同私人 DNS 保護住</string>
     <string name="status_protected_with_proxy_private_dns">被代理同私人 DNS 保護住</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>：阻止某個 app 上網。
-\n <u>#2</u>：阻止任何想連去某個特定 IP 嘅 app。
-\n <u>#3</u>：喺裝置鎖定時阻止所有連線（通用攔截規則）。
-\n <u>#4</u>：阻止任何唔係用緊嘅 app 連線（通用攔截規則）。
-\n <u>#5</u>：阻止唔識嘅 app 嘅連線（通用攔截規則）。
-\n <u>#6</u>：攔截除咗 DNS 之外嘅所有 UDP 流量（通用攔截規則）。
-\n <u>#7</u>：攔截繞過 DNS 嘅流量（通用攔截規則）。</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>：阻止某個 app 上網。 \n <u>#2</u>：阻止任何想連去某個特定 IP 嘅 app。 \n <u>#3</u>：喺裝置鎖定時阻止所有連線（通用攔截規則）。 \n <u>#4</u>：阻止任何唔係用緊嘅 app 連線（通用攔截規則）。 \n <u>#5</u>：阻止唔識嘅 app 嘅連線（通用攔截規則）。 \n <u>#6</u>：攔截除咗 DNS 之外嘅所有 UDP 流量（通用攔截規則）。 \n <u>#7</u>：攔截繞過 DNS 嘅流量（通用攔截規則）。</string>
     <string name="doh_custom_url_remove_success">丟咗個端點。</string>
     <string name="dns_crypt_url_remove_success">丟咗個 DNSCrypt 解析服務。</string>
     <string name="search_rethinkplus_file_tag"><font size="12">搵攔截清單</font></string>
