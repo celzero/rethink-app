@@ -1019,4 +1019,6 @@
     <string name="crypt_relay_france" translatable="true">Anonymisiertes DNS-Relay, gehostet in Paris, Frankreich und bereitgestellt von https://cryptostrom.is/.</string>
     <string name="crypt_relay_sweden" translatable="true">Anonymisiertes DNS-Relay, gehostet in Schweden und bereitgestellt von https://cryptostrom.is/.</string>
     <string name="lbl_last" translatable="true">Zuletzt</string>
+    <string name="lbl_test" translatable="true">Test</string>
+    <string name="lbl_hop" translatable="true">Mail-Relay</string>
 </resources>
