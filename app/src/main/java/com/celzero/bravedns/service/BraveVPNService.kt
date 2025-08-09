@@ -1238,9 +1238,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // family must be either AF_INET (for IPv4) or AF_INET6 (for IPv6)
         }
 
-        // fixme: remove this when the issue is fixed
-        builder.allowBypass()
-
         val underlyingNws = getUnderlays()
         builder.setUnderlyingNetworks(underlyingNws)
         tunUnderlyingNetworks = underlyingNws?.joinToString()
