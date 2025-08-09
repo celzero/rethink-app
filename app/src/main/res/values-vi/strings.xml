@@ -126,13 +126,7 @@
 \nRethinkDNS sử dụng dịch vụ trợ năng để theo dõi xem những nào ứng dụng đang được sử dụng trực tiếp (foreground) và những ứng dụng nào đang không được sử dụng trực tiếp/chạy ngầm (background).</string>
     <string name="bsct_conn_desc_allowed" translatable="true">đã được cho phép trên %1$s %2$s</string>
     <string name="always_on_dialog_lockdown_stop_message" translatable="true">Rethink đang chạy VPN ở chế độ <i>Lockdown</i>. Nếu dừng nó sẽ dẫn đến mất kết nối Internet trên hồ sơ người dùng này. Bạn có muốn tiếp tục không?</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Chặn ứng dụng kết nối với Internet.
-\n <u>#2</u>: Chặn bất kỳ ứng dụng nào kết nối với một IP cụ thể.
-\n <u>#3</u>: Chặn tất cả các kết nối khi thiết bị đang khóa màn (Tường lửa chung).
-\n <u>#4</u>: Chặn bất kỳ ứng dụng nào không được sử dụng (Tường lửa chung).
-\n <u>#5</u>: Chặn kết nối khi ứng dụng có nguồn gốc không được xác định (Tường lửa chung).
-\n <u>#6</u>: Chặn tất cả lưu lượng UDP ngoại trừ DNS (Tường lửa chung).
-\n <u>#7</u>: Chặn kết nối khi DNS bị bỏ qua (Tường lửa chung).</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Chặn ứng dụng kết nối với Internet. \n <u>#2</u>: Chặn bất kỳ ứng dụng nào kết nối với một IP cụ thể. \n <u>#3</u>: Chặn tất cả các kết nối khi thiết bị đang khóa màn (Tường lửa chung). \n <u>#4</u>: Chặn bất kỳ ứng dụng nào không được sử dụng (Tường lửa chung). \n <u>#5</u>: Chặn kết nối khi ứng dụng có nguồn gốc không được xác định (Tường lửa chung). \n <u>#6</u>: Chặn tất cả lưu lượng UDP ngoại trừ DNS (Tường lửa chung). \n <u>#7</u>: Chặn kết nối khi DNS bị bỏ qua (Tường lửa chung).</string>
     <string name="dns_crypt_relay_remove_success" translatable="true">Đã xóa Chuyển tiếp DNSCrypt.</string>
     <string name="doh_custom_url_remove_dialog_title" translatable="true">Xóa điểm cuối DoH?</string>
     <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Xóa chuyển tiếp DNSCrypt khỏi cấu hình đã lưu.</string>
