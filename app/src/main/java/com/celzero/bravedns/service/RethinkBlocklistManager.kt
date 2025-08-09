@@ -330,7 +330,7 @@ object RethinkBlocklistManager : KoinComponent {
         remoteFileTagRepository.updateTags(values, isSelected)
     }
 
-    fun updateFiletagsLocal(values: Set<Int>, isSelected: Int) {
+    suspend fun updateFiletagsLocal(values: Set<Int>, isSelected: Int) {
         localFileTagRepository.updateTags(values, isSelected)
     }
 

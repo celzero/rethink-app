@@ -47,8 +47,7 @@ class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkL
         return rethinkLocalFileTagDao.insertAll(fileTags)
     }
 
-    // fixme: removed suspend for testing, add it back
-    fun updateTags(list: Set<Int>, isSelected: Int) {
+    suspend fun updateTags(list: Set<Int>, isSelected: Int) {
         rethinkLocalFileTagDao.updateTags(list, isSelected)
     }
 
