@@ -54,10 +54,6 @@ object NewSettingsManager: KoinComponent {
 
     const val ANTI_CENSORSHIP = "anti_censorship"
 
-    init {
-        handleNewSettings()
-    }
-
     private val newSettingsList = listOf(
         WG_HOP_SETTING,
         WG_MOBILE_SETTING,
@@ -79,23 +75,42 @@ object NewSettingsManager: KoinComponent {
         ANTI_CENSORSHIP
     )
 
+    init {
+        handleNewSettings()
+    }
+
+
     fun shouldShowBadge(key: String): Boolean {
-        val contains = persistentState.newSettings.contains(key)
-        val seen = persistentState.newSettingsSeen.contains(key)
+        val newSettings = persistentState.newSettings.split(",").filter { it.isNotEmpty() }.toSet()
+        val seenSettings =
+            persistentState.newSettingsSeen.split(",").filter { it.isNotEmpty() }.toSet()
+        val contains = newSettings.contains(key)
+        val seen = seenSettings.contains(key)
         val show = contains && !seen
-        Logger.v(LOG_TAG_UI, "NewSettingsManager: shouldShowBadge for $key: $show, $contains, $seen, ${persistentState.newSettings}, seen: ${persistentState.newSettingsSeen}")
+        Logger.v(
+            LOG_TAG_UI,
+            "NewSettingsManager: shouldShowBadge for $key: $show, $contains, $seen, ${persistentState.newSettings}, seen: ${persistentState.newSettingsSeen}"
+        )
         return show
     }
 
     fun markSettingSeen(key: String) {
-        val seenSettings = persistentState.newSettingsSeen.split(",").toMutableSet()
+        val seenSettings =
+            persistentState.newSettingsSeen.split(",").filter { it.isNotEmpty() }.toMutableSet()
+        if (seenSettings.contains(key)) {
+            Logger.v(LOG_TAG_UI, "NewSettingsManager: setting $key already seen, no action taken")
+            return
+        }
         seenSettings.add(key)
         saveSeenSettings(seenSettings)
-        Logger.v(LOG_TAG_UI, "NewSettingsManager: marked setting $key as seen, ${persistentState.newSettings}, seen: ${persistentState.newSettingsSeen}")
+        Logger.v(
+            LOG_TAG_UI,
+            "NewSettingsManager: marked setting $key as seen, ${persistentState.newSettings}, seen: ${persistentState.newSettingsSeen}"
+        )
     }
 
     fun initializeNewSettings() {
-        persistentState.newSettings = newSettingsList.joinToString()
+        persistentState.newSettings = newSettingsList.joinToString(",")
         persistentState.newSettingsSeen = ""
         Logger.v(LOG_TAG_UI, "NewSettingsManager: initialized new settings: ${persistentState.newSettings}")
     }
@@ -114,12 +129,16 @@ object NewSettingsManager: KoinComponent {
     }
 
     private fun saveSeenSettings(set: Set<String>) {
-        persistentState.newSettingsSeen =  set.joinToString()
+        persistentState.newSettingsSeen = set.joinToString(",")
         // remove the setting from new settings if it exists
-        val newSettings = persistentState.newSettings.split(",").toMutableSet()
+        val newSettings =
+            persistentState.newSettings.split(",").filter { it.isNotEmpty() }.toMutableSet()
         newSettings.removeAll(set)
-        persistentState.newSettings = newSettings.joinToString()
-        Logger.v(LOG_TAG_UI, "NewSettingsManager: saveSeenSettings: ${persistentState.newSettings}, seen: ${persistentState.newSettingsSeen}")
+        persistentState.newSettings = newSettings.joinToString(",")
+        Logger.v(
+            LOG_TAG_UI,
+            "NewSettingsManager: saveSeenSettings: ${persistentState.newSettings}, seen: ${persistentState.newSettingsSeen}"
+        )
     }
 
     fun clearAll() {
