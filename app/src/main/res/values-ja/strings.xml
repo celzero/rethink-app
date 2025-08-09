@@ -316,13 +316,7 @@
     <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink は、ユーザー補助サービスを使用して、どのアプリが使用中 (フォアグラウンド) で、どのアプリが使用されていない (バックグラウンド) かを追跡します。
 \n
 \nRethink は、いかなる方法でも、あなたの情報を収集したり、スパイ行為を行ったりすることはありません。</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>:アプリケーションのインターネットへの接続をブロックします。
-\n<u>#2</u>:アプリが特定のIPに接続できないようにします。
-\n<u>#3</u>:デバイスがロックされているときにすべての接続をブロックします(ユニバーサルファイアウォール)。
-\n<u>#4</u>:使用されていないアプリをブロックします(ユニバーサルファイアウォール)。
-\n<u>#5</u>:アプリケーションの提供元が不明なときに接続をブロックします(ユニバーサルファイアウォール)。
-\n<u>#6</u>:DNSを除くすべてのUDPトラフィックをブロックします(ユニバーサルファイアウォール)。
-\n<u>#7</u>:DNSをバイパスする接続をブロックします(ユニバーサルファイアウォール)。</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>:アプリケーションのインターネットへの接続をブロックします。 \n<u>#2</u>:アプリが特定のIPに接続できないようにします。 \n<u>#3</u>:デバイスがロックされているときにすべての接続をブロックします(ユニバーサルファイアウォール)。 \n<u>#4</u>:使用されていないアプリをブロックします(ユニバーサルファイアウォール)。 \n<u>#5</u>:アプリケーションの提供元が不明なときに接続をブロックします(ユニバーサルファイアウォール)。 \n<u>#6</u>:DNSを除くすべてのUDPトラフィックをブロックします(ユニバーサルファイアウォール)。 \n<u>#7</u>:DNSをバイパスする接続をブロックします(ユニバーサルファイアウォール)。</string>
     <string name="orbot_stop_dialog_negative" translatable="true">Orbotを止める</string>
     <string name="orbot_install_dialog_message" translatable="true">Orbotは、Torの特徴と機能をAndroidにもたらします。</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">保存された構成から DNS プロキシを削除します。</string>
