@@ -407,6 +407,8 @@ object WireguardManager : KoinComponent {
             return proxyIds
         }
 
+        /* TODO: commenting the code as v055o doesn't use ip-app specific and domain-app specific
+        // rules
         // check for ip-app specific config first
         // returns Pair<String, String> - first is ProxyId, second is CC
         val ipc = IpRulesManager.hasProxy(uid, ip, port)
@@ -441,6 +443,7 @@ object WireguardManager : KoinComponent {
         }
         // add the domain-app specific config to the list
         if (dcProxyPair.first.isNotEmpty()) proxyIds.add(dcProxyPair.first) // domain-app specific
+        */
 
         // check for app specific config
         val ac = ProxyManager.getProxyIdForApp(uid)
@@ -462,6 +465,7 @@ object WireguardManager : KoinComponent {
         // add the app specific config to the list
         if (appProxyPair.first.isNotEmpty()) proxyIds.add(appProxyPair.first)
 
+        /* TODO: commenting the code as v055o doesn't use universal ip and domain rules
         // check for universal ip config
         val uipc = IpRulesManager.hasProxy(UID_EVERYBODY, ip, port)
         val uipcProxyPair = canUseConfig(uipc.first, "univ-ip($ip:$port)", usesMeteredNw)
@@ -494,10 +498,11 @@ object WireguardManager : KoinComponent {
         }
 
         // add the universal domain config to the list
-        if (udcProxyPair.first.isNotEmpty()) proxyIds.add(udcProxyPair.first)
+        if (udcProxyPair.first.isNotEmpty()) proxyIds.add(udcProxyPair.first)*/
 
         // once the app-specific config is added, check if any catch-all config is enabled
         // if catch-all config is enabled, then add the config id to the list
+
         val cac = mappings.filter { it.isActive && it.isCatchAll }
         cac.forEach {
             if (checkEligibilityBasedOnNw(it.id, usesMeteredNw)) {
