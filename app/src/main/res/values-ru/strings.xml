@@ -1183,4 +1183,5 @@
     <string name="processing_dialog_title" translatable="true">Обработка</string>
     <string name="processing_dialog_desc" translatable="true">Пожалуйста, подождите, пока мы обработаем ваш запрос.</string>
     <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> случайным образом использует любой из этих DNS-преобразователей:</string>
+    <string name="lbl_service_providers" translatable="true">Поставщик услуг</string>
 </resources>
