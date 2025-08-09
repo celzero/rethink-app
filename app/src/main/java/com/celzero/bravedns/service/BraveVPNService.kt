@@ -1238,9 +1238,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // family must be either AF_INET (for IPv4) or AF_INET6 (for IPv6)
         }
 
-        // fixme: remove this when the issue is fixed
-        builder.allowBypass()
-
         val underlyingNws = getUnderlays()
         builder.setUnderlyingNetworks(underlyingNws)
         tunUnderlyingNetworks = underlyingNws?.joinToString()
@@ -4370,8 +4367,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         logd("flow: $_uid, $src, $dest, $realIps, $d, $blocklists")
         handleVpnLockdownStateAsync()
 
-        lastFlowRealtime = elapsedRealtime()
-
         // in case of double loopback, all traffic will be part of rinr instead of just rethink's
         // own traffic. flip the doubleLoopback flag to true if we need that behavior
         val doubleLoopback = false
@@ -4504,7 +4499,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             logd("flow: dns-request, returning ${Backend.Base}, $uid, $connId")
             return@go2kt persistAndConstructFlowResponse(null, Backend.Base, connId, uid)
         }
-
+        // set only when the request is not from dns / rethink's own traffic
+        lastFlowRealtime = elapsedRealtime()
         processFirewallRequest(cm, anyRealIpBlocked, blocklists.tos() ?: "", isSplApp)
 
         if (cm.isBlocked) {

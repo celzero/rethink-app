@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingBottom="10dp"
     android:background="@drawable/welcome_gradient_bg">
 
     <androidx.viewpager.widget.ViewPager
@@ -31,6 +32,7 @@
         android:id="@+id/btn_next"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:background="@null"
@@ -42,6 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
+        android:layout_marginStart="10dp"
         android:layout_alignParentBottom="true"
         android:background="@null"
         android:text="@string/skip"
