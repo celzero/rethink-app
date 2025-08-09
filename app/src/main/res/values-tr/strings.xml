@@ -600,10 +600,7 @@
     <string name="orbot_stop_dialog_title">Manuel müdahale gerekli</string>
     <string name="orbot_app_issue">Orbot başlatılamadı. Yüklü mü\?</string>
     <string name="orbot_bs_status_trying_connect">Orbot kurulumu…</string>
-    <string name="orbot_explanation">Orbot, diğer uygulamaların interneti daha <u>güvenli bir şekilde</u> kullanmasını sağlayan ücretsiz bir proxy uygulamasıdır.
-\nOrbot, İnternet trafiğinizi şifrelemek için <u>Tor</u> kullanır, bu da <u>sansürü</u> atlamanıza ve kişisel özgürlüğü ve gizliliği tehdit eden <u>ağ gözetimi</u> biçimlerine karşı savunmanıza yardımcı olur.
-\n<u>TCP Proxy</u>: RethinkDNS, hariç tutulan uygulamalar hariç tüm TCP bağlantılarını Orbot\'a iletir.
-\n<u>HTTP Proxy</u>: RethinkDNS <i>,</i> HTTP proxy\'sini ayarlar ancak uygulamaların bunu kullanmasını zorunlu kılmaz. Genellikle Chrome ve Firefox gibi tarayıcılar bunu kullanır. HTTP(S) proxy kullanan uygulamalar hem Güvenlik Duvarı hem de DNS kurallarını atlayacaktır.</string>
+    <string name="orbot_explanation">Orbot, diğer uygulamaların interneti daha <u>güvenli bir şekilde</u> kullanmasını sağlayan ücretsiz bir proxy uygulamasıdır. \nOrbot, İnternet trafiğinizi şifrelemek için <u>Tor</u> kullanır, bu da <u>sansürü</u> atlamanıza ve kişisel özgürlüğü ve gizliliği tehdit eden <u>ağ gözetimi</u> biçimlerine karşı savunmanıza yardımcı olur. \n<u>TCP Proxy</u>: RethinkDNS, hariç tutulan uygulamalar hariç tüm TCP bağlantılarını Orbot\'a iletir. \n<u>HTTP Proxy</u>: RethinkDNS <i>,</i> HTTP proxy\'sini ayarlar ancak uygulamaların bunu kullanmasını zorunlu kılmaz. Genellikle Chrome ve Firefox gibi tarayıcılar bunu kullanır. HTTP(S) proxy kullanan uygulamalar hem Güvenlik Duvarı hem de DNS kurallarını atlayacaktır.</string>
     <string name="orbot_status_arg_3">DNS ve TCP</string>
     <string name="settings_autostart_bootup_desc">Cihaz açıldığında, kapatılmadan önce çalışıyorsa Rethink’i başlatın.</string>
     <string name="settings_http_proxy_error_text2">Kapı Geçersiz</string>

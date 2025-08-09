@@ -114,10 +114,7 @@
     <string name="orbot_status_arg_3">DNS ir TCP</string>
     <string name="orbot_stop_dialog_message">RethinkDNS nustojo peradresuoti ryšius į Orbot, tačiau Orbot galbūt veikia fone.</string>
     <string name="orbot_stop_dialog_negative">Sustabdyti Orbot</string>
-    <string name="orbot_explanation">Orbot yra nemokama įgaliotojo serverio programėlė, kuri suteikia kitoms programėlėms galimybę <u>saugiau</u> naudotis internetu.
-\nOrbot naudoja <u>Tor</u>, kad užšifruotų jūsų interneto srautą, kuris padeda <u>apeiti cenzūrą</u> ir apsiginti nuo įvairių <u>tinklo stebėjimo</u> formų, kurios kelia grėsmę asmeninei laisvei ir privatumui.
-\n<u>TCP įgaliotasis serveris</u>: RethinkDNS į Orbot peradresuoja visų programėlių, išskyrus išskirtųjų, TCP ryšius.
-\n<u>HTTP įgaliotasis serveris</u>: RethinkDNS <i>nustato</i> HTTP įgaliotajį serverį, bet neįpareigoja, kad programėlės jį naudotų. Paprastai jį naudoja tokios naršyklės kaip Chrome ir Firefox. Programėlės, naudojančios HTTP(S) įgaliotąjį serverį, apeis ugniasienės ir DNS taisykles.</string>
+    <string name="orbot_explanation">Orbot yra nemokama įgaliotojo serverio programėlė, kuri suteikia kitoms programėlėms galimybę <u>saugiau</u> naudotis internetu. \nOrbot naudoja <u>Tor</u>, kad užšifruotų jūsų interneto srautą, kuris padeda <u>apeiti cenzūrą</u> ir apsiginti nuo įvairių <u>tinklo stebėjimo</u> formų, kurios kelia grėsmę asmeninei laisvei ir privatumui. \n<u>TCP įgaliotasis serveris</u>: RethinkDNS į Orbot peradresuoja visų programėlių, išskyrus išskirtųjų, TCP ryšius. \n<u>HTTP įgaliotasis serveris</u>: RethinkDNS <i>nustato</i> HTTP įgaliotajį serverį, bet neįpareigoja, kad programėlės jį naudotų. Paprastai jį naudoja tokios naršyklės kaip Chrome ir Firefox. Programėlės, naudojančios HTTP(S) įgaliotąjį serverį, apeis ugniasienės ir DNS taisykles.</string>
     <string name="orbot_install_dialog_title">Įdiegti Orbot\?</string>
     <string name="orbot_install_dialog_positive">Įdiegti</string>
     <string name="orbot_install_dialog_neutral">Interneto svetainė</string>
