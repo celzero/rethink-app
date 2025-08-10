@@ -4182,7 +4182,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val id = iid.substringAfter(ID_WG_BASE).toIntOrNull() ?: return@go2kt
         val files = WireguardManager.getConfigFilesById(id) ?: return@go2kt
 
-        if (!files.useOnlyOnMetered) return@go2kt
+        if (!files.useOnlyOnMetered || !files.oneWireGuard) return@go2kt
         withContext(CoroutineName("onProxyAdded") + serializer) {
             val newNet = underlyingNetworks
             val v4first = newNet?.ipv4Net?.firstOrNull()
@@ -4744,11 +4744,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     unfilteredIds = wgs
                 }
             }
-            // if canRoute fails for all configs, then the connection will be sent to
-            // baseOrExit if available, else it will be blocked. only true when the proxy is
-            // not lockdown
-            // in case of lockdown, and in-active block will be sent, added rule for that
-            if (unfilteredIds.contains(Backend.Block)) {
+            // canRoute may fail for all configs.
+            // if that happens:
+            //   - traffic is sent to baseOrExit if available,
+            //   - in lockdown mode, traffic is blocked if not active, apply rule#17
+            if (unfilteredIds.contains(Backend.Block)) { // block should be the only entry
                 connTracker.isBlocked = true
                 connTracker.blockedByRule = FirewallRuleset.RULE17.id
             }

@@ -1042,7 +1042,8 @@ class GoVpnAdapter : KoinComponent {
             wgConfigs.forEach {
                 val id = ID_WG_BASE + it.getId()
                 val files = WireguardManager.getConfigFilesById(it.getId())
-                val isWireGuardMobileOnly = files?.useOnlyOnMetered == true
+                // skip one-wg proxy, mobile-only doesn't apply
+                val isWireGuardMobileOnly = files?.useOnlyOnMetered == true && !files.oneWireGuard
                 val canResume = isWireGuardMobileOnly && canResumeMobileOnlyWg
 
                 val stats = getProxyStatusById(id).first
