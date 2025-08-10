@@ -319,8 +319,11 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // to fail due to the "Block connections without VPN" option.
         persistentState.allowBypass = false
 
+        // reset stall on no networks to false, for v055p
+        persistentState.stallOnNoNetwork = false
+
         // change the persistent state for defaultDnsUrl, if its google.com (only for v055d)
-        // fixme: remove this post v054.
+        // TODO: remove this post v054.
         // this is to fix the default dns url, as the default dns url is changed from
         // dns.google.com to dns.google. In servers.xml default ips available for dns.google
         // so changing the default dns url to dns.google
