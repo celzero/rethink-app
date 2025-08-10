@@ -2271,7 +2271,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 io("failOpenOnNoNetwork") {
                     notifyConnectionMonitor()
                 }
-                val reason = "failOpenOnNoNetwork: ${persistentState.failOpenOnNoNetwork}"
+                val reason = "failOpenOnNoNetwork: ${persistentState.stallOnNoNetwork}"
                 vpnRestartTrigger.value = reason
             }
         }
@@ -2716,7 +2716,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     private fun getUnderlays(): Array<Network>? {
         val networks = underlyingNetworks
-        val failOpenOnNoNetwork = persistentState.failOpenOnNoNetwork
+        val failOpenOnNoNetwork = persistentState.stallOnNoNetwork
         if (networks == null) {
             Logger.w(LOG_TAG_VPN, "getUnderlays: null nws; fail-open? $failOpenOnNoNetwork")
             return if (failOpenOnNoNetwork) { // failing open on no nw
@@ -3251,7 +3251,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             has6 = route6(n2)
         }
         if (!has4 && !has6) {
-            val failOpen = persistentState.failOpenOnNoNetwork
+            val failOpen = persistentState.stallOnNoNetwork
             // no route available for both v4 and v6, add all routes
             // connectivity manager is expected to retry when no route is available
             // see ConnectionMonitor#repopulateTrackedNetworks

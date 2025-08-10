@@ -1737,8 +1737,8 @@
 
     <string name="local_blocklist_delete_desc" translatable="true">Delete on-device blocklists?</string>
 
-    <string name="fail_open_network_title" translatable="true">Do not stall on network loss</string>
-    <string name="fail_open_network_desc" translatable="true">When disabled, Rethink stalls all data when no connectivity is available, like in <i>Airplane Mode</i>.</string>
+    <string name="fail_open_network_title" translatable="true">Stall on network loss</string>
+    <string name="fail_open_network_desc" translatable="true">When enabled, Rethink stalls all data when no connectivity is available, like in <i>Airplane Mode</i>.</string>
 
     <string name="about_license" translatable="true">Licensed under APLv2</string>
 

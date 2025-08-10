@@ -135,7 +135,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         val networkSet: Set<Network>,
         val isForceUpdate: Boolean,
         val testReachability: Boolean,
-        val failOpenOnNoNetwork: Boolean,
+        val stallOnNoNetwork: Boolean,
         val useAutoConnectivityChecks: Boolean
     )
 
@@ -347,7 +347,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         val dualStack =
             InternetProtocol.getInternetProtocol(persistentState.internetProtocolType).isIPv46()
         val testReachability = dualStack && persistentState.connectivityChecks
-        val failOpenOnNoNetwork = persistentState.failOpenOnNoNetwork
+        val failOpenOnNoNetwork = persistentState.stallOnNoNetwork
         val useAutoConnectivityChecks = persistentState.performAutoNetworkConnectivityChecks
         val msg =
             constructNetworkMessage(
@@ -1042,7 +1042,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             }
 
             // handle fail-open when no networks are found in both IPv4 and IPv6 sets
-            val failOpen = opPrefs.failOpenOnNoNetwork
+            val failOpen = !opPrefs.stallOnNoNetwork
             if (trackedIpv4Networks.isEmpty() && trackedIpv6Networks.isEmpty() && failOpen) {
                 Logger.i(LOG_TAG_CONNECTION, "no networks found, but fail-open is enabled")
                 nwProps.forEach outer@{ prop ->

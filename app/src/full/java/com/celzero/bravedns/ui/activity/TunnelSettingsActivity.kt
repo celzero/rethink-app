@@ -92,7 +92,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.dvTimeoutTxt.setBadgeDotVisible(this, idleTimeout)
         b.genSettingsExcludeProxyAppsTxt.setBadgeDotVisible(this, loopback)
         b.dvEimfTxt.setBadgeDotVisible(this, eimf)
-        b.genFailOpenTxt.setBadgeDotVisible(this, doNotStall)
+        b.genStallNoNwTxt.setBadgeDotVisible(this, doNotStall)
         b.genSettingsConnectivityChecksTxt.setBadgeDotVisible(this, performConnectionCheck)
         b.dvWgListenPortTxt.setBadgeDotVisible(this, randomizeWgPort)
         b.genSettingsMobileMeteredTxt.setBadgeDotVisible(this, mobileMetered)
@@ -122,7 +122,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.settingsActivityMobileMeteredSwitch.isChecked = persistentState.treatOnlyMobileNetworkAsMetered
 
-        b.settingsFailOpenSwitch.isChecked = persistentState.failOpenOnNoNetwork
+        b.settingsStallNoNwSwitch.isChecked = persistentState.stallOnNoNetwork
 
         b.dvWgListenPortSwitch.isChecked = !persistentState.randomizeListenPort
 
@@ -344,13 +344,13 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                 !b.settingsActivityMobileMeteredSwitch.isChecked
         }
 
-        b.settingsFailOpenSwitch.setOnCheckedChangeListener { _, isChecked ->
+        b.settingsStallNoNwSwitch.setOnCheckedChangeListener { _, isChecked ->
             NewSettingsManager.markSettingSeen(NewSettingsManager.DO_NOT_STALL)
-            persistentState.failOpenOnNoNetwork = isChecked
+            persistentState.stallOnNoNetwork = isChecked
         }
 
-        b.settingsFailOpenRl.setOnClickListener {
-            b.settingsFailOpenSwitch.isChecked = !b.settingsFailOpenSwitch.isChecked
+        b.settingsStallNoNwRl.setOnClickListener {
+            b.settingsStallNoNwSwitch.isChecked = !b.settingsStallNoNwSwitch.isChecked
         }
 
         b.dvWgListenPortSwitch.setOnCheckedChangeListener { _, isChecked ->

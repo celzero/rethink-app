@@ -404,7 +404,7 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/settings_fail_open_rl"
+                    android:id="@+id/settings_stall_no_nw_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
@@ -412,7 +412,7 @@
                     android:paddingBottom="15dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/settings_fail_open_icon"
+                        android:id="@+id/settings_stall_no_nw_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
@@ -428,12 +428,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/settings_fail_open_switch"
-                        android:layout_toEndOf="@id/settings_fail_open_icon"
+                        android:layout_toStartOf="@id/settings_stall_no_nw_switch"
+                        android:layout_toEndOf="@id/settings_stall_no_nw_icon"
                         android:orientation="vertical">
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/gen_fail_open_txt"
+                            android:id="@+id/gen_stall_no_nw_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -441,7 +441,7 @@
                             android:textSize="@dimen/large_font_text_view" />
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/gen_fail_open_desc"
+                            android:id="@+id/gen_stall_no_nw_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
@@ -450,7 +450,7 @@
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/settings_fail_open_switch"
+                        android:id="@+id/settings_stall_no_nw_switch"
                         style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

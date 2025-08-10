@@ -367,10 +367,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // perform auto or manual network connectivity checks
     var performAutoNetworkConnectivityChecks by booleanPref("perform_auto_network_connectivity_checks").withDefault<Boolean>(true)
 
-    // fail-open on no network
+    // stall on no network
     // TODO: add routes as normal but do not send fd to netstack
     // repopulateTrackedNetworks also fails open see isAnyNwValidated
-    var failOpenOnNoNetwork by booleanPref("fail_open_on_no_network").withDefault<Boolean>(false)
+    var stallOnNoNetwork by booleanPref("fail_open_on_no_network").withDefault<Boolean>(false)
 
     // last grace period reminder time, when rethinkdns+ is enabled and user is cancelled/expired
     // this is used to show a reminder to the user to renew the subscription with grace period

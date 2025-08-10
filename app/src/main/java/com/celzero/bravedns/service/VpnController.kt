@@ -263,7 +263,7 @@ object VpnController : KoinComponent {
             URL4
         } else {
             // if both are false, then return based on the FAIL_OPEN_ON_NO_NETWORK value
-            if (persistentState.failOpenOnNoNetwork) {
+            if (persistentState.stallOnNoNetwork) {
                 "$URL4, $URL6"
             } else {
                 ""
@@ -273,7 +273,7 @@ object VpnController : KoinComponent {
 
     fun updateProtocol(proto: Pair<Boolean, Boolean>) {
         if (!proto.first && !proto.second) {
-            val failOpen = persistentState.failOpenOnNoNetwork
+            val failOpen = persistentState.stallOnNoNetwork
             Logger.i(LOG_TAG_VPN, "both v4 and v6 false, setting $failOpen")
             protocol = Pair(failOpen, failOpen)
             return
