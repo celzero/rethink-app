@@ -22,7 +22,7 @@
     <string name="slide_2_title">வரவேற்பு வணக்கம்</string>
     <string name="slide_2_desc">உங்கள் ஆண்ட்ராய்டு சாதனத்தில் பிணைய செயல்பாட்டைக் கண்காணிக்கவும், இணைய தணிக்கை மற்றும் ஃபயர்வால் பயன்பாடுகளைத் தவிர்ப்பதற்கான எளிதான வழி ரீடிங்க் ஆகும்.</string>
     <string name="slide_1_title">இலவச மற்றும் திறந்த மூலம்</string>
-    <string name="slide_1_desc">ரீதிங்க் என்பது மொசில்லா பில்டர்ச் எம்விபி திட்டத்தின் ஆதரவுடன் ஒரு திறந்த மூல மென்பொருளாகும்.</string>
+    <string name="slide_1_desc">ரீதிங்க் என்பது மொசில்லா பில்டர்ச் எம்விபி திட்டத்தின் ஆதரவுடன் ஒரு திறந்த மூல மென்பொருளாகும், ஃபோச் ஒன்றுபட்டது பவுண்டேசன்.</string>
     <string name="alert_firewall_accessibility_explanation">பயன்படுத்தப்படாத (பின்னணி) எந்தப் பயன்பாடுகள் பயன்படுத்தப்படுகின்றன (முன்புறமாக) என்பதைக் கண்காணிக்க ரீடிங்க் அணுகல் சேவையைப் பயன்படுத்துகிறது.\n\n ரீடிங்க் எந்தத் தகவலையும் சேகரிக்கவில்லை அல்லது எந்த வகையிலும் உளவு பார்க்காது.</string>
     <string name="status_protected_with_tor">டார் மூலம் பாதுகாக்கப்படுகிறது</string>
     <string name="status_protected_with_private_dns">தனியார் டிஎன்எச் மூலம் பாதுகாக்கப்படுகிறது</string>
@@ -104,7 +104,7 @@
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">காத்திருக்கிறது</string>
     <string name="rdns_plus">ஆர்டிஎன்எஸ் கூடுதல்</string>
     <string name="status_dns_server_down">டிஎன்எச் சர்வர் செயலிழந்தது</string>
-    <string name="bsct_conn_rule_explanation"><u>#1</u>: ஒரு பயன்பாட்டை இணையத்துடன் இணைப்பதைத் தடுக்கிறது. \n <u>#2</u>: குறிப்பிட்ட ஐபியுடன் இணைக்கும் எந்தப் பயன்பாட்டையும் தடுக்கிறது. \n <u>#3</u>: சாதனம் பூட்டப்படும் போது அனைத்து இணைப்புகளையும் தடுக்கிறது (யுனிவர்சல் ஃபயர்வால்). \n <u>#4</u>: பயன்பாட்டில் இல்லாத எந்த பயன்பாட்டையும் தடுக்கிறது (யுனிவர்சல் ஃபயர்வால்). \n <u>#5</u>: மூல ஆப்ச் தெரியாதபோது இணைப்புகளைத் தடுக்கிறது (யுனிவர்சல் ஃபயர்வால்). \n <u>#6</u>: DNS (யுனிவர்சல் ஃபயர்வால்) தவிர அனைத்து UDP போக்குவரத்தையும் தடுக்கிறது. \n <u>#7</u>: DNS புறக்கணிக்கப்படும் போது இணைப்புகளைத் தடு (யுனிவர்சல் ஃபயர்வால்).</string>
+    <string name="bsct_conn_rule_explanation"><u>#1 </u>: இணையத்துடன் இணைப்பதில் இருந்து ஒரு பயன்பாட்டைத் தடுக்கிறது. \n<u>#2 </u>: ஒரு குறிப்பிட்ட ஐபியுடன் இணைப்பதைத் தடுக்கிறது. \n<u>#3 </u>: சாதனம் பூட்டப்படும்போது அனைத்து இணைப்புகளையும் தடுக்கிறது (யுனிவர்சல் ஃபயர்வால்). \n<u>#4 </u>: பயன்பாட்டில் இல்லாத எந்த பயன்பாட்டையும் தடுக்கிறது (யுனிவர்சல் ஃபயர்வால்). \n<u>#5 </u>: மூல பயன்பாடு தெரியாதபோது இணைப்புகளைத் தடுக்கிறது (யுனிவர்சல் ஃபயர்வால்). \n<u>#6 </u>: டி.என்.எச் (யுனிவர்சல் ஃபயர்வால்) தவிர அனைத்து யுடிபி போக்குவரத்தையும் தடுக்கிறது. \n<u>#7 </u>: டி.என்.எச் புறக்கணிக்கப்படும்போது இணைப்புகளைத் தடுக்கவும் (யுனிவர்சல் ஃபயர்வால்).</string>
     <string name="always_on_dialog_lockdown_stop_message">ரீடிங்க் <i> பூட்டுதல் </i> பயன்முறையில் VPN ஐ இயக்குகிறது. அதை நிறுத்துவது இந்த பயனர் சுயவிவரத்தில் இணைய இணைப்பை இழக்க நேரிடும். எப்படியும் தொடர விரும்புகிறீர்களா?</string>
     <string name="doh_custom_url_remove_success">இறுதிப்புள்ளி நீக்கப்பட்டது.</string>
     <string name="lbl_idle" translatable="true">நிலையிக்கம்</string>
@@ -520,7 +520,7 @@
     <string name="about_email" translatable="true">எங்களுக்கு மின்னஞ்சல் அனுப்புங்கள்</string>
     <string name="about_settings_notification" translatable="true">அறிவிப்பு அமைப்புகள்</string>
     <string name="about_whats_new" translatable="true">%1$s இல் புதியது என்ன</string>
-    <string name="about_mozilla" translatable="true">ரீதிங்கை மொசில்லா பில்டர்ச், ஃபோச் ஒன்றுபட்டது பவுண்டேசன், ஓஎச்ஓஎம் தயாரிப்புகள் இன்க்.</string>
+    <string name="about_mozilla" translatable="true">ரீதிங்கை ஃபோச் ஒன்றுபட்டது அறக்கட்டளை மொசில்லா பில்டர்ச் ஆதரிக்கிறார்.</string>
     <string name="cd_custom_doh_url_name_default" translatable="true">தோ</string>
     <string name="cd_custom_doh_url_name" translatable="true">Doh %1$s</string>
     <string name="cd_custom_dns_proxy_name_default" translatable="true">பதிலாள்</string>
@@ -901,7 +901,7 @@
     <string name="hs_biometeric_error" translatable="true">பயோமெட்ரிக் அங்கீகார பிழை</string>
     <string name="firewall_card_text_active" translatable="true">%1$s தடுக்கப்பட்டது\n%2$s புறக்கணிக்கப்பட்டது\n%3$s விலக்கப்பட்டது\n%4$s தனிமைப்படுத்தப்பட்டது</string>
     <string name="hsf_start_btn_state" translatable="true">தொடங்கு</string>
-    <string name="hsf_vpn_dialog_message" translatable="true">சாதனத்தின் டிஎன்எச் கோரிக்கைகளைக் குறியாக்கவும், பிணைய மானிட்டரை செயல்படுத்தவும், ஃபயர்வால் விதிகளை அமல்படுத்தவும் உள்ளக வி.பி.என் அமைக்க ரீடிங்க் தேவை. \n\n ரீடிங்க் எந்தத் தகவலையும் சேகரிக்கவில்லை அல்லது எந்த வகையிலும் உளவு பார்க்காது.</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">சாதனத்தின் டிஎன்எச் கோரிக்கைகளை குறியாக்கவும், பிணைய மானிட்டரை செயல்படுத்தவும், ஃபயர்வால் விதிகளை அமல்படுத்தவும் உள்ளக வி.பி.என் அமைக்க ரீடிங்க் தேவை. \n\nரீடிங்க் எந்த தகவலையும் சேகரிக்கவில்லை அல்லது எந்த வகையிலும் உளவு பார்க்காது.</string>
     <string name="hsf_vpn_prepare_failure" translatable="true">VPN இசைவு காணவில்லை, அல்லது மற்றொரு பயன்பாடு எப்போதும் VPN பயன்முறையில் இருக்கும்.</string>
     <string name="lbl_unselected" translatable="true">தேர்வு செய்யப்படாதது</string>
     <string name="search_firewall_all_apps" translatable="true"><font size="12">UID ஆல் பயன்பாடுகளைத் தேடுங்கள், பெயர் </font></string>
@@ -938,7 +938,7 @@
     <string name="orbot_title" translatable="true">ஆர்போட் மற்றும் ப்ராக்சிகள்</string>
     <string name="settings_go_log_desc" translatable="true">பிழைத்திருத்த நோக்கங்களுக்காக</string>
     <string name="settings_rinr_desc_disabled" translatable="true">பிளாக்லிச்ட் பதிவிறக்கங்கள், இணைப்பு காசோலைகள், டிஎன்எச் இணைப்புகள் போன்ற ரீதிங்கின் சொந்த போக்குவரத்து மீண்டும் சுரங்கப்பாதையில்.</string>
-    <string name="orbot_explanation" translatable="true">ஆர்போட் என்பது ஒரு இலவச பதிலாள் பயன்பாடாகும், இது இணையத்தை மேலும் பயன்படுத்த மற்ற பயன்பாடுகளுக்கு அதிகாரம் அளிக்கிறது <u> பாதுகாப்பாக </u>\n உங்கள் இணைய போக்குவரத்தை குறியாக்க ஆர்போட் <u> டோர் </u> ஐப் பயன்படுத்துகிறது, இது உங்களுக்கு <u> தணிக்கை </u> ஐத் தவிர்த்து, தனிப்பட்ட விடுதலை மற்றும் தனியுரிமையை அச்சுறுத்தும் <u> பிணையம் கண்காணிப்பு </u> வடிவங்களுக்கு எதிராக பாதுகாக்க உதவுகிறது\n <u> TCP பதிலாள் </u>: மறுபரிசீலனை செய்யுங்கள் <i> இன் TCP இணைப்புகள் மட்டுமே </i> ஆர்போட்டுக்கு பயன்பாடுகள்\n <u> http பதிலாள் </u>: மறுபரிசீலனை <i> நிறுவுகிறது </i> http சுரங்கப்பாதையை ஆர்போட்டுடன் இணைக்கவும், <i> சேர்க்கப்பட்ட </i> பயன்பாடுகளின் TCP இணைப்புகளை மட்டுமே முன்னோக்கி செய்கிறது.</string>
+    <string name="orbot_explanation" translatable="true">ஆர்போட் என்பது ஒரு இலவச பதிலாள் பயன்பாடாகும், இது இணையத்தை மேலும் பயன்படுத்த மற்ற பயன்பாடுகளுக்கு அதிகாரம் அளிக்கிறது <u> பாதுகாப்பாக </u>. \nஉங்கள் இணைய போக்குவரத்தை குறியாக்க ஆர்போட் <u> டோர் </u> ஐப் பயன்படுத்துகிறது, இது உங்களுக்கு <u> தணிக்கை </u> ஐத் தவிர்த்து, தனிப்பட்ட விடுதலை மற்றும் தனியுரிமையை அச்சுறுத்தும் <u> பிணையம் கண்காணிப்பு </u> வடிவங்களுக்கு எதிராக பாதுகாக்க உதவுகிறது. \n<u> TCP பதிலாள் </u>: மறுபரிசீலனை செய்யுங்கள் <i> இன் TCP இணைப்புகள் மட்டுமே </i> ஆர்போட்டுக்கு பயன்பாடுகள். \n<u> http பதிலாள் </u>: மறுபரிசீலனை <i> நிறுவுகிறது </i> http சுரங்கப்பாதையை ஆர்போட்டுடன் இணைக்கவும், <i> சேர்க்கப்பட்ட </i> பயன்பாடுகளின் TCP இணைப்புகளை மட்டுமே முன்னோக்கி செய்கிறது.</string>
     <string name="orbot_install_dialog_title" translatable="true">ஆர்போட்டை நிறுவவா?</string>
     <string name="orbot_install_dialog_message" translatable="true">ORBOT TOR இன் அம்சங்களையும் செயல்பாட்டையும் ஆண்ட்ராய்டு க்கு கொண்டு வருகிறது.</string>
     <string name="orbot_install_dialog_positive" translatable="true">நிறுவு</string>
@@ -969,4 +969,30 @@
     <string name="memory_notification_text">ரீடிங்க் குறைந்த நினைவகத்தை அனுபவிக்கிறது. கணினி நடவடிக்கைகள் குறைவாக இருக்கலாம்.</string>
     <string name="lbl_notification" translatable="true">அறிவிப்பு</string>
     <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s தடுபட்டியல்(கள்)</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="lbl_test" translatable="true">தேர்வு</string>
+    <string name="lbl_protos" translatable="true">புரோட்டியா</string>
+    <string name="lbl_experimental" translatable="true">(சோதனை)</string>
+    <string name="lbl_service_providers" translatable="true">பணி வழங்குநர்கள்</string>
+    <string name="lbl_hop" translatable="true">அஞ்சல் சுருள்</string>
+    <string name="lbl_manual" translatable="true">கையேடு</string>
+    <string name="wireguard_title" translatable="true">வயர் கார்டுடன் பாதுகாப்பான இணையம்</string>
+    <string name="wireguard_desc" translatable="true">உங்கள் இணைய போக்குவரத்தை வயர் கார்டுடன் குறியாக்கவும். வெவ்வேறு பயன்பாடுகளுக்கு வெவ்வேறு வழிகளைத் தேர்வுசெய்க.</string>
+    <string name="firewall_title" translatable="true">ஃபயர்வால் மூலம் உங்கள் ஆண்ட்ராய்டு ஐப் பாதுகாக்கவும்</string>
+    <string name="firewall_desc" translatable="true">கட்டுப்பாட்டு பயன்பாட்டு இணைய பயன்பாடு; பயன்பாடு அல்லது பிணைய செயல்பாட்டின் அடிப்படையில் இணைப்புகளை கட்டுப்படுத்தவும்.</string>
+    <string name="dns_title" translatable="true">டி.என்.எச் உடன் விளம்பரங்கள் மற்றும் தீம்பொருளைத் தடுக்கவும்</string>
+    <string name="dns_desc" translatable="true">விளம்பரங்கள், டிராக்கர்கள் மற்றும் தீம்பொருளை நிறுத்த 190+ பட்டியல்களிலிருந்து தேர்வு செய்யவும்.</string>
+    <string name="status_no_network" translatable="true">பிணையம் இல்லை</string>
+    <string name="settings_mobile_metered_heading" translatable="true">மீட்டர் மொபைல் நெட்வொர்க்குகள்</string>
+    <string name="settings_mobile_metered_desc" translatable="true">மொபைல் நெட்வொர்க்குகளை எப்போதும் மீட்டர் எனக் கருதுங்கள்.</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">லைட் பிளச்</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">இருண்ட பிளச்</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">பயோமெட்ரிக் ஏற்பு</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">எதுவுமில்லை</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">உடனடியாக</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">5 மணித்துளி கழித்து</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">15 நிமிடங்களுக்குப் பிறகு</string>
+    <string name="sponser_dialog_usage_msg" translatable="true"><b>%1$s நாட்கள் </b> க்கு நீங்கள் ரீதிங்கைப் பயன்படுத்துகிறீர்கள், இது <b> $%2$s </b> இன் பயன்பாட்டு செலவுக்கு மொழிபெயர்க்கப்பட்டுள்ளது. அதன் வளர்ச்சியைத் தக்கவைக்க ஒப்புரவாளர் செய்வதை நீங்கள் கருதுகிறீர்களா?</string>
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">குறைக்கப்படாத களங்களுக்கு கணினி டி.என்.எச் பயன்படுத்தவும்</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true"><i> .லான் </i>, <i> .internal </i>, முதலியன போன்றவற்றில் பயன்படுத்தப்படாத களங்களுக்கு கணினி DNS ஐப் பயன்படுத்தவும்.</string>
+    <string name="dc_filtering_heading" translatable="true">வடிகட்டுதல்</string>
 </resources>
