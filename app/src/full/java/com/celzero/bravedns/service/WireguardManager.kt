@@ -777,6 +777,9 @@ object WireguardManager : KoinComponent {
                 m.isDeletable
             )
         mappings.add(newMap)
+        if (m.isActive) {
+            VpnController.addWireGuardProxy(id = ID_WG_BASE + id)
+        }
     }
 
     suspend fun addPeer(id: Int, peer: Peer) {

@@ -29,7 +29,6 @@ import com.celzero.firestack.backend.RDNS
 import com.celzero.firestack.backend.RouterStats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConsoleLog
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.DNSTransport
@@ -317,8 +316,8 @@ object VpnController : KoinComponent {
         braveVpnService?.addWireGuardProxy(id)
     }
 
-    fun refreshOrReAddProxies() {
-        braveVpnService?.refreshOrReAddProxies()
+    suspend fun refreshOrPauseOrResumeOrReAddProxies() {
+        braveVpnService?.refreshOrPauseOrResumeOrReAddProxies()
     }
 
     fun closeConnectionsIfNeeded(uid: Int = INVALID_UID) {

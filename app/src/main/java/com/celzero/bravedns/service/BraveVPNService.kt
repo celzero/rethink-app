@@ -105,6 +105,7 @@ import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Protocol
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
@@ -189,6 +190,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private var inflowDispatcher = Daemons.ioDispatcher("inflow", Mark(), vpnScope)
     private var preflowDispatcher = Daemons.ioDispatcher("preflow", PreMark(), vpnScope)
     private var dnsQueryDispatcher = Daemons.ioDispatcher("onQuery", DNSOpts(), vpnScope)
+    private var proxyAddedDispatcher = Daemons.ioDispatcher("proxyAdded", Unit, vpnScope)
 
     @Volatile
     private var builderStats: String = ""
@@ -197,7 +199,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     @Volatile
     private var prevDns: MutableSet<InetAddress> = mutableSetOf()
     @Volatile
-    private var lastFlowRealtime: Long = elapsedRealtime() // tracks last flow()
+    private var lastRxTrafficTime: Long = elapsedRealtime() // tracks rx from onSocketClosed()
     private var testFd: AtomicInteger = AtomicInteger(-1)
 
     companion object {
@@ -244,7 +246,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // win last connected threshold in milliseconds
         private const val WIN_LAST_CONNECTED_THRESHOLD_MS = 60 * 60 * 1000L // 60 minutes
 
-        private const val FLOW_STALL_THRESHOLD_MS = 30 * 1000L // 30 seconds
+        private const val DATA_STALL_THRESHOLD_MS = 30 * 1000L // 30 seconds
     }
 
     private var lastSubscriptionCheckTime: Long = 0
@@ -1073,10 +1075,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         if (abs(now - ts) > Constants.ACTIVE_NETWORK_CHECK_THRESHOLD_MS) {
             curnet.lastUpdated = now
             val activeNetwork = cm.activeNetwork
-            val networkCapabilities =
-                cm.getNetworkCapabilities(activeNetwork)
-            curnet.isActiveNetworkCellular =
-                networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
+            val cap = cm.getNetworkCapabilities(activeNetwork) ?: return false
+            val isCellular = cap.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+            val isWifi = cap.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+            curnet.isActiveNetworkCellular = isCellular && !isWifi
         }
         return curnet.isActiveNetworkMetered
     }
@@ -2678,6 +2680,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     )
                     val reason = "nwDisconnect, routes: ${interestingChanges.routesChanged}, net: ${interestingChanges.netChanged}, mtu: ${interestingChanges.mtuChanged}"
                     vpnRestartTrigger.value = reason
+                    // pause mobile-only wgs on no network
+                    refreshOrPauseOrResumeOrReAddProxies()
                     // remove the system dns
                     prevDns = mutableSetOf()
                     setNetworkAndDefaultDnsIfNeeded(true)
@@ -2701,7 +2705,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // these calls are not fool proof, just a mitigation mechanism
         // see if there is no flow call for 30 seconds and this is called, then restart the vpn
         val elapsed = elapsedRealtime()
-        if (elapsed >= lastFlowRealtime + FLOW_STALL_THRESHOLD_MS) {
+        if (elapsed >= lastRxTrafficTime + DATA_STALL_THRESHOLD_MS) {
             Logger.w(LOG_TAG_VPN, "nwStall; no flow call for 30 seconds, restarting vpn")
             val reason = "nwStall, time: $elapsed"
             vpnRestartTrigger.value = reason
@@ -2797,11 +2801,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 }
             }
 
-            if (!isRoutesChanged && isBoundNetworksChanged) {
+            // now the proxy need to be either paused/resumed/refreshed/readded
+            // so no need to check for isRoutesChanged, even though the routes are same,
+            // the bound networks have changed, so either of the above operations are needed
+            // case: wireguard in mobile-only mode.
+            if (isBoundNetworksChanged) {
                 // Workaround for WireGuard connection issues after network change
                 // WireGuard may fail to connect to the server when the network changes.
                 Logger.i(LOG_TAG_VPN, "$TAG routes/bound-nws changed, refresh wg")
-                refreshOrReAddProxies() // takes care of adding the proxies if missing in tunnel
+                refreshOrPauseOrResumeOrReAddProxies() // takes care of adding the proxies if missing in tun
             }
 
             underlyingNetworks?.ipv4Net?.forEach {
@@ -3903,14 +3911,27 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             if (FirewallManager.isAppExcludedFromProxy(uid)) {
                 return Pair(appendDnsCacheIfNeeded(defaultTid), "")
             }
-            // take only the active nw into account as we do not know the dns server ip
-            // which the domain is going to be resolved
-            val activeNwMetered = isActiveIfaceCellular()
             // only when there is an uid, we need to calculate wireguard ids
-            val ids = WireguardManager.getAllPossibleConfigIdsForApp(uid, ip="", port = 0, domain, activeNwMetered)
+            val ids = WireguardManager.getAllPossibleConfigIdsForApp(uid, ip="", port = 0, domain, true)
+            var modifiedIds: String = ids.joinToString(",")
+            // spl case: handled for wg-mobile only
+            val pausedIds: MutableList<String> = mutableListOf()
+            ids.forEach { id ->
+                val dnsStats = vpnAdapter?.getProxyStatusById(id)
+                if (dnsStats != null && dnsStats.first == UIUtils.ProxyStatus.TPU.id) {
+                    pausedIds.add(id)
+                }
+            }
+            // compare regardless of the order
+            if (ids.toSet() == pausedIds.toSet()) {
+                // in case all the ids are paused, then use the default transport id
+                // this will happen when all the selected wireguard configs for this connection
+                // is mobile-only
+                modifiedIds = defaultTid
+            }
             return if (ids.isNotEmpty()) {
                 Logger.d(LOG_TAG_VPN, "(onQuery)wg ids($ids) found for uid: $uid")
-                Pair(ids.joinToString(","), "")
+                Pair(modifiedIds, "")
             } else {
                 Logger.d(LOG_TAG_VPN, "(onQuery)no wg ids found for uid: $uid, using $defaultTid")
                 Pair(appendDnsCacheIfNeeded(defaultTid), "")
@@ -4049,21 +4070,34 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 "$oid,$defaultProxy"
             }
         } else {
-            // take only the active nw into account as we do not know the dns server ip
-            // which the domain is going to be resolved
-            val activeNwMetered = isActiveIfaceCellular()
             // if the enabled wireguard is catchall-wireguard, then return wireguard id
             val ids = WireguardManager.getAllPossibleConfigIdsForApp(
                 uid,
                 ip = "",
                 port = 0,
                 domain,
-                activeNwMetered,
+                true,
                 defaultProxy
             )
+            var modifiedProxies: String = ids.joinToString(",")
+            // spl case: handled for wg-mobile only
+            val pausedProxies: MutableList<String> = mutableListOf()
+            ids.forEach { id ->
+                val dnsStats = vpnAdapter?.getProxyStatusById(id)
+                if (dnsStats != null && dnsStats.first == UIUtils.ProxyStatus.TPU.id) {
+                    pausedProxies.add(id)
+                }
+            }
+            // compare regardless of the order
+            if (ids.toSet() == pausedProxies.toSet()) {
+                // in case all the ids are paused, then use the default transport id
+                // this will happen when all the selected wireguard configs for this connection
+                // are mobile-only
+                modifiedProxies = defaultProxy
+            }
             if (ids.isNotEmpty()) {
                 Logger.d(LOG_TAG_VPN, "(onQuery-pid)wg ids($ids) found for uid: $uid")
-                ids.joinToString(",")
+                modifiedProxies
             } else {
                 Logger.d(LOG_TAG_VPN, "(onQuery-pid)no wg ids found for uid: $uid, return $defaultProxy")
                 defaultProxy
@@ -4126,23 +4160,40 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         logd("onProxiesStopped; clear the handshake times")
     }
 
-    override fun onProxyAdded(id: Gostr?) {
+    override fun onProxyAdded(id: Gostr?): Unit = go2kt(proxyAddedDispatcher) {
         val iid = id.tos()
         if (iid == null) {
             Logger.e(LOG_TAG_VPN, "onProxyAdded: received null id")
-            return
+            return@go2kt
         }
 
         if (!iid.contains(ID_WG_BASE, true)) {
             // only wireguard proxies are considered for overlay network
             logd("onProxyAdded: no-op as it is not wireguard proxy, added $iid")
-            return
+            return@go2kt
         }
+
         // new proxy added, refresh overlay network pair
         io("onProxyAdded") {
             val nw: OverlayNetworks? = vpnAdapter?.getActiveProxiesIpAndMtu()
             logd("onProxyAdded for proxy $iid: $nw")
             onOverlayNetworkChanged(nw ?: OverlayNetworks())
+        }
+        val id = iid.substringAfter(ID_WG_BASE).toIntOrNull() ?: return@go2kt
+        val files = WireguardManager.getConfigFilesById(id) ?: return@go2kt
+
+        if (!files.useOnlyOnMetered) return@go2kt
+        withContext(CoroutineName("onProxyAdded") + serializer) {
+            val newNet = underlyingNetworks
+            val v4first = newNet?.ipv4Net?.firstOrNull()
+            val v6first = newNet?.ipv6Net?.firstOrNull()
+            val v4Mobile = v4first?.capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ?: false
+            val v6Mobile = v6first?.capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ?: false
+            val isActiveMobile = v4Mobile || (v4first == null && v6Mobile)
+            Logger.i(LOG_TAG_VPN, "onProxyAdded: wg proxy $iid is added, isActiveMobile: $isActiveMobile")
+            if (!isActiveMobile) {
+                io("pauseWg") { vpnAdapter?.pauseWireguard(iid) }
+            }
         }
     }
 
@@ -4295,6 +4346,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 )
             netLogTracker.writeIpLog(cm)
             return
+        }
+
+        // note the last time when there is a connection update with download traffic
+        // useful to detect data stalls
+        if (s.rx  > 0) {
+            lastRxTrafficTime = elapsedRealtime()
         }
 
         try {
@@ -4499,8 +4556,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             logd("flow: dns-request, returning ${Backend.Base}, $uid, $connId")
             return@go2kt persistAndConstructFlowResponse(null, Backend.Base, connId, uid)
         }
-        // set only when the request is not from dns / rethink's own traffic
-        lastFlowRealtime = elapsedRealtime()
         processFirewallRequest(cm, anyRealIpBlocked, blocklists.tos() ?: "", isSplApp)
 
         if (cm.isBlocked) {
@@ -4658,27 +4713,47 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val connId = connTracker.connId
         val uid = connTracker.uid
 
-        if (FirewallManager.isAppExcludedFromProxy(uid)) {
+        if (FirewallManager.isAppExcludedFromProxy(uid) && connTracker.blockedByRule == FirewallRuleset.RULE0.id) {
             logd("flow/inflow: app is excluded from proxy, returning Ipn.Base, $connId, $uid")
             connTracker.blockedByRule = FirewallRuleset.RULE15.id
             return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid)
         }
-        // used to check wg proxy
-        val isConnCellular = isIfaceCellular(connTracker.destIP)
+        // here no need to check for paused proxies, as the default transport id is added
+        // along with the wireguard ids, so that the connection can be routed via the default,
+        // in case of paused wireguard proxies, still add the checks so that we can filter out
+        // the paused wireguard proxies.
 
         // add baseOrExit in the end of the list if needed (not true for lockdown)
-        val wgs = WireguardManager.getAllPossibleConfigIdsForApp(uid, connTracker.destIP, connTracker.destPort, connTracker.query ?: "", isConnCellular, baseOrExit)
+        val wgs = WireguardManager.getAllPossibleConfigIdsForApp(uid, connTracker.destIP, connTracker.destPort, connTracker.query ?: "", true, baseOrExit)
         if (wgs.isNotEmpty()) {
+            var unfilteredIds: List<String> = wgs
+            // spl case: handled for wg-mobile only
+            val pausedIds: MutableList<String> = mutableListOf()
+            wgs.forEach { id ->
+                val dnsStats = vpnAdapter?.getProxyStatusById(id)
+                if (dnsStats != null && dnsStats.first == UIUtils.ProxyStatus.TPU.id) {
+                    pausedIds.add(id)
+                }
+            }
+            // remove all the paused wireguard ids from the modifiedIds
+            if (pausedIds.isNotEmpty()) {
+                unfilteredIds = unfilteredIds.filter { !pausedIds.contains(it) }
+                // if all the ids are paused, then only lockdown proxies are added
+                // use the wgs as is
+                if (unfilteredIds.isEmpty()) {
+                    unfilteredIds = wgs
+                }
+            }
             // if canRoute fails for all configs, then the connection will be sent to
             // baseOrExit if available, else it will be blocked. only true when the proxy is
             // not lockdown
-            val ids = wgs.joinToString(",")
-            // can be block when proxy is lockdown but disabled, added new rule for that
-            if (ids.contains(Backend.Block)) {
+            // in case of lockdown, and in-active block will be sent, added rule for that
+            if (unfilteredIds.contains(Backend.Block)) {
                 connTracker.isBlocked = true
                 connTracker.blockedByRule = FirewallRuleset.RULE17.id
             }
-            logd("flow/inflow: wg is active, returning $ids, $connId, $uid")
+            logd("flow/inflow: wg is active, returning $unfilteredIds, $connId, $uid")
+            val ids = unfilteredIds.joinToString(",")
             return persistAndConstructFlowResponse(connTracker, ids, connId, uid)
         } else {
             Logger.vv(LOG_TAG_VPN, "flow/inflow: no wg proxy, $baseOrExit, $connId, $uid")
@@ -4814,9 +4889,19 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         vpnAdapter?.addWgProxy(id)
     }
 
-    fun refreshOrReAddProxies() {
-        logd("refresh wg config")
-        io("refreshWg") { vpnAdapter?.refreshOrReAddProxies() }
+    suspend fun refreshOrPauseOrResumeOrReAddProxies() {
+        withContext(CoroutineName("ref-pro") + serializer) {
+            logd("refresh wg config")
+            // perform the active network mobile check
+            val newNet = underlyingNetworks
+            val v4first = newNet?.ipv4Net?.firstOrNull()
+            val v6first = newNet?.ipv6Net?.firstOrNull()
+            val v4Mobile = v4first?.capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ?: false
+            val v6Mobile = v6first?.capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ?: false
+            val isActiveMobile = v4Mobile || (v4first == null && v6Mobile)
+            Logger.v(LOG_TAG_VPN, "refreshOrPauseOrResumeOrReAddProxies: canResumeMobileOnlyWg? $isActiveMobile")
+            io("refreshWg") { vpnAdapter?.refreshOrPauseOrResumeOrReAddProxies(isActiveMobile) }
+        }
     }
 
     suspend fun getDnsStatus(id: String): Long? {

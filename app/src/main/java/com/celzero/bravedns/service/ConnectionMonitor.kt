@@ -483,13 +483,16 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         /**
          * tracks the changes in active network. Set the underlying network if the current active
          * network is different from already assigned one unless the force update is required.
+         *
+         * call only iff useAllAvaialble is false, else the `cm.activeNetwork` will be always
+         * returns vpn network.
          */
         private suspend fun processActiveNetwork(opPrefs: OpPrefs) {
             val newActiveNetwork = cm.activeNetwork
             val newActiveNetworkCap = cm.getNetworkCapabilities(newActiveNetwork)
             // set active network's connection status
             val isActiveNetworkMetered = isActiveConnectionMetered()
-            val isActiveNetworkCellular = isActiveConnectionCellular(newActiveNetwork)
+            val isActiveNetworkCellular = isNetworkCellular(newActiveNetwork)
             val newNetworks = createNetworksSet(newActiveNetwork, opPrefs.networkSet)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
             val vpnRoutes = determineVpnProtos(opPrefs.networkSet)
@@ -533,11 +536,11 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             val newNetworks = createNetworksSet(newActiveNetwork, opPrefs.networkSet)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
             val vpnRoutes = determineVpnProtos(opPrefs.networkSet)
-            val isActiveNetworkCellular = isActiveConnectionCellular(newActiveNetwork)
+            val isActiveNetworkCellular = isNetworkCellular(newActiveNetwork)
             val isDnsChanged = hasNwDnsChanged(currentNetworks, newNetworks)
 
-            Logger.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, currNws: $currentNetworks ; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered")
-            Logger.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, newNws: $newNetworks \n ; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered")
+            Logger.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, currNws: $currentNetworks \nnew? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered")
+            Logger.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, newNws: $newNetworks \nnew? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered")
 
             if (isNewNetwork || opPrefs.isForceUpdate || isDnsChanged) {
                 currentNetworks = newNetworks
@@ -864,11 +867,12 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
 
         /**
          * Checks if the active network connection is metered.
-         * A metered connection is one for which the user may be charged per unit of data consumed.
          *
          * @return True if the active network connection is metered, false otherwise.
          */
         private suspend fun isActiveConnectionMetered(): Boolean {
+            // TODO: revisit this logic, see if this also needs similar treatment as
+            // isActiveConnectionCellular
             return cm.isActiveNetworkMetered
         }
 
@@ -878,14 +882,22 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
          * @param network The network to check.
          * @return True if the active connection is cellular, false otherwise.
          */
-        private suspend fun isActiveConnectionCellular(network: Network?): Boolean {
+        private suspend fun isNetworkCellular(network: Network?): Boolean {
             if (network == null) {
-                Logger.d(LOG_TAG_CONNECTION, "isActiveConnectionCellular: network is null")
+                Logger.d(LOG_TAG_CONNECTION, "isNetworkCellular: network is null")
                 return false
             }
 
-            val networkCapabilities = cm.getNetworkCapabilities(network)
-            return networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
+            val cap = cm.getNetworkCapabilities(network)
+            val hasCellular = cap?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ?: false
+            val hasWifi = cap?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ?: false
+            Logger.v(LOG_TAG_CONNECTION, "isNetworkCellular: netid: ${netId(network.networkHandle)}, hasCellular? $hasCellular, hasWifi? $hasWifi, metered? ${cm.isActiveNetworkMetered}")
+            val isCellular = cap?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
+            val isWifi = cap?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+            // when "use all available networks" is enabled, both cellular and wifi can be active.
+            // in this case, `cm` always returns true for TRANSPORT_CELLULAR when both are active.
+            // mark cellular networks as true only if wifi is not active.
+            return isCellular && !isWifi
         }
 
         /**
