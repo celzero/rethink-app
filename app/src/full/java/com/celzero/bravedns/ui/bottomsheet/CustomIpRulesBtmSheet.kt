@@ -26,6 +26,7 @@ import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.service.IpRulesManager.IpRuleStatus
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
@@ -347,22 +348,26 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
     }
 
     private suspend fun byPassUniversal(ci: CustomIp) {
-        Logger.v(LOG_TAG_UI, "$TAG: set ${ci.ipAddress} to bypass universal")
+        Logger.i(LOG_TAG_UI, "$TAG: set ${ci.ipAddress} to bypass universal")
+        ci.status = IpRuleStatus.BYPASS_UNIVERSAL.id
         IpRulesManager.updateBypass(ci)
     }
 
     private suspend fun byPassAppRule(ci: CustomIp) {
-        Logger.v(LOG_TAG_UI, "$TAG: set ${ci.ipAddress} to bypass app")
+        Logger.i(LOG_TAG_UI, "$TAG: set ${ci.ipAddress} to bypass app")
+        ci.status = IpRuleStatus.TRUST.id
         IpRulesManager.updateTrust(ci)
     }
 
     private suspend fun blockIp(ci: CustomIp) {
-        Logger.v(LOG_TAG_UI, "$TAG: block ${ci.ipAddress}")
+        Logger.i(LOG_TAG_UI, "$TAG: block ${ci.ipAddress}")
+        ci.status = IpRuleStatus.BLOCK.id
         IpRulesManager.updateBlock(ci)
     }
 
     private suspend fun noRuleIp(ci: CustomIp) {
-        Logger.v(LOG_TAG_UI, "$TAG: no rule for ${ci.ipAddress}")
+        Logger.i(LOG_TAG_UI, "$TAG: no rule for ${ci.ipAddress}")
+        ci.status = IpRuleStatus.NONE.id
         IpRulesManager.updateNoRule(ci)
     }
 
