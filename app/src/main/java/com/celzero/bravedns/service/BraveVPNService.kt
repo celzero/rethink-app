@@ -4182,7 +4182,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val id = iid.substringAfter(ID_WG_BASE).toIntOrNull() ?: return@go2kt
         val files = WireguardManager.getConfigFilesById(id) ?: return@go2kt
 
-        if (!files.useOnlyOnMetered || !files.oneWireGuard) return@go2kt
+        if (!files.useOnlyOnMetered || files.oneWireGuard) return@go2kt
         withContext(CoroutineName("onProxyAdded") + serializer) {
             val newNet = underlyingNetworks
             val v4first = newNet?.ipv4Net?.firstOrNull()
