@@ -45,7 +45,6 @@ import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
 import com.celzero.bravedns.databinding.DialogSetProxyBinding
 import com.celzero.bravedns.databinding.FragmentProxyConfigureBinding
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
@@ -267,7 +266,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         b.wgRefresh.isEnabled = false
         b.wgRefresh.animation = animation
         b.wgRefresh.startAnimation(animation)
-        VpnController.refreshOrReAddProxies()
+        io { VpnController.refreshOrPauseOrResumeOrReAddProxies() }
         delay(REFRESH_TIMEOUT, lifecycleScope) {
             b.wgRefresh.isEnabled = true
             b.wgRefresh.clearAnimation()

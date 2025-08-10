@@ -405,7 +405,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         private fun getStrokeColorForStatus(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
             return when (status) {
                 UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) return R.attr.chipTextNeutral else R.attr.accentGood
-                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ -> R.attr.chipTextNeutral
+                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TPU -> R.attr.chipTextNeutral
                 else -> R.attr.chipTextNegative // TNT, TKO, TEND
             }
         }
@@ -417,12 +417,18 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             errMsg: String? = null
         ): String {
             if (status == null) {
-                val txt = if (errMsg != null) {
+                val txt = if (!errMsg.isNullOrEmpty()) {
                     context.getString(R.string.status_waiting) + " ($errMsg)"
                 } else {
                     context.getString(R.string.status_waiting)
                 }
                 return txt.replaceFirstChar(Char::titlecase)
+            }
+
+            // no need to check for lastOk/since for paused wg
+            if (status == UIUtils.ProxyStatus.TPU) {
+                return context.getString(UIUtils.getProxyStatusStringRes(status.id))
+                            .replaceFirstChar(Char::titlecase)
             }
 
             val now = System.currentTimeMillis()

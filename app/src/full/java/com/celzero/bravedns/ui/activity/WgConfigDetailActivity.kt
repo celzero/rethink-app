@@ -153,6 +153,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }
 
         b.hopBtn.text = getString(R.string.two_argument_space, getString(R.string.hop_add_remove_title), getString(R.string.lbl_experimental))
+        b.useMobileTitleTv.text = getString(R.string.two_argument_space, getString(R.string.wg_setting_use_on_mobile), getString(R.string.lbl_experimental))
 
         b.editBtn.text = getString(R.string.rt_edit_dialog_positive).lowercase()
         b.globalLockdownTitleTv.text =
@@ -294,6 +295,12 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             return txt.replaceFirstChar(Char::titlecase)
         }
 
+        // no need to check for lastOk/since for paused wg
+        if (status == UIUtils.ProxyStatus.TPU) {
+            return  getString(UIUtils.getProxyStatusStringRes(status.id))
+                        .replaceFirstChar(Char::titlecase)
+        }
+
         val now = System.currentTimeMillis()
         val lastOk = stats?.lastOK ?: 0L
         val since = stats?.since ?: 0L
@@ -339,7 +346,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private fun getStrokeColorForStatus(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
         return when (status) {
             UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) return R.attr.chipTextNeutral else R.attr.accentGood
-            UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ -> R.attr.chipTextNeutral
+            UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TPU -> R.attr.chipTextNeutral
             else -> R.attr.chipTextNegative // TNT, TKO, TEND
         }
     }
@@ -484,6 +491,16 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         b.catchAllCheck.setOnClickListener { updateCatchAll(b.catchAllCheck.isChecked) }
 
         b.useMobileCheck.setOnClickListener {
+            val sid = ID_WG_BASE + configId
+            if (WgHopManager.isAlreadyHop(sid)) {
+                Utilities.showToastUiCentered(
+                    this,
+                    getString(R.string.wg_mobile_only_hop_err, getString(R.string.lbl_hop)),
+                    Toast.LENGTH_LONG
+                )
+                b.useMobileCheck.isChecked = !b.useMobileCheck.isChecked
+                return@setOnClickListener
+            }
             NewSettingsManager.markSettingSeen(NewSettingsManager.WG_MOBILE_SETTING)
             updateUseOnMobileNetwork(b.useMobileCheck.isChecked)
         }
@@ -500,6 +517,15 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 return@setOnClickListener
             }
 
+            if (mapping.useOnlyOnMetered) {
+                Utilities.showToastUiCentered(
+                    this,
+                    getString(R.string.hop_error_toast_msg_3),
+                    Toast.LENGTH_LONG
+                )
+                return@setOnClickListener
+            }
+
             if (mapping.isActive || mapping.isLockdown || mapping.isCatchAll) {
                 io {
                     val sid = ID_WG_BASE + configId
@@ -509,7 +535,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                             Utilities.showToastUiCentered(
                                 this,
                                 getString(R.string.hop_error_toast_msg_1, getString(R.string.lbl_hop)),
-                                Toast.LENGTH_SHORT
+                                Toast.LENGTH_LONG
                             )
                         }
                         return@io
@@ -523,7 +549,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                             Utilities.showToastUiCentered(
                                 this,
                                 getString(R.string.hop_error_toast_msg_2),
-                                Toast.LENGTH_SHORT
+                                Toast.LENGTH_LONG
                             )
                         } else {
                             openHopDialog(hopables, iid)
