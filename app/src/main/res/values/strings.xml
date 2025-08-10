@@ -469,7 +469,7 @@
 
 
     <string name="settings_mobile_metered_heading" translatable="true">Meter mobile networks</string>
-    <string name="settings_mobile_metered_desc" translatable="true">Always treat mobile networks as metered.</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Only treat mobile networks as metered, rest as unmetered.</string>
 
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback proxy forwarder apps</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">When disabled, excludes proxy (SOCKS5, HTTP, DNS) forwarder apps from Rethink\'s VPN tunnel.</string>
@@ -1669,6 +1669,7 @@
 
     <string name="hop_error_toast_msg_1" translatable="true">Cannot relay, already %1$s</string>
     <string name="hop_error_toast_msg_2" translatable="true">No WireGuard available for relay; please add more.</string>
+    <string name="hop_error_toast_msg_3" translatable="true">Disable Mobile only to use Relays</string>
 
     <string name="mode_change_error_proxy_enabled" translatable="true">Cannot change modes when proxies are in use. Tap to &lt;u&gt;edit proxy settings&lt;/u&gt;.</string>
 
@@ -1753,6 +1754,8 @@
 
     <string name="custom_rules_proxy_title" translatable="false">Proxy rules</string>
     <string name="custom_rules_proxy_desc" translatable="false">Select a proxy to use for this rule.</string>
+
+    <string name="wg_mobile_only_hop_err" translatable="true">Mobile-only mode is not supported for Relays</string>
 
     <!-- alert, commenting out for now in v055b -->
 
