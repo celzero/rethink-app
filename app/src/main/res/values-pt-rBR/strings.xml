@@ -1017,4 +1017,8 @@
     <string name="exclude_apps_from_proxy">Ignorar aplicativo de todos os proxies</string>
     <string name="lbl_notification" translatable="true">notificação</string>
     <string name="memory_notification_text">Rethink está com pouca memória. As ações do sistema podem ser limitadas.</string>
+    <string name="lbl_test" translatable="true">testar</string>
+    <string name="lbl_protos" translatable="true">protos</string>
+    <string name="lbl_experimental" translatable="true">(experimental)</string>
+    <string name="lbl_service_providers" translatable="true">Provedores de serviços</string>
 </resources>
