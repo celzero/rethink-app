@@ -153,8 +153,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }
 
         b.hopBtn.text = getString(R.string.two_argument_space, getString(R.string.hop_add_remove_title), getString(R.string.lbl_experimental))
-        b.useMobileTitleTv.text = getString(R.string.two_argument_space, getString(R.string.wg_setting_use_on_mobile), getString(R.string.lbl_experimental))
-
         b.editBtn.text = getString(R.string.rt_edit_dialog_positive).lowercase()
         b.globalLockdownTitleTv.text =
             getString(
@@ -168,10 +166,12 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 getString(R.string.catch_all_wg_dialog_title),
                 getString(R.string.symbol_lightening)
             )
+
+        val mobileOnlyExperimentalTxt = getString(R.string.two_argument_space, getString(R.string.wg_setting_use_on_mobile), getString(R.string.lbl_experimental))
         b.useMobileTitleTv.text =
             getString(
                 R.string.two_argument_space,
-                getString(R.string.wg_setting_use_on_mobile),
+                mobileOnlyExperimentalTxt,
                 getString(R.string.symbol_mobile)
             )
         if (wgType.isDefault()) {
