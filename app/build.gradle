@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'com.google.devtools.ksp'
     // to download blocklists for the headless variant
-    id "de.undercouch.download" version "5.3.0"
+    id "de.undercouch.download" version "5.6.0"
     id 'kotlin-android'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
@@ -173,30 +173,30 @@ configurations {
 }
 
 dependencies {
-    androidTestImplementation 'androidx.test:rules:1.5.0'
-    def room_version = "2.6.1"
-    def paging_version = "3.2.1"
+    androidTestImplementation 'androidx.test:rules:1.7.0'
+    def room_version = "2.7.2"
+    def paging_version = "3.3.6"
 
-    implementation 'com.google.guava:guava:32.1.1-android'
+    implementation 'com.google.guava:guava:33.4.8-android'
 
     // https://developer.android.com/studio/write/java8-support
     // included to fix issues with Android 6 support, issue#563
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
-    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.21'
-    fullImplementation 'androidx.appcompat:appcompat:1.6.1'
-    fullImplementation 'androidx.core:core-ktx:1.12.0'
+    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20'
+    fullImplementation 'androidx.appcompat:appcompat:1.7.1'
+    fullImplementation 'androidx.core:core-ktx:1.16.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
-    fullImplementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    fullImplementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     fullImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
-    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
-    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
+    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
 
     // LiveData
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.2'
 
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.google.code.gson:gson:2.13.1'
 
     implementation "androidx.room:room-runtime:$room_version"
     ksp "androidx.room:room-compiler:$room_version"
@@ -204,22 +204,22 @@ dependencies {
     implementation "androidx.room:room-paging:$room_version"
 
     fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
-    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2'
+    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.2'
 
     // Pagers Views
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    fullImplementation 'androidx.fragment:fragment-ktx:1.6.2'
-    implementation 'com.google.android.material:material:1.11.0'
-    fullImplementation 'androidx.viewpager2:viewpager2:1.0.0'
+    fullImplementation 'androidx.fragment:fragment-ktx:1.8.8'
+    implementation 'com.google.android.material:material:1.12.0'
+    fullImplementation 'androidx.viewpager2:viewpager2:1.1.0'
 
-    fullImplementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    fullImplementation 'com.squareup.okhttp3:okhttp:5.1.0'
     fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.12.0'
 
-    fullImplementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    fullImplementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    fullImplementation 'com.squareup.retrofit2:retrofit:2.11.0'
+    fullImplementation 'com.squareup.retrofit2:converter-gson:3.0.0'
 
-    implementation 'com.squareup.okio:okio-jvm:3.9.0'
+    implementation 'com.squareup.okio:okio-jvm:3.16.0'
     // Glide
     fullImplementation('com.github.bumptech.glide:glide:4.16.0') {
         exclude group: 'glide-parent'
@@ -235,11 +235,11 @@ dependencies {
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
 
     // Koin core
-    download 'io.insert-koin:koin-core:3.5.6'
-    implementation 'io.insert-koin:koin-core:3.5.6'
+    download 'io.insert-koin:koin-core:4.1.0'
+    implementation 'io.insert-koin:koin-core:4.1.0'
     // Koin main (Scope, ViewModel ...)
-    download 'io.insert-koin:koin-android:3.5.6'
-    implementation 'io.insert-koin:koin-android:3.5.6'
+    download 'io.insert-koin:koin-android:4.1.0'
+    implementation 'io.insert-koin:koin-android:4.1.0'
 
     download 'hu.autsoft:krate:2.0.0'
     implementation 'hu.autsoft:krate:2.0.0'
@@ -256,7 +256,7 @@ dependencies {
     playImplementation 'com.github.celzero:firestack:ee0a5ac71f:debug@aar'
 
     // Work manager
-    implementation('androidx.work:work-runtime-ktx:2.9.0') {
+    implementation('androidx.work:work-runtime-ktx:2.10.3') {
         modules {
             module("com.google.guava:listenablefuture") {
                 replacedBy("com.google.guava:guava", "listenablefuture is part of guava")
@@ -266,17 +266,17 @@ dependencies {
 
     // for handling IP addresses and subnets, both IPv4 and IPv6
     // https://seancfoley.github.io/IPAddress/ipaddress.html
-    download 'com.github.seancfoley:ipaddress:5.4.0'
-    implementation 'com.github.seancfoley:ipaddress:5.4.0'
+    download 'com.github.seancfoley:ipaddress:5.5.1'
+    implementation 'com.github.seancfoley:ipaddress:5.5.1'
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
 
-    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
-    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
+    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.9.3'
+    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.9.3'
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
@@ -284,17 +284,17 @@ dependencies {
     playImplementation 'com.google.android.play:app-update-ktx:2.1.0'
 
     // for encrypting wireguard configuration files
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
-    implementation("androidx.security:security-app-authenticator:1.0.0-alpha03")
-    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-alpha03")
+    implementation("androidx.security:security-crypto:1.1.0")
+    implementation("androidx.security:security-app-authenticator:1.0.0")
+    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0")
 
     // barcode scanner for wireguard
     fullImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 
     // only using firebase crashlytics experimentally for stability tracking, only in play variant
     // not in fdroid or website
-    playImplementation 'com.google.firebase:firebase-crashlytics:19.0.0'
-    playImplementation 'com.google.firebase:firebase-crashlytics-ndk:19.0.0'
+    playImplementation 'com.google.firebase:firebase-crashlytics:20.0.0'
+    playImplementation 'com.google.firebase:firebase-crashlytics-ndk:20.0.0'
 }
 
 // github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903
