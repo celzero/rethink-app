@@ -14,7 +14,7 @@
     <string name="slide_1_desc">Rethink é um programa de código aberto apoiado pelo programa Mozilla Builders MVP.</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Aviso: Rethink foi desativado</string>
     <string name="exclude">excluir</string>
-    <string name="pause_mode_notification_title">Pausa! A firewall continua a bloquear as aplicações.</string>
+    <string name="pause_mode_notification_title">Pausado! As aplicações bloqueadas continuarão a ser controladas.</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Toque para alterar a definição de proteção</string>
     <string name="dns_mode_notification_title">Protegido! Conectado a DNS rápido e seguro.</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">à espera</string>
@@ -101,14 +101,10 @@
     <string name="settings_theme_dialog_title">Aparência</string>
     <string name="settings_theme_dialog_themes_1">Definido pelo sistema</string>
     <string name="settings_theme_dialog_themes_4">Preto profundo</string>
-    <string name="settings_notification_dialog_option_1">"
-\nPausa/Parar (padrão):
-\nMostra dois botões para colocar em pausa ou parar Rethink rapidamente."</string>
+    <string name="settings_notification_dialog_option_1">\nPausar/Parar (predefinição):\n\nMostra dois botões, para pausar ou parar Rethink rapidamente.</string>
     <string name="dc_other_dns_heading">tipo</string>
     <string name="settings_ip_text_ipv4">IPv4</string>
-    <string name="settings_notification_dialog_option_2">"
-\nDNS / DNS + Firewall:
-\nMostra dois botões para mudar rapidamente entre o modo DNS para poupar bateria e o modo normal DNS + Firewall."</string>
+    <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall:\nMostra dois botões para mudar rapidamente entre o modo DNS para poupar bateria e o modo normal DNS + Firewall.</string>
     <string name="hsf_vpn_dialog_message">Rethink necessita da sua permissão para criar uma VPN local para cifrar os pedidos DNS, implementar um monitor de rede e impor as regras da firewall.
 \n
 \nRethink não recolhe informações nem monitoriza as suas atividades.</string>
@@ -206,10 +202,7 @@
     <string name="settings_notification_desc2">DNS / DNS + Firewall</string>
     <string name="settings_notification_desc3">Nenhum</string>
     <string name="settings_notification_dialog_title">Escolher ação na notificação</string>
-    <string name="settings_notification_dialog_option_3">"
-\nNenhum:
-\nNão mostra qualquer botão.
-\n"</string>
+    <string name="settings_notification_dialog_option_3">\nNenhum:\nNão mostra qualquer botão.\n</string>
     <string name="settings_selected_theme">Tema atual: %1$s</string>
     <string name="settings_protocol_translation_dns_inactive">Mudar para o modo DNS/DNS+Firewall para ativar esta definição</string>
     <string name="apps_icon_content_desc">Ícone da aplicação</string>
@@ -414,13 +407,13 @@
     <string name="cd_dns_crypt_dialog_desc">Descrição (opcional)</string>
     <string name="cd_doh_dialog_resolver_name">Nome do resolvedor</string>
     <string name="cd_doh_dialog_resolver_url">URL do resolvedor</string>
-    <string name="dns_btm_sheet_dialog_message"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s lista(s) de bloqueio</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_message"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s lista(s) de bloqueio</h3>%3$s.<br/><br/>]]></Data></string>
     <string name="univ_firewall_rule_1">Bloquear todas as aplicações se o dispositivo estiver bloqueado</string>
     <string name="dns_btm_record_type">Tipo de pedido: %1$s</string>
     <string name="firewall_rule_block_ip_univ_desc">Uma regra de firewall, definida pelo utilizador, bloqueou o <i>IP/Porta de destino</i>.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.</string>
     <string name="univ_firewall_rule_8">Bloquear tráfego na porta 80 (HTTP inseguro)</string>
     <string name="dns_proxy_connection_failure_lockdown">Se excluir %1$s para %2$s no modo bloqueado, pode causar problemas de conectividade com a Internet.</string>
-    <string name="firewall_rule_block_app_desc">Uma regra de firewall, definida pelo utilizador, bloqueou esta <i>aplicação</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as aplicações</i>.</string>
+    <string name="firewall_rule_block_app_desc"><![CDATA[Uma regra de firewall definida pelo utilizador bloqueou esta <i>aplicação</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as Aplicações.]]></string>
     <string name="notif_dialog_pause_dialog_message">Aplicação no modo de pausa, retome para continuar</string>
     <string name="notif_channed_desc_download">Alertar sobre o progresso das descargas de listas de bloqueio</string>
     <string name="notif_channel_vpn_failure">VPN inativa</string>
@@ -472,7 +465,7 @@
 \n
 \nNúmero da porta: %3$s</string>
     <string name="fapps_info_dialog_message">Bloqueie a ligação de aplicações à Internet. Limitar o acesso à Internet ajuda a evitar o uso indevido de dados, além de economizar bateria.</string>
-    <string name="fapps_firewall_filter_desc_category">A mostrar <u>%1$s</u> de %2$s aplicações nas categorias: %3$s</string>
+    <string name="fapps_firewall_filter_desc_category"><![CDATA[A mostrar <u>%1$s</u> de %2$s aplicações nas categorias: %3$s]]></string>
     <string name="rules_load_failure_heading">Nota</string>
     <string name="settings_local_blocklist_version">Versão: v%1$s</string>
     <string name="accessibility_failure_toast">O serviço de acessibilidade Rethink parou ou encravou. Não está a bloquear aplicações em segundo plano.</string>
@@ -482,7 +475,7 @@
     <string name="pause_desc">Nota: as %1$s aplicações bloqueadas continuarão a ser protegidas por firewall.</string>
     <string name="firewall_rule_block_app_mobile_desc">Uma regra de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a uma rede <i>limitada</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as aplicações</i>.</string>
     <string name="firewall_rule_trusted_ip">IP de confiança</string>
-    <string name="firewall_rule_new_app_desc">Esta aplicação fez uma ligação pela <i>primeira</i> vez.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.</string>
+    <string name="firewall_rule_new_app_desc"><![CDATA[Esta aplicação fez uma ligação pela <i>primeira</i> vez.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.]]></string>
     <string name="firewall_rule_block_udp_ntp_desc">Uma regra de firewall, definida pelo utilizador, bloqueou esta ligação <i>UDP</i>.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc">Esta ligação foi permitida porque o &lt;i&gt;IP de destino&lt;/i&gt; está configurado para ignorar todas as regras universais de firewall.&lt;br/&gt;&lt;br/&gt; Para alterar, aceda às &lt;i&gt;Regras de IP&lt;i&gt; no separador &lt;i&gt;Universal&lt;/i&gt;.</string>
     <string name="firewall_rule_foreground_desc">Esta ligação foi protegida por firewall porque a aplicação de origem <i>não estava em primeiro plano</i>.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Universal</i>.</string>
@@ -519,7 +512,7 @@
     <string name="ctbs_block_other_apps">As regras aplicadas em %1$s também serão aplicadas em %2$s outras aplicações</string>
     <string name="ctbs_dialog_negative_btn">Recuar</string>
     <string name="dns_log_dialog_positive">Eliminar registos</string>
-    <string name="dns_btm_sheet_dialog_ips"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips"><Data><![CDATA[ %1$s %2$s <br/>]]></Data></string>
     <string name="dns_btm_sheet_chip">+%1$s outros IPs</string>
     <string name="dns_btm_sheet_chip_no_answer">Sem resposta</string>
     <string name="dns_btm_resolved_crypt">resolvido <u>anonimamente</u> %1$s por %2$s através de %3$s</string>
@@ -568,7 +561,7 @@
     <string name="fapps_metered_unblock_dialog_title">Permitir em redes limitadas</string>
     <string name="fapps_metered_unblock_dialog_message">Permitir ligações em redes limitadas (móveis) para as aplicações <i>da lista</i>\?</string>
     <string name="fapps_firewall_filter_hint">Mostrar todas as aplicações</string>
-    <string name="fapps_firewall_filter_desc">A mostrar <u>%1$s</u> de %2$s aplicações</string>
+    <string name="fapps_firewall_filter_desc"><![CDATA[A mostrar <u>%1$s</u> de %2$s aplicações]]></string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
@@ -590,7 +583,7 @@
     <string name="other_dns_list_tab1">DoH</string>
     <string name="other_dns_list_tab2">DNSCrypt</string>
     <string name="other_dns_list_tab3">Proxy DNS</string>
-    <string name="hs_btm_sheet_lock_down">Não é possível alterar o modo quando a VPN está no modo <i>bloqueado</i>. <u>Toque aqui para editar as definições de VPN</u>.</string>
+    <string name="hs_btm_sheet_lock_down">Não é possível alterar os modos quando a VPN está como &lt;i&gt;bloqueado&lt;/i&gt;. &lt;u&gt;Toque para &amp;lt;u&amp;gt;editar as definições da VPN&amp;lt;/u&amp;gt;.</string>
     <string name="firewall_rule_no_rule">Sem regra</string>
     <string name="firewall_rule_block_app">Aplicação bloqueada</string>
     <string name="firewall_rule_block_unmetered">Ilimitada (Wi-Fi)</string>
@@ -811,7 +804,7 @@
     <string name="settings_default_dns_desc" translatable="true">Em casos raros, quando o DNS preferencial do utilizador não pode ser usado, é utilizado o DNS de recurso.</string>
     <string name="settings_pcap_heading" translatable="true">Captura de pacotes</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Captura de pacotes desativada</string>
-    <string name="cd_dns_alg_desc" translatable="true">Atribuir um IP único por cada pedido DNS</string>
+    <string name="cd_dns_alg_desc" translatable="true">Atribuir um IP único por cada pedido DNS.</string>
     <string name="cd_dns_alg_heading" translatable="true">Filtragem DNS avançada (experimental)</string>
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">Aplicação ignorada</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS bloqueado</string>
