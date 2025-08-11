@@ -100,7 +100,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
     private fun initView() {
         b.settingsActivityWireguardText.text = getString(R.string.settings_proxy_header).lowercase()
-        b.settingsActivityTcpText.text = getString(R.string.orbot_status_arg_2).lowercase()
+        val text = getString(R.string.two_argument, getString(R.string.orbot_status_arg_2).lowercase(), getString(R.string.lbl_ip))
+        b.settingsActivityTcpText.text = text.lowercase()
 
         b.settingsActivityAllowBypassProgress.visibility = View.GONE
         displayAllowBypassUi()
