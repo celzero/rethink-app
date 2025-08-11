@@ -774,7 +774,7 @@ interface StatsSummaryDao {
                 FROM ConnectionTracker 
                 WHERE timeStamp > :to 
                   AND dnsQuery = :query 
-                  AND isBlocked = 0 
+                  AND isBlocked = :isBlocked
                 GROUP BY uid
                    
                 UNION ALL 
@@ -788,7 +788,7 @@ interface StatsSummaryDao {
                 FROM DnsLogs 
                 WHERE time > :to 
                   AND queryStr like :query 
-                  AND isBlocked = 0 
+                  AND isBlocked = :isBlocked 
                   AND status = 'COMPLETE' 
                   AND queryStr != '' 
                 GROUP BY uid
@@ -797,7 +797,7 @@ interface StatsSummaryDao {
             ORDER BY count DESC
         """
     )
-    fun getDomainDetails(query: String, to: Long): PagingSource<Int, AppConnection>
+    fun getDomainDetails(query: String, to: Long, isBlocked: Boolean): PagingSource<Int, AppConnection>
 
 
     @Query(

@@ -75,7 +75,8 @@ class DomainConnectionsActivity : AppCompatActivity(R.layout.activity_domain_con
         when (type) {
             InputType.DOMAIN -> {
                 val domain = intent.getStringExtra(INTENT_EXTRA_DOMAIN) ?: ""
-                viewModel.setDomain(domain)
+                val isBlocked = intent.getBooleanExtra(INTENT_EXTRA_IS_BLOCKED, false)
+                viewModel.setDomain(domain, isBlocked)
                 b.dcTitle.text = domain
             }
             InputType.FLAG -> {
