@@ -574,16 +574,19 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
             b.settingsActivityAllowBypassRl.alpha = 0.5f
             b.settingsActivityExcludeProxyAppsRl.alpha = 0.5f
+            b.settingsStallNoNwRl.alpha = 0.5f
         } else {
             b.settingsActivityVpnLockdownDesc.visibility = View.GONE
             b.settingsActivityAllowBypassRl.alpha = 1f
             b.settingsActivityExcludeProxyAppsRl.alpha = 1f
+            b.settingsStallNoNwRl.alpha = 1f
         }
         b.settingsActivityAllowBypassSwitch.isEnabled = !isLockdown
         b.settingsActivityAllowBypassRl.isEnabled = !isLockdown
         b.settingsActivityLanTrafficRl.isEnabled = !isLockdown
         b.settingsActivityExcludeProxyAppsSwitch.isEnabled = !isLockdown
         b.settingsActivityExcludeProxyAppsRl.isEnabled = !isLockdown
+        b.settingsStallNoNwRl.isEnabled = !isLockdown
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {
