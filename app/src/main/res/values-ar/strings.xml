@@ -922,4 +922,38 @@
     <string name="lbl_unselected" translatable="true">الغاء تحديد</string>
     <string name="lbl_idle" translatable="true">خامل</string>
     <string name="lbl_split" translatable="true">منقسم</string>
+    <string name="lbl_test" translatable="true">اختبار</string>
+    <string name="lbl_protos" translatable="true">بروتوكولات</string>
+    <string name="lbl_experimental" translatable="true">)تجريبي(</string>
+    <string name="lbl_service_providers" translatable="true">مقدموا الخدمة</string>
+    <string name="lbl_hop" translatable="true">تتابع</string>
+    <string name="lbl_manual" translatable="true">يدوي</string>
+    <string name="wireguard_title" translatable="true">إنترنت آمن مع WireGuard</string>
+    <string name="wireguard_desc" translatable="true">شفّر حركة مرور الإنترنت لديك باستخدام WireGuard. اختر مسارات مختلفة لتطبيقات مختلفة.</string>
+    <string name="firewall_title" translatable="true">حماية جهاز Android الخاص بك باستخدام جدار الحماية</string>
+    <string name="firewall_desc" translatable="true">التحكم في استخدام التطبيقات للإنترنت؛ تقييد الاتصالات استنادًا إلى نشاط التطبيق أو الشبكة.</string>
+    <string name="dns_title" translatable="true">حظر الإعلانات والبرامج الضارة باستخدام DNS</string>
+    <string name="dns_desc" translatable="true">اختر من بين أكثر من 190 قائمة لإيقاف الإعلانات وأدوات التتبع والبرامج الضارة.</string>
+    <string name="status_no_network" translatable="true">لا يوجد شبكة</string>
+    <string name="settings_allow_lan_heading" translatable="true">لا تقم بتوجيه عناوين IP الخاصة (تجريبي)</string>
+    <string name="settings_allow_lan_desc" translatable="true">استبعد مسارات LAN، وloopback، وmulticast، وlink-local من نفق VPN الخاص بـ Rethink.</string>
+    <string name="settings_mobile_metered_heading" translatable="true">قياس شبكات الهاتف المحمول</string>
+    <string name="settings_mobile_metered_desc" translatable="true">تعامل دائمًا مع شبكات الهاتف المحمول على أنها مقيسة.</string>
+    <string name="settings_exclude_proxy_apps_heading" translatable="true">تطبيقات إعادة توجيه الوكيل الحلقي</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">عند تعطيله، يتم استبعاد تطبيقات إعادة التوجيه بالوكيل (SOCKS5، HTTP، DNS) من نفق VPN الخاص بـ Rethink.</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">إعادة النظر في حركة المرور الخاصة بـ Rethink، مثل تنزيلات القائمة المحظورة، وفحوصات الاتصال، واتصالات DNS، مرة أخرى إلى النفق.</string>
+    <string name="settings_rinr_dialog_title" translatable="true">حلقة استرجاعية (تجريبية)</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">أيضا يقوم بتفعيل الاعداد<!--settings_network_all_networks--> %1$s. هل تريد الاستمرار؟</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">فاتح بلس</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">داكن بلس</string>
+    <string name="settings_default_dns_desc" translatable="true">في الحالات النادرة التي لا يمكن فيها التأكد من DNS المفضل للمستخدم، يتم استخدام DNS الاحتياطي.</string>
+    <string name="settings_pcap_dialog_option_2" translatable="true">الإخراج إلى Logcat</string>
+    <string name="settings_pcap_dialog_option_3" translatable="true">الإخراج إلى مجلد التنزيلات</string>
+    <string name="pcap_failure_toast" translatable="true">حدث خطأ أثناء إنشاء ملف pcap، حاول مرة أخرى!</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">المصادقة البيومترية</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">لا يوجد</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">فورا</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">بعد 5 دقائق</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">بعد 15 دقيقة</string>
+    <string name="firewall_card_universal_rules" translatable="true">%1$s قاعدة عالمية</string>
 </resources>
