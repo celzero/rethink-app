@@ -518,10 +518,11 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
+                        android:alpha="0.5"
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
                         android:padding="10dp"
-                        android:src="@drawable/bs_dns_home_screen" />
+                        android:src="@drawable/ic_split_dns" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"

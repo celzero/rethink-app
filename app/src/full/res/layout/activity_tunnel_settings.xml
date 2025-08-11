@@ -367,7 +367,7 @@
                         android:layout_marginBottom="5dp"
                         android:alpha="0.5"
                         android:padding="10dp"
-                        android:src="@drawable/ic_timeout" />
+                        android:src="@drawable/ic_meter_mobile_only" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
