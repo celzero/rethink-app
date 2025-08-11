@@ -87,10 +87,6 @@ object NewSettingsManager: KoinComponent {
         val contains = newSettings.contains(key)
         val seen = seenSettings.contains(key)
         val show = contains && !seen
-        Logger.v(
-            LOG_TAG_UI,
-            "NewSettingsManager: shouldShowBadge for $key: $show, $contains, $seen, ${persistentState.newSettings}, seen: ${persistentState.newSettingsSeen}"
-        )
         return show
     }
 
@@ -98,21 +94,15 @@ object NewSettingsManager: KoinComponent {
         val seenSettings =
             persistentState.newSettingsSeen.split(",").filter { it.isNotEmpty() }.toMutableSet()
         if (seenSettings.contains(key)) {
-            Logger.v(LOG_TAG_UI, "NewSettingsManager: setting $key already seen, no action taken")
             return
         }
         seenSettings.add(key)
         saveSeenSettings(seenSettings)
-        Logger.v(
-            LOG_TAG_UI,
-            "NewSettingsManager: marked setting $key as seen, ${persistentState.newSettings}, seen: ${persistentState.newSettingsSeen}"
-        )
     }
 
     fun initializeNewSettings() {
         persistentState.newSettings = newSettingsList.joinToString(",")
         persistentState.newSettingsSeen = ""
-        Logger.v(LOG_TAG_UI, "NewSettingsManager: initialized new settings: ${persistentState.newSettings}")
     }
 
     private fun isExpired(): Boolean {
@@ -121,10 +111,8 @@ object NewSettingsManager: KoinComponent {
         val diff = now - appUpdatedTs
         if (appUpdatedTs == 0L) {
             // if app update time is not set, consider it as expired
-            Logger.v(LOG_TAG_UI, "NewSettingsManager: app update time not set, considering new settings as expired")
             return true
         }
-        Logger.v(LOG_TAG_UI, "NewSettingsManager: app updated at $appUpdatedTs, now: $now, diff: $diff")
         return diff >= EXPIRY_DAYS * 24 * 60 * 60 * 1000L
     }
 
@@ -135,10 +123,6 @@ object NewSettingsManager: KoinComponent {
             persistentState.newSettings.split(",").filter { it.isNotEmpty() }.toMutableSet()
         newSettings.removeAll(set)
         persistentState.newSettings = newSettings.joinToString(",")
-        Logger.v(
-            LOG_TAG_UI,
-            "NewSettingsManager: saveSeenSettings: ${persistentState.newSettings}, seen: ${persistentState.newSettingsSeen}"
-        )
     }
 
     fun clearAll() {
