@@ -1217,7 +1217,7 @@ class GoVpnAdapter : KoinComponent {
     private fun newDefaultTransport(url: String): DefaultDNS? {
         val fallbackDns = getDefaultFallbackDns()
         try {
-            // when the url is empty, set the default transport to 8.8.4.4, 2001:4860:4860::8844 or
+            // when the url is empty, set the default transport to 9.9.9.9, 2620:fe::fe or
             // null based on the value of SKIP_DEFAULT_DNS_ON_INIT
             if (url.isEmpty()) { // empty url denotes default dns set to none (system dns)
                 if (SKIP_DEFAULT_DNS_ON_INIT && !persistentState.routeRethinkInRethink) {
