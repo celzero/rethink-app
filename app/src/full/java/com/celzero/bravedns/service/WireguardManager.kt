@@ -260,11 +260,11 @@ object WireguardManager : KoinComponent {
     }
 
     fun canDisableConfig(map: WgConfigFilesImmutable): Boolean {
-        // do not allow to disable the proxy if it is catch-all
-        val catchAll = !map.isCatchAll
-        // do not allow if the config is either hop or via
-        val isHopOrVia = WgHopManager.isWgEitherHopOrSrc(map.id)
-        return !catchAll || !isHopOrVia
+        return when {
+            map.isCatchAll -> false // cannot disable catch-all
+            WgHopManager.isWgEitherHopOrSrc(map.id) -> false // cannot disable hop/via
+            else -> true // safe to disable
+        }
     }
 
     fun canDisableAllActiveConfigs(): Boolean {
@@ -407,6 +407,8 @@ object WireguardManager : KoinComponent {
             return proxyIds
         }
 
+        /* TODO: commenting the code as v055o doesn't use ip-app specific and domain-app specific
+        // rules
         // check for ip-app specific config first
         // returns Pair<String, String> - first is ProxyId, second is CC
         val ipc = IpRulesManager.hasProxy(uid, ip, port)
@@ -441,6 +443,7 @@ object WireguardManager : KoinComponent {
         }
         // add the domain-app specific config to the list
         if (dcProxyPair.first.isNotEmpty()) proxyIds.add(dcProxyPair.first) // domain-app specific
+        */
 
         // check for app specific config
         val ac = ProxyManager.getProxyIdForApp(uid)
@@ -462,6 +465,7 @@ object WireguardManager : KoinComponent {
         // add the app specific config to the list
         if (appProxyPair.first.isNotEmpty()) proxyIds.add(appProxyPair.first)
 
+        /* TODO: commenting the code as v055o doesn't use universal ip and domain rules
         // check for universal ip config
         val uipc = IpRulesManager.hasProxy(UID_EVERYBODY, ip, port)
         val uipcProxyPair = canUseConfig(uipc.first, "univ-ip($ip:$port)", usesMeteredNw)
@@ -494,10 +498,11 @@ object WireguardManager : KoinComponent {
         }
 
         // add the universal domain config to the list
-        if (udcProxyPair.first.isNotEmpty()) proxyIds.add(udcProxyPair.first)
+        if (udcProxyPair.first.isNotEmpty()) proxyIds.add(udcProxyPair.first)*/
 
         // once the app-specific config is added, check if any catch-all config is enabled
         // if catch-all config is enabled, then add the config id to the list
+
         val cac = mappings.filter { it.isActive && it.isCatchAll }
         cac.forEach {
             if (checkEligibilityBasedOnNw(it.id, usesMeteredNw)) {
@@ -507,6 +512,11 @@ object WireguardManager : KoinComponent {
                     "catch-all config is active: ${it.id}, ${it.name} => add ${ID_WG_BASE + it.id}"
                 )
             }
+        }
+
+        if (proxyIds.isEmpty()) {
+            Logger.i(LOG_TAG_PROXY, "no proxy ids found for $uid, $ip, $port, $domain; returning empty list")
+            return emptyList()
         }
 
         // add the default proxy to the end, will not be true for lockdown but lockdown is handled
@@ -750,7 +760,7 @@ object WireguardManager : KoinComponent {
             return
         }
         Logger.i(LOG_TAG_PROXY, "updating useMobileNw as $useMobileNw for config: $id, ${config.getName()}")
-        db.updateCatchAllConfig(id, useMobileNw)
+        db.updateMobileConfig(id, useMobileNw)
         val m = mappings.find { it.id == id } ?: return
         mappings.remove(m)
         val newMap =
@@ -760,15 +770,16 @@ object WireguardManager : KoinComponent {
                 m.configPath,
                 m.serverResponse,
                 m.isActive,
-                m.isCatchAll, // just updating catch all field
+                m.isCatchAll,
                 m.isLockdown,
                 m.oneWireGuard,
-                useMobileNw,
+                useMobileNw, // just updating useOnMetered field
                 m.isDeletable
             )
         mappings.add(newMap)
-
-        enableConfig(newMap) // catch all should be always enabled
+        if (m.isActive) {
+            VpnController.addWireGuardProxy(id = ID_WG_BASE + id)
+        }
     }
 
     suspend fun addPeer(id: Int, peer: Peer) {

@@ -106,6 +106,9 @@ object UIUtils {
             Backend.TNT -> {
                 R.string.status_waiting
             }
+            Backend.TPU -> {
+                R.string.pause_text
+            }
             else -> {
                 R.string.rt_filter_parent_selected
             }
@@ -116,6 +119,7 @@ object UIUtils {
         TOK(Backend.TOK),
         TUP(Backend.TUP),
         TZZ(Backend.TZZ),
+        TPU(Backend.TPU), // paused
         TNT(Backend.TNT),
         TKO(Backend.TKO),
         END(Backend.END)
@@ -331,7 +335,7 @@ object UIUtils {
         return fetchColor(context, attributeFetch)
     }
 
-    fun fetchFavIcon(context: Context, dnsLog: DnsLog) {
+    suspend fun fetchFavIcon(context: Context, dnsLog: DnsLog) {
         if (dnsLog.groundedQuery()) return
 
         if (isDgaDomain(dnsLog.queryStr)) return

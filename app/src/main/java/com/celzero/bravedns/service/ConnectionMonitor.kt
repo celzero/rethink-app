@@ -33,7 +33,6 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isNetworkSame
-import com.google.common.collect.Sets
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -60,17 +59,14 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
     // create drop oldest channel to handle the network changes from the connectivity manager
     private lateinit var channel: Channel<OpPrefs>
 
-    // add cellular, wifi, bluetooth, ethernet, vpn, wifi aware, low pan
     private val networkRequest: NetworkRequest =
         NetworkRequest.Builder()
-            // ref: github.com/celzero/rethink-app/issues/347
             .apply { if (isAtleastR()) clearCapabilities() else removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN) }
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            // network validity makes onAvailable / onLost events appear atleast 5-10 secs later than without it
+            //.addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
             .apply { if (isAtleastS()) setIncludeOtherUidNetworks(true) }
-            // api27: .addTransportType(NetworkCapabilities.TRANSPORT_WIFI_AWARE)
-            // api26: .addTransportType(NetworkCapabilities.TRANSPORT_LOWPAN)
             .build()
-
 
     //private var serviceHandler: NetworkRequestHandler? = null
     private val persistentState by inject<PersistentState>()
@@ -135,7 +131,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         val networkSet: Set<Network>,
         val isForceUpdate: Boolean,
         val testReachability: Boolean,
-        val failOpenOnNoNetwork: Boolean,
+        val stallOnNoNetwork: Boolean,
         val useAutoConnectivityChecks: Boolean
     )
 
@@ -276,7 +272,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                         .filter { it.isNotEmpty() }
                 )
 
-                val hdl = NetworkRequestHandler(cm, networkListener, ips)
+                val hdl = NetworkRequestHandler(cm, networkListener, ips, ::sendNetworkChanges)
                 sendNetworkChanges(isForceUpdate = true)
                 for (m in channel) {
                     // process the message in a coroutine context
@@ -347,7 +343,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         val dualStack =
             InternetProtocol.getInternetProtocol(persistentState.internetProtocolType).isIPv46()
         val testReachability = dualStack && persistentState.connectivityChecks
-        val failOpenOnNoNetwork = persistentState.failOpenOnNoNetwork
+        val failOpenOnNoNetwork = !persistentState.stallOnNoNetwork
         val useAutoConnectivityChecks = persistentState.performAutoNetworkConnectivityChecks
         val msg =
             constructNetworkMessage(
@@ -437,12 +433,13 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
     private class NetworkRequestHandler(
         val cm: ConnectivityManager,
         val listener: NetworkListener,
-        ipsAndUrl: IpsAndUrlToProbe
+        ipsAndUrl: IpsAndUrlToProbe,
+        val redrive: suspend () -> Unit
     ) {
 
         // number of times the reachability check is performed due to failures
         private var reachabilityCount = 0L
-        private val maxReachabilityCount = 10L
+        private val maxReachabilityCount = 3L
 
         companion object {
             private const val DEFAULT_MTU = 1280 // same as BraveVpnService#VPN_INTERFACE_MTU
@@ -483,33 +480,35 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         /**
          * tracks the changes in active network. Set the underlying network if the current active
          * network is different from already assigned one unless the force update is required.
+         *
+         * call only iff useAllAvaialble is false, else the `cm.activeNetwork` will be always
+         * returns vpn network.
          */
         private suspend fun processActiveNetwork(opPrefs: OpPrefs) {
             val newActiveNetwork = cm.activeNetwork
             val newActiveNetworkCap = cm.getNetworkCapabilities(newActiveNetwork)
             // set active network's connection status
             val isActiveNetworkMetered = isActiveConnectionMetered()
-            val isActiveNetworkCellular = isActiveConnectionCellular(newActiveNetwork)
+            val isActiveNetworkCellular = isNetworkCellular(newActiveNetwork)
             val newNetworks = createNetworksSet(newActiveNetwork, opPrefs.networkSet)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
             val vpnRoutes = determineVpnProtos(opPrefs.networkSet)
             val isDnsChanged = hasNwDnsChanged(currentNetworks, newNetworks)
             val isLinkAddressChanged = hasLinkAddrChanged(currentNetworks, newNetworks)
 
-            Logger.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, currNws: $currentNetworks ; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered")
+            Logger.i(LOG_TAG_CONNECTION, "process message active nws, currNws: $currentNetworks")
             Logger.i(
                 LOG_TAG_CONNECTION,
                 "Connected network: ${newActiveNetwork?.networkHandle} ${
                     networkType(newActiveNetworkCap)
                 }, netid: ${netId(newActiveNetwork?.networkHandle)}, new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}," +
-                 "cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged"
+                 "cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged, link-address-changed? $isLinkAddressChanged"
             )
 
-            if (isNewNetwork || opPrefs.isForceUpdate || isDnsChanged || isLinkAddressChanged) {
-                currentNetworks = newNetworks
-                repopulateTrackedNetworks(opPrefs, currentNetworks)
-                informListener(true, isActiveNetworkMetered, isActiveNetworkCellular, vpnRoutes)
-            }
+            currentNetworks = newNetworks
+            repopulateTrackedNetworks(opPrefs, currentNetworks)
+            // client code must call setUnderlyingNetworks() to invoke linkCapabilities for other uids
+            informListener(true, isActiveNetworkMetered, isActiveNetworkCellular, vpnRoutes)
         }
 
         private suspend fun hasNwDnsChanged(currNws: Set<NetworkProperties>, newNws: Set<NetworkProperties>): Boolean {
@@ -533,17 +532,16 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             val newNetworks = createNetworksSet(newActiveNetwork, opPrefs.networkSet)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
             val vpnRoutes = determineVpnProtos(opPrefs.networkSet)
-            val isActiveNetworkCellular = isActiveConnectionCellular(newActiveNetwork)
+            val isActiveNetworkCellular = isNetworkCellular(newActiveNetwork)
             val isDnsChanged = hasNwDnsChanged(currentNetworks, newNetworks)
+            val isLinkAddressChanged = hasLinkAddrChanged(currentNetworks, newNetworks)
 
-            Logger.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, currNws: $currentNetworks ; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered")
-            Logger.i(LOG_TAG_CONNECTION, "process message MESSAGE_AVAILABLE_NETWORK, newNws: $newNetworks \n ; new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered")
+            Logger.i(LOG_TAG_CONNECTION, "process message all nws, currNws: $currentNetworks")
+            Logger.i(LOG_TAG_CONNECTION, "process message all nws, newNws: $newNetworks \nnew? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged, link-addr-changed? $isLinkAddressChanged")
 
-            if (isNewNetwork || opPrefs.isForceUpdate || isDnsChanged) {
-                currentNetworks = newNetworks
-                repopulateTrackedNetworks(opPrefs, currentNetworks)
-                informListener(false, isActiveNetworkMetered, isActiveNetworkCellular, vpnRoutes)
-            }
+            currentNetworks = newNetworks
+            repopulateTrackedNetworks(opPrefs, currentNetworks)
+            informListener(false, isActiveNetworkMetered, isActiveNetworkCellular, vpnRoutes)
         }
 
         /**
@@ -577,11 +575,11 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
 
             // fixme: using below code has issues when private networks are excluded, return null for now
             // come up with a better way to determine the protocols
-            /*val lp = cm.getLinkProperties(vpnNw)
+            val lp = cm.getLinkProperties(vpnNw)
             var has4 = false
             var has6 = false
 
-            lp?.routes?.forEach { route ->
+            /*lp?.routes?.forEach { route ->
                 val dst = route.destination
                 val addr = dst.address
                 val prefix = dst.prefixLength
@@ -635,7 +633,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                 )
 
                 if (has4 && has6) return@forEach
-            }
+            } */
 
             if (!has4 && !has6) {
                 lp?.routes?.forEach rloop@{
@@ -657,8 +655,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             }
 
             Logger.i(LOG_TAG_CONNECTION, "determineVpnProtos; has4? $has4, has6? $has6, $lp")
-            */
-            return null //Pair(has4, has6)
+            return Pair(has4, has6)
         }
 
         /**
@@ -864,11 +861,12 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
 
         /**
          * Checks if the active network connection is metered.
-         * A metered connection is one for which the user may be charged per unit of data consumed.
          *
          * @return True if the active network connection is metered, false otherwise.
          */
         private suspend fun isActiveConnectionMetered(): Boolean {
+            // TODO: revisit this logic, see if this also needs similar treatment as
+            // isActiveConnectionCellular
             return cm.isActiveNetworkMetered
         }
 
@@ -878,14 +876,22 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
          * @param network The network to check.
          * @return True if the active connection is cellular, false otherwise.
          */
-        private suspend fun isActiveConnectionCellular(network: Network?): Boolean {
+        private suspend fun isNetworkCellular(network: Network?): Boolean {
             if (network == null) {
-                Logger.d(LOG_TAG_CONNECTION, "isActiveConnectionCellular: network is null")
+                Logger.d(LOG_TAG_CONNECTION, "isNetworkCellular: network is null")
                 return false
             }
 
-            val networkCapabilities = cm.getNetworkCapabilities(network)
-            return networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
+            val cap = cm.getNetworkCapabilities(network)
+            val hasCellular = cap?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ?: false
+            val hasWifi = cap?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ?: false
+            Logger.v(LOG_TAG_CONNECTION, "isNetworkCellular: netid: ${netId(network.networkHandle)}, hasCellular? $hasCellular, hasWifi? $hasWifi, metered? ${cm.isActiveNetworkMetered}")
+            val isCellular = cap?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
+            val isWifi = cap?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+            // when "use all available networks" is enabled, both cellular and wifi can be active.
+            // in this case, `cm` always returns true for TRANSPORT_CELLULAR when both are active.
+            // mark cellular networks as true only if wifi is not active.
+            return isCellular && !isWifi
         }
 
         /**
@@ -1030,7 +1036,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             }
 
             // handle fail-open when no networks are found in both IPv4 and IPv6 sets
-            val failOpen = opPrefs.failOpenOnNoNetwork
+            val failOpen = !opPrefs.stallOnNoNetwork
             if (trackedIpv4Networks.isEmpty() && trackedIpv6Networks.isEmpty() && failOpen) {
                 Logger.i(LOG_TAG_CONNECTION, "no networks found, but fail-open is enabled")
                 nwProps.forEach outer@{ prop ->
@@ -1082,7 +1088,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                 }
             }
 
-            redoReachabilityIfNeeded(trackedIpv4Networks, trackedIpv6Networks, opPrefs)
+            redoReachabilityIfNeeded(trackedIpv4Networks, trackedIpv6Networks)
 
             trackedIpv4Networks = rearrangeNetworks(trackedIpv4Networks)
             trackedIpv6Networks = rearrangeNetworks(trackedIpv6Networks)
@@ -1137,8 +1143,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
          */
         private suspend fun redoReachabilityIfNeeded(
             ipv4: LinkedHashSet<NetworkProperties>,
-            ipv6: LinkedHashSet<NetworkProperties>,
-            opPrefs: OpPrefs
+            ipv6: LinkedHashSet<NetworkProperties>
         ) {
             if (ipv4.isEmpty() && ipv6.isEmpty()) {
                 reachabilityCount++
@@ -1147,7 +1152,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
 
                 val delay = TimeUnit.SECONDS.toMillis(10 * reachabilityCount)
                 delay(delay)
-                handleMessage(opPrefs)
+                redrive()
             } else {
                 Logger.d(LOG_TAG_CONNECTION, "reset reachability count, prev: $reachabilityCount")
                 // reset the reachability count
@@ -1172,7 +1177,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             }
             val cn = currentNetworks.map { it.network.networkHandle }.toHashSet()
             val nn = newNetworks.map { it.network.networkHandle }.toHashSet()
-            return Sets.symmetricDifference(cn, nn).isNotEmpty()
+            return cn != nn
         }
 
         /**

@@ -17,13 +17,17 @@ package com.celzero.bravedns.customdownloader
 
 import Logger
 import Logger.LOG_TAG_DOWNLOAD
+import Logger.LOG_TAG_VPN
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.IpInfo
 import com.celzero.bravedns.database.IpInfoRepository
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
+import inet.ipaddr.IPAddressString
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.converter.gson.GsonConverterFactory
@@ -46,6 +50,13 @@ object IpInfoDownloader: KoinComponent {
             return
         }
 
+        val isLanIp = isLanIp(ipToLookup)
+        if (isLanIp == null || isLanIp) {
+            // if the ip is LAN IPv4 or IPv6, skip download
+            Logger.vv(LOG_TAG_DOWNLOAD, "$TAG; lan-ip ($ipToLookup), skip download")
+            return
+        }
+
         // check in database whether the ip info is already downloaded
         val ipInfo = db.getIpInfo(ipToLookup)
         if (ipInfo != null) {
@@ -57,6 +68,18 @@ object IpInfoDownloader: KoinComponent {
         val downloadSuccessful = performIpInfoDownload(ipToLookup)
         Logger.d(LOG_TAG_DOWNLOAD, "$TAG; download complete, success? $downloadSuccessful")
     }
+
+    private fun isLanIp(ipAddress: String): Boolean? {
+        try {
+            val ip = IPAddressString(ipAddress).address ?: return null
+
+            return ip.isLoopback || ip.isLocal || ip.isAnyLocal || UNSPECIFIED_IP_IPV4.equals(ip) || UNSPECIFIED_IP_IPV6.equals(ip)
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "err in isLanIp ${e.message}", e)
+        }
+        return null
+    }
+
 
     private suspend fun performIpInfoDownload(ipToLookup: String): Boolean {
         if (DEBUG) OkHttpDebugLogging.enableHttp2()

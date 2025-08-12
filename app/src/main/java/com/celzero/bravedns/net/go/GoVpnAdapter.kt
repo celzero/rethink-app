@@ -939,6 +939,7 @@ class GoVpnAdapter : KoinComponent {
                 Logger.i(LOG_TAG_VPN, "$TAG wg proxy not found in tunnel $id, proceed adding")
             }
 
+            val wgFiles = WireguardManager.getConfigFilesById(proxyId)
             val wgConfig = WireguardManager.getConfigById(proxyId)
             val isOneWg = WireguardManager.getOneWireGuardProxyId() == proxyId
             if (!isOneWg) checkAndAddProxyForHopIfNeeded(id)
@@ -1021,14 +1022,15 @@ class GoVpnAdapter : KoinComponent {
         Logger.i(LOG_TAG_VPN, "$TAG close connection: $connIds, res: $res")
     }
 
-    suspend fun refreshOrReAddProxies() {
+    suspend fun refreshOrPauseOrResumeOrReAddProxies(canResumeMobileOnlyWg: Boolean) {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing proxies")
             return
         }
         try {
+            // refresh proxies should never return error/exception
             val res = getProxies()?.refreshProxies()
-            Logger.i(LOG_TAG_VPN, "$TAG refresh proxies: $res")
+            Logger.i(LOG_TAG_VPN, "$TAG wg refresh proxies: $res, can resume mobile? $canResumeMobileOnlyWg")
             // re-add the proxies if the its not available in the tunnel
             val wgConfigs: List<Config> = WireguardManager.getActiveConfigs()
             if (wgConfigs.isEmpty()) {
@@ -1039,18 +1041,33 @@ class GoVpnAdapter : KoinComponent {
             // TNT means proxy UP but not responding
             wgConfigs.forEach {
                 val id = ID_WG_BASE + it.getId()
+                val files = WireguardManager.getConfigFilesById(it.getId())
+                // skip one-wg proxy, mobile-only doesn't apply
+                val isWireGuardMobileOnly = files?.useOnlyOnMetered == true && !files.oneWireGuard
+                val canResume = isWireGuardMobileOnly && canResumeMobileOnlyWg
+
                 val stats = getProxyStatusById(id).first
                 if (stats == null || stats == Backend.TNT) {
-                    Logger.w(LOG_TAG_VPN, "$TAG proxy stats for $id is null or tnt, re-adding")
+                    Logger.w(LOG_TAG_VPN, "$TAG proxy stats for $id is null or tnt, $stats, re-adding")
                     // there are cases where the proxy needs to be re-added, so pingOrReAddProxy
                     // case: some of the wg proxies are added to tunnel but not erring out, so
                     // re-adding those proxies seems working, work around for now
                     // now re-add logic is handled in go-tun
                     addWgProxy(id, true)
+                } else if (stats == Backend.TPU && canResume) {
+                    // if the proxy is paused, then resume it
+                    // this is needed when the tunnel is reconnected and the proxies are paused
+                    // so resume them
+                    val res = getProxies()?.getProxy(id.togs())?.resume()
+                    Logger.i(LOG_TAG_VPN, "$TAG resumed proxy: $id, res: $res")
+                } else if (isWireGuardMobileOnly && !canResumeMobileOnlyWg) {
+                    // if the proxy is not paused, then pause it
+                    val res = getProxies()?.getProxy(id.togs())?.pause()
+                    Logger.i(LOG_TAG_VPN, "$TAG paused proxy: $id, res: $res")
                 }
             }
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_VPN, "$TAG err refreshing proxies: ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "$TAG err refreshing proxies: ${e.message}", e)
         }
     }
 
@@ -1061,6 +1078,28 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) {
             Logger.w(LOG_TAG_VPN, "$TAG err getting proxy stats($id): ${e.message}")
             null
+        }
+    }
+
+    suspend fun pauseWireguard(id: String): Boolean {
+        return try {
+            val res = getProxies()?.getProxy(id.togs())?.pause()
+            Logger.i(LOG_TAG_VPN, "$TAG paused wg proxy: $id, res: $res")
+            res ?: false
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "$TAG err pausing wg proxy($id): ${e.message}", e)
+            false
+        }
+    }
+
+    suspend fun resumeWireguard(id: String): Boolean {
+        return try {
+            val res = getProxies()?.getProxy(id.togs())?.resume()
+            Logger.i(LOG_TAG_VPN, "$TAG resumed wg proxy: $id, res: $res")
+            res ?: false
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "$TAG err resuming wg proxy($id): ${e.message}", e)
+            false
         }
     }
 
@@ -1178,7 +1217,7 @@ class GoVpnAdapter : KoinComponent {
     private fun newDefaultTransport(url: String): DefaultDNS? {
         val fallbackDns = getDefaultFallbackDns()
         try {
-            // when the url is empty, set the default transport to 8.8.4.4, 2001:4860:4860::8844 or
+            // when the url is empty, set the default transport to 9.9.9.9, 2620:fe::fe or
             // null based on the value of SKIP_DEFAULT_DNS_ON_INIT
             if (url.isEmpty()) { // empty url denotes default dns set to none (system dns)
                 if (SKIP_DEFAULT_DNS_ON_INIT && !persistentState.routeRethinkInRethink) {
@@ -1902,7 +1941,7 @@ class GoVpnAdapter : KoinComponent {
         try {
             Intra.experimental(value)
             // refresh proxies on experimental settings change (required for wireguard)
-            refreshOrReAddProxies()
+            //refreshOrReAddProxies()
             Logger.i(LOG_TAG_VPN, "$TAG set experimental settings: $value")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err set experimental settings: ${e.message}", e)

@@ -43,6 +43,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         private const val FAV_ICON_NEXTDNS_BASE_URL = "https://favicons.nextdns.io/"
         private const val FAV_ICON_SIZE = "@2x.png"
         private const val CACHE_BUILDER_MAX_SIZE = 10000L
+        private const val DEFAULT_DELAY = 15000L // 15 seconds
 
         private val failedFavIconUrls: Cache<String, Boolean> =
             CacheBuilder.newBuilder().maximumSize(CACHE_BUILDER_MAX_SIZE).build()
@@ -72,6 +73,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
 
     override fun run() {
         Process.setThreadPriority(Process.THREAD_PRIORITY_LOWEST)
+
         // url will have . at end of the file, which needs to be removed.
         val fdqnUrl = url.dropLastWhile { it == '.' }
 

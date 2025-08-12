@@ -485,6 +485,7 @@ class SummaryStatisticsAdapter(
             when (input) {
                 DomainConnectionsActivity.InputType.DOMAIN -> {
                     intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_DOMAIN, appConnection.appOrDnsName)
+                    intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, false)
                 }
                 DomainConnectionsActivity.InputType.ASN -> {
                     intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_ASN, appConnection.appOrDnsName)

@@ -61,6 +61,9 @@ interface WgConfigFilesDAO {
     @Query("update WgConfigFiles set isCatchAll = :isCatchAll, oneWireGuard = 0 where id = :id")
     fun updateCatchAllConfig(id: Int, isCatchAll: Boolean)
 
+    @Query("update WgConfigFiles set useOnlyOnMetered = :isMobile where id = :id")
+    fun updateMobileConfig(id: Int, isMobile: Boolean)
+
     @Query("update WgConfigFiles set oneWireGuard = :oneWireGuard where id = :id")
     fun updateOneWireGuardConfig(id: Int, oneWireGuard: Boolean)
 

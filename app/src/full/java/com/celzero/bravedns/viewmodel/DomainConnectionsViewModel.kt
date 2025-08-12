@@ -58,7 +58,8 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
         flag.postValue("")
     }
 
-    fun setDomain(domain: String) {
+    fun setDomain(domain: String, isBlocked: Boolean) {
+        this.isBlocked = isBlocked
         domains.postValue(domain)
     }
 
@@ -67,8 +68,8 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
     }
 
     fun setAsn(asn: String, isBlocked: Boolean) {
-        this.asn.postValue(asn)
         this.isBlocked = isBlocked
+        this.asn.postValue(asn)
     }
 
     fun timeCategoryChanged(tc: TimeCategory) {
@@ -103,7 +104,7 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
 
     private fun fetchDomainConnections(input: String) =
         Pager(PagingConfig(pageSize = Constants.LIVEDATA_PAGE_SIZE)) {
-            statsDao.getDomainDetails(input, startTime.value!!)
+            statsDao.getDomainDetails(input, startTime.value!!, isBlocked)
         }.liveData.cachedIn(viewModelScope)
 
     private fun fetchFlagConnections(input: String) =

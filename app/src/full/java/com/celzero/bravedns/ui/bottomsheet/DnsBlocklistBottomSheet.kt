@@ -52,6 +52,7 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
+import com.celzero.bravedns.ui.activity.DomainConnectionsActivity.Companion.INTENT_EXTRA_IS_BLOCKED
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Themes
@@ -437,7 +438,9 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TYPE, DomainConnectionsActivity.InputType.DOMAIN.type)
         intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_DOMAIN, domain)
         intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TIME_CATEGORY, DomainConnectionsViewModel.TimeCategory.SEVEN_DAYS.value)
+        intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, log!!.isBlocked)
         requireContext().startActivity(intent)
+        this.dismiss()
     }
 
     private fun showBlocklistDialog(groupNames: Multimap<String, String>) {
@@ -552,10 +555,8 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         }
 
         if (log!!.isAnonymized()) { // anonymized queries answered by dns-crypt / proxies
-            val p = if (log!!.relayIP.isEmpty()) {
+            val p = log!!.relayIP.ifEmpty {
                 log!!.proxyId
-            } else {
-                log!!.relayIP
             }
             val text = getString(R.string.dns_btm_resolved_crypt, uptime, log!!.serverIP, p)
             b.dnsBlockBlockedDesc.text = htmlToSpannedText(text)

@@ -864,7 +864,7 @@ object Utilities {
     }
 
     fun isNetworkSame(n1: Network?, n2: Network?): Boolean {
-        if (n1 == null || n2 == null) return false
+        if (n1 == null || n2 == null) return n1 == n2
 
         return n1.networkHandle == n2.networkHandle
     }

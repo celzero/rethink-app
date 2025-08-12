@@ -64,6 +64,10 @@ class WgConfigFilesRepository(private val wgConfigFilesDAO: WgConfigFilesDAO) {
         wgConfigFilesDAO.updateCatchAllConfig(id, isCatchAll)
     }
 
+    suspend fun updateMobileConfig(id: Int, isMobile: Boolean) {
+        wgConfigFilesDAO.updateMobileConfig(id, isMobile)
+    }
+
     suspend fun updateOneWireGuardConfig(id: Int, owg: Boolean) {
         wgConfigFilesDAO.updateOneWireGuardConfig(id, owg)
     }

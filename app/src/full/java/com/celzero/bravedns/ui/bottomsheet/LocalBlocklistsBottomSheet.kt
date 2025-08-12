@@ -273,7 +273,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         builder.setTitle(R.string.lbl_delete)
         builder.setMessage(getString(R.string.local_blocklist_delete_desc))
         builder.setCancelable(false)
-        builder.setPositiveButton(getString(R.string.settings_local_blocklist_dialog_positive)) {
+        builder.setPositiveButton(getString(R.string.lbl_delete)) {
             _: DialogInterface, _: Int ->
             deleteLocalBlocklist()
         }

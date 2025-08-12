@@ -39,6 +39,7 @@ import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.scheduler.WorkScheduler.Companion.BLOCKLIST_UPDATE_CHECK_JOB_TAG
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
@@ -98,7 +99,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         updateLocalBlocklistUi()
         showNewBadgeIfNeeded()
     }
-
 
     private fun showNewBadgeIfNeeded() {
         val smart = NewSettingsManager.shouldShowBadge(NewSettingsManager.SMART_DNS)
@@ -173,6 +173,36 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         }
     }
 
+    private fun updateLatency(dnsType: String = b.connectedStatusTitleUrl.text.toString()) {
+        io {
+            val prefId = if (appConfig.isSmartDnsEnabled()) {
+                Backend.Plus
+            } else if (appConfig.isSystemDns()) {
+                Backend.System
+            } else {
+                Backend.Preferred
+            }
+            val dnsId = if (WireguardManager.oneWireGuardEnabled()) {
+                val id = WireguardManager.getOneWireGuardProxyId()
+                if (id == null) {
+                    prefId
+                } else {
+                    "${ProxyManager.ID_WG_BASE}${id}"
+                }
+            } else {
+                prefId
+            }
+            val p50 = VpnController.p50(dnsId)
+            if (p50 <= 0L) return@io
+
+            uiCtx {
+                val latency = getString(R.string.dns_query_latency, p50.toString())
+                val text = getString(R.string.single_argument_parenthesis, latency)
+                b.connectedStatusTitleUrl.text = getString(R.string.two_argument_space, text, dnsType)
+            }
+        }
+    }
+
     private fun showSplitDnsUi() {
         if (isAtleastR()) {
             // show split dns by default only if the device is running on Android 12 or above
@@ -209,10 +239,12 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     }
 
     private fun updateConnectedStatus(connectedDns: String) {
+        var dnsType = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
         if (WireguardManager.oneWireGuardEnabled()) {
             b.connectedStatusTitleUrl.text =
                 resources.getString(R.string.configure_dns_connected_dns_proxy_status)
             b.connectedStatusTitle.text = resources.getString(R.string.lbl_wireguard)
+            updateLatency()
             return
         }
 
@@ -223,43 +255,52 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
         when (appConfig.getDnsType()) {
             AppConfig.DnsType.DOH -> {
+                dnsType = resources.getString(R.string.configure_dns_connected_doh_status)
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_doh_status)
                 b.connectedStatusTitle.text = dns
             }
             AppConfig.DnsType.DOT -> {
+                dnsType = resources.getString(R.string.lbl_dot)
                 b.connectedStatusTitleUrl.text = resources.getString(R.string.lbl_dot)
                 b.connectedStatusTitle.text = dns
             }
             AppConfig.DnsType.DNSCRYPT -> {
+                dnsType = resources.getString(R.string.configure_dns_connected_dns_crypt_status)
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_dns_crypt_status)
                 b.connectedStatusTitle.text = dns
             }
             AppConfig.DnsType.DNS_PROXY -> {
+                dnsType = resources.getString(R.string.configure_dns_connected_dns_proxy_status)
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_dns_proxy_status)
                 b.connectedStatusTitle.text = dns
             }
             AppConfig.DnsType.RETHINK_REMOTE -> {
+                dnsType = resources.getString(R.string.dc_rethink_dns)
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_doh_status)
                 b.connectedStatusTitle.text = dns
             }
             AppConfig.DnsType.SYSTEM_DNS -> {
+                dnsType = resources.getString(R.string.dc_dns_proxy)
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_dns_proxy_status)
                 b.connectedStatusTitle.text = dns
             }
             AppConfig.DnsType.ODOH -> {
+                dnsType = resources.getString(R.string.lbl_odoh)
                 b.connectedStatusTitleUrl.text = resources.getString(R.string.lbl_odoh)
                 b.connectedStatusTitle.text = dns
             }
             AppConfig.DnsType.SMART_DNS -> {
+                dnsType = resources.getString(R.string.smart_dns)
                 b.connectedStatusTitleUrl.text = resources.getString(R.string.smart_dns)
                 b.connectedStatusTitle.text = dns
             }
         }
+        updateLatency(dnsType)
     }
 
     private fun isSystemDns(): Boolean {

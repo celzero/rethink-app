@@ -56,6 +56,8 @@ object DomainRulesManager : KoinComponent {
 
     private val selectedCCs: MutableSet<String> = mutableSetOf()
 
+    private const val KV_SEP = ":"
+
     enum class Status(val id: Int) {
         NONE(0),
         BLOCK(1),
@@ -126,7 +128,7 @@ object DomainRulesManager : KoinComponent {
     }
 
     private fun mkTrieValue(status: String, proxyId: String, proxyCC: String): Gostr? {
-        return ("${status}${Backend.Vsep}${proxyId}${Backend.Vsep}${proxyCC}").togs()
+        return ("${status}$KV_SEP${proxyId}$KV_SEP${proxyCC}").togs()
     }
 
     suspend fun load(): Long {
@@ -184,7 +186,7 @@ object DomainRulesManager : KoinComponent {
             if (DEBUG) Logger.vv(LOG_TAG_DNS, "matchesWildcard: $domain($uid), no match found")
             return Status.NONE
         }
-        val status = match.split(Backend.Vsep)[0]
+        val status = match.split(KV_SEP)[0]
         val res = Status.getStatus(status.toIntOrNull())
         if (DEBUG) Logger.vv(LOG_TAG_DNS, "matchesWildcard: $domain($uid), res: $res")
         return res
@@ -198,7 +200,7 @@ object DomainRulesManager : KoinComponent {
             if (DEBUG) Logger.vv(LOG_TAG_DNS, "getDomainRule: $domain($uid), no match found")
             return Status.NONE
         }
-        val status = match.split(Backend.Vsep)[0]
+        val status = match.split(KV_SEP)[0]
         val res = Status.getStatus(status.toIntOrNull())
         if (DEBUG) Logger.vv(LOG_TAG_DNS, "getDomainRule: $domain($uid), res: $res")
         return res
@@ -213,7 +215,7 @@ object DomainRulesManager : KoinComponent {
             if (match.isNullOrEmpty()) {
                 return Pair("", "")
             }
-            val parts = match.split(Backend.Vsep)
+            val parts = match.split(KV_SEP)
 
             if (parts.size <= 2) return Pair("", "")
 
@@ -230,7 +232,7 @@ object DomainRulesManager : KoinComponent {
                 val wild = trie.getAny(key).tos()
                 if (wild.isNullOrEmpty()) return Pair("", "")
 
-                val wildParts = wild.split(Backend.Vsep)
+                val wildParts = wild.split(KV_SEP)
                 if (wildParts.size <= 2) return Pair("", "")
 
                 proxyId = wildParts[1]

@@ -108,7 +108,7 @@
     <string name="lbl_experimental" translatable="true">(experimental)</string>
     <string name="lbl_service_providers" translatable="true">Service Providers</string>
     <string name="lbl_search" translatable="false">Search</string>
-    <string name="lbl_hop" translatable="true">Relay</string>
+    <string name="lbl_hop" translatable="true">Relays</string>
     <string name="lbl_ipinfo_inc" translatable="false">IPinfo Inc.</string>
     <string name="lbl_manual" translatable="true">Manual</string>
 
@@ -149,7 +149,7 @@
     <string name="symbol_max" translatable="false">🪂</string>
     <string name="symbol_duck" translatable="false">🦆</string>
     <string name="symbol_mobile" translatable="false">📶</string>
-    <string name="symbol_satellite" translatable="false">📡</string>
+    <string name="symbol_satellite" translatable="false">🛰️</string>
 
     <string name="numeric_one" translatable="false">1</string>
     <string name="numeric_twenty_four" translatable="false">24</string>
@@ -469,7 +469,7 @@
 
 
     <string name="settings_mobile_metered_heading" translatable="true">Meter mobile networks</string>
-    <string name="settings_mobile_metered_desc" translatable="true">Always treat mobile networks as metered.</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Only treat mobile networks as metered, rest as unmetered.</string>
 
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback proxy forwarder apps</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">When disabled, excludes proxy (SOCKS5, HTTP, DNS) forwarder apps from Rethink\'s VPN tunnel.</string>
@@ -1656,9 +1656,9 @@
     <string name="ac_retry_options_title" translatable="true">strategy</string>
     <string name="ac_retry_options_desc" translatable="true">Set how retries work for censored connections.</string>
 
-    <string name="ac_retry_options_never_desc" translatable="true">Do not retry.</string>
+    <string name="ac_retry_options_never_desc" translatable="true">On failure, never retry anti-censorship techniques.</string>
 
-    <string name="ac_retry_options_with_split_desc" translatable="true">Apply anti-censorship technique when necessary.</string>
+    <string name="ac_retry_options_with_split_desc" translatable="true">Apply anti-censorship techniques when necessary.</string>
 
     <string name="lbl_always" translatable="true">Always</string>
     <string name="ac_retry_options_after_split_desc" translatable="true">Always apply anti-censorship techniques.</string>
@@ -1669,6 +1669,7 @@
 
     <string name="hop_error_toast_msg_1" translatable="true">Cannot relay, already %1$s</string>
     <string name="hop_error_toast_msg_2" translatable="true">No WireGuard available for relay; please add more.</string>
+    <string name="hop_error_toast_msg_3" translatable="true">Disable Mobile only to use Relays</string>
 
     <string name="mode_change_error_proxy_enabled" translatable="true">Cannot change modes when proxies are in use. Tap to &lt;u&gt;edit proxy settings&lt;/u&gt;.</string>
 
@@ -1736,8 +1737,8 @@
 
     <string name="local_blocklist_delete_desc" translatable="true">Delete on-device blocklists?</string>
 
-    <string name="fail_open_network_title" translatable="true">Do not stall on network loss</string>
-    <string name="fail_open_network_desc" translatable="true">When disabled, Rethink stalls all data when no connectivity is available, like in <i>Airplane Mode</i>.</string>
+    <string name="fail_open_network_title" translatable="true">Stall on network loss</string>
+    <string name="fail_open_network_desc" translatable="true">When enabled, Rethink stalls all data when no connectivity is available, like in <i>Airplane Mode</i>.</string>
 
     <string name="about_license" translatable="true">Licensed under APLv2</string>
 
@@ -1753,6 +1754,8 @@
 
     <string name="custom_rules_proxy_title" translatable="false">Proxy rules</string>
     <string name="custom_rules_proxy_desc" translatable="false">Select a proxy to use for this rule.</string>
+
+    <string name="wg_mobile_only_hop_err" translatable="true">Mobile-only mode is not supported for Relays</string>
 
     <!-- alert, commenting out for now in v055b -->
 

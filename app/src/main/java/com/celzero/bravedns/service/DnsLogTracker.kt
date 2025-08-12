@@ -37,6 +37,9 @@ import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.Utilities.makeAddressPair
 import com.celzero.bravedns.util.Utilities.normalizeIp
 import com.celzero.firestack.backend.DNSSummary
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -214,7 +217,7 @@ internal constructor(
         }
 
         if (persistentState.fetchFavIcon) {
-            fetchFavIcon(context, dnsLog)
+            io { fetchFavIcon(context, dnsLog) }
         }
 
         // fetch appName and packageName from uid
@@ -286,5 +289,9 @@ internal constructor(
         if (transaction == null) return false
 
         return transaction.serverName.isEmpty()
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch { f() }
     }
 }

@@ -449,24 +449,34 @@
                         android:textSize="@dimen/large_font_text_view"
                         app:rippleColor="?attr/secondaryTextColor" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/hop_btn"
-                        style="@style/Widget.AppCompat.Button"
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginStart="30dp"
                         android:layout_marginTop="10dp"
                         android:layout_marginEnd="30dp"
-                        android:alpha="0.75"
                         android:background="@drawable/rectangle_border_background"
-                        android:foreground="?attr/selectableItemBackground"
-                        android:gravity="center"
-                        android:padding="15dp"
-                        android:text="@string/hop_add_remove_title"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:textSize="@dimen/large_font_text_view"
-                        app:rippleColor="?attr/secondaryTextColor" />
+                        android:gravity="center_vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/hop_btn"
+                            style="@style/Widget.AppCompat.Button"
+                            android:background="@null"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_centerInParent="true"
+                            android:foregroundGravity="center"
+                            android:alpha="0.75"
+                            android:drawablePadding="10dp"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:gravity="center"
+                            android:padding="15dp"
+                            android:text="@string/hop_add_remove_title"
+                            android:textColor="?attr/secondaryTextColor"
+                            android:textSize="@dimen/large_font_text_view" />
+                    </RelativeLayout>
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/logs_btn"

@@ -72,7 +72,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val RPN_MODE = "rpn_mode"
         const val DIAL_TIMEOUT_SEC = "dial_timeout_sec"
         const val AUTO_DIALS_PARALLEL = "auto_dials_parallel"
-        const val FAIL_OPEN_ON_NO_NETWORK = "fail_open_on_no_network"
+        const val STALL_ON_NO_NETWORK = "fail_open_on_no_network"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -367,10 +367,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // perform auto or manual network connectivity checks
     var performAutoNetworkConnectivityChecks by booleanPref("perform_auto_network_connectivity_checks").withDefault<Boolean>(true)
 
-    // fail-open on no network
+    // stall on no network
     // TODO: add routes as normal but do not send fd to netstack
     // repopulateTrackedNetworks also fails open see isAnyNwValidated
-    var failOpenOnNoNetwork by booleanPref("fail_open_on_no_network").withDefault<Boolean>(false)
+    var stallOnNoNetwork by booleanPref("fail_open_on_no_network").withDefault<Boolean>(false)
 
     // last grace period reminder time, when rethinkdns+ is enabled and user is cancelled/expired
     // this is used to show a reminder to the user to renew the subscription with grace period

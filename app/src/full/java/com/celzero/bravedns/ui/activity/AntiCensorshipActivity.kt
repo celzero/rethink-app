@@ -206,6 +206,9 @@ class AntiCensorshipActivity : AppCompatActivity(R.layout.activity_anti_censorsh
             if (mode == DialStrategies.NEVER_SPLIT.mode) {
                 // disable retry radio buttons for never split
                 handleRetryMode(true, RetryStrategies.RETRY_NEVER.mode, showToast = false)
+            } else if (mode == DialStrategies.SPLIT_AUTO.mode) {
+                // enable retry radio buttons for desync
+                handleRetryMode(true, RetryStrategies.RETRY_WITH_SPLIT.mode, showToast = false)
             }
         } else {
             // no-op

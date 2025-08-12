@@ -56,6 +56,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
+import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_4
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openUrl
@@ -63,6 +64,7 @@ import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.sendEmailIntent
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
@@ -141,10 +143,23 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             val v = getString(R.string.about_version_install_source, version, getDownloadSource())
 
             val build = VpnController.goBuildVersion(false)
-            b.aboutAppVersion.text = "$v\n$build"
+            val updatedTs = getLastUpdatedTs()
+            b.aboutAppVersion.text = "$v\n$build\n$updatedTs"
 
         } catch (e: PackageManager.NameNotFoundException) {
             Logger.w(LOG_TAG_UI, "err-version-info; pkg name not found: ${e.message}", e)
+        }
+    }
+
+    private fun getLastUpdatedTs(): String {
+        val pInfo: PackageInfo? = getPackageMetadata(requireContext().packageManager, requireContext().packageName)
+        // TODO: modify this to use the latest version code api
+        val updatedTs = pInfo?.lastUpdateTime ?: return ""
+        return if (updatedTs > 0) {
+            val updatedDate = Utilities.convertLongToTime(updatedTs, TIME_FORMAT_4)
+            updatedDate
+        } else {
+            ""
         }
     }
 
