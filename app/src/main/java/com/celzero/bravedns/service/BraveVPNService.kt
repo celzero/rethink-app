@@ -247,6 +247,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         private const val WIN_LAST_CONNECTED_THRESHOLD_MS = 60 * 60 * 1000L // 60 minutes
 
         private const val DATA_STALL_THRESHOLD_MS = 30 * 1000L // 30 seconds
+
+        // vpnRoutes are only used for diagnostics, the current implementation will taken
+        // into account the vpn routes are handled properly, case: do not route private ips
+        private const val RECONCILE_WITH_VPN_ROUTES = false
     }
 
     private var lastSubscriptionCheckTime: Long = 0
@@ -2267,11 +2271,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     setAutoDialsParallel()
                 }
             }
-            PersistentState.FAIL_OPEN_ON_NO_NETWORK -> {
-                io("failOpenOnNoNetwork") {
+            PersistentState.STALL_ON_NO_NETWORK -> {
+                io("stallOnNoNetwork") {
                     notifyConnectionMonitor()
                 }
-                val reason = "failOpenOnNoNetwork: ${persistentState.stallOnNoNetwork}"
+                val reason = "stallOnNoNetwork: ${persistentState.stallOnNoNetwork}"
                 vpnRestartTrigger.value = reason
             }
         }
@@ -2716,10 +2720,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     private fun getUnderlays(): Array<Network>? {
         val networks = underlyingNetworks
-        val failOpenOnNoNetwork = persistentState.stallOnNoNetwork
+        val failOpen = !persistentState.stallOnNoNetwork
+        val setNullOnVpnLockdown = false
+        val mustSetNullOnVpnLockdown = VpnController.isVpnLockdown() && setNullOnVpnLockdown
         if (networks == null) {
-            Logger.w(LOG_TAG_VPN, "getUnderlays: null nws; fail-open? $failOpenOnNoNetwork")
-            return if (failOpenOnNoNetwork) { // failing open on no nw
+            Logger.w(LOG_TAG_VPN, "getUnderlays: null nws; fail-open? $failOpen")
+            return if (failOpen || mustSetNullOnVpnLockdown) { // failing open on no nw / lockdown
                 null // use whichever network is active, whenever it becomes active
             } else {
                 emptyArray() // deny all traffic; fail closed
@@ -2742,7 +2748,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 distinctNetworks.toTypedArray() // use all networks
             }
         } else {
-            if (failOpenOnNoNetwork) { // failing open on no nw
+            if (failOpen || mustSetNullOnVpnLockdown) { // failing open on no nw / lockdown
                 null // use whichever network is active, whenever it becomes active
             } else {
                 emptyArray() // deny all traffic; fail closed
@@ -2751,7 +2757,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         Logger.i(
             LOG_TAG_VPN,
-            "getUnderlays: use active? ${networks.useActive}; fail-open? $failOpenOnNoNetwork; networks: ${underlays?.size}; null-underlay? ${underlays == null}"
+            "getUnderlays: use active? ${networks.useActive}; fail-open? $failOpen; lockdown? $mustSetNullOnVpnLockdown; networks: ${underlays?.size}; null-underlay? ${underlays == null}"
         )
         if (!hasUnderlyingNetwork) {
             Logger.w(LOG_TAG_VPN, "getUnderlays: no underlying networks found")
@@ -2783,7 +2789,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             tunUnderlyingNetworks = underlyingNws?.joinToString()
 
             logd(
-                "underyiny: ${underlyingNws?.joinToString()}, mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}), tun: ${tunMtu()}; routes? $isRoutesChanged, bound-nws? $isBoundNetworksChanged, updatedTs: ${networks.lastUpdated}"
+                "underlays: ${underlyingNws?.joinToString()}, mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}), tun: ${tunMtu()}; routes? $isRoutesChanged, bound-nws? $isBoundNetworksChanged, updatedTs: ${networks.lastUpdated}"
             )
 
             // restart vpn if the routes or when mtu changes
@@ -2906,8 +2912,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         // when the nws are null from the connection monitor, then consider the builder routes
         // as the new routes
-        val vpnHas4 = new.vpnRoutes?.first ?: builderHas4
-        val vpnHas6 = new.vpnRoutes?.second ?: builderHas6
+
+        var vpnHas4 = builderHas4
+        var vpnHas6 = builderHas6
+        if (RECONCILE_WITH_VPN_ROUTES) {
+            vpnHas4 = new.vpnRoutes?.first ?: builderHas4
+            vpnHas6 = new.vpnRoutes?.second ?: builderHas6
+        }
 
         val n = Networks(new, aux)
         val (tunWants4, tunWants6) = determineRoutes(n)
@@ -3251,7 +3262,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             has6 = route6(n2)
         }
         if (!has4 && !has6) {
-            val failOpen = persistentState.stallOnNoNetwork
+            val failOpen = !persistentState.stallOnNoNetwork
             // no route available for both v4 and v6, add all routes
             // connectivity manager is expected to retry when no route is available
             // see ConnectionMonitor#repopulateTrackedNetworks

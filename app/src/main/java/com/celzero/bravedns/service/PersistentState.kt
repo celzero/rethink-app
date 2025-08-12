@@ -72,7 +72,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val RPN_MODE = "rpn_mode"
         const val DIAL_TIMEOUT_SEC = "dial_timeout_sec"
         const val AUTO_DIALS_PARALLEL = "auto_dials_parallel"
-        const val FAIL_OPEN_ON_NO_NETWORK = "fail_open_on_no_network"
+        const val STALL_ON_NO_NETWORK = "fail_open_on_no_network"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
