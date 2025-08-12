@@ -726,7 +726,7 @@
     <string name="fapps_exclude_block_dialog_message" translatable="true"><i> பட்டியலிடப்பட்ட </i> டிஎன்எச் மற்றும் ஃபயர்வாலில் இருந்து பயன்பாடுகளை விலக்கு?</string>
     <string name="fapps_isolate_block_dialog_title" translatable="true">பயன்பாடுகளை தனிமைப்படுத்தவும்</string>
     <string name="fapps_firewall_filter_hint" translatable="true">அனைத்து பயன்பாடுகளையும் காட்டுகிறது</string>
-    <string name="fapps_firewall_filter_desc" translatable="true"><![CDATA[Showing <u>%1$s</u> %2$s செயலிகள்]]></string>
+    <string name="fapps_firewall_filter_desc" translatable="true">Showing &lt;u&gt;%1$s&lt;/u&gt; %2$s செயலிகள்</string>
     <string name="rules_load_failure_heading" translatable="true">குறிப்பு</string>
     <string name="rules_load_failure_desc" translatable="true">ஃபயர்வால் விதிகள் எதுவும் கிடைக்கவில்லை</string>
     <string name="network_log_app_name_unnamed" translatable="true">பெயரிடப்படாத (%1$s)</string>
@@ -884,7 +884,7 @@
     <string name="cd_dialog_edittext_hint" translatable="true">%1$s ஐ உள்ளிடவும்</string>
     <string name="cd_blocked_initial" translatable="true">B</string>
     <string name="ci_trust_txt" translatable="true">நம்பகமான</string>
-    <string name="ada_firewall_status" translatable="true">&lt;! [CDATA [இந்த பயன்பாடு &lt;b&gt; &lt;i&gt;%1$s &lt;/i&gt; &lt;/b&gt;</string>
+    <string name="ada_firewall_status" translatable="true"><![CDATA[இந்த பயன்பாடு <b><i>%1$s</i></b>.]]></string>
     <string name="ada_ip_connection_count" translatable="true">%1$s ஐபி முகவரியுடன் இணைக்கப்பட்டுள்ளது (ES)</string>
     <string name="ada_app_status_block" translatable="true">தடுக்கப்பட்டுள்ளது</string>
     <string name="ada_app_status_block_wifi" translatable="true">அளவிடப்படாத (வைஃபை) நெட்வொர்க்குகளில் தடுக்கப்பட்டுள்ளது</string>
@@ -1025,10 +1025,14 @@
     <string name="crypt_cleanbrowsing_family_desc" translatable="true">அனைத்து வயதுவந்த, ஆபாச மற்றும் வெளிப்படையான தளங்களுக்கும் அணுகலைத் தடுக்கிறது. வடிப்பான்களைத் தவிர்ப்பதற்குப் பயன்படுத்தப்படும் பதிலாள் மற்றும் விபிஎன் களங்களையும் இது தடுக்கிறது. கலப்பு உள்ளடக்க தளங்களும் (ரெடிட் போன்றவை) தடுக்கப்படுகின்றன. கூகிள், பிங் மற்றும் யூடியூப் ஆகியவை பாதுகாப்பான பயன்முறையில் அமைக்கப்பட்டுள்ளன.</string>
     <string name="crypt_relay_netherlands" translatable="true">அநாமதேயப்படுத்தப்பட்ட டி.என்.எச் ரிலே நெதர்லாந்தில் வழங்கப்பட்டது</string>
     <string name="crypt_relay_france" translatable="true">பிரான்சின் பாரிசில் வழங்கப்பட்ட அநாமதேய டி.என்.எச் ரிலே https://cryptostrom.is/ வழங்கியது.</string>
-    <string name="dns_btm_sheet_dialog_ips" translatable="true"><Data><![CDATA[ %1$s %2$s <br/>]]></Data></string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true">
+        <Data><![CDATA[ %1$s %2$s <br/>]]></Data>
+    </string>
     <string name="memory_notification_text">ரீடிங்க் குறைந்த நினைவகத்தை அனுபவிக்கிறது. கணினி நடவடிக்கைகள் குறைவாக இருக்கலாம்.</string>
     <string name="lbl_notification" translatable="true">அறிவிப்பு</string>
-    <string name="dns_btm_sheet_dialog_message" translatable="true"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s தடுபட்டியல்(கள்)</h3>%3$s.<br/><br/>]]></Data></string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true">
+        <Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s தடுபட்டியல்(கள்)</h3>%3$s.<br/><br/>]]></Data>
+    </string>
     <string name="lbl_test" translatable="true">தேர்வு</string>
     <string name="lbl_protos" translatable="true">புரோட்டியா</string>
     <string name="lbl_experimental" translatable="true">(சோதனை)</string>
