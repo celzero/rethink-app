@@ -73,8 +73,6 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
 
     override fun run() {
         Process.setThreadPriority(Process.THREAD_PRIORITY_LOWEST)
-        // add a delay for 15 seconds before fetching the fav icon
-        Thread.sleep(DEFAULT_DELAY)
 
         // url will have . at end of the file, which needs to be removed.
         val fdqnUrl = url.dropLastWhile { it == '.' }

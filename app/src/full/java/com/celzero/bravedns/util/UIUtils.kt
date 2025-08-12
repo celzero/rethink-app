@@ -335,7 +335,7 @@ object UIUtils {
         return fetchColor(context, attributeFetch)
     }
 
-    fun fetchFavIcon(context: Context, dnsLog: DnsLog) {
+    suspend fun fetchFavIcon(context: Context, dnsLog: DnsLog) {
         if (dnsLog.groundedQuery()) return
 
         if (isDgaDomain(dnsLog.queryStr)) return
