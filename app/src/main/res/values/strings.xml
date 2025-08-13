@@ -841,7 +841,7 @@
     <string name="about_translate_link" translatable="false">https://svc.rethinkdns.com/r/translate</string>
     <string name="about_privacy_policy_link" translatable="false">https://www.rethinkdns.com/privacy</string>
     <string name="about_terms_link" translatable="false">https://rethinkdns.com/terms</string>
-    <string name="about_license_link" translatable="false">https://github.com/celzero/rethink-app/blob/main/LICENSE</string>
+    <string name="about_license_link" translatable="false">https://opensource.org/license/apache-2-0</string>
     <string name="about_mastodom_handle" translatable="false">https://mastodon.social/@rdns</string>
     <string name="about_reddit_handle" translatable="false">https://www.reddit.com/r/rethinkdns</string>
     <string name="about_matrix_handle" translatable="false">https://matrix.to/#/!jrTSpJiEkFNNBMhSaE:matrix.org</string>
@@ -914,7 +914,7 @@
                                               <a href="https://t.me/kaliangel">kaliangel</a> /
                                               <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
                                               <br/>📌 Geo-IP <br/>
-                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IpInfo Lite</a><br/>
+                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPInfo Lite</a><br/>
                                               <br/>❇ Translations <br/>
                                               <a href="https://weblate.org/en/">Weblate</a><br/>
                                               <br/>🦆 Icons <br/>
@@ -1740,7 +1740,7 @@
     <string name="fail_open_network_title" translatable="true">Stall on network loss</string>
     <string name="fail_open_network_desc" translatable="true">When enabled, Rethink stalls all data when no connectivity is available, like in <i>Airplane Mode</i>.</string>
 
-    <string name="about_license" translatable="true">Licensed under APLv2</string>
+    <string name="about_license" translatable="true">Licensed under Apache-2.0</string>
 
     <string name="close_all" translatable="true">Close All</string>
 
