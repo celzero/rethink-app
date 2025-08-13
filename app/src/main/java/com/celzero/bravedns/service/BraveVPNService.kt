@@ -192,6 +192,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private var dnsQueryDispatcher = Daemons.ioDispatcher("onQuery", DNSOpts(), vpnScope)
     private var proxyAddedDispatcher = Daemons.ioDispatcher("proxyAdded", Unit, vpnScope)
 
+    // TODO: remove volatile
     @Volatile
     private var builderStats: String = ""
     @Volatile
@@ -2658,44 +2659,56 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     // TODO: #294 - Figure out a way to show users that the device is offline instead of status as
     // failing.
-    override suspend fun onNetworkDisconnected(networks: ConnectionMonitor.UnderlyingNetworks) {
+    suspend fun onNetworkDisconnected(networks: ConnectionMonitor.UnderlyingNetworks) {
+        val old = underlyingNetworks
+        underlyingNetworks = networks
+
+        val underlyingNws = getUnderlays()
+        setUnderlyingNetworks(underlyingNws)
+        tunUnderlyingNetworks = underlyingNws?.joinToString()
+        Logger.i(
+            LOG_TAG_VPN,
+            "onNetworkDisconnected: state: z, $networks, setUnderlying: ${underlyingNws?.joinToString()}, updatedTs: ${networks.lastUpdated}, underlying: ${networks.ipv4Net.size} ipv4, ${networks.ipv6Net.size} ipv6"
+        )
+
+        // always restart, because global var builderRoutes is set to only in builder, also
+        // need to set routes as well based on the protos
+        // TODO: do we need to restart if the network is not changed?
+        ioCtx("nwDisconnect") {
+            Logger.i(LOG_TAG_VPN, "$TAG; nw disconnect, routes/net/mtu changed, restart vpn")
+            val interestingChanges = interestingNetworkChanges(old = old, _new = networks)
+            // if there is no changes, then already a disconnection restart happened, no need to
+            // restart again, this will avoid unnecessary restarts
+            // some cases, onLost is called multiple times, so avoid restarting
+            if (interestingChanges.routesChanged || interestingChanges.netChanged || interestingChanges.mtuChanged) {
+                Logger.i(
+                    LOG_TAG_VPN,
+                    "$TAG; nw disconnect, routes/net/mtu changed, restart vpn"
+                )
+                val reason =
+                    "nwDisconnect, routes: ${interestingChanges.routesChanged}, net: ${interestingChanges.netChanged}, mtu: ${interestingChanges.mtuChanged}"
+                vpnRestartTrigger.value = reason
+                // pause mobile-only wgs on no network
+                pauseMobileOnlyWireGuardOnNoNw()
+                setNetworkAndDefaultDnsIfNeeded(true)
+                VpnController.onConnectionStateChanged(null)
+            } else {
+                Logger.i(
+                    LOG_TAG_VPN,
+                    "$TAG; nw disconnect, no routes/net/mtu changes, no restart"
+                )
+            }
+        }
+    }
+
+    override suspend fun onNetworkChange(networks: ConnectionMonitor.UnderlyingNetworks) {
         withContext(serializer) {
-            val old = underlyingNetworks
-            underlyingNetworks = networks
-
-            val underlyingNws = getUnderlays()
-            setUnderlyingNetworks(underlyingNws)
-            tunUnderlyingNetworks = underlyingNws?.joinToString()
-            Logger.i(LOG_TAG_VPN, "onNetworkDisconnected: state: z, $networks, setUnderlying: ${underlyingNws?.joinToString()}, updatedTs: ${networks.lastUpdated}, underlying: ${networks.ipv4Net.size} ipv4, ${networks.ipv6Net.size} ipv6")
-
-            // always restart, because global var builderRoutes is set to only in builder, also
-            // need to set routes as well based on the protos
-            // TODO: do we need to restart if the network is not changed?
-            ioCtx("nwDisconnect") {
-                Logger.i(LOG_TAG_VPN, "$TAG; nw disconnect, routes/net/mtu changed, restart vpn")
-                val interestingChanges = interestingNetworkChanges(old = old, _new = networks)
-                // if there is no changes, then already a disconnection restart happened, no need to
-                // restart again, this will avoid unnecessary restarts
-                // some cases, onLost is called multiple times, so avoid restarting
-                if (interestingChanges.routesChanged || interestingChanges.netChanged || interestingChanges.mtuChanged) {
-                    Logger.i(
-                        LOG_TAG_VPN,
-                        "$TAG; nw disconnect, routes/net/mtu changed, restart vpn"
-                    )
-                    val reason = "nwDisconnect, routes: ${interestingChanges.routesChanged}, net: ${interestingChanges.netChanged}, mtu: ${interestingChanges.mtuChanged}"
-                    vpnRestartTrigger.value = reason
-                    // pause mobile-only wgs on no network
-                    refreshOrPauseOrResumeOrReAddProxies()
-                    // remove the system dns
-                    prevDns = mutableSetOf()
-                    setNetworkAndDefaultDnsIfNeeded(true)
-                    VpnController.onConnectionStateChanged(null)
-                } else {
-                    Logger.i(
-                        LOG_TAG_VPN,
-                        "$TAG; nw disconnect, no routes/net/mtu changes, no restart"
-                    )
-                }
+            // TODO: skip if UnderlyingNetworks.lastUpdated is greater than previous one
+            val size = networks.ipv4Net.size + networks.ipv6Net.size
+            if (size > 0) {
+                onNetworkConnected(networks)
+            } else {
+                onNetworkDisconnected(networks)
             }
         }
     }
@@ -2772,83 +2785,82 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return underlays
     }
 
-    override suspend fun onNetworkConnected(networks: ConnectionMonitor.UnderlyingNetworks) {
-        withContext(serializer) {
-            val curnet = underlyingNetworks
-            val out = interestingNetworkChanges(curnet, networks)
-            val isRoutesChanged = hasRouteChangedInAutoMode(out)
-            val isBoundNetworksChanged = out.netChanged
-            val isMtuChanged = out.mtuChanged
-            underlyingNetworks = networks
+    suspend fun onNetworkConnected(networks: ConnectionMonitor.UnderlyingNetworks) {
+        val curnet = underlyingNetworks
+        val out = interestingNetworkChanges(curnet, networks)
+        val isRoutesChanged = hasRouteChangedInAutoMode(out)
+        val isBoundNetworksChanged = out.netChanged
+        val isMtuChanged = out.mtuChanged
+        underlyingNetworks = networks
 
-            // always reset the system dns server ip of the active network with the tunnel
-            setNetworkAndDefaultDnsIfNeeded(isRoutesChanged || isBoundNetworksChanged)
+        // always reset the system dns server ip of the active network with the tunnel
+        setNetworkAndDefaultDnsIfNeeded(isRoutesChanged || isBoundNetworksChanged)
 
-            val underlyingNws = getUnderlays()
-            setUnderlyingNetworks(underlyingNws)
-            tunUnderlyingNetworks = underlyingNws?.joinToString()
+        val underlyingNws = getUnderlays()
+        setUnderlyingNetworks(underlyingNws)
+        tunUnderlyingNetworks = underlyingNws?.joinToString()
 
-            logd(
-                "underlays: ${underlyingNws?.joinToString()}, mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}), tun: ${tunMtu()}; routes? $isRoutesChanged, bound-nws? $isBoundNetworksChanged, updatedTs: ${networks.lastUpdated}"
-            )
+        logd(
+            "underlays: ${underlyingNws?.joinToString()}, mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}), tun: ${tunMtu()}; routes? $isRoutesChanged, bound-nws? $isBoundNetworksChanged, stall? ${persistentState.stallOnNoNetwork}, updatedTs: ${networks.lastUpdated}"
+        )
 
-            // restart vpn if the routes or when mtu changes
-            if (isMtuChanged || isRoutesChanged) {
-                Logger.i(LOG_TAG_VPN, "$TAG; mtu/routes changed,  restart vpn")
-                ioCtx("nwConnect") {
-                    val reason = "nwConnect, mtu: $isMtuChanged, routes: $isRoutesChanged, bound-nws: $isBoundNetworksChanged"
-                    vpnRestartTrigger.value = reason
-                    // not needed as the refresh is done in go, TODO: remove below code later
-                    // only after set links and routes, wg can be refreshed
-                    // if (isRoutesChanged) {
-                    // Logger.v(LOG_TAG_VPN, "refresh wg after network change")
-                    // refreshProxies()
-                    // }
-                }
+        // restart vpn if the routes or when mtu changes
+        if (isMtuChanged || isRoutesChanged) {
+            Logger.i(LOG_TAG_VPN, "$TAG; mtu/routes changed,  restart vpn")
+            ioCtx("nwConnect") {
+                val reason =
+                    "nwConnect, mtu: $isMtuChanged, routes: $isRoutesChanged, bound-nws: $isBoundNetworksChanged"
+                vpnRestartTrigger.value = reason
+                // not needed as the refresh is done in go, TODO: remove below code later
+                // only after set links and routes, wg can be refreshed
+                // if (isRoutesChanged) {
+                // Logger.v(LOG_TAG_VPN, "refresh wg after network change")
+                // refreshProxies()
+                // }
             }
-
-            // now the proxy need to be either paused/resumed/refreshed/readded
-            // so no need to check for isRoutesChanged, even though the routes are same,
-            // the bound networks have changed, so either of the above operations are needed
-            // case: wireguard in mobile-only mode.
-            if (isBoundNetworksChanged) {
-                // Workaround for WireGuard connection issues after network change
-                // WireGuard may fail to connect to the server when the network changes.
-                Logger.i(LOG_TAG_VPN, "$TAG routes/bound-nws changed, refresh wg")
-                refreshOrPauseOrResumeOrReAddProxies() // takes care of adding the proxies if missing in tun
-            }
-
-            underlyingNetworks?.ipv4Net?.forEach {
-                it.linkProperties?.linkAddresses?.forEach { ips ->
-                    Logger.i(
-                        LOG_TAG_VPN,
-                        "IPv4 link Address: ${ips.address.hostAddress}, prefix: ${ips.prefixLength}, flags: ${ips.flags}, scope: ${ips.scope}, all: ${ips}"
-                    )
-                }
-            }
-
-            underlyingNetworks?.ipv6Net?.forEach {
-                it.linkProperties?.linkAddresses?.forEach { ips ->
-                    Logger.i(
-                        LOG_TAG_VPN,
-                        "IPv6 link Address: ${ips.address.hostAddress}, prefix: ${ips.prefixLength}, flags: ${ips.flags}, scope: ${ips.scope}, all: ${ips}"
-                    )
-                }
-            }
-
-            // no need to close the existing connections if the bound networks are changed
-            // observations on close connections:
-            // instagram video delays when the network changes, reconnects (5-10s), feeds take longer
-            // play store downloads completely broke when the network changes
-            // observations on not closing connections:
-            // instagram video delays when the network changes, reconnects (5-10s or more), feeds normal
-            // play store downloads continue when the network changes, resumes after reconnect (5-10s)
-            // so, not closing connections is better for user experience
-            /* if (isBoundNetworksChanged) {
-                logd("bound networks changed, close connections")
-                io("boundNetworksChanged") { vpnAdapter?.closeAllConnections() }
-            } */
         }
+
+        // now the proxy need to be either paused/resumed/refreshed/readded
+        // so no need to check for isRoutesChanged, even though the routes are same,
+        // the bound networks have changed, so either of the above operations are needed
+        // case: wireguard in mobile-only mode.
+        if (isBoundNetworksChanged) {
+            // Workaround for WireGuard connection issues after network change
+            // WireGuard may fail to connect to the server when the network changes.
+            Logger.i(LOG_TAG_VPN, "$TAG routes/bound-nws changed, refresh wg")
+            refreshOrPauseOrResumeOrReAddProxies() // takes care of adding the proxies if missing in tun
+        }
+
+        underlyingNetworks?.ipv4Net?.forEach {
+            it.linkProperties?.linkAddresses?.forEach { ips ->
+                Logger.i(
+                    LOG_TAG_VPN,
+                    "IPv4 link Address: ${ips.address.hostAddress}, prefix: ${ips.prefixLength}, flags: ${ips.flags}, scope: ${ips.scope}, all: ${ips}"
+                )
+            }
+        }
+
+        underlyingNetworks?.ipv6Net?.forEach {
+            it.linkProperties?.linkAddresses?.forEach { ips ->
+                Logger.i(
+                    LOG_TAG_VPN,
+                    "IPv6 link Address: ${ips.address.hostAddress}, prefix: ${ips.prefixLength}, flags: ${ips.flags}, scope: ${ips.scope}, all: ${ips}"
+                )
+            }
+        }
+
+        // no need to close the existing connections if the bound networks are changed
+        // observations on close connections:
+        // instagram video delays when the network changes, reconnects (5-10s), feeds take longer
+        // play store downloads completely broke when the network changes
+        // observations on not closing connections:
+        // instagram video delays when the network changes, reconnects (5-10s or more), feeds normal
+        // play store downloads continue when the network changes, resumes after reconnect (5-10s)
+        // so, not closing connections is better for user experience
+        /* if (isBoundNetworksChanged) {
+            logd("bound networks changed, close connections")
+            io("boundNetworksChanged") { vpnAdapter?.closeAllConnections() }
+        } */
     }
 
     fun tunMtu(): Int {
@@ -3024,12 +3036,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 }
             }
             io("setSystemAndDefaultDns") {
-                val same = if (prevDns.isEmpty()) {
-                    false
-                } else {
-                    // ref: kotlinlang.org/docs/equality.html#structural-equality
-                    dnsServers == prevDns
-                }
+                // ref: kotlinlang.org/docs/equality.html#structural-equality
+                val same = dnsServers == prevDns
+
                 Logger.i(
                     LOG_TAG_VPN,
                     "dns: $dnsServers, existing: $prevDns, force: $forceUpdate, same? $same"
@@ -3038,7 +3047,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     return@io
                 }
                 // set system dns whenever there is a change in network
-                prevDns = dnsServers
+                prevDns.clear()
+                prevDns.addAll(dnsServers)
                 val dns = dnsServers.map { it.hostAddress }
                 vpnAdapter?.setSystemDns(dns)
                 // set default dns server for the tunnel if none is set
@@ -4724,9 +4734,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val connId = connTracker.connId
         val uid = connTracker.uid
 
-        if (FirewallManager.isAppExcludedFromProxy(uid) && connTracker.blockedByRule == FirewallRuleset.RULE0.id) {
+        if (FirewallManager.isAppExcludedFromProxy(uid)) {
             logd("flow/inflow: app is excluded from proxy, returning Ipn.Base, $connId, $uid")
-            connTracker.blockedByRule = FirewallRuleset.RULE15.id
+            if (connTracker.blockedByRule == FirewallRuleset.RULE0.id) {
+                connTracker.blockedByRule = FirewallRuleset.RULE15.id
+            }
             return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid)
         }
         // here no need to check for paused proxies, as the default transport id is added
@@ -4898,6 +4910,22 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     suspend fun addWireGuardProxy(id: String) {
         logd("add wg from tunnel: $id")
         vpnAdapter?.addWgProxy(id)
+    }
+
+    suspend fun pauseMobileOnlyWireGuardOnNoNw() {
+        val activeWgs = WireguardManager.getActiveConfigs()
+        activeWgs.forEach { config ->
+            val map = WireguardManager.getConfigFilesById(config.getId())
+            if (map == null || !map.useOnlyOnMetered) {
+                // if the config is not using only on metered, then skip it
+                logd("pause wg from tunnel: ${config.getId()} is not using only on metered")
+                return@forEach
+            }
+            val id = ID_WG_BASE + config.getId()
+            logd("pause wg from tunnel: $id")
+            // pause the wireguard proxy, so that it won't be used for new connections
+            vpnAdapter?.pauseWireguard(id)
+        }
     }
 
     suspend fun refreshOrPauseOrResumeOrReAddProxies() {
@@ -5303,6 +5331,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         sb.append("   builderRoutes: ${builderRoutes}\n")
         sb.append("   fd: ${testFd.get()}\n")
         sb.append("   dns: ${dnsStats()}\n")
+        sb.append("   stall: ${persistentState.stallOnNoNetwork}\n")
         sb.append("   setUnderlyingNws: $tunUnderlyingNetworks\n")
         sb.append("   Underlay\n")
         sb.append("      4: ${n.underlyingNws?.ipv4Net?.size}\n")

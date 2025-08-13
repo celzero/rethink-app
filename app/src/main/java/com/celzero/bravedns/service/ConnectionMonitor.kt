@@ -51,21 +51,86 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
 
-class ConnectionMonitor(private val networkListener: NetworkListener, private val serializer: CoroutineDispatcher, private val scope: CoroutineScope) :
-    ConnectivityManager.NetworkCallback(), KoinComponent, DiagnosticsManager.DiagnosticsListener {
+class ConnectionMonitor(private val networkListener: NetworkListener, private val serializer: CoroutineDispatcher, private val scope: CoroutineScope) : KoinComponent, DiagnosticsManager.DiagnosticsListener {
 
     private val networkSet: MutableSet<Network> = ConcurrentHashMap.newKeySet()
 
     // create drop oldest channel to handle the network changes from the connectivity manager
     private lateinit var channel: Channel<OpPrefs>
 
+    val internetValidatedCallBack = object : ConnectivityManager.NetworkCallback () {
+        override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
+            scope.launch(CoroutineName("cmIntCap") + serializer) {
+                Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(1), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                addToNwSet(network)
+                sendNetworkChanges(isForceUpdate = true)
+            }
+        }
+
+        override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+            scope.launch(CoroutineName("cmIntLink") + serializer) {
+                Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(1), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                val res = networkSet.add(network) // ensure the network is added to the set
+                addToNwSet(network)
+                sendNetworkChanges(isForceUpdate = true)
+            }
+        }
+    }
+
+    val transportCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
+            scope.launch(CoroutineName("cmTransCap") + serializer) {
+                Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                addToNwSet(network)
+                sendNetworkChanges(isForceUpdate = true)
+            }
+        }
+
+        override fun onAvailable(network: Network) {
+            scope.launch(CoroutineName("cmTransAvl") + serializer) {
+                Logger.d(LOG_TAG_CONNECTION, "onAvailable(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                addToNwSet(network)
+                sendNetworkChanges(isForceUpdate = true)
+            }
+        }
+
+        override fun onLost(network: Network) {
+            scope.launch(CoroutineName("cmTransLost") + serializer) {
+                Logger.d(LOG_TAG_CONNECTION, "onLost(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                networkSet.remove(network)
+                sendNetworkChanges(isForceUpdate = true)
+            }
+        }
+
+        override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+            scope.launch(CoroutineName("cmTransLink") + serializer) {
+                Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                addToNwSet(network)
+                sendNetworkChanges(isForceUpdate = true)
+            }
+        }
+    }
+
     private val networkRequest: NetworkRequest =
         NetworkRequest.Builder()
             .apply { if (isAtleastR()) clearCapabilities() else removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN) }
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            // network validity makes onAvailable / onLost events appear atleast 5-10 secs later than without it
-            //.addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
             .apply { if (isAtleastS()) setIncludeOtherUidNetworks(true) }
+            .build()
+
+
+    private val networkRequestWithTransports: NetworkRequest =
+        NetworkRequest.Builder()
+            .apply { if (isAtleastR()) clearCapabilities() else removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN) }
+            .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .addTransportType(NetworkCapabilities.TRANSPORT_ETHERNET)
+            .addTransportType(NetworkCapabilities.TRANSPORT_VPN)
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .apply { if (isAtleastS()) setIncludeOtherUidNetworks(true) }
+            // api27: .addTransportType(NetworkCapabilities.TRANSPORT_WIFI_AWARE)
+            // api26: .addTransportType(NetworkCapabilities.TRANSPORT_LOWPAN)
             .build()
 
     //private var serviceHandler: NetworkRequestHandler? = null
@@ -140,79 +205,18 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
     data class ProbeResult(val ip: String, val ok: Boolean, val capabilities: NetworkCapabilities?)
 
     interface NetworkListener {
-        suspend fun onNetworkDisconnected(networks: UnderlyingNetworks)
-
-        suspend fun onNetworkConnected(networks: UnderlyingNetworks)
-
         suspend fun onNetworkRegistrationFailed()
 
         suspend fun maybeNetworkStall()
+
+        suspend fun onNetworkChange(networks: UnderlyingNetworks)
     }
 
-    override fun onAvailable(network: Network) {
-        scope.launch(CoroutineName("cmAvl") + serializer) {
-            val res = networkSet.add(network)
-            if (!res) {
-                networkSet.remove(network)
-                networkSet.add(network) // re-add to ensure the latest network is used
-            }
-            val cap = cm.getNetworkCapabilities(network)
-            Logger.d(
-                LOG_TAG_CONNECTION,
-                "onAvailable: ${network.networkHandle}, netid: ${netId(network.networkHandle)}, $network, ${networkSet.size}, ${
-                    networkType(
-                        cap
-                    )
-                }"
-            )
-            sendNetworkChanges()
-        }
-    }
-
-    override fun onLost(network: Network) {
-        scope.launch(CoroutineName("cmLost") + serializer) {
+    private fun addToNwSet(network: Network) {
+        val res = networkSet.add(network) // ensure the network is added to the set
+        if (!res) {
             networkSet.remove(network)
-            val cap = cm.getNetworkCapabilities(network)
-            Logger.d(
-                LOG_TAG_CONNECTION,
-                "onLost: ${network.networkHandle}, netid: ${netId(network.networkHandle)}, $network, ${networkSet.size}, ${
-                    networkType(
-                        cap
-                    )
-                }"
-            )
-            sendNetworkChanges()
-        }
-    }
-
-    override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
-        scope.launch(CoroutineName("cmCap") + serializer) {
-            Logger.d(
-                LOG_TAG_CONNECTION,
-                "onCapabilitiesChanged, ${network.networkHandle}, netid: ${netId(network.networkHandle)}, $network"
-            )
-            val res = networkSet.add(network) // ensure the network is added to the set
-            if (!res) {
-                networkSet.remove(network)
-                networkSet.add(network) // re-add to ensure the latest network is used
-            }
-
-            sendNetworkChanges(isForceUpdate = false)
-        }
-    }
-
-    override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
-        scope.launch(CoroutineName("cmAvl") + serializer) {
-            Logger.d(
-                LOG_TAG_CONNECTION,
-                "onLinkPropertiesChanged: ${network.networkHandle}, netid: ${netId(network.networkHandle)}, $network"
-            )
-            val res = networkSet.add(network) // ensure the network is added to the set
-            if (!res) {
-                networkSet.remove(network)
-                networkSet.add(network) // re-add to ensure the latest network is used
-            }
-            sendNetworkChanges()
+            networkSet.add(network) // re-add to ensure the latest network is used
         }
     }
 
@@ -230,7 +234,6 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
      * the VPN start is completed. Always called from the main thread
      */
     suspend fun onVpnStart(context: Context): Boolean  {
-        val callback = this
         val deferred = scope.async {
             val isNewVpn = !::cm.isInitialized
 
@@ -244,7 +247,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
 
             try {
                 // TODO: use a custom Looper(HandlerThread) to avoid blocking the main thread
-                cm.registerNetworkCallback(networkRequest, callback)
+                cm.registerNetworkCallback(networkRequest, internetValidatedCallBack)
+                cm.registerNetworkCallback(networkRequestWithTransports, transportCallback)
             } catch (e: Exception) {
                 Logger.w(LOG_TAG_CONNECTION, "Exception while registering network callback", e)
                 networkListener.onNetworkRegistrationFailed()
@@ -317,12 +321,12 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
 
     // Always called from the main thread
     suspend fun onVpnStop() {
-        val nwCallback = this
         scope.launch(CoroutineName("cmStop") + serializer) {
             try {
                 // check if connectivity manager is initialized as it is lazy initialized
                 if (::cm.isInitialized) {
-                    cm.unregisterNetworkCallback(nwCallback)
+                    cm.unregisterNetworkCallback(internetValidatedCallBack)
+                    cm.unregisterNetworkCallback(transportCallback)
                 }
                 if (isAtleastR()) {
                     unregisterDiags()
@@ -646,10 +650,10 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                     has4 = hasDefaultRoute4
                     has4 = hasDefaultRoute6
 
-                    Logger.v(
+                    /*Logger.v(
                         LOG_TAG_CONNECTION,
                         "determineVpnProtos; for $it, has4? $has4, has6? $has6, ${it.destination}, ${it.gateway}, ${it.isDefaultRoute}, ${it.`interface`}"
-                    )
+                    )*/
                     if (has4 && has6) return@rloop
                 }
             }
@@ -715,7 +719,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                         SystemClock.elapsedRealtimeNanos(),
                         Collections.unmodifiableMap(dnsServers)
                     )
-                listener.onNetworkConnected(underlyingNetworks)
+                listener.onNetworkChange(underlyingNetworks)
             } else {
                 val underlyingNetworks =
                     UnderlyingNetworks(
@@ -729,7 +733,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                         SystemClock.elapsedRealtimeNanos(),
                         LinkedHashMap()
                     )
-                listener.onNetworkDisconnected(underlyingNetworks)
+                listener.onNetworkChange(underlyingNetworks)
             }
         }
 
@@ -855,7 +859,13 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                 // mtu can be 0 when the value is not set, see:LinkProperties#getMtu()
                 if (m2 <= 0) m1 else min(m1, m2)
             } else {
-                m2
+                if (m2 <= 0) {
+                    // both m1 and m2 are invalid, return MIN_MTU
+                    MIN_MTU
+                } else {
+                    // m1 is invalid, return m2
+                    m2
+                }
             }
         }
 

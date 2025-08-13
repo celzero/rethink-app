@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.celzero.bravedns"
-    android:versionCode="48"
-    android:versionName="v055p"> <!-- 48 for v055p -->
+    android:versionCode="49"
+    android:versionName="v055q"> <!-- 49 for v055q -->
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
