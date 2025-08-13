@@ -4724,9 +4724,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val connId = connTracker.connId
         val uid = connTracker.uid
 
-        if (FirewallManager.isAppExcludedFromProxy(uid) && connTracker.blockedByRule == FirewallRuleset.RULE0.id) {
+        if (FirewallManager.isAppExcludedFromProxy(uid)) {
             logd("flow/inflow: app is excluded from proxy, returning Ipn.Base, $connId, $uid")
-            connTracker.blockedByRule = FirewallRuleset.RULE15.id
+            if (connTracker.blockedByRule == FirewallRuleset.RULE0.id) {
+                connTracker.blockedByRule = FirewallRuleset.RULE15.id
+            }
             return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid)
         }
         // here no need to check for paused proxies, as the default transport id is added
