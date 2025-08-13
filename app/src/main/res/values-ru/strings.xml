@@ -813,11 +813,11 @@
     <string name="fapps_info_exclude_msg">Исключить из DNS и брандмауэра.</string>
     <string name="fapps_info_isolate_msg">Блокировать все, кроме доверенных IP.</string>
     <string name="fapps_bypass_block_dialog_title">Обходные приложения</string>
-    <string name="fapps_bypass_block_dialog_message">Как обойти правила универсального брандмауэра для приложений из списка <i/> \?</string>
+    <string name="fapps_bypass_block_dialog_message">Как обойти правила универсального брандмауэра для приложений из списка <i></i> \?</string>
     <string name="fapps_unblock_dialog_message">Разрешить подключения для <i>перечисленных</i> приложений\?</string>
     <string name="fapps_unblock_dialog_title">Разрешить приложения</string>
     <string name="fapps_exclude_block_dialog_title">Исключение приложений</string>
-    <string name="fapps_exclude_block_dialog_message">Исключить приложения из списка <i/> из DNS и брандмауэра\?</string>
+    <string name="fapps_exclude_block_dialog_message">Исключить приложения из списка <i></i> из DNS и брандмауэра\?</string>
     <string name="fapps_isolate_block_dialog_title">Изолировать приложения</string>
     <string name="fapps_isolate_block_dialog_message">Изолировать <i>перечисленные</i> приложения\?</string>
     <string name="ci_trust_initial">T</string>
@@ -1082,7 +1082,7 @@
     <string name="lbl_test" translatable="true">тест</string>
     <string name="lbl_protos" translatable="true">protos</string>
     <string name="lbl_experimental" translatable="true">(эксперементально)</string>
-    <string name="lbl_hop" translatable="true">relay</string>
+    <string name="lbl_hop" translatable="true">relays</string>
     <string name="lbl_manual" translatable="true">Вручную</string>
     <string name="wireguard_title" translatable="true">Безопасный Интернет с WireGuard</string>
     <string name="wireguard_desc" translatable="true">Шифруйте свой интернет-трафик с помощью WireGuard. Выбирайте разные маршруты для разных приложений.</string>
@@ -1092,7 +1092,7 @@
     <string name="dns_desc" translatable="true">Выбирайте из 190+ списков, чтобы остановить рекламу, трекеры и вредоносное ПО.</string>
     <string name="status_no_network" translatable="true">нет подключения к сети</string>
     <string name="settings_mobile_metered_heading" translatable="true">измерить мобильные сети</string>
-    <string name="settings_mobile_metered_desc" translatable="true">Всегда считать мобильные сети как тарифные.</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Считать только мобильные сети тарифнымии, остальные - безлимитные</string>
     <string name="settings_theme_dialog_themes_5" translatable="true">светлая plus</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">тёмная plus</string>
     <string name="settings_biometric_dialog_heading" translatable="true">Биометрическая аутентификация</string>
@@ -1141,8 +1141,8 @@
     <string name="ac_desync_desc" translatable="true">При необходимости отправляйте пакеты-приманки.</string>
     <string name="ac_retry_options_title" translatable="true">стратегия</string>
     <string name="ac_retry_options_desc" translatable="true">Укажите, как будут работать повторные попытки для подключений с цензурой.</string>
-    <string name="ac_retry_options_never_desc" translatable="true">Не повторять попытки.</string>
-    <string name="ac_retry_options_with_split_desc" translatable="true">При необходимости применяйте технику антицензуры.</string>
+    <string name="ac_retry_options_never_desc" translatable="true">После неудачи не использовать методы антицензуры</string>
+    <string name="ac_retry_options_with_split_desc" translatable="true">При необходимости применять методы антицензуры.</string>
     <string name="lbl_always" translatable="true">Всегда</string>
     <string name="ac_retry_options_after_split_desc" translatable="true">Всегда применяйте методы антицензуры.</string>
     <string name="ac_toast_retry_disabled" translatable="true">Выберите любой вариант антицензуры, чтобы выбрать стратегию.</string>
@@ -1175,8 +1175,8 @@
     <string name="close_conns_dialog_title" translatable="true">закрыть соеденения</string>
     <string name="close_conns_dialog_desc" translatable="true">Закрыть все соединения за %1$s?</string>
     <string name="local_blocklist_delete_desc" translatable="true">Удалить черные списки на устройстве?</string>
-    <string name="fail_open_network_title" translatable="true">Не останавливать при потере сети</string>
-    <string name="fail_open_network_desc" translatable="true">Когда отключено, Rethink блокирует все данные при отсутствии подключения, как в режиме <i> В самолёте</i>.</string>
+    <string name="fail_open_network_title" translatable="true">Останавливать при потере сети</string>
+    <string name="fail_open_network_desc" translatable="true">Когда включено, Rethink блокирует все данные при отсутствии подключения, как в режиме <i> В самолёте</i>.</string>
     <string name="about_license" translatable="true">Лицензия APLv2</string>
     <string name="close_all" translatable="true">Закрыть все</string>
     <string name="smart_dns" translatable="true">Умный DNS</string>
@@ -1184,4 +1184,6 @@
     <string name="processing_dialog_desc" translatable="true">Пожалуйста, подождите, пока мы обработаем ваш запрос.</string>
     <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> случайным образом использует любой из этих DNS-преобразователей:</string>
     <string name="lbl_service_providers" translatable="true">Поставщик услуг</string>
+    <string name="hop_error_toast_msg_3" translatable="true">Отключить только мобильный, чтобы использовать relays</string>
+    <string name="wg_mobile_only_hop_err" translatable="true">Режим «Только мобильный» не поддерживается для relays</string>
 </resources>

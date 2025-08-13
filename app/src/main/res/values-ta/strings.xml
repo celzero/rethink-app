@@ -539,7 +539,7 @@
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">பைபாச் பயன்பாடுகள்</string>
     <string name="firewall_rule_block_app_new_install" translatable="true">புதிய பயன்பாடு</string>
     <string name="firewall_rule_device_lock_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_global_lockdown_desc" translatable="true">&lt;! [சி.டி.ஏ.டி.ஏ [உலகளாவிய பூட்டுதல் அமைக்கப்பட்டிருப்பதால் இந்த இணைப்பு தடுக்கப்பட்டது.</string>
+    <string name="firewall_rule_global_lockdown_desc" translatable="true">உலகளாவிய பூட்டுதல் அமைக்கப்பட்டிருப்பதால் இந்த இணைப்பு தடுக்கப்பட்டது.</string>
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">&lt;!</string>
     <string name="notif_dialog_pause_dialog_positive" translatable="true">தற்குறிப்பு</string>
     <string name="notif_channel_desc_proxy_failure" translatable="true">பதிலாள் பிழைகள் மற்றும் முரண்பாடுகள் குறித்து எச்சரிக்கை</string>
@@ -752,7 +752,7 @@
     <string name="firewall_rule_global_lockdown" translatable="true">முடக்குதல்</string>
     <string name="firewall_rule_trusted_domain" translatable="true">நம்பகமான டொமைன் (பயன்பாடு)</string>
     <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[ஒரு பயனர்-செட் ஃபயர்வால் விதி இதைத் தடுத்தது <i> பயன்பாடு </i>.<br/><br/>To change go to <i>All Apps</i> tab.]]></string>
-    <string name="firewall_rule_new_app_desc" translatable="true">&lt;! [சி.டி.ஏ.டி.ஏ [இந்த பயன்பாடு &lt;i&gt; முதல் &lt;/i&gt; நேரத்திற்கான இணைப்பை ஏற்படுத்தியது.</string>
+    <string name="firewall_rule_new_app_desc" translatable="true"><![CDATA[இந்த பயன்பாடு <i> முதல் </i> நேரத்திற்கான இணைப்பை ஏற்படுத்தியது.]]></string>
     <string name="firewall_rule_block_app_mobile_desc" translatable="true">&lt;!</string>
     <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">&lt;!</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">&lt;!</string>
@@ -835,7 +835,7 @@
     <string name="settings_enable_logs_desc" translatable="true">டி.என்.எச் மற்றும் ஃபயர்வால் பதிவுகளை உள்நாட்டில் சாதனத்தில் சேமிக்கவும்.</string>
     <string name="settings_enable_logs" translatable="true">ஆன்-சாதன பதிவுகளை இயக்கவும்</string>
     <string name="app_mode_choose" translatable="true">பயன்முறையைத் தேர்வுசெய்க</string>
-    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் <i> இலக்கு ஐபி </i> அனைத்து உலகளாவிய ஃபயர்வால் விதிகளையும் புறக்கணிக்க அமைக்கப்பட்டுள்ளது. /i&gt; தாவல்.</string>
+    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><![CDATA[இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் <i> இலக்கு ஐபி </i> அனைத்து உலகளாவிய ஃபயர்வால் விதிகளையும் புறக்கணிக்க அமைக்கப்பட்டுள்ளது. /i&gt; தாவல்.]]></string>
     <string name="settings_rinr_desc_enabled" translatable="true">ரூட்டிங் ரீதிங்கின் சொந்த போக்குவரத்தை சுரங்கப்பாதை வழியாக. நீங்கள் என்ன செய்கிறீர்கள் என்று உங்களுக்குத் தெரியாவிட்டால், அதை அணைக்கவும்.</string>
     <string name="settings_rinr_dialog_desc" translatable="true"><!--settings_network_all_networks--> %1$s அமைப்பையும் இயக்குகிறது. நீங்கள் தொடர விரும்புகிறீர்களா?</string>
     <string name="settings_http_proxy_error_text1" translatable="true">துறைமுகம் வீச்சு 1024–65535 முதல் இருக்க வேண்டும்</string>
@@ -862,9 +862,9 @@
     <string name="firewall_rule_block_dns_bypass_desc" translatable="true">&lt;!</string>
     <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">&lt;!</string>
     <string name="firewall_rule_exempt_orbot_setup_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">&lt;! [சி.டி.ஏ.டி.ஏ [இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் &lt;i&gt; டொமைன் &lt;/i&gt; நம்பகமான களமாக அமைக்கப்பட்டுள்ளது.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[இந்த இணைப்பு அனுமதிக்கப்பட்டது, ஏனெனில் <i> டொமைன் </i> நம்பகமான களமாக அமைக்கப்பட்டுள்ளது.]]></string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">&lt;!</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">&lt;! [சி.டி.ஏ.டி.ஏ [இந்த இணைப்பு பயனர்-வழங்கப்பட்ட பதிலாள்.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">இந்த இணைப்பு பயனர்-வழங்கப்பட்ட பதிலாள்.</string>
     <string name="notif_dialog_pause_dialog_neutral" translatable="true">காட்டு</string>
     <string name="ci_trust_initial" translatable="true">டி</string>
     <string name="notif_channel_vpn_notification" translatable="true">செயலில் VPN</string>
@@ -884,7 +884,7 @@
     <string name="cd_dialog_edittext_hint" translatable="true">%1$s ஐ உள்ளிடவும்</string>
     <string name="cd_blocked_initial" translatable="true">B</string>
     <string name="ci_trust_txt" translatable="true">நம்பகமான</string>
-    <string name="ada_firewall_status" translatable="true">&lt;! [CDATA [இந்த பயன்பாடு &lt;b&gt; &lt;i&gt;%1$s &lt;/i&gt; &lt;/b&gt;</string>
+    <string name="ada_firewall_status" translatable="true"><![CDATA[இந்த பயன்பாடு <b> <i>%1$s </i> </b>.]]></string>
     <string name="ada_ip_connection_count" translatable="true">%1$s ஐபி முகவரியுடன் இணைக்கப்பட்டுள்ளது (ES)</string>
     <string name="ada_app_status_block" translatable="true">தடுக்கப்பட்டுள்ளது</string>
     <string name="ada_app_status_block_wifi" translatable="true">அளவிடப்படாத (வைஃபை) நெட்வொர்க்குகளில் தடுக்கப்பட்டுள்ளது</string>
@@ -1064,7 +1064,7 @@
     <string name="firewall_rule_bypass_proxy" translatable="true">பைபாச் பதிலாள்</string>
     <string name="firewall_rule_paused_app" translatable="true">பயன்பாடு இடைநிறுத்தப்பட்டது</string>
     <string name="firewall_rule_lockdown_wg" translatable="true">பூட்டுதல் பதிலாள்</string>
-    <string name="firewall_rule_private_dns_desc" translatable="true">&lt;! [சி.டி.ஏ.டி.ஏ [இந்த இணைப்பு ஒரு &lt;i&gt; தனியார் டி.என்.எச் &lt;/i&gt; சேவையகத்தைத் தேடுகிறது.]]]&gt;</string>
+    <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[இந்த இணைப்பு ஒரு <i> தனியார் டி.என்.எச் </i> சேவையகத்தைத் தேடுகிறது.]]></string>
     <string name="firewall_rule_bypass_proxy_desc" translatable="true">&lt;!</string>
     <string name="firewall_rule_paused_app_desc" translatable="true">&lt;!</string>
     <string name="firewall_rule_lockdown_wg_desc" translatable="true">&lt;!</string>
@@ -1088,7 +1088,6 @@
     <string name="ac_split_tcp_desc" translatable="true">TCP பாக்கெட்டுகளை மாற்றவும்.</string>
     <string name="ac_split_tls" translatable="true">TCP/TLS</string>
     <string name="ac_split_tls_desc" translatable="true">TCP அல்லது TLS பாக்கெட்டுகளை மாற்றவும்.</string>
-    <string name="ac_desync" translatable="true">Desync</string>
     <string name="ac_desync_desc" translatable="true">தேவையான அளவு டிகோய் பாக்கெட்டுகளை அனுப்பவும்.</string>
     <string name="ac_retry_options_title" translatable="true">மூலோபாயம்</string>
     <string name="ac_retry_options_desc" translatable="true">தணிக்கை செய்யப்பட்ட இணைப்புகளுக்கு முயற்சிகள் எவ்வாறு செயல்படுகின்றன என்பதை அமைக்கவும்.</string>
