@@ -751,7 +751,7 @@
     <string name="firewall_rule_block_http" translatable="true">பாதுகாப்பற்ற http</string>
     <string name="firewall_rule_global_lockdown" translatable="true">முடக்குதல்</string>
     <string name="firewall_rule_trusted_domain" translatable="true">நம்பகமான டொமைன் (பயன்பாடு)</string>
-    <string name="firewall_rule_block_app_desc" translatable="true">&lt;! [சி.டி.ஏ.டி.ஏ [ஒரு பயனர்-செட் ஃபயர்வால் விதி இதைத் தடுத்தது &lt;i&gt; பயன்பாடு &lt;/i&gt;.</string>
+    <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[ஒரு பயனர்-செட் ஃபயர்வால் விதி இதைத் தடுத்தது <i> பயன்பாடு </i>.<br/><br/>To change go to <i>All Apps</i> tab.]]></string>
     <string name="firewall_rule_new_app_desc" translatable="true">&lt;! [சி.டி.ஏ.டி.ஏ [இந்த பயன்பாடு &lt;i&gt; முதல் &lt;/i&gt; நேரத்திற்கான இணைப்பை ஏற்படுத்தியது.</string>
     <string name="firewall_rule_block_app_mobile_desc" translatable="true">&lt;!</string>
     <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">&lt;!</string>
