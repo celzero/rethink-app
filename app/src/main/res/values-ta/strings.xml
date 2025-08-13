@@ -1088,7 +1088,6 @@
     <string name="ac_split_tcp_desc" translatable="true">TCP பாக்கெட்டுகளை மாற்றவும்.</string>
     <string name="ac_split_tls" translatable="true">TCP/TLS</string>
     <string name="ac_split_tls_desc" translatable="true">TCP அல்லது TLS பாக்கெட்டுகளை மாற்றவும்.</string>
-    <string name="ac_desync" translatable="true"></string>
     <string name="ac_desync_desc" translatable="true">தேவையான அளவு டிகோய் பாக்கெட்டுகளை அனுப்பவும்.</string>
     <string name="ac_retry_options_title" translatable="true">மூலோபாயம்</string>
     <string name="ac_retry_options_desc" translatable="true">தணிக்கை செய்யப்பட்ட இணைப்புகளுக்கு முயற்சிகள் எவ்வாறு செயல்படுகின்றன என்பதை அமைக்கவும்.</string>
