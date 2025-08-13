@@ -85,6 +85,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
             return
         } else {
             this.filters.firewallFilter = f.firewallFilter
+            this.filters.categoryFilters.addAll(f.categoryFilters)
         }
 
         applyParentFilter(f.topLevelFilter.id)
@@ -190,7 +191,6 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         when (tag) {
             AppListActivity.TopLevelFilter.ALL.id -> {
                 filters.topLevelFilter = AppListActivity.TopLevelFilter.ALL
-                filters.categoryFilters.clear()
                 io {
                     val categories = FirewallManager.getAllCategories()
                     uiCtx { remakeChildFilterChipsUi(categories) }
@@ -198,7 +198,6 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
             }
             AppListActivity.TopLevelFilter.INSTALLED.id -> {
                 filters.topLevelFilter = AppListActivity.TopLevelFilter.INSTALLED
-                filters.categoryFilters.clear()
                 io {
                     val categories = FirewallManager.getCategoriesForInstalledApps()
                     uiCtx { remakeChildFilterChipsUi(categories) }
@@ -206,7 +205,6 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
             }
             AppListActivity.TopLevelFilter.SYSTEM.id -> {
                 filters.topLevelFilter = AppListActivity.TopLevelFilter.SYSTEM
-                filters.categoryFilters.clear()
                 io {
                     val categories = FirewallManager.getCategoriesForSystemApps()
                     uiCtx { remakeChildFilterChipsUi(categories) }
@@ -218,14 +216,21 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
     private fun remakeChildFilterChipsUi(categories: List<String>) {
         b.ffaChipGroup.removeAllViews()
         for (c in categories) {
-            b.ffaChipGroup.addView(makeChildChip(c))
+            if (filters.categoryFilters.contains(c)) {
+                // if the category is already selected, check the chip
+                b.ffaChipGroup.addView(makeChildChip(c, true))
+            } else {
+                b.ffaChipGroup.addView(makeChildChip(c, false))
+            }
         }
     }
 
-    private fun makeChildChip(title: String): Chip {
+    private fun makeChildChip(title: String, checked: Boolean): Chip {
         val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
         chip.text = title
         chip.tag = title
+        chip.isChecked = checked
+        if (checked) colorUpChipIcon(chip)
 
         chip.setOnCheckedChangeListener { compoundButton: CompoundButton, isSelected: Boolean ->
             applyChildFilter(compoundButton.tag, isSelected)
