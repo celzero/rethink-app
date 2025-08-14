@@ -26,7 +26,7 @@
         android:layout_height="1dp"
         android:alpha=".5"
         android:layout_above="@id/layoutDots"
-        android:background="@android:color/white" />
+        android:background="?attr/svgStrokeColor" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_next"
@@ -37,7 +37,7 @@
         android:layout_alignParentBottom="true"
         android:background="@null"
         android:text="@string/next"
-        android:textColor="@android:color/white" />
+        android:textColor="?attr/svgStrokeColor" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_skip"
@@ -48,6 +48,6 @@
         android:layout_alignParentBottom="true"
         android:background="@null"
         android:text="@string/skip"
-        android:textColor="@android:color/white" />
+        android:textColor="?attr/svgStrokeColor" />
 
 </RelativeLayout>
