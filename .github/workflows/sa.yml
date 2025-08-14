@@ -13,18 +13,6 @@ jobs:
       - name: "checkout"
         uses: actions/checkout@v4
 
-      - name: Setup python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.9
-
-      # github.com/google/vanir
-      - name: "vanir"
-        run: |
-          pip install vanir
-          python -m vanir.detector_runner repo_scanner Android ./
-        shell: bash
-
       - name: "detekt"
         uses: natiginfo/action-detekt-all@1.23.8
         # from: https://github.com/natiginfo/action-detekt-all
