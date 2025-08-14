@@ -336,10 +336,6 @@ object VpnController : KoinComponent {
         return braveVpnService?.getRDNS(type)
     }
 
-    fun goBuildVersion(full: Boolean): String {
-        return braveVpnService?.goBuildVersion(full) ?: ""
-    }
-
     fun protectSocket(socket: Socket) {
         braveVpnService?.protectSocket(socket)
     }

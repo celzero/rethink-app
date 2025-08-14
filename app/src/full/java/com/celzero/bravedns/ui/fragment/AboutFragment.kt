@@ -69,6 +69,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.firestack.intra.Intra
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -142,7 +143,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             // complete version name along with the source of installation
             val v = getString(R.string.about_version_install_source, version, getDownloadSource())
 
-            val build = VpnController.goBuildVersion(false)
+            val build = Intra.build(false)
             val updatedTs = getLastUpdatedTs()
             b.aboutAppVersion.text = "$v\n$build\n$updatedTs"
 
