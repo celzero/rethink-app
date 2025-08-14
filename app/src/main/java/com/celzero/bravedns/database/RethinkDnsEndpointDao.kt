@@ -92,4 +92,7 @@ interface RethinkDnsEndpointDao {
     @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'sky', 'max')") fun switchToMax()
 
     @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'max', 'sky')") fun switchToSky()
+
+    @Query("select * from RethinkDnsEndpoint where name = 'RDNS Default' and isCustom = 0 LIMIT 1")
+    fun getDefaultRethinkEndpoint(): RethinkDnsEndpoint?
 }

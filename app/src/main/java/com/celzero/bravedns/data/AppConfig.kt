@@ -532,7 +532,7 @@ internal constructor(
                 postConnectedDnsName(endpoint.name, endpoint.resolver)
             }
             DnsType.DNSCRYPT -> {
-                val endpoint = getConnectedDnscryptServer()
+                val endpoint = getConnectedDnscryptServer() ?: return
                 postConnectedDnsName(endpoint.dnsCryptName, endpoint.dnsCryptURL)
             }
             DnsType.DNS_PROXY -> {
@@ -639,7 +639,7 @@ internal constructor(
         return dnsProxyEndpointRepository.getSelectedProxy()
     }
 
-    suspend fun getConnectedDnscryptServer(): DnsCryptEndpoint {
+    suspend fun getConnectedDnscryptServer(): DnsCryptEndpoint? {
         return dnsCryptEndpointRepository.getConnectedDNSCrypt()
     }
 
@@ -758,6 +758,10 @@ internal constructor(
 
     suspend fun getRemoteRethinkEndpoint(): RethinkDnsEndpoint? {
         return rethinkDnsEndpointRepository.getConnectedEndpoint()
+    }
+
+    suspend fun getRethinkDefaultEndpoint(): RethinkDnsEndpoint? {
+        return rethinkDnsEndpointRepository.getDefaultRethinkEndpoint()
     }
 
     suspend fun getBlockFreeRethinkEndpoint(): String {
