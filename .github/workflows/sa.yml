@@ -2,6 +2,7 @@ name: Static Analyser
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   detekt:
@@ -17,6 +18,7 @@ jobs:
         with:
           python-version: 3.9
 
+      # github.com/google/vanir
       - name: "vanir"
         run: |
           pip install vanir
