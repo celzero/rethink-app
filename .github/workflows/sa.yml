@@ -2,6 +2,7 @@ name: Static Analyser
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   detekt:
@@ -10,11 +11,23 @@ jobs:
 
     steps:
       - name: "checkout"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: "run"
-        uses: natiginfo/action-detekt-all@1.23.6
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+
+      # github.com/google/vanir
+      - name: "vanir"
+        run: |
+          pip install vanir
+          python -m vanir.detector_runner repo_scanner Android ./
+        shell: bash
+
+      - name: "detekt"
+        uses: natiginfo/action-detekt-all@1.23.8
         # from: https://github.com/natiginfo/action-detekt-all
         with:
-          args:  --config .github/detekt-config.yml
+          args: --config .github/detekt-config.yml
 
