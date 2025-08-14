@@ -1,3 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    </resources>
+    <string name="title_settings" translatable="true">Mipangilio</string>
+    <string name="title_statistics" translatable="true">Takwimu</string>
+    <string name="pause_title_desc" translatable="true">Kupumzika</string>
+    <string name="about_title_desc" translatable="true">Gundua na zuia tishio kwa usalama mtandaoni</string>
+    <string name="txt_home" translatable="true">Nyumbani</string>
+    <string name="accessibility_service_description" translatable="true">Rethink hutumia huduma inayofikika (accessibility service) ili kugundua na kuzuia programu zinazofanya kazi kwa nyuma (background applications). Rethink haikusanyi wala kuuza taarifa yoyote.</string>
+    <string name="next" translatable="true">Inayofuta</string>
+    <string name="skip" translatable="true">Potezea</string>
+    <string name="finish" translatable="true">Maliza</string>
+    <string name="lbl_cancel" translatable="true">Hairisha</string>
+    <string name="lbl_all" translatable="true">Yote</string>
+    <string name="lbl_allowed" translatable="true">Ruhusiwa</string>
+    <string name="lbl_maybe_blocked" translatable="true">Yaweza kuizuiwa</string>
+    <string name="lbl_blocked" translatable="true">Imezuiwa</string>
+    <string name="lbl_disabled" translatable="true">Haijawezeshwa</string>
+    <string name="lbl_domain" translatable="true">Himaya</string>
+    <string name="lbl_wildcard" translatable="true">Nyota juu</string>
+    <string name="lbl_action_required" translatable="true">Unatakiwa kutenda jambo</string>
+    <string name="lbl_rules" translatable="true">Utaratibu</string>
+    <string name="lbl_network" translatable="true">Mtandao</string>
+    <string name="lbl_create" translatable="true">Unda</string>
+    <string name="lbl_qr_code" translatable="true">Msimbo wa QR</string>
+    <string name="lbl_public_key" translatable="true">Ufungo wa umma</string>
+    <string name="lbl_addresses" translatable="true">Anwani</string>
+    <string name="lbl_proceed" translatable="true">Endelea</string>
+    <string name="lbl_private_key" translatable="true">Funguo Binafsi</string>
+    <string name="lbl_generated" translatable="true">Iliyotengenezwa</string>
+    <string name="lbl_random" translatable="true">Tofutatofauti</string>
+    <string name="lbl_listen_port" translatable="true">Njia inayotumiwa</string>
+    <string name="lbl_auto" translatable="true">Bila jitihada</string>
+    <string name="lbl_include" translatable="true">Kutia ndani</string>
+    <string name="lbl_select_all" translatable="true">Chagua zote</string>
+    <string name="title_about" translatable="true">Kuhusu</string>
+</resources>
