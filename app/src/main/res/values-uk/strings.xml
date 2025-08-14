@@ -279,7 +279,7 @@
                                               <a href="https://t.me/kaliangel">kaliangel</a> /
                                               <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
                                               <br/>📌 Geo-IP <br/>
-                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IpInfo Lite</a><br/>
+                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPInfo Lite</a><br/>
                                               <br/>❇ Translations <br/>
                                               <a href="https://weblate.org/en/">Weblate</a><br/>
                                               <br/>🦆 Icons <br/>
@@ -1154,7 +1154,7 @@
     <string name="local_blocklist_delete_desc" translatable="true">Видалити списки блокування на пристрої?</string>
     <string name="fail_open_network_title" translatable="true">Зупинка через втрату мережі</string>
     <string name="fail_open_network_desc" translatable="true">Коли функцію ввімкнено, Rethink зупиняє всі дані, коли немає з’єднання, наприклад, у режимі <i>У літаку</i>.</string>
-    <string name="about_license" translatable="true">Ліцензовано за APLv2</string>
+    <string name="about_license" translatable="true">Ліцензовано під Apache-2.0</string>
     <string name="close_all" translatable="true">Закрити все</string>
     <string name="smart_dns" translatable="true">Розумний DNS</string>
     <string name="processing_dialog_title" translatable="true">Обробка</string>
