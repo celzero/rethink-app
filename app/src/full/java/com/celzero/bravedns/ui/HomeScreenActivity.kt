@@ -16,7 +16,6 @@
 package com.celzero.bravedns.ui
 
 import Logger
-import Logger.LOG_IAB
 import Logger.LOG_TAG_APP_UPDATE
 import Logger.LOG_TAG_BACKUP_RESTORE
 import Logger.LOG_TAG_DOWNLOAD
@@ -60,7 +59,6 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState

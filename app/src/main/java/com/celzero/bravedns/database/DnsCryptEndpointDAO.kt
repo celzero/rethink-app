@@ -56,7 +56,7 @@ interface DnsCryptEndpointDAO {
 
     @Transaction
     @Query("select * from DNSCryptEndpoint where isSelected = 1")
-    fun getConnectedDNSCrypt(): DnsCryptEndpoint
+    fun getConnectedDNSCrypt(): DnsCryptEndpoint?
 
     @Query("select count(*) from DNSCryptEndpoint where isSelected = 1")
     fun getConnectedCount(): Int

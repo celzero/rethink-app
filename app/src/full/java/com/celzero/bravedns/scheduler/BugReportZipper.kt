@@ -26,6 +26,7 @@ import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities
+import com.celzero.firestack.intra.Intra
 import com.google.common.io.Files
 import java.io.File
 import java.io.FileInputStream
@@ -382,7 +383,7 @@ object BugReportZipper {
         file.appendText(prefsDetails.toString())
         val separator = "--------------------------------------------\n"
         file.appendText(separator)
-        val build = VpnController.goBuildVersion(true)
+        val build = Intra.build(true)
         file.appendText(build)
         file.appendText(separator)
     }
