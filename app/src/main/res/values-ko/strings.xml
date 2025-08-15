@@ -677,13 +677,13 @@
     <string name="firewall_rule_block_domain" translatable="true">도메인 (앱)</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS가 차단됨</string>
     <string name="firewall_rule_no_rule_desc" translatable="true">이 연결과 일치하는 방화벽 규칙이 없습니다.</string>
-    <string name="firewall_rule_block_app_desc" translatable="true">사용자 설정 방화벽 규칙이 이 <i>앱</i>을 차단했습니다.<br/><br/> 변경하려면 <i>모든 앱</i> 탭으로 이동하세요.</string>
+    <string name="firewall_rule_block_app_desc" translatable="true">사용자 설정 방화벽 규칙이 이 <i>앱</i>을 차단했습니다.<br></br><br></br> 변경하려면 <i>모든 앱</i> 탭으로 이동하세요.</string>
     <string name="socks5_proxy_toast_parameter" translatable="true">SOCKS5 proxy</string>
     <string name="settings_local_blocklist_dialog_positive" translatable="true">다운로드</string>
     <string name="accessibility_failure_toast" translatable="true">Rethink 접근성 서비스가 중지되었거나 충돌했습니다. 더 이상 백그라운드 앱을 차단하지 않습니다.</string>
     <string name="other_dns_list_tab3" translatable="true">DNS 프록시</string>
     <string name="toast_allow_bypass_disabled" translatable="true">프록시가 활성화되어 있으므로 %1$s를 사용할 수 없습니다</string>
-    <string name="firewall_rule_new_app_desc" translatable="true">이 앱은 <i>처음</i> 시간 동안 연결되었습니다.<br/><br/> 변경하려면 <i>Universal</i> 탭으로 이동합니다.</string>
+    <string name="firewall_rule_new_app_desc" translatable="true">이 앱은 <i>처음</i> 시간 동안 연결되었습니다.<br></br><br></br> 변경하려면 <i>Universal</i> 탭으로 이동합니다.</string>
     <string name="coming_soon_toast" translatable="true">곧 출시 예정</string>
     <string name="dns_crypt_relay_error_toast" translatable="true">해결사를 선택하지 않았습니다</string>
     <string name="fapps_filter_categories_heading" translatable="true">카테고리</string>
@@ -697,7 +697,7 @@
     <string name="firewall_rule_proxied" translatable="true">프록시 적용됨</string>
     <string name="dns_btm_resolved_crypt" translatable="true">%3$s를 통해 %2$s만큼 <u>익명으로</u> %1$s를 해결했습니다</string>
     <string name="dns_info_positive" translatable="true">동의하다</string>
-    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">사용자 설정 방화벽 규칙이 <i> 종량제 </i> 네트워크에 접속하려고 했기 때문에 이 <i> 앱 </i>를 차단했습니다. <br/><br/>변경하려면 ,<i>모든 앱</i>탭으로 이동해 주세요.</string>
-    <string name="firewall_rule_block_app_mobile_desc" translatable="true">사용자 설정 방화벽 규칙이 <i> 종량제 </i> 네트워크에 접속하려고 했기 때문에 이 <i> 앱 </i>를 차단했습니다. <br/><br/>변경하려면 ,<i>모든 앱</i>탭으로 이동해 주세요.</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><i>종량제</i>(모바일) 네트워크에 접속하려고 했을 때에, 유저가 설정한 범용 방화벽 규칙이 이<i>앱</i>를 차단했습니다. <br/><br/>변경하려면 ,<i>범용</i>탭으로 이동해 주세요.</string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">사용자 설정 방화벽 규칙이 <i> 종량제 </i> 네트워크에 접속하려고 했기 때문에 이 <i> 앱 </i>를 차단했습니다. <br></br><br></br>변경하려면 ,<i>모든 앱</i>탭으로 이동해 주세요.</string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true">사용자 설정 방화벽 규칙이 <i> 종량제 </i> 네트워크에 접속하려고 했기 때문에 이 <i> 앱 </i>를 차단했습니다. <br></br><br></br>변경하려면 ,<i>모든 앱</i>탭으로 이동해 주세요.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><i>종량제</i>(모바일) 네트워크에 접속하려고 했을 때에, 유저가 설정한 범용 방화벽 규칙이 이<i>앱</i>를 차단했습니다. <br></br><br></br>변경하려면 ,<i>범용</i>탭으로 이동해 주세요.</string>
 </resources>

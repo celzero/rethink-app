@@ -1,1 +1,1 @@
-防火墙应用程序，使用 WireGuard VPN，监控网络，阻止恶意软件，更改 DNS。
+管控应用程序，使用 WireGuard VPN ，监测网络，拦截恶意软件，更改 DNS 。

@@ -410,7 +410,7 @@
     <string name="dns_btm_sheet_dialog_message"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s lista(s) de bloqueio</h3>%3$s.<br/><br/>]]></Data></string>
     <string name="univ_firewall_rule_1">Bloquear todas as aplicações se o dispositivo estiver bloqueado</string>
     <string name="dns_btm_record_type">Tipo de pedido: %1$s</string>
-    <string name="firewall_rule_block_ip_univ_desc">Uma regra de firewall, definida pelo utilizador, bloqueou o <i>IP/Porta de destino</i>.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.</string>
+    <string name="firewall_rule_block_ip_univ_desc">Uma regra de firewall, definida pelo utilizador, bloqueou o <i>IP/Porta de destino</i>.<br></br><br></br> Para alterar, aceda ao separador <i>Universal</i>.</string>
     <string name="univ_firewall_rule_8">Bloquear tráfego na porta 80 (HTTP inseguro)</string>
     <string name="dns_proxy_connection_failure_lockdown">Se excluir %1$s para %2$s no modo bloqueado, pode causar problemas de conectividade com a Internet.</string>
     <string name="firewall_rule_block_app_desc"><![CDATA[Uma regra de firewall definida pelo utilizador bloqueou esta <i>aplicação</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as Aplicações.]]></string>
@@ -458,7 +458,7 @@
     <string name="dns_info_neutral">Copiar</string>
     <string name="fapps_metered_block_dialog_message">Bloquear ligações em redes limitadas (móveis) para as aplicações <i>da lista</i>\?</string>
     <string name="firewall_rule_block_udp_ntp">UDP bloqueado</string>
-    <string name="firewall_rule_trusted_ip_desc">Esta ligação foi permitida porque o <i>IP de destino</i> está configurado com um IP de confiança.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação </i>.</string>
+    <string name="firewall_rule_trusted_ip_desc">Esta ligação foi permitida porque o <i>IP de destino</i> está configurado com um IP de confiança.<br></br><br></br>Para alterar, aceda ao ecrã <i>Firewall por aplicação </i>.</string>
     <string name="dns_proxy_dialog_message">Nome da aplicação: %1$s
 \n
 \nEndereço IP: %2$s
@@ -473,18 +473,18 @@
     <string name="update_complete_snack_message">Nova versão descarregada.</string>
     <string name="settings_local_blocklist_in_use">%1$s listas de bloqueio usadas</string>
     <string name="pause_desc">Nota: as %1$s aplicações bloqueadas continuarão a ser protegidas por firewall.</string>
-    <string name="firewall_rule_block_app_mobile_desc">Uma regra de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a uma rede <i>limitada</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as aplicações</i>.</string>
+    <string name="firewall_rule_block_app_mobile_desc">Uma regra de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a uma rede <i>limitada</i>.<br></br><br></br> Para alterar, aceda ao separador <i>Todas as aplicações</i>.</string>
     <string name="firewall_rule_trusted_ip">IP de confiança</string>
     <string name="firewall_rule_new_app_desc"><![CDATA[Esta aplicação fez uma ligação pela <i>primeira</i> vez.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.]]></string>
-    <string name="firewall_rule_block_udp_ntp_desc">Uma regra de firewall, definida pelo utilizador, bloqueou esta ligação <i>UDP</i>.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.</string>
+    <string name="firewall_rule_block_udp_ntp_desc">Uma regra de firewall, definida pelo utilizador, bloqueou esta ligação <i>UDP</i>.<br></br><br></br> Para alterar, aceda ao separador <i>Universal</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc">Esta ligação foi permitida porque o &lt;i&gt;IP de destino&lt;/i&gt; está configurado para ignorar todas as regras universais de firewall.&lt;br/&gt;&lt;br/&gt; Para alterar, aceda às &lt;i&gt;Regras de IP&lt;i&gt; no separador &lt;i&gt;Universal&lt;/i&gt;.</string>
-    <string name="firewall_rule_foreground_desc">Esta ligação foi protegida por firewall porque a aplicação de origem <i>não estava em primeiro plano</i>.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Universal</i>.</string>
-    <string name="firewall_rule_block_dns_bypass_desc">Esta ligação foi bloqueada porque a <i>aplicação de origem</i> ignorou o DNS preferencial do utilizador.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Universal</i>.</string>
-    <string name="firewall_rule_block_http_desc">Esta ligação foi bloqueada porque, provavelmente, usava <i>HTTP inseguro</i>.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.</string>
-    <string name="firewall_rule_device_lock_desc">Esta ligação foi protegida por firewall porque o <i>dispositivo estava bloqueado</i> nesse momento.<br/><br/> Para alterar este comportamento, aceda ao separador <i>Universal</i>.</string>
-    <string name="firewall_rule_global_lockdown_desc">Esta ligação foi bloqueada porque o bloqueio universal está ativo.<br/><br/> Para alterar, aceda ao separador <i>Universal</i>.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">Esta ligação foi permitida porque a <i>aplicação de origem</i> está configurada para <i>ignorar as regras universais da firewall</i>.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc">Esta ligação DNS foi feita via proxy e encaminhada para o terminal DNS preferido do utilizador.<br/><br/> Para alterar, desative <i>Prevenir fugas de DNS</i> no ecrã <i>Configurar</i> do DNS.</string>
+    <string name="firewall_rule_foreground_desc">Esta ligação foi protegida por firewall porque a aplicação de origem <i>não estava em primeiro plano</i>.<br></br><br></br>Para alterar este comportamento, aceda ao separador <i>Universal</i>.</string>
+    <string name="firewall_rule_block_dns_bypass_desc">Esta ligação foi bloqueada porque a <i>aplicação de origem</i> ignorou o DNS preferencial do utilizador.<br></br><br></br>Para alterar este comportamento, aceda ao separador <i>Universal</i>.</string>
+    <string name="firewall_rule_block_http_desc">Esta ligação foi bloqueada porque, provavelmente, usava <i>HTTP inseguro</i>.<br></br><br></br> Para alterar, aceda ao separador <i>Universal</i>.</string>
+    <string name="firewall_rule_device_lock_desc">Esta ligação foi protegida por firewall porque o <i>dispositivo estava bloqueado</i> nesse momento.<br></br><br></br> Para alterar este comportamento, aceda ao separador <i>Universal</i>.</string>
+    <string name="firewall_rule_global_lockdown_desc">Esta ligação foi bloqueada porque o bloqueio universal está ativo.<br></br><br></br> Para alterar, aceda ao separador <i>Universal</i>.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc">Esta ligação foi permitida porque a <i>aplicação de origem</i> está configurada para <i>ignorar as regras universais da firewall</i>.<br></br><br></br>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc">Esta ligação DNS foi feita via proxy e encaminhada para o terminal DNS preferido do utilizador.<br></br><br></br> Para alterar, desative <i>Prevenir fugas de DNS</i> no ecrã <i>Configurar</i> do DNS.</string>
     <string name="new_app_notification_action_toast_allow">Ligação de rede permitida para a aplicação</string>
     <string name="cd_dns_crypt_title">resolvedores</string>
     <string name="cd_custom_doh_dialog_title">URL do servidor personalizado</string>
@@ -604,11 +604,11 @@
     <string name="firewall_rule_block_http">HTTP inseguro</string>
     <string name="firewall_rule_global_lockdown">Confinado</string>
     <string name="firewall_rule_no_rule_desc">Esta ligação não coincide com quaisquer regras da firewall.</string>
-    <string name="firewall_rule_block_app_unmetered_desc">Uma regra de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a uma rede <i>ilimitada</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as aplicações</i>.</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc">Uma regra universal de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a uma rede <i>limitada</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as aplicações</i>.</string>
-    <string name="firewall_rule_isolate_desc">Uma regra de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a um IP diferente de um <i>IP ignorado</i>.<br/><br/> Para alterar, aceda ao separador <i>Todas as aplicações</i>.</string>
-    <string name="firewall_rule_block_ip_desc">Uma regra de firewall, definida pelo utilizador, bloqueou o <i>IP de destino</i>.<br/><br/> Para alterar, aceda ao separador <i>Firewall por aplicação</i>.</string>
-    <string name="firewall_rule_unknown_desc">Esta ligação foi protegida por firewall porque não foi possível determinar a <i>aplicação de origem</i>.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Universal</i>.</string>
+    <string name="firewall_rule_block_app_unmetered_desc">Uma regra de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a uma rede <i>ilimitada</i>.<br></br><br></br> Para alterar, aceda ao separador <i>Todas as aplicações</i>.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc">Uma regra universal de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a uma rede <i>limitada</i>.<br></br><br></br> Para alterar, aceda ao separador <i>Todas as aplicações</i>.</string>
+    <string name="firewall_rule_isolate_desc">Uma regra de firewall, definida pelo utilizador, bloqueou <i>esta aplicação</i> de se ligar a um IP diferente de um <i>IP ignorado</i>.<br></br><br></br> Para alterar, aceda ao separador <i>Todas as aplicações</i>.</string>
+    <string name="firewall_rule_block_ip_desc">Uma regra de firewall, definida pelo utilizador, bloqueou o <i>IP de destino</i>.<br></br><br></br> Para alterar, aceda ao separador <i>Firewall por aplicação</i>.</string>
+    <string name="firewall_rule_unknown_desc">Esta ligação foi protegida por firewall porque não foi possível determinar a <i>aplicação de origem</i>.<br></br><br></br>Para alterar este comportamento, aceda ao separador <i>Universal</i>.</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">Esta ligação foi permitida porque a configuração <i>Tor-as-a-proxy com um toque</i> via Orbot estava a decorrer.</string>
     <string name="new_app_bulk_notification_title">Atenção</string>
     <string name="new_app_bulk_notification_content">Rethink bloqueou %1$s novas aplicações. Toque para ver ou alterar.</string>
@@ -779,8 +779,8 @@
     <string name="ssv_see_more">Mostrar tudo</string>
     <string name="lbl_allowed" translatable="true">Permitida</string>
     <string name="lbl_disabled" translatable="true">Desativada</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">Uma regra de firewall, definida pelo utilizador, bloqueou o <i>domínio</i>.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">Esta ligação foi permitida porque o <i>domínio</i> está definido como confiável.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Uma regra de firewall, definida pelo utilizador, bloqueou o <i>domínio</i>.<br></br><br></br>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Esta ligação foi permitida porque o <i>domínio</i> está definido como confiável.<br></br><br></br>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.</string>
     <string name="bsdl_block_desc" translatable="true">Bloquear, confiar <u>neste domínio</u></string>
     <string name="lbl_cancel" translatable="true">Cancelar</string>
     <string name="lbl_apply" translatable="true">Aplicar</string>
@@ -809,9 +809,9 @@
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">Aplicação ignorada</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS bloqueado</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Domínio (universal)</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Esta ligação foi permitida porque a <i>aplicação de origem </i> está definida para <i>ignorar DNS e firewall </i>.<br/><br/>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">Esta ligação foi bloqueada porque o <i>domínio</i> está bloqueado pelo DNS preferido do utilizador.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Configurar DNS</i>.</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Esta ligação foi permitida porque o <i>domínio</i> está definido como confiável nas regras universais de domínio.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Configurar DNS</i>.</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Esta ligação foi permitida porque a <i>aplicação de origem </i> está definida para <i>ignorar DNS e firewall </i>.<br></br><br></br>Para alterar, aceda ao ecrã <i>Firewall por aplicação</i>.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">Esta ligação foi bloqueada porque o <i>domínio</i> está bloqueado pelo DNS preferido do utilizador.<br></br><br></br>Para alterar este comportamento, aceda ao separador <i>Configurar DNS</i>.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Esta ligação foi permitida porque o <i>domínio</i> está definido como confiável nas regras universais de domínio.<br></br><br></br>Para alterar este comportamento, aceda ao separador <i>Configurar DNS</i>.</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Solicitações unificadas, respostas em cache, tratamento de erros resiliente</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">Desativado (padrão)</string>
@@ -834,7 +834,7 @@
     <string name="settings_default_dns_heading" translatable="true">Escolha o DNS de recurso</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s regras universais</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Ignorar DNS universal e regras de firewall para as aplicações <i>da lista</i>\?</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Esta ligação foi bloqueada porque o <i>domínio</i> está definido como bloqueado pelas regras universais.<br/><br/>Para alterar este comportamento, aceda ao separador <i>Configurar DNS</i>.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Esta ligação foi bloqueada porque o <i>domínio</i> está definido como bloqueado pelas regras universais.<br></br><br></br>Para alterar este comportamento, aceda ao separador <i>Configurar DNS</i>.</string>
     <string name="dc_setting_dns_cache_heading" translatable="true">Reforço de DNS</string>
     <string name="lbl_qr_code" translatable="true">Código QR</string>
     <string name="lbl_import" translatable="true">Importar</string>
@@ -913,7 +913,7 @@
     <string name="settings_rinr_dialog_desc" translatable="true">Também ativa a definição <!--settings_network_all_networks--> %1$s. Deseja continuar?</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Não validar certificados TLS do servidor (ative apenas se souber o que está a fazer)</string>
     <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Ignorar regras de DNS e de firewall.</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">Esta ligação foi reencaminhada para o proxy preferido pelo utilizador.<br/><br/>Para alterar, aceda a <i>Proxy</i> no ecrã <i>Configurar</i>.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">Esta ligação foi reencaminhada para o proxy preferido pelo utilizador.<br></br><br></br>Para alterar, aceda a <i>Proxy</i> no ecrã <i>Configurar</i>.</string>
     <string name="bypass_dns_firewall_tooltip">%1$s apenas funciona com o DNS Rethink</string>
     <string name="bad_config_reason_invalid_key" translatable="true">Chave inválida</string>
     <string name="bad_config_reason_invalid_number" translatable="true">Número inválido</string>
