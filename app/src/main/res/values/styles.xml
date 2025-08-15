@@ -155,8 +155,8 @@
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtLight</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgLight</item>
 
-        <item name="homeScreenBtnGradientEnd">@color/colorPrimaryLight</item>
-        <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkLight</item>
+        <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDarkLight</item>
+        <item name="homeScreenBtnGradientStart">@color/accentGoodLight</item>
     </style>
 
     <style name="AppThemeTrueBlack" parent="Theme.MaterialComponents.NoActionBar.Bridge">
@@ -228,7 +228,7 @@
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtBlack</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlack</item>
 
-        <item name="homeScreenBtnGradientEnd">@color/colorPrimaryBlack</item>
+        <item name="homeScreenBtnGradientEnd">@color/homeScreenBtnBackgroundBlack</item>
         <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkBlack</item>
     </style>
 
@@ -300,7 +300,7 @@
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtLightPlus</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgLightPlus</item>
 
-        <item name="homeScreenBtnGradientEnd">@color/colorPrimaryLightPlus</item>
+        <item name="homeScreenBtnGradientEnd">@color/accentGoodLightPlus</item>
         <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkLightPlus</item>
     </style>
 
@@ -373,8 +373,8 @@
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtBlackPlus</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgBlackPlus</item>
 
-        <item name="homeScreenBtnGradientEnd">@color/colorPrimaryBlackPlus</item>
-        <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkBlackPlus</item>
+        <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDarkBlackPlus</item>
+        <item name="homeScreenBtnGradientStart">@color/colorBackgroundFloatingBlackPlus</item>
     </style>
 
     <style name="CustomWidget.MaterialComponents.CompoundButton.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
