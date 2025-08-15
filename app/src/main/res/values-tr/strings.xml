@@ -196,7 +196,7 @@
     <string name="settings_local_blocklist_version">Sürüm: %1$s</string>
     <string name="hs_btm_sheet_lock_down">VPN <i>kilitlendiğinde modlar değiştirilemiyor</i>. <u> VPN ayarlarını düzenlemek için dokunun</u>.</string>
     <string name="firewall_rule_block_unmetered">Ölçümsüz (WiFi)</string>
-    <string name="firewall_rule_isolate_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, bu <i>uygulamasının</i> <i> atlanan IP\'ler</i> dışındaki IP\'lere bağlanmasını engelledi.<br/><br/> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
+    <string name="firewall_rule_isolate_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, bu <i>uygulamasının</i> <i> atlanan IP\'ler</i> dışındaki IP\'lere bağlanmasını engelledi.<br></br><br></br> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
     <string name="ci_dialog_title">IP / Port Kuralı Ekle</string>
     <string name="ci_block">Engelle</string>
     <string name="ada_network_log_title">bu uygulama için ağ günlüğü</string>
@@ -416,7 +416,7 @@
     <string name="ctbs_app_info_not_available_toast">Uygulama ayarları sayfası bulunamadı</string>
     <string name="fapps_metered_block_dialog_title">Ölçülen üzerinde blok</string>
     <string name="pause_desc">Not: %1$s engellenen uygulamalar güvenlik duvarına takılmaya devam edecektir.</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc">Bu DNS bağlantısı proxy\'lenmiş ve kullanıcı tarafından tercih edilen DNS uç noktasına iletilmiştir.<br/><br/> Devre dışı bırakmayı değiştirmek için <i>DNS sızıntılarını önle</i> DNS <i>Yapılandır</i> ekranından.</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc">Bu DNS bağlantısı proxy\'lenmiş ve kullanıcı tarafından tercih edilen DNS uç noktasına iletilmiştir.<br></br><br></br> Devre dışı bırakmayı değiştirmek için <i>DNS sızıntılarını önle</i> DNS <i>Yapılandır</i> ekranından.</string>
     <string name="ada_ip_connection_count">%1$s IP adres(ler)ine bağlandı</string>
     <string name="rt_re_download">Blok listelerini yeniden indirin</string>
     <string name="lbbs_enabled">Etkin</string>
@@ -520,7 +520,7 @@
     <string name="univ_firewall_rule_4">DNS ve NTP dışında UDP\'yi engelleyin</string>
     <string name="rules_load_failure_desc">Güvenlik duvarı kuralı bulunamadı</string>
     <string name="accessibility_notification_content">Rethink erişilebilirlik hizmeti durdu veya çöktü. Artık arka plandaki uygulamaları engellemiyor. Yeniden etkinleştirmek için dokunun.</string>
-    <string name="firewall_rule_block_app_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı bu <i>uygulamasını</i> engelledi.<br/><br/> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
+    <string name="firewall_rule_block_app_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı bu <i>uygulamasını</i> engelledi.<br></br><br></br> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
     <string name="notif_dialog_pause_dialog_positive">Devam ettir</string>
     <string name="build__flavor_website">web sitesi</string>
     <string name="dc_doh">HTTPS üzerinden Dns</string>
@@ -538,8 +538,8 @@
     <string name="dns_btm_resolved_crypt">çözüldü <u>anonim olarak</u> %1$s tarafından %2$s aracılığıyla %3$s</string>
     <string name="dns_connected">Bağlandı</string>
     <string name="fapps_filter_categories_heading">Kategoriler</string>
-    <string name="firewall_rule_block_ip_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı <i>hedef IP\'sini</i> engelledi.<br/><br/> Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.</string>
-    <string name="firewall_rule_block_udp_ntp_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı bu <i>UDP</i> bağlantısını engelledi.<br/><br/> Değiştirmek için <i>Evrensel</i> sekmesine gidin.</string>
+    <string name="firewall_rule_block_ip_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı <i>hedef IP\'sini</i> engelledi.<br></br><br></br> Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.</string>
+    <string name="firewall_rule_block_udp_ntp_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı bu <i>UDP</i> bağlantısını engelledi.<br></br><br></br> Değiştirmek için <i>Evrensel</i> sekmesine gidin.</string>
     <string name="category_name_sys_components">Sistem Bileşenleri</string>
     <string name="cd_dialog_desc">Bir URL veya bir opsiyonel joker karakteri olan bir etki alanı adı: *.test.com, test.com/test</string>
     <string name="cd_custom_doh_url_name">DoH %1$s</string>
@@ -625,8 +625,8 @@
     <string name="rbl_privacy">Gizlilik</string>
     <string name="rt_dialog_message">Yeni yapılandırılmış blok listelerini uygulamak istiyor musunuz\?</string>
     <string name="cd_doh_dialog_resolver_url">Çözümleyici URL\'si</string>
-    <string name="firewall_rule_block_app_unmetered_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, <i>Ölçülmemiş</i> ağına bağlanmaya çalışırken bu <i>uygulamasını</i> engelledi.<br/><br/> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
-    <string name="firewall_rule_block_ip_univ_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı <i>hedef IP / Port</i> adresini engelledi.<br/><br/> Değiştirmek için <i>Universal</i> sekmesine gidin.</string>
+    <string name="firewall_rule_block_app_unmetered_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, <i>Ölçülmemiş</i> ağına bağlanmaya çalışırken bu <i>uygulamasını</i> engelledi.<br></br><br></br> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
+    <string name="firewall_rule_block_ip_univ_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı <i>hedef IP / Port</i> adresini engelledi.<br></br><br></br> Değiştirmek için <i>Universal</i> sekmesine gidin.</string>
     <string name="firewall_card_text_active">%1$s engellenmiş
 \n%2$s bypass edildi
 \n%3$s hariç tutuldu
@@ -646,7 +646,7 @@
     <string name="firewall_rule_univ_block_metered">Ölçülü (Evrensel)</string>
     <string name="firewall_rule_block_app_exception">Hata</string>
     <string name="firewall_rule_no_rule_desc">Bu bağlantıyla eşleşen güvenlik duvarı kuralı yok.</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc">Kullanıcı tarafından ayarlanan bir evrensel güvenlik duvarı kuralı, <i>Metered</i> (Mobil) ağına bağlanmaya çalışırken bu <i>uygulamasını</i> engelledi.<br/><br/> Değiştirmek için <i>Evrensel</i> sekmesine gidin.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc">Kullanıcı tarafından ayarlanan bir evrensel güvenlik duvarı kuralı, <i>Metered</i> (Mobil) ağına bağlanmaya çalışırken bu <i>uygulamasını</i> engelledi.<br></br><br></br> Değiştirmek için <i>Evrensel</i> sekmesine gidin.</string>
     <string name="ci_dialog_error_invalid_ip">Geçersiz IP adresi, alt ağ veya bağlantı noktası.</string>
     <string name="dns_proxy_ip_address">IP Adresi</string>
     <string name="fapps_info_dialog_positive_btn">Tamam</string>
@@ -661,20 +661,20 @@
 \n
 \n2. <i>Kullanılabilir tüm ağları kullan</i> ayarı etkinleştirilir.</string>
     <string name="dns_crypt_relay_error_toast">Çözümleyici seçilmedi</string>
-    <string name="firewall_rule_foreground_desc">Kaynak uygulama <i>ön planda</i> olmadığı için bu bağlantı güvenlik duvarına takıldı.<br/><br/> Bu davranışı değiştirmek için <i>Universal</i> sekmesine gidin.</string>
-    <string name="firewall_rule_unknown_desc">Bu bağlantı, <i>kaynak uygulaması</i> belirlenemediği için güvenlik duvarına takıldı.<br/><br/> Bu davranışı değiştirmek için <i>Universal</i> sekmesine gidin.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">Bu bağlantıya izin verildi çünkü <i>kaynak uygulaması</i> <i> evrensel</i> güvenlik duvarı kurallarını atlayacak şekilde ayarlandı.<br/><br/> Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.</string>
-    <string name="firewall_rule_global_lockdown_desc">Evrensel kilitleme ayarlandığı için bu bağlantı engellendi.<br/><br/> Değiştirmek için <i>Universal</i> sekmesine gidin.</string>
+    <string name="firewall_rule_foreground_desc">Kaynak uygulama <i>ön planda</i> olmadığı için bu bağlantı güvenlik duvarına takıldı.<br></br><br></br> Bu davranışı değiştirmek için <i>Universal</i> sekmesine gidin.</string>
+    <string name="firewall_rule_unknown_desc">Bu bağlantı, <i>kaynak uygulaması</i> belirlenemediği için güvenlik duvarına takıldı.<br></br><br></br> Bu davranışı değiştirmek için <i>Universal</i> sekmesine gidin.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc">Bu bağlantıya izin verildi çünkü <i>kaynak uygulaması</i> <i> evrensel</i> güvenlik duvarı kurallarını atlayacak şekilde ayarlandı.<br></br><br></br> Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.</string>
+    <string name="firewall_rule_global_lockdown_desc">Evrensel kilitleme ayarlandığı için bu bağlantı engellendi.<br></br><br></br> Değiştirmek için <i>Universal</i> sekmesine gidin.</string>
     <string name="orbot_toast_parameter">Proxy olarak Tor</string>
     <string name="other_dns_list_tab1">DoH</string>
     <string name="firewall_rule_no_rule">Kural Yok</string>
-    <string name="firewall_rule_device_lock_desc">O sırada <i>cihazı</i> kilitli olduğu için bu bağlantı güvenlik duvarına alınmıştır.<br/><br/> Bu davranışı değiştirmek için <i>Universal</i> sekmesine gidin.</string>
-    <string name="firewall_rule_block_dns_bypass_desc">Bu bağlantı, <i>kaynak uygulaması</i> kullanıcı tarafından tercih edilen DNS\'yi atladığı için engellendi.<br/><br/> Bu davranışı değiştirmek için <i>Universal</i> sekmesine gidin.</string>
+    <string name="firewall_rule_device_lock_desc">O sırada <i>cihazı</i> kilitli olduğu için bu bağlantı güvenlik duvarına alınmıştır.<br></br><br></br> Bu davranışı değiştirmek için <i>Universal</i> sekmesine gidin.</string>
+    <string name="firewall_rule_block_dns_bypass_desc">Bu bağlantı, <i>kaynak uygulaması</i> kullanıcı tarafından tercih edilen DNS\'yi atladığı için engellendi.<br></br><br></br> Bu davranışı değiştirmek için <i>Universal</i> sekmesine gidin.</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">Bu bağlantıya izin verildi çünkü Orbot aracılığıyla <i>tek tıklamayla Tor-as-a-proxy</i> kurulumu devam ediyordu.</string>
-    <string name="firewall_rule_block_http_desc">Bu bağlantı engellendi çünkü muhtemelen <i>güvensiz HTTP</i> kullanıyordu.<br/><br/> Değiştirmek için <i>Universal</i> sekmesine gidin.</string>
-    <string name="firewall_rule_new_app_desc">Bu uygulama <i>ilk</i> kez bağlantı kurdu.<br/><br/> Değiştirmek için <i>Universal</i> sekmesine gidin.</string>
-    <string name="firewall_rule_block_app_mobile_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, <i>Metered</i> ağına bağlanmaya çalışırken bu <i>uygulamasını</i> engelledi.<br/><br/> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
-    <string name="firewall_rule_trusted_ip_desc">Bu bağlantıya izin verildi çünkü <i>hedef IP</i> uygulamaya özel tüm kuralları atlayacak şekilde ayarlandı.<br/><br/> Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.</string>
+    <string name="firewall_rule_block_http_desc">Bu bağlantı engellendi çünkü muhtemelen <i>güvensiz HTTP</i> kullanıyordu.<br></br><br></br> Değiştirmek için <i>Universal</i> sekmesine gidin.</string>
+    <string name="firewall_rule_new_app_desc">Bu uygulama <i>ilk</i> kez bağlantı kurdu.<br></br><br></br> Değiştirmek için <i>Universal</i> sekmesine gidin.</string>
+    <string name="firewall_rule_block_app_mobile_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, <i>Metered</i> ağına bağlanmaya çalışırken bu <i>uygulamasını</i> engelledi.<br></br><br></br> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
+    <string name="firewall_rule_trusted_ip_desc">Bu bağlantıya izin verildi çünkü <i>hedef IP</i> uygulamaya özel tüm kuralları atlayacak şekilde ayarlandı.<br></br><br></br> Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.</string>
     <string name="cd_no_rule_initial">K</string>
     <string name="cd_no_rule_txt">Kural Yok</string>
     <string name="ci_dialog_added_success">IP listeye eklendi</string>
@@ -780,14 +780,14 @@
     <string name="firewall_rule_trusted_domain" translatable="true">Güvenilir Alan Adı (Uygulama)</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
     <string name="crypt_adguard_desc" translatable="true">Cihazınızı kötü amaçlı yazılımlara ve daha fazlasına karşı korur.</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Bu bağlantı, <i>bağlantı uygulamasının</i> <i>dns ve güvenlik duvarını atlayın</i> kurallarına izin verildiği için mümkün oldu.<br/><br/> Değiştirmek için <i>Uygulama Özel Güvenlik Duvarı</i> ekranına gidin.</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Bu bağlantı, <i>bağlantı uygulamasının</i> <i>dns ve güvenlik duvarını atlayın</i> kurallarına izin verildiği için mümkün oldu.<br></br><br></br> Değiştirmek için <i>Uygulama Özel Güvenlik Duvarı</i> ekranına gidin.</string>
     <string name="wireguard_description" translatable="true">WireGuard\'ı proxy olarak kullanın.</string>
     <string name="quad9_dns_desc" translatable="true">Quad9, DNS sorgularınızı dünya genelindeki güvenli sunucu ağı üzerinden yönlendirir.</string>
     <string name="univ_firewall_heading" translatable="true">Evrensel Güvenlik duvarı kuralları</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">Paket yakalama etkin</string>
     <string name="cloudflare_security_dns_desc" translatable="true">Kötü amaçlı içeriği engeller. Cloudflare\'in 1.1.1.2 DNS uç noktasını kullanır.</string>
     <string name="rules_card_domain_count" translatable="true">%1$s alan adı kuralları</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">Bu bağlantı, kullanıcı tercihine göre yönlendirilen Proxy\'ye iletilmiştir.<br/><br/> Değiştirmek için <i>Yapılandırma</i> ekranından <i>Proxy</i> seçeneğine gidin.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">Bu bağlantı, kullanıcı tercihine göre yönlendirilen Proxy\'ye iletilmiştir.<br></br><br></br> Değiştirmek için <i>Yapılandırma</i> ekranından <i>Proxy</i> seçeneğine gidin.</string>
     <string name="lbl_import" translatable="true">İçe Aktar</string>
     <string name="lbl_allowed_ips" translatable="true">İzin Verilen IP\'ler</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
@@ -865,11 +865,11 @@
     <string name="settings_general_customize" translatable="true">özelleştir</string>
     <string name="new_warp_error_toast" translatable="true">WARP yapılandırması alınamıyor</string>
     <string name="bad_config_context" translatable="true">%1$s\'s %2$s</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">Bir kullanıcı tarafından belirlenen güvenlik duvarı kuralı, <i>alan adını</i> engelledi.<br/><br/> Değiştirmek için <i>Uygulama Özel Güvenlik Duvarı</i> ekranına gidin.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Bir kullanıcı tarafından belirlenen güvenlik duvarı kuralı, <i>alan adını</i> engelledi.<br></br><br></br> Değiştirmek için <i>Uygulama Özel Güvenlik Duvarı</i> ekranına gidin.</string>
     <string name="hs_biometeric_failed" translatable="true">Biyometrik kimlik doğrulama başarısız oldu</string>
     <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">En çok engellenmiş uygulamalar</string>
     <string name="settings_go_log_heading" translatable="true">Günlük seviyesi</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Bu bağlantı, evrensel alan kurallarında <i>alan adı</i> olarak engellendiği için engellendi.<br/><br/> Bu davranışı değiştirmek için <i>DNS Yapılandırma</i> sekmesine gidin.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Bu bağlantı, evrensel alan kurallarında <i>alan adı</i> olarak engellendiği için engellendi.<br></br><br></br> Bu davranışı değiştirmek için <i>DNS Yapılandırma</i> sekmesine gidin.</string>
     <string name="lbl_auto" translatable="true">(otomatik)</string>
     <string name="bad_config_explanation_udp_port" translatable="true">: Geçerli bir UDP bağlantı noktası numarası olmalıdır</string>
     <string name="lbl_slow" translatable="true">yavaş</string>
@@ -878,7 +878,7 @@
     <string name="bad_config_reason_invalid_value" translatable="true">Geçersiz değer</string>
     <string name="ada_app_firewall" translatable="true">Güvenlik Duvarı</string>
     <string name="logs_card_dns_count" translatable="true">%1$s sorgular</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">Bu bağlantı, <i>alan adının</i> Güvenilir alan olarak ayarlandığı için izin verildi.<br/><br/> Değiştirmek için <i>Uygulama Özel Güvenlik Duvarı</i> ekranına gidin.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Bu bağlantı, <i>alan adının</i> Güvenilir alan olarak ayarlandığı için izin verildi.<br></br><br></br> Değiştirmek için <i>Uygulama Özel Güvenlik Duvarı</i> ekranına gidin.</string>
     <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">en çok iletişim kurulan alan adları</string>
     <string name="lbl_day" translatable="true">gün</string>
     <string name="lbl_fast" translatable="true">hızlı</string>
@@ -913,7 +913,7 @@
     <string name="crypt_cleanbrowsing_family_desc" translatable="true">Tüm yetişkin, pornografik ve açık sitelere erişimi engeller. Ayrıca filtreleri atlamak için kullanılan proxy ve VPN alan adlarını da engeller. Karışık içerikli siteler (örneğin Reddit) de engellenir. Google, Bing ve Youtube Güvenli Mod\'a ayarlanmıştır.</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">DNS ve Güvenlik Duvarını Atlayın</string>
     <string name="lbl_preshared_key" translatable="true">Önceden paylaşılmış anahtar</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Bu bağlantı, evrensel alan kurallarında <i>alan adı</i> olarak güvenilir olarak ayarlandığı için izin verildi.<br/><br/> Bu davranışı değiştirmek için <i>DNS Yapılandırma</i> sekmesine gidin.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Bu bağlantı, evrensel alan kurallarında <i>alan adı</i> olarak güvenilir olarak ayarlandığı için izin verildi.<br></br><br></br> Bu davranışı değiştirmek için <i>DNS Yapılandırma</i> sekmesine gidin.</string>
     <string name="bad_config_reason_unknown_section" translatable="true">Bilinmeyen Bölüm</string>
     <string name="lbl_applications" translatable="true">Uygulamalar</string>
     <string name="lbl_include" translatable="true">Dahil et</string>
@@ -936,7 +936,7 @@
     <string name="settings_lock_down_proxy_desc" translatable="true">VPN yalnızca DNS modunda çalışırken proxy\'ler kurulamıyor.</string>
     <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">en çok engellenen alan adları</string>
     <string name="lbl_select_all" translatable="true">tümünü seç</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">Bu bağlantı, kullanıcı tercihine göre DNS tarafından engellendi çünkü <i>alan adı</i> engellendi.<br/><br/> Bu davranışı değiştirmek için <i>DNS Yapılandırma</i> sekmesine gidin.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">Bu bağlantı, kullanıcı tercihine göre DNS tarafından engellendi çünkü <i>alan adı</i> engellendi.<br></br><br></br> Bu davranışı değiştirmek için <i>DNS Yapılandırma</i> sekmesine gidin.</string>
     <string name="cleanbrowsing_adult_dns_desc" translatable="true">Yetişkin filtresi, tüm yetişkin, pornografik ve açık sitelere erişimi engeller. Proxy veya VPN\'leri, karışık içerikli siteleri engellemez. Reddit gibi sitelere izin verir. Google ve Bing Güvenli Mod\'a ayarlanmıştır.</string>
     <string name="config_delete_dialog_desc">Bu Konfigürasyonu silmek istediğinizden emin misiniz\?</string>
     <string name="parse_error_reason" translatable="true">%1$s \"%2$s\" ayrıştırılamıyor</string>
