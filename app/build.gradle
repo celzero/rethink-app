@@ -201,18 +201,18 @@ def firestackDependency = { suffix = "" ->
 }
 
 dependencies {
-    def room_version = "2.6.1"
+    def room_version = "2.7.2"
     def paging_version = "3.3.6"
 
     implementation 'com.google.guava:guava:33.4.8-android'
 
     // https://developer.android.com/studio/write/java8-support
     // included to fix issues with Android 6 support, issue#563
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
-    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0'
+    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20'
     fullImplementation 'androidx.appcompat:appcompat:1.7.1'
-    fullImplementation 'androidx.core:core-ktx:1.16.0'
+    fullImplementation 'androidx.core:core-ktx:1.17.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
     fullImplementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     fullImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
@@ -221,7 +221,7 @@ dependencies {
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
 
     // LiveData
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.2'
 
     implementation 'com.google.code.gson:gson:2.13.1'
 
@@ -230,13 +230,12 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.room:room-paging:$room_version"
 
-    fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.1'
-    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.1'
+    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2'
+    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.2'
 
     // Pagers Views
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    fullImplementation 'androidx.fragment:fragment-ktx:1.8.8'
+    fullImplementation 'androidx.fragment:fragment-ktx:1.8.9'
     implementation 'com.google.android.material:material:1.12.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.1.0'
 
@@ -246,7 +245,7 @@ dependencies {
     fullImplementation 'com.squareup.retrofit2:retrofit:3.0.0'
     fullImplementation 'com.squareup.retrofit2:converter-gson:3.0.0'
 
-    implementation 'com.squareup.okio:okio-jvm:3.15.0'
+    implementation 'com.squareup.okio:okio-jvm:3.16.0'
     // Glide
     fullImplementation('com.github.bumptech.glide:glide:4.16.0') {
         exclude group: 'glide-parent'
@@ -282,7 +281,7 @@ dependencies {
     playImplementation firestackDependency()
 
     // Work manager
-    implementation('androidx.work:work-runtime-ktx:2.10.2') {
+    implementation('androidx.work:work-runtime-ktx:2.10.3') {
         modules {
             module("com.google.guava:listenablefuture") {
                 replacedBy("com.google.guava:guava", "listenablefuture is part of guava")
@@ -296,14 +295,14 @@ dependencies {
     implementation 'com.github.seancfoley:ipaddress:5.5.1'
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
-    androidTestImplementation 'androidx.test:rules:1.6.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
+    androidTestImplementation 'androidx.test:rules:1.7.0'
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
 
-    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.9.1'
-    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.9.1'
+    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.9.3'
+    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.9.3'
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
@@ -311,9 +310,9 @@ dependencies {
     playImplementation 'com.google.android.play:app-update-ktx:2.1.0'
 
     // for encrypting wireguard configuration files
-    implementation("androidx.security:security-crypto:1.1.0-beta01")
-    implementation("androidx.security:security-app-authenticator:1.0.0-rc01")
-    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-rc01")
+    implementation("androidx.security:security-crypto:1.1.0")
+    implementation("androidx.security:security-app-authenticator:1.0.0")
+    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0")
 
     // barcode scanner for wireguard
     fullImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
