@@ -1,0 +1,1 @@
+Firewall, VPN WireGuard, monitorizează rețeaua, blochează malware, modifică DNS.
