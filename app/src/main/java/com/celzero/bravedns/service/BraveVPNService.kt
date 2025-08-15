@@ -864,7 +864,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val ip4str = ip4in6.toNormalizedString()
             val statusIpPort4in6 = IpRulesManager.hasRule(uid, ip4str, destPort)
             if (statusIpPort4in6 != IpRulesManager.IpRuleStatus.NONE) {
-                return statusIpPort // trusted or blocked or bypassed-universal
+                return statusIpPort4in6 // trusted or blocked or bypassed-universal
             }
         }
         return statusIpPort
