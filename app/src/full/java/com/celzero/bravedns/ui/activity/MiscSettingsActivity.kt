@@ -635,6 +635,9 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             persistentState.goLoggerLevel = which.toLong()
             GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
             updateConfigLevel(persistentState.goLoggerLevel)
+            b.genSettingsGoLogDesc.text =
+                Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt()).name.lowercase()
+                    .replaceFirstChar(Char::titlecase).replace("_", " ")
         }
         alertBuilder.create().show()
     }
