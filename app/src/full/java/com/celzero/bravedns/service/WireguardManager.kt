@@ -517,10 +517,16 @@ object WireguardManager : KoinComponent {
             Logger.i(LOG_TAG_PROXY, "no proxy ids found for $uid, $ip, $port, $domain; returning empty list")
             return emptyList()
         }
+        // see if any id is part of lockdown, if so, then return the list, cac's can have lockdown
+        val isAnyIdLockdown = proxyIds.any { id ->
+            val confId = convertStringIdToId(id)
+            val conf = mappings.find { it.id == confId }
+            conf?.isLockdown ?: false
+        }
 
         // add the default proxy to the end, will not be true for lockdown but lockdown is handled
         // above, so no need to check here
-        if (default.isNotEmpty()) proxyIds.add(default)
+        if (default.isNotEmpty() && !isAnyIdLockdown) proxyIds.add(default)
 
         // the proxyIds list will contain the ip-app specific, domain-app specific, app specific,
         // universal ip, universal domain, catch-all and default configs in the order of priority
