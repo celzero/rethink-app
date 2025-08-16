@@ -317,8 +317,19 @@ internal constructor(
         prevPackageName: String?
     ) {
         val appInfo = fetchApplicationInfo(appTuple.uid) ?: return
-        // TODO: implement upsert logic handling all the edge cases
+        
+        Logger.i(LOG_TAG_APP_DB, "upsertNonApp: converting non-app to real app, uid: ${appTuple.uid}, old pkg: $prevPackageName, new pkg: ${appInfo.packageName}")
+        
+        // Clean up any conflicting entries for this UID before inserting the new app
+        if (FirewallManager.hasUidConflict(appTuple.uid, appInfo.packageName)) {
+            Logger.w(LOG_TAG_APP_DB, "UID conflict during upsert for uid: ${appTuple.uid}")
+            FirewallManager.cleanupUidConflicts(appTuple.uid, appInfo.packageName)
+        }
+        
+        // Remove the old non-app entry
         deletePackage(appTuple.uid, prevPackageName)
+        
+        // Insert the new real app
         insertApp(appInfo)
     }
 
@@ -505,7 +516,15 @@ internal constructor(
             FirewallManager.resetTombstoneTs(oldUid, pkg)
             return
         }
+        
         Logger.i(LOG_TAG_APP_DB, "update app; oldUid: $oldUid, newUid: $newUid, pkg: $pkg")
+        
+        // Check for UID conflicts with the new UID before updating
+        if (FirewallManager.hasUidConflict(newUid, pkg)) {
+            Logger.w(LOG_TAG_APP_DB, "UID conflict detected during app update for newUid: $newUid, package: $pkg")
+            FirewallManager.cleanupUidConflicts(newUid, pkg)
+        }
+        
         FirewallManager.updateUid(oldUid, newUid, pkg)
     }
 
@@ -521,6 +540,12 @@ internal constructor(
         // see: fetchApplicationInfo()
         entry.uid = ai.uid
         entry.isSystemApp = isSystemApp
+
+        // Check for UID conflicts and clean them up before inserting the new app
+        if (FirewallManager.hasUidConflict(ai.uid, ai.packageName)) {
+            Logger.w(LOG_TAG_APP_DB, "UID conflict detected for uid: ${ai.uid}, package: ${ai.packageName}")
+            FirewallManager.cleanupUidConflicts(ai.uid, ai.packageName)
+        }
 
         // do not firewall app by default, if blockNewlyInstalledApp is set to false
         if (persistentState.getBlockNewlyInstalledApp()) {

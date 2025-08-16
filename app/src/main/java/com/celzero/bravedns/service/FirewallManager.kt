@@ -606,6 +606,17 @@ object FirewallManager : KoinComponent {
         return getAppInfoByUid(uid)?.packageName?.startsWith(NO_PACKAGE_PREFIX) ?: false
     }
 
+    suspend fun hasUidConflict(uid: Int, packageName: String): Boolean {
+        return db.hasUidConflict(uid, packageName)
+    }
+
+    suspend fun cleanupUidConflicts(uid: Int, packageName: String) {
+        Logger.i(LOG_TAG_FIREWALL, "cleaning up UID conflicts for uid: $uid, package: $packageName")
+        db.cleanupUidConflicts(uid, packageName)
+        // Reload the app list to reflect changes
+        load()
+    }
+
     private suspend fun informObservers() {
         val v = getAppInfos()
         v.let { appInfosLiveData.postValue(v) }
