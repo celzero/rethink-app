@@ -262,39 +262,26 @@ object FirewallManager : KoinComponent {
 
     suspend fun isUidSystemApp(uid: Int): Boolean {
         mutex.withLock {
-            return appInfos.get(uid).any { it.isSystemApp }
+            return appInfos.get(uid).any { it.isSystemApp && it.tombstoneTs == 0L }
         }
     }
 
     suspend fun getAllApps(): Set<AppInfoTuple> {
         mutex.withLock {
+            // only return apps that are not tombstoned
             return appInfos.values().map { AppInfoTuple(it.uid, it.packageName) }.toSet()
         }
     }
 
-    suspend fun deletePackages(packagesToDelete: Set<AppInfoTuple>) {
-        mutex.withLock {
-            packagesToDelete.forEach { tuple ->
-                appInfos
-                    .get(tuple.uid)
-                    .filter { tuple.packageName == it.packageName }
-                    .forEach { ai -> appInfos.remove(tuple.uid, ai) }
-            }
-        }
-        // Delete the uninstalled apps from database
-        packagesToDelete.forEach { tuple -> db.deletePackage(tuple.uid, tuple.packageName) }
-    }
-
-    suspend fun tombstoneApp(uid: Int, packageName: String?) {
-        val currentTime = System.currentTimeMillis()
+    suspend fun tombstoneApp(uid: Int, packageName: String?, ts: Long = System.currentTimeMillis()) {
         mutex.withLock {
             appInfos
                 .values()
                 .filter { it.packageName == packageName && it.uid == uid }
-                .forEach { it.tombstoneTs = currentTime }
+                .forEach { it.tombstoneTs = ts }
         }
         // delete the uninstalled apps from database
-        db.tombstoneApp(uid, packageName, currentTime)
+        db.tombstoneApp(uid, packageName, ts)
     }
 
     suspend fun resetTombstoneTs(uid: Int, packageName: String?) {
@@ -328,13 +315,22 @@ object FirewallManager : KoinComponent {
     // TODO: Use the package-manager API instead
     suspend fun isOrbotInstalled(): Boolean {
         mutex.withLock {
-            return appInfos.values().any { it.packageName == OrbotHelper.ORBOT_PACKAGE_NAME }
+            return appInfos.values().any { it.packageName == OrbotHelper.ORBOT_PACKAGE_NAME && it.tombstoneTs == 0L }
         }
     }
 
     suspend fun hasUid(uid: Int): Boolean {
         mutex.withLock {
-            return appInfos.containsKey(uid)
+            val appInfo = appInfos.get(uid)
+            return appInfo.isNotEmpty() && appInfo.any { it.tombstoneTs == 0L }
+        }
+    }
+
+    suspend fun tombstoned(packageName: String): Boolean {
+        mutex.withLock {
+            return appInfos.values().any {
+                it.packageName == packageName && it.tombstoneTs > 0L
+            }
         }
     }
 
@@ -370,7 +366,7 @@ object FirewallManager : KoinComponent {
         mutex.withLock {
             return appInfos
                 .values()
-                .filter { it.firewallStatus == FirewallStatus.EXCLUDE.id }
+                .filter { it.firewallStatus == FirewallStatus.EXCLUDE.id && it.tombstoneTs == 0L }
                 .map { it.packageName }
                 .toMutableSet()
         }
@@ -380,36 +376,37 @@ object FirewallManager : KoinComponent {
     suspend fun isAnyAppBypassesDns(): Boolean {
         mutex.withLock {
             return appInfos.values().any {
-                it.firewallStatus == FirewallStatus.BYPASS_DNS_FIREWALL.id
+                it.firewallStatus == FirewallStatus.BYPASS_DNS_FIREWALL.id &&
+                it.tombstoneTs == 0L
             }
         }
     }
 
     suspend fun getPackageNameByAppName(appName: String?): String? {
         mutex.withLock {
-            return appInfos.values().firstOrNull { it.appName == appName }?.packageName
+            return appInfos.values().firstOrNull { it.appName == appName && it.tombstoneTs == 0L}?.packageName
         }
     }
 
     suspend fun getAppNamesByUid(uid: Int): List<String> {
         mutex.withLock {
-            return appInfos.get(uid).map { it.appName }
+            return appInfos.get(uid).filter {  it.tombstoneTs == 0L }.map { it.appName }
         }
     }
 
     suspend fun getPackageNamesByUid(uid: Int): List<String> {
         mutex.withLock {
-            return appInfos.get(uid).map { it.packageName }
+            return appInfos.get(uid).filter { it.tombstoneTs == 0L }.map { it.packageName }
         }
     }
 
     suspend fun getAllAppNames(): List<String> {
-        return getAppInfos().map { it.appName }.sortedBy { it.lowercase() }
+        return getAppInfos().filter { it.tombstoneTs == 0L }.map { it.appName }.sortedBy { it.lowercase() }
     }
 
     suspend fun getAppNameByUid(uid: Int): String? {
         mutex.withLock {
-            return appInfos.get(uid).firstOrNull()?.appName
+            return appInfos.get(uid).firstOrNull { it.tombstoneTs == 0L }?.appName
         }
     }
 
@@ -422,13 +419,13 @@ object FirewallManager : KoinComponent {
 
     suspend fun getAppInfoByUid(uid: Int): AppInfo? {
         mutex.withLock {
-            return appInfos.get(uid).firstOrNull()
+            return appInfos.get(uid).firstOrNull { it.tombstoneTs == 0L }
         }
     }
 
     suspend fun getPackageNameByUid(uid: Int): String? {
         mutex.withLock {
-            return appInfos.get(uid).firstOrNull()?.packageName
+            return appInfos.get(uid).firstOrNull { it.tombstoneTs == 0L }?.packageName
         }
     }
 
@@ -658,7 +655,7 @@ object FirewallManager : KoinComponent {
         io {
             mutex.withLock {
                 appInfos.get(uid).forEach {
-                    it.isProxyExcluded = isProxyExcluded
+                    it.isProxyExcluded = isProxyExcluded && it.tombstoneTs == 0L
                 }
             }
             db.updateProxyExcluded(uid, isProxyExcluded)
