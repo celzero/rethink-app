@@ -35,7 +35,6 @@ import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
 import com.celzero.bravedns.receiver.NotificationActionReceiver
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
@@ -51,6 +50,7 @@ import com.celzero.bravedns.ui.NotificationHandlerActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.PlayStoreCategory
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
@@ -181,11 +181,11 @@ internal constructor(
                 "installed apps: ${installedApps.size}, tracked apps: ${trackedApps.size}"
             )
             val packagesToAdd =
-                findPackagesToAdd(trackedApps, installedApps, action == ACTION_REFRESH_RESTORE)
+                findPackagesToAdd(trackedApps, installedApps)
             val packagesToDelete =
-                findPackagesToDelete(trackedApps, installedApps, action == ACTION_REFRESH_RESTORE)
+                findPackagesToDelete(trackedApps, installedApps)
             val packagesToUpdate =
-                findPackagesToUpdate(trackedApps, installedApps, action == ACTION_REFRESH_RESTORE)
+                findPackagesToUpdate(trackedApps, installedApps)
 
             printAll(packagesToAdd, "packagesToAdd")
             printAll(packagesToDelete, "packagesToDelete")
@@ -218,47 +218,30 @@ internal constructor(
 
     private fun findPackagesToAdd(
         old: Set<FirewallManager.AppInfoTuple>,
-        latest: Set<FirewallManager.AppInfoTuple>,
-        ignoreUid: Boolean = false
+        latest: Set<FirewallManager.AppInfoTuple>
     ): Set<FirewallManager.AppInfoTuple> {
-        return if (ignoreUid) {
-            val oldpkgs = old.map { it.packageName }.toSet()
-            latest
-                .filter { !oldpkgs.contains(it.packageName) }
-                .toHashSet() // latest apps not found in old
-        } else {
-            latest.filter { !old.contains(it) }.toHashSet()
-        }
+        val oldpkgs = old.map { it.packageName }.toSet()
+        return latest
+            .filter { !oldpkgs.contains(it.packageName) }
+            .toHashSet()
     }
 
     private fun findPackagesToDelete(
         old: Set<FirewallManager.AppInfoTuple>,
-        latest: Set<FirewallManager.AppInfoTuple>,
-        ignoreUid: Boolean = false
+        latest: Set<FirewallManager.AppInfoTuple>
     ): Set<FirewallManager.AppInfoTuple> {
-        return if (ignoreUid) {
-            val latestpkgs = latest.map { it.packageName }.toSet()
-            old.filter { !latestpkgs.contains(it.packageName) && !isNonApp(it.packageName) }
-                .toHashSet()
-        } else {
-            // extract old apps that are not latest
-            old.filter { !latest.contains(it) && !isNonApp(it.packageName) }.toHashSet()
-        }
+        val latestpkgs = latest.map { it.packageName }.toSet()
+        return old.filter { !latestpkgs.contains(it.packageName) && !isNonApp(it.packageName) }
+                        .toHashSet()
     }
 
     private fun findPackagesToUpdate(
         old: Set<FirewallManager.AppInfoTuple>,
-        latest: Set<FirewallManager.AppInfoTuple>,
-        ignoreUid: Boolean = false
+        latest: Set<FirewallManager.AppInfoTuple>
     ): Set<FirewallManager.AppInfoTuple> {
-        return if (ignoreUid) {
-            val latestpkgs = latest.map { it.packageName }.toSet()
-            old.filter { latestpkgs.contains(it.packageName) }
-                .toSet() // find old package names that appear in latest
-        } else {
-            // Sets.intersection(old, latest); need not update apps already tracked
-            emptySet()
-        }
+        val latestpkgs = latest.map { it.packageName }.toSet()
+        return old.filter { latestpkgs.contains(it.packageName) }
+            .toSet() // find old package names that appear in latest
     }
 
     private suspend fun deletePackages(packagesToDelete: Set<FirewallManager.AppInfoTuple>, restore: Boolean) {
@@ -273,7 +256,7 @@ internal constructor(
             if (appInfo != null) {
                 if (appInfo.tombstoneTs == 0L && !restore) {
                     // mark the app as tombstoned
-                    FirewallManager.tombstoneApp(it.uid, it.packageName)
+                    FirewallManager.tombstoneApp(it.uid, it.packageName, currentTime)
                     Logger.i(
                         LOG_TAG_APP_DB,
                         "tombstone app: ${it.packageName}, uid: ${it.uid}, ts: ${appInfo.tombstoneTs}"
@@ -290,6 +273,8 @@ internal constructor(
                             LOG_TAG_APP_DB,
                             "delete app: ${it.packageName}, uid: ${it.uid}, ts: ${appInfo.tombstoneTs}"
                         )
+                    } else {
+                        // no-op, package is already tombstoned, will be deleted later
                     }
                 }
             }
@@ -367,9 +352,10 @@ internal constructor(
         apps.forEach { old ->
             // FirewallManager must have been updated by now, so we can get the latest app info
             // using the package-name (as uid have changed)
-            val newinfo = FirewallManager.getAppInfoByPackage(old.packageName) ?: return@forEach
+            val newInfo = FirewallManager.getAppInfoByPackage(old.packageName) ?: return@forEach
+            if (newInfo.uid == old.uid) return@forEach
             oldUids.add(old.uid)
-            newUids.add(newinfo.uid)
+            newUids.add(newInfo.uid)
         }
         DomainRulesManager.updateUids(oldUids, newUids)
     }
@@ -383,6 +369,32 @@ internal constructor(
         val ai = maybeFetchAppInfo(uid)
         val pkg = ai?.packageName ?: ""
         Logger.i(LOG_TAG_APP_DB, "insert app; uid: $uid, pkg: $pkg")
+        val tombstone = FirewallManager.tombstone(pkg)
+        if (tombstone) {
+            val oldUid = FirewallManager.getAppInfoByPackage(pkg)?.uid
+            if (oldUid == null) {
+                Logger.e(LOG_TAG_APP_DB, "insertApp: $uid is tombstoned, but oldUid is null")
+                return
+            }
+            if (ai == null) {
+                // if the app is tombstoned, but the app info is not available, maybe non-app
+                // reset the tombstone timestamp
+                val newUid = if (oldUid < INVALID_UID) { // negative for tombstoned apps
+                    // if the oldUid is invalid, then use the current uid
+                    uid
+                } else {
+                    oldUid
+                }
+                FirewallManager.resetTombstoneTs(oldUid, newUid, pkg)
+                Logger.i(LOG_TAG_APP_DB, "insertApp: $uid is tombstoned, but app info is null (non-app)")
+                return
+            }
+            // if the app is markes as tombstone, then reset the tombstone timestamp
+            // and return, so that the app is not added again
+            FirewallManager.updateUid(oldUid, ai.uid, pkg)
+            Logger.i(LOG_TAG_APP_DB, "insertApp: $uid is tombstoned, reset ts")
+            return
+        }
         if (ai != null) {
             // uid may be different from the one in ai, if the app is installed in a different user
             insertApp(ai)
@@ -502,7 +514,7 @@ internal constructor(
     private suspend fun updateApp(oldUid: Int, newUid: Int, pkg: String) {
         if (oldUid == newUid) {
             Logger.i(LOG_TAG_APP_DB, "update app; uid: $oldUid == $newUid, reset tombstone ts")
-            FirewallManager.resetTombstoneTs(oldUid, pkg)
+            FirewallManager.resetTombstoneTs(oldUid, newUid, pkg)
             return
         }
         Logger.i(LOG_TAG_APP_DB, "update app; oldUid: $oldUid, newUid: $newUid, pkg: $pkg")

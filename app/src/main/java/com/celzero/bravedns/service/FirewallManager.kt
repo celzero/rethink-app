@@ -274,25 +274,28 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun tombstoneApp(uid: Int, packageName: String?, ts: Long = System.currentTimeMillis()) {
+        val newUid = -1 * uid // use negative uid to mark the app as tombstone
         mutex.withLock {
             appInfos
                 .values()
                 .filter { it.packageName == packageName && it.uid == uid }
-                .forEach { it.tombstoneTs = ts }
+                .forEach {
+                    it.tombstoneTs = ts
+                    it.uid = newUid
+                }
         }
-        // delete the uninstalled apps from database
-        db.tombstoneApp(uid, packageName, ts)
+        db.tombstoneApp(newUid, uid, packageName, ts)
     }
 
-    suspend fun resetTombstoneTs(uid: Int, packageName: String?) {
+    suspend fun resetTombstoneTs(oldUid: Int, newUid: Int = oldUid, packageName: String?) {
         mutex.withLock {
             appInfos
                 .values()
-                .filter { it.packageName == packageName && it.uid == uid }
+                .filter { it.packageName == packageName && it.uid == oldUid }
                 .forEach { it.tombstoneTs = 0 }
         }
         // delete the uninstalled apps from database
-        db.tombstoneApp(uid, packageName, 0)
+        db.tombstoneApp(newUid, oldUid, packageName, 0)
     }
 
     suspend fun deletePackage(uid: Int, packageName: String?) {
@@ -326,7 +329,7 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    suspend fun tombstoned(packageName: String): Boolean {
+    suspend fun tombstone(packageName: String): Boolean {
         mutex.withLock {
             return appInfos.values().any {
                 it.packageName == packageName && it.tombstoneTs > 0L
