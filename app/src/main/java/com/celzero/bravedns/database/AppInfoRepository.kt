@@ -45,6 +45,22 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.updateUid(oldUid, pkg, uid)
     }
 
+    suspend fun hasUidConflict(uid: Int, packageName: String): Boolean {
+        val existingApps = appInfoDAO.getAppInfoByUid(uid)
+        // Check if there are any apps with this UID that have different package names
+        return existingApps.any { it.packageName != packageName }
+    }
+
+    suspend fun cleanupUidConflicts(uid: Int, newPackageName: String) {
+        val conflictingApps = appInfoDAO.getAppInfoByUid(uid)
+        // Remove any apps with the same UID but different package names
+        conflictingApps.forEach { existingApp ->
+            if (existingApp.packageName != newPackageName) {
+                appInfoDAO.deletePackage(uid, existingApp.packageName)
+            }
+        }
+    }
+
     suspend fun deleteByPackageName(packageNames: List<String>) {
         appInfoDAO.deleteByPackageName(packageNames)
     }

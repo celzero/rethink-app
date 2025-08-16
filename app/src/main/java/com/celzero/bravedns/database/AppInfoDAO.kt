@@ -170,4 +170,7 @@ interface AppInfoDAO {
 
     @Query("select uid from AppInfo where packageName = :packageName")
     fun getAppInfoUidForPackageName(packageName: String): Int
+
+    @Query("select * from AppInfo where uid = :uid")
+    fun getAppInfoByUid(uid: Int): List<AppInfo>
 }
