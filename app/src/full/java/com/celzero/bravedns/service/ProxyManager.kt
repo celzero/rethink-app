@@ -231,15 +231,15 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun purgeDupsBeforeRefresh() {
-        val visited = mutableSetOf<FirewallManager.AppInfoTuple>()
+        val visited = mutableSetOf<String>() // contains package-names
         val dups = mutableSetOf<FirewallManager.AppInfoTuple>()
         pamSet
             .map { FirewallManager.AppInfoTuple(it.uid, it.packageName) }
-            .forEach { if (visited.contains(it)) dups.add(it) else visited.add(it) }
+            .forEach { if (visited.contains(it.packageName)) dups.add(it) else visited.add(it.packageName) }
         // duplicates are unexpected; but since refreshDatabase only deals in uid+package-name
         // and proxy-mapper primary keys on uid+package-name+proxy-id, there have been cases
         // of duplicate entries in the proxy-mapper. Purge all entries that have same
-        // uid+package-name pair. Note that, doing so also removes entry for an app even if it is
+        // package-name. Note that, doing so also removes entry for an app even if it is
         // currently installed.
         // This is okay, given we do not expect any dups. Also: This fn must be called before
         // refreshDatabase so that any entries removed are added back as "new mappings" via
