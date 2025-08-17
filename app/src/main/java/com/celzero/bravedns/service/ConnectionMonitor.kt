@@ -344,6 +344,12 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
     }
 
     private suspend fun sendNetworkChanges(isForceUpdate: Boolean = true) {
+        // Check if channel is initialized to avoid UninitializedPropertyAccessException
+        if (!::channel.isInitialized) {
+            Logger.w(LOG_TAG_CONNECTION, "channel not initialized, skipping network changes")
+            return
+        }
+        
         val dualStack =
             InternetProtocol.getInternetProtocol(persistentState.internetProtocolType).isIPv46()
         val testReachability = dualStack && persistentState.connectivityChecks
