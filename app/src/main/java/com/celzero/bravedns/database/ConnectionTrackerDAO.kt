@@ -203,7 +203,7 @@ interface ConnectionTrackerDAO {
     )
     fun getTotalUsages(to: Long, meteredTxt: String): DataUsageSummary
 
-    @Query("select * from ConnectionTracker where blockedByRule in ('Rule #1B', 'Rule #1F', 'Rule #3', 'Rule #4', 'Rule #5', 'Rule #6', 'Http block', 'Universal Lockdown')")
+    @Query("select * from ConnectionTracker where blockedByRule in ('Rule #1B', 'Rule #1F', 'Rule #3', 'Rule #4', 'Rule #5', 'Rule #6', 'Rule #7', 'Http block', 'Universal Lockdown')")
     fun getBlockedUniversalRulesCount(): List<ConnectionTracker>
 
     @Query("SELECT uid AS uid, '' AS ipAddress, 0 AS port, COUNT(id) AS count, flag AS flag, 0 AS blocked, appName AS appOrDnsName, SUM(downloadBytes) AS downloadBytes, SUM(uploadBytes) AS uploadBytes, SUM(uploadBytes + downloadBytes) AS totalBytes FROM ConnectionTracker WHERE proxyDetails = :wgId AND timeStamp > :to GROUP BY appName ORDER BY totalBytes DESC")
