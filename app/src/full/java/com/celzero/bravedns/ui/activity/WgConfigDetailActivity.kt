@@ -208,7 +208,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             // if catch all is enabled, disable the add apps button and lockdown
             b.catchAllCheck.isChecked = mapping.isCatchAll
             if (mapping.isCatchAll) {
-                b.lockdownCheck.isEnabled = false
                 b.applicationsBtn.isEnabled = false
                 b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
             }
@@ -653,7 +652,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
             WireguardManager.updateCatchAllConfig(configId, enabled)
             uiCtx {
-                b.lockdownCheck.isEnabled = !enabled
                 b.applicationsBtn.isEnabled = !enabled
                 if (enabled) {
                     b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
