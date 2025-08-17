@@ -34,7 +34,6 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.Companion.DOH_INDEX
 import com.celzero.bravedns.data.AppConfig.Companion.DOT_INDEX
 import com.celzero.bravedns.databinding.FragmentDnsConfigureBinding
-import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.scheduler.WorkScheduler.Companion.BLOCKLIST_UPDATE_CHECK_JOB_TAG
 import com.celzero.bravedns.service.BraveVPNService
