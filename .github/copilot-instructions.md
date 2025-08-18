@@ -207,3 +207,24 @@ app/src/
 - `app/src/main/AndroidManifest.xml` -- App permissions and components
 - `.github/workflows/android.yml` -- CI/CD pipeline
 - `.github/detekt-config.yml` -- Code style configuration
+
+### Quick File Lookups (No Build Required)
+Use these commands to explore the codebase when builds fail:
+
+```bash
+# Find all test files
+find app/src -name "*.kt" -exec grep -l "@Test" {} \;
+
+# Count source files by type
+find app/src -name "*.kt" | wc -l  # Kotlin files
+find app/src -name "*.java" | wc -l  # Java files
+
+# Explore key directories
+ls -la app/src/main/java/com/celzero/bravedns/service/  # Core services
+ls -la app/src/main/java/com/celzero/bravedns/database/  # Database entities
+find app/src -path "*/ui/*" -name "*Activity*" | head -10  # UI activities
+
+# Validate project structure
+ls -la app/src/  # Source sets (main, test, androidTest, flavors)
+grep -r "buildTypes\|productFlavors" app/build.gradle  # Build configuration
+```
