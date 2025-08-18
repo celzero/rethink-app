@@ -404,6 +404,10 @@ class CustomDomainAdapter(
                         }
                     }
 
+                    b.customDomainCheckbox.setOnClickListener {
+                        toggleSelection(cd)
+                    }
+
                     b.customDomainSeeMoreChip.setOnClickListener { openAppWiseRulesActivity(cd.uid) }
 
                     b.customDomainContainer.setOnLongClickListener {
@@ -539,6 +543,10 @@ class CustomDomainAdapter(
                 } else {
                     showButtonsBottomSheet(customDomain)
                 }
+            }
+
+            b.customDomainCheckbox.setOnClickListener {
+                toggleSelection(cd)
             }
 
             b.customDomainContainer.setOnLongClickListener {

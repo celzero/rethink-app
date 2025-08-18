@@ -32,6 +32,9 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -105,7 +108,11 @@ object IpRulesManager : KoinComponent {
     suspend fun load(): Long {
         iptree.clear()
         db.getIpRules().forEach {
-            val pair = it.getCustomIpAddress() ?: return@forEach
+            val pair = it.getCustomIpAddress()
+            if (pair == null) {
+                Logger.w(LOG_TAG_FIREWALL, "invalid ip address for rule: ${it.ipAddress}")
+                return@forEach
+            }
             val ipaddr = pair.first
             val port = pair.second
             val k = normalize(ipaddr)
@@ -191,41 +198,48 @@ object IpRulesManager : KoinComponent {
         resultsCache.invalidateAll()
     }
 
-    private suspend fun updateRule(uid: Int, ipaddr: String, port: Int, status: IpRuleStatus, proxyId: String, proxyCC: String) {
-        Logger.i(LOG_TAG_FIREWALL, "ip rule, update: $ipaddr for uid: $uid; status: ${status.name}")
-        // ipaddr is expected to be normalized
-        val c = makeCustomIp(uid, ipaddr, port, status, wildcard = false, proxyId, proxyCC)
-        db.update(c)
-        val k = treeKey(ipaddr)
+    private suspend fun updateRule(ci: CustomIp) {
+        Logger.i(LOG_TAG_FIREWALL, "ip rule, update: ${ci.ipAddress} for uid: ${ci.uid}; status: ${ci.status}")
+        // ensure modified time is updated for ordering
+        ci.modifiedDateTime = System.currentTimeMillis()
+        db.update(ci)
+        val k = treeKey(ci.ipAddress)
         if (!k.isNullOrEmpty()) {
-            iptree.escLike(k.togs(), treeValLike(uid, port))
-            iptree.add(k.togs(), treeVal(uid, port, status.id, proxyId, proxyCC))
+            // escape old entries and add updated rule using ci.port (not android attr)
+            iptree.escLike(k.togs(), treeValLike(ci.uid, ci.port))
+            iptree.add(k.togs(), treeVal(ci.uid, ci.port, ci.status, ci.proxyId, ci.proxyCC))
         }
         resultsCache.invalidateAll()
     }
 
     suspend fun updateBypass(c: CustomIp) {
-        return updateRule(c.uid, c.ipAddress, c.port, IpRuleStatus.BYPASS_UNIVERSAL, c.proxyId, c.proxyCC)
+        c.status = IpRuleStatus.BYPASS_UNIVERSAL.id
+        return updateRule(c)
     }
 
     suspend fun updateTrust(c: CustomIp) {
-        return updateRule(c.uid, c.ipAddress, c.port, IpRuleStatus.TRUST, c.proxyId, c.proxyCC)
+        c.status = IpRuleStatus.TRUST.id
+        return updateRule(c)
     }
 
     suspend fun updateNoRule(c: CustomIp) {
-        return updateRule(c.uid, c.ipAddress, c.port, IpRuleStatus.NONE, c.proxyId, c.proxyCC)
+        c.status = IpRuleStatus.NONE.id
+        return updateRule(c)
     }
 
     suspend fun updateBlock(c: CustomIp) {
-        return updateRule(c.uid, c.ipAddress, c.port, IpRuleStatus.BLOCK, c.proxyId, c.proxyCC)
+        c.status = IpRuleStatus.BLOCK.id
+        return updateRule(c)
     }
 
     suspend fun updateProxyId(c: CustomIp, proxyId: String) {
-        return updateRule(c.uid, c.ipAddress, c.port, IpRuleStatus.getStatus(c.status), proxyId, c.proxyCC)
+        c.proxyId = proxyId
+        return updateRule(c)
     }
 
     suspend fun updateProxyCC(c: CustomIp, proxyCC: String) {
-        return updateRule(c.uid, c.ipAddress, c.port, IpRuleStatus.getStatus(c.status), c.proxyId, proxyCC)
+        c.proxyCC = proxyCC
+        return updateRule(c)
     }
 
     fun hasRule(uid: Int, ipstr: String, port: Int): IpRuleStatus {
