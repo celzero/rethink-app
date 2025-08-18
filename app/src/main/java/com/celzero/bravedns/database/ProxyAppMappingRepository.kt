@@ -39,6 +39,10 @@ class ProxyAppMappingRepository(
         proxyApplicationMappingDAO.deleteAll()
     }
 
+    suspend fun deleteAppByPkgName(packageName: String) {
+        proxyApplicationMappingDAO.deleteAppByPkgName(packageName)
+    }
+
     suspend fun getApps(): List<ProxyApplicationMapping> {
         return proxyApplicationMappingDAO.getWgAppMapping() ?: emptyList()
     }
@@ -69,5 +73,9 @@ class ProxyAppMappingRepository(
 
     suspend fun updateUidForApp(uid: Int, packageName: String) {
         proxyApplicationMappingDAO.updateUidForApp(uid, packageName)
+    }
+
+    suspend fun tombstoneApp(oldUid: Int, newUid: Int) {
+        proxyApplicationMappingDAO.tombstoneApp(oldUid, newUid)
     }
 }

@@ -340,6 +340,12 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
         }
 
+        // remove this after v055r
+        io {
+            rdb.cleanupTombstone()
+            rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE)
+        }
+
         // reset the local blocklist download from android download manager to custom in v055o
         persistentState.useCustomDownloadManager = true
 

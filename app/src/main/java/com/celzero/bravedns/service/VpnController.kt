@@ -254,7 +254,6 @@ object VpnController : KoinComponent {
     fun protocols(): String {
         val ipv4 = protocol.first
         val ipv6 = protocol.second
-        Logger.d(LOG_TAG_VPN, "protocols => ipv4: $ipv4, ipv6: $ipv6")
         return if (ipv4 && ipv6) {
             "$URL4, $URL6"
         } else if (ipv6) {

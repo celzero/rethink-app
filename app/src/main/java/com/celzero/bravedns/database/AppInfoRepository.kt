@@ -57,12 +57,12 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         }
     }
 
-    suspend fun tombstoneApp(newUid: Int, uid: Int, packageName: String?, tombstoneTs: Long) {
+    suspend fun tombstoneApp(oldUid: Int, newUid: Int, packageName: String?, tombstoneTs: Long) {
         if (packageName == null) {
-            appInfoDAO.tombstoneApp(newUid, uid, tombstoneTs)
+            appInfoDAO.tombstoneApp(oldUid, newUid, tombstoneTs)
             return
         }
-        appInfoDAO.tombstoneApp(newUid, uid, packageName, tombstoneTs)
+        appInfoDAO.tombstoneApp(oldUid, newUid, packageName, tombstoneTs)
     }
 
     suspend fun getAppInfo(): List<AppInfo> {

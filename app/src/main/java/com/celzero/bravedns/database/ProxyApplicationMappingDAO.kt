@@ -40,6 +40,9 @@ interface ProxyApplicationMappingDAO {
     @Query("delete from ProxyApplicationMapping where uid = :uid and packageName = :packageName")
     fun deleteApp(uid: Int, packageName: String)
 
+    @Query("delete from ProxyApplicationMapping where packageName = :packageName")
+    fun deleteAppByPkgName(packageName: String)
+
     @Query("delete from ProxyApplicationMapping") fun deleteAll()
 
     @Query("select * from ProxyApplicationMapping")
@@ -97,4 +100,7 @@ interface ProxyApplicationMappingDAO {
 
     @Query("update ProxyApplicationMapping set uid = :uid where packageName = :packageName")
     fun updateUidForApp(uid: Int, packageName: String)
+
+    @Query("update ProxyApplicationMapping set uid = :newUid where uid = :oldUid")
+    fun tombstoneApp(oldUid: Int, newUid: Int)
 }

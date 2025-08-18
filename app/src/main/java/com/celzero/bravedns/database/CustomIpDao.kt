@@ -111,4 +111,7 @@ interface CustomIpDao {
     @Query("select count(*) from CustomIp") fun getRulesCount(): Int
 
     @Query("select count(*) from CustomIp where proxyCC = :cc") fun getRulesCountByCC(cc: String): Int
+
+    @Query("update CustomIp set uid = :newUid where uid = :oldUid")
+    fun tombstoneRulesByUid(oldUid: Int, newUid: Int)
 }

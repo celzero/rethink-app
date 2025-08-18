@@ -771,6 +771,17 @@ object IpRulesManager : KoinComponent {
         return Pair(ipNet, port)
     }
 
+    suspend fun tombstoneRulesByUid(oldUid: Int) {
+        Logger.i(LOG_TAG_FIREWALL, "tombstone rules for uid: $oldUid")
+        // here tombstone means negating the uid of the rule
+        // this is used when the app is uninstalled, so that the rules are not deleted
+        // but the uid is set to (-1 * uid), so that the rules are not applied
+        val newUid = -1 * oldUid
+        db.tombstoneRulesByUid(oldUid, newUid)
+        resultsCache.invalidateAll()
+        load()
+    }
+
     fun joinIpNetPort(ipNet: String, port: Int = 0): String {
         return if (ipNet.contains(":") || ipNet.contains("/")) {
             "[$ipNet]:$port"

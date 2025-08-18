@@ -208,6 +208,10 @@ object ProxyManager : KoinComponent {
         m.forEach { addNewApp(it) }
     }
 
+    suspend fun updateApps(m: Collection<FirewallManager.AppInfoTuple>) {
+        m.forEach { updateApp(it.uid, it.packageName) }
+    }
+
     suspend fun addApp(appInfo: AppInfo?) {
         addNewApp(appInfo)
     }
@@ -303,10 +307,27 @@ object ProxyManager : KoinComponent {
         }
     }
 
+    suspend fun deleteAppByPkgName(packageName: String) {
+        // delete the app from the cache
+        pamSet.removeIf { it.packageName == packageName }
+        // delete the app from the database
+        db.deleteAppByPkgName(packageName)
+        Logger.i(LOG_TAG_PROXY, "deleting app for mapping by package name: $packageName")
+    }
+
     suspend fun clear() {
         pamSet.clear()
         db.deleteAll()
         Logger.d(LOG_TAG_PROXY, "deleting all apps for mapping")
+    }
+
+    suspend fun tombstoneApp(oldUid: Int) {
+        // tombstone the app in the database and reload the cache
+        val newUid = -1 * oldUid // negative uid to indicate tombstone app
+        db.tombstoneApp(oldUid, newUid)
+        // reload the cache
+        load()
+        Logger.i(LOG_TAG_PROXY, "tombstoning app for mapping: $oldUid, $newUid")
     }
 
     fun isAnyAppSelected(proxyId: String): Boolean {

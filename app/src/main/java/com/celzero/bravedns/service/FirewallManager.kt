@@ -262,7 +262,7 @@ object FirewallManager : KoinComponent {
 
     suspend fun isUidSystemApp(uid: Int): Boolean {
         mutex.withLock {
-            return appInfos.get(uid).any { it.isSystemApp && it.tombstoneTs == 0L }
+            return appInfos.get(uid).any { it.isSystemApp }
         }
     }
 
@@ -276,26 +276,21 @@ object FirewallManager : KoinComponent {
     suspend fun tombstoneApp(uid: Int, packageName: String?, ts: Long = System.currentTimeMillis()) {
         val newUid = -1 * uid // use negative uid to mark the app as tombstone
         mutex.withLock {
-            appInfos
-                .values()
-                .filter { it.packageName == packageName && it.uid == uid }
-                .forEach {
-                    it.tombstoneTs = ts
-                    it.uid = newUid
+            val iter = appInfos.get(uid).iterator()
+            while (iter.hasNext()) {
+                val ai = iter.next()
+                if (ai.packageName == packageName) {
+                    iter.remove() // safe removal while iterating
+                    ai.uid = newUid
+                    ai.tombstoneTs = ts
+                    appInfos.put(newUid, ai)
+                    break
                 }
+            }
         }
         db.tombstoneApp(newUid, uid, packageName, ts)
-    }
-
-    suspend fun resetTombstoneTs(oldUid: Int, newUid: Int = oldUid, packageName: String?) {
-        mutex.withLock {
-            appInfos
-                .values()
-                .filter { it.packageName == packageName && it.uid == oldUid }
-                .forEach { it.tombstoneTs = 0 }
-        }
-        // delete the uninstalled apps from database
-        db.tombstoneApp(newUid, oldUid, packageName, 0)
+        Logger.d(LOG_TAG_FIREWALL, "tombstone app: $packageName, uid: $uid, ts: $ts, newUid: $newUid")
+        informObservers()
     }
 
     suspend fun deletePackage(uid: Int, packageName: String?) {
@@ -325,11 +320,11 @@ object FirewallManager : KoinComponent {
     suspend fun hasUid(uid: Int): Boolean {
         mutex.withLock {
             val appInfo = appInfos.get(uid)
-            return appInfo.isNotEmpty() && appInfo.any { it.tombstoneTs == 0L }
+            return appInfo.isNotEmpty()
         }
     }
 
-    suspend fun tombstone(packageName: String): Boolean {
+    suspend fun isTombstone(packageName: String): Boolean {
         mutex.withLock {
             return appInfos.values().any {
                 it.packageName == packageName && it.tombstoneTs > 0L
@@ -387,29 +382,29 @@ object FirewallManager : KoinComponent {
 
     suspend fun getPackageNameByAppName(appName: String?): String? {
         mutex.withLock {
-            return appInfos.values().firstOrNull { it.appName == appName && it.tombstoneTs == 0L}?.packageName
+            return appInfos.values().firstOrNull { it.appName == appName }?.packageName
         }
     }
 
     suspend fun getAppNamesByUid(uid: Int): List<String> {
         mutex.withLock {
-            return appInfos.get(uid).filter {  it.tombstoneTs == 0L }.map { it.appName }
+            return appInfos.get(uid).map { it.appName }
         }
     }
 
     suspend fun getPackageNamesByUid(uid: Int): List<String> {
         mutex.withLock {
-            return appInfos.get(uid).filter { it.tombstoneTs == 0L }.map { it.packageName }
+            return appInfos.get(uid).map { it.packageName }
         }
     }
 
     suspend fun getAllAppNames(): List<String> {
-        return getAppInfos().filter { it.tombstoneTs == 0L }.map { it.appName }.sortedBy { it.lowercase() }
+        return getAppInfos().map { it.appName }.sortedBy { it.lowercase() }
     }
 
     suspend fun getAppNameByUid(uid: Int): String? {
         mutex.withLock {
-            return appInfos.get(uid).firstOrNull { it.tombstoneTs == 0L }?.appName
+            return appInfos.get(uid).firstOrNull()?.appName
         }
     }
 
@@ -422,13 +417,13 @@ object FirewallManager : KoinComponent {
 
     suspend fun getAppInfoByUid(uid: Int): AppInfo? {
         mutex.withLock {
-            return appInfos.get(uid).firstOrNull { it.tombstoneTs == 0L }
+            return appInfos.get(uid).firstOrNull()
         }
     }
 
     suspend fun getPackageNameByUid(uid: Int): String? {
         mutex.withLock {
-            return appInfos.get(uid).firstOrNull { it.tombstoneTs == 0L }?.packageName
+            return appInfos.get(uid).firstOrNull()?.packageName
         }
     }
 
@@ -477,25 +472,28 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    suspend fun updateUid(olduid: Int, uid: Int, pkg: String) {
+    suspend fun updateUidAndResetTombstone(oldUid: Int, newUid: Int, pkg: String) {
         // while updating the package reset the tombstone timestamp
         var cacheok = false
-        // FIXME: review once again
+        val appInfo = getAppInfoByUid(oldUid)
+        Logger.i(LOG_TAG_FIREWALL, "updateUidAndResetTombstone: $oldUid -> $newUid; has? ${appInfo?.packageName} == pkg: $pkg")
         mutex.withLock {
-            appInfos.get(olduid).forEach { ai ->
+            val iter = appInfos.get(oldUid).iterator()
+            while (iter.hasNext()) {
+                val ai = iter.next()
                 if (ai.packageName == pkg) {
-                    appInfos.remove(olduid, ai) // remove the old uid entry
-                    ai.uid = uid // update the uid in-place
-                    ai.tombstoneTs = 0 // remove the tombstone timestamp
-                    appInfos.put(uid, ai) // add the updated ai entry
+                    iter.remove() // safe removal while iterating
+                    ai.uid = newUid
+                    ai.tombstoneTs = 0
+                    appInfos.put(newUid, ai)
                     cacheok = true
-                    return@withLock
+                    break
                 }
             }
         }
-        // Delete the uninstalled apps from database
-        val dbok = db.updateUid(olduid, uid, pkg)
-        Logger.d(LOG_TAG_FIREWALL, "update: $pkg; $olduid -> $uid; c? $cacheok; db? $dbok")
+
+        val dbok = db.updateUid(oldUid, newUid, pkg)
+        Logger.d(LOG_TAG_FIREWALL, "update: $pkg; $oldUid -> $newUid; c? $cacheok; db? $dbok")
         informObservers()
     }
 
@@ -598,10 +596,6 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    suspend fun getTotalAppsCount(): Int {
-        return getAppInfos().size
-    }
-
     suspend fun isUnknownPackage(uid: Int): Boolean {
         return getAppInfoByUid(uid)?.packageName?.startsWith(NO_PACKAGE_PREFIX) ?: false
     }
@@ -658,12 +652,16 @@ object FirewallManager : KoinComponent {
         io {
             mutex.withLock {
                 appInfos.get(uid).forEach {
-                    it.isProxyExcluded = isProxyExcluded && it.tombstoneTs == 0L
+                    it.isProxyExcluded = isProxyExcluded
                 }
             }
             db.updateProxyExcluded(uid, isProxyExcluded)
             informObservers()
         }
+    }
+
+    fun getTombstoneApps(): List<AppInfo> {
+        return appInfos.values().filter { it.tombstoneTs > 0L }
     }
 
     fun isAppExcludedFromProxy(uid: Int): Boolean {
