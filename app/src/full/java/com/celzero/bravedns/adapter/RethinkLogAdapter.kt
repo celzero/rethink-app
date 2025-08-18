@@ -298,7 +298,7 @@ class RethinkLogAdapter(private val context: Context) :
         }
 
         private fun isConnectionProxied(proxyDetails: String): Boolean {
-            return ProxyManager.isIpnProxy(proxyDetails)
+            return ProxyManager.isNotLocalAndRpnProxy(proxyDetails)
         }
 
         private fun isConnectionHeavier(ct: RethinkLog): Boolean {

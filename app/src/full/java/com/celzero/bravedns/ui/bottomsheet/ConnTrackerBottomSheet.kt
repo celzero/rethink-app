@@ -48,7 +48,7 @@ import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.FirewallRuleset.Companion.getFirewallRule
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.ProxyManager.isIpnProxy
+import com.celzero.bravedns.service.ProxyManager.isNotLocalAndRpnProxy
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.util.Constants
@@ -238,7 +238,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         }
 
         val rule = info!!.blockedByRule
-        val isIpnProxy = isIpnProxy(info?.proxyDetails ?: "")
+        val isIpnProxy = isNotLocalAndRpnProxy(info?.proxyDetails ?: "")
         // TODO: below code is not required, remove it in future (20/03/2023)
         if (rule.contains(FirewallRuleset.RULE2G.id)) {
             b.bsConnTrackAppInfo.text =
@@ -248,15 +248,24 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             // add the proxy id to the chip text if available
             b.bsConnTrackAppInfo.text = getString(R.string.two_argument_colon, getFirewallRule(rule)?.title?.let { getString(it) }, info?.proxyDetails)
         } else {
-            val isRuleAddedAsProxy = getFirewallRule(rule)?.id == FirewallRuleset.RULE12.id
-            // when the conn is marked as proxied with id from flow, but the returned summary
-            // doesn't have the proxy details. change the rule from proxied to none
-            if (isRuleAddedAsProxy && (info?.proxyDetails.isNullOrEmpty() || !isIpnProxy)) {
-                b.bsConnTrackAppInfo.text = getString(getFirewallRule(FirewallRuleset.RULE0.id)?.title ?: R.string.firewall_rule_no_rule)
+            if (isInvalidProxyDetails()) {
+                b.bsConnTrackAppInfo.text = getString(getFirewallRule(FirewallRuleset.RULE1C.id)?.title ?: R.string.firewall_rule_no_rule)
             } else {
                 b.bsConnTrackAppInfo.text = getFirewallRule(rule)?.title?.let { getString(it) }
             }
         }
+    }
+
+    private fun isInvalidProxyDetails(): Boolean {
+        val isIpnProxy = isNotLocalAndRpnProxy(info?.proxyDetails ?: "")
+        val rule = info!!.blockedByRule
+        val isRuleAddedAsProxy = getFirewallRule(rule)?.id == FirewallRuleset.RULE12.id
+        if (isRuleAddedAsProxy && (info?.proxyDetails.isNullOrEmpty() || !isIpnProxy)) {
+            // when the conn is marked as proxied with id from flow, but the returned summary
+            // doesn't have the proxy details. change the rule from proxied to error (RULE1C)
+            return true
+        }
+        return false
     }
 
     private fun updateAppDetails() {
@@ -379,7 +388,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                 requireContext(),
                 FirewallRuleset.getRulesIcon(info?.blockedByRule)
             )
-        if (info!!.isBlocked) {
+        if (info!!.isBlocked || isInvalidProxyDetails()) {
             b.bsConnTrackAppInfo.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
             val colorFilter =
                 PorterDuffColorFilter(

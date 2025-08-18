@@ -348,7 +348,7 @@ object ProxyManager : KoinComponent {
         return pamSet.count { it.proxyId == proxyId }
     }
 
-    fun isIpnProxy(ipnProxyId: String): Boolean {
+    fun isNotLocalAndRpnProxy(ipnProxyId: String): Boolean {
         if (ipnProxyId.isEmpty()) return false
         // check if the proxy id is not the base, block, exit, auto or ingress
         // all these are special cases and should not be considered as proxied traffic
@@ -357,7 +357,6 @@ object ProxyManager : KoinComponent {
             ipnProxyId != Backend.Exit &&
             ipnProxyId != Backend.Auto &&
             ipnProxyId != Backend.Ingress &&
-            ipnProxyId != Backend.Plus &&
             !ipnProxyId.endsWith(Backend.RPN)
     }
 
