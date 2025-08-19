@@ -1053,4 +1053,27 @@
     <string name="cd_split_dns_heading" translatable="true">DNS Terpisah (pengujian)</string>
     <string name="cd_split_dns_desc" translatable="true">Meneruskan kueri DNS dari aplikasi yang diproksi ke server DNS proxy.</string>
     <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Perlakukan aturan DNS sebagai aturan firewall (pengujian)</string>
+    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">Pemblokiran DNS akan dilewati selama resolusi; keputusan akan dibuat pada saat penyambungan.</string>
+    <string name="univ_firewall_rule_11" translatable="true">Blokir semua sambungan host lokal</string>
+    <string name="firewall_rule_private_dns" translatable="true">DNS Pribadi</string>
+    <string name="firewall_rule_bypass_proxy" translatable="true">Proksi Bypass</string>
+    <string name="firewall_rule_paused_app" translatable="true">Aplikasi Dijeda</string>
+    <string name="firewall_rule_lockdown_wg" translatable="true">Proksi Penguncian</string>
+    <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[Sambungan ini mencari <i>DNS Pribadi</i> server tidak tersedia.]]></string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Sambungan ini diizinkan karena <i>aplikasi sumber</i> diatur ke aturan <i>proksi bypass</i>.<br/><br/> Untuk mengubahnya pergi ke layar <i>Aplikasi Firewall Spesifik</i>.]]></string>
+    <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Sambungan ini diizinkan karena <i>aplikasi</i> sedang dalam kondisi <i>dijeda</i>.]]></string>
+    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Sambungan ini diblokir karena WireGuard dalam mode <i>terkunci</i>.<br/><br/> Untuk mengubahnya pergi ke layar <i>WireGuard</i>.]]></string>
+    <string name="wireguard_disable_failure_relay" translatable="true">\"Relay WireGuard\" tidak dapat dimatikan</string>
+    <string name="config_invalid_desc" translatable="true">Konfigurasi WireGuard tidak valid</string>
+    <string name="console_log_title" translatable="true">Catatan Aplikasi</string>
+    <string name="console_log_desc" translatable="true">Catatan mungkin berisi informasi sensitif.</string>
+    <string name="do_not_randomize_listen_port_title" translatable="true">Jangan mengacak port listen WireGuard</string>
+    <string name="do_not_randomize_listen_port_desc" translatable="true">Pertahankan port listen tetap WireGuard (tidak ada pengacakan) dalam mode Lanjutan.</string>
+    <string name="endpoint_independent_mapping_title" translatable="true">Pemetaan Titik Akhir-Independen</string>
+    <string name="endpoint_independent_mapping_desc" translatable="true">Apabila diaktifkan, soket UDP akan mempertahankan alamat dan port yang tetap untuk semua tujuan.</string>
+    <string name="anti_censorship_title" translatable="true">Anti-sensor</string>
+    <string name="anti_censorship_desc" translatable="true">Pilih dari berbagai teknik Anti-sensor.</string>
+    <string name="tcp_keep_alive_title" translatable="true">TCP yang lebih pendek tetap hidup</string>
+    <string name="tcp_keep_alive_desc" translatable="true">Tutup soket TCP tanpa aktivitas terbaru dengan cepat.</string>
+    <string name="ac_title" translatable="true">anti-sensor</string>
 </resources>
