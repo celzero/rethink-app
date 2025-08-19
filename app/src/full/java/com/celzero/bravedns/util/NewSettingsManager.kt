@@ -51,6 +51,7 @@ object NewSettingsManager: KoinComponent {
     const val MARK_MOBILE_METERED = "mark_mobile_metered"
     const val DO_NOT_STALL = "do_not_stall"
     const val PERFORM_CONNECTION_CHECK = "perform_connection_check"
+    const val TUN_NETWORK_POLICY = "tun_network_handling_policy"
 
     const val ANTI_CENSORSHIP = "anti_censorship"
 
@@ -72,7 +73,8 @@ object NewSettingsManager: KoinComponent {
         MARK_MOBILE_METERED,
         DO_NOT_STALL,
         PERFORM_CONNECTION_CHECK,
-        ANTI_CENSORSHIP
+        ANTI_CENSORSHIP,
+        TUN_NETWORK_POLICY
     )
 
     init {
