@@ -28,7 +28,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.celzero.firestack.backend.RouterStats
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
@@ -64,6 +63,7 @@ import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
+import com.celzero.firestack.backend.RouterStats
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -127,10 +127,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun showNewBadgeIfNeeded() {
-        val hop = NewSettingsManager.shouldShowBadge(NewSettingsManager.WG_HOP_SETTING)
         val mobile = NewSettingsManager.shouldShowBadge(NewSettingsManager.WG_MOBILE_SETTING)
 
-        b.hopBtn.setBadgeDotVisible(this, hop)
         b.useMobileTitleTv.setBadgeDotVisible(this, mobile)
     }
 
