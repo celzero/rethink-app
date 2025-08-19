@@ -864,17 +864,23 @@
     <string name="contributors_dialog_title" translatable="true">Authors</string>
     <string name="contributors_list" translatable="true"><![CDATA[The <i>Rethink Open Source Project</i> owes its existence to these volunteers who devote countless hours on its development.<br/>
                                               <br/>🛡️ Android app <br/>
+                                              <a href="https://github.com/anthonyryan1">Anthony Ryan</a> /
                                               <a href="https://github.com/BayLee4">BayLee4</a> /
                                               <a href="https://github.com/Ch4t4r">Ch4t4r</a> /
+                                              <a href="https://github.com/samthesamman">CodingAttack</a> /
                                               <a href="https://github.com/HrBDev">HrBDev</a> /
                                               <a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /
                                               <a href="https://github.com/ignoramous">ignoramous</a> /
+                                              <a href="https://github.com/ironveil">ironveil</a> /
                                               <a href="https://github.com/markwmuller">markwmuller</a> /
+                                              <a href="https://github.com/mohammaduvez">Mohammaduvez</a> /
                                               <a href="https://github.com/Mygod">Mygod</a> /
-                                              <a href="https://github.com/Uldiniad">Uldiniad</a> /
                                               <a href="https://github.com/Poussinou">Poussinou</a> /
                                               <a href="https://github.com/pjosingh">pjosingh</a> /
-                                              <a href="https://github.com/RohitSurwase">RohitSurwase</a><br/>
+                                              <a href="https://github.com/RohitSurwase">RohitSurwase</a> /
+                                              <a href="https://github.com/ShantanuVichare">Shantanu</a> /
+                                              <a href="https://github.com/Uldiniad">Uldiniad</a><br/> /
+                                              <a href="https://github.com/yurtpage">Yurt Page</a><br/>
                                               <br/>🚂 Network engine <br/>
                                               <a href="https://github.com/alalamav">alalamav</a> /
                                               <a href="https://github.com/bemasc">bemasc</a> /
@@ -914,7 +920,7 @@
                                               <a href="https://t.me/kaliangel">kaliangel</a> /
                                               <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
                                               <br/>📌 Geo-IP <br/>
-                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPInfo Lite</a><br/>
+                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a><br/>
                                               <br/>❇ Translations <br/>
                                               <a href="https://weblate.org/en/">Weblate</a><br/>
                                               <br/>🦆 Icons <br/>
@@ -1029,6 +1035,8 @@
     <string name="univ_ip_delete_toast_success" translatable="true">Deleted all IP rules.</string>
     <string name="univ_delete_firewall_dialog_title" translatable="true">Delete all IP Rules?</string>
     <string name="univ_delete_firewall_dialog_message" translatable="true">Deleting these rules would allow any application to connect to the currently blocked IPs.</string>
+    <string name="univ_delete_domain_dialog_title" translatable="true">Delete all Domain Rules?</string>
+    <string name="univ_delete_domain_dialog_message" translatable="true">Deleting these rules would allow any application to connect to the currently blocked Domains.</string>
 
     <string name="univ_accessibility_crash_dialog_positive" translatable="true">Goto Settings</string>
     <string name="univ_accessibility_dialog_positive" translatable="true">Grant</string>
@@ -1757,6 +1765,14 @@
 
     <string name="wg_mobile_only_hop_err" translatable="true">Mobile-only mode is not supported for Relays</string>
 
+    <string name="vpn_policy_auto_desc" translatable="true">Reacts to important network and connectivity changes.</string>
+    <string name="vpn_policy_sensitive" translatable="true">Sensitive</string>
+    <string name="vpn_policy_sensitive_desc" translatable="true">Reacts to all network and connectivity changes.</string>
+    <string name="vpn_policy_relaxed" translatable="true">Relaxed</string>
+    <string name="vpn_policy_relaxed_desc" translatable="true">Reacts to connectivity changes.</string>
+
+    <string name="vpn_policy_title" translatable="true">Connection change policy</string>
+
     <!-- alert, commenting out for now in v055b -->
 
    <!-- <string name="alert_severity_high" translatable="true">High</string>
@@ -1835,4 +1851,6 @@
     <string name="alert_message_ip_domain_blocked" translatable="true">Rethink is blocking a connection</string>
     <string name="alert_actions_ip_domain_blocked" translatable="true">View</string>
     <string name="alert_solution_ip_domain_blocked" translatable="true">Rethink is blocking a connection</string>-->
+    <string name="title_database_dump" translatable="true">Database state</string>
+    <string name="copied_clipboard" translatable="true">Copied</string>
 </resources>
