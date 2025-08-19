@@ -103,7 +103,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         if (isFdroidFlavour()) {
             b.aboutAppUpdate.visibility = View.GONE
         }
-        b.aboutDbStats.text = "DB " + getString(R.string.title_statistics)
         updateVersionInfo()
 
         updateSponsorInfo()
@@ -421,43 +420,35 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             val stat = VpnController.getNetStat()
             val formatedStat = UIUtils.formatNetStat(stat)
             val vpnStats = VpnController.vpnStats()
+            val stats = formatedStat + vpnStats
             uiCtx {
-                val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-                val builder =
-                    MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
-                val lp = WindowManager.LayoutParams()
-                val dialog = builder.create()
-                dialog.show()
-                lp.copyFrom(dialog.window?.attributes)
-                lp.width = WindowManager.LayoutParams.MATCH_PARENT
-                lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-                dialog.setCancelable(true)
-                dialog.window?.attributes = lp
-
-                val heading = dialogBinding.infoRulesDialogRulesTitle
-                val okBtn = dialogBinding.infoRulesDialogCancelImg
-                val descText = dialogBinding.infoRulesDialogRulesDesc
-                dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
-
-                heading.text = getString(R.string.title_statistics)
-                heading.setCompoundDrawablesWithIntrinsicBounds(
-                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_log_level),
-                    null,
-                    null,
-                    null
-                )
-
-                descText.movementMethod = LinkMovementMethod.getInstance()
+                if (!isAdded) return@uiCtx
+                val tv = android.widget.TextView(requireContext())
+                val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
+                tv.setPadding(pad, pad, pad, pad)
                 if (formatedStat == null) {
-                    descText.text = "No Stats"
+                    tv.text = "No Stats"
                 } else {
-                    descText.text = formatedStat + vpnStats
+                    tv.text = stats
                 }
+                tv.setTextIsSelectable(true)
+                tv.typeface = android.graphics.Typeface.MONOSPACE
+                val scroll = android.widget.ScrollView(requireContext())
+                scroll.addView(tv)
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(getString(R.string.title_statistics))
+                    .setView(scroll)
+                    .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
+                    .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
+                        copyToClipboard("stats_dump", stats)
+                        showToastUiCentered(
+                            requireContext(),
+                            getString(R.string.copied_clipboard),
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                    .show()
 
-                okBtn.setOnClickListener { dialog.dismiss() }
-
-                dialog.show()
             }
         }
     }

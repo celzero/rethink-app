@@ -163,9 +163,10 @@
                     android:paddingStart="15dp"
                     android:paddingTop="10dp"
                     android:paddingEnd="15dp"
+                    android:drawableTint="?attr/primaryTextColor"
                     android:paddingBottom="10dp"
                     android:text="@string/about_join_telegram"
-                    android:textColor="?attr/secondaryTextColor"
+                    android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -235,7 +236,8 @@
                     android:paddingEnd="15dp"
                     android:paddingBottom="10dp"
                     android:text="@string/about_bug_report"
-                    android:textColor="?attr/secondaryTextColor"
+                    android:drawableTint="?attr/primaryTextColor"
+                    android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -643,12 +645,12 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:background="?android:attr/selectableItemBackground"
-                android:drawableStart="@drawable/ic_log_level"
+                android:drawableStart="@drawable/ic_backup"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:text="@string/title_statistics"
+                android:text="@string/title_database_dump"
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
