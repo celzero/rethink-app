@@ -446,23 +446,23 @@
     <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Rethink のユーザー補助サービスが停止またはクラッシュしました。<i><b>設定に移動して Rethink を強制終了</b></i>し、再度起動してください。<i>使用していないアプリをブロックする</i> 機能を使用してください。
 \n
 \nRethink は、ユーザー補助サービスを使用して、使用中 (フォアグラウンド) のアプリと使用していない (バックグラウンド) のアプリを追跡しています。</string>
-    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><i>宛先IP</i>がすべてのユニバーサルファイアウォールルールをバイパスするように設定されているため、この接続は許可されました。<br/><br/>変更するには、<i>ユニバーサル</i>の<i>IPルール</i>に移動してください。</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><i>ドメイン</i>がユニバーサルドメインルールでブロックされているため、この接続はブロックされました。<br/><br/>この動作を変更するには、<i>DNSの設定</i>タブに移動します。</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">この接続が許可されたのは、<i>ドメイン</i>がユニバーサルドメインルールで信頼できるものとして設定されているためです。<br/><br/>この動作を変更するには、<i>DNSの設定</i>タブに移動します。</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><i>従量制</i>（モバイル）ネットワークに接続しようとしたときに、ユーザーが設定したユニバーサルファイアウォール規則がこの<i>アプリ</i>をブロックしました。<br/><br/>変更するには、<i>ユニバーサル</i>タブに移動してください。</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">この接続は、接続元の<i>アプリ</i>がdnsと<i>ファイアウォールのルールを回避</i>するように設定されているため、許可されました。<br/><br/>変更するには、<i>アプリ固有のファイアウォール</i>画面に移動してください。</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">この接続は、接続元の<i>アプリ</i>がdnsと<i>ファイアウォールのルールを回避</i>するように設定されているため、許可されました。<br/><br/>変更するには、<i>アプリ固有のファイアウォール</i>画面に移動してください。</string>
+    <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><i>宛先IP</i>がすべてのユニバーサルファイアウォールルールをバイパスするように設定されているため、この接続は許可されました。<br></br><br></br>変更するには、<i>ユニバーサル</i>の<i>IPルール</i>に移動してください。</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><i>ドメイン</i>がユニバーサルドメインルールでブロックされているため、この接続はブロックされました。<br></br><br></br>この動作を変更するには、<i>DNSの設定</i>タブに移動します。</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">この接続が許可されたのは、<i>ドメイン</i>がユニバーサルドメインルールで信頼できるものとして設定されているためです。<br></br><br></br>この動作を変更するには、<i>DNSの設定</i>タブに移動します。</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><i>従量制</i>（モバイル）ネットワークに接続しようとしたときに、ユーザーが設定したユニバーサルファイアウォール規則がこの<i>アプリ</i>をブロックしました。<br></br><br></br>変更するには、<i>ユニバーサル</i>タブに移動してください。</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">この接続は、接続元の<i>アプリ</i>がdnsと<i>ファイアウォールのルールを回避</i>するように設定されているため、許可されました。<br></br><br></br>変更するには、<i>アプリ固有のファイアウォール</i>画面に移動してください。</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">この接続は、接続元の<i>アプリ</i>がdnsと<i>ファイアウォールのルールを回避</i>するように設定されているため、許可されました。<br></br><br></br>変更するには、<i>アプリ固有のファイアウォール</i>画面に移動してください。</string>
     <string name="hsf_start_dialog_message" translatable="true">安全で安全なAndroidへの第一歩:ネットワークアクティビティを即座に確認し、Webサイト、IP、および不正に動作するアプリケーションをブロックします。</string>
-    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">ユーザー設定のファイアウォール規則が<i>従量制</i>ネットワークに接続しようとしたため、この<i>アプリ</i>をブロックしました。<br/><br/>変更するには、<i>すべてのアプリ</i>タブに移動してください。</string>
-    <string name="firewall_rule_block_app_mobile_desc" translatable="true">ユーザー設定のファイアウォール規則が<i>従量制</i>ネットワークに接続しようとしたため、この<i>アプリ</i>をブロックしました。<br/><br/>変更するには、<i>すべてのアプリ</i>タブに移動してください。</string>
-    <string name="firewall_rule_foreground_desc" translatable="true">ソースアプリケーションが<i>フォアグラウンドにない</i>ため、この接続はファイアウォールで保護されました。<br/><br/>この動作を変更するには、<i>ユニバーサル</i>タブに移動します。</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">このDNS接続はプロキシ処理され、ユーザー優先のDNSエンドポイントに転送されました。<br/><br/> 変更するには、<i>DNS漏洩の防止</i> を <i>DNSの設定</i> から無効にします。</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true"><i>ドメイン</i>がユーザー優先のDNSによってブロックされているため、この接続はブロックされました。<br/><br/>この動作を変更するには、<i>DNSの設定</i>タブに移動します。</string>
-    <string name="firewall_rule_isolate_desc" translatable="true">ユーザー設定のファイアウォール規則により、この<i>アプリ</i>が<i>バイパスされたIP</i>以外に接続したためブロックされました。<br/><br/>変更するには、<i>すべてのアプリ</i>タブに移動してください。</string>
-    <string name="firewall_rule_trusted_ip_desc" translatable="true"><i>送信先IPアドレス</i>が信頼できるIPアドレスに設定されているため、この接続は許可されました。<br/><br/>変更するには、<i>アプリ固有のファイアウォール</i>画面に移動します。</string>
-    <string name="firewall_rule_device_lock_desc" translatable="true"><i>デバイスがロックされていた</i>ため、この接続はファイアウォールで保護されていました。<br/><br/>この動作を変更するには、<i>ユニバーサル </i>タブに移動します。</string>
-    <string name="firewall_rule_unknown_desc" translatable="true"><i>ソースアプリケーション</i>を判別できなかったため、この接続はファイアウォールで保護されました。<br/><br/>この動作を変更するには、<i>ユニバーサル</i>タブに移動してください。</string>
-    <string name="firewall_rule_block_dns_bypass_desc" translatable="true"><i>ソースアプリケーション</i>がユーザー優先のDNSをバイパスしたため、この接続はブロックされました。<br/><br/>この動作を変更するには、<i>ユニバーサル</i>タブに移動してください。</string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">ユーザー設定のファイアウォール規則が<i>従量制</i>ネットワークに接続しようとしたため、この<i>アプリ</i>をブロックしました。<br></br><br></br>変更するには、<i>すべてのアプリ</i>タブに移動してください。</string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true">ユーザー設定のファイアウォール規則が<i>従量制</i>ネットワークに接続しようとしたため、この<i>アプリ</i>をブロックしました。<br></br><br></br>変更するには、<i>すべてのアプリ</i>タブに移動してください。</string>
+    <string name="firewall_rule_foreground_desc" translatable="true">ソースアプリケーションが<i>フォアグラウンドにない</i>ため、この接続はファイアウォールで保護されました。<br></br><br></br>この動作を変更するには、<i>ユニバーサル</i>タブに移動します。</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">このDNS接続はプロキシ処理され、ユーザー優先のDNSエンドポイントに転送されました。<br></br><br></br> 変更するには、<i>DNS漏洩の防止</i> を <i>DNSの設定</i> から無効にします。</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true"><i>ドメイン</i>がユーザー優先のDNSによってブロックされているため、この接続はブロックされました。<br></br><br></br>この動作を変更するには、<i>DNSの設定</i>タブに移動します。</string>
+    <string name="firewall_rule_isolate_desc" translatable="true">ユーザー設定のファイアウォール規則により、この<i>アプリ</i>が<i>バイパスされたIP</i>以外に接続したためブロックされました。<br></br><br></br>変更するには、<i>すべてのアプリ</i>タブに移動してください。</string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true"><i>送信先IPアドレス</i>が信頼できるIPアドレスに設定されているため、この接続は許可されました。<br></br><br></br>変更するには、<i>アプリ固有のファイアウォール</i>画面に移動します。</string>
+    <string name="firewall_rule_device_lock_desc" translatable="true"><i>デバイスがロックされていた</i>ため、この接続はファイアウォールで保護されていました。<br></br><br></br>この動作を変更するには、<i>ユニバーサル </i>タブに移動します。</string>
+    <string name="firewall_rule_unknown_desc" translatable="true"><i>ソースアプリケーション</i>を判別できなかったため、この接続はファイアウォールで保護されました。<br></br><br></br>この動作を変更するには、<i>ユニバーサル</i>タブに移動してください。</string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true"><i>ソースアプリケーション</i>がユーザー優先のDNSをバイパスしたため、この接続はブロックされました。<br></br><br></br>この動作を変更するには、<i>ユニバーサル</i>タブに移動してください。</string>
     <string name="ci_dialog_desc" translatable="true">IPアドレス、IPサブネット(範囲)、ポートを許可(バイパス)またはブロックします。例: 10.10.10.10, 10.1.1.*、 10.2.2/24、 ffff::/104、 [::]:80、 [10.1.0.0/16]:80、 *.*:80</string>
     <string name="show_logs_disabled_dns_message" translatable="true">DNS要求ログが無効になっています。再度有効にするには、<i>設定</i>に移動して<i>デバイス上のログを有効にする</i>をオンにしてください</string>
     <string name="dc_dns_leaks_desc" translatable="true">有効にすると、RethinkDNSはポート53上のすべてのパケットをキャプチャし、ユーザー設定のDNSエンドポイントに転送します</string>
@@ -514,7 +514,7 @@
     <string name="firewall_rule_block_http" translatable="true">安全でないHTTP</string>
     <string name="firewall_rule_trusted_domain" translatable="true">信頼できるドメイン (アプリ)</string>
     <string name="firewall_rule_no_rule_desc" translatable="true">この接続に一致するファイアウォール規則はありません。</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true"><i>ドメイン</i>が信頼されたドメインとして設定されているため、この接続は許可されました。<br/><br/>変更するには、<i>アプリ固有のファイアウォール</i>画面に移動します。</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true"><i>ドメイン</i>が信頼されたドメインとして設定されているため、この接続は許可されました。<br></br><br></br>変更するには、<i>アプリ固有のファイアウォール</i>画面に移動します。</string>
     <string name="new_app_bulk_notification_title" translatable="true">注意</string>
     <string name="new_app_notification_content" translatable="true">RethinkDNSは最近インストールされたアプリ、%1$s をブロックしました。</string>
     <string name="notif_dialog_pause_dialog_title" translatable="true">アプリが一時停止しました！</string>
@@ -543,7 +543,7 @@
     <string name="settings_orbot_disabled_error" translatable="true">Tor-as-a-proxyの設定を続けるには、HTTP(S)とSOCKS5プロキシをオフにしてください。</string>
     <string name="firewall_rule_global_lockdown" translatable="true">ロックダウン</string>
     <string name="firewall_rule_trusted_ip" translatable="true">信頼できるIP</string>
-    <string name="firewall_rule_block_app_desc" translatable="true">ユーザーが設定したファイアウォールルールがこの<i>アプリ</i> をブロックしています。<br/><br/> 変更するには、<i>「すべてのアプリ」</i> タブに移動します。</string>
+    <string name="firewall_rule_block_app_desc" translatable="true">ユーザーが設定したファイアウォールルールがこの<i>アプリ</i> をブロックしています。<br></br><br></br> 変更するには、<i>「すべてのアプリ」</i> タブに移動します。</string>
     <string name="notif_dialog_pause_dialog_neutral" translatable="true">表示</string>
     <string name="firewall_rule_foreground" translatable="true">未使用のアプリ</string>
     <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNSプロキシ</string>

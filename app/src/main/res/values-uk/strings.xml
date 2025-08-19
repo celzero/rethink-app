@@ -279,7 +279,7 @@
                                               <a href="https://t.me/kaliangel">kaliangel</a> /
                                               <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
                                               <br/>📌 Geo-IP <br/>
-                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IpInfo Lite</a><br/>
+                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPInfo Lite</a><br/>
                                               <br/>❇ Translations <br/>
                                               <a href="https://weblate.org/en/">Weblate</a><br/>
                                               <br/>🦆 Icons <br/>
@@ -1069,7 +1069,7 @@
     <string name="dns_desc" translatable="true">Оберіть один із понад 190 списків, щоб зупинити рекламу, трекери та шкідливе програмне забезпечення.</string>
     <string name="status_no_network" translatable="true">немає мережі</string>
     <string name="settings_mobile_metered_heading" translatable="true">Лічильник мобільних мереж</string>
-    <string name="settings_mobile_metered_desc" translatable="true">Завжди вважайте мобільні мережі лімітованими.</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Вважати мобільні мережі лише такими, що лімітуються, решту – такими, що не лімітуються.</string>
     <string name="settings_theme_dialog_themes_5" translatable="true">Світло Плюс</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">Темний плюс</string>
     <string name="settings_biometric_dialog_heading" translatable="true">Біометрична автентифікація</string>
@@ -1118,7 +1118,7 @@
     <string name="ac_desync_desc" translatable="true">Надсилайте пакети-приманки за потреби.</string>
     <string name="ac_retry_options_title" translatable="true">стратегія</string>
     <string name="ac_retry_options_desc" translatable="true">Налаштуйте, як працюватимуть повторні спроби для цензурованих з’єднань.</string>
-    <string name="ac_retry_options_never_desc" translatable="true">Не повторюйте спробу.</string>
+    <string name="ac_retry_options_never_desc" translatable="true">У разі невдачі ніколи не повторюйте антицензурні методи.</string>
     <string name="ac_retry_options_with_split_desc" translatable="true">За потреби застосовуйте методи боротьби з цензурою.</string>
     <string name="lbl_always" translatable="true">Завжди</string>
     <string name="ac_retry_options_after_split_desc" translatable="true">Завжди застосовуйте методи боротьби з цензурою.</string>
@@ -1152,12 +1152,14 @@
     <string name="close_conns_dialog_title" translatable="true">Тісні зв\'язки</string>
     <string name="close_conns_dialog_desc" translatable="true">Закрити всі з’єднання для %1$s?</string>
     <string name="local_blocklist_delete_desc" translatable="true">Видалити списки блокування на пристрої?</string>
-    <string name="fail_open_network_title" translatable="true">Не зупиняйтеся через втрату мережі</string>
-    <string name="fail_open_network_desc" translatable="true">Якщо цю функцію вимкнено, Rethink зупиняє всі дані, коли немає з’єднання, наприклад, у режимі «<i> літаку</i>.</string>
-    <string name="about_license" translatable="true">Ліцензовано за APLv2</string>
+    <string name="fail_open_network_title" translatable="true">Зупинка через втрату мережі</string>
+    <string name="fail_open_network_desc" translatable="true">Коли функцію ввімкнено, Rethink зупиняє всі дані, коли немає з’єднання, наприклад, у режимі <i>У літаку</i>.</string>
+    <string name="about_license" translatable="true">Ліцензовано під Apache-2.0</string>
     <string name="close_all" translatable="true">Закрити все</string>
     <string name="smart_dns" translatable="true">Розумний DNS</string>
     <string name="processing_dialog_title" translatable="true">Обробка</string>
     <string name="processing_dialog_desc" translatable="true">Будь ласка, зачекайте, поки ми обробимо ваш запит.</string>
     <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> випадковим чином використовує будь-який з цих DNS-резолверів:</string>
+    <string name="hop_error_toast_msg_3" translatable="true">Вимкніть режим \"Тільки мобільні пристрої\", щоб використовувати реле</string>
+    <string name="wg_mobile_only_hop_err" translatable="true">Режим \"лише для мобільних пристроїв\" не підтримується для реле</string>
 </resources>

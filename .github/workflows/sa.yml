@@ -2,6 +2,7 @@ name: Static Analyser
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   detekt:
@@ -10,11 +11,11 @@ jobs:
 
     steps:
       - name: "checkout"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: "run"
-        uses: natiginfo/action-detekt-all@1.23.6
+      - name: "detekt"
+        uses: natiginfo/action-detekt-all@1.23.8
         # from: https://github.com/natiginfo/action-detekt-all
         with:
-          args:  --config .github/detekt-config.yml
+          args: --config .github/detekt-config.yml
 
