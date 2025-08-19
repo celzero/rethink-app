@@ -481,7 +481,18 @@ class FirewallAppListAdapter(
     }
 
     override fun getSectionName(position: Int): String {
+        // Check if position is valid to prevent IndexOutOfBoundsException
+        if (position < 0 || position >= itemCount) {
+            return ""
+        }
+        
         val appInfo = getItem(position) ?: return ""
-        return appInfo.appName.substring(0, 1)
+        
+        // Handle empty app names safely
+        return if (appInfo.appName.isNotEmpty()) {
+            appInfo.appName.substring(0, 1)
+        } else {
+            ""
+        }
     }
 }
