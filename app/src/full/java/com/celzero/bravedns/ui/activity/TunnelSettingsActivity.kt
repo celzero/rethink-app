@@ -21,10 +21,14 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.CompoundButton
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatRadioButton
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -87,6 +91,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         val performConnectionCheck = NewSettingsManager.shouldShowBadge(NewSettingsManager.PERFORM_CONNECTION_CHECK)
         val randomizeWgPort = NewSettingsManager.shouldShowBadge(NewSettingsManager.RANDOMIZE_WG_PORT)
         val mobileMetered = NewSettingsManager.shouldShowBadge(NewSettingsManager.MARK_MOBILE_METERED)
+        val tunNetworkPolicy = NewSettingsManager.shouldShowBadge(NewSettingsManager.TUN_NETWORK_POLICY)
 
         b.dvTcpKeepAliveTxt.setBadgeDotVisible(this, tcpKeepAlive)
         b.dvTimeoutTxt.setBadgeDotVisible(this, idleTimeout)
@@ -96,6 +101,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.genSettingsConnectivityChecksTxt.setBadgeDotVisible(this, performConnectionCheck)
         b.dvWgListenPortTxt.setBadgeDotVisible(this, randomizeWgPort)
         b.genSettingsMobileMeteredTxt.setBadgeDotVisible(this, mobileMetered)
+        b.settingsActivityVpnHeadingText.setBadgeDotVisible(this, tunNetworkPolicy)
     }
 
     private fun initView() {
@@ -127,14 +133,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.dvWgListenPortSwitch.isChecked = !persistentState.randomizeListenPort
 
-        // check if the device is running on Android 12 or above for EIMF
-        if (isAtleastS()) {
-            // endpoint independent mapping (eim) / endpoint independent filtering (eif)
-            b.dvEimfRl.visibility = View.VISIBLE
-            b.dvEimfSwitch.isChecked = persistentState.endpointIndependence
-        } else {
-            b.dvEimfRl.visibility = View.GONE
-        }
+        // endpoint independent mapping (eim) / endpoint independent filtering (eif)
+        b.dvEimfSwitch.isChecked = persistentState.endpointIndependence
 
         b.dvTcpKeepAliveSwitch.isChecked = persistentState.tcpKeepAlive
         b.dvTimeoutSeekbar.progress = persistentState.dialTimeoutSec / 60
@@ -142,6 +142,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         displayDialerTimeOutUi(persistentState.dialTimeoutSec)
         displayInternetProtocolUi()
         displayRethinkInRethinkUi()
+        showNwPolicyDescription(persistentState.vpnBuilderPolicy)
     }
 
 
@@ -313,6 +314,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.settingsActivityDefaultDnsRl.setOnClickListener { showDefaultDnsDialog() }
 
+        b.settingsVpnProcessPolicyRl.setOnClickListener { showTunNetworkPolicyDialog() }
+
         b.settingsActivityConnectivityChecksRl.setOnClickListener {
             NewSettingsManager.markSettingSeen(NewSettingsManager.PERFORM_CONNECTION_CHECK)
             showConnectivityChecksOptionsDialog()
@@ -430,6 +433,60 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[pos].url
         }
         alertBuilder.create().show()
+    }
+
+    data class NetworkPolicyOption(val title: String, val description: String)
+    private fun showTunNetworkPolicyDialog() {
+        val options = listOf(
+            NetworkPolicyOption(getString(R.string.settings_ip_text_ipv46), getString(R.string.vpn_policy_auto_desc)),
+            NetworkPolicyOption(getString(R.string.vpn_policy_sensitive), getString(R.string.vpn_policy_sensitive_desc)),
+            NetworkPolicyOption(getString(R.string.vpn_policy_relaxed), getString(R.string.vpn_policy_relaxed_desc))
+        )
+        var currentSelection = persistentState.vpnBuilderPolicy
+        val adapter = object : ArrayAdapter<NetworkPolicyOption>(
+            this, R.layout.item_network_policy, R.id.policyTitle, options
+        ) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent)
+                val titleView = view.findViewById<AppCompatTextView>(R.id.policyTitle)
+                val descView = view.findViewById<AppCompatTextView>(R.id.policyDesc)
+                val radio = view.findViewById<AppCompatRadioButton>(R.id.radioButton)
+
+                val item = getItem(position)
+                titleView.text = item?.title
+                descView.text = item?.description
+                radio.isChecked = position == currentSelection
+
+                return view
+            }
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.vpn_policy_title))
+            .setAdapter(adapter) { _, which ->
+                currentSelection = which
+                saveNetworkPolicy(which)
+                adapter.notifyDataSetChanged()
+            }
+            .setPositiveButton(getString(R.string.hs_download_positive_default)) { dialog, _ ->
+                dialog.dismiss()
+                saveNetworkPolicy(currentSelection)
+            }
+            .setNegativeButton(getString(R.string.lbl_cancel), null)
+            .show()
+    }
+
+    private fun saveNetworkPolicy(which: Int) {
+        persistentState.vpnBuilderPolicy = which
+        showNwPolicyDescription(which)
+    }
+
+    private fun showNwPolicyDescription(which: Int) {
+        when (which) {
+            0 -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.settings_ip_text_ipv46) }
+            1 -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.vpn_policy_sensitive) }
+            2 -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.vpn_policy_sensitive) }
+        }
     }
 
     private fun showNwReachabilityCheckDialog() {

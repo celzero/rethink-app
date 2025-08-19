@@ -120,7 +120,20 @@ class ConnectionTrackerAdapter(private val context: Context) :
             displayProtocolDetails(connTracker.port, connTracker.protocol)
             displayAppDetails(connTracker)
             displaySummaryDetails(connTracker)
-            displayFirewallRulesetHint(connTracker.isBlocked, connTracker.blockedByRule)
+            // case: when the rule is set to RULE12 but no proxy is set, consider this as error
+            // handle this as special case, and display the RULE1C hint
+            // RULE1C is the hint for RULE12 with no proxy set.
+            val blocked = if (connTracker.blockedByRule == FirewallRuleset.RULE12.id) {
+                connTracker.proxyDetails.isEmpty()
+            } else {
+                connTracker.isBlocked
+            }
+            val rule = if (connTracker.blockedByRule == FirewallRuleset.RULE12.id && connTracker.proxyDetails.isEmpty()) {
+                FirewallRuleset.RULE1C.id
+            } else {
+                connTracker.blockedByRule
+            }
+            displayFirewallRulesetHint(blocked, rule)
 
             b.connectionParentLayout.setOnClickListener { openBottomSheet(connTracker) }
         }
@@ -382,7 +395,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
         private fun isConnectionProxied(ruleName: String?, proxyDetails: String): Boolean {
             if (ruleName == null) return false
             val rule = FirewallRuleset.getFirewallRule(ruleName) ?: return false
-            val proxy = ProxyManager.isIpnProxy(proxyDetails)
+            val proxy = ProxyManager.isNotLocalAndRpnProxy(proxyDetails)
             return FirewallRuleset.isProxied(rule) && proxyDetails.isNotEmpty() && proxy
         }
 

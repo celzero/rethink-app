@@ -27,6 +27,8 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import androidx.annotation.RequiresApi
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.service.VpnBuilderPolicy.Companion.getNetworkBehaviourDuration
 import com.celzero.bravedns.util.ConnectivityCheckHelper
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -75,6 +77,34 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                 sendNetworkChanges(isForceUpdate = true)
             }
         }
+
+        override fun onAvailable(network: Network) {
+            val behaviour = getConnectionMonitorBehaviour()
+            if (behaviour != VpnBuilderPolicy.ConnectionMonitorBehaviour.VALIDATED_NETWORKS) {
+                // no-op, as we expect the transportCallback to add to network set and send message
+                Logger.d(LOG_TAG_CONNECTION, "onAvailable(1), aggressive policy, ignoring networks from net-validated callback")
+                return
+            }
+            scope.launch(CoroutineName("cmIntAvl") + serializer) {
+                Logger.d(LOG_TAG_CONNECTION, "onAvailable(1), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                addToNwSet(network)
+                sendNetworkChanges(isForceUpdate = true)
+            }
+        }
+
+        override fun onLost(network: Network) {
+            val behaviour = getConnectionMonitorBehaviour()
+            if (behaviour != VpnBuilderPolicy.ConnectionMonitorBehaviour.VALIDATED_NETWORKS) {
+                // no-op, as we expect the transportCallback to add to network set and send message
+                Logger.d(LOG_TAG_CONNECTION, "onLost(1), aggressive policy, ignoring networks from net-cap callback")
+                return
+            }
+            scope.launch(CoroutineName("cmIntLost") + serializer) {
+                Logger.d(LOG_TAG_CONNECTION, "onLost(1), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                networkSet.remove(network)
+                sendNetworkChanges(isForceUpdate = true)
+            }
+        }
     }
 
     val transportCallback = object : ConnectivityManager.NetworkCallback() {
@@ -119,7 +149,6 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             .apply { if (isAtleastS()) setIncludeOtherUidNetworks(true) }
             .build()
 
-
     private val networkRequestWithTransports: NetworkRequest =
         NetworkRequest.Builder()
             .apply { if (isAtleastR()) clearCapabilities() else removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN) }
@@ -133,7 +162,6 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             // api26: .addTransportType(NetworkCapabilities.TRANSPORT_LOWPAN)
             .build()
 
-    //private var serviceHandler: NetworkRequestHandler? = null
     private val persistentState by inject<PersistentState>()
 
     private lateinit var cm: ConnectivityManager
@@ -220,6 +248,11 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         }
     }
 
+    private fun getConnectionMonitorBehaviour(): VpnBuilderPolicy.ConnectionMonitorBehaviour {
+        val policyId = persistentState.vpnBuilderPolicy
+        return VpnBuilderPolicy.fromOrdinalOrDefault(policyId).connectionMonitorBehaviour
+    }
+
     /**
      * Handles user preference changes, ie, when the user elects to see either multiple underlying
      * networks, or just one (the active network).
@@ -227,6 +260,31 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
     fun onUserPreferenceChanged() {
         Logger.d(LOG_TAG_CONNECTION, "onUserPreferenceChanged")
         scope.launch(CoroutineName("cmPref") + serializer) { sendNetworkChanges() }
+    }
+
+    fun onPolicyChanged() {
+        Logger.d(LOG_TAG_CONNECTION, "onPolicyChanged")
+        scope.launch(CoroutineName("cmPolicy") + serializer) {
+            // re-register the network callbacks based on the new policy
+            if (::cm.isInitialized) {
+                // register the network callbacks, can throw exception
+                try {
+                    cm.unregisterNetworkCallback(internetValidatedCallBack)
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_CONNECTION, "err unregistering internetValidatedCallBack, ${e.message}")
+                }
+                try {
+                    cm.unregisterNetworkCallback(transportCallback)
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_CONNECTION, "err unregistering transportCallback, ${e.message}")
+                }
+            }
+            val success = registerCallbackBasedOnPolicy()
+
+            if (!success) {
+                networkListener.onNetworkRegistrationFailed()
+            }
+        }
     }
 
     /**
@@ -242,25 +300,22 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                 return@async false
             }
 
-            Logger.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
+            // initialize channel before registering
+            channel = Channel(Channel.CONFLATED)
             cm = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networkBehaviour = getConnectionMonitorBehaviour()
+            Logger.i(LOG_TAG_CONNECTION, "new vpn is created force update the network, policy: $networkBehaviour")
+            val success = registerCallbackBasedOnPolicy()
 
-            try {
-                // TODO: use a custom Looper(HandlerThread) to avoid blocking the main thread
-                cm.registerNetworkCallback(networkRequest, internetValidatedCallBack)
-                cm.registerNetworkCallback(networkRequestWithTransports, transportCallback)
-            } catch (e: Exception) {
-                Logger.w(LOG_TAG_CONNECTION, "Exception while registering network callback", e)
+            if (!success) {
                 networkListener.onNetworkRegistrationFailed()
-                return@async isNewVpn
+                return@async false
             }
 
             // register for diagnostics manager if the android version is R or above
             if (isAtleastR()) {
                 registerDiags(context)
             }
-
-            channel = Channel(Channel.CONFLATED)
 
             scope.launch(CoroutineName("nwHdl") + serializer) {
 
@@ -283,7 +338,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                     val deferred = async { hdl.handleMessage(m) }
                     deferred.await()
                     // add a delay to avoid processing multiple network changes in quick succession
-                    delay(TimeUnit.SECONDS.toMillis(2))
+                    val duration = getNetworkBehaviourDuration(networkBehaviour)
+                    delay(duration)
                 }
             }
 
@@ -291,6 +347,39 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         }
 
         return deferred.await()
+    }
+
+    private fun registerCallbackBasedOnPolicy(): Boolean {
+        val behaviour = getConnectionMonitorBehaviour()
+        Logger.i(LOG_TAG_CONNECTION, "register nw callback/s, policy: ${behaviour.name}")
+        return when (behaviour) {
+            VpnBuilderPolicy.ConnectionMonitorBehaviour.TRANSPORTS -> {
+                // process the network changes with 2 seconds delay
+                registerNetworkCallback(networkRequestWithTransports, transportCallback)
+            }
+
+            VpnBuilderPolicy.ConnectionMonitorBehaviour.VALIDATED_NETWORKS -> {
+                // process the network changes with 1 second delay
+                registerNetworkCallback(networkRequest, internetValidatedCallBack)
+            }
+
+            VpnBuilderPolicy.ConnectionMonitorBehaviour.VALIDATED_NETWORKS_AND_TRANSPORTS -> {
+                // delay the processing of network changes, ie, process the network changes with 5 seconds delay
+                registerNetworkCallback(networkRequestWithTransports, transportCallback) &&
+                        registerNetworkCallback(networkRequest, internetValidatedCallBack)
+            }
+        }
+    }
+
+    private fun registerNetworkCallback(req: NetworkRequest, callback: ConnectivityManager.NetworkCallback): Boolean {
+        return try {
+            // TODO: use a custom Looper(HandlerThread) to avoid blocking the main thread
+            cm.registerNetworkCallback(req, callback)
+            true
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_CONNECTION, "err registering network callback", e)
+            false
+        }
     }
 
     @RequiresApi(30)
@@ -358,7 +447,16 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                 failOpenOnNoNetwork,
                 useAutoConnectivityChecks
             )
+
+        // channel is initialized only when the vpn is started, so check if it is initialized
+        // before sending the message (should not happen, but just in case)
+        if (!::channel.isInitialized) {
+            // channel is not initialized, return
+            Logger.e(LOG_TAG_CONNECTION, "sendNetworkChanges, channel is not initialized")
+            return
+        }
         // TODO: process after a delay to avoid processing multiple network changes in short bursts
+        if (DEBUG) Logger.v(LOG_TAG_CONNECTION, "sendNetworkChanges, channel closed? ${channel.isClosedForSend} msg: ${msg.msgType}, force: ${msg.isForceUpdate}, test: ${msg.testReachability}, stall: ${msg.stallOnNoNetwork}, useAutoChecks: ${msg.useAutoConnectivityChecks}, networks: ${msg.networkSet.size}")
         channel.send(msg)
     }
 
@@ -398,6 +496,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         var isActiveNetworkCellular: Boolean,
         var lastUpdated: Long, // may be updated by client listener
         val dnsServers: Map<InetAddress, Network>,
+        var vpnLockdown: Boolean = false // updated by client listener
     )
 
     data class IpsAndUrlToProbe(

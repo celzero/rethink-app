@@ -73,6 +73,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val DIAL_TIMEOUT_SEC = "dial_timeout_sec"
         const val AUTO_DIALS_PARALLEL = "auto_dials_parallel"
         const val STALL_ON_NO_NETWORK = "fail_open_on_no_network"
+        const val TUN_NETWORK_POLICY = "tun_network_handling_policy"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -379,6 +380,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var newSettings by stringPref("new_settings").withDefault<String>("")
     var newSettingsSeen by stringPref("new_settings_seen").withDefault<String>("")
     var appUpdateTimeTs by longPref("app_update_time_ts").withDefault<Long>(INIT_TIME_MS)
+
+    // 0 - auto, 1 - relaxed, 2 - aggressive
+    var vpnBuilderPolicy by intPref("tun_network_handling_policy").withDefault<Int>(0)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()

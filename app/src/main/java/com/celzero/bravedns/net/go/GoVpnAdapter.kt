@@ -43,6 +43,7 @@ import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.BraveVPNService.Companion.FIRESTACK_MUST_DUP_TUNFD
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
@@ -110,7 +111,7 @@ class GoVpnAdapter : KoinComponent {
     constructor(
         context: Context,
         externalScope: CoroutineScope,
-        tunFd: ParcelFileDescriptor,
+        tunFd: Long,
         mtu: Int,
         opts: TunnelOptions) {
         this.context = context
@@ -118,10 +119,11 @@ class GoVpnAdapter : KoinComponent {
         val defaultDns = newDefaultTransport(appConfig.getDefaultDns())
         // no need to connect tunnel if already connected, just reset the tunnel with new
         // parameters
+        val prev = Settings.dupTunFd(FIRESTACK_MUST_DUP_TUNFD)
         Logger.i(LOG_TAG_VPN, "$TAG connect tunnel with new params")
         tunnel =
             Intra.connect(
-                tunFd.fd.toLong(),
+                tunFd,
                 mtu.toLong(),
                 opts.fakeDns,
                 defaultDns,
@@ -140,7 +142,6 @@ class GoVpnAdapter : KoinComponent {
         // setTcpProxyIfNeeded()
         // no need to add default in init as it is already added in connect
         // addDefaultTransport(appConfig.getDefaultDns())
-        setRoute(opts)
         // TODO: ideally the values required for transport, alg and rdns should be set in the
         // opts itself.
         setRDNS()
@@ -191,29 +192,6 @@ class GoVpnAdapter : KoinComponent {
             Logger.w(LOG_TAG_VPN, "crash fd is null, cannot set")
         }
     }*/
-
-    private suspend fun setRoute(tunnelOptions: TunnelOptions) {
-        Logger.v(LOG_TAG_VPN, "$TAG setRoute")
-        if (!tunnel.isConnected) {
-            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set route")
-            return
-        }
-        try {
-            // setRoute can throw exception iff preferredEngine is invalid, which is not possible
-            // Log.d(LOG_TAG_VPN, "set route: ${tunnelOptions.preferredEngine.value()}")
-            // tunnel.setRoute(tunnelOptions.preferredEngine.value())
-            // above code is commented as the route is now set as default instead of preferred
-            tunnel.setRoute(InternetProtocol.IPv46.value())
-
-            // on route change, set the tun mode again for ptMode
-            setTunMode(tunnelOptions)
-
-            Logger.i(LOG_TAG_VPN, "$TAG set route: ${InternetProtocol.IPv46.value()}")
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG err setting route: ${e.message}", e)
-        }
-        Logger.v(LOG_TAG_VPN, "$TAG setRoute done")
-    }
 
     suspend fun addTransport() {
         Logger.v(LOG_TAG_VPN, "$TAG addTransport")
@@ -1417,22 +1395,38 @@ class GoVpnAdapter : KoinComponent {
     }
 
     suspend fun updateLinkAndRoutes(
-        tunFd: ParcelFileDescriptor,
+        tunFd: Long,
         mtu: Int,
         proto: Long
     ): Boolean {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG updateLink: tunnel disconnected, returning")
-
             return false
         }
-        Logger.i(LOG_TAG_VPN, "$TAG updateLink with fd(${tunFd.fd}) mtu: ${mtu}")
+
+        Logger.i(LOG_TAG_VPN, "$TAG updateLink with fd(${tunFd}) mtu: $mtu")
         return try {
-            tunnel.setLinkAndRoutes(tunFd.fd.toLong(), mtu.toLong(), proto)
+            tunnel.setLinkAndRoutes(tunFd, mtu.toLong(), proto)
             true
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err update tun: ${e.message}", e)
             false
+        }
+    }
+
+    suspend fun restartTunnel(tunFd: Long, mtu: Int, proto: Long): Boolean {
+        if (!tunnel.isConnected) {
+            Logger.e(LOG_TAG_VPN, "$TAG restartTunnel: tunnel is not connected, returning")
+            return false
+        }
+
+        Logger.i(LOG_TAG_VPN, "$TAG restarting tunnel")
+        try {
+            tunnel.restart(tunFd, mtu.toLong(), proto)
+            return true
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG error restarting tunnel: ${e.message}", e)
+            return false
         }
     }
 
