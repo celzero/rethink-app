@@ -488,7 +488,11 @@ class FirewallAppListAdapter(
         
         val appInfo = getItem(position) ?: return ""
         
-        // Use more idiomatic Kotlin approach to get first character
-        return appInfo.appName.firstOrNull()?.toString() ?: ""
+        // Handle empty app names safely
+        return if (appInfo.appName.isNotEmpty()) {
+            appInfo.appName.substring(0, 1)
+        } else {
+            ""
+        }
     }
 }
