@@ -152,8 +152,8 @@ internal constructor(
         // mark the query as blocked if the transaction id is Dnsx.BlockAll, no need to check
         // for blocklist as it is already marked as blocked
         if (transaction.id == Backend.BlockAll) {
-            // TODO: rdata should be empty for block all
-            if (transaction.response.isNotEmpty()) {
+            // TODO: rdata should be either empty / 0.0.0.0 / ::0 / -- for block all
+            if (transaction.response.isNotEmpty() && transaction.response != UNSPECIFIED_IP_IPV4 && transaction.response != UNSPECIFIED_IP_IPV6 && transaction.response != EMPTY_RESPONSE) {
                 Logger.w(
                     LOG_TAG_VPN,
                     "id is BlockAll, but rdata is not empty: ${transaction.response} for ${transaction.qName}"
