@@ -34,6 +34,13 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     }
 
     suspend fun updateUid(oldUid: Int, newUid: Int, pkg: String): Int {
+        val isExist = appInfoDAO.isUidPkgExist(newUid, pkg) != null
+        if (isExist) {
+            // already app is present with the new uid, so no need to update
+            // in that case, old uid with same pkg should be deleted as we intend to update the uid
+            appInfoDAO.deletePackage(oldUid, pkg)
+            return 0
+        }
         return appInfoDAO.updateUid(oldUid, pkg, newUid)
     }
 

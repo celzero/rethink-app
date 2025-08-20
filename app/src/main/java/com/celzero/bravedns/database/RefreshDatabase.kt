@@ -574,6 +574,9 @@ internal constructor(
 
     private suspend fun updateApp(oldUid: Int, newUid: Int, pkg: String) {
         Logger.i(LOG_TAG_APP_DB, "update app; oldUid: $oldUid, newUid: $newUid, pkg: $pkg")
+        if (oldUid == newUid) {
+            return
+        }
         FirewallManager.updateUidAndResetTombstone(oldUid, newUid, pkg)
     }
 
