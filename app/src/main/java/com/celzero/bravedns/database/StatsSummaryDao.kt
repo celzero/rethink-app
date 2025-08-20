@@ -989,7 +989,7 @@ interface StatsSummaryDao {
               0 AS port, 
               COUNT(id) AS count, 
               flag AS flag, 
-              :isBlocked AS blocked, 
+              isBlocked AS blocked, 
               appName AS appOrDnsName, 
               SUM(uploadBytes) AS uploadBytes, 
               SUM(downloadBytes) AS downloadBytes, 
