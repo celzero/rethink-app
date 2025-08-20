@@ -25,18 +25,19 @@
             android:id="@+id/dns_flag"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_gravity="center"
+            android:layout_gravity="center_vertical"
             android:alpha="0.9"
             android:ellipsize="none"
             android:layout_margin="10dp"
             android:gravity="center"
             android:maxWidth="32dp"
+            android:foregroundGravity="center_vertical"
             android:maxHeight="32dp"
             android:minWidth="32dp"
             android:singleLine="true"
             android:src="@drawable/default_app_icon"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textSize="30sp"
+            android:textSize="25sp"
             tools:text="" />
 
         <androidx.appcompat.widget.AppCompatImageView
