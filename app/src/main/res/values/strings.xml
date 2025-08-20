@@ -111,6 +111,7 @@
     <string name="lbl_hop" translatable="true">Relays</string>
     <string name="lbl_ipinfo_inc" translatable="false">IPinfo Inc.</string>
     <string name="lbl_manual" translatable="true">Manual</string>
+    <string name="lbl_fallback" translatable="true">Fallback</string>
 
     <string name="memory_notification_text">Rethink is experiencing low memory. System actions may be limited.</string>
 
@@ -1772,6 +1773,9 @@
     <string name="vpn_policy_relaxed_desc" translatable="true">Reacts to connectivity changes.</string>
 
     <string name="vpn_policy_title" translatable="true">Connection change policy</string>
+
+    <string name="use_fallback_dns_to_bypass" translatable="true">Fallback DNS for Trusted Domains</string>
+    <string name="use_fallback_dns_to_bypass_desc" translatable="true">Use fallback DNS to resolve trusted domains. If off, resolution may fail on user chosen DNS.</string>
 
     <!-- alert, commenting out for now in v055b -->
 
