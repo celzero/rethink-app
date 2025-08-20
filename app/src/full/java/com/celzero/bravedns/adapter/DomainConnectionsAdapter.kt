@@ -33,6 +33,9 @@ import com.celzero.bravedns.databinding.ListItemStatisticsSummaryBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity
+import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment.SummaryStatisticsType
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getFlag
@@ -129,11 +132,28 @@ class DomainConnectionsAdapter(private val context: Context, private val type: D
             b.ssProgress.visibility = View.GONE
 
             b.ssContainer.setOnClickListener {
-                val intent = Intent(context, AppInfoActivity::class.java)
-                intent.putExtra(AppInfoActivity.INTENT_UID, dc.uid)
-                context.startActivity(intent)
+                io {
+                    if (isUnknownApp(dc)) {
+                        uiCtx {
+                            val intent = Intent(context, NetworkLogsActivity::class.java)
+                            intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, NetworkLogsActivity.Tabs.NETWORK_LOGS.screen)
+                            intent.putExtra(Constants.SEARCH_QUERY, dc.appOrDnsName)
+                            context.startActivity(intent)
+                        }
+                    } else {
+                        uiCtx {
+                            val intent = Intent(context, AppInfoActivity::class.java)
+                            intent.putExtra(AppInfoActivity.INTENT_UID, dc.uid)
+                            context.startActivity(intent)
+                        }
+                    }
+                }
             }
+        }
 
+        private suspend fun isUnknownApp(appConnection: AppConnection): Boolean {
+            val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
+            return appInfo == null
         }
 
         private fun loadAppIcon(drawable: Drawable?) {
