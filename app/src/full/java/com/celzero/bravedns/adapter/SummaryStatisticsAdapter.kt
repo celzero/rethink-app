@@ -467,10 +467,10 @@ class SummaryStatisticsAdapter(
                         }
                     }
                     SummaryStatisticsType.MOST_CONTACTED_IPS -> {
-                        showNetworkLogs(appConnection, SummaryStatisticsType.MOST_CONTACTED_IPS)
+                        startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.IP)
                     }
                     SummaryStatisticsType.MOST_BLOCKED_IPS -> {
-                        showNetworkLogs(appConnection, SummaryStatisticsType.MOST_BLOCKED_IPS)
+                        startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.IP, true)
                     }
                     SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
                         startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.FLAG)
@@ -493,6 +493,10 @@ class SummaryStatisticsAdapter(
                 }
                 DomainConnectionsActivity.InputType.FLAG -> {
                     intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_FLAG, appConnection.flag)
+                }
+                DomainConnectionsActivity.InputType.IP -> {
+                    intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IP, appConnection.ipAddress)
+                    intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, isBlocked)
                 }
             }
             intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_TIME_CATEGORY, timeCategory.value)

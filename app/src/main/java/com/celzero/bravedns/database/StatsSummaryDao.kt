@@ -981,4 +981,26 @@ interface StatsSummaryDao {
         """
     )
     fun getAllDomainsByUid(uid: Int, to: Long): PagingSource<Int, AppConnection>
+
+    @Query(
+        """
+            SELECT uid AS uid, 
+              appName AS ipAddress, 
+              0 AS port, 
+              COUNT(id) AS count, 
+              flag AS flag, 
+              0 AS blocked, 
+              appName AS appOrDnsName, 
+              SUM(uploadBytes) AS uploadBytes, 
+              SUM(downloadBytes) AS downloadBytes, 
+              SUM(downloadBytes + uploadBytes) AS totalBytes 
+            FROM ConnectionTracker 
+            WHERE timeStamp > :to 
+              AND ipAddress = :ip 
+              AND isBlocked = :isBlocked
+            GROUP BY uid 
+            ORDER BY count DESC
+        """
+    )
+    fun getIpDetails(ip: String, to: Long, isBlocked: Boolean): PagingSource<Int, AppConnection>
 }
