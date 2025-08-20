@@ -127,7 +127,7 @@
     <string name="three_argument_colon" translatable="false">%1$s:%2$s:%3$s</string>
     <string name="symbol_heavy" translatable="false">🐘</string>
     <string name="symbol_turtle" translatable="false">🐢</string>
-    <string name="symbol_currency" translatable="false">💸</string>
+    <string name="symbol_currency" translatable="false">💲</string>
     <string name="symbol_green_circle" translatable="false">🟢</string>
     <string name="symbol_red_circle" translatable="false">🔴</string>
     <string name="symbol_key" translatable="false">🗝️</string>
@@ -1647,7 +1647,7 @@
 
     <!-- anti-censorship -->
     <string name="ac_title" translatable="true">anti-censorship</string>
-    <string name="ac_desc" translatable="true">Anti-censorship tools can grant internet freedom, but they may not work everywhere. Only attempted on non-proxied connections</string>
+    <string name="ac_desc" translatable="true">Anti-censorship tools can grant internet freedom, but those may not work everywhere. Only attempted on non-proxied connections.</string>
 
     <string name="ac_never_split_desc" translatable="true">Do not alter packets.</string>
 
@@ -1770,12 +1770,12 @@
     <string name="vpn_policy_sensitive" translatable="true">Sensitive</string>
     <string name="vpn_policy_sensitive_desc" translatable="true">Reacts to all network and connectivity changes.</string>
     <string name="vpn_policy_relaxed" translatable="true">Relaxed</string>
-    <string name="vpn_policy_relaxed_desc" translatable="true">Reacts to connectivity changes.</string>
+    <string name="vpn_policy_relaxed_desc" translatable="true">Reacts to interesting connectivity changes.</string>
 
     <string name="vpn_policy_title" translatable="true">Connection change policy</string>
 
-    <string name="use_fallback_dns_to_bypass" translatable="true">Fallback DNS for Trusted Domains</string>
-    <string name="use_fallback_dns_to_bypass_desc" translatable="true">Use fallback DNS to resolve trusted domains. If off, resolution may fail on user chosen DNS.</string>
+    <string name="use_fallback_dns_to_bypass" translatable="true">Use fallback DNS as bypass</string>
+    <string name="use_fallback_dns_to_bypass_desc" translatable="true">When enabled, always uses fallback DNS for bypassed apps, domains, and IPs.</string>
 
     <!-- alert, commenting out for now in v055b -->
 
