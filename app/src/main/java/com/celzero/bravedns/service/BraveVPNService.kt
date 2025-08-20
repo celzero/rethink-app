@@ -1746,9 +1746,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // see restartVpn and updateTun which expect this to be the case
             persistentState.setVpnEnabled(true)
 
-            // this should always happen after vpn enabled is set to true, as this will call
-            // restart-vpn and there is a check for vpn enabled state
-            observeVpnRestartRequests()
             startOrbotAsyncIfNeeded()
 
             val isNewVpn = connectionMonitor.onVpnStart(this)
@@ -1783,6 +1780,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     // have app, ip, domain rules. See RefreshDatabase#refresh
                     rdb.refresh(RefreshDatabase.ACTION_REFRESH_AUTO) {
                         restartVpn(this, opts, why = "startVpn")
+                        // this should always happen after vpn enabled is set to true, as this will
+                        // call restart-vpn and there is a check for vpn enabled state
+                        observeVpnRestartRequests()
                         // call this *after* a new vpn is created #512
                         uiCtx("observers") { observeChanges() }
                     }
@@ -4314,6 +4314,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     override fun onSvcComplete(p0: ServerSummary) {
         // no-op
+    }
+
+    override fun onUpstreamAnswer(smm: DNSSummary?, ipcsv: Gostr?): DNSOpts? {
+        // no-op
+        if (DEBUG) logd("onUpstreamAnswer: $smm, ipcsv: ${ipcsv.tos()}")
+        return null
     }
 
     override fun svcRoute(
