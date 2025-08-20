@@ -4410,12 +4410,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         // TODO: convert the duration obj to long, this is work around
         val durationSec = (s.duration / 1000).toInt()
-        val isIpnProxy = isNotLocalAndRpnProxy(s.pid)
+        val isNotLocalProxy = isNotLocalAndRpnProxy(s.pid)
 
         val cm = getConnTrackerMetaData(s.id)
         if (cm != null) { // if the connection metadata is already tracked, insert with summary
             var proxyRule = ""
-            if (s.pid.isNotEmpty() && !isIpnProxy) {
+            if (s.pid.isNotEmpty() && isNotLocalProxy) {
                 proxyRule = FirewallRuleset.RULE12.id
             }
 
@@ -4776,8 +4776,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val isRethink = cm.uid == rethinkUid
         cm.proxyDetails = mark.pidcsv
         cm.destIP = mark.ip
-        val isIpnProxy = isNotLocalAndRpnProxy(mark.pidcsv)
-        if (mark.pidcsv.isNotEmpty() && !isIpnProxy) {
+        val isNotLocalProxy = isNotLocalAndRpnProxy(mark.pidcsv)
+        if (mark.pidcsv.isNotEmpty() && isNotLocalProxy) {
             cm.blockedByRule = FirewallRuleset.RULE12.id
         }
 
@@ -5141,7 +5141,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 cm.proxyDetails = proxyIds // contains only one proxy id
 
                 // set proxied rule if the proxy is ipn
-                if (isNotLocalAndRpnProxy(proxyIds) && !cm.isBlocked) {
+                if (proxyIds.isNotEmpty() && isNotLocalAndRpnProxy(proxyIds)) {
                     cm.blockedByRule = FirewallRuleset.RULE12.id
                 }
 
