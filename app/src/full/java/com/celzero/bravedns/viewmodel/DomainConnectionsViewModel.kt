@@ -30,6 +30,7 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
     private var domains: MutableLiveData<String> = MutableLiveData()
     private var asn: MutableLiveData<String> = MutableLiveData()
     private var flag: MutableLiveData<String> = MutableLiveData()
+    private var ip: MutableLiveData<String> = MutableLiveData()
     private var timeCategory: TimeCategory = TimeCategory.ONE_HOUR
     private var startTime: MutableLiveData<Long> = MutableLiveData()
     private var isBlocked: Boolean = false
@@ -56,6 +57,7 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
         domains.postValue("")
         asn.postValue("")
         flag.postValue("")
+        ip.postValue("")
     }
 
     fun setDomain(domain: String, isBlocked: Boolean) {
@@ -70,6 +72,11 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
     fun setAsn(asn: String, isBlocked: Boolean) {
         this.isBlocked = isBlocked
         this.asn.postValue(asn)
+    }
+
+    fun setIp(ip: String, isBlocked: Boolean) {
+        this.isBlocked = isBlocked
+        this.ip.postValue(ip)
     }
 
     fun timeCategoryChanged(tc: TimeCategory) {
@@ -88,6 +95,7 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
         asn.value = ""
         flag.value = ""
         domains.value = ""
+        ip.value = ""
     }
 
     val domainConnectionList = domains.switchMap { input ->
@@ -100,6 +108,10 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
 
     val asnConnectionList = asn.switchMap { input ->
         fetchAsnConnections(input)
+    }
+
+    val ipConnectionList = ip.switchMap { input ->
+        fetchIpConnections(input)
     }
 
     private fun fetchDomainConnections(input: String) =
@@ -119,5 +131,10 @@ class DomainConnectionsViewModel(private val statsDao: StatsSummaryDao) : ViewMo
             } else {
                 statsDao.getAsnDetails(input, startTime.value!!)
             }
+        }.liveData.cachedIn(viewModelScope)
+
+    private fun fetchIpConnections(input: String) =
+        Pager(PagingConfig(pageSize = Constants.LIVEDATA_PAGE_SIZE)) {
+            statsDao.getIpDetails(input, startTime.value!!, isBlocked)
         }.liveData.cachedIn(viewModelScope)
 }
