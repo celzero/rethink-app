@@ -407,6 +407,7 @@
             android:ellipsize="start"
             android:fontFamily="sans-serif-light"
             android:gravity="center"
+            android:textIsSelectable="true"
             android:marqueeRepeatLimit="marquee_forever"
             android:maxLines="3"
             android:paddingStart="8dp"

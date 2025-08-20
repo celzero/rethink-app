@@ -19,8 +19,7 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -42,6 +41,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 
 class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics) {
     private val b by viewBinding(FragmentSummaryStatisticsBinding::bind)
@@ -54,11 +54,16 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     private var loadMoreClicked: Boolean = false
 
     private var contactedDomainsAdapter: SummaryStatisticsAdapter? = null
+    private var blockedDomainsAdapter: SummaryStatisticsAdapter? = null
     private var contactedAsnAdapter: SummaryStatisticsAdapter? = null
     private var blockedAsnAdapter: SummaryStatisticsAdapter? = null
     private var contactedCountriesAdapter: SummaryStatisticsAdapter? = null
+    private var contactedIpsAdapter: SummaryStatisticsAdapter? = null
+    private var blockedIpsAdapter: SummaryStatisticsAdapter? = null
 
-    private lateinit var animation: Animation
+    // Remove unused loadMore overlay views and rotation animator; add progress drawable for FAB
+    private var progressDrawable: CircularProgressDrawable? = null
+    private var originalFabText: CharSequence? = null
 
     enum class SummaryStatisticsType(val tid: Int) {
         MOST_CONNECTED_APPS(0),
@@ -104,7 +109,6 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun initView() {
-        addAnimation()
         setTabbedViewTxt()
         highlightToggleBtn()
         showTopActiveApps()
@@ -201,9 +205,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun initClickListeners() {
-        b.loadMoreTv.setOnClickListener {
+        b.fssFabLoadMore.setOnClickListener {
             showLoadMoreProgress(!loadMoreClicked)
-         }
+        }
         b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
 
         b.fssActiveAppsChip.setOnClickListener {
@@ -252,9 +256,12 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 viewModel.timeCategoryChanged(timeCategory)
                 handleTotalUsagesUi()
                 contactedDomainsAdapter?.setTimeCategory(timeCategory)
+                blockedDomainsAdapter?.setTimeCategory(timeCategory)
                 contactedCountriesAdapter?.setTimeCategory(timeCategory)
                 contactedAsnAdapter?.setTimeCategory(timeCategory)
                 blockedAsnAdapter?.setTimeCategory(timeCategory)
+                contactedIpsAdapter?.setTimeCategory(timeCategory)
+                blockedIpsAdapter?.setTimeCategory(timeCategory)
                 return@OnButtonCheckedListener
             }
 
@@ -291,38 +298,39 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun showLoadMoreProgress(isClicked: Boolean) {
         if (isClicked) {
-            b.loadMoreTv.isEnabled = false
-            b.loadProgressBar.animation = animation
-            b.loadProgressBar.startAnimation(animation)
-            Utilities.delay(LOAD_MORE_TIMEOUT, lifecycleScope) {
-                if (this.isAdded) {
-                    b.loadProgressBar.clearAnimation()
-                    b.loadProgressBar.visibility = View.GONE
-                    b.loadMoreLl.visibility = View.GONE
+            loadMoreClicked = true
+            b.fssFabLoadMore.isEnabled = false
+            // cache original text
+            if (originalFabText == null) originalFabText = b.fssFabLoadMore.text
+            // create or reuse progress drawable
+            if (progressDrawable == null) {
+                progressDrawable = CircularProgressDrawable(requireContext()).apply {
+                    strokeWidth = 5f
+                    centerRadius = 18f
+                    setStyle(CircularProgressDrawable.LARGE)
                 }
             }
-            b.loadProgressBar.visibility = View.VISIBLE
-            b.loadMoreTv.visibility = View.GONE
+            progressDrawable?.start()
+            // shrink to icon-only then set icon to progress indicator
+            b.fssFabLoadMore.shrink()
+            b.fssFabLoadMore.icon = progressDrawable
+            b.fssFabLoadMore.text = "" // ensure no residual text
+            handleLoadMore(true)
+            Utilities.delay(LOAD_MORE_TIMEOUT, lifecycleScope) {
+                if (!isAdded) return@delay
+                progressDrawable?.stop()
+                b.fssFabLoadMore.visibility = View.GONE
+                loadMoreClicked = false
+            }
         } else {
-            b.loadMoreLl.visibility = View.VISIBLE
-            b.loadMoreTv.visibility = View.VISIBLE
-            b.loadProgressBar.visibility = View.GONE
+            // reset early
+            progressDrawable?.stop()
+            b.fssFabLoadMore.text = originalFabText ?: getString(R.string.load_more)
+            b.fssFabLoadMore.extend()
+            b.fssFabLoadMore.isEnabled = true
+            loadMoreClicked = false
+            handleLoadMore(false)
         }
-        loadMoreClicked = isClicked
-        handleLoadMore(isClicked)
-    }
-
-    private fun addAnimation() {
-        animation =
-            RotateAnimation(ANIMATION_START_DEGREE,
-                ANIMATION_END_DEGREE,
-                Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE,
-                Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE
-            )
-        animation.repeatCount = ANIMATION_REPEAT_COUNT
-        animation.duration = ANIMATION_DURATION
     }
 
     private fun openDetailedStatsUi(type: SummaryStatisticsType) {
@@ -343,12 +351,6 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         fun newInstance() = SummaryStatisticsFragment()
 
         private const val RECYCLER_ITEM_VIEW_HEIGHT = 480
-        private const val ANIMATION_DURATION = 750L
-        private const val ANIMATION_REPEAT_COUNT = -1
-        private const val ANIMATION_PIVOT_VALUE = 0.5f
-        private const val ANIMATION_START_DEGREE = 0.0f
-        private const val ANIMATION_END_DEGREE = 360.0f
-
         private const val LOAD_MORE_TIMEOUT: Long = 1000
     }
 
@@ -586,7 +588,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.fssBlockedDomainRecyclerView.layoutManager = layoutManager
 
-        val recyclerAdapter =
+        blockedDomainsAdapter =
             SummaryStatisticsAdapter(
                 requireContext(),
                 persistentState,
@@ -594,13 +596,16 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 SummaryStatisticsType.MOST_BLOCKED_DOMAINS
             )
 
+        val timeCategory = viewModel.getTimeCategory()
+        blockedDomainsAdapter?.setTimeCategory(timeCategory)
+
         viewModel.mbd.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+            blockedDomainsAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
         }
 
-        recyclerAdapter.addLoadStateListener {
+        blockedDomainsAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (recyclerAdapter.itemCount < 1) {
+                if (blockedDomainsAdapter!!.itemCount < 1) {
                     b.fssDomainBlockedLl.visibility = View.GONE
                 } else {
                     b.fssDomainBlockedLl.visibility = View.VISIBLE
@@ -612,7 +617,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         val scale = resources.displayMetrics.density
         val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
         b.fssBlockedDomainRecyclerView.minimumHeight = pixels.toInt()
-        b.fssBlockedDomainRecyclerView.adapter = recyclerAdapter
+        b.fssBlockedDomainRecyclerView.adapter = blockedDomainsAdapter
     }
 
     private fun showMostContactedIps() {
@@ -626,20 +631,23 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.fssContactedIpsRecyclerView.layoutManager = layoutManager
 
-        val recyclerAdapter =
-            SummaryStatisticsAdapter(
+        contactedIpsAdapter = SummaryStatisticsAdapter(
                 requireContext(),
                 persistentState,
                 appConfig,
                 SummaryStatisticsType.MOST_CONTACTED_IPS
             )
+
+        val timeCategory = viewModel.getTimeCategory()
+        contactedIpsAdapter?.setTimeCategory(timeCategory)
+
         viewModel.getMostContactedIps.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+            contactedIpsAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
         }
 
-        recyclerAdapter.addLoadStateListener {
+        contactedIpsAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (recyclerAdapter.itemCount < 1) {
+                if (contactedIpsAdapter!!.itemCount < 1) {
                     b.fssIpAllowedLl.visibility = View.GONE
                 } else {
                     b.fssIpAllowedLl.visibility = View.VISIBLE
@@ -651,7 +659,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         val scale = resources.displayMetrics.density
         val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
         b.fssContactedIpsRecyclerView.minimumHeight = pixels.toInt()
-        b.fssContactedIpsRecyclerView.adapter = recyclerAdapter
+        b.fssContactedIpsRecyclerView.adapter = contactedIpsAdapter
     }
 
     private fun showMostBlockedIps() {
@@ -665,20 +673,23 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.fssBlockedIpsRecyclerView.layoutManager = layoutManager
 
-        val recyclerAdapter =
-            SummaryStatisticsAdapter(
+        blockedIpsAdapter = SummaryStatisticsAdapter(
                 requireContext(),
                 persistentState,
                 appConfig,
                 SummaryStatisticsType.MOST_BLOCKED_IPS
             )
+
+        val timeCategory = viewModel.getTimeCategory()
+        blockedIpsAdapter?.setTimeCategory(timeCategory)
+
         viewModel.getMostBlockedIps.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+            blockedIpsAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
         }
 
-        recyclerAdapter.addLoadStateListener {
+        blockedIpsAdapter?.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                if (recyclerAdapter.itemCount < 1) {
+                if (blockedIpsAdapter!!.itemCount < 1) {
                     b.fssIpBlockedLl.visibility = View.GONE
                 } else {
                     b.fssIpBlockedLl.visibility = View.VISIBLE
@@ -690,7 +701,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         val scale = resources.displayMetrics.density
         val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 80) * scale + 0.5f)
         b.fssBlockedIpsRecyclerView.minimumHeight = pixels.toInt()
-        b.fssBlockedIpsRecyclerView.adapter = recyclerAdapter
+        b.fssBlockedIpsRecyclerView.adapter = blockedIpsAdapter
     }
 
     private fun showMostContactedCountries() {

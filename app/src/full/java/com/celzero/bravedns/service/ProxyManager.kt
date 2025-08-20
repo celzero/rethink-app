@@ -208,6 +208,10 @@ object ProxyManager : KoinComponent {
         m.forEach { addNewApp(it) }
     }
 
+    suspend fun updateApps(m: Collection<FirewallManager.AppInfoTuple>) {
+        m.forEach { updateApp(it.uid, it.packageName) }
+    }
+
     suspend fun addApp(appInfo: AppInfo?) {
         addNewApp(appInfo)
     }
@@ -231,15 +235,15 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun purgeDupsBeforeRefresh() {
-        val visited = mutableSetOf<FirewallManager.AppInfoTuple>()
+        val visited = mutableSetOf<String>() // contains package-names
         val dups = mutableSetOf<FirewallManager.AppInfoTuple>()
         pamSet
             .map { FirewallManager.AppInfoTuple(it.uid, it.packageName) }
-            .forEach { if (visited.contains(it)) dups.add(it) else visited.add(it) }
+            .forEach { if (visited.contains(it.packageName)) dups.add(it) else visited.add(it.packageName) }
         // duplicates are unexpected; but since refreshDatabase only deals in uid+package-name
         // and proxy-mapper primary keys on uid+package-name+proxy-id, there have been cases
         // of duplicate entries in the proxy-mapper. Purge all entries that have same
-        // uid+package-name pair. Note that, doing so also removes entry for an app even if it is
+        // package-name. Note that, doing so also removes entry for an app even if it is
         // currently installed.
         // This is okay, given we do not expect any dups. Also: This fn must be called before
         // refreshDatabase so that any entries removed are added back as "new mappings" via
@@ -303,10 +307,27 @@ object ProxyManager : KoinComponent {
         }
     }
 
+    suspend fun deleteAppByPkgName(packageName: String) {
+        // delete the app from the cache
+        pamSet.removeIf { it.packageName == packageName }
+        // delete the app from the database
+        db.deleteAppByPkgName(packageName)
+        Logger.i(LOG_TAG_PROXY, "deleting app for mapping by package name: $packageName")
+    }
+
     suspend fun clear() {
         pamSet.clear()
         db.deleteAll()
         Logger.d(LOG_TAG_PROXY, "deleting all apps for mapping")
+    }
+
+    suspend fun tombstoneApp(oldUid: Int) {
+        // tombstone the app in the database and reload the cache
+        val newUid = -1 * oldUid // negative uid to indicate tombstone app
+        db.tombstoneApp(oldUid, newUid)
+        // reload the cache
+        load()
+        Logger.i(LOG_TAG_PROXY, "tombstoning app for mapping: $oldUid, $newUid")
     }
 
     fun isAnyAppSelected(proxyId: String): Boolean {
@@ -327,7 +348,7 @@ object ProxyManager : KoinComponent {
         return pamSet.count { it.proxyId == proxyId }
     }
 
-    fun isIpnProxy(ipnProxyId: String): Boolean {
+    fun isNotLocalAndRpnProxy(ipnProxyId: String): Boolean {
         if (ipnProxyId.isEmpty()) return false
         // check if the proxy id is not the base, block, exit, auto or ingress
         // all these are special cases and should not be considered as proxied traffic
@@ -336,7 +357,6 @@ object ProxyManager : KoinComponent {
             ipnProxyId != Backend.Exit &&
             ipnProxyId != Backend.Auto &&
             ipnProxyId != Backend.Ingress &&
-            ipnProxyId != Backend.Plus &&
             !ipnProxyId.endsWith(Backend.RPN)
     }
 

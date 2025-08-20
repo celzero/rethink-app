@@ -254,7 +254,6 @@ object VpnController : KoinComponent {
     fun protocols(): String {
         val ipv4 = protocol.first
         val ipv6 = protocol.second
-        Logger.d(LOG_TAG_VPN, "protocols => ipv4: $ipv4, ipv6: $ipv6")
         return if (ipv4 && ipv6) {
             "$URL4, $URL6"
         } else if (ipv6) {
@@ -266,7 +265,7 @@ object VpnController : KoinComponent {
             if (!persistentState.stallOnNoNetwork) {
                 "$URL4, $URL6"
             } else {
-                ""
+                "-"
             }
         }
     }
@@ -334,10 +333,6 @@ object VpnController : KoinComponent {
 
     suspend fun getRDNS(type: RethinkBlocklistManager.RethinkBlocklistType): RDNS? {
         return braveVpnService?.getRDNS(type)
-    }
-
-    fun goBuildVersion(full: Boolean): String {
-        return braveVpnService?.goBuildVersion(full) ?: ""
     }
 
     fun protectSocket(socket: Socket) {

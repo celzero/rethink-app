@@ -70,13 +70,15 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             object : DiffUtil.ItemCallback<CustomIp>() {
 
                 override fun areItemsTheSame(oldConnection: CustomIp, newConnection: CustomIp) =
-                    oldConnection.ipAddress == newConnection.ipAddress &&
-                        oldConnection.status == newConnection.status &&
-                        oldConnection.proxyCC == newConnection.proxyCC &&
-                        oldConnection.proxyId == newConnection.proxyId
+                    oldConnection.uid == newConnection.uid &&
+                            oldConnection.ipAddress == newConnection.ipAddress &&
+                            oldConnection.port == newConnection.port
 
                 override fun areContentsTheSame(oldConnection: CustomIp, newConnection: CustomIp) =
-                    oldConnection == newConnection
+                    oldConnection.status == newConnection.status &&
+                            oldConnection.proxyCC == newConnection.proxyCC &&
+                            oldConnection.proxyId == newConnection.proxyId &&
+                            oldConnection.modifiedDateTime == newConnection.modifiedDateTime
             }
     }
 
@@ -249,6 +251,14 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                 }
             }
 
+            b.customIpCheckbox.setOnClickListener {
+                if (!isSelectionMode) {
+                    isSelectionMode = true
+                }
+                toggleSelection(customIp)
+                notifyDataSetChanged()
+            }
+
             b.customIpSeeMoreChip.setOnClickListener { openAppWiseRulesActivity(customIp.uid) }
 
             b.customIpContainer.setOnLongClickListener {
@@ -410,6 +420,14 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                 } else {
                     showBtmSheet()
                 }
+            }
+
+            b.customIpCheckbox.setOnClickListener {
+                if (!isSelectionMode) {
+                    isSelectionMode = true
+                }
+                toggleSelection(customIp)
+                notifyDataSetChanged()
             }
 
             b.customIpContainer.setOnLongClickListener {

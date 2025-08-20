@@ -84,7 +84,7 @@ class ConnectionTrackerFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (arguments != null) {
-            val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
+            val query = arguments?.getString(Constants.SEARCH_QUERY) ?: ""
             fromUniversalFirewallScreen = query.contains(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)
             fromWireGuardScreen = query.contains(NetworkLogsActivity.RULES_SEARCH_ID_WIREGUARD)
             if (fromUniversalFirewallScreen) {
@@ -101,6 +101,7 @@ class ConnectionTrackerFragment :
                 hideSearchLayout()
             } else {
                 b.connectionSearch.setQuery(query, true)
+                viewModel.setFilter(query, filterCategories, filterType)
             }
         }
         initView()

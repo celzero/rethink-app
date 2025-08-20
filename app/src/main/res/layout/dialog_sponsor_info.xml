@@ -23,7 +23,7 @@
         android:layout_marginTop="8dp"
         android:gravity="center_horizontal"
         android:padding="16dp"
-        android:textColor="?attr/homeScreenHeaderTextColor"
+        android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/default_font_text_view" />
 
     <androidx.appcompat.widget.AppCompatTextView

@@ -67,7 +67,13 @@ class FirewallAppListAdapter(
                     oldConnection: AppInfo,
                     newConnection: AppInfo
                 ): Boolean {
-                    return oldConnection == newConnection
+                    return oldConnection.uid == newConnection.uid &&
+                            oldConnection.packageName == newConnection.packageName &&
+                            oldConnection.appName == newConnection.appName
+                            && oldConnection.tombstoneTs == newConnection.tombstoneTs
+                            && oldConnection.isProxyExcluded == newConnection.isProxyExcluded
+                            && oldConnection.firewallStatus == newConnection.firewallStatus
+                            && oldConnection.connectionStatus == newConnection.connectionStatus
                 }
 
                 override fun areContentsTheSame(
@@ -241,8 +247,8 @@ class FirewallAppListAdapter(
                     showWifiUnused()
                 }
                 else -> {
-                    showWifiDisabled()
-                    showMobileDataDisabled()
+                    showWifiEnabled()
+                    showMobileDataEnabled()
                 }
             }
         }

@@ -127,7 +127,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         io {
             val appInfo = FirewallManager.getAppInfoByUid(uid)
             // case: app is uninstalled but still available in RethinkDNS database
-            if (appInfo == null || uid == INVALID_UID) {
+            if (appInfo == null || uid == INVALID_UID || appInfo.tombstoneTs > 0) {
                 uiCtx { showNoAppFoundDialog() }
                 return@io
             }
@@ -152,6 +152,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
                 if (appInfo.packageName == rethinkPkgName) {
                     isRethinkApp = true
                     b.aadFirewallStatus.visibility = View.GONE
+                    b.aadAapFirewallNewCard.visibility = View.GONE
                     hideFirewallStatusUi()
                     hideDomainBlockUi()
                     hideIpBlockUi()

@@ -45,12 +45,14 @@ object NewSettingsManager: KoinComponent {
     const val TREAT_DNS_FIREWALL = "treat_dns_as_firewall"
     const val SPLIT_DNS = "split_dns"
     const val USE_SYS_DNS_UNDELEGATED = "use_sys_dns_undelegated"
+    const val USE_FALLBACK_TO_BYPASS = "use_fallback_to_bypass"
 
     // network
     const val LOOP_BACK_PROXY_FORWARDER = "loop_back_proxy_forwarder"
     const val MARK_MOBILE_METERED = "mark_mobile_metered"
     const val DO_NOT_STALL = "do_not_stall"
     const val PERFORM_CONNECTION_CHECK = "perform_connection_check"
+    const val TUN_NETWORK_POLICY = "tun_network_handling_policy"
 
     const val ANTI_CENSORSHIP = "anti_censorship"
 
@@ -72,7 +74,8 @@ object NewSettingsManager: KoinComponent {
         MARK_MOBILE_METERED,
         DO_NOT_STALL,
         PERFORM_CONNECTION_CHECK,
-        ANTI_CENSORSHIP
+        ANTI_CENSORSHIP,
+        TUN_NETWORK_POLICY
     )
 
     init {

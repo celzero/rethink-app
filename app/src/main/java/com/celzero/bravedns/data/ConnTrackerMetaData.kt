@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.data
 
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import java.io.Serializable
 
 // do not use it as key in the map or set, as it is mutable
@@ -23,7 +24,7 @@ data class ConnTrackerMetaData(
     val usrId: Int,
     val sourceIP: String,
     val sourcePort: Int,
-    val destIP: String,
+    var destIP: String,
     val destPort: Int,
     val timestamp: Long,
     var isBlocked: Boolean,
@@ -33,5 +34,11 @@ data class ConnTrackerMetaData(
     val protocol: Int,
     var query: String?,
     var connId: String,
-    var connType: String
+    var connType: String,
+    var rpid: String = "", // relay proxy id
+    var message: String = "",
+    var downloadBytes: Long = 0,
+    var uploadBytes: Long = 0,
+    var duration: Int = 0,
+    var synack: Long = 0 // treat it as rtt (round trip time
 ) : Serializable

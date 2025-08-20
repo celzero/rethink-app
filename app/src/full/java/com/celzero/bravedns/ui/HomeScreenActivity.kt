@@ -16,7 +16,6 @@
 package com.celzero.bravedns.ui
 
 import Logger
-import Logger.LOG_IAB
 import Logger.LOG_TAG_APP_UPDATE
 import Logger.LOG_TAG_BACKUP_RESTORE
 import Logger.LOG_TAG_DOWNLOAD
@@ -60,7 +59,6 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
@@ -340,6 +338,12 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
             // to SystemClock.elapsedRealtime
             persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
+        }
+
+        // remove this after v055r
+        io {
+            rdb.cleanupTombstone()
+            rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE)
         }
 
         // reset the local blocklist download from android download manager to custom in v055o

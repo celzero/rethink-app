@@ -71,7 +71,7 @@
                         android:layout_height="match_parent"
                         android:clipToPadding="false"
                         app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
+                        app:cardElevation="4dp"
                         app:cardUseCompatPadding="true">
 
                         <RelativeLayout
@@ -173,7 +173,7 @@
                         android:clipToPadding="true"
                         android:orientation="vertical"
                         app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
+                        app:cardElevation="4dp"
                         app:cardUseCompatPadding="true">
 
                         <RelativeLayout
@@ -284,7 +284,7 @@
                         android:clipToPadding="true"
                         android:orientation="vertical"
                         app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
+                        app:cardElevation="4dp"
                         app:cardUseCompatPadding="true">
 
                         <RelativeLayout
@@ -357,7 +357,7 @@
                         android:clipToPadding="true"
                         android:orientation="vertical"
                         app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
+                        app:cardElevation="4dp"
                         app:cardUseCompatPadding="true">
 
                         <RelativeLayout
@@ -458,7 +458,7 @@
                 android:clipToPadding="true"
                 android:orientation="vertical"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
+                app:cardElevation="4dp"
                 app:cardUseCompatPadding="true">
 
                 <RelativeLayout
@@ -507,7 +507,7 @@
                             android:gravity="center"
                             android:paddingStart="10dp"
                             android:paddingEnd="0dp"
-                            android:textColor="?attr/primaryTextColor"
+                            android:textColor="?attr/homeScreenHeaderTextColor"
                             android:textSize="@dimen/rethink_header_text" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -524,7 +524,7 @@
                             android:gravity="center"
                             android:padding="5dp"
                             android:text="@string/symbol_slash"
-                            android:textColor="?attr/primaryTextColor"
+                            android:textColor="?attr/homeScreenHeaderTextColor"
                             android:textSize="@dimen/heading_font_text_view" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -539,7 +539,7 @@
                             android:layout_toEndOf="@id/fhs_card_apps_divider"
                             android:alpha="0.8"
                             android:gravity="center"
-                            android:textColor="?attr/primaryTextColor"
+                            android:textColor="?attr/homeScreenHeaderTextColor"
                             android:textSize="@dimen/extra_large_font_text_view" />
 
                         <RelativeLayout

@@ -33,16 +33,15 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.insert(appInfo)
     }
 
-    suspend fun updateUid(oldUid: Int, uid: Int, pkg: String): Int {
-        val isExist = appInfoDAO.isUidPkgExist(uid, pkg) != null
+    suspend fun updateUid(oldUid: Int, newUid: Int, pkg: String): Int {
+        val isExist = appInfoDAO.isUidPkgExist(newUid, pkg) != null
         if (isExist) {
             // already app is present with the new uid, so no need to update
             // in that case, old uid with same pkg should be deleted as we intend to update the uid
             appInfoDAO.deletePackage(oldUid, pkg)
             return 0
         }
-
-        return appInfoDAO.updateUid(oldUid, pkg, uid)
+        return appInfoDAO.updateUid(oldUid, pkg, newUid)
     }
 
     suspend fun deleteByPackageName(packageNames: List<String>) {
@@ -57,12 +56,12 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         }
     }
 
-    suspend fun tombstoneApp(uid: Int, packageName: String?, tombstoneTs: Long) {
+    suspend fun tombstoneApp(oldUid: Int, newUid: Int, packageName: String?, tombstoneTs: Long) {
         if (packageName == null) {
-            appInfoDAO.tombstoneApp(uid, tombstoneTs)
+            appInfoDAO.tombstoneApp(oldUid, newUid, tombstoneTs)
             return
         }
-        appInfoDAO.tombstoneApp(uid, packageName, tombstoneTs)
+        appInfoDAO.tombstoneApp(oldUid, newUid, packageName, tombstoneTs)
     }
 
     suspend fun getAppInfo(): List<AppInfo> {

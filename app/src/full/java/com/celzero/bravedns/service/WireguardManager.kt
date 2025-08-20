@@ -27,7 +27,6 @@ import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.database.WgConfigFilesRepository
 import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
-import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Config
@@ -377,7 +376,7 @@ object WireguardManager : KoinComponent {
     }
 
     // no need to check for app excluded from proxy here, expected to call this fn after that
-    suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMeteredNw: Boolean, default: String = ""): List<String> {
+    suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMobileNw: Boolean, default: String = ""): List<String> {
         val block = Backend.Block
         val proxyIds: MutableList<String> = mutableListOf()
         if (oneWireGuardEnabled()) {
@@ -450,7 +449,7 @@ object WireguardManager : KoinComponent {
         // app-specific config can be empty, if the app is not configured
         // app-specific config id
         val acid = if (ac == ID_NONE) "" else ac // ignore id string if it is ID_NONE
-        val appProxyPair = canUseConfig(acid, "app($uid)", usesMeteredNw)
+        val appProxyPair = canUseConfig(acid, "app($uid)", usesMobileNw)
         if (!appProxyPair.second) {
             if (appProxyPair.first == block) {
                 proxyIds.clear()
@@ -505,7 +504,7 @@ object WireguardManager : KoinComponent {
 
         val cac = mappings.filter { it.isActive && it.isCatchAll }
         cac.forEach {
-            if (checkEligibilityBasedOnNw(it.id, usesMeteredNw)) {
+            if (checkEligibilityBasedOnNw(it.id, usesMobileNw)) {
                 proxyIds.add(ID_WG_BASE + it.id)
                 Logger.i(
                     LOG_TAG_PROXY,
@@ -518,10 +517,16 @@ object WireguardManager : KoinComponent {
             Logger.i(LOG_TAG_PROXY, "no proxy ids found for $uid, $ip, $port, $domain; returning empty list")
             return emptyList()
         }
+        // see if any id is part of lockdown, if so, then return the list, cac's can have lockdown
+        val isAnyIdLockdown = proxyIds.any { id ->
+            val confId = convertStringIdToId(id)
+            val conf = mappings.find { it.id == confId }
+            conf?.isLockdown ?: false
+        }
 
         // add the default proxy to the end, will not be true for lockdown but lockdown is handled
         // above, so no need to check here
-        if (default.isNotEmpty()) proxyIds.add(default)
+        if (default.isNotEmpty() && !isAnyIdLockdown) proxyIds.add(default)
 
         // the proxyIds list will contain the ip-app specific, domain-app specific, app specific,
         // universal ip, universal domain, catch-all and default configs in the order of priority

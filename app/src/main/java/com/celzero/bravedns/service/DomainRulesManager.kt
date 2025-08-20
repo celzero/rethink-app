@@ -17,6 +17,7 @@ package com.celzero.bravedns.service
 
 import Logger
 import Logger.LOG_TAG_DNS
+import Logger.LOG_TAG_FIREWALL
 import android.content.Context
 import android.util.Patterns
 import androidx.lifecycle.LiveData
@@ -30,6 +31,9 @@ import com.celzero.bravedns.util.Utilities.togs
 import com.celzero.bravedns.util.Utilities.tos
 import com.celzero.firestack.backend.Gostr
 import com.celzero.firestack.backend.RadixTree
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.MalformedURLException
@@ -121,7 +125,7 @@ object DomainRulesManager : KoinComponent {
         return (domain.lowercase(Locale.ROOT) + Backend.Ksep + uid).togs()
     }
 
-    private fun mkTrieKey(d: String): Gostr? {
+    private fun mkTrieKeyForTrustedMap(d: String): Gostr? {
         // *.google.co.uk -> .google.co.uk
         val domain = d.removePrefix("*")
         return domain.lowercase(Locale.ROOT).togs()
@@ -142,7 +146,9 @@ object DomainRulesManager : KoinComponent {
             maybeAddToTrustedMap(cd)
             if (cd.proxyCC.isNotEmpty()) selectedCCs.add(cd.proxyCC)
         }
-        return trie.len()
+        val trieLen = trie.len()
+        Logger.i(LOG_TAG_DNS, "DomainRulesManager: loaded $trieLen rules from db")
+        return trieLen
     }
 
     fun getAllUniqueCCs(): List<String> {
@@ -153,7 +159,7 @@ object DomainRulesManager : KoinComponent {
     private fun maybeAddToTrustedMap(cd: CustomDomain) {
         if (cd.status == Status.TRUST.id) {
             val domain = cd.domain.lowercase(Locale.ROOT)
-            val key = mkTrieKey(domain)
+            val key = mkTrieKeyForTrustedMap(domain)
             trustedTrie.set(key, cd.status.toString().togs())
             trustedMap[cd.domain] = trustedMap.getOrDefault(domain, emptySet()).plus(cd.uid)
         }
@@ -197,12 +203,12 @@ object DomainRulesManager : KoinComponent {
         val match = trie.get(key).tos()
         if (match.isNullOrEmpty()) {
             // no match found, return NONE
-            if (DEBUG) Logger.vv(LOG_TAG_DNS, "getDomainRule: $domain($uid), no match found")
+            if (DEBUG) Logger.vv(LOG_TAG_DNS, "domain rule for $key, no match found")
             return Status.NONE
         }
         val status = match.split(KV_SEP)[0]
         val res = Status.getStatus(status.toIntOrNull())
-        if (DEBUG) Logger.vv(LOG_TAG_DNS, "getDomainRule: $domain($uid), res: $res")
+        if (DEBUG) Logger.vv(LOG_TAG_DNS, "domain rule for $key, res: $res")
         return res
     }
 
@@ -311,10 +317,10 @@ object DomainRulesManager : KoinComponent {
             trustedMap[d] = trustedMap.getOrDefault(d, emptySet()).minus(uid)
         }
         if (trustedMap[d] == null) {
-            val key = mkTrieKey(d)
+            val key = mkTrieKeyForTrustedMap(d)
             trustedTrie.del(key)
         } else {
-            val key = mkTrieKey(d)
+            val key = mkTrieKeyForTrustedMap(d)
             trustedTrie.set(key, status.id.toString().togs())
         }
     }
@@ -356,7 +362,7 @@ object DomainRulesManager : KoinComponent {
         val trustedUids = trustedMap.getOrDefault(d, emptySet()).minus(uid)
         if (trustedUids.isEmpty()) {
             trustedMap.remove(d)
-            val key = mkTrieKey(d)
+            val key = mkTrieKeyForTrustedMap(d)
             trustedTrie.del(key)
         } else {
             trustedMap[d] = trustedUids
@@ -368,7 +374,7 @@ object DomainRulesManager : KoinComponent {
             val newUids = uids.minus(uid)
             if (newUids.isEmpty()) {
                 trustedMap.remove(domain)
-                val key = mkTrieKey(domain)
+                val key = mkTrieKeyForTrustedMap(domain)
                 trustedTrie.del(key)
             } else {
                 trustedMap[domain] = newUids
@@ -473,6 +479,17 @@ object DomainRulesManager : KoinComponent {
         Logger.i(LOG_TAG_DNS, "setProxyId: updated domain: ${cd.domain} to $proxyId")
         rehydrateFromDB(cd.uid)
     }
+
+    suspend fun tombstoneRulesByUid(oldUid: Int) {
+        Logger.i(LOG_TAG_FIREWALL, "tombstone rules for uid: $oldUid")
+        // here tombstone means negating the uid of the rule
+        // this is used when the app is uninstalled, so that the rules are not deleted
+        // but the uid is set to (-1 * uid), so that the rules are not applied
+        val newUid = -1 * oldUid
+        db.tombstoneRulesByUid(oldUid, newUid)
+        load()
+    }
+
 
     fun isWildCardEntry(url: String): Boolean {
         return wcRegex.matcher(url).matches()

@@ -1,23 +1,25 @@
 /*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.ui.fragment
 
 import Logger
 import Logger.LOG_TAG_UI
 import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -43,6 +45,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogViewLogsBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
@@ -69,6 +72,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.firestack.intra.Intra
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -84,6 +88,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     private var lastAppExitInfoDialogInvokeTime = INIT_TIME_MS
     private val workScheduler by inject<WorkScheduler>()
+    private val appDatabase by inject<AppDatabase>()
 
     companion object {
         private const val SCHEME_PACKAGE = "package"
@@ -98,7 +103,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         if (isFdroidFlavour()) {
             b.aboutAppUpdate.visibility = View.GONE
         }
-
         updateVersionInfo()
 
         updateSponsorInfo()
@@ -129,6 +133,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppContributors.setOnClickListener(this)
         b.aboutAppTranslate.setOnClickListener(this)
         b.aboutStats.setOnClickListener(this)
+        b.aboutDbStats.setOnClickListener(this)
     }
 
     private fun updateVersionInfo() {
@@ -142,7 +147,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             // complete version name along with the source of installation
             val v = getString(R.string.about_version_install_source, version, getDownloadSource())
 
-            val build = VpnController.goBuildVersion(false)
+            val build = Intra.build(false)
             val updatedTs = getLastUpdatedTs()
             b.aboutAppVersion.text = "$v\n$build\n$updatedTs"
 
@@ -290,7 +295,124 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutStats -> {
                 openStatsDialog()
             }
+            b.aboutDbStats -> {
+                openDatabaseDumpDialog()
+            }
+            else -> {
+                Logger.w(LOG_TAG_UI, "unknown view clicked: ${view?.id}")
+            }
         }
+    }
+
+    private fun openDatabaseDumpDialog() {
+        io {
+            val dump = buildDatabaseDump()
+            uiCtx {
+                if (!isAdded) return@uiCtx
+                val tv = android.widget.TextView(requireContext())
+                val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
+                tv.setPadding(pad, pad, pad, pad)
+                tv.text = dump
+                tv.setTextIsSelectable(true)
+                tv.typeface = android.graphics.Typeface.MONOSPACE
+                val scroll = android.widget.ScrollView(requireContext())
+                scroll.addView(tv)
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(getString(R.string.title_database_dump))
+                    .setView(scroll)
+                    .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
+                    .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
+                        copyToClipboard("db_dump", dump)
+                        showToastUiCentered(requireContext(), getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
+                    }
+                    .show()
+            }
+        }
+    }
+
+    private fun copyToClipboard(label: String, text: String): ClipboardManager? {
+        val cb = ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
+        cb?.setPrimaryClip(ClipData.newPlainText(label, text))
+        return cb
+    }
+
+    private fun buildDatabaseDump(): String {
+        val db = appDatabase.openHelper.readableDatabase
+        val cursor = db.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")
+        val tablesToSkip = setOf(
+            "android_metadata", // system table
+            "sqlite_sequence", // auto-increment table
+            "room_master_table", // room db table
+            "TcpProxyEndpoint",
+            "RpnProxy",
+            "SubscriptionStatus",
+            "SubscriptionStatusHistory"
+        )
+        val tables = mutableListOf<String>()
+        cursor.use {
+            while (it.moveToNext()) {
+                tables.add(it.getString(0))
+            }
+        }
+        val sb = StringBuilder()
+        val maxRowsPerTable = 500 // safety limit
+        tables.forEach { table ->
+            if (table in tablesToSkip) return@forEach
+            try {
+                sb.append("\n===== TABLE: ").append(table).append(" =====\n")
+                // get column names
+                val pragma = db.query("PRAGMA table_info($table)")
+                val columns = mutableListOf<String>()
+                pragma.use { p ->
+                    while (p.moveToNext()) {
+                        columns.add(p.getString(p.getColumnIndexOrThrow("name")))
+                    }
+                }
+                sb.append(columns.joinToString(separator = " | ")).append('\n')
+                val dataCursor = db.query("SELECT * FROM $table LIMIT $maxRowsPerTable")
+                var rowCount = 0
+                dataCursor.use { dc ->
+                    while (dc.moveToNext()) {
+                        val row = buildString {
+                            columns.forEachIndexed { idx, col ->
+                                if (idx > 0) append(" | ")
+                                val colIndex = dc.getColumnIndex(col)
+                                if (colIndex >= 0) {
+                                    when (dc.getType(colIndex)) {
+                                        android.database.Cursor.FIELD_TYPE_NULL -> append("NULL")
+                                        android.database.Cursor.FIELD_TYPE_INTEGER -> append(dc.getLong(colIndex))
+                                        android.database.Cursor.FIELD_TYPE_FLOAT -> append(dc.getDouble(colIndex))
+                                        android.database.Cursor.FIELD_TYPE_STRING -> {
+                                            var v = dc.getString(colIndex)
+                                            if (v.length > 200) {
+                                                v = v.substring(0, 200) + "…"
+                                            }
+                                            append(v.replace('\n', ' '))
+                                        }
+                                        android.database.Cursor.FIELD_TYPE_BLOB -> append("<BLOB>")
+                                        else -> append("?")
+                                    }
+                                } else append("?")
+                            }
+                        }
+                        sb.append(row).append('\n')
+                        rowCount++
+                    }
+                }
+                // count total rows
+                val countCursor = db.query("SELECT COUNT(1) FROM $table")
+                var total = rowCount
+                countCursor.use { cc -> if (cc.moveToFirst()) total = cc.getInt(0) }
+                if (total > rowCount) {
+                    sb.append("[shown ").append(rowCount).append(" of ").append(total).append(" rows]\n")
+                } else {
+                    sb.append("[rows: ").append(total).append("]\n")
+                }
+            } catch (e: Exception) {
+                sb.append("Error dumping table ").append(table).append(": ").append(e.message).append('\n')
+            }
+        }
+        return sb.toString()
     }
 
     private fun openStatsDialog() {
@@ -298,43 +420,35 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             val stat = VpnController.getNetStat()
             val formatedStat = UIUtils.formatNetStat(stat)
             val vpnStats = VpnController.vpnStats()
+            val stats = formatedStat + vpnStats
             uiCtx {
-                val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-                val builder =
-                    MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
-                val lp = WindowManager.LayoutParams()
-                val dialog = builder.create()
-                dialog.show()
-                lp.copyFrom(dialog.window?.attributes)
-                lp.width = WindowManager.LayoutParams.MATCH_PARENT
-                lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-                dialog.setCancelable(true)
-                dialog.window?.attributes = lp
-
-                val heading = dialogBinding.infoRulesDialogRulesTitle
-                val okBtn = dialogBinding.infoRulesDialogCancelImg
-                val descText = dialogBinding.infoRulesDialogRulesDesc
-                dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
-
-                heading.text = getString(R.string.title_statistics)
-                heading.setCompoundDrawablesWithIntrinsicBounds(
-                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_log_level),
-                    null,
-                    null,
-                    null
-                )
-
-                descText.movementMethod = LinkMovementMethod.getInstance()
+                if (!isAdded) return@uiCtx
+                val tv = android.widget.TextView(requireContext())
+                val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
+                tv.setPadding(pad, pad, pad, pad)
                 if (formatedStat == null) {
-                    descText.text = "No Stats"
+                    tv.text = "No Stats"
                 } else {
-                    descText.text = formatedStat + vpnStats
+                    tv.text = stats
                 }
+                tv.setTextIsSelectable(true)
+                tv.typeface = android.graphics.Typeface.MONOSPACE
+                val scroll = android.widget.ScrollView(requireContext())
+                scroll.addView(tv)
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(getString(R.string.title_statistics))
+                    .setView(scroll)
+                    .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
+                    .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
+                        copyToClipboard("stats_dump", stats)
+                        showToastUiCentered(
+                            requireContext(),
+                            getString(R.string.copied_clipboard),
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                    .show()
 
-                okBtn.setOnClickListener { dialog.dismiss() }
-
-                dialog.show()
             }
         }
     }

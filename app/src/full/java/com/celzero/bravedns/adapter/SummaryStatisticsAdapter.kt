@@ -432,10 +432,32 @@ class SummaryStatisticsAdapter(
                         startAppInfoActivity(appConnection)
                     }
                     SummaryStatisticsType.MOST_CONNECTED_APPS -> {
-                        startAppInfoActivity(appConnection)
+                        io {
+                            if (isUnknownApp(appConnection)) {
+                                uiCtx {
+                                    showNetworkLogs(
+                                        appConnection,
+                                        SummaryStatisticsType.MOST_CONNECTED_APPS
+                                    )
+                                }
+                            } else {
+                                uiCtx { startAppInfoActivity(appConnection) }
+                            }
+                        }
                     }
                     SummaryStatisticsType.MOST_BLOCKED_APPS -> {
-                        startAppInfoActivity(appConnection)
+                        io {
+                            if (isUnknownApp(appConnection)) {
+                                uiCtx {
+                                    showNetworkLogs(
+                                        appConnection,
+                                        SummaryStatisticsType.MOST_BLOCKED_APPS
+                                    )
+                                }
+                            } else {
+                                uiCtx { startAppInfoActivity(appConnection) }
+                            }
+                        }
                     }
                     SummaryStatisticsType.MOST_CONNECTED_ASN -> {
                         startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.ASN)
@@ -460,6 +482,11 @@ class SummaryStatisticsAdapter(
                     }
                 }
             }
+        }
+
+        private suspend fun isUnknownApp(appConnection: AppConnection): Boolean {
+            val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
+            return appInfo == null
         }
 
         private fun startDomainConnectionsActivity(appConnection: AppConnection, input: DomainConnectionsActivity.InputType, isBlocked: Boolean = false) {
@@ -548,7 +575,7 @@ class SummaryStatisticsAdapter(
                 }
                 else -> {
                     // should never happen, but just in case we'll show all logs
-                    startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, "")
+                    startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.appOrDnsName)
                 }
             }
         }

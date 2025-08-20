@@ -100,4 +100,8 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
     suspend fun getRulesCountByCC(cc: String): Int {
         return customDomainDAO.getRulesCountByCC(cc)
     }
+
+    suspend fun tombstoneRulesByUid(oldUid: Int, newUid: Int) {
+        customDomainDAO.tombstoneRulesByUid(oldUid, newUid)
+    }
 }

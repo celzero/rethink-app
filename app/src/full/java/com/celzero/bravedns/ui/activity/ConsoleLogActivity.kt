@@ -332,9 +332,10 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
         val intent =
             Intent(Intent.ACTION_SEND).apply {
                 type = "application/zip"
-                putExtra(Intent.EXTRA_SUBJECT, "Log File")
-                putExtra(Intent.EXTRA_TEXT, "Attached is the log file for RethinkDNS.")
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_bugreport_subject))
+                putExtra(Intent.EXTRA_TEXT, "Crash/Issue Report (Logs Attached)")
                 putExtra(Intent.EXTRA_STREAM, uri)
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.about_mail_to)))
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 

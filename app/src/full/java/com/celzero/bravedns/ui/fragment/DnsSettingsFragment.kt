@@ -34,7 +34,6 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.Companion.DOH_INDEX
 import com.celzero.bravedns.data.AppConfig.Companion.DOT_INDEX
 import com.celzero.bravedns.databinding.FragmentDnsConfigureBinding
-import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.scheduler.WorkScheduler.Companion.BLOCKLIST_UPDATE_CHECK_JOB_TAG
 import com.celzero.bravedns.service.BraveVPNService
@@ -105,11 +104,13 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         val treatDnsFirewall = NewSettingsManager.shouldShowBadge(NewSettingsManager.TREAT_DNS_FIREWALL)
         val splitDns = NewSettingsManager.shouldShowBadge(NewSettingsManager.SPLIT_DNS)
         val useSysDnsUndelegated = NewSettingsManager.shouldShowBadge(NewSettingsManager.USE_SYS_DNS_UNDELEGATED)
+        val useFallbackDnsToBypass = NewSettingsManager.shouldShowBadge(NewSettingsManager.USE_FALLBACK_TO_BYPASS)
 
         b.smartDnsRb.setBadgeDotVisible(requireContext(), smart)
         b.dvBypassDnsBlockTxt.setBadgeDotVisible(requireContext(), treatDnsFirewall)
         b.dcSplitDnsTxt.setBadgeDotVisible(requireContext(), splitDns)
         b.dcUndelegatedDomainsHeading.setBadgeDotVisible(requireContext(), useSysDnsUndelegated)
+        b.dcUseFallbackToBypassHeading.setBadgeDotVisible(requireContext(), useFallbackDnsToBypass)
     }
 
     private fun initView() {
@@ -133,6 +134,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcUndelegatedDomainsSwitch.isChecked = persistentState.useSystemDnsForUndelegatedDomains
         b.connectedStatusTitle.text = getConnectedDnsType()
         b.dvBypassDnsBlockSwitch.isChecked = persistentState.bypassBlockInDns
+        b.dcUseFallbackToBypassSwitch.isChecked = persistentState.useFallbackDnsToBypass
         showSplitDnsUi()
     }
 
@@ -561,6 +563,15 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcUndelegatedDomainsSwitch.setOnCheckedChangeListener { _, isChecked ->
             NewSettingsManager.markSettingSeen(NewSettingsManager.USE_SYS_DNS_UNDELEGATED)
             persistentState.useSystemDnsForUndelegatedDomains = isChecked
+        }
+
+        b.dcUseFallbackToBypassSwitch.setOnCheckedChangeListener { _, isChecked ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.USE_FALLBACK_TO_BYPASS)
+            persistentState.useFallbackDnsToBypass = isChecked
+        }
+
+        b.dcUseFallbackToBypassHeading.setOnClickListener {
+            b.dcUseFallbackToBypassSwitch.isChecked = !b.dcUseFallbackToBypassSwitch.isChecked
         }
     }
 

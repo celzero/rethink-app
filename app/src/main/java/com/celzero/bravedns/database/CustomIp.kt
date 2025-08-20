@@ -48,9 +48,27 @@ class CustomIp {
     var ruleType: Int = 0
     var modifiedDateTime: Long = INIT_TIME_MS
 
+    // Deep copy to prevent in-place mutation issues with paging diff util
+    fun deepCopy(): CustomIp {
+        val c = CustomIp()
+        c.uid = uid
+        c.ipAddress = ipAddress
+        c.port = port
+        c.protocol = protocol
+        c.isActive = isActive
+        c.proxyId = proxyId
+        c.proxyCC = proxyCC
+        c.status = status
+        c.wildcard = wildcard
+        c.ruleType = ruleType
+        c.modifiedDateTime = modifiedDateTime
+        return c
+    }
+
     override fun equals(other: Any?): Boolean {
         if (other !is CustomIp) return false
         if (ipAddress != other.ipAddress) return false
+        if (port != other.port) return false
         if (uid != other.uid) return false
         if (status != other.status) return false
         return true
@@ -59,6 +77,7 @@ class CustomIp {
     override fun hashCode(): Int {
         var result = this.uid.hashCode()
         result += result * 31 + this.ipAddress.hashCode()
+        result += result * 31 + this.port
         result += result * 31 + this.status
         return result
     }
@@ -67,7 +86,7 @@ class CustomIp {
         try {
             val ip = IPAddressString(ipAddress).address
             return Pair(ip, port)
-        } catch (e: Exception) {
+        } catch (ignored: Exception) {
             return null
         }
     }

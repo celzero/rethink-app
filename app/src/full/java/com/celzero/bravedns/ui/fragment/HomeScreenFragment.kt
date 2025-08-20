@@ -547,7 +547,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     val status = VpnController.getProxyStatusById(proxyId).first
                     if (status != null) {
                         // consider starting and up as active
-                        if (status == Backend.TZZ) {
+                        if (status == Backend.TZZ || status == Backend.TPU) {
                           idle++
                         } else if (status == Backend.TOK || status == Backend.TUP) {
                             val isUp = System.currentTimeMillis() - stats.lastOK < WG_HANDSHAKE_TIMEOUT

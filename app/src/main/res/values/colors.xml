@@ -150,7 +150,7 @@
     <color name="invertedPrimaryTextLight">#FFFFFF</color>
     <color name="secondaryTextLight">#005cb2</color>
     <color name="textColorAccentBadLight">#CCC51162</color>
-    <color name="homeScreenHeaderTextColorLight">#000000</color>
+    <color name="homeScreenHeaderTextColorLight">#FFFFFF</color>
 
     <color name="fabBackgroundLight">#FFFFFF</color>
 
@@ -169,7 +169,7 @@
 
     <!-- theme dark -->
     <color name="colorPrimaryBlack">#383838</color>
-    <color name="colorPrimaryDarkBlack">#000000</color>
+    <color name="colorPrimaryDarkBlack">#1b1818</color>
     <color name="colorSecondaryBlack">#4fc3f7</color>
     <color name="colorBackgroundFloatingBlack">#383838</color>
 
@@ -215,7 +215,7 @@
 
     <color name="fabBackgroundBlack">#77959595</color>
 
-    <color name="selectedCardBgBlack">#383838</color>
+    <color name="selectedCardBgBlack">#282525</color>
 
     <color name="firewallNoRuleToggleBtnTxtBlack">#C5E1A5</color>
     <color name="firewallNoRuleToggleBtnBgBlack">#33691E</color>

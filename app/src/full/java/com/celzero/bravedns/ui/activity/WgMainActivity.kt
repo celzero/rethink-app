@@ -308,6 +308,10 @@ class WgMainActivity :
                     }
                     dnsNames += activeConfigs.joinToString(",") { it.getName() }
                 }
+                // add fallback to the list as it can be used to bypass trusted ip/domains/apps
+                if (persistentState.useFallbackDnsToBypass) {
+                    dnsNames += ", " + getString(R.string.lbl_fallback)
+                }
                 b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsNames)
             }
         }

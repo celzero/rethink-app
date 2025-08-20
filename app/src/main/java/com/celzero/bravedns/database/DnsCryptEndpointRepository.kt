@@ -41,7 +41,7 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
         dnsCryptEndpointDAO.removeConnectionStatus()
     }
 
-    suspend fun getConnectedDNSCrypt(): DnsCryptEndpoint {
+    suspend fun getConnectedDNSCrypt(): DnsCryptEndpoint? {
         return dnsCryptEndpointDAO.getConnectedDNSCrypt()
     }
 

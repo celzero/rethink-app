@@ -95,7 +95,7 @@ class DnsLog {
     }
 
     fun isAnonymized(): Boolean {
-        return this.relayIP.isNotEmpty() || ( this.proxyId.isNotEmpty() && ProxyManager.isIpnProxy(this.proxyId))
+        return this.relayIP.isNotEmpty() || ( this.proxyId.isNotEmpty() && ProxyManager.isNotLocalAndRpnProxy(this.proxyId))
     }
 
     fun isLocallyAnswered(): Boolean {
