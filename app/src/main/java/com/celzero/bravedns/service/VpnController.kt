@@ -265,7 +265,7 @@ object VpnController : KoinComponent {
             if (!persistentState.stallOnNoNetwork) {
                 "$URL4, $URL6"
             } else {
-                ""
+                "-"
             }
         }
     }

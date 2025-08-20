@@ -45,6 +45,7 @@ object NewSettingsManager: KoinComponent {
     const val TREAT_DNS_FIREWALL = "treat_dns_as_firewall"
     const val SPLIT_DNS = "split_dns"
     const val USE_SYS_DNS_UNDELEGATED = "use_sys_dns_undelegated"
+    const val USE_FALLBACK_TO_BYPASS = "use_fallback_to_bypass"
 
     // network
     const val LOOP_BACK_PROXY_FORWARDER = "loop_back_proxy_forwarder"

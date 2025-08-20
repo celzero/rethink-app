@@ -384,6 +384,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // 0 - auto, 1 - relaxed, 2 - aggressive
     var vpnBuilderPolicy by intPref("tun_network_handling_policy").withDefault<Int>(0)
 
+    // whether to use default dns for trusted ips and domains
+    var useFallbackDnsToBypass by booleanPref("use_fallback_dns_to_bypass").withDefault<Boolean>(true)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
     var universalRulesCount: MutableLiveData<Int> = MutableLiveData()

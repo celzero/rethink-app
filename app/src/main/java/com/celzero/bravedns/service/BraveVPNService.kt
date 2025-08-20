@@ -3760,6 +3760,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return@go2kt result ?: makeNsOpts(INVALID_UID, Pair(Backend.BlockAll, ""), fqdn ?: "")
     }
 
+    private fun getTransportIdToBypass(id: Pair<String, String>): Pair<String, String> {
+        // determines whether fallback DNS should be used for trusted domains or IPs.
+        // this must be called before using Backend.BlockFree. in rethink’s dns case, BlockFree
+        // transport is added to tun so calling this method is not required.
+        return if (persistentState.useFallbackDnsToBypass) { // setting to use fallback dns
+            Pair(Backend.BlockFree, "")
+        } else {
+            id
+        }
+    }
+
     // function to decide which transport id to return on Dns only mode
     private suspend fun getTransportIdForDnsMode(uid: Int, fqdn: String): DNSOpts {
         // useFixedTransport is false in Dns only mode
@@ -3776,7 +3787,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // in the DNS.uid (AID_DNS) field
         if (uid != INVALID_UID) {
             when (DomainRulesManager.getDomainRule(fqdn, uid)) {
-                DomainRulesManager.Status.TRUST -> return makeNsOpts(uid, Pair(Backend.BlockFree, ""), fqdn, true)
+                DomainRulesManager.Status.TRUST -> return makeNsOpts(uid, getTransportIdToBypass(tid), fqdn, true)
                 DomainRulesManager.Status.BLOCK -> return makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn, false)
                 else -> {} // no-op, fall-through;
             }
@@ -3784,7 +3795,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         // check for global domain rules
         when (DomainRulesManager.getDomainRule(fqdn, UID_EVERYBODY)) {
-            DomainRulesManager.Status.TRUST -> return makeNsOpts(uid, Pair(Backend.BlockFree, ""), fqdn, true)
+            DomainRulesManager.Status.TRUST -> return makeNsOpts(uid, getTransportIdToBypass(tid), fqdn, true)
             DomainRulesManager.Status.BLOCK -> return makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn, false)
             else -> {} // no-op, fall-through;
         }
@@ -3853,14 +3864,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             if (appStatus.bypassDnsFirewall()) {
                 // in case of bypass dns, bypass the local blocklists and set only block-free
                 Logger.vv(LOG_TAG_VPN, "$TAG; onQuery, $uid bypasses dns+firewall, $fqdn")
-                return makeNsOpts(uid, Pair(Backend.BlockFree, ""), fqdn, true)
+                return makeNsOpts(uid, getTransportIdToBypass(tid), fqdn, true)
             }
 
             val appDomainRule =  getDomainRule(fqdn, uid)
             when (appDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
                     Logger.vv(LOG_TAG_VPN, "$TAG; onQuery, $uid, domain trusted: $fqdn")
-                    return makeNsOpts(uid, Pair(Backend.BlockFree, ""), fqdn, true)
+                    return makeNsOpts(uid, getTransportIdToBypass(tid), fqdn, true)
                 }
                 DomainRulesManager.Status.BLOCK -> {
                     Logger.vv(LOG_TAG_VPN, "$TAG; onQuery, $uid, domain blocked: $fqdn")
@@ -3875,7 +3886,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             when (globalDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
                     Logger.vv(LOG_TAG_VPN, "$TAG; onQuery, $uid, univ domain trusted: $fqdn")
-                    return makeNsOpts(uid, Pair(Backend.BlockFree, ""), fqdn, true)
+                    return makeNsOpts(uid, getTransportIdToBypass(tid), fqdn, true)
                 }
                 DomainRulesManager.Status.BLOCK -> {
                     Logger.vv(LOG_TAG_VPN, "$TAG; onQuery, $uid, univ domain blocked: $fqdn")
