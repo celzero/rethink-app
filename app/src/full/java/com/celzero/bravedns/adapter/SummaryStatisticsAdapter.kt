@@ -447,24 +447,7 @@ class SummaryStatisticsAdapter(
                         startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.DOMAIN)
                     }
                     SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
-                        io {
-                            val isDnsBypassed = FirewallManager.isAnyAppBypassesDns()
-                            uiCtx {
-                                if (appConfig.getBraveMode().isDnsMode()) {
-                                    showDnsLogs(appConnection)
-                                }
-                                // if any app bypasses dns, then the decision made in flow() call
-                                // will be to show the network logs. Else, show the dns logs.
-                                if (isDnsBypassed) {
-                                    showNetworkLogs(
-                                        appConnection,
-                                        SummaryStatisticsType.MOST_BLOCKED_DOMAINS
-                                    )
-                                } else {
-                                    showDnsLogs(appConnection)
-                                }
-                            }
-                        }
+                        startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.DOMAIN, true)
                     }
                     SummaryStatisticsType.MOST_CONTACTED_IPS -> {
                         startDomainConnectionsActivity(appConnection, DomainConnectionsActivity.InputType.IP)
@@ -485,7 +468,7 @@ class SummaryStatisticsAdapter(
             when (input) {
                 DomainConnectionsActivity.InputType.DOMAIN -> {
                     intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_DOMAIN, appConnection.appOrDnsName)
-                    intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, false)
+                    intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_IS_BLOCKED, isBlocked)
                 }
                 DomainConnectionsActivity.InputType.ASN -> {
                     intent.putExtra(DomainConnectionsActivity.INTENT_EXTRA_ASN, appConnection.appOrDnsName)

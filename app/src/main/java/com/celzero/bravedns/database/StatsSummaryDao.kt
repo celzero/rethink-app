@@ -985,11 +985,11 @@ interface StatsSummaryDao {
     @Query(
         """
             SELECT uid AS uid, 
-              appName AS ipAddress, 
+              ipAddress AS ipAddress, 
               0 AS port, 
               COUNT(id) AS count, 
               flag AS flag, 
-              0 AS blocked, 
+              :isBlocked AS blocked, 
               appName AS appOrDnsName, 
               SUM(uploadBytes) AS uploadBytes, 
               SUM(downloadBytes) AS downloadBytes, 
