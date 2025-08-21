@@ -42,6 +42,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.ConsoleLogAdapter
 import com.celzero.bravedns.database.ConsoleLogRepository
 import com.celzero.bravedns.databinding.ActivityConsoleLogBinding
+import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
@@ -244,10 +245,17 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
         val items = Logger.LoggerLevel.entries
         val checkedItem = Logger.uiLogLevel.toInt()
         builder.setSingleChoiceItems(
-            items.map { it.name }.toTypedArray(),
+            items.map {
+                it.name.lowercase()
+                    .replaceFirstChar(Char::titlecase).replace("_", " ")
+            }.toTypedArray(),
             checkedItem
         ) { _, which ->
             Logger.uiLogLevel = items[which].id
+            GoVpnAdapter.setLogLevel(
+                persistentState.goLoggerLevel.toInt(),
+                Logger.uiLogLevel.toInt()
+            )
             viewModel.setLogLevel(which.toLong())
             if (which < Logger.LoggerLevel.ERROR.id) {
                 consoleLogRepository.setStartTimestamp(System.currentTimeMillis())
