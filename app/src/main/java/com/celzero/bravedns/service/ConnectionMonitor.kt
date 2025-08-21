@@ -457,7 +457,11 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         }
         // TODO: process after a delay to avoid processing multiple network changes in short bursts
         if (DEBUG) Logger.v(LOG_TAG_CONNECTION, "sendNetworkChanges, channel closed? ${channel.isClosedForSend} msg: ${msg.msgType}, force: ${msg.isForceUpdate}, test: ${msg.testReachability}, stall: ${msg.stallOnNoNetwork}, useAutoChecks: ${msg.useAutoConnectivityChecks}, networks: ${msg.networkSet.size}")
-        channel.send(msg)
+        try {
+            channel.send(msg)
+        } catch(e: Exception) {
+            Logger.e(LOG_TAG_CONNECTION, "sendNetworkChanges, err while sending message to channel", e)
+        }
     }
 
     /**
