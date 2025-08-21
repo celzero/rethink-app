@@ -881,7 +881,7 @@
                                               <a href="https://github.com/RohitSurwase">RohitSurwase</a> /
                                               <a href="https://github.com/ShantanuVichare">Shantanu</a> /
                                               <a href="https://github.com/Uldiniad">Uldiniad</a><br/> /
-                                              <a href="https://github.com/yurtpage">Yurt Page</a><br/>
+                                              <a href="https://github.com/yurtpage">yurtpage</a><br/>
                                               <br/>🚂 Network engine <br/>
                                               <a href="https://github.com/alalamav">alalamav</a> /
                                               <a href="https://github.com/bemasc">bemasc</a> /
@@ -928,7 +928,8 @@
                                               <a href="https://github.com/celzero/rethink-app/issues/346">Icons</a><br/>
                                               <br/>📦 Build servers <br/>
                                               <a href="https://jitpack.io/">JitPack</a> /
-                                              <a href="https://github.com/">GitHub</a><br/>
+                                              <a href="https://github.com/">GitHub</a> /
+                                              <a href="https://central.sonatype.com/">Sonatype</a><br/>
                                               ]]></string>
     <!-- Configure DNS Fragment string == cd -->
     <string name="cd_dns_crypt_title" translatable="true">resolvers</string>
