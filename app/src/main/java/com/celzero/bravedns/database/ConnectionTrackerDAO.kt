@@ -199,7 +199,7 @@ interface ConnectionTrackerDAO {
     fun getDataUsage(from: Long, to: Long): List<DataUsage>
 
     @Query(
-        "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, ict.meteredDataUsage as meteredDataUsage from ConnectionTracker as ct join (select sum(downloadBytes + uploadBytes) as meteredDataUsage from ConnectionTracker where connType like :meteredTxt and timeStamp > :to) as ict where timeStamp > :to"
+        "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, ict.meteredDataUsage as meteredDataUsage from ConnectionTracker as ct join (select sum(downloadBytes + uploadBytes) as meteredDataUsage from ConnectionTracker where connType = :meteredTxt and timeStamp > :to) as ict where timeStamp > :to"
     )
     fun getTotalUsages(to: Long, meteredTxt: String): DataUsageSummary
 
@@ -210,7 +210,7 @@ interface ConnectionTrackerDAO {
     fun getWgAppNetworkActivity(wgId: String, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, ict.meteredDataUsage as meteredDataUsage from ConnectionTracker as ct join (select sum(downloadBytes + uploadBytes) as meteredDataUsage from ConnectionTracker where connType like :meteredTxt and timeStamp > :to) as ict where timeStamp > :to and proxyDetails = :wgId"
+        "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, ict.meteredDataUsage as meteredDataUsage from ConnectionTracker as ct join (select sum(downloadBytes + uploadBytes) as meteredDataUsage from ConnectionTracker where connType = :meteredTxt and timeStamp > :to) as ict where timeStamp > :to and proxyDetails = :wgId"
     )
     fun getTotalUsagesByWgId(to: Long, meteredTxt: String, wgId: String): DataUsageSummary
 

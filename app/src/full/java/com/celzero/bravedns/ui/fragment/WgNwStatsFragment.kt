@@ -161,7 +161,7 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
     }
 
     private fun setTotalUsagesUi(dataUsage: DataUsageSummary) {
-        val unmeteredUsage = (dataUsage.totalDownload + dataUsage.totalUpload) - dataUsage.meteredDataUsage
+        val unmeteredUsage = (dataUsage.totalDownload + dataUsage.totalUpload)
         val totalUsage = unmeteredUsage + dataUsage.meteredDataUsage
 
         b.fssUnmeteredDataUsage.text =
