@@ -23,13 +23,13 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 // channel buffer receives batched entries of batchsize or once every waitms from a batching
 // producer or a time-based monitor (signal) running in a single-threaded co-routine context.
@@ -68,8 +68,8 @@ class NetLogBatcher<T, V>(
     // signal channel, holds at most 1 signal, and drops the oldest
     private val signal = Channel<Int>(Channel.Factory.CONFLATED)
 
-    private var batches = mutableListOf<T>()
-    private var updates = mutableListOf<V>()
+    private var batches: AtomicReference<MutableList<T>> = AtomicReference(mutableListOf())
+    private var updates: AtomicReference<MutableList<V>> = AtomicReference(mutableListOf())
 
     fun begin(scope: CoroutineScope) {
         // launch suspend fns sig and consume asynchronously
@@ -109,16 +109,16 @@ class NetLogBatcher<T, V>(
     }
 
     private suspend fun txswap() {
-        val b = batches
-        val u = updates
+        // swap buffers
+        val b = batches.getAndSet(mutableListOf())
+        val u = updates.getAndSet(mutableListOf())
 
-        if (b.size > 0) {
-            batches = mutableListOf() // swap buffers
+        if (b.isNotEmpty()) {
             buffersCh.send(b)
         }
-        if (u.size > 0) {
-        updates = mutableListOf() // swap buffers
-        updatesCh.send(u)
+        if (u.isNotEmpty()) {
+            delay(waitms / 5)
+            updatesCh.send(u)
         }
 
         logd( "txswap (${lsn}) b: ${b.size}, u: ${u.size}")
@@ -128,21 +128,23 @@ class NetLogBatcher<T, V>(
 
     suspend fun add(payload: T) =
         withContext(looper + nprod) {
-            batches.add(payload)
+            val b = batches.get()
+            b.add(payload)
             // if the batch size is met, dispatch it to the consumer
-            if (batches.size >= batchSize) {
+            if (b.size >= batchSize) {
                 txswap()
-            } else if (batches.size == 1) {
+            } else if (b.size == 1) {
                 signal.send(lsn) // start tracking 'lsn'
             }
         }
 
     suspend fun update(payload: V) =
         withContext(looper + nprod) {
-            updates.add(payload)
-            if (updates.size >= batchSize) {
+            val u = updates.get()
+            u.add(payload)
+            if (u.size >= batchSize) {
                 txswap()
-            } else if (updates.size == 1) {
+            } else if (u.size == 1) {
                 signal.send(lsn)
             }
         }
@@ -158,7 +160,9 @@ class NetLogBatcher<T, V>(
                 // do not honor the signal for 'l' if a[l] is empty
                 // this can happen if the signal for 'l' is processed
                 // after the fact that 'l' has been swapped out by 'batch'
-                if (batches.size <= 0 && updates.size <= 0) {
+                val b = batches.get()
+                val u = updates.get()
+                if (b.isEmpty() && u.isEmpty()) {
                     logd("signal continue")
                     continue
                 } else {
@@ -167,12 +171,12 @@ class NetLogBatcher<T, V>(
 
                 // wait for 'batch' to dispatch
                 delay(waitms)
-                logd("signal wait over, sz(b: ${batches.size}, u: ${updates.size}) / cur-buf(${lsn})")
+                logd("signal wait over, sz(b: ${b.size}, u: ${u.size}) / cur-buf(${lsn})")
 
                 // 'l' is the current buffer, that is, 'l == i',
                 // and 'batch' hasn't dispatched it,
                 // but time's up...
-                if (lsn == tracklsn && (batches.size > 0 || updates.size > 0)) {
+                if (lsn == tracklsn && (b.isNotEmpty() || u.isNotEmpty())) {
                     txswap()
                 }
             }

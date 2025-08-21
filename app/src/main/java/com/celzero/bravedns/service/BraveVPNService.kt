@@ -147,6 +147,7 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
@@ -2689,7 +2690,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return@withContext noTun
             } finally {
                 try { // close the tunFd as GoVpnAdapter has its own copy
-                    if (!FIRESTACK_MUST_DUP_TUNFD) tunFd.close()
+                    if (FIRESTACK_MUST_DUP_TUNFD) tunFd.close()
                 } catch (ignored: IOException) {
                     Logger.e(LOG_TAG_VPN, "err closing tunFd: ${ignored.message}", ignored)
                 }
@@ -3174,7 +3175,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         } catch (e: IllegalArgumentException) {
             Logger.w(LOG_TAG_VPN, "Unregister receiver error: ${e.message}")
         }
-
         persistentState.setVpnEnabled(false)
         stopPauseTimer()
         // reset the underlying networks
