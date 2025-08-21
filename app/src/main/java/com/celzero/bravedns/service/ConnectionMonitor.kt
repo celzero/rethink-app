@@ -459,7 +459,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         if (DEBUG) Logger.v(LOG_TAG_CONNECTION, "sendNetworkChanges, channel closed? ${channel.isClosedForSend} msg: ${msg.msgType}, force: ${msg.isForceUpdate}, test: ${msg.testReachability}, stall: ${msg.stallOnNoNetwork}, useAutoChecks: ${msg.useAutoConnectivityChecks}, networks: ${msg.networkSet.size}")
         try {
             channel.send(msg)
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             Logger.e(LOG_TAG_CONNECTION, "sendNetworkChanges, err while sending message to channel", e)
         }
     }
