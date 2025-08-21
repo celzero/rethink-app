@@ -148,7 +148,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun setTotalUsagesUi(dataUsage: DataUsageSummary) {
-        val unmeteredUsage = (dataUsage.totalDownload + dataUsage.totalUpload)
+        val unmeteredUsage = (dataUsage.totalDownload + dataUsage.totalUpload) - dataUsage.meteredDataUsage
         val totalUsage = unmeteredUsage + dataUsage.meteredDataUsage
 
         b.fssUnmeteredDataUsage.text =
