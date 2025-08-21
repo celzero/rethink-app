@@ -19,6 +19,7 @@ package com.celzero.bravedns.net.go
 import Logger
 import Logger.LOG_TAG_PROXY
 import Logger.LOG_TAG_VPN
+import android.R.attr.level
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -382,9 +383,44 @@ class GoVpnAdapter : KoinComponent {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: dns crypt failure for $id", e)
             getResolver()?.remove(id.togs())
             removeDnscryptRelaysIfAny()
+            showDnscryptFailureNotification(e.message ?: context.getString(R.string.dns_crypt_connection_failure))
             showDnscryptConnectionFailureToast()
         }
         Logger.v(LOG_TAG_VPN, "$TAG addDnscryptTransport done")
+    }
+
+    private fun showDnscryptFailureNotification(msg: String) {
+        val notifChannelId = "DNSCrypt failure"
+        ui {
+            val notificationManager =
+                context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+            if (isAtleastO()) {
+                val channelName = context.getString(R.string.lbl_dc_abbr)
+                val importance = NotificationManager.IMPORTANCE_DEFAULT
+                val channel = NotificationChannel(notifChannelId, channelName, importance)
+                notificationManager.createNotificationChannel(channel)
+            }
+
+            val pendingIntent =
+                Utilities.getActivityPendingIntent(
+                    context,
+                    Intent(context, AppLockActivity::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                    mutable = false
+                )
+            val builder =
+                NotificationCompat.Builder(context, notifChannelId)
+                    .setSmallIcon(R.drawable.ic_notification_icon)
+                    .setContentTitle(context.getString(R.string.lbl_dc_abbr))
+                    .setContentText(msg)
+                    .setStyle(NotificationCompat.BigTextStyle().bigText(msg))
+                    .setContentIntent(pendingIntent)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setAutoCancel(true)
+            builder.color = ContextCompat.getColor(context, getAccentColor(persistentState.theme))
+            notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
+        }
     }
 
     private suspend fun addDnsProxyTransport(id: String) {
@@ -1560,12 +1596,12 @@ class GoVpnAdapter : KoinComponent {
             return ""
         }
 
-        fun setLogLevel(level: Int) {
+        fun setLogLevel(l1: Int, l2: Int = Logger.uiLogLevel.toInt()) {
             // 0 - very verbose, 1 - verbose, 2 - debug, 3 - info, 4 - warn, 5 - error, 6 - stacktrace, 7 - user, 8 - none
             // from UI, if none is selected, set the log level to 7 (user), usr will send only
             // user notifications
-            Intra.logLevel(level, level)
-            Logger.i(LOG_TAG_VPN, "$TAG set go-log level: ${Logger.LoggerLevel.fromId(level)}")
+            Intra.logLevel(l1, l2)
+            Logger.i(LOG_TAG_VPN, "$TAG set go-log level: $l1, $l2")
         }
     }
 
