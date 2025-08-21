@@ -1209,10 +1209,12 @@ class GoVpnAdapter : KoinComponent {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing resolvers")
             return
         }
-        val maindnsOK = getDnsStatus(Backend.Preferred) != null || getDnsStatus(Backend.Plus) != null
-        Logger.i(LOG_TAG_VPN, "preferred/plus set? ${maindnsOK}, if not set it again")
 
-        if (!maindnsOK) {
+        val id = if (appConfig.isSmartDnsEnabled()) Backend.Plus else Backend.Preferred
+        val mainDnsOK = getDnsStatus(id) != null
+        Logger.i(LOG_TAG_VPN, "preferred/plus set? ${mainDnsOK}, if not set it again")
+
+        if (!mainDnsOK) {
             addTransport()
         }
 
