@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.celzero.bravedns"
     android:versionCode="51"
-    android:versionName="v055s"> <!-- 51 for v055s -->
+    android:versionName="v055t"> <!-- 51 for v055t -->
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
