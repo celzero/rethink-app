@@ -1123,6 +1123,13 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private suspend fun blockBackgroundData(uid: Int): Boolean {
         if (!persistentState.getBlockAppWhenBackground()) return false
 
+        // Apps with bypass universal setting should not be blocked by background rules
+        val appStatus = FirewallManager.appStatus(uid)
+        if (appStatus.bypassUniversal()) {
+            logd("blockBackgroundData: app has bypass universal, allowing background, $uid")
+            return false
+        }
+
         if (!accessibilityServiceFunctional()) {
             Logger.w(LOG_TAG_VPN, "accessibility service not functional, disable bg-block")
             handleAccessibilityFailure()
