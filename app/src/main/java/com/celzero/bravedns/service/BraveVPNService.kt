@@ -4006,7 +4006,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             }
             return if (ids.isNotEmpty()) {
                 Logger.d(LOG_TAG_VPN, "(onQuery)wg ids($ids) found for uid: $uid")
-                Pair(modifiedIds, "")
+                // Apply DNS cache to WireGuard transport IDs when split DNS is enabled
+                val cachedIds = if (modifiedIds == defaultTid) {
+                    // If all WireGuard configs are paused, use default transport with cache
+                    appendDnsCacheIfNeeded(defaultTid)
+                } else {
+                    // Apply cache to each WireGuard transport ID to enable DNS Booster cache sharing
+                    modifiedIds.split(",").map { appendDnsCacheIfNeeded(it) }.joinToString(",")
+                }
+                Pair(cachedIds, "")
             } else {
                 Logger.d(LOG_TAG_VPN, "(onQuery)no wg ids found for uid: $uid, using $defaultTid")
                 Pair(appendDnsCacheIfNeeded(defaultTid), "")
