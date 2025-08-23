@@ -1132,4 +1132,8 @@
     <string name="firewall_rule_lockdown_wg" translatable="true">Zárolt proxy</string>
     <string name="lbl_experimental" translatable="true">(kísérleti)</string>
     <string name="wireguard_title" translatable="true">Biztonságos internetkapcsolat WireGuarddal</string>
+    <string name="lbl_hop" translatable="true">Átjátszó</string>
+    <string name="lbl_manual" translatable="true">Kézikönyv</string>
+    <string name="lbl_fallback" translatable="true">Tartalék</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">Egyik sem</string>
 </resources>
