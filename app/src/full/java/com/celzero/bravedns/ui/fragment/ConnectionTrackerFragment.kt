@@ -355,16 +355,32 @@ class ConnectionTrackerFragment :
     }
 
     private fun showDeleteDialog() {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.conn_track_clear_logs_title)
-            .setMessage(R.string.conn_track_clear_logs_message)
-            .setCancelable(true)
-            .setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
-                io { connectionTrackerRepository.clearAllData() }
-            }
-            .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
-            .create()
-            .show()
+        if (fromUniversalFirewallScreen && filterCategories.isNotEmpty()) {
+            // Rule-specific deletion for Universal Firewall Settings
+            val rule = filterCategories.first()
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.conn_track_clear_rule_logs_title)
+                .setMessage(R.string.conn_track_clear_rule_logs_message)
+                .setCancelable(true)
+                .setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
+                    io { connectionTrackerRepository.clearLogsByRule(rule) }
+                }
+                .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
+                .create()
+                .show()
+        } else {
+            // Default deletion behavior - delete all logs
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.conn_track_clear_logs_title)
+                .setMessage(R.string.conn_track_clear_logs_message)
+                .setCancelable(true)
+                .setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
+                    io { connectionTrackerRepository.clearAllData() }
+                }
+                .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
+                .create()
+                .show()
+        }
     }
 
     private fun remakeChildFilterChipsUi(categories: List<FirewallRuleset>) {
