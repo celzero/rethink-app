@@ -227,20 +227,26 @@
     <string name="settings_app_notification_a13_heading" translatable="true">Сповіщення застосунку</string>
     <string name="notification_screen_error" translatable="true">Не вдалося запустити екран сповіщень застосунку.</string>
     <string name="settings_custom_downloader_heading" translatable="true">Використовувати вбудований завантажувач</string>
-    <string name="contributors_list" translatable="true"><![CDATA[The <i>Переосмислити відкрите програмне забезпечення</i> завдячує своїм існуванням цим волонтерам, які присвячують незліченну кількість годин його розробці..<br/>
-                                              <br/>🛡️ Додаток для Android <br/>
+    <string name="contributors_list" translatable="true"><![CDATA[The <i>Проект «Переосмислити відкритий код» завдячує своїм існуванням цим волонтерам, які присвячують незліченну кількість годин його розробці.<br/>
+                                              <br/>🛡️ Android app <br/>
+                                              <a href="https://github.com/anthonyryan1">Anthony Ryan</a> /
                                               <a href="https://github.com/BayLee4">BayLee4</a> /
                                               <a href="https://github.com/Ch4t4r">Ch4t4r</a> /
+                                              <a href="https://github.com/samthesamman">CodingAttack</a> /
                                               <a href="https://github.com/HrBDev">HrBDev</a> /
                                               <a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /
                                               <a href="https://github.com/ignoramous">ignoramous</a> /
+                                              <a href="https://github.com/ironveil">ironveil</a> /
                                               <a href="https://github.com/markwmuller">markwmuller</a> /
+                                              <a href="https://github.com/mohammaduvez">Mohammaduvez</a> /
                                               <a href="https://github.com/Mygod">Mygod</a> /
-                                              <a href="https://github.com/Uldiniad">Uldiniad</a> /
                                               <a href="https://github.com/Poussinou">Poussinou</a> /
                                               <a href="https://github.com/pjosingh">pjosingh</a> /
-                                              <a href="https://github.com/RohitSurwase">RohitSurwase</a><br/>
-                                              <br/>🚂 Мережевий двигун <br/>
+                                              <a href="https://github.com/RohitSurwase">RohitSurwase</a> /
+                                              <a href="https://github.com/ShantanuVichare">Shantanu</a> /
+                                              <a href="https://github.com/Uldiniad">Uldiniad</a><br/> /
+                                              <a href="https://github.com/yurtpage">yurtpage</a><br/>
+                                              <br/>🚂 Network engine <br/>
                                               <a href="https://github.com/alalamav">alalamav</a> /
                                               <a href="https://github.com/bemasc">bemasc</a> /
                                               <a href="https://github.com/dmcardle">dmcardle</a> /
@@ -249,7 +255,7 @@
                                               <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
                                               <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
                                               <a href="https://github.com/SeanBurford">SeanBurford</a><br/>
-                                              <br/>📚 Вирішити <br/>
+                                              <br/>📚 Resolver <br/>
                                               <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /
                                               <a href="https://github.com/amithm7">amithm7</a> /
                                               <a href="https://github.com/arfshl">arfshl</a> /
@@ -268,7 +274,7 @@
                                               <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
                                               <a href="https://github.com/shruuub">shruuub</a> /
                                               <a href="https://github.com/shuvashish76">shuvashish76</a><br/>
-                                              <br/>⚜ Модифікації спільноти <br/>
+                                              <br/>⚜ Community mods <br/>
                                               <a href="https://t.me/amithm7">amithm7</a> /
                                               <a href="https://t.me/TronSlayer">Andersen</a> /
                                               <a href="https://t.me/ppatra">ppatra</a> /
@@ -279,14 +285,15 @@
                                               <a href="https://t.me/kaliangel">kaliangel</a> /
                                               <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
                                               <br/>📌 Geo-IP <br/>
-                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPInfo Lite</a><br/>
+                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a><br/>
                                               <br/>❇ Translations <br/>
                                               <a href="https://weblate.org/en/">Weblate</a><br/>
                                               <br/>🦆 Icons <br/>
                                               <a href="https://github.com/celzero/rethink-app/issues/346">Icons</a><br/>
                                               <br/>📦 Build servers <br/>
                                               <a href="https://jitpack.io/">JitPack</a> /
-                                              <a href="https://github.com/">GitHub</a><br/>
+                                              <a href="https://github.com/">GitHub</a> /
+                                              <a href="https://central.sonatype.com/">Sonatype</a><br/>
                                               ]]></string>
     <string name="univ_firewall_rule_2" translatable="true">Блокувати застосунки, які не використовуються</string>
     <string name="univ_firewall_rule_3" translatable="true">Блокувати, якщо джерело застосунку невідоме</string>
@@ -1162,4 +1169,17 @@
     <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> випадковим чином використовує будь-який з цих DNS-резолверів:</string>
     <string name="hop_error_toast_msg_3" translatable="true">Вимкніть режим \"Тільки мобільні пристрої\", щоб використовувати реле</string>
     <string name="wg_mobile_only_hop_err" translatable="true">Режим \"лише для мобільних пристроїв\" не підтримується для реле</string>
+    <string name="lbl_fallback" translatable="true">Резервний варіант</string>
+    <string name="univ_delete_domain_dialog_title" translatable="true">Видалити всі правила домену?</string>
+    <string name="univ_delete_domain_dialog_message" translatable="true">Видалення цих правил дозволить будь-якій програмі підключатися до наразі заблокованих доменів.</string>
+    <string name="vpn_policy_auto_desc" translatable="true">Реагує на важливі зміни в мережі та з\'єднанні.</string>
+    <string name="vpn_policy_sensitive" translatable="true">Чутливий</string>
+    <string name="vpn_policy_sensitive_desc" translatable="true">Реагує на всі зміни мережі та підключення.</string>
+    <string name="vpn_policy_relaxed" translatable="true">Розслаблений</string>
+    <string name="vpn_policy_relaxed_desc" translatable="true">Реагує на цікаві зміни в підключенні.</string>
+    <string name="vpn_policy_title" translatable="true">Політика зміни підключення</string>
+    <string name="use_fallback_dns_to_bypass" translatable="true">Використовувати резервний DNS як обхідний</string>
+    <string name="use_fallback_dns_to_bypass_desc" translatable="true">Якщо ввімкнено, завжди використовується резервний DNS для обійдених програм, доменів та IP-адрес.</string>
+    <string name="title_database_dump" translatable="true">Стан бази даних</string>
+    <string name="copied_clipboard" translatable="true">Скопійовано</string>
 </resources>
