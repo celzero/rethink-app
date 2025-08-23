@@ -1186,4 +1186,13 @@
     <string name="lbl_service_providers" translatable="true">Поставщик услуг</string>
     <string name="hop_error_toast_msg_3" translatable="true">Отключить только мобильный, чтобы использовать relays</string>
     <string name="wg_mobile_only_hop_err" translatable="true">Режим «Только мобильный» не поддерживается для relays</string>
+    <string name="univ_delete_domain_dialog_title" translatable="true">Исключить все Правила Домена?</string>
+    <string name="univ_delete_domain_dialog_message" translatable="true">Исключение этих правил позволит любому приложению подключиться к заблокированным Доменам.</string>
+    <string name="vpn_policy_auto_desc" translatable="true">Реакция на важные изменения сети и подключения.</string>
+    <string name="vpn_policy_sensitive" translatable="true">Чувство</string>
+    <string name="vpn_policy_sensitive_desc" translatable="true">Реакция на все изменения сети и подключения.</string>
+    <string name="vpn_policy_relaxed_desc" translatable="true">Реакция на интересные изменения подключения.</string>
+    <string name="vpn_policy_title" translatable="true">Политика изменения связи</string>
+    <string name="use_fallback_dns_to_bypass" translatable="true">Использовать обратный DNS в обход</string>
+    <string name="use_fallback_dns_to_bypass_desc" translatable="true">При включении, всегда использует DNS-отказы для объездных приложений, доменов и IP-адресов.</string>
 </resources>

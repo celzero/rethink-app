@@ -967,4 +967,36 @@
     <string name="crypt_relay_us" translatable="true">Névtelenített DNS átjátszó (relay) az USA-ban, Los Angelesben, a https://cryptostorm.is/ szolgáltató üzemeltetésében.</string>
     <string name="crypt_relay_singapore" translatable="true">Névtelenített DNS átjátszó (relay) Szingapúrban.</string>
     <string name="cd_toast_edit" translatable="true">Szerkesztve</string>
+    <string name="lbl_test" translatable="true">teszt</string>
+    <string name="lbl_protos" translatable="true">protos</string>
+    <string name="lbl_service_providers" translatable="true">Szolgáltatók</string>
+    <string name="wireguard_desc" translatable="true">Titkosítsa az internetes forgalom WireGuard. Válasszon különböző útvonalakat különböző alkalmazásokhoz.</string>
+    <string name="firewall_title" translatable="true">Védje Androidját a Firewall segítségével</string>
+    <string name="firewall_desc" translatable="true">Ellenőrző alkalmazás internet használat; korlátozza az alkalmazáson vagy hálózati tevékenységen alapuló kapcsolatokat.</string>
+    <string name="dns_title" translatable="true">Block Ads &amp; Malware with DNS</string>
+    <string name="dns_desc" translatable="true">Válasszon 190+ listából, hogy megakadályozza a hirdetéseket, a nyomkövetőket és a malware-t.</string>
+    <string name="status_no_network" translatable="true">nincs hálózat</string>
+    <string name="settings_mobile_metered_heading" translatable="true">Meter mobilhálózatok</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Mindig kezelje a mobilhálózatokat mérőként.</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">Light Plus</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">Dark Plus</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">Biometrikus hitelesítés</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">Közvetlenül</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">5 perc</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">15 perc</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">A Rethink for <b>%1$s napokat </b> használták, amely a <b>$%2$s$</b> használati költségére vonatkozik. Megfontolná a szponzorálást, hogy fenntartsa fejlődését?</string>
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Rendszer DNS felhatalmazás nélküli domainekhez</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Használja a System DNS-t olyan csalatlan domainekhez, mint a <i>.lan</i>, <i>.internal</i>, stb.</string>
+    <string name="dc_filtering_heading" translatable="true">szűrés</string>
+    <string name="cd_split_dns_heading" translatable="true">Split DNS (tapasztalat)</string>
+    <string name="cd_split_dns_desc" translatable="true">Forward DNS lekérdezések a proxy DNS-kiszolgálóihoz közelített alkalmazásokból.</string>
+    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Treat DNS szabályok tűzfal szabályok (tapasztalat)</string>
+    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">A DNS-blokkolást az állásfoglalás során megkerülik; a döntést a kapcsolati időben fogják meghozni.</string>
+    <string name="univ_firewall_rule_11" translatable="true">Block minden helyi fogadó kapcsolat</string>
+    <string name="univ_delete_domain_dialog_title" translatable="true">Törölje az összes domain szabályt?</string>
+    <string name="univ_delete_domain_dialog_message" translatable="true">E szabályok törlése lehetővé tenné a jelenleg blokkolt domainekhez való csatlakozást.</string>
+    <string name="firewall_rule_private_dns" translatable="true">Private DNS</string>
+    <string name="firewall_rule_bypass_proxy" translatable="true">Bypass Proxy</string>
+    <string name="firewall_rule_paused_app" translatable="true">App Paused</string>
+    <string name="firewall_rule_lockdown_wg" translatable="true">Lockdown Proxy</string>
 </resources>
