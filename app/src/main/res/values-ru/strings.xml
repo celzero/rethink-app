@@ -1204,4 +1204,5 @@
     <string name="lbl_fallback" translatable="true">Запасной</string>
     <string name="vpn_policy_relaxed" translatable="true">Расслабленный</string>
     <string name="title_database_dump" translatable="true">Состояние базы данных</string>
+    <string name="copied_clipboard" translatable="true">Скопировано</string>
 </resources>
