@@ -316,6 +316,8 @@
 
     <string name="conn_track_clear_logs_title" translatable="true">Delete all network logs?</string>
     <string name="conn_track_clear_logs_message" translatable="true">This only deletes network logs but not firewall rules. This operation is not reversible. Do you want to proceed?</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">Delete logs for this rule?</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">This will only delete network logs for the currently viewed firewall rule. This operation is not reversible. Do you want to proceed?</string>
 
     <string name="dns_query_clear_logs_title" translatable="true">Delete all DNS logs?</string>
     <string name="dns_query_clear_logs_message" translatable="true">This deletes on-device DNS logs. This operation is not reversible. Do you want to proceed?</string>
