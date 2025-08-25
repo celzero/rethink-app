@@ -4004,7 +4004,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // tids. Go will remove if its not applicable for that transport id.
         val tidCsv = tid.first.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
         opts.tidcsv = tidCsv
-        val secCsv = tid.second.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) }
+        // tid.second can be empty
+        val secCsv = if (tid.second.isNotEmpty()) tid.second.split(",").joinToString(",") { appendDnsCacheIfNeeded(it) } else ""
         opts.tidseccsv = secCsv
 
         if (uid == rethinkUid) {
