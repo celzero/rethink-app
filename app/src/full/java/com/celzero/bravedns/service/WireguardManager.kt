@@ -376,13 +376,13 @@ object WireguardManager : KoinComponent {
     }
 
     // no need to check for app excluded from proxy here, expected to call this fn after that
-    suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMobileNw: Boolean, default: String = ""): List<String> {
+    suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMobileNw: Boolean, default: String): List<String> {
         val block = Backend.Block
         val proxyIds: MutableList<String> = mutableListOf()
         if (oneWireGuardEnabled()) {
             val id = getOneWireGuardProxyId()
             if (id == null || id == INVALID_CONF_ID) {
-                Logger.e(LOG_TAG_PROXY, "canAdd: one-wg not found, id: $id, return ${emptyList<String>()}")
+                Logger.e(LOG_TAG_PROXY, "canAdd: one-wg not found, id: $id, return empty")
                 return emptyList<String>()
             }
 
