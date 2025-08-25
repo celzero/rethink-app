@@ -203,7 +203,7 @@ class UniversalFirewallSettingsActivity :
 
         b.firewallDnsBypassRl.setOnClickListener { startActivity(FirewallRuleset.RULE7.id) }
 
-        b.firewallNewAppRl.setOnClickListener { startActivity(FirewallRuleset.RULE8.id) }
+        b.firewallNewAppRl.setOnClickListener { startActivity(FirewallRuleset.RULE1B.id) }
 
         b.firewallMeteredRl.setOnClickListener { startActivity(FirewallRuleset.RULE1F.id) }
 
@@ -353,7 +353,7 @@ class UniversalFirewallSettingsActivity :
             val dnsBypass =
                 blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE7.id) }
             val newApp =
-                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE8.id) }
+                blockedUniversalRules.filter { it.blockedByRule.contains(FirewallRuleset.RULE1B.id) }
             val metered =
                 blockedUniversalRules.filter {
                     it.blockedByRule.contains(FirewallRuleset.RULE1F.id)
