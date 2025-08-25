@@ -1002,8 +1002,11 @@ class GoVpnAdapter : KoinComponent {
             val skipListenPort = !isOneWg && persistentState.randomizeListenPort
             val wgUserSpaceString = wgConfig?.toWgUserspaceString(skipListenPort)
             val p = getProxies()?.addProxy(id.togs(), wgUserSpaceString.togs())
-            //if (isOneWg) setWireGuardDns(id)
-            setWireGuardDns(id)
+            // For simple mode (oneWireGuard), always set DNS to ensure WireGuard DNS takes precedence
+            // For advanced mode, set DNS only if the config has DNS servers defined
+            if (isOneWg || wgConfig?.getInterface()?.dnsServers?.isNotEmpty() == true) {
+                setWireGuardDns(id)
+            }
             // initiate a ping request to the wg proxy
             initiateWgPing(id)
             Logger.i(LOG_TAG_VPN, "$TAG added wireguard proxy with $id; success? ${p != null}")
