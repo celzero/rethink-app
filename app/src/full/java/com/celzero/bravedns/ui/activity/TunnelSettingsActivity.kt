@@ -368,10 +368,6 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.dvEimfSwitch.setOnCheckedChangeListener { _, isChecked ->
             NewSettingsManager.markSettingSeen(NewSettingsManager.ENDPOINT_INDEPENDENT)
-            if (!isAtleastS()) {
-                return@setOnCheckedChangeListener
-            }
-
             persistentState.endpointIndependence = isChecked
         }
 
