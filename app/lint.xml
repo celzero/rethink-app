@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- Ignore ALL lint issues in any strings.xml under any values[-xx] folder, for any source set (main/debug/release/flavors) -->
+    <issue id="all">
+        <ignore regexp=".*/src/.*/res/values(?:-[^/]+)?/strings\.xml" />
+    </issue>
+</lint>
