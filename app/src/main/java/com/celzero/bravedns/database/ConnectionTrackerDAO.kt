@@ -137,7 +137,7 @@ interface ConnectionTrackerDAO {
 
     @Query("delete from ConnectionTracker where uid = :uid") fun clearLogsByUid(uid: Int)
 
-    @Query("delete from ConnectionTracker where blockedByRule LIKE '%' || :rule || '%'") fun clearLogsByRule(rule: String)
+    @Query("delete from ConnectionTracker where blockedByRule = :rule") fun clearLogsByRule(rule: String)
 
     @Query("delete from ConnectionTracker where uid = :uid and timeStamp > :time")
     fun clearLogsByTime(uid: Int, time: Long)
