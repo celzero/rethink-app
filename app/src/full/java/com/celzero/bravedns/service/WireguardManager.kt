@@ -504,7 +504,7 @@ object WireguardManager : KoinComponent {
 
         val cac = mappings.filter { it.isActive && it.isCatchAll }
         cac.forEach {
-            if (checkEligibilityBasedOnNw(it.id, usesMobileNw)) {
+            if (checkEligibilityBasedOnNw(it.id, usesMobileNw) && !proxyIds.contains(ID_WG_BASE + it.id)) {
                 proxyIds.add(ID_WG_BASE + it.id)
                 Logger.i(
                     LOG_TAG_PROXY,
