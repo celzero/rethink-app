@@ -311,8 +311,8 @@ object VpnController : KoinComponent {
         braveVpnService?.removeWireGuardProxy(id)
     }
 
-    suspend fun addWireGuardProxy(id: String) {
-        braveVpnService?.addWireGuardProxy(id)
+    suspend fun addWireGuardProxy(id: String, force: Boolean = false) {
+        braveVpnService?.addWireGuardProxy(id, force)
     }
 
     suspend fun refreshOrPauseOrResumeOrReAddProxies() {

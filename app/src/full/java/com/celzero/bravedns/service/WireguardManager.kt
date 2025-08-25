@@ -875,7 +875,7 @@ object WireguardManager : KoinComponent {
         addOrUpdateConfigFileMapping(cfg, file?.toImmutable(), path, serverResponse)
         addOrUpdateConfig(cfg)
         if (file?.isActive == true) {
-            VpnController.addWireGuardProxy(id = ID_WG_BASE + cfg.getId())
+            VpnController.addWireGuardProxy(id = ID_WG_BASE + cfg.getId(), force = true)
         }
     }
 

@@ -5001,9 +5001,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         vpnAdapter?.removeWgProxy(id)
     }
 
-    suspend fun addWireGuardProxy(id: String) {
+    suspend fun addWireGuardProxy(id: String, force: Boolean = false) {
         logd("add wg from tunnel: $id")
-        vpnAdapter?.addWgProxy(id)
+        vpnAdapter?.addWgProxy(id, force)
     }
 
     suspend fun pauseMobileOnlyWireGuardOnNoNw() {
