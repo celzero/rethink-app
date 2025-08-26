@@ -46,6 +46,10 @@ import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel.TopLevelFilter
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -139,6 +143,7 @@ class ConnectionTrackerFragment :
 
         remakeParentFilterChipsUi()
         remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
+        setQueryFilter()
     }
 
     private fun setupRecyclerView() {
@@ -334,23 +339,28 @@ class ConnectionTrackerFragment :
         }
     }
 
-    override fun onQueryTextSubmit(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
-            if (this.isAdded) {
-                this.filterQuery = query
-                viewModel.setFilter(query, filterCategories, filterType)
-            }
+    @OptIn(FlowPreview::class)
+    private fun setQueryFilter() {
+        lifecycleScope.launch {
+            searchQuery
+                .debounce(QUERY_TEXT_DELAY)
+                .distinctUntilChanged()
+                .collect { query ->
+                    filterQuery = query
+                    viewModel.setFilter(query, filterCategories, filterType)
+                }
         }
+    }
+
+    val searchQuery = MutableStateFlow("")
+
+    override fun onQueryTextSubmit(query: String): Boolean {
+        searchQuery.value = query
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
-            if (this.isAdded) {
-                this.filterQuery = query
-                viewModel.setFilter(query, filterCategories, filterType)
-            }
-        }
+        searchQuery.value = query
         return true
     }
 

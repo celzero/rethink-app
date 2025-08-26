@@ -53,7 +53,7 @@ interface DnsLogDAO {
     )
     fun getAllowedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
-    @Query("select * from DNSLogs where isBlocked = 1 order by time desc LIMIT $MAX_LOGS")
+    @Query("select * from DNSLogs where isBlocked = 1 order by id desc LIMIT $MAX_LOGS")
     fun getBlockedDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(

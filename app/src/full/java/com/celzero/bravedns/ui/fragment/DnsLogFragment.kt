@@ -35,6 +35,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.activity.ConsoleLogActivity
 import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
@@ -43,6 +44,10 @@ import com.celzero.bravedns.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -106,6 +111,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         displayPerDnsUi()
         setupClickListeners()
         remakeFilterChipsUi()
+        setQueryFilter()
     }
 
     override fun onResume() {
@@ -147,10 +153,8 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         val favIcon = persistentState.fetchFavIcon
         val isRethinkDns = appConfig.isRethinkDnsConnected()
         val recyclerAdapter = DnsLogAdapter(requireContext(), favIcon, isRethinkDns)
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.dnsLogsList.observe(viewLifecycleOwner) {
-                recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
-            }
+        viewModel.dnsLogsList.observe(viewLifecycleOwner) {
+            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.recyclerQuery.adapter = recyclerAdapter
 
@@ -283,22 +287,26 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
-            if (this.isAdded) {
-                this.filterValue = query
-                viewModel.setFilter(filterValue, filterType)
-            }
-        }
+        searchQuery.value = query
         return true
     }
 
-    override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
-            if (this.isAdded) {
-                this.filterValue = query
-                viewModel.setFilter(filterValue, filterType)
-            }
+    @OptIn(FlowPreview::class)
+    private fun setQueryFilter() {
+        lifecycleScope.launch {
+            searchQuery
+                .debounce(QUERY_TEXT_DELAY)
+                .distinctUntilChanged()
+                .collect { query ->
+                    filterValue = query
+                    viewModel.setFilter(filterValue, filterType)
+                }
         }
+    }
+
+    val searchQuery = MutableStateFlow("")
+    override fun onQueryTextChange(query: String): Boolean {
+        searchQuery.value = query
         return true
     }
 
