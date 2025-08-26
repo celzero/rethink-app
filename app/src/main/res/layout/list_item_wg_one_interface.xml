@@ -143,21 +143,21 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
                     android:layout_marginEnd="5dp"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/interface_active_uptime"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
-                        android:layout_toEndOf="@id/interface_active_rx_tx"
+                        android:layout_toStartOf="@id/interface_active_rx_tx"
                         android:ellipsize="marquee"
                         android:padding="5dp"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/default_font_text_view"
                         android:visibility="visible" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/interface_active_rx_tx"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

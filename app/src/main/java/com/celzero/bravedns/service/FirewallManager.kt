@@ -555,7 +555,7 @@ object FirewallManager : KoinComponent {
         // When the user engages the app and locks the screen, the app is
         // considered to be in background and the connections for those apps
         // should be blocked.
-        val locked =  keyguardManager?.isKeyguardLocked == true
+        val locked = keyguardManager?.isKeyguardLocked == true
         val inForegroundList = foregroundUids.contains(uid)
         Logger.d(
             LOG_TAG_FIREWALL,
