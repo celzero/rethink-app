@@ -3974,6 +3974,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             }
             return if (splitDns) {
                 // in case of split dns, append Fixed to the tid when there is no uid
+                // this synthesizes A/AAAA from a single fixed IP
                 Pair(tid, Backend.Fixed)
             } else {
                 Pair(tid, "")
@@ -4747,7 +4748,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     }
 
     fun handleExpiredConnMetaData(notification: RemovalNotification<String, ConnTrackerMetaData>) {
-        // handle onlty the expired connMetaData
+        // handle only the expired connMetaData
         if (notification.cause != RemovalCause.EXPIRED) return
 
         // this is called when the connMetaData is expired from the cache
@@ -4771,6 +4772,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         } else {
             netLogTracker.writeIpLog(cm)
         }
+        Logger.d(LOG_TAG_VPN, "expired connMetaData, close conns: $cm")
     }
 
     private suspend fun isSpecialApp(uid: Int): Boolean {
