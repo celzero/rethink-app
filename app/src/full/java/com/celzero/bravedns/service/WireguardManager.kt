@@ -784,6 +784,8 @@ object WireguardManager : KoinComponent {
         mappings.add(newMap)
         if (m.isActive) {
             VpnController.addWireGuardProxy(id = ID_WG_BASE + id)
+            // Refresh proxies to immediately pause/resume based on new mobile-only setting and current network
+            VpnController.refreshOrPauseOrResumeOrReAddProxies()
         }
     }
 

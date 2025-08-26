@@ -89,6 +89,10 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         connectionTrackerDAO.clearLogsByUid(uid)
     }
 
+    suspend fun clearLogsByRule(rule: String) {
+        connectionTrackerDAO.clearLogsByRule(rule)
+    }
+
     suspend fun getDataUsage(before: Long, current: Long): List<DataUsage> {
         return connectionTrackerDAO.getDataUsage(before, current)
     }
