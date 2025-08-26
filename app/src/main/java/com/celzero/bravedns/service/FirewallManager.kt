@@ -541,7 +541,7 @@ object FirewallManager : KoinComponent {
                 }
             }
             val isAppUid = AndroidUidConfig.isUidAppRange(uid)
-            Logger.d(LOG_TAG_FIREWALL, "app in foreground with uid? $isAppUid")
+            Logger.d(LOG_TAG_FIREWALL, "app in foreground; uid($uid)? $isAppUid")
 
             // Only track packages within app uid range.
             if (!isAppUid) return@io
@@ -555,13 +555,13 @@ object FirewallManager : KoinComponent {
         // When the user engages the app and locks the screen, the app is
         // considered to be in background and the connections for those apps
         // should be blocked.
-        val locked = keyguardManager?.isKeyguardLocked == false
-        val isForeground = foregroundUids.contains(uid)
+        val locked =  keyguardManager?.isKeyguardLocked == true
+        val inForegroundList = foregroundUids.contains(uid)
         Logger.d(
             LOG_TAG_FIREWALL,
-            "is app $uid foreground? ${locked && isForeground}, isLocked? $locked, is available in foreground list? $isForeground"
+            "is app $uid foreground? ${!locked && inForegroundList}, isLocked? $locked,  in foreground list? $inForegroundList"
         )
-        return locked && isForeground
+        return !locked && inForegroundList
     }
 
     suspend fun updateFirewalledApps(uid: Int, connectionStatus: ConnectionStatus) {

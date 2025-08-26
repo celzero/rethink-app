@@ -1127,7 +1127,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             handleAccessibilityFailure()
             return false
         }
-
+        if (keyguardManager == null) {
+            keyguardManager = getSystemService(KEYGUARD_SERVICE) as KeyguardManager
+        }
+        // if keyguard is locked, then the app is in background
         val allowed = testWithBackoff { FirewallManager.isAppForeground(uid, keyguardManager) }
 
         return !allowed
