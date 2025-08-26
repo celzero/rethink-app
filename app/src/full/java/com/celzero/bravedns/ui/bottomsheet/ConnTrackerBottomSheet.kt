@@ -735,13 +735,6 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun applyIpRule(ipRuleStatus: IpRulesManager.IpRuleStatus) {
-        val proto = Protocol.getProtocolName(info!!.protocol).name
-        val cr = ConnectionRules(info!!.ipAddress, info!!.port, proto)
-
-        Logger.i(
-            LOG_TAG_FIREWALL,
-            "Apply ip rule for ${cr.ipAddress}, ${FirewallRuleset.RULE2.name}"
-        )
         io {
             // no need to apply rule, prev selection and current selection are same
             if (
@@ -753,6 +746,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             val ipPair = IpRulesManager.getIpNetPort(info!!.ipAddress)
             val ip = ipPair.first ?: return@io
             IpRulesManager.addIpRule(info!!.uid, ip, /*wildcard-port*/ 0, ipRuleStatus, proxyId = "", proxyCC = "")
+            Logger.i(LOG_TAG_FIREWALL, "apply ip-rule for ${info!!.uid}, $ip, ${ipRuleStatus.name}")
         }
     }
 
