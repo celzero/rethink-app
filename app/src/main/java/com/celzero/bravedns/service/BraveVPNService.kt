@@ -4166,14 +4166,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return
             }
         }
-        if (!Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt())
-                .isLessThan(Logger.LoggerLevel.INFO)
-        ) { // skip cached response logging for info and above
-            if (summary.cached) {
-                logd("onResponse: cached response, not logging")
-                return
-            }
-        }
         netLogTracker.processDnsLog(summary, rethinkUid)
         setRegionLiveDataIfRequired(summary)
     }
