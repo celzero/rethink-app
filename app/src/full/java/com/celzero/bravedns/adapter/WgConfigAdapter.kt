@@ -119,6 +119,8 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             b.interfaceIdText.text = context.getString(R.string.single_argument_parenthesis, config.id.toString())
             b.interfaceSwitch.isChecked = config.isActive && VpnController.hasTunnel()
             setupClickListeners(config)
+            val appsCount = ProxyManager.getAppCountForProxy(ID_WG_BASE + config.id)
+            updateUi(config, appsCount)
             updateStatusJob(config)
             updateHopSrcChip(config.id)
             updateAmneziaChip(config)
@@ -140,11 +142,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 b.protocolInfoChipGroup.visibility = View.GONE
                 b.interfaceActiveLayout.visibility = View.GONE
                 b.interfaceStatus.visibility = View.GONE
-                val id = ID_WG_BASE + config.id
-                val appsCount = ProxyManager.getAppCountForProxy(id)
-                updateUi(config, appsCount)
             } else {
-                b.interfaceConfigStatus.visibility = View.GONE
                 b.interfaceAppsCount.visibility = View.GONE
                 b.interfaceActiveLayout.visibility = View.GONE
                 b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.background)
@@ -247,7 +245,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
         private suspend fun updateStatus(config: WgConfigFiles) {
             val id = ID_WG_BASE + config.id
-            val appsCount = ProxyManager.getAppCountForProxy(id)
             val statusId = VpnController.getProxyStatusById(id)
             val pair = VpnController.getSupportedIpVersion(id)
             val c = WireguardManager.getConfigById(config.id)
@@ -277,7 +274,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
             uiCtx {
                 updateStatusUi(config, statusId, dnsStatusId, stats)
-                updateUi(config, appsCount)
                 updateProtocolChip(pair)
                 updateSplitTunnelChip(isSplitTunnel)
             }
@@ -306,38 +302,41 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
         private fun updateUi(config: WgConfigFiles, appsCount: Int) {
             b.interfaceAppsCount.visibility = View.VISIBLE
+            b.chipProperties.text = ""
             if (config.isCatchAll) {
-                b.interfaceConfigStatus.visibility = View.VISIBLE
-                b.interfaceAppsCount.text = context.getString(R.string.routing_remaining_apps)
-                b.interfaceAppsCount.setTextColor(
-                    fetchColor(context, R.attr.primaryLightColorText)
-                )
-                b.interfaceConfigStatus.text = context.getString(R.string.catch_all_wg_dialog_title)
-                return // no need to update the apps count
-            } else if (config.isLockdown) {
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(R.string.symbol_lightening)
+            }
+            if (config.isLockdown) {
                 if (!config.isActive) {
                     b.interfaceDetailCard.strokeWidth = 2
                     b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.accentBad)
                 }
-                b.interfaceConfigStatus.visibility = View.VISIBLE
-                b.interfaceConfigStatus.text =
-                    context.getString(R.string.firewall_rule_global_lockdown)
-            } else {
-                b.interfaceConfigStatus.visibility = View.GONE
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(R.string.two_argument_space, b.chipProperties.text.toString(), context.getString(R.string.symbol_lockdown))
             }
+            if (config.useOnlyOnMetered) {
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(R.string.two_argument_space,b.chipProperties.text.toString(), context.getString(R.string.symbol_mobile))
+            }
+
+            val visible = if (b.chipProperties.text.isNotEmpty()) View.VISIBLE else View.GONE
+            b.chipProperties.visibility = visible
+
             if (!config.isActive) {
                 // no need to update the apps count if the config is disabled
                 b.interfaceAppsCount.visibility = View.GONE
                 b.interfaceActiveLayout.visibility = View.GONE
-                return
-            }
-
-            b.interfaceAppsCount.text =
-                context.getString(R.string.firewall_card_status_active, appsCount.toString())
-            if (appsCount == 0) {
-                b.interfaceAppsCount.setTextColor(fetchColor(context, R.attr.accentBad))
-            } else {
+            } else if (config.isCatchAll) {
+                b.interfaceAppsCount.text = context.getString(R.string.routing_remaining_apps)
                 b.interfaceAppsCount.setTextColor(fetchColor(context, R.attr.primaryLightColorText))
+            } else {
+                b.interfaceAppsCount.text = context.getString(R.string.firewall_card_status_active, appsCount.toString())
+                if (appsCount == 0) {
+                    b.interfaceAppsCount.setTextColor(fetchColor(context, R.attr.accentBad))
+                } else {
+                    b.interfaceAppsCount.setTextColor(fetchColor(context, R.attr.primaryLightColorText))
+                }
             }
         }
 
@@ -346,7 +345,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 b.interfaceSwitch.isChecked = true
                 b.interfaceDetailCard.strokeWidth = 2
                 b.interfaceStatus.visibility = View.VISIBLE
-                b.interfaceConfigStatus.visibility = View.VISIBLE
                 b.interfaceActiveLayout.visibility = View.VISIBLE
                 val time = getUpTime(stats)
                 val rxtx = getRxTx(stats)
@@ -394,7 +392,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.background)
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceSwitch.isChecked = false
-                b.interfaceConfigStatus.visibility = View.GONE
                 b.interfaceAppsCount.visibility = View.GONE
                 b.interfaceStatus.visibility = View.VISIBLE
                 b.interfaceStatus.text =
