@@ -932,7 +932,6 @@ object WireguardManager : KoinComponent {
             sb.append("   lastTx: ${getRelativeTimeSpan(stats?.lastTx)}\n")
             sb.append("   lastOk: ${getRelativeTimeSpan(stats?.lastOK)}\n")
             sb.append("   since: ${getRelativeTimeSpan(stats?.since)}\n")
-            sb.append("\n")
         }
         return sb.toString()
     }
