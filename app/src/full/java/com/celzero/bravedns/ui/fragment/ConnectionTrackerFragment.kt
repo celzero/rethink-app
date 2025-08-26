@@ -355,11 +355,9 @@ class ConnectionTrackerFragment :
     }
 
     private fun showDeleteDialog() {
-        if (fromUniversalFirewallScreen && filterCategories.isNotEmpty()) {
+        val rule = filterCategories.firstOrNull()
+        if (fromUniversalFirewallScreen && rule != null) {
             // Rule-specific deletion for Universal Firewall Settings
-        if (fromUniversalFirewallScreen && filterCategories.size == 1) {
-            // Rule-specific deletion for Universal Firewall Settings
-            val rule = filterCategories[0]
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.conn_track_clear_rule_logs_title)
                 .setMessage(R.string.conn_track_clear_rule_logs_message)
