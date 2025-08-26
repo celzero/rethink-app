@@ -1110,10 +1110,11 @@ class GoVpnAdapter : KoinComponent {
                     // re-adding those proxies seems working, work around for now
                     // now re-add logic is handled in go-tun
                     addWgProxy(id, true)
-                } else if (stats == Backend.TPU && canResume) {
+                } else if (stats == Backend.TPU && (canResume || files?.useOnlyOnMetered == false)) {
                     // if the proxy is paused, then resume it
                     // this is needed when the tunnel is reconnected and the proxies are paused
-                    // so resume them
+                    // so resume them, also when there is switch in wg-config for useOnlyOnMetered
+                    // from true to false
                     val res = getProxies()?.getProxy(id.togs())?.resume()
                     Logger.i(LOG_TAG_VPN, "$TAG resumed proxy: $id, res: $res")
                 } else if (isWireGuardMobileOnly && !canResumeMobileOnlyWg) {
