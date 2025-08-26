@@ -559,7 +559,7 @@ object FirewallManager : KoinComponent {
         val inForegroundList = foregroundUids.contains(uid)
         Logger.d(
             LOG_TAG_FIREWALL,
-            "is app $uid foreground? ${!locked && inForegroundList}, isLocked? $locked,  in foreground list? $inForegroundList"
+            "is app $uid foreground? ${!locked && inForegroundList}, isLocked? $locked, in foreground list? $inForegroundList"
         )
         return !locked && inForegroundList
     }
