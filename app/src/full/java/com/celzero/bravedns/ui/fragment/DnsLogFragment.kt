@@ -114,12 +114,13 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         // some ROMs kill or freeze the keyboard/IME process to save memory or battery,
         // causing SearchView to stop receiving input events
         // this is a workaround to restart the IME process
-        b.queryListSearch.setQuery("", false)
         b.queryListSearch.clearFocus()
 
         val imm = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.restartInput(b.queryListSearch)
         b.topRl.requestFocus()
+
+        viewModel.setFilter(filterValue, filterType)
     }
 
     private fun setupClickListeners() {
