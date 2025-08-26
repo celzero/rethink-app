@@ -216,9 +216,9 @@ interface ConnectionTrackerDAO {
     )
     fun getTotalUsagesByWgId(to: Long, meteredTxt: String, wgId: String): DataUsageSummary
 
-    @Query("update ConnectionTracker set message = 'manual-close', duration = 0 where connId in (:connIds)")
-    fun closeConnections(connIds: List<String>)
+    @Query("update ConnectionTracker set message = :reason, duration = 0 where connId in (:connIds)")
+    fun closeConnections(connIds: List<String>, reason: String)
 
-    @Query("update ConnectionTracker set message = 'manual-close', duration = 0 where uid in (:uids)")
-    fun closeConnectionForUids( uids: List<Int> )
+    @Query("update ConnectionTracker set message = :reason, duration = 0 where uid in (:uids)")
+    fun closeConnectionForUids( uids: List<Int>, reason: String)
 }

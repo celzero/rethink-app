@@ -1039,7 +1039,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun closeConnections(connIds: List<String>, isUid: Boolean = false) {
+    suspend fun closeConnections(connIds: List<String>, isUid: Boolean = false, reason: String) {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip closeConns")
             return
@@ -1047,17 +1047,18 @@ class GoVpnAdapter : KoinComponent {
 
         if (connIds.isEmpty()) {
             val res = tunnel.closeConns("") // closes all connections
-            Logger.i(LOG_TAG_VPN, "$TAG close all connections, res: $res")
+            Logger.i(LOG_TAG_VPN, "$TAG close all connections($connIds), res: $res")
             return
         }
 
         val connIdsStr = connIds.joinToString(",")
         // there maybe chance that the res can be empty, when the conns are already closed
         val res = tunnel.closeConns(connIdsStr)
+        val closedConns = res.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
         // check if all connections are closed. for any connIds not present in the result,
         // mark their database entries as closed. These connections were either closed when
         // the tunnel was disconnected or were missed during database update.
-        val diff = connIds.filter { it !in res }
+        val diff = connIds.filter { !closedConns.contains(it) }
         // check if the elements in the diff has the size equal to the connIds size,
         // there can be case where the connIds contains uid,
         if (diff.isNotEmpty()) {
@@ -1065,11 +1066,11 @@ class GoVpnAdapter : KoinComponent {
                 if (isUid) {
                     // close the connections for all the uids in the diff
                     val uids = diff.mapNotNull { it.toIntOrNull() }
-                    connTrackerDb.closeConnectionForUids(uids)
-                    Logger.i(LOG_TAG_VPN, "$TAG closeConns: $connIds, res: $res, uids: $uids")
+                    connTrackerDb.closeConnectionForUids(uids, reason)
+                    Logger.i(LOG_TAG_VPN, "$TAG closeConns: $connIds, res: $res, uids: $uids, reason: $reason")
                 } else {
-                    connTrackerDb.closeConnections(diff)
-                    Logger.i(LOG_TAG_VPN, "$TAG closeConns: $connIds, res: $res, ids: $diff")
+                    connTrackerDb.closeConnections(diff, reason)
+                    Logger.i(LOG_TAG_VPN, "$TAG closeConns: $connIds, res: $res, ids: $diff, reason: $reason")
                 }
             } catch (e: Exception) {
                 Logger.i(LOG_TAG_VPN, "$TAG err closing connections: ${e.message}")

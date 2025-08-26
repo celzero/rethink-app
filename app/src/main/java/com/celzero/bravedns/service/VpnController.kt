@@ -319,12 +319,12 @@ object VpnController : KoinComponent {
         braveVpnService?.refreshOrPauseOrResumeOrReAddProxies()
     }
 
-    fun closeConnectionsIfNeeded(uid: Int = INVALID_UID) {
-        braveVpnService?.closeConnectionsIfNeeded(uid)
+    fun closeConnectionsIfNeeded(uid: Int = INVALID_UID, reason: String) {
+        braveVpnService?.closeConnectionsIfNeeded(uid, reason)
     }
 
-    fun closeConnectionsByUidDomain(uid: Int, ipAddress: String?) {
-        braveVpnService?.closeConnectionsByUidDomain(uid, ipAddress)
+    fun closeConnectionsByUidDomain(uid: Int, ipAddress: String?, reason: String) {
+        braveVpnService?.closeConnectionsByUidDomain(uid, ipAddress, reason)
     }
 
     suspend fun getDnsStatus(id: String): Long? {

@@ -2358,21 +2358,21 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         vpnAdapter?.setRDNS()
     }
 
-    fun closeConnectionsIfNeeded(uid: Int) { // can be invalid uid, in which case, no-op
+    fun closeConnectionsIfNeeded(uid: Int, reason: String) { // can be invalid uid, in which case, no-op
         if (uid == INVALID_UID) return
 
         if (uid == UID_EVERYBODY) {
             // when the uid is everybody, close all the connections
-            io("closeConn") { vpnAdapter?.closeConnections(emptyList()) }
+            io("closeConn") { vpnAdapter?.closeConnections(emptyList(), isUid = false, reason) }
             return
         }
 
         // close conns can now be called with a list of uids / connIds
         val uid0 = listOf(FirewallManager.appId(uid, isPrimaryUser()).toString())
-        io("closeConn") { vpnAdapter?.closeConnections(uid0, isUid = true) }
+        io("closeConn") { vpnAdapter?.closeConnections(uid0, isUid = true, reason) }
     }
 
-    fun closeConnectionsByUidDomain(uid: Int, ipAddress: String?) {
+    fun closeConnectionsByUidDomain(uid: Int, ipAddress: String?, reason: String) {
         // can be invalid uid, in which case, no-op
         // no need to close all connections in case of empty domain, as it is not valid
         if (uid == INVALID_UID || ipAddress.isNullOrEmpty()) return
@@ -2385,8 +2385,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 Logger.w(LOG_TAG_VPN, "no connections found for uid: $uid, domain: $ipAddress")
                 return@io
             }
-            vpnAdapter?.closeConnections(cids)
-            Logger.i(LOG_TAG_VPN, "close connections by uid: $uid, domain: $ipAddress, cids: $cids")
+            vpnAdapter?.closeConnections(cids, isUid = false, reason)
+            Logger.i(LOG_TAG_VPN, "close connections by uid: $uid, domain: $ipAddress, cids: $cids, reason: $reason")
         }
     }
 
@@ -5166,7 +5166,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         io("devLockCloseConns") {
             // do not call closeConnections with empty list, as it will close all connections
             if (trackedCidsToClose.isNotEmpty()) {
-                vpnAdapter?.closeConnections(trackedCidsToClose.toList())
+                vpnAdapter?.closeConnections(trackedCidsToClose.toList(), isUid = false, "dev-lock-close-conns")
                 trackedCidsToClose.clear()
             }
         }

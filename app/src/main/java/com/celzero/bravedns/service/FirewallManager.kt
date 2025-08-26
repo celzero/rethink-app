@@ -462,11 +462,11 @@ object FirewallManager : KoinComponent {
         connectionStatus: ConnectionStatus
     ) {
         if (firewallStatus == FirewallStatus.ISOLATE) {
-            VpnController.closeConnectionsIfNeeded(uid)
+            VpnController.closeConnectionsIfNeeded(uid, "isolate-manual-close")
         } else if (
             firewallStatus == FirewallStatus.NONE && connectionStatus != ConnectionStatus.ALLOW
         ) {
-            VpnController.closeConnectionsIfNeeded(uid)
+            VpnController.closeConnectionsIfNeeded(uid, "block-manual-close")
         } else {
             // no-op, no need to close existing connections, if the app is not isolated or blocked
         }
