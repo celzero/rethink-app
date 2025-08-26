@@ -919,6 +919,37 @@ object WireguardManager : KoinComponent {
         }
     }
 
+    suspend fun stats(): String {
+        val sb = StringBuilder()
+        mappings.filter { it.isActive }.forEach {
+            val id = ID_WG_BASE + it.id
+            val stats = VpnController.getProxyStats(id)
+            sb.append("   id: ${it.id}, name: ${it.name}\n")
+            sb.append("   addr: ${stats?.addr}").append("\n")
+            sb.append("   rx: ${stats?.rx}\n")
+            sb.append("   tx: ${stats?.tx}\n")
+            sb.append("   lastRx: ${getRelativeTimeSpan(stats?.lastRx)}\n")
+            sb.append("   lastTx: ${getRelativeTimeSpan(stats?.lastTx)}\n")
+            sb.append("   lastOk: ${getRelativeTimeSpan(stats?.lastOK)}\n")
+            sb.append("   since: ${getRelativeTimeSpan(stats?.since)}\n")
+            sb.append("\n")
+        }
+        return sb.toString()
+    }
+
+    private fun getRelativeTimeSpan(t: Long?): CharSequence? {
+        if (t == null || t <= 0L) return "0"
+
+        val now = System.currentTimeMillis()
+        // returns a string describing 'time' as a time relative to 'now'
+        return DateUtils.getRelativeTimeSpanString(
+            t,
+            now,
+            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        )
+    }
+
     private fun getConfigFilePath(): String {
         return applicationContext.filesDir.absolutePath +
                 File.separator +

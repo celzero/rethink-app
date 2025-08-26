@@ -5338,10 +5338,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         stats.append("Firewall:\n${firewallStats()}\n")
         //stats.append("DNS: ${dnsStats()}\n")
         stats.append("Proxy:\n${proxyStats()}\n")
+        stats.append("WireGuard:\n${wireguardStats()}\n")
         //stats.append("RPN:\n${rpnStats()}\n")
         stats.append("IpRules:\n${ipRulesStats()}\n")
         stats.append("DomainRules:\n${domainRulesStats()}\n")
-
         return stats.toString()
     }
 
@@ -5379,6 +5379,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     private suspend fun domainRulesStats(): String {
         return DomainRulesManager.stats()
+    }
+
+    private suspend fun wireguardStats(): String {
+        return WireguardManager.stats()
     }
 
     fun screenLock() {
