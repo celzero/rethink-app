@@ -333,15 +333,16 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
             if (rule == null) return false
 
             return when (rule) {
-                RULE8.id -> true
                 RULE1H.id -> true
-                RULE9.id -> true
-                RULE9B.id -> true
-                RULE7.id -> true
                 RULE2B.id -> true
                 RULE2C.id -> true
                 RULE2F.id -> true
+                RULE2H.id -> true
                 RULE2I.id -> true
+                RULE7.id -> true
+                RULE8.id -> true
+                RULE9.id -> true
+                RULE9B.id -> true
                 RULE15.id -> true
                 else -> false
             }
