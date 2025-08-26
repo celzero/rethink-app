@@ -1000,11 +1000,10 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             val hasWifi = cap?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ?: false
             Logger.v(LOG_TAG_CONNECTION, "isNetworkCellular: netid: ${netId(network.networkHandle)}, hasCellular? $hasCellular, hasWifi? $hasWifi, metered? ${cm.isActiveNetworkMetered}")
             val isCellular = cap?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
-            val isWifi = cap?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
             // when "use all available networks" is enabled, both cellular and wifi can be active.
             // in this case, `cm` always returns true for TRANSPORT_CELLULAR when both are active.
             // mark cellular networks as true only if wifi is not active.
-            return isCellular && !isWifi
+            return isCellular
         }
 
         /**

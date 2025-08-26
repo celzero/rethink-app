@@ -1099,8 +1099,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val activeNetwork = cm.activeNetwork
             val cap = cm.getNetworkCapabilities(activeNetwork) ?: return false
             val isCellular = cap.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
-            val isWifi = cap.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
-            curnet.isActiveNetworkCellular = isCellular && !isWifi
+            curnet.isActiveNetworkCellular = isCellular
         }
         return curnet.isActiveNetworkMetered
     }
