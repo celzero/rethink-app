@@ -70,9 +70,8 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
 
     private fun setupClickListeners() {
 
-        b.settingsAntiCensorshipRl.setOnClickListener {
-            val intent = Intent(this, AntiCensorshipActivity::class.java)
-            startActivity(intent)
+        b.settingsExperimentalRl.setOnClickListener {
+            b.dvExperimentalSwitch.isChecked = !b.dvExperimentalSwitch.isChecked
         }
 
         b.dvExperimentalSwitch.setOnCheckedChangeListener { _, isChecked ->
