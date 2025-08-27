@@ -1130,8 +1130,8 @@
     <string name="firewall_rule_bypass_proxy" translatable="true">Proxy megkerülése (Bypass Proxy)</string>
     <string name="firewall_rule_paused_app" translatable="true">Alkalmazás szüneteltetve</string>
     <string name="firewall_rule_lockdown_wg" translatable="true">Zárolt proxy</string>
-    <string name="lbl_experimental" translatable="true">(kísérleti)</string>
-    <string name="wireguard_title" translatable="true">Biztonságos internetkapcsolat WireGuarddal</string>
+    <string name="lbl_experimental" translatable="true">(tapasztalat)</string>
+    <string name="wireguard_title" translatable="true">Biztonságos internet WireGuard</string>
     <string name="lbl_hop" translatable="true">Átjátszó</string>
     <string name="lbl_manual" translatable="true">Kézikönyv</string>
     <string name="lbl_fallback" translatable="true">Tartalék</string>
