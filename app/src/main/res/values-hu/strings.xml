@@ -1154,4 +1154,6 @@
     <string name="close_all" translatable="true">Összes bezárása</string>
     <string name="processing_dialog_title" translatable="true">Feldolgozás</string>
     <string name="copied_clipboard" translatable="true">Másolva</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">Törli ennek a szabálynak a naplóit?</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">Ez csak a jelenleg megtekintett tűzfalszabályhoz tartozó hálózati naplókat törli. Ez a művelet nem visszavonható. Folytatja?</string>
 </resources>
