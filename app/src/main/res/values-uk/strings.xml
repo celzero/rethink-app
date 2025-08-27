@@ -1182,4 +1182,6 @@
     <string name="use_fallback_dns_to_bypass_desc" translatable="true">Якщо ввімкнено, завжди використовується резервний DNS для обійдених програм, доменів та IP-адрес.</string>
     <string name="title_database_dump" translatable="true">Стан бази даних</string>
     <string name="copied_clipboard" translatable="true">Скопійовано</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">Видалити журнали для цього правила?</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">Це видалить лише мережеві журнали для поточного правила брандмауера. Цю операцію неможливо скасувати. Продовжити?</string>
 </resources>
