@@ -1148,4 +1148,10 @@
     <string name="use_fallback_dns_to_bypass" translatable="true">Tartalék DNS használata megkerülésként</string>
     <string name="use_fallback_dns_to_bypass_desc" translatable="true">Ha engedélyezve van, mindig a tartalék DNS-t használja a megkerült alkalmazásokhoz, domainekhez és IP-címekhez.</string>
     <string name="title_database_dump" translatable="true">Adatbázis állapota</string>
+    <string name="lbl_always" translatable="true">Mindig</string>
+    <string name="about_terms_of_service" translatable="true">Általános szerződési feltételek</string>
+    <string name="adv_taster_title" translatable="true">Automatizáció</string>
+    <string name="close_all" translatable="true">Összes bezárása</string>
+    <string name="processing_dialog_title" translatable="true">Feldolgozás</string>
+    <string name="copied_clipboard" translatable="true">Másolva</string>
 </resources>
