@@ -353,7 +353,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             uiCtx {
                 if (!isAdded) return@uiCtx
                 if (tables.isEmpty()) {
-                    showToastUiCentered(requireContext(), getString(R.string.config_add_success_toast), Toast.LENGTH_SHORT)
+                    showToastUiCentered(requireContext(), getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
                     return@uiCtx
                 }
                 val appended = mutableSetOf<String>()
@@ -380,7 +380,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 listView.onItemClickListener = android.widget.AdapterView.OnItemClickListener { _, _, position, _ ->
                     val table = tables[position]
                     if (appended.contains(table)) {
-                        showToastUiCentered(ctx, getString(R.string.hs_download_negative_default), Toast.LENGTH_SHORT)
+                        showToastUiCentered(ctx, getString(R.string.config_add_success_toast), Toast.LENGTH_SHORT)
                         return@OnItemClickListener
                     }
                     appended.add(table)
