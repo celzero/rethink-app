@@ -1205,4 +1205,6 @@
     <string name="vpn_policy_relaxed" translatable="true">Расслабленный</string>
     <string name="title_database_dump" translatable="true">Состояние базы данных</string>
     <string name="copied_clipboard" translatable="true">Скопировано</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">Удалить журнал для этого правила?</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">Это приведет к удалению только сетевых журналов для текущего правила фаервола. Эта операция необратима. Продолжить?</string>
 </resources>
