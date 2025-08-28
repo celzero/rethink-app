@@ -1402,7 +1402,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     private fun registerUserPresentReceiver() {
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_USER_PRESENT)
-            addAction(Intent.ACTION_USER_UNLOCKED)
         }
         registerReceiver(userPresentReceiver, filter)
         Logger.i(LOG_TAG_VPN, "user present receiver registered")
