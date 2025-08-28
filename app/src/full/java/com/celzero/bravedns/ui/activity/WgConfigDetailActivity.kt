@@ -239,9 +239,11 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             uiCtx {
                 if (dnsStatusId != null && isDnsError(dnsStatusId)) {
                     // check for dns failure cases and update the UI
-                    b.interfaceDetailCard.strokeColor = fetchColor(this, R.attr.chipTextNegative)
                     b.statusText.text = getString(R.string.status_failing)
                         .replaceFirstChar(Char::titlecase)
+                    b.interfaceDetailCard.strokeWidth = 2
+                    b.interfaceDetailCard.strokeColor = fetchColor(this, R.attr.chipTextNegative)
+                    return@uiCtx
                 } else if (statusPair.first != null) {
                     val handshakeTime = getHandshakeTime(stats).toString()
                     val statusText = getIdleStatusText(ps, stats)

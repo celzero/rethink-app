@@ -296,7 +296,8 @@ class Constants {
                 DefaultDnsServer(0, "System", "", "None"),
                 DefaultDnsServer(1, "Rethink", "https://zero.rethinkdns.com/dns-query", "DoH"),
                 DefaultDnsServer(2, "Google", "https://dns.google/dns-query", "DoH"),
-                DefaultDnsServer(3, "Cloudflare", "https://cloudflare-dns.com/dns-query", "DoH")
+                DefaultDnsServer(3, "Cloudflare", "https://cloudflare-dns.com/dns-query", "DoH"),
+                DefaultDnsServer(4, "Quad9", "https://dns.quad9.net/dns-query", "DoH")
             )
 
         // pcap folder name

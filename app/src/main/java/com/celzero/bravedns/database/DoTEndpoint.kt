@@ -49,7 +49,7 @@ class DoTEndpoint {
         id: Int,
         name: String,
         url: String,
-        desc: String,
+        desc: String?,
         isSelected: Boolean,
         isCustom: Boolean,
         isSecure: Boolean,

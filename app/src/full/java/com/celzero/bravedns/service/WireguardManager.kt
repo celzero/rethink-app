@@ -376,13 +376,13 @@ object WireguardManager : KoinComponent {
     }
 
     // no need to check for app excluded from proxy here, expected to call this fn after that
-    suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMobileNw: Boolean, default: String = ""): List<String> {
+    suspend fun getAllPossibleConfigIdsForApp(uid: Int, ip: String, port: Int, domain: String, usesMobileNw: Boolean, default: String): List<String> {
         val block = Backend.Block
         val proxyIds: MutableList<String> = mutableListOf()
         if (oneWireGuardEnabled()) {
             val id = getOneWireGuardProxyId()
             if (id == null || id == INVALID_CONF_ID) {
-                Logger.e(LOG_TAG_PROXY, "canAdd: one-wg not found, id: $id, return ${emptyList<String>()}")
+                Logger.e(LOG_TAG_PROXY, "canAdd: one-wg not found, id: $id, return empty")
                 return emptyList<String>()
             }
 
@@ -504,7 +504,7 @@ object WireguardManager : KoinComponent {
 
         val cac = mappings.filter { it.isActive && it.isCatchAll }
         cac.forEach {
-            if (checkEligibilityBasedOnNw(it.id, usesMobileNw)) {
+            if (checkEligibilityBasedOnNw(it.id, usesMobileNw) && !proxyIds.contains(ID_WG_BASE + it.id)) {
                 proxyIds.add(ID_WG_BASE + it.id)
                 Logger.i(
                     LOG_TAG_PROXY,
@@ -877,7 +877,7 @@ object WireguardManager : KoinComponent {
         addOrUpdateConfigFileMapping(cfg, file?.toImmutable(), path, serverResponse)
         addOrUpdateConfig(cfg)
         if (file?.isActive == true) {
-            VpnController.addWireGuardProxy(id = ID_WG_BASE + cfg.getId())
+            VpnController.addWireGuardProxy(id = ID_WG_BASE + cfg.getId(), force = true)
         }
     }
 
@@ -917,6 +917,36 @@ object WireguardManager : KoinComponent {
             mappings.remove(configFile)
             mappings.add(file)
         }
+    }
+
+    suspend fun stats(): String {
+        val sb = StringBuilder()
+        mappings.filter { it.isActive }.forEach {
+            val id = ID_WG_BASE + it.id
+            val stats = VpnController.getProxyStats(id)
+            sb.append("   id: ${it.id}, name: ${it.name}\n")
+            sb.append("   addr: ${stats?.addr}").append("\n")
+            sb.append("   rx: ${stats?.rx}\n")
+            sb.append("   tx: ${stats?.tx}\n")
+            sb.append("   lastRx: ${getRelativeTimeSpan(stats?.lastRx)}\n")
+            sb.append("   lastTx: ${getRelativeTimeSpan(stats?.lastTx)}\n")
+            sb.append("   lastOk: ${getRelativeTimeSpan(stats?.lastOK)}\n")
+            sb.append("   since: ${getRelativeTimeSpan(stats?.since)}\n")
+        }
+        return sb.toString()
+    }
+
+    private fun getRelativeTimeSpan(t: Long?): CharSequence? {
+        if (t == null || t <= 0L) return "0"
+
+        val now = System.currentTimeMillis()
+        // returns a string describing 'time' as a time relative to 'now'
+        return DateUtils.getRelativeTimeSpanString(
+            t,
+            now,
+            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        )
     }
 
     private fun getConfigFilePath(): String {

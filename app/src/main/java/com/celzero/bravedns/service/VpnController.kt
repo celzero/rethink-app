@@ -311,20 +311,20 @@ object VpnController : KoinComponent {
         braveVpnService?.removeWireGuardProxy(id)
     }
 
-    suspend fun addWireGuardProxy(id: String) {
-        braveVpnService?.addWireGuardProxy(id)
+    suspend fun addWireGuardProxy(id: String, force: Boolean = false) {
+        braveVpnService?.addWireGuardProxy(id, force)
     }
 
     suspend fun refreshOrPauseOrResumeOrReAddProxies() {
         braveVpnService?.refreshOrPauseOrResumeOrReAddProxies()
     }
 
-    fun closeConnectionsIfNeeded(uid: Int = INVALID_UID) {
-        braveVpnService?.closeConnectionsIfNeeded(uid)
+    fun closeConnectionsIfNeeded(uid: Int = INVALID_UID, reason: String) {
+        braveVpnService?.closeConnectionsIfNeeded(uid, reason)
     }
 
-    fun closeConnectionsByUidDomain(uid: Int, ipAddress: String?) {
-        braveVpnService?.closeConnectionsByUidDomain(uid, ipAddress)
+    fun closeConnectionsByUidDomain(uid: Int, ipAddress: String?, reason: String) {
+        braveVpnService?.closeConnectionsByUidDomain(uid, ipAddress, reason)
     }
 
     suspend fun getDnsStatus(id: String): Long? {
@@ -417,10 +417,6 @@ object VpnController : KoinComponent {
 
     suspend fun getPlusTransportById(id: String): DNSTransport? {
         return braveVpnService?.getPlusTransportById(id)
-    }
-
-    fun screenLock() {
-        braveVpnService?.screenLock()
     }
 
     fun isUnderlyingVpnNetworkEmpty(): Boolean {

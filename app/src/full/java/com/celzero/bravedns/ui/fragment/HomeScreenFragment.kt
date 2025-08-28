@@ -47,6 +47,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import com.celzero.firestack.backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -408,7 +409,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun enableProxyCardIfNeeded() {
         if (isVpnActivated && !appConfig.getBraveMode().isDnsMode()) {
-            if (persistentState.getProxyStatus().value != -1) {
+            val isAnyProxyEnabled = appConfig.isProxyEnabled()
+            if (isAnyProxyEnabled) {
                 observeProxyStates()
             } else {
                 disableProxyCard()
@@ -468,7 +470,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private var proxyStateListenerJob: Job? = null
 
     private fun observeProxyStates() {
-        persistentState.getProxyStatus().observe(viewLifecycleOwner) {
+        persistentState.getProxyStatus().distinctUntilChanged().observe(viewLifecycleOwner) {
             Logger.vv(LOG_TAG_UI, "$TAG proxy state changed to $it")
             if (it != -1) {
                 if (proxyStateListenerJob?.isActive == true) {
@@ -738,7 +740,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             updateUiWithDnsStates(it)
         }
 
-        VpnController.getRegionLiveData().observe(viewLifecycleOwner) {
+        VpnController.getRegionLiveData().distinctUntilChanged().observe(viewLifecycleOwner) {
             if (it != null) {
                 b.fhsCardRegion.text = it.uppercase()
             }

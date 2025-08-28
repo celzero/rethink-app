@@ -201,7 +201,7 @@ interface ConnectionTrackerDAO {
     fun getDataUsage(from: Long, to: Long): List<DataUsage>
 
     @Query(
-        "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, ict.meteredDataUsage as meteredDataUsage from ConnectionTracker as ct join (select sum(downloadBytes + uploadBytes) as meteredDataUsage from ConnectionTracker where connType like :meteredTxt and timeStamp > :to) as ict where timeStamp > :to"
+        "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, (select sum(downloadBytes + uploadBytes) from ConnectionTracker where connType = :meteredTxt and timeStamp > :to) as meteredDataUsage from ConnectionTracker as ct where ct.timeStamp > :to"
     )
     fun getTotalUsages(to: Long, meteredTxt: String): DataUsageSummary
 
@@ -216,9 +216,9 @@ interface ConnectionTrackerDAO {
     )
     fun getTotalUsagesByWgId(to: Long, meteredTxt: String, wgId: String): DataUsageSummary
 
-    @Query("update ConnectionTracker set message = 'manual-close', duration = 0 where connId in (:connIds)")
-    fun closeConnections(connIds: List<String>)
+    @Query("update ConnectionTracker set message = :reason, duration = 0 where connId in (:connIds)")
+    fun closeConnections(connIds: List<String>, reason: String)
 
-    @Query("update ConnectionTracker set message = 'manual-close', duration = 0 where uid in (:uids)")
-    fun closeConnectionForUids( uids: List<Int> )
+    @Query("update ConnectionTracker set message = :reason, duration = 0 where uid in (:uids)")
+    fun closeConnectionForUids( uids: List<Int>, reason: String)
 }
