@@ -1,0 +1,1 @@
+Thiết lập tường lửa ứng dụng, sử dụng VPN WireGuard, giám sát mạng, chặn phần mềm độc hại, thay đổi DNS.

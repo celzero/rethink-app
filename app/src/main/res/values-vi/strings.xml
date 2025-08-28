@@ -56,7 +56,7 @@
     <string name="custom_url_error_invalid_url" translatable="true">URL không hợp lệ</string>
     <string name="conn_track_clear_logs_title" translatable="true">Xóa tất cả nhật ký mạng\?</string>
     <string name="ssv_see_more" translatable="true">Hiển thị tất cả</string>
-    <string name="slide_1_desc" translatable="true">RethinkDNS là một phần mềm nguồn mở được hỗ trợ bởi chương trình MVP của Mozilla Builders.</string>
+    <string name="slide_1_desc" translatable="true">Rethink là một phần mềm mã nguồn mở được hỗ trợ bởi chương trình MVP của Mozilla Builders, FOSS United Foundation.</string>
     <string name="slide_2_desc" translatable="true">RethinkDNS là cách dễ nhất để giám sát hoạt động mạng, vượt qua kiểm duyệt Internet và các ứng dụng tường lửa trên thiết bị Android của bạn.</string>
     <string name="rdns_plus" translatable="true">RDNS Plus</string>
     <string name="hybrid_mode_notification_title" translatable="true">Được bảo vệ! Đã kết nối với DNS + Tường lửa.</string>
@@ -350,7 +350,7 @@
     <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s ứng dụng khác</string>
     <string name="dns_btm_resolved_doh" translatable="true">đã giải quyết %1$s bởi %2$s</string>
     <string name="dns_btm_resolved_doh_no_server" translatable="true">đã giải quyết %1$s</string>
-    <string name="dns_btm_latency_ms" translatable="true">%1$sms</string>
+    <string name="dns_btm_latency_ms" translatable="true">%1$ss</string>
     <string name="hs_download_positive_play_store" translatable="true">Hoàn thành cập nhật</string>
     <string name="hs_download_positive_website" translatable="true">Truy cập Website</string>
     <string name="hs_download_negative_default" translatable="true">Nhắc tôi sau</string>
@@ -381,7 +381,7 @@
     <string name="cd_doh_dialog_heading" translatable="true">Thêm DNS qua HTTPS</string>
     <string name="cd_doh_dialog_resolver_url" translatable="true">URL trình phân giải</string>
     <string name="cd_dns_alg_heading" translatable="true">Lọc DNS nâng cao (thử nghiệm)</string>
-    <string name="cd_dns_alg_desc" translatable="true">Gán IP riêng cho mỗi yêu cầu DNS</string>
+    <string name="cd_dns_alg_desc" translatable="true">Gán IP riêng cho mỗi yêu cầu DNS.</string>
     <string name="dns_log_dialog_positive" translatable="true">Xóa nhật ký</string>
     <string name="dns_btm_sheet_dialog_ips" translatable="true"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="univ_firewall_rule_4" translatable="true">Chặn UDP ngoại trừ DNS và NTP</string>
@@ -415,7 +415,7 @@
     <string name="about_bravedns_toreport_text" translatable="true">trợ giúp &amp; phản hồi</string>
     <string name="about_docs" translatable="true">đọc tài liệu</string>
     <string name="dc_check_update_heading" translatable="true">Nhắc nhở khi danh sách chặn có cập nhật</string>
-    <string name="about_mozilla" translatable="true">Rethink được ủng hộ bởi Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
+    <string name="about_mozilla" translatable="true">Rethink được ủng hộ bởi Mozilla Builders, FOSS United Foundation.</string>
     <string name="dc_check_update_desc" translatable="true">Kiểm tra bản cập nhật danh sách chặn <i>ba</i> ngày một lần</string>
     <string name="about_bravedns_whoarewe" translatable="true">Rethink là một dự án mã nguồn mở miễn phí, được dẫn dắt bởi các cựu kĩ sư từ Amazon, IBM, và Scientific Games.</string>
     <string name="about_app_translate" translatable="true">Dịch</string>
@@ -503,7 +503,7 @@
     <string name="about_mail_to_string" translatable="true">mailto:</string>
     <string name="network_log_app_name_unknown" translatable="true">Không rõ</string>
     <string name="rules_load_failure_heading" translatable="true">Ghi chú</string>
-    <string name="rules_load_failure_desc" translatable="true">Không tìm thấy quy tắc tường lửa</string>
+    <string name="rules_load_failure_desc" translatable="true">Không tìm thấy quy tắc tường lửa nào</string>
     <string name="rules_load_failure_reload" translatable="true">tải lại</string>
     <string name="lbl_random" translatable="true">(ngẫu nhiên)</string>
     <string name="lbl_mtu" translatable="true">MTU</string>
@@ -535,12 +535,12 @@
     <string name="fapps_exclude_block_dialog_title" translatable="true">Loại trừ ứng dụng</string>
     <string name="fapps_firewall_filter_hint" translatable="true">Hiện tất cả ứng dụng</string>
     <string name="fapps_info_exclude_msg" translatable="true">Loại trừ khỏi cả DNS + Tường lửa.</string>
-    <string name="fapps_exclude_block_dialog_message" translatable="true">Loại trừ các ứng dụng <i>được liệt kê</i> khỏi DNS và Tường lửa\?</string>
+    <string name="fapps_exclude_block_dialog_message" translatable="true">Loại trừ các ứng dụng <i>được liệt kê</i> khỏi DNS và Tường lửa?</string>
     <string name="dns_crypt_connection_failure" translatable="true">Lỗi kết nối với máy chủ DNSCrypt.</string>
     <string name="dns_proxy_toast_parameter" translatable="true">DNS Proxy</string>
     <string name="copy_clipboard_label" translatable="true">URL</string>
     <string name="socks5_proxy_toast_parameter" translatable="true">SOCKS5 Proxy</string>
-    <string name="update_complete_snack_message" translatable="true">Phiên bản mới đã được tải xuống</string>
+    <string name="update_complete_snack_message" translatable="true">Phiên bản mới đã được tải xuống.</string>
     <string name="update_complete_action_snack" translatable="true">KHỞI ĐỘNG LẠI</string>
     <string name="lbl_applications" translatable="true">Ứng dụng</string>
     <string name="ada_ip_no_connection" translatable="true">Không có nhật ký mạng cho ứng dụng này</string>
@@ -676,8 +676,63 @@
     <string name="fapps_isolate_block_dialog_message" translatable="true">Cô lập các ứng dụng <i>được liệt kê </i>\?</string>
     <string name="settings_rinr_dialog_title" translatable="true">Loopback (thử nghiệm)</string>
     <string name="fapps_isolate_block_dialog_title" translatable="true">Cô lập ứng dụng</string>
-    <string name="fapps_firewall_filter_desc" translatable="true">Đang hiển thị các ứng dụng <u>%1$s</u> %2$s</string>
-    <string name="fapps_firewall_filter_desc_category" translatable="true">Đang hiển thị các ứng dụng <u>%1$s</u> %2$s trong danh mục: %3$s</string>
+    <string name="fapps_firewall_filter_desc" translatable="true"><![CDATA[Đang hiển thị <u>%1$s</u> %2$s ứng dụng]]></string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true"><![CDATA[Đang hiển thị <u>%1$s</u> %2$s ứng dụng trong các danh mục: %3$s]]></string>
     <string name="fapps_unblock_dialog_title" translatable="true">Cho phép ứng dụng</string>
     <string name="fapps_unblock_dialog_message" translatable="true">Cho phép kết nối cho các ứng dụng <i>được liệt kê </i>\?</string>
+    <string name="lbl_test" translatable="true">thử</string>
+    <string name="lbl_experimental" translatable="true">(thử nghiệm)</string>
+    <string name="lbl_service_providers" translatable="true">Nhà cung cấp dịch vụ</string>
+    <string name="lbl_manual" translatable="true">Thủ công</string>
+    <string name="lbl_fallback" translatable="true">Dự phòng</string>
+    <string name="wireguard_title" translatable="true">Internet bảo mật với WireGuard</string>
+    <string name="wireguard_desc" translatable="true">Mã hóa giao thông mạng của bạn với WireGuard. Chọn những lối đi khác nhau cho từng ứng dụng.</string>
+    <string name="firewall_title" translatable="true">Bảo vệ Android của bạn với tường lửa</string>
+    <string name="firewall_desc" translatable="true">Kiểm soát truy cập internet; hạn chế kết nối dựa trên ứng dụng hoặc hoạt động mạng.</string>
+    <string name="dns_title" translatable="true">Chặn quảng cáo &amp; phần mềm độc hại với DNS</string>
+    <string name="dns_desc" translatable="true">Chọn từ hơn 190 danh sách để chặn quảng cáo, trình theo dõi và phần mềm độc hại.</string>
+    <string name="status_no_network" translatable="true">không có mạng</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">Xóa nhật kí cho quy tắc này?</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">Việc này sẽ chỉ xóa nhật kí mạng cho quy tắc tường lửa hiện đang xem. Thao tác này không thể được thu hồi. Bạn có muốn tiếp tục?</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Chỉ coi mạng dữ liệu di động là giới hạn, còn lại là không giới hạn.</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">Sáng Nâng cao</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">Tối Nâng cao</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">Xác thực sinh trắc học</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">Không</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">Ngay lập tức</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">Sau 5 phút</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">Sau 15 phút</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">Bạn đã sử dụng Rethink được <b>%1$s ngày</b>, tương đương với chi phí sử dụng là <b>$%2$s</b>. Bạn có muốn tài trợ để duy trì sự phát triển của ứng dụng này không?</string>
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Sử dụng DNS hệ thống cho những tên miền không được chuyển giao</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Sử dụng DNS hệ thống cho những tên miền không được chuyển giao như <i>.lan</i>, <i>.internal</i>,...</string>
+    <string name="cd_split_dns_heading" translatable="true">Tách DNS (thử nghiệm)</string>
+    <string name="cd_split_dns_desc" translatable="true">Chuyển hướng yêu cầu DNS từ những ứng dụng có proxy tới máy chủ DNS của proxy.</string>
+    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Coi quy tắc DNS như quy tắc tường lửa (thử nghiệm)</string>
+    <string name="univ_firewall_rule_11" translatable="true">Chặn mọi kết nối máy chủ cục bộ</string>
+    <string name="univ_delete_domain_dialog_title" translatable="true">Xóa tất cả Quy tắc Tên miền?</string>
+    <string name="univ_delete_domain_dialog_message" translatable="true">Việc xóa những quy tắc trên sẽ cho phép bất kì ứng dụng nào truy cập vào những Tên miền hiện đang bị chặn.</string>
+    <string name="network_log_app_name_unnamed" translatable="true">Không tên (%1$s)</string>
+    <string name="dns_proxy_connection_failure" translatable="true">Lỗi kết nối tới máy chủ DNS Proxy.</string>
+    <string name="dns_proxy_connection_failure_lockdown" translatable="true">Việc loại trừ %1$s cho %2$s trong chế độ phong tỏa có thể gây ra vấn đề kết nối mạng.</string>
+    <string name="orbot_toast_parameter" translatable="true">Tor-với-tư-cách-là-proxy</string>
+    <string name="system_dns_connection_failure" translatable="true">Không thể xác định máy chủ DNS hiện tại</string>
+    <string name="settings_local_blocklist_in_use" translatable="true">%1$s danh sách chặn đang dùng</string>
+    <string name="settings_local_blocklist_dialog_positive" translatable="true">Tải</string>
+    <string name="settings_local_blocklist_version" translatable="true">Phiên bản: v%1$s</string>
+    <string name="accessibility_notification_content" translatable="true">Dịch vụ trợ năng Rethink đã dừng hoặc sập. Tạm dừng việc chặn ứng dụng chạy nền. Nhấn để kích hoạt lại.</string>
+    <string name="accessibility_failure_toast" translatable="true">Dịch vụ trợ năng Rethink đã dừng hoặc sập. Tạm dừng việc chặn ứng dụng chạy nền.</string>
+    <string name="coming_soon_toast" translatable="true">sắp ra mắt</string>
+    <string name="toast_allow_bypass_disabled" translatable="true">%1$s bị vô hiệu hóa vì đang có proxy hoạt động</string>
+    <string name="pause_text" translatable="true">tạm dừng</string>
+    <string name="pause_desc" translatable="true">Chú ý: %1$s ứng dụng bị chặn sẽ tiếp tục bị chặn bởi tường lửa.</string>
+    <string name="other_dns_list_tab1" translatable="true">DoH</string>
+    <string name="other_dns_list_tab2" translatable="true">Dnscrypt</string>
+    <string name="other_dns_list_tab3" translatable="true">Dns Proxy</string>
+    <string name="hs_btm_sheet_lock_down" translatable="true">Không thể đổi chế độ khi VPN ở <i>chế độ phong tỏa</i>. Nhấn để &lt;u&gt;thay đổi cài đặt VPN&lt;/u&gt;.</string>
+    <string name="firewall_rule_no_rule" translatable="true">Không có quy tắc nào</string>
+    <string name="firewall_rule_block_app" translatable="true">Ứng dụng đã bị chặn</string>
+    <string name="firewall_rule_block_unmetered" translatable="true">Không giới hạn (WiFi)</string>
+    <string name="firewall_rule_block_metered" translatable="true">Giới hạn (Dữ liệu di động)</string>
+    <string name="firewall_rule_univ_block_metered" translatable="true">Giới hạn (Chung)</string>
+    <string name="firewall_rule_isolate" translatable="true">Cách ly</string>
 </resources>
