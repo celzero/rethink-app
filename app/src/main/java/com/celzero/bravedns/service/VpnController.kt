@@ -419,10 +419,6 @@ object VpnController : KoinComponent {
         return braveVpnService?.getPlusTransportById(id)
     }
 
-    fun screenLock() {
-        braveVpnService?.screenLock()
-    }
-
     fun isUnderlyingVpnNetworkEmpty(): Boolean {
         return braveVpnService?.isUnderlyingVpnNetworkEmpty() ?: false
     }

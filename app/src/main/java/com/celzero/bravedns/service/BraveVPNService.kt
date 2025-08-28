@@ -5385,10 +5385,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return WireguardManager.stats()
     }
 
-    fun screenLock() {
-        // no-op
-    }
-
     fun screenUnlock() {
         io("screenUnlock") {
             // initiate wireguard ping for one wg, catch-all, hop proxies
