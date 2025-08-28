@@ -65,7 +65,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
     private var lifecycleOwner: LifecycleOwner? = null
 
     companion object {
-        private const val ONE_SEC_MS = 1500L
+        private const val DELAY_MS = 1500L
         private const val TAG = "WgConfigAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
@@ -164,7 +164,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             return io {
                 while (true) {
                     updateStatus(config)
-                    delay(ONE_SEC_MS)
+                    delay(DELAY_MS)
                 }
             }
         }

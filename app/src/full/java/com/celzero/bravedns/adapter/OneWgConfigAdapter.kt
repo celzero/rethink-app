@@ -66,7 +66,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
     }
 
     companion object {
-        private const val ONE_SEC = 1500L
+        private const val DELAY_MS = 1500L
         private const val TAG = "OneWgConfigAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
@@ -138,7 +138,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             job = io {
                 while (true) {
                     updateStatus(config)
-                    delay(ONE_SEC)
+                    delay(DELAY_MS)
                 }
             }
         }
