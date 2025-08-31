@@ -1,2 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="title_about" translatable="true">درباره</string>
+    <string name="settings_title_desc" translatable="true">یک دی‌ان‌اس و دیوار آتش با قابلیت شخصی سازی بسیار</string>
+    <string name="about_title_desc" translatable="true">تهدیدات امنیتی شبکه را تشخیص و مسدود کنید</string>
+    <string name="txt_home" translatable="true">خانه</string>
+    <string name="accessibility_service_description" translatable="true">ری‌ثینک از سرویس دسترسی‌پذیری برای تشخیص و فایروال کردن برنامه‌های پس‌زمینه استفاده می‌کند. ری‌ثینک هیچ اطلاعاتی را جمع‌آوری نکرده و نمی‌فروشد.</string>
+    <string name="next" translatable="true">بعدی</string>
+    <string name="skip" translatable="true">رد شدن</string>
+    <string name="finish" translatable="true">پایان</string>
+    <string name="lbl_cancel" translatable="true">لغو</string>
+    <string name="lbl_apply" translatable="true">اعمال</string>
+    <string name="lbl_dismiss" translatable="true">لغو اعمال</string>
+    <string name="lbl_all" translatable="true">همه</string>
+    <string name="lbl_allowed" translatable="true">مجاز</string>
+    <string name="lbl_maybe_blocked" translatable="true">شاید مسدود</string>
+    <string name="lbl_blocked" translatable="true">مسدود</string>
+    <string name="lbl_disabled" translatable="true">قطع شده</string>
+    <string name="lbl_domain" translatable="true">دامین</string>
+</resources>
