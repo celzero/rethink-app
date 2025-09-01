@@ -509,7 +509,7 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
                 }
 
             } catch (e: Exception) {
-                Logger.w(LOG_TAG_CONNECTION, "err while unregistering", e)
+                Logger.w(LOG_TAG_CONNECTION, "err while unregistering; ${e.message}")
             }
 
         }
