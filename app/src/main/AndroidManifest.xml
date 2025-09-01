@@ -18,6 +18,12 @@
     <!-- Allows applications to change network connectivity state -->
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- WiFi and Location permissions required for SSID access -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    
     <!-- Android 11 introduces changes related to package visibility. These changes affect
     apps only if they target Android 11.
     https://developer.android.com/training/package-visibility -->

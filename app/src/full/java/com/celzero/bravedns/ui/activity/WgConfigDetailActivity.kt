@@ -17,14 +17,17 @@ package com.celzero.bravedns.ui.activity
 
 import Logger
 import Logger.LOG_TAG_PROXY
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,6 +35,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.adapter.WgPeersAdapter
+import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.databinding.ActivityWgDetailBinding
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.PersistentState
@@ -51,6 +55,7 @@ import com.celzero.bravedns.ui.dialog.WgHopDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.NewSettingsManager
+import com.celzero.bravedns.util.SsidPermissionManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
@@ -84,6 +89,37 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private var wgInterface: WgInterface? = null
     private val peers: MutableList<Peer> = mutableListOf()
     private var wgType: WgType = WgType.DEFAULT
+
+    // SSID permission handling
+    private val ssidPermissionCallback = object : SsidPermissionManager.PermissionCallback {
+        override fun onPermissionsGranted() {
+            // Check if location is enabled after permissions are granted
+            if (!SsidPermissionManager.isLocationEnabled(this@WgConfigDetailActivity)) {
+                showLocationEnableDialog()
+                return
+            }
+
+            // Enable SSID settings UI and reload configuration
+            updateSsidPermissionState(true)
+            val cfg = WireguardManager.getConfigFilesById(configId)
+            setupSsidSection(cfg)
+        }
+
+        override fun onPermissionsDenied() {
+            // Disable SSID switch and show explanation
+            updateSsidPermissionState(false)
+            Utilities.showToastUiCentered(
+                this@WgConfigDetailActivity,
+                getString(R.string.ssid_permission_explanation),
+                Toast.LENGTH_LONG
+            )
+        }
+
+        override fun onPermissionsRationale() {
+            // Show explanation dialog before requesting permissions
+            showSsidPermissionExplanationDialog()
+        }
+    }
 
     companion object {
         private const val CLIPBOARD_PUBLIC_KEY_LBL = "Public Key"
@@ -151,7 +187,9 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }
 
         b.hopBtn.text = getString(R.string.two_argument_space, getString(R.string.hop_add_remove_title), getString(R.string.lbl_experimental))
-        b.editBtn.text = getString(R.string.rt_edit_dialog_positive).lowercase()
+        b.editBtn.text = getString(R.string.rt_edit_dialog_positive).uppercase()
+        b.deleteBtn.text = getString(R.string.lbl_delete).uppercase()
+
         b.globalLockdownTitleTv.text =
             getString(
                 R.string.two_argument_space,
@@ -219,7 +257,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.applicationsBtn.isEnabled = false
             // texts are updated based on the catch all and one-wg
         }
-
+        setupSsidSection(mapping)
         io { updateStatusUi(config.getId()) }
         prefillConfig(config)
     }
@@ -490,13 +528,20 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         b.catchAllCheck.setOnClickListener { updateCatchAll(b.catchAllCheck.isChecked) }
 
         b.useMobileCheck.setOnClickListener {
-            val sid = ID_WG_BASE + configId
-            if (WgHopManager.isAlreadyHop(sid)) {
+            val mapping = WireguardManager.getConfigFilesById(configId)
+            if (mapping?.ssidEnabled == true) {
+                // ssid is enabled, cannot enable mobile only
                 Utilities.showToastUiCentered(
                     this,
-                    getString(R.string.wg_mobile_only_hop_err, getString(R.string.lbl_hop)),
+                    getString(R.string.wg_ssid_and_mobile_err),
                     Toast.LENGTH_LONG
                 )
+                b.useMobileCheck.isChecked = !b.useMobileCheck.isChecked
+                return@setOnClickListener
+            }
+            val sid = ID_WG_BASE + configId
+            if (WgHopManager.isAlreadyHop(sid)) {
+                Utilities.showToastUiCentered(this, getString(R.string.wg_mobile_only_hop_err), Toast.LENGTH_LONG)
                 b.useMobileCheck.isChecked = !b.useMobileCheck.isChecked
                 return@setOnClickListener
             }
@@ -748,5 +793,210 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    // SSID section setup
+    private fun setupSsidSection(cfg: WgConfigFilesImmutable?) {
+        val sw = b.ssidCheck
+        val editGroup = b.ssidEditGroup
+        val displayGroup = b.ssidDisplayGroup
+        val editText = b.ssidEditText
+        val okBtn: AppCompatImageView = b.ssidOkBtn
+        val editBtn: AppCompatImageView = b.ssidEditBtn
+        val valueTv = b.ssidValueTv
+        val layout = b.ssidFilterRl
+
+        if (cfg == null) {
+            hideSsidExtras(editGroup, displayGroup)
+            sw.isEnabled = false
+            Logger.w(LOG_TAG_UI, "setupSsidSection: cfg is null for $configId")
+            return
+        }
+
+        // Check if device supports required features
+        if (!SsidPermissionManager.isDeviceSupported(this)) {
+            hideSsidExtras(editGroup, displayGroup)
+            sw.isEnabled = false
+            layout.visibility = View.GONE
+            Logger.w(LOG_TAG_UI, "setupSsidSection: device not supported for SSID feature")
+            return
+        }
+
+        sw.isEnabled = true
+        layout.visibility = View.VISIBLE
+        // Check permissions and location services are enabled
+        val hasPermissions = SsidPermissionManager.hasRequiredPermissions(this)
+        val isLocationEnabled = SsidPermissionManager.isLocationEnabled(this)
+        val canUseSsid = hasPermissions && isLocationEnabled
+        updateSsidPermissionState(canUseSsid)
+
+        val enabled = cfg.ssidEnabled && canUseSsid
+        val ssids = parseSsids(cfg.ssids)
+        sw.isChecked = enabled
+
+        if (enabled) {
+            if (ssids.isEmpty()) {
+                showSsidEdit(editGroup, displayGroup)
+            } else {
+                valueTv.text = ssids.joinToString(", ")
+                showSsidDisplay(editGroup, displayGroup)
+            }
+        } else {
+            hideSsidExtras(editGroup, displayGroup)
+        }
+
+        sw.setOnCheckedChangeListener { _, isChecked ->
+            val mapping = WireguardManager.getConfigFilesById(configId)
+            if (mapping?.useOnlyOnMetered == true && isChecked) {
+                Utilities.showToastUiCentered(
+                    this,
+                    getString(R.string.wg_ssid_and_mobile_err),
+                    Toast.LENGTH_LONG
+                )
+                sw.isChecked = false
+                return@setOnCheckedChangeListener
+            }
+            if (isChecked) {
+                // Check permissions before enabling SSID feature
+                if (!SsidPermissionManager.hasRequiredPermissions(this)) {
+                    // Reset the switch and request permissions
+                    sw.isChecked = false
+                    SsidPermissionManager.checkAndRequestPermissions(this, ssidPermissionCallback)
+                    Logger.d(LOG_TAG_UI, "SSID permissions not granted, requesting...")
+                    return@setOnCheckedChangeListener
+                }
+
+                // Check if location services are enabled
+                if (!SsidPermissionManager.isLocationEnabled(this)) {
+                    // Reset the switch and prompt user to enable location
+                    sw.isChecked = false
+                    showLocationEnableDialog()
+                    Logger.d(LOG_TAG_UI, "Location services not enabled, prompting user...")
+                    return@setOnCheckedChangeListener
+                }
+
+                // Permissions and location are available, proceed with enabling
+                io { WireguardManager.updateSsidEnabled(configId, isChecked) }
+                io { // reload ssids from manager
+                    val cur = WireguardManager.getConfigFilesById(configId)?.ssids ?: ""
+                    val list = parseSsids(cur)
+                    uiCtx {
+                        if (list.isEmpty()) {
+                            showSsidEdit(editGroup, displayGroup)
+                        } else {
+                            valueTv.text = list.joinToString(", ")
+                            showSsidDisplay(editGroup, displayGroup)
+                        }
+                    }
+                }
+                Logger.i(LOG_TAG_UI, "SSID feature enabled for configId: $configId")
+            } else {
+                // Disabling SSID feature
+                io { WireguardManager.updateSsidEnabled(configId, isChecked) }
+                hideSsidExtras(editGroup, displayGroup)
+                Logger.i(LOG_TAG_UI, "SSID feature disabled for configId: $configId")
+            }
+        }
+
+        layout.setOnClickListener { sw.performClick() }
+
+        okBtn.setOnClickListener {
+            val parsed = parseSsids(editText.text?.toString())
+            val ssids = if (parsed.isEmpty()) "" else parsed.joinToString(",")
+            io { WireguardManager.updateSsids(configId, ssids) }
+            valueTv.text = if (ssids.isEmpty()) getString(R.string.lbl_empty) else parsed.joinToString(", ")
+            showSsidDisplay(editGroup, displayGroup)
+            Utilities.showToastUiCentered(
+                this,
+                getString(R.string.config_add_success_toast),
+                Toast.LENGTH_SHORT
+            )
+        }
+
+        editBtn.setOnClickListener {
+            val current = parseSsids(cfg.ssids)
+            editText.setText(current.joinToString(", "))
+            showSsidEdit(editGroup, displayGroup)
+        }
+
+        editText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                okBtn.performClick(); true
+            } else false
+        }
+    }
+
+    private fun showSsidEdit(edit: View, display: View) {
+        edit.visibility = View.VISIBLE
+        display.visibility = View.GONE
+    }
+    private fun showSsidDisplay(edit: View, display: View) {
+        edit.visibility = View.GONE
+        display.visibility = View.VISIBLE
+    }
+    private fun hideSsidExtras(edit: View, display: View) {
+        edit.visibility = View.GONE
+        display.visibility = View.GONE
+    }
+
+    private fun parseSsids(raw: String?): List<String> {
+        if (raw.isNullOrBlank()) return emptyList()
+        return raw.split(',', '\n', '\r')
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
+            .take(50)
+    }
+
+    private fun showSsidPermissionExplanationDialog() {
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setTitle(getString(R.string.wg_setting_ssid_title))
+        builder.setMessage(SsidPermissionManager.getPermissionExplanation(this))
+        builder.setCancelable(false)
+        builder.setPositiveButton(getString(R.string.lbl_proceed)) { _, _ ->
+            SsidPermissionManager.requestSsidPermissions(this)
+        }
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ ->
+            dialog.dismiss()
+            updateSsidPermissionState(false)
+        }
+        builder.create().show()
+    }
+
+    private fun updateSsidPermissionState(granted: Boolean) {
+        if (!granted) {
+            b.ssidCheck.isChecked = false
+            // disable SSID feature in database if permissions are not granted
+            io { WireguardManager.updateSsidEnabled(configId, false) }
+        }
+    }
+
+    private fun showLocationEnableDialog() {
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setTitle(getString(R.string.wg_setting_ssid_title))
+        builder.setMessage(SsidPermissionManager.getLocationEnableExplanation(this))
+        builder.setCancelable(false)
+        builder.setPositiveButton(getString(R.string.lbl_proceed)) { _, _ ->
+            SsidPermissionManager.requestLocationEnable(this)
+        }
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ ->
+            dialog.dismiss()
+            updateSsidPermissionState(false)
+        }
+        builder.create().show()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        SsidPermissionManager.handlePermissionResult(
+            requestCode,
+            permissions,
+            grantResults,
+            ssidPermissionCallback
+        )
     }
 }

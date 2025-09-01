@@ -85,6 +85,7 @@ import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.ProxyManager.isNotLocalAndRpnProxy
+import com.celzero.bravedns.service.WireguardManager.NOTIF_CHANNEL_ID_WIREGUARD_ALERTS
 import com.celzero.bravedns.ui.NotificationHandlerActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
@@ -97,6 +98,8 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
+import com.celzero.bravedns.util.Constants.Companion.NOTIF_WG_PERMISSION_NAME
+import com.celzero.bravedns.util.Constants.Companion.NOTIF_WG_PERMISSION_VALUE
 import com.celzero.bravedns.util.Constants.Companion.PRIMARY_USER
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Daemons
@@ -106,7 +109,7 @@ import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Protocol
-import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.SsidPermissionManager
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
@@ -1133,6 +1136,77 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val allowed = testWithBackoff { FirewallManager.isAppForeground(uid, keyguardManager) }
 
         return !allowed
+    }
+    
+    private fun handlePermissionCheckForSsidWgsIfNeeded() {
+        val wgs = WireguardManager.getActiveSsidEnabledConfigs()
+        if (wgs.isEmpty()) return
+
+        val hasPermission = SsidPermissionManager.hasRequiredPermissions(this)
+        val locationEnabled = SsidPermissionManager.isLocationEnabled(this)
+        if (hasPermission && locationEnabled) return
+
+        Logger.w(LOG_TAG_VPN, "ssid wgs: missing permissions, show notification")
+        showPermissionMissingNotificationForWg()
+        return
+    }
+
+    private fun showPermissionMissingNotificationForWg() {
+        Logger.i(LOG_TAG_VPN, "wg permission missing, show notification")
+
+        val intent = Intent(this, NotificationHandlerActivity::class.java)
+        intent.putExtra(
+            NOTIF_WG_PERMISSION_NAME,
+            NOTIF_WG_PERMISSION_VALUE
+        )
+
+        val pendingIntent =
+            Utilities.getActivityPendingIntent(
+                this,
+                Intent(this, AppLockActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                mutable = false
+            )
+
+        var builder: NotificationCompat.Builder
+        if (isAtleastO()) {
+            val name: CharSequence = getString(R.string.notif_channel_firewall_alerts)
+            val description = this.resources.getString(R.string.notif_channel_desc_firewall_alerts)
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(NOTIF_CHANNEL_ID_WIREGUARD_ALERTS, name, importance)
+            channel.description = description
+            notificationManager.createNotificationChannel(channel)
+            builder = NotificationCompat.Builder(this, NOTIF_CHANNEL_ID_WIREGUARD_ALERTS)
+        } else {
+            builder = NotificationCompat.Builder(this, NOTIF_CHANNEL_ID_WIREGUARD_ALERTS)
+        }
+
+        val contentTitle: String = this.resources.getString(R.string.lbl_action_required)
+        val contentText: String =
+            this.resources.getString(R.string.permission_missing_notification_desc)
+
+        builder
+            .setSmallIcon(R.drawable.ic_notification_icon)
+            .setContentTitle(contentTitle)
+            .setContentIntent(pendingIntent)
+            .setContentText(contentText)
+
+        builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+        builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
+
+        // Secret notifications are not shown on the lock screen.  No need for this app to show
+        // there.
+        // Only available in API >= 21
+        builder = builder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
+
+        // Cancel the notification after clicking.
+        builder.setAutoCancel(true)
+
+        notificationManager.notify(
+            NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
+            NOTIF_ID_ACCESSIBILITY_FAILURE,
+            builder.build()
+        )
     }
 
     private fun handleAccessibilityFailure() {
@@ -2829,6 +2903,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val isRoutesChanged = hasRouteChangedInAutoMode(out)
         val isBoundNetworksChanged = out.netChanged
         val isMtuChanged = out.mtuChanged
+        val isSsidChanged = out.ssidChanged
         underlyingNetworks = networks
         underlyingNetworks?.vpnLockdown = isLockdown()
 
@@ -2838,7 +2913,16 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val underlyingNws = getUnderlays()
         setUnderlyingNetworks(underlyingNws)
         tunUnderlyingNetworks = underlyingNws?.joinToString()
+        var ipv4Ssid = ""
+        var ipv6Ssid = ""
+        networks.ipv4Net.forEach {
+            ipv4Ssid = ipv4Ssid + it.network.networkHandle.toString() + "##" + (it.ssid ?: "")
+        }
+        networks.ipv6Net.forEach {
+            ipv6Ssid = ipv6Ssid + it.network.networkHandle.toString() + "##" + (it.ssid ?: "")
+        }
 
+        logd("getNetworkSSID - onNetworkConnected: active: ${networks.activeSsid}, v4: $ipv4Ssid, v6: $ipv6Ssid")
         logd(
             "underlays: ${underlyingNws?.joinToString()}, forceRestart? $forceRestart mtu? $isMtuChanged(o:${curnet?.minMtu}, n:${networks.minMtu}), tun: ${tunMtu()}; routes? $isRoutesChanged, bound-nws? $isBoundNetworksChanged, stall? ${persistentState.stallOnNoNetwork}, updatedTs: ${networks.lastUpdated}"
         )
@@ -2865,11 +2949,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // now the proxy need to be either paused/resumed/refreshed/readded
         // so no need to check for isRoutesChanged, even though the routes are same,
         // the bound networks have changed, so either of the above operations are needed
-        // case: wireguard in mobile-only mode.
-        if (isBoundNetworksChanged) {
+        // case: wireguard in mobile-only mode & ssid change in wifi for ssidEnabled wgs
+        if (isBoundNetworksChanged || isSsidChanged) {
             // Workaround for WireGuard connection issues after network change
             // WireGuard may fail to connect to the server when the network changes.
-            Logger.i(LOG_TAG_VPN, "$TAG routes/bound-nws changed, refresh wg")
+            Logger.i(LOG_TAG_VPN, "$TAG ssid/bound-nws changed, refresh wg if needed")
             refreshOrPauseOrResumeOrReAddProxies() // takes care of adding the proxies if missing in tun
         }
 
@@ -2907,7 +2991,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     data class NetworkChanges(
         val routesChanged: Boolean = true,
         val netChanged: Boolean = true,
-        val mtuChanged: Boolean = true
+        val mtuChanged: Boolean = true,
+        val ssidChanged: Boolean = true
     )
 
     private fun interestingNetworkChanges(
@@ -2975,16 +3060,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 val activHas6 = isNetworkSame(new.ipv6Net.firstOrNull()?.network, activ)
                 val oldActivHas4 = isNetworkSame(old.ipv4Net.firstOrNull()?.network, activ)
                 val oldActivHas6 = isNetworkSame(old.ipv6Net.firstOrNull()?.network, activ)
-                val okActiv4 =
-                    oldActivHas4 ==
-                            activHas4 // routing for ipv4 is same in old and new FIRST network
-                val okActiv6 =
-                    oldActivHas6 ==
-                            activHas6 // routing for ipv6 is same in old and new FIRST network
+                val okActiv4 = oldActivHas4 == activHas4 // routing for ipv4 is same in old and new FIRST network
+                val okActiv6 = oldActivHas6 == activHas6 // routing for ipv6 is same in old and new FIRST network
                 val netChanged = !okActiv4 || !okActiv6
+
+                val ssidChanged = old.activeSsid != new.activeSsid
                 logd("tun: oldActiv4: $oldActivHas4, newActiv4: $activHas4, oldActiv6: $oldActivHas6, newActiv6: $activHas6, netChanged? $netChanged")
+                logd("tun: oldActiveSsid: ${old.activeSsid}, newActiveSsid: ${new.activeSsid}, ssidChanged? $ssidChanged")
                 // for active networks, changes in routes includes all possible network changes;
-                return NetworkChanges(routesChanged, netChanged, mtuChanged)
+                return NetworkChanges(routesChanged, netChanged, mtuChanged, ssidChanged)
             } // active network null, fallthrough to check for netChanged
         }
         // check if ipv6 or ipv4 routes are different in old and new networks
@@ -2999,10 +3083,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val newFirst6 = new.ipv6Net.firstOrNull()?.network
         val oldFirst4 = old.ipv4Net.firstOrNull()?.network
         val newFirst4 = new.ipv4Net.firstOrNull()?.network
-        val netChanged =
-            !isNetworkSame(oldFirst6, newFirst6) || !isNetworkSame(oldFirst4, newFirst4)
+        val netChanged = !isNetworkSame(oldFirst6, newFirst6) || !isNetworkSame(oldFirst4, newFirst4)
+
+        val oldSsidFirst4 = old.ipv4Net.firstOrNull()?.ssid
+        val newSsidFirst4 = new.ipv4Net.firstOrNull()?.ssid
+        val oldSsidFirst6 = old.ipv6Net.firstOrNull()?.ssid
+        val newSsidFirst6 = new.ipv6Net.firstOrNull()?.ssid
+        val ssidChanged = oldSsidFirst4 != newSsidFirst4 || oldSsidFirst6 != newSsidFirst6
+
         logd("tun: oldFirst4: $oldFirst4, newFirst4: $newFirst4, oldFirst6: $oldFirst6, newFirst6: $newFirst6, netChanged? $netChanged")
-        return NetworkChanges(routesChanged, netChanged, mtuChanged)
+        logd("tun: oldSsidFirst4: $oldSsidFirst4, newSsidFirst4: $newSsidFirst4, oldSsidFirst6: $oldSsidFirst6, newSsidFirst6: $newSsidFirst6, ssidChanged? $ssidChanged")
+        return NetworkChanges(routesChanged, netChanged, mtuChanged, ssidChanged)
     }
 
     private suspend fun setNetworkAndDefaultDnsIfNeeded(forceUpdate: Boolean = false) {
@@ -3989,9 +4080,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             }
             // only when there is an uid, we need to calculate wireguard ids
             // gives all the possible wgs for the app regardless of usesMobileNetwork
-            val ids = WireguardManager.getAllPossibleConfigIdsForApp(uid, ip = "", port = 0, domain, true, defaultTid)
+            val ssid = underlyingNetworks?.activeSsid ?: underlyingNetworks?.ipv4Net?.firstOrNull { it.ssid != null }?.ssid ?: underlyingNetworks?.ipv6Net?.firstOrNull() { it.ssid != null }?.ssid ?: ""
+            val ids = WireguardManager.getAllPossibleConfigIdsForApp(uid, ip = "", port = 0, domain, true, ssid, defaultTid)
+            val wgOrDefaultTid = if (ids.isEmpty()) {
+                Logger.d(LOG_TAG_VPN, "(onQuery-pid)no wg found, return $defaultTid")
+                defaultTid
+            } else {
+                Logger.d(LOG_TAG_VPN, "(onQuery-pid)wg ids($ids) found for uid: $uid")
+                ids.joinToString(",")
+            }
             Logger.d(LOG_TAG_VPN, "(onQuery)wg ids($ids) found for uid: $uid")
-            return Pair(ids.joinToString(","), "")
+            return Pair(wgOrDefaultTid, "")
         }
     }
 
@@ -4117,31 +4216,25 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 "(onQuery-pid)customHttp enabled, return ${ProxyManager.ID_HTTP_BASE},${defaultProxy}"
             )
             "${ProxyManager.ID_HTTP_BASE},${defaultProxy}"
-        } else if (WireguardManager.oneWireGuardEnabled()) {
-            val id = WireguardManager.getOneWireGuardProxyId()
-            if (id == null) {
-                Logger.e(
-                    LOG_TAG_VPN,
-                    "(onQuery-pid)No one-wg id found but one-wg enabled, return $defaultProxy"
-                )
-                defaultProxy // this should not happen
-            } else {
-                // include defaultProxy as well in case if the canRoute fails for one-wireguard
-                val oid = ID_WG_BASE + id
-                "$oid,$defaultProxy"
-            }
         } else {
             // if the enabled wireguard is catchall-wireguard, then return wireguard id
+            val ssid = underlyingNetworks?.activeSsid ?: underlyingNetworks?.ipv4Net?.firstOrNull { it.ssid != null }?.ssid ?: underlyingNetworks?.ipv6Net?.firstOrNull() { it.ssid != null }?.ssid ?: ""
             val ids = WireguardManager.getAllPossibleConfigIdsForApp(
                 uid,
                 ip = "",
                 port = 0,
                 domain,
                 true,
+                ssid,
                 defaultProxy
             )
-            Logger.d(LOG_TAG_VPN, "(onQuery-pid)wg ids($ids) found for uid: $uid")
-            ids.joinToString(",")
+            if (ids.isEmpty()) {
+                Logger.d(LOG_TAG_VPN, "(onQuery-pid)no wg found, return $defaultProxy")
+                defaultProxy
+            } else {
+                Logger.d(LOG_TAG_VPN, "(onQuery-pid)wg ids($ids) found for uid: $uid")
+                ids.joinToString(",")
+            }
         }
     }
 
@@ -4856,8 +4949,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid)
         }
         // add baseOrExit in the end of the list if needed (not true for lockdown)
-        val wgs = WireguardManager.getAllPossibleConfigIdsForApp(uid, connTracker.destIP, connTracker.destPort, connTracker.query ?: "", true, baseOrExit)
-        if (wgs.isNotEmpty()) {
+        val ssid = underlyingNetworks?.activeSsid ?: underlyingNetworks?.ipv4Net?.firstOrNull { it.ssid != null }?.ssid ?: underlyingNetworks?.ipv6Net?.firstOrNull() { it.ssid != null }?.ssid ?: ""
+        val wgs = WireguardManager.getAllPossibleConfigIdsForApp(uid, connTracker.destIP, connTracker.destPort, connTracker.query ?: "", true, ssid, baseOrExit)
+        if (wgs.isNotEmpty() && wgs.first() != baseOrExit) {
             // canRoute may fail for all configs.
             // if that happens:
             //   - traffic is sent to baseOrExit if available,
@@ -4866,11 +4960,18 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 connTracker.isBlocked = true
                 connTracker.blockedByRule = FirewallRuleset.RULE17.id
             }
-            logd("flow/inflow: wg is active, returning $wgs, $connId, $uid")
             val ids = wgs.joinToString(",")
-            return persistAndConstructFlowResponse(connTracker, ids, connId, uid)
+            if (ids.isEmpty()) { // should not happen as wgs is not empty
+                logd("flow/inflow: wg ids is empty, returning $baseOrExit, $connId, $uid")
+                return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid)
+            } else {
+                logd("flow/inflow: wg is active, returning $wgs, $connId, $uid")
+                // see if there is a wg enabled with ssid restriction, if so, check for permission
+                io("perm-check") { handlePermissionCheckForSsidWgsIfNeeded() }
+                return persistAndConstructFlowResponse(connTracker, ids, connId, uid)
+            }
         } else {
-            Logger.vv(LOG_TAG_VPN, "flow/inflow: no wg proxy, $baseOrExit, $connId, $uid")
+            Logger.vv(LOG_TAG_VPN, "flow/inflow: no wg proxy, fall-through")
         }
 
         // carry out this check after wireguard, because wireguard has catchAll and lockdown.
@@ -5029,8 +5130,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val v4Mobile = v4first?.capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ?: false
             val v6Mobile = v6first?.capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ?: false
             val isActiveMobile = v4Mobile || (v4first == null && v6Mobile)
-            Logger.v(LOG_TAG_VPN, "refreshOrPauseOrResumeOrReAddProxies: canResumeMobileOnlyWg? $isActiveMobile")
-            io("refreshWg") { vpnAdapter?.refreshOrPauseOrResumeOrReAddProxies(isActiveMobile) }
+            val activeSsid = newNet?.activeSsid ?: newNet?.ipv4Net?.firstOrNull()?.ssid ?: newNet?.ipv6Net?.firstOrNull()?.ssid ?: ""
+            Logger.v(LOG_TAG_VPN, "refreshOrPauseOrResumeOrReAddProxies: canResumeMobileOnlyWg? $isActiveMobile, $activeSsid")
+            io("refreshWg") { vpnAdapter?.refreshOrPauseOrResumeOrReAddProxies(isActiveMobile, activeSsid) }
         }
     }
 
@@ -5069,7 +5171,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // in case of multiple proxies we do not need to write the log as we are not sure
             // which proxy is used for the connection, so wait for the postflow/onSocketClosed
             // to write the log, until that maintain the connTrackerMetaData in a set
-            if (proxyIds.contains(",")) {
+            val containsMultipleProxy = proxyIds
+                .split(",")
+                .map { it.trim() }.count { it.isNotEmpty() } > 1
+            if (containsMultipleProxy) {
                 trackedConnMetaData.put(cm.connId, cm)
                 if (DEBUG) logd("flow/inflow/postflow: multiple proxies for connId: $connId, proxies: $proxyIds, uid: $uid, cache-size: ${trackedConnMetaData.size()}, cm: $cm")
             } else {
