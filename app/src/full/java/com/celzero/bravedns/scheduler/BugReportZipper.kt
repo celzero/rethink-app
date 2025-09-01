@@ -34,6 +34,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.file.NoSuchFileException
 import java.util.Enumeration
 import java.util.zip.ZipEntry
 import java.util.zip.ZipException
@@ -115,6 +116,8 @@ object BugReportZipper {
             return ZipFile(file)
         } catch (e: FileNotFoundException) {
             Logger.w(LOG_TAG_BUG_REPORT, "file not found exception while creating zip file", e)
+        } catch (e: NoSuchFileException) {
+            Logger.w(LOG_TAG_BUG_REPORT, "zip file disappeared during access: ${file.absolutePath}", e)
         } catch (e: ZipException) {
             Logger.w(LOG_TAG_BUG_REPORT, "err while creating zip file", e)
             Utilities.deleteRecursive(file) // delete corrupted zip file
