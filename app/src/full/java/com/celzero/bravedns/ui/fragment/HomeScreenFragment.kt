@@ -417,7 +417,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         } else {
             disableProxyCard()
-            unobserveProxyStates()
         }
     }
 
@@ -481,7 +480,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 proxyStateListenerJob = ui("proxyStates") {
                     while (isVisible && isAdded) {
                         updateUiWithProxyStates(it)
-                        kotlinx.coroutines.delay(2500L)
+                        kotlinx.coroutines.delay(1500L)
                     }
                     proxyStateListenerJob?.cancel()
                 }
