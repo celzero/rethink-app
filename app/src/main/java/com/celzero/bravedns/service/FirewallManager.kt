@@ -274,7 +274,7 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun tombstoneApp(uid: Int, packageName: String?, ts: Long = System.currentTimeMillis()) {
-        val newUid = -1 * uid // use negative uid to mark the app as tombstone
+        val newUid = if (uid > 0) -1 * uid else uid // use negative uid to mark the app as tombstone
         mutex.withLock {
             val iter = appInfos.get(uid).iterator()
             while (iter.hasNext()) {

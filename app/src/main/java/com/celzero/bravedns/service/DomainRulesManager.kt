@@ -485,7 +485,7 @@ object DomainRulesManager : KoinComponent {
         // here tombstone means negating the uid of the rule
         // this is used when the app is uninstalled, so that the rules are not deleted
         // but the uid is set to (-1 * uid), so that the rules are not applied
-        val newUid = -1 * oldUid
+        val newUid = if (oldUid > 0) -1 * oldUid else oldUid
         db.tombstoneRulesByUid(oldUid, newUid)
         load()
     }

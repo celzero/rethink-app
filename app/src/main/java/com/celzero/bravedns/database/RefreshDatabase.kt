@@ -286,6 +286,11 @@ internal constructor(
             val appInfo = FirewallManager.getAppInfoByPackage(it.packageName)
             Logger.d(LOG_TAG_APP_DB, "tombstone app: $it, tombstone: ${appInfo?.tombstoneTs}, restore: $restore, current: $currentTime, diff: ${currentTime - (appInfo?.tombstoneTs ?: 0L)}")
             if (appInfo != null) {
+                if (appInfo.tombstoneTs > 0L) {
+                    // should not be the case as we filter out the tombstone packages
+                    Logger.w(LOG_TAG_APP_DB, "tombstone app: ${it.packageName}, uid: ${it.uid}, ts: ${appInfo.tombstoneTs} is already tombstoned, no-op")
+                    return@forEach
+                }
                 // mark the app as tombstone, only appInfo will be updated with tombstone ts
                 // all other rules will be updated with new uid (-1 * uid)
                 IpRulesManager.tombstoneRulesByUid(it.uid)
@@ -581,7 +586,12 @@ internal constructor(
     }
 
     private suspend fun insertApp(ai: ApplicationInfo) {
-        val appName = ctx.packageManager.getApplicationLabel(ai).toString()
+        val appName: String = try {
+            ctx.packageManager.getApplicationLabel(ai).toString()
+        } catch (ignored: Exception) {
+            // fallback if base.apk is not accessible
+            ctx.getString(R.string.network_log_app_name_unnamed, ai.uid.toString())
+        }
         val isSystemApp = isSystemApp(ai)
         val entry = AppInfo(null)
 
@@ -699,7 +709,12 @@ internal constructor(
             if (appInfo == null) {
                 app.uid
             } else {
-                ctx.packageManager.getApplicationLabel(appInfo).toString()
+                try {
+                    ctx.packageManager.getApplicationLabel(appInfo).toString()
+                } catch (ignored: Exception) {
+                    // fallback if base.apk is not accessible
+                    ctx.getString(R.string.network_log_app_name_unnamed, appInfo.uid.toString())
+                }
             }
 
         val notificationManager =
