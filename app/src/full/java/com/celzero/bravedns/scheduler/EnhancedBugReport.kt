@@ -62,19 +62,19 @@ object EnhancedBugReport {
                             inputStream.copyTo(zipOutputStream)
                         }
                     } catch (e: FileNotFoundException) {
-                        Log.e(LOG_TAG_BUG_REPORT, "file not found: ${file.name}, ${e.message}", e)
+                        Log.e(LOG_TAG_BUG_REPORT, "file not found: ${file.name}, ${e.message}")
                     } catch (e: Exception) {
-                        Log.e(LOG_TAG_BUG_REPORT, "err adding file to zip: ${file.name}, ${e.message}", e)
+                        Log.e(LOG_TAG_BUG_REPORT, "err adding file to zip: ${file.name}, ${e.message}")
                     }
                 }
             }
             Log.i(LOG_TAG_BUG_REPORT, "zip file created: ${zipFilePath.absolutePath}")
         } catch (e: FileNotFoundException) {
-            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}")
         } catch (e: ZipException) {
-            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}")
         } catch (e: Exception) {
-            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}")
         } finally {
 
         }
