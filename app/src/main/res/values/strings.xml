@@ -760,6 +760,17 @@
     <string name="lbl_battery_optimization" translatable="true">Battery optimization</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Disable %1$s</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> may result in connectivity loss. Change setting to let Rethink use data and other resources when in background.</string>
+    
+    <!-- OEM-specific battery optimization strings -->
+    <string name="oem_battery_optimization_instruction" translatable="true">%1$s devices have additional battery optimization settings. Please disable battery optimization for Rethink in both Android settings and %1$s\'s device management settings to prevent the app from being killed.</string>
+    <string name="generic_battery_optimization_instruction" translatable="true">Disable battery optimization for Rethink to prevent connectivity issues when the app runs in the background.</string>
+    <string name="xiaomi_battery_instruction" translatable="true">MIUI devices require disabling battery optimization in both Android settings and MIUI\'s Autostart manager. Please enable Autostart for Rethink and disable battery optimization.</string>
+    <string name="oppo_battery_instruction" translatable="true">ColorOS devices require disabling battery optimization in both Android settings and ColorOS\'s Auto-launch management. Please enable Auto-launch for Rethink and disable battery optimization.</string>
+    <string name="vivo_battery_instruction" translatable="true">Vivo devices require disabling battery optimization in both Android settings and Vivo\'s background app management. Please allow Rethink to run in the background and disable battery optimization.</string>
+    <string name="huawei_battery_instruction" translatable="true">EMUI devices require disabling battery optimization in both Android settings and EMUI\'s Protected apps. Please add Rethink to Protected apps and disable battery optimization.</string>
+    <string name="oneplus_battery_instruction" translatable="true">OnePlus devices require disabling battery optimization in both Android settings and OnePlus\'s Auto-launch management. Please enable Auto-launch for Rethink and disable battery optimization.</string>
+    <string name="oem_settings_open_error" translatable="true">Unable to open device-specific settings. Please manually navigate to your device\'s battery optimization or auto-start settings.</string>
+    <string name="oem_battery_settings_button" translatable="true">Device Settings</string>
 
     <string name="sponser_dialog_usage_msg" translatable="true">You’ve been using Rethink for <b>%1$s days</b>, which translates to a usage cost of <b>$%2$s</b>. Would you consider sponsoring to sustain its development?</string>
 
