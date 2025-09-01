@@ -140,6 +140,13 @@ object DomainRulesManager : KoinComponent {
         trustedTrie.clear()
         trustedMap.clear()
         db.getAllCustomDomains().forEach { cd ->
+            // adding as part of defensive programming, even adding these rules to cache will
+            // not cause any issues, but to avoid unnecessary entries in the trie, skipping these
+            // entries
+            if (cd.uid < 0 && cd.uid != Constants.UID_EVERYBODY) {
+                Logger.w(LOG_TAG_DNS, "skipping domain rule for uid: ${cd.uid}")
+                return@forEach
+            }
             val key = mkTrieKey(cd.domain, cd.uid)
             val value = mkTrieValue(cd.status.toString(), cd.proxyId, cd.proxyCC)
             trie.set(key, value)
