@@ -24,6 +24,7 @@ import com.celzero.bravedns.database.ProxyApplicationMapping
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.concurrent.CopyOnWriteArraySet
+import kotlin.collections.removeAll
 
 object ProxyManager : KoinComponent {
 
@@ -282,10 +283,9 @@ object ProxyManager : KoinComponent {
     }
 
     private fun deleteFromCache(uid: Int, packageName: String) {
-        pamSet.forEach {
-            if (it.uid == uid && it.packageName == packageName) {
-                pamSet.remove(it)
-            }
+        val toRemove = pamSet.filter { it.uid == uid && it.packageName == packageName }
+        if (toRemove.isNotEmpty()) {
+            pamSet.removeAll(toRemove.toSet())
         }
     }
 
@@ -308,8 +308,12 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun deleteAppByPkgName(packageName: String) {
-        // delete the app from the cache
-        pamSet.removeIf { it.packageName == packageName }
+        val toRemove = pamSet.filter { it.packageName == packageName }
+        if (toRemove.isEmpty()) {
+            Logger.i(LOG_TAG_PROXY, "deleteAppByPkgName: app not found in proxy mapping: $packageName")
+            return
+        }
+        pamSet.removeAll(toRemove.toSet())
         // delete the app from the database
         db.deleteAppByPkgName(packageName)
         Logger.i(LOG_TAG_PROXY, "deleting app for mapping by package name: $packageName")
