@@ -77,6 +77,7 @@ import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openNetworkSettings
 import com.celzero.bravedns.util.UIUtils.openUrl
+import com.celzero.bravedns.util.UIUtils.requestBatteryOptimizationWhitelist
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities.delay
@@ -1015,16 +1016,20 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
             Logger.v(LOG_TAG_UI, "launch battery optimization settings")
-            val ok =
-                openNetworkSettings(
+            val ok = requestBatteryOptimizationWhitelist(requireContext())
+            Logger.v(LOG_TAG_UI, "battery optimization whitelist request launched: $ok")
+            if (!ok) {
+                // fallback to general battery optimization settings if the specific request is not available
+                Logger.v(LOG_TAG_UI, "fallback to general battery optimization settings")
+                val fallbackOk = openNetworkSettings(
                     requireContext(),
                     Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
                 )
-            Logger.v(LOG_TAG_UI, "battery optimization settings launched: $ok")
-            if (!ok) {
-                // launch app settings if the above settings is not available
-                Logger.v(LOG_TAG_UI, "launch app info, battery optimization settings not available")
-                openAppInfo(requireContext())
+                if (!fallbackOk) {
+                    // launch app settings if the above settings are not available
+                    Logger.v(LOG_TAG_UI, "launch app info, battery optimization settings not available")
+                    openAppInfo(requireContext())
+                }
             }
         }
 

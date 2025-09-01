@@ -28,6 +28,8 @@
     <uses-permission
         android:name="android.permission.INTERACT_ACROSS_USERS"
         tools:ignore="ProtectedPermissions" />
+    <!-- Allows the app to request battery optimization whitelist -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <!-- https://github.com/celzero/rethink-app/issues/786 set memtagMode to off -->
     <application

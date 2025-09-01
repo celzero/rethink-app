@@ -201,6 +201,21 @@ object UIUtils {
         }
     }
 
+    fun requestBatteryOptimizationWhitelist(context: Context): Boolean {
+        return try {
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+            intent.data = Uri.fromParts("package", context.packageName, null)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+            true
+        } catch (e: ActivityNotFoundException) {
+            val msg = context.getString(R.string.intent_launch_error, Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+            Utilities.showToastUiCentered(context, msg, Toast.LENGTH_SHORT)
+            Logger.w(Logger.LOG_TAG_VPN, "err opening battery optimization request: ${e.message}", e)
+            false
+        }
+    }
+
     fun openAppInfo(context: Context) {
         val packageName = context.packageName
         try {
