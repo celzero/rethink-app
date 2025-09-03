@@ -210,6 +210,11 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 mobileOnlyExperimentalTxt,
                 getString(R.string.symbol_mobile)
             )
+        b.ssidTitleTv.text = getString(
+            R.string.two_argument_space,
+            getString(R.string.wg_setting_ssid_title),
+            getString(R.string.symbol_id)
+        )
         if (wgType.isDefault()) {
             b.wgHeaderTv.text = getString(R.string.lbl_advanced).replaceFirstChar(Char::titlecase)
             b.lockdownRl.visibility = View.VISIBLE
@@ -485,6 +490,15 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun setupClickListeners() {
         b.editBtn.setOnClickListener {
+            val isPartofHop = WgHopManager.isWgEitherHopOrSrc(configId)
+            if (isPartofHop) {
+                Utilities.showToastUiCentered(
+                    this,
+                    getString(R.string.wg_edit_hop_err),
+                    Toast.LENGTH_LONG
+                )
+                return@setOnClickListener
+            }
             val intent = Intent(this, WgConfigEditorActivity::class.java)
             intent.putExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, configId)
             intent.putExtra(INTENT_EXTRA_WG_TYPE, wgType.value)
@@ -561,7 +575,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 return@setOnClickListener
             }
 
-            if (mapping.useOnlyOnMetered) {
+            if (mapping.useOnlyOnMetered || mapping.ssidEnabled) {
                 Utilities.showToastUiCentered(
                     this,
                     getString(R.string.hop_error_toast_msg_3),
