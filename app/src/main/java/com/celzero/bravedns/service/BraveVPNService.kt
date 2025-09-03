@@ -298,7 +298,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     // used to store the conn-ids that are allowed and active, to show in network logs
     // as active connections. removed when the connection is closed (onSummary)
-    private var trackedCids = Collections.newSetFromMap(ConcurrentHashMap<CidKey, Boolean>())
+    private var activeCids = Collections.newSetFromMap(ConcurrentHashMap<CidKey, Boolean>())
 
     // used to store the ConnTrackerMetaData that has multiple proxy ids associated with it
     // waiting for the connection to be established, the call from postFlow/socketClosed will
@@ -4521,14 +4521,16 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             if (s.uid == Backend.UidSelf || s.uid == rethinkUid.toString()) {
                 // update rethink summary
                 val key = CidKey(connectionSummary.connId, rethinkUid)
-                trackedCids.remove(key)
+                activeCids.remove(key)
+                trackedCidsToClose.remove(connectionSummary.connId)
                 netLogTracker.updateRethinkSummary(connectionSummary)
             } else {
                 // other apps summary
                 // convert the uid to app id
                 val uid = FirewallManager.appId(s.uid.toInt(), isPrimaryUser())
                 val key = CidKey(connectionSummary.connId, uid)
-                trackedCids.remove(key)
+                activeCids.remove(key)
+                trackedCidsToClose.remove(connectionSummary.connId)
                 netLogTracker.updateIpSummary(connectionSummary)
             }
             io("dlIpInfo") {
@@ -4709,7 +4711,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     // add to trackedCids, so that the connection can be removed from the list when the
                     // connection is closed (onSocketClosed), use: ui to show the active connections
                     val key = CidKey(cm.connId, uid)
-                    trackedCids.add(key)
+                    activeCids.add(key)
                     Backend.Exit
                 }
 
@@ -4736,7 +4738,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // add to trackedCids, so that the connection can be removed from the list when the
         // connection is closed (onSocketClosed), use: ui to show the active connections
         val key = CidKey(cm.connId, uid)
-        trackedCids.add(key)
+        activeCids.add(key)
 
         return@go2kt determineProxyDetails(cm, doubleLoopback)
     }
@@ -4800,7 +4802,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // add to trackedCids, so that the connection can be removed from the list when the
             // connection is closed (onSocketClosed), use: ui to show the active connections
             val key = CidKey(cm.connId, uid)
-            trackedCids.add(key)
+            activeCids.add(key)
 
             logd("inflow: determine proxy and other dtls for $connId, $uid")
 
@@ -5091,7 +5093,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // get app id from uid
         val uid0 = FirewallManager.appId(uid, isPrimaryUser())
         val key = CidKey(connId, uid0)
-        return trackedCids.contains(key)
+        return activeCids.contains(key)
     }
 
     suspend fun removeWireGuardProxy(id: Int) {
