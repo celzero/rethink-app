@@ -284,6 +284,10 @@ object VpnController : KoinComponent {
         return braveVpnService?.tunMtu() ?: 0
     }
 
+    fun underlyingSsid(): String? {
+        return braveVpnService?.underlyingNetworks?.activeSsid ?: braveVpnService?.underlyingNetworks?.ipv4Net?.firstOrNull { !it.ssid.isNullOrEmpty() }?.ssid ?: braveVpnService?.underlyingNetworks?.ipv6Net?.firstOrNull { !it.ssid.isNullOrEmpty() }?.ssid ?: ""
+    }
+
     fun netType(): String {
         // using firewall_status_unknown from strings.xml as a place holder to show network
         // type as Unknown.
