@@ -92,6 +92,7 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.waseemsabir.betterypermissionhelper.BatteryPermissionHelper
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineName
@@ -113,6 +114,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private lateinit var themeNames: Array<String>
     private lateinit var startForResult: ActivityResultLauncher<Intent>
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
+
+    private val batteryPermissionHelper = BatteryPermissionHelper.getInstance()
 
     companion object {
         private const val TAG = "HSFragment"
@@ -966,9 +969,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         // prompt user to disable battery optimization and restrict background data
-        if (isRestrictBackgroundActive(requireContext()) && !isVpnActivated) {
-            showRestrictBgActiveDialog()
-        } else if (batteryOptimizationActive(requireContext()) && !isVpnActivated) {
+        if (isRestrictBackgroundActive(requireContext()) && batteryOptimizationActive(requireContext()) && !isVpnActivated) {
             showBatteryOptimizationDialog()
         }
 
@@ -986,15 +987,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun batteryOptimizationActive(context: Context): Boolean {
-        val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        val exemptFromBatteryOptimization = pm.isIgnoringBatteryOptimizations(context.packageName)
-        Logger.d(LOG_TAG_UI, "ignore battery optimization: $exemptFromBatteryOptimization")
-
-        return if (isAtleastU()) {
-            !pm.isExemptFromLowPowerStandby || !exemptFromBatteryOptimization
-        } else {
-            !exemptFromBatteryOptimization
-        }
+        // check whether or not Battery Permission is Available for Device
+        return batteryPermissionHelper.isBatterySaverPermissionAvailable(context = context, onlyIfSupported = true)
     }
 
     private fun showBatteryOptimizationDialog() {
@@ -1016,17 +1010,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
             Logger.v(LOG_TAG_UI, "launch battery optimization settings")
-            val ok =
-                openNetworkSettings(
-                    requireContext(),
-                    Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
-                )
-            Logger.v(LOG_TAG_UI, "battery optimization settings launched: $ok")
-            if (!ok) {
-                // launch app settings if the above settings is not available
-                Logger.v(LOG_TAG_UI, "launch app info, battery optimization settings not available")
-                openAppInfo(requireContext())
-            }
+            batteryPermissionHelper.getPermission(requireContext(), open = true, newTask = true)
         }
 
         builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
@@ -1050,35 +1034,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         } else {
             isBackgroundRestricted == ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED
         }
-    }
-
-    private fun showRestrictBgActiveDialog() {
-        if (!isAtleastN()) return
-
-        val builder = MaterialAlertDialogBuilder(requireContext())
-        builder.setTitle(R.string.lbl_background_data)
-        val msg =
-            getString(R.string.restrict_dialog_message, getString(R.string.lbl_background_data))
-        builder.setMessage(msg)
-        builder.setCancelable(false)
-        builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
-            Logger.v(LOG_TAG_UI, "launch restrict background data settings")
-            val ok =
-                openNetworkSettings(
-                    requireContext(),
-                    Settings.ACTION_IGNORE_BACKGROUND_DATA_RESTRICTIONS_SETTINGS
-                )
-            if (!ok) {
-                // launch app settings if the above settings is not available
-                Logger.v(LOG_TAG_UI, "launch app info, restrict bg data settings not available")
-                openAppInfo(requireContext())
-            }
-        }
-
-        builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
-            // no-op
-        }
-        builder.create().show()
     }
 
     private fun showAlwaysOnStopDialog() {
