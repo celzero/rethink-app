@@ -242,16 +242,22 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
         // show dialog with level filter
         val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(getString(R.string.console_log_title))
-        val items = Logger.LoggerLevel.entries
+        val items = arrayOf(
+            getString(R.string.settings_gologger_dialog_option_0),
+            getString(R.string.settings_gologger_dialog_option_1),
+            getString(R.string.settings_gologger_dialog_option_2),
+            getString(R.string.settings_gologger_dialog_option_3),
+            getString(R.string.settings_gologger_dialog_option_4),
+            getString(R.string.settings_gologger_dialog_option_5),
+            getString(R.string.settings_gologger_dialog_option_6),
+            getString(R.string.settings_gologger_dialog_option_7),
+        )
         val checkedItem = Logger.uiLogLevel.toInt()
         builder.setSingleChoiceItems(
-            items.map {
-                it.name.lowercase()
-                    .replaceFirstChar(Char::titlecase).replace("_", " ")
-            }.toTypedArray(),
+            items.map { it }.toTypedArray(),
             checkedItem
         ) { _, which ->
-            Logger.uiLogLevel = items[which].id
+            Logger.uiLogLevel = which.toLong()
             GoVpnAdapter.setLogLevel(
                 persistentState.goLoggerLevel.toInt(),
                 Logger.uiLogLevel.toInt()
@@ -260,7 +266,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
             if (which < Logger.LoggerLevel.ERROR.id) {
                 consoleLogRepository.setStartTimestamp(System.currentTimeMillis())
             }
-            Logger.i(LOG_TAG_BUG_REPORT, "Log level set to ${items[which].name}")
+            Logger.i(LOG_TAG_BUG_REPORT, "Log level set to ${items[which]}")
         }
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialogInterface, _ ->
