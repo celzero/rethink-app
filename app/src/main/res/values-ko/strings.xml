@@ -722,4 +722,7 @@
     <string name="sponser_dialog_usage_msg" translatable="true">Rethink을(를) <b>%1$s일</b> 동안 사용하셨고, 이는 <b>$%2$s</b>의 가치에 해당합니다. 앞으로도 개발이 이어질 수 있도록 후원해 주시겠습니까?</string>
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">별도로 지정된 DNS가 없는 도메인에 대해서는 시스템 DNS를 사용합니다</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true"><i>.lan</i>, <i>.internal</i> 등 별도로 지정된 DNS가 없는 도메인에는 시스템 DNS를 사용합니다.</string>
+    <string name="lbl_hop" translatable="true">중계서버</string>
+    <string name="lbl_manual" translatable="true">수동 편집</string>
+    <string name="lbl_fallback" translatable="true">대체</string>
 </resources>
