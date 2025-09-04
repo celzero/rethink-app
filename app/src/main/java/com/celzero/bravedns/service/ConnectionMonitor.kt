@@ -63,87 +63,171 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
     // create drop oldest channel to handle the network changes from the connectivity manager
     private lateinit var channel: Channel<OpPrefs>
 
-    val internetValidatedCallBack = object : ConnectivityManager.NetworkCallback () {
-        override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
-            scope.launch(CoroutineName("cmIntCap") + serializer) {
-                Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(1), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
-                val ssid = getNetworkSSID(network, capabilities)
-                addToNwSet(network, ssid)
-                sendNetworkChanges(isForceUpdate = true)
-            }
-        }
+    fun internetValidatedCallback(): ConnectivityManager.NetworkCallback {
+        return if (isAtleastS()) {
+            // Only called on S+ devices
+            object : ConnectivityManager.NetworkCallback(FLAG_INCLUDE_LOCATION_INFO) {
+                override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
+                    scope.launch(CoroutineName("cmIntCap") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(1S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        val ssid = getNetworkSSID(network, capabilities)
+                        addToNwSet(network, ssid)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
 
-        override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
-            scope.launch(CoroutineName("cmIntLink") + serializer) {
-                Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(1), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
-                addToNwSet(network)
-                sendNetworkChanges(isForceUpdate = true)
-            }
-        }
+                override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+                    scope.launch(CoroutineName("cmIntLink") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(1S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        addToNwSet(network)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
 
-        override fun onAvailable(network: Network) {
-            val behaviour = getConnectionMonitorBehaviour()
-            if (behaviour != VpnBuilderPolicy.ConnectionMonitorBehaviour.VALIDATED_NETWORKS) {
-                // no-op, as we expect the transportCallback to add to network set and send message
-                Logger.d(LOG_TAG_CONNECTION, "onAvailable(1), aggressive policy, ignoring networks from net-validated callback")
-                return
-            }
-            scope.launch(CoroutineName("cmIntAvl") + serializer) {
-                Logger.d(LOG_TAG_CONNECTION, "onAvailable(1), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
-                addToNwSet(network)
-                sendNetworkChanges(isForceUpdate = true)
-            }
-        }
+                override fun onAvailable(network: Network) {
+                    val behaviour = getConnectionMonitorBehaviour()
+                    if (behaviour != VpnBuilderPolicy.ConnectionMonitorBehaviour.VALIDATED_NETWORKS) {
+                        // no-op, as we expect the transportCallback to add to network set and send message
+                        Logger.d(LOG_TAG_CONNECTION, "onAvailable(1S), aggressive policy, ignoring networks from net-validated callback")
+                        return
+                    }
+                    scope.launch(CoroutineName("cmIntAvl") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onAvailable(1S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        addToNwSet(network)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
 
-        override fun onLost(network: Network) {
-            val behaviour = getConnectionMonitorBehaviour()
-            if (behaviour != VpnBuilderPolicy.ConnectionMonitorBehaviour.VALIDATED_NETWORKS) {
-                // no-op, as we expect the transportCallback to add to network set and send message
-                Logger.d(LOG_TAG_CONNECTION, "onLost(1), aggressive policy, ignoring networks from net-cap callback")
-                return
+                override fun onLost(network: Network) {
+                    val behaviour = getConnectionMonitorBehaviour()
+                    if (behaviour != VpnBuilderPolicy.ConnectionMonitorBehaviour.VALIDATED_NETWORKS) {
+                        // no-op, as we expect the transportCallback to add to network set and send message
+                        Logger.d(LOG_TAG_CONNECTION, "onLost(1S), aggressive policy, ignoring networks from net-cap callback")
+                        return
+                    }
+                    scope.launch(CoroutineName("cmIntLost") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onLost(1S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        removeFromNwSet(network)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
             }
-            scope.launch(CoroutineName("cmIntLost") + serializer) {
-                Logger.d(LOG_TAG_CONNECTION, "onLost(1), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
-                removeFromNwSet(network)
-                sendNetworkChanges(isForceUpdate = true)
+        } else {
+            // Pre-S devices
+            object : ConnectivityManager.NetworkCallback() {
+                override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
+                    scope.launch(CoroutineName("cmTransCap") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        val ssid = getNetworkSSID(network, capabilities)
+                        addToNwSet(network, ssid)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
+
+                override fun onAvailable(network: Network) {
+                    scope.launch(CoroutineName("cmTransAvl") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onAvailable(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        addToNwSet(network)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
+
+                override fun onLost(network: Network) {
+                    scope.launch(CoroutineName("cmTransLost") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onLost(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        removeFromNwSet(network)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
+
+                override fun onLinkPropertiesChanged(
+                    network: Network,
+                    linkProperties: LinkProperties
+                ) {
+                    scope.launch(CoroutineName("cmTransLink") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        addToNwSet(network)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
             }
         }
     }
 
-    val transportCallback = object : ConnectivityManager.NetworkCallback() {
-        override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
-            scope.launch(CoroutineName("cmTransCap") + serializer) {
-                Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
-                val ssid = getNetworkSSID(network, capabilities)
-                addToNwSet(network, ssid)
-                sendNetworkChanges(isForceUpdate = true)
-            }
-        }
+    fun transportCallback(): ConnectivityManager.NetworkCallback {
+        return if (isAtleastS()) {
+            object : ConnectivityManager.NetworkCallback(FLAG_INCLUDE_LOCATION_INFO) {
+                override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
+                    scope.launch(CoroutineName("cmTransCap") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        val ssid = getNetworkSSID(network, capabilities)
+                        addToNwSet(network, ssid)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
 
-        override fun onAvailable(network: Network) {
-            scope.launch(CoroutineName("cmTransAvl") + serializer) {
-                Logger.d(LOG_TAG_CONNECTION, "onAvailable(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
-                addToNwSet(network)
-                sendNetworkChanges(isForceUpdate = true)
-            }
-        }
+                override fun onAvailable(network: Network) {
+                    scope.launch(CoroutineName("cmTransAvl") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onAvailable(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        addToNwSet(network)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
 
-        override fun onLost(network: Network) {
-            scope.launch(CoroutineName("cmTransLost") + serializer) {
-                Logger.d(LOG_TAG_CONNECTION, "onLost(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
-                removeFromNwSet(network)
-                sendNetworkChanges(isForceUpdate = true)
-            }
-        }
+                override fun onLost(network: Network) {
+                    scope.launch(CoroutineName("cmTransLost") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onLost(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        removeFromNwSet(network)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
 
-        override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
-            scope.launch(CoroutineName("cmTransLink") + serializer) {
-                Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
-                addToNwSet(network)
-                sendNetworkChanges(isForceUpdate = true)
+                override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+                    scope.launch(CoroutineName("cmTransLink") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        addToNwSet(network)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
+            }
+        } else {
+            object : ConnectivityManager.NetworkCallback() {
+                override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
+                    scope.launch(CoroutineName("cmTransCap") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        val ssid = getNetworkSSID(network, capabilities)
+                        addToNwSet(network, ssid)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
+
+                override fun onAvailable(network: Network) {
+                    scope.launch(CoroutineName("cmTransAvl") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onAvailable(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        addToNwSet(network)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
+
+                override fun onLost(network: Network) {
+                    scope.launch(CoroutineName("cmTransLost") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onLost(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        removeFromNwSet(network)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
+
+                override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+                    scope.launch(CoroutineName("cmTransLink") + serializer) {
+                        Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        addToNwSet(network)
+                        sendNetworkChanges(isForceUpdate = true)
+                    }
+                }
             }
         }
     }
+
 
     /**
      * Fetches the SSID for the given network if it's a WiFi network.
@@ -350,12 +434,12 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             if (::cm.isInitialized) {
                 // register the network callbacks, can throw exception
                 try {
-                    cm.unregisterNetworkCallback(internetValidatedCallBack)
+                    cm.unregisterNetworkCallback(internetValidatedCallback())
                 } catch (e: Exception) {
                     Logger.w(LOG_TAG_CONNECTION, "err unregistering internetValidatedCallBack, ${e.message}")
                 }
                 try {
-                    cm.unregisterNetworkCallback(transportCallback)
+                    cm.unregisterNetworkCallback(transportCallback())
                 } catch (e: Exception) {
                     Logger.w(LOG_TAG_CONNECTION, "err unregistering transportCallback, ${e.message}")
                 }
@@ -438,18 +522,18 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         return when (behaviour) {
             VpnBuilderPolicy.ConnectionMonitorBehaviour.TRANSPORTS -> {
                 // process the network changes with 2 seconds delay
-                registerNetworkCallback(networkRequestWithTransports, transportCallback)
+                registerNetworkCallback(networkRequestWithTransports, transportCallback())
             }
 
             VpnBuilderPolicy.ConnectionMonitorBehaviour.VALIDATED_NETWORKS -> {
                 // process the network changes with 1 second delay
-                registerNetworkCallback(networkRequest, internetValidatedCallBack)
+                registerNetworkCallback(networkRequest, internetValidatedCallback())
             }
 
             VpnBuilderPolicy.ConnectionMonitorBehaviour.VALIDATED_NETWORKS_AND_TRANSPORTS -> {
                 // delay the processing of network changes, ie, process the network changes with 5 seconds delay
-                registerNetworkCallback(networkRequestWithTransports, transportCallback) &&
-                        registerNetworkCallback(networkRequest, internetValidatedCallBack)
+                registerNetworkCallback(networkRequestWithTransports, transportCallback()) &&
+                        registerNetworkCallback(networkRequest, internetValidatedCallback())
             }
         }
     }
@@ -497,8 +581,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             try {
                 // check if connectivity manager is initialized as it is lazy initialized
                 if (::cm.isInitialized) {
-                    cm.unregisterNetworkCallback(internetValidatedCallBack)
-                    cm.unregisterNetworkCallback(transportCallback)
+                    cm.unregisterNetworkCallback(internetValidatedCallback())
+                    cm.unregisterNetworkCallback(transportCallback())
                 }
                 if (isAtleastR()) {
                     unregisterDiags()
