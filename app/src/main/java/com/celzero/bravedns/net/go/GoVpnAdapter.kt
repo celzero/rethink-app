@@ -1608,7 +1608,11 @@ class GoVpnAdapter : KoinComponent {
             // 0 - very verbose, 1 - verbose, 2 - debug, 3 - info, 4 - warn, 5 - error, 6 - stacktrace, 7 - user, 8 - none
             // from UI, if none is selected, set the log level to 7 (user), usr will send only
             // user notifications
-            Intra.logLevel(l1, l2)
+            // there is no user level shown in UI, so if the user selects none, set the log level
+            // to 8 (none)
+            val goLogLevel = if (l1 == 7) 8 else l1
+            val consoleLogLevel = if (l2 == 7) 8 else l2
+            Intra.logLevel(goLogLevel, consoleLogLevel)
             Logger.i(LOG_TAG_VPN, "$TAG set go-log level: $l1, $l2")
         }
     }
