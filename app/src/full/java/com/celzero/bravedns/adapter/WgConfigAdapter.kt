@@ -300,34 +300,42 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                     c.getH4().isPresent || c.getS1().isPresent || c.getS2().isPresent
         }
 
-        private fun updateUi(config: WgConfigFiles, appsCount: Int) {
+        private fun updateUi(mapping: WgConfigFiles, appsCount: Int) {
             b.interfaceAppsCount.visibility = View.VISIBLE
             b.chipProperties.text = ""
-            if (config.isCatchAll) {
+            if (mapping.isCatchAll) {
                 b.chipProperties.visibility = View.VISIBLE
                 b.chipProperties.text = context.getString(R.string.symbol_lightening)
             }
-            if (config.isLockdown) {
-                if (!config.isActive) {
+            if (mapping.isLockdown) {
+                if (!mapping.isActive) {
                     b.interfaceDetailCard.strokeWidth = 2
                     b.interfaceDetailCard.strokeColor = fetchColor(context, R.attr.accentBad)
                 }
                 b.chipProperties.visibility = View.VISIBLE
                 b.chipProperties.text = context.getString(R.string.two_argument_space, b.chipProperties.text.toString(), context.getString(R.string.symbol_lockdown))
             }
-            if (config.useOnlyOnMetered) {
+            if (mapping.useOnlyOnMetered) {
                 b.chipProperties.visibility = View.VISIBLE
                 b.chipProperties.text = context.getString(R.string.two_argument_space,b.chipProperties.text.toString(), context.getString(R.string.symbol_mobile))
+            }
+            if (mapping.ssidEnabled) {
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(
+                    R.string.two_argument_space,
+                    b.chipProperties.text.toString(),
+                    context.getString(R.string.symbol_id)
+                )
             }
 
             val visible = if (b.chipProperties.text.isNotEmpty()) View.VISIBLE else View.GONE
             b.chipProperties.visibility = visible
 
-            if (!config.isActive) {
+            if (!mapping.isActive) {
                 // no need to update the apps count if the config is disabled
                 b.interfaceAppsCount.visibility = View.GONE
                 b.interfaceActiveLayout.visibility = View.GONE
-            } else if (config.isCatchAll) {
+            } else if (mapping.isCatchAll) {
                 b.interfaceAppsCount.text = context.getString(R.string.routing_remaining_apps)
                 b.interfaceAppsCount.setTextColor(fetchColor(context, R.attr.primaryLightColorText))
             } else {
