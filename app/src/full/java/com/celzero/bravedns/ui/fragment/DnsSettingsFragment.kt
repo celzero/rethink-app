@@ -133,7 +133,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         // use system dns for undelegated domains
         b.dcUndelegatedDomainsSwitch.isChecked = persistentState.useSystemDnsForUndelegatedDomains
         b.connectedStatusTitle.text = getConnectedDnsType()
-        b.dvBypassDnsBlockSwitch.isChecked = persistentState.bypassBlockInDns
         b.dcUseFallbackToBypassSwitch.isChecked = persistentState.useFallbackDnsToBypass
         showSplitDnsUi()
     }
@@ -214,6 +213,8 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             if (persistentState.enableDnsAlg) {
                 b.dcSplitDnsRl.visibility = View.VISIBLE
                 b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
+                b.dvBypassDnsBlockRl.visibility = View.VISIBLE
+                b.dvBypassDnsBlockSwitch.isChecked = persistentState.bypassBlockInDns
             } else {
                 b.dcSplitDnsRl.visibility = View.GONE
                 b.dcSplitDnsSwitch.isChecked = false
@@ -526,6 +527,8 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         }
 
         b.dvBypassDnsBlockSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (!persistentState.enableDnsAlg) return@setOnCheckedChangeListener
+
             NewSettingsManager.markSettingSeen(NewSettingsManager.TREAT_DNS_FIREWALL)
             persistentState.bypassBlockInDns = isChecked
         }
