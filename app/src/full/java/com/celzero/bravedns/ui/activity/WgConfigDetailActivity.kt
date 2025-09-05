@@ -575,15 +575,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 return@setOnClickListener
             }
 
-            if (mapping.useOnlyOnMetered || mapping.ssidEnabled) {
-                Utilities.showToastUiCentered(
-                    this,
-                    getString(R.string.hop_error_toast_msg_3),
-                    Toast.LENGTH_LONG
-                )
-                return@setOnClickListener
-            }
-
             if (mapping.isActive || mapping.isLockdown || mapping.isCatchAll) {
                 io {
                     val sid = ID_WG_BASE + configId
