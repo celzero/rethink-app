@@ -246,7 +246,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             return
         } else if (!info?.proxyDetails.isNullOrEmpty() && isIpnProxy) {
             // add the proxy id to the chip text if available
-            b.bsConnTrackAppInfo.text = getString(R.string.two_argument_colon, getFirewallRule(rule)?.title?.let { getString(it) }, info?.proxyDetails)
+            b.bsConnTrackAppInfo.text = getString(R.string.two_argument_colon, getString(FirewallRuleset.RULE12.title), info?.proxyDetails)
         } else {
             if (isInvalidProxyDetails()) {
                 b.bsConnTrackAppInfo.text = getString(getFirewallRule(FirewallRuleset.RULE1C.id)?.title ?: R.string.firewall_rule_no_rule)
