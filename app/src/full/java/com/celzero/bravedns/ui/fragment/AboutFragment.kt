@@ -45,6 +45,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.battery.BatteryStatsProvider
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogViewLogsBinding
@@ -134,6 +135,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppTranslate.setOnClickListener(this)
         b.aboutStats.setOnClickListener(this)
         b.aboutDbStats.setOnClickListener(this)
+        b.aboutBatteryStats.setOnClickListener(this)
     }
 
     private fun updateVersionInfo() {
@@ -298,6 +300,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutDbStats -> {
                 openDatabaseDumpDialog()
             }
+            b.aboutBatteryStats -> {
+                openBatteryStatsDialog()
+            }
             else -> {
                 Logger.w(LOG_TAG_UI, "unknown view clicked: ${view?.id}")
             }
@@ -377,25 +382,30 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 listView.adapter = adapter
 
                 // load + append dump when a table is tapped
-                listView.onItemClickListener = android.widget.AdapterView.OnItemClickListener { _, _, position, _ ->
-                    val table = tables[position]
-                    if (appended.contains(table)) {
-                        showToastUiCentered(ctx, getString(R.string.config_add_success_toast), Toast.LENGTH_SHORT)
-                        return@OnItemClickListener
-                    }
-                    appended.add(table)
-                    tv.append("\nLoading $table ...\n")
-                    io {
-                        val dump = buildTableDump(table)
-                        uiCtx {
-                            if (!isAdded) return@uiCtx
-                            // replace the temporary loading line (not strictly necessary)
-                            tv.text = tv.text.toString().replace("Loading $table ...", "")
-                            tv.append("\n===== TABLE: $table =====\n")
-                            tv.append(dump)
+                listView.onItemClickListener =
+                    android.widget.AdapterView.OnItemClickListener { _, _, position, _ ->
+                        val table = tables[position]
+                        if (appended.contains(table)) {
+                            showToastUiCentered(
+                                ctx,
+                                getString(R.string.config_add_success_toast),
+                                Toast.LENGTH_SHORT
+                            )
+                            return@OnItemClickListener
+                        }
+                        appended.add(table)
+                        tv.append("\nLoading $table ...\n")
+                        io {
+                            val dump = buildTableDump(table)
+                            uiCtx {
+                                if (!isAdded) return@uiCtx
+                                // replace the temporary loading line (not strictly necessary)
+                                tv.text = tv.text.toString().replace("Loading $table ...", "")
+                                tv.append("\n===== TABLE: $table =====\n")
+                                tv.append(dump)
+                            }
                         }
                     }
-                }
 
                 val container = android.widget.LinearLayout(ctx)
                 container.orientation = android.widget.LinearLayout.VERTICAL
@@ -408,7 +418,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                     .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
                     .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
                         copyToClipboard("db_dump", tv.text.toString())
-                        showToastUiCentered(ctx, getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
+                        showToastUiCentered(
+                            ctx,
+                            getString(R.string.copied_clipboard),
+                            Toast.LENGTH_SHORT
+                        )
                     }
                     .show()
             }
@@ -417,7 +431,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     private fun getDatabaseTables(): List<String> {
         val db = appDatabase.openHelper.readableDatabase
-        val cursor = db.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")
+        val cursor =
+            db.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")
         val tablesToSkip = setOf(
             "android_metadata",
             "sqlite_sequence",
@@ -462,13 +477,24 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                             if (colIndex >= 0) {
                                 when (dc.getType(colIndex)) {
                                     android.database.Cursor.FIELD_TYPE_NULL -> append("NULL")
-                                    android.database.Cursor.FIELD_TYPE_INTEGER -> append(dc.getLong(colIndex))
-                                    android.database.Cursor.FIELD_TYPE_FLOAT -> append(dc.getDouble(colIndex))
+                                    android.database.Cursor.FIELD_TYPE_INTEGER -> append(
+                                        dc.getLong(
+                                            colIndex
+                                        )
+                                    )
+
+                                    android.database.Cursor.FIELD_TYPE_FLOAT -> append(
+                                        dc.getDouble(
+                                            colIndex
+                                        )
+                                    )
+
                                     android.database.Cursor.FIELD_TYPE_STRING -> {
                                         var v = dc.getString(colIndex)
                                         if (v.length > 200) v = v.substring(0, 200) + "…"
                                         append(v.replace('\n', ' '))
                                     }
+
                                     android.database.Cursor.FIELD_TYPE_BLOB -> append("<BLOB>")
                                     else -> append("?")
                                 }
@@ -483,7 +509,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             var total = rowCount
             countCursor.use { cc -> if (cc.moveToFirst()) total = cc.getInt(0) }
             if (total > rowCount) {
-                sb.append("[shown ").append(rowCount).append(" of ").append(total).append(" rows]\n")
+                sb.append("[shown ").append(rowCount).append(" of ").append(total)
+                    .append(" rows]\n")
             } else {
                 sb.append("[rows: ").append(total).append("]\n")
             }
@@ -539,14 +566,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
             .setTitle(title)
-            .setPositiveButton(getString(R.string.about_dialog_positive_button)) {
-                dialogInterface,
-                _ ->
+            .setPositiveButton(getString(R.string.about_dialog_positive_button)) { dialogInterface,
+                                                                                   _ ->
                 dialogInterface.dismiss()
             }
-            .setNeutralButton(getString(R.string.about_dialog_neutral_button)) {
-                _: DialogInterface,
-                _: Int ->
+            .setNeutralButton(getString(R.string.about_dialog_neutral_button)) { _: DialogInterface,
+                                                                                 _: Int ->
                 sendEmailIntent(requireContext())
             }
             .setCancelable(true)
@@ -558,7 +583,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun emailBugReport() {
         try {
             // get the rethink.tombstone file
-            val tombstoneFile:File? = EnhancedBugReport.getTombstoneZipFile(requireContext())
+            val tombstoneFile: File? = EnhancedBugReport.getTombstoneZipFile(requireContext())
 
             // get the bug_report.zip file
             val dir = requireContext().filesDir
@@ -714,7 +739,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                         break
                     }
                 }
-                Logger.d(LOG_TAG_UI, "bug report content size: ${inputString.length}, $zipPath, ${zipFile.size()}")
+                Logger.d(
+                    LOG_TAG_UI,
+                    "bug report content size: ${inputString.length}, $zipPath, ${zipFile.size()}"
+                )
                 uiCtx {
                     if (!isAdded) return@uiCtx
                     binding.info.visibility = View.VISIBLE
@@ -784,7 +812,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 workManager.pruneWork()
             } else if (
                 WorkInfo.State.CANCELLED == workInfo.state ||
-                    WorkInfo.State.FAILED == workInfo.state
+                WorkInfo.State.FAILED == workInfo.state
             ) {
                 onAppExitInfoFailure()
                 workManager.pruneWork()
@@ -818,7 +846,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         // refrain from calling promptCrashLogAction multiple times
         if (
             SystemClock.elapsedRealtime() - lastAppExitInfoDialogInvokeTime <
-                TimeUnit.SECONDS.toMillis(1L)
+            TimeUnit.SECONDS.toMillis(1L)
         ) {
             return
         }
@@ -834,5 +862,38 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
+    }
+
+    private fun openBatteryStatsDialog() {
+        val ctx = requireContext()
+        val textView = android.widget.TextView(ctx)
+        val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
+        textView.setPadding(pad, pad, pad, pad)
+        textView.typeface = android.graphics.Typeface.MONOSPACE
+        textView.setTextIsSelectable(true)
+        textView.text = "Loading battery stats…"
+
+        val scroll = android.widget.ScrollView(ctx)
+        scroll.addView(textView)
+
+        val dialog = MaterialAlertDialogBuilder(ctx)
+            .setTitle("Battery stats")
+            .setView(scroll)
+            .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
+            .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
+                copyToClipboard("battery_stats", textView.text.toString())
+                showToastUiCentered(ctx, getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
+            }
+            .create()
+        dialog.show()
+
+        // load metrics async to avoid any UI jank
+        io {
+            val stats = BatteryStatsProvider.formattedStats()
+            uiCtx {
+                if (!isAdded) return@uiCtx
+                textView.text = stats
+            }
+        }
     }
 }
