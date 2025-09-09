@@ -38,6 +38,7 @@ class RethinkDnsApplicationPlay : Application() {
             applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE ==
                     ApplicationInfo.FLAG_DEBUGGABLE
 
+
         startKoin {
             if (BuildConfig.DEBUG) androidLogger()
             androidContext(this@RethinkDnsApplicationPlay)
@@ -52,6 +53,9 @@ class RethinkDnsApplicationPlay : Application() {
                 )
             )
         }
+
+        // Initialize global exception handler
+        GlobalExceptionHandler.initialize()
 
         CoroutineScope(SupervisorJob()).launch {
             scheduleJobs()
