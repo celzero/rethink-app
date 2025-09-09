@@ -387,6 +387,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // whether to use default dns for trusted ips and domains
     var useFallbackDnsToBypass by booleanPref("use_fallback_dns_to_bypass").withDefault<Boolean>(true)
 
+    // Firebase error reporting enabled (only for play and website variants)
+    var firebaseErrorReportingEnabled by booleanPref("firebase_error_reporting").withDefault<Boolean>(false)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
     var universalRulesCount: MutableLiveData<Int> = MutableLiveData()
