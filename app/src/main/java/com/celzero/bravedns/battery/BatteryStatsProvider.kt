@@ -43,6 +43,9 @@ import com.facebook.battery.serializer.cpu.CpuMetricsSerializer
 import com.facebook.battery.serializer.healthstats.HealthStatsMetricsSerializer
 import com.facebook.battery.serializer.network.NetworkMetricsSerializer
 import com.facebook.battery.serializer.time.TimeMetricsSerializer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 /**
@@ -132,11 +135,11 @@ object BatteryStatsProvider {
         mStatefulCollector = StatefulSystemMetricsCollector(mMetricsCollector)
     }
 
-    fun formattedStats(): String {
+    suspend fun formattedStats(): String {
         return BatteryStatsLogger.readLogFile() + "\n" + mStatefulCollector.latestDiffAndReset?.metrics.toString()
     }
 
-    fun logMetrics(tag: String?) {
+    fun logMetrics(tag: String?) = CoroutineScope(Dispatchers.IO).launch {
         // Note -- this gets the difference from the last call / initialization of the StatefulCollector
         val update: CompositeMetrics? = mStatefulCollector.getLatestDiffAndReset()
 
