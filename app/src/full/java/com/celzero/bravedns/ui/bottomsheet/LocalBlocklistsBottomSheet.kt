@@ -481,6 +481,15 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
             return
         }
 
+        if (!VpnController.hasTunnel()) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.ssv_toast_start_rethink),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+
         ui {
             val blocklistsExist =
                 withContext(Dispatchers.Default) {
