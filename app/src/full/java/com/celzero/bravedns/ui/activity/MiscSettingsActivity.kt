@@ -92,6 +92,7 @@ import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
 import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
+import com.celzero.bravedns.util.FirebaseErrorReporting
 
 
 class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) {
@@ -143,6 +144,11 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
         if (isFdroidFlavour()) {
             b.settingsActivityCheckUpdateRl.visibility = View.GONE
+            // Hide Firebase error reporting for F-Droid variant
+            b.settingsFirebaseErrorReportingRl.visibility = View.GONE
+        } else {
+            // Show Firebase error reporting for play and website variants
+            b.settingsFirebaseErrorReportingRl.visibility = View.VISIBLE
         }
 
         // add ipInfo inc to the desc
@@ -160,6 +166,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
         // camera and microphone access
         b.settingsMicCamAccessSwitch.isChecked = persistentState.micCamAccess
+        // Firebase error reporting
+        b.settingsFirebaseErrorReportingSwitch.isChecked = persistentState.firebaseErrorReportingEnabled
 
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {
@@ -608,6 +616,38 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             persistentState.downloadIpInfo = isChecked
         }
 
+        // Firebase error reporting toggle
+        b.settingsFirebaseErrorReportingRl.setOnClickListener {
+            b.settingsFirebaseErrorReportingSwitch.isChecked =
+                !b.settingsFirebaseErrorReportingSwitch.isChecked
+        }
+
+        b.settingsFirebaseErrorReportingSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
+            handleFirebaseErrorReportingToggle(isChecked)
+        }
+
+    }
+
+    private fun handleFirebaseErrorReportingToggle(isChecked: Boolean) {
+        if (isChecked) {
+            // enable firebase error reporting
+            FirebaseErrorReporting.setEnabled(true)
+            b.settingsFirebaseErrorReportingSwitch.isChecked = true
+            showToastUiCentered(
+                this,
+                getString(R.string.config_add_success_toast),
+                Toast.LENGTH_SHORT
+            )
+        } else {
+            // disable firebase error reporting
+            FirebaseErrorReporting.setEnabled(false)
+            b.settingsFirebaseErrorReportingSwitch.isChecked = false
+            showToastUiCentered(
+                this,
+                getString(R.string.config_add_success_toast),
+                Toast.LENGTH_SHORT
+            )
+        }
     }
 
     private fun showGoLoggerDialog() {
@@ -635,8 +675,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             persistentState.goLoggerLevel = which.toLong()
             GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
             updateConfigLevel(persistentState.goLoggerLevel)
-            b.genSettingsGoLogDesc.text =
-                Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt()).name.lowercase()
+            val logLevel = if (persistentState.goLoggerLevel.toInt() == 7) 8 else persistentState.goLoggerLevel.toInt()
+            b.genSettingsGoLogDesc.text = Logger.LoggerLevel.fromId(logLevel).name.lowercase()
                     .replaceFirstChar(Char::titlecase).replace("_", " ")
         }
         alertBuilder.create().show()
@@ -831,102 +871,102 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 if (xpp.eventType == XmlPullParser.START_TAG) {
                     if (xpp.name == "locale") {
                         tagsList.add(xpp.getAttributeValue(0))
-                    }
-                }
-                xpp.next()
-            }
-        } catch (e: XmlPullParserException) {
-            Logger.e(LOG_TAG_UI, "error parsing locale_config.xml", e)
-        } catch (e: IOException) {
-            Logger.e(LOG_TAG_UI, "error parsing locale_config.xml", e)
-        }
+                      }
+                  }
+                  xpp.next()
+              }
+          } catch (e: XmlPullParserException) {
+              Logger.e(LOG_TAG_UI, "error parsing locale_config.xml", e)
+          } catch (e: IOException) {
+              Logger.e(LOG_TAG_UI, "error parsing locale_config.xml", e)
+          }
 
-        return LocaleListCompat.forLanguageTags(tagsList.joinToString(","))
-    }
+          return LocaleListCompat.forLanguageTags(tagsList.joinToString(","))
+      }
 
-    private fun getLocaleEntries(): Map<String, String> {
-        val localeList = getLocalesFromLocaleConfig()
-        val map = mutableMapOf<String, String>()
+      private fun getLocaleEntries(): Map<String, String> {
+          val localeList = getLocalesFromLocaleConfig()
+          val map = mutableMapOf<String, String>()
 
-        for (a in 0 until localeList.size()) {
-            localeList[a].let { it?.let { it1 -> map.put(it1.displayName, it1.toLanguageTag()) } }
-        }
-        return map
-    }
+          for (a in 0 until localeList.size()) {
+              localeList[a].let { it?.let { it1 -> map.put(it1.displayName, it1.toLanguageTag()) } }
+          }
+          return map
+      }
 
-    private fun invokeImportExport() {
-        if (this.isFinishing || this.isDestroyed) {
-            Logger.w(LOG_TAG_UI, "err opening bkup btmsheet, activity is destroyed")
-            return
-        }
+      private fun invokeImportExport() {
+          if (this.isFinishing || this.isDestroyed) {
+              Logger.w(LOG_TAG_UI, "err opening bkup btmsheet, activity is destroyed")
+              return
+          }
 
-        val bottomSheetFragment = BackupRestoreBottomSheet()
-        bottomSheetFragment.show(this.supportFragmentManager, bottomSheetFragment.tag)
-    }
+          val bottomSheetFragment = BackupRestoreBottomSheet()
+          bottomSheetFragment.show(this.supportFragmentManager, bottomSheetFragment.tag)
+      }
 
-    private fun openConsoleLogActivity() {
-        try {
-            val intent = Intent(this, ConsoleLogActivity::class.java)
-            startActivity(intent)
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_UI, "err opening console log activity ${e.message}", e)
-        }
-    }
+      private fun openConsoleLogActivity() {
+          try {
+              val intent = Intent(this, ConsoleLogActivity::class.java)
+              startActivity(intent)
+          } catch (e: Exception) {
+              Logger.e(LOG_TAG_UI, "err opening console log activity ${e.message}", e)
+          }
+      }
 
-    fun showAppTriggerPackageDialog(context: Context, onPackageSet: (String) -> Unit) {
-        val editText = AppCompatEditText(context).apply {
-            hint = context.getString(R.string.adv_tasker_dialog_edit_hint)
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-            setHorizontallyScrolling(true)
-            if (persistentState.appTriggerPackages.isNotEmpty()) {
-                setText(persistentState.appTriggerPackages)
-            }
-            setPadding(50, 40, 50, 40)
-            gravity = Gravity.TOP or Gravity.START
-            android.R.style.Widget_Material_EditText
-        }
+      fun showAppTriggerPackageDialog(context: Context, onPackageSet: (String) -> Unit) {
+          val editText = AppCompatEditText(context).apply {
+              hint = context.getString(R.string.adv_tasker_dialog_edit_hint)
+              inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+              setHorizontallyScrolling(true)
+              if (persistentState.appTriggerPackages.isNotEmpty()) {
+                  setText(persistentState.appTriggerPackages)
+              }
+              setPadding(50, 40, 50, 40)
+              gravity = Gravity.TOP or Gravity.START
+              android.R.style.Widget_Material_EditText
+          }
 
-        val selectableTextView = AppCompatTextView(context).apply {
-            text = context.getString(R.string.adv_tasker_dialog_msg)
-            setTextIsSelectable(true)
-            setPadding(50, 40, 50, 0)
-            textSize = 16f
-        }
+          val selectableTextView = AppCompatTextView(context).apply {
+              text = context.getString(R.string.adv_tasker_dialog_msg)
+              setTextIsSelectable(true)
+              setPadding(50, 40, 50, 0)
+              textSize = 16f
+          }
 
-        val instructionsTextView = AppCompatTextView(context).apply {
-            text = context.getString(R.string.adv_tasker_dialog_instructions)
-            setTextIsSelectable(true)
-            setPadding(50, 40, 50, 0)
-            textSize = 16f
-        }
+          val instructionsTextView = AppCompatTextView(context).apply {
+              text = context.getString(R.string.adv_tasker_dialog_instructions)
+              setTextIsSelectable(true)
+              setPadding(50, 40, 50, 0)
+              textSize = 16f
+          }
 
-        // add a LinearLayout as the single child of the ScrollView, then add the text view and
-        // edit text to the LinearLayout.
-        val linearLayout = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            addView(selectableTextView)
-            addView(editText)
-            addView(instructionsTextView)
-        }
+          // add a LinearLayout as the single child of the ScrollView, then add the text view and
+          // edit text to the LinearLayout.
+          val linearLayout = LinearLayout(context).apply {
+              orientation = LinearLayout.VERTICAL
+              addView(selectableTextView)
+              addView(editText)
+              addView(instructionsTextView)
+          }
 
-        val scrollView = ScrollView(context).apply {
-            setPadding(40, 10, 40, 0)
-            addView(linearLayout)
-        }
+          val scrollView = ScrollView(context).apply {
+              setPadding(40, 10, 40, 0)
+              addView(linearLayout)
+          }
 
-        AlertDialog.Builder(context)
-            .setTitle(context.getString(R.string.adv_taster_title))
-            .setView(scrollView)
-            .setPositiveButton(context.getString(R.string.lbl_save)) { dialog, _ ->
-                val pkgName = editText.text.toString().trim()
-                if (pkgName.isNotEmpty()) {
-                    onPackageSet(pkgName)
-                }
-                dialog.dismiss()
-            }
-            .setNegativeButton(context.getString(R.string.lbl_cancel)) { dialog, _ -> dialog.cancel() }
-            .show()
-    }
+          AlertDialog.Builder(context)
+              .setTitle(context.getString(R.string.adv_taster_title))
+              .setView(scrollView)
+              .setPositiveButton(context.getString(R.string.lbl_save)) { dialog, _ ->
+                  val pkgName = editText.text.toString().trim()
+                  if (pkgName.isNotEmpty()) {
+                      onPackageSet(pkgName)
+                  }
+                  dialog.dismiss()
+              }
+              .setNegativeButton(context.getString(R.string.lbl_cancel)) { dialog, _ -> dialog.cancel() }
+              .show()
+      }
 
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -1152,3 +1192,4 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         delay(ms, lifecycleScope) { for (v in views) v.isEnabled = true }
     }
 }
+
