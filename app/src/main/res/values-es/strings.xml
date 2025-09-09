@@ -1029,4 +1029,5 @@
     <string name="firewall_desc" translatable="true">Controla el uso de internet de la app; restringe conexiones basadas en la actividad de red o app.</string>
     <string name="dns_title" translatable="true">Bloquear anuncios y malware con DNS</string>
     <string name="dns_desc" translatable="true">Elige entre más de 190 listas para bloquear anuncios, rastreadores y malware.</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">Inmediatamente</string>
 </resources>
