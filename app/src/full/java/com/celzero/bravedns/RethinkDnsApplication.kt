@@ -23,10 +23,10 @@ import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.os.StrictMode
 import com.celzero.bravedns.battery.BatteryStatsLogger
-import com.celzero.bravedns.battery.BatteryStatsProvider
 import com.celzero.bravedns.battery.BatteryStatsProvider.logMetrics
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
+import com.celzero.bravedns.util.GlobalExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -51,6 +51,9 @@ class RethinkDnsApplication : Application(), Application.ActivityLifecycleCallba
             androidContext(this@RethinkDnsApplication)
             koin.loadModules(AppModules)
         }
+
+        // Initialize global exception handler
+        GlobalExceptionHandler.initialize()
 
         // initialize battery stats provider (facebook battery-metrics)
         try {
