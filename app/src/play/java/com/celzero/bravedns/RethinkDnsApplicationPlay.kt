@@ -55,7 +55,8 @@ class RethinkDnsApplicationPlay : Application() {
         }
 
         // Initialize global exception handler
-        GlobalExceptionHandler.initialize()
+        GlobalExceptionHandler.initialize(this)
+        FirebaseErrorReporting.initialize()
 
         CoroutineScope(SupervisorJob()).launch {
             scheduleJobs()

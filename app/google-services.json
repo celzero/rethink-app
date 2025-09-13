@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "96801500380",
+    "project_id": "rethink-dns-firewall-test",
+    "storage_bucket": "rethink-dns-firewall-test.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:96801500380:android:7b1d4994d142b74a141819",
+        "android_client_info": {
+          "package_name": "com.celzero.bravedns"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArrVpPeKrqYVq0CNLCANRCk-6KH-VSEOQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
     id 'com.google.devtools.ksp'
     id 'kotlin-android'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -337,4 +339,10 @@ dependencies {
     implementation 'com.facebook.battery:reporters:1.0.0'
     implementation 'com.facebook.battery:serializers:1.0.0'
 
+    // Firebase dependencies for error reporting (website and play variants only)
+    websiteImplementation platform('com.google.firebase:firebase-bom:34.2.0')
+    websiteImplementation 'com.google.firebase:firebase-crashlytics'
+
+    playImplementation platform('com.google.firebase:firebase-bom:34.2.0')
+    playImplementation 'com.google.firebase:firebase-crashlytics'
 }

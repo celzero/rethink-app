@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.util
 
-import android.content.Context
+import Logger
 import Logger.LOG_FIREBASE
 import com.celzero.bravedns.service.PersistentState
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -33,10 +33,10 @@ object FirebaseErrorReporting : KoinComponent {
     /**
      * Initialize Firebase Crashlytics if available and enabled
      */
-    fun initialize(context: Context) {
+    fun initialize() {
         try {
             val crashlytics = FirebaseCrashlytics.getInstance()
-            crashlytics.setCrashlyticsCollectionEnabled(persistentState.firebaseErrorReportingEnabled)
+            crashlytics.isCrashlyticsCollectionEnabled = persistentState.firebaseErrorReportingEnabled
             Logger.i(LOG_FIREBASE, "crashlytics initialized, enabled: ${persistentState.firebaseErrorReportingEnabled}")
         } catch (e: Exception) {
             Logger.w(LOG_FIREBASE, "crashlytics not available: ${e.message}")

@@ -45,7 +45,8 @@ class RethinkDnsApplication : Application() {
         }
 
         // Initialize global exception handler
-        GlobalExceptionHandler.initialize()
+        GlobalExceptionHandler.initialize(this)
+        FirebaseErrorReporting.initialize()
         get<ScheduleManager>().scheduleDatabaseRefreshJob()
     }
 }

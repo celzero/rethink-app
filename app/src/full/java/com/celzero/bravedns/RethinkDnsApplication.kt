@@ -26,6 +26,7 @@ import com.celzero.bravedns.battery.BatteryStatsLogger
 import com.celzero.bravedns.battery.BatteryStatsProvider.logMetrics
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
+import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.GlobalExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -53,7 +54,8 @@ class RethinkDnsApplication : Application(), Application.ActivityLifecycleCallba
         }
 
         // Initialize global exception handler
-        GlobalExceptionHandler.initialize()
+        GlobalExceptionHandler.initialize(this)
+        FirebaseErrorReporting.initialize()
 
         // initialize battery stats provider (facebook battery-metrics)
         try {
