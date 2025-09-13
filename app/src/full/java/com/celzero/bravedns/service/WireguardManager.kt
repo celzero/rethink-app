@@ -22,6 +22,7 @@ import android.text.format.DateUtils
 import com.celzero.firestack.backend.Backend
 import com.celzero.bravedns.backup.BackupHelper.Companion.TEMP_WG_DIR
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgConfigFilesImmutable
 import com.celzero.bravedns.database.WgConfigFilesRepository
@@ -571,20 +572,67 @@ object WireguardManager : KoinComponent {
         }
 
         if (config.ssidEnabled) {
-            val ssidList = config.ssids.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-            if (ssidList.isEmpty()) {
-                Logger.d(LOG_TAG_PROXY, "canAdd: ssidEnabled is true, but ssid list is empty")
-                return false
+            val ssidItems = SsidItem.parseStorageList(config.ssids)
+            if (ssidItems.isEmpty()) { // treat empty as match all
+                Logger.d(LOG_TAG_PROXY, "canAdd: ssidEnabled is true, but ssid list is empty, match all")
+                return true
             }
 
-            if (ssidList.none { it.equals(ssid, ignoreCase = true) }) {
-                Logger.i(LOG_TAG_PROXY, "canAdd: ssidEnabled is true, but ssid($ssid) not available, ssidList: $ssidList")
+            val matchFound = ssidItems.any { ssidItem ->
+                when (ssidItem.type) {
+                    SsidItem.SsidType.STRING -> {
+                        ssidItem.name.equals(ssid, ignoreCase = true)
+                    }
+                    SsidItem.SsidType.WILDCARD -> {
+                        matchesWildcard(ssidItem.name, ssid)
+                    }
+                }
+            }
+
+            if (!matchFound) {
+                val ssidNames = ssidItems.map { "${it.name}(${it.type.displayName})" }
+                Logger.i(LOG_TAG_PROXY, "canAdd: ssidEnabled is true, but ssid($ssid) not available, ssidList: $ssidNames")
                 return false
             }
         }
 
         Logger.d(LOG_TAG_PROXY, "canAdd: eligible for ssid: $ssid")
         return true
+    }
+
+    private fun matchesWildcard(pattern: String, text: String): Boolean {
+        // Convert wildcard pattern to regex
+        // * matches any sequence of characters
+        // ? matches any single character
+        val regexPattern = pattern
+            .replace(".", "\\.")  // Escape dots
+            .replace("*", ".*")   // Convert * to .*
+            .replace("?", ".")    // Convert ? to .
+
+        return try {
+            text.matches(Regex(regexPattern, RegexOption.IGNORE_CASE))
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_PROXY, "Invalid wildcard pattern: $pattern, error: ${e.message}")
+            false
+        }
+    }
+
+    fun matchesSsidList(ssidList: String, ssid: String): Boolean {
+        val ssidItems = SsidItem.parseStorageList(ssidList)
+        if (ssidItems.isEmpty()) { // treat empty as match all
+            return true
+        }
+
+        return ssidItems.any { ssidItem ->
+            when (ssidItem.type) {
+                SsidItem.SsidType.STRING -> {
+                    ssidItem.name.equals(ssid, ignoreCase = true)
+                }
+                SsidItem.SsidType.WILDCARD -> {
+                    matchesWildcard(ssidItem.name, ssid)
+                }
+            }
+        }
     }
 
     private fun convertStringIdToId(id: String): Int {
@@ -737,6 +785,7 @@ object WireguardManager : KoinComponent {
         )
         if (map?.isActive == true) {
             VpnController.addWireGuardProxy(id = ID_WG_BASE + config.getId())
+            VpnController.notifyConnectionMonitor()
         }
     }
 
@@ -1148,4 +1197,3 @@ object WireguardManager : KoinComponent {
         CoroutineScope(Dispatchers.IO).launch { f() }
     }
 }
-

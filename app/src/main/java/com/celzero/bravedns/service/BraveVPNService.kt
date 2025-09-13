@@ -103,6 +103,7 @@ import com.celzero.bravedns.util.Constants.Companion.NOTIF_WG_PERMISSION_VALUE
 import com.celzero.bravedns.util.Constants.Companion.PRIMARY_USER
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Daemons
+import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.IPUtil
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.KnownPorts
@@ -144,6 +145,8 @@ import com.google.common.cache.RemovalCause
 import com.google.common.cache.RemovalNotification
 import com.google.common.collect.Sets
 import inet.ipaddr.HostName
+import inet.ipaddr.IPAddress
+import inet.ipaddr.IPAddressSeqRange
 import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
@@ -305,7 +308,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     // remove the entry from this map
     private val trackedConnMetaData: Cache<String, ConnTrackerMetaData> =
         CacheBuilder.newBuilder()
-            .expireAfterWrite(60, TimeUnit.SECONDS) // entry removed 60s after creation/update
+            .expireAfterWrite(300, TimeUnit.SECONDS) // entry removed 300s after creation/update
             .removalListener<String, ConnTrackerMetaData> { notification ->
                 handleExpiredConnMetaData(notification)
             }
@@ -2718,8 +2721,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
                 if (vpnAdapter == null) {
                     // create a new vpn adapter
-                    Logger.i(LOG_TAG_VPN, "vpn-adapter doesn't exists, create one, fd: $fd, lockdown: $lockdown, protos: $protos")
-                    vpnAdapter = GoVpnAdapter(ctx, vpnScope, fd, mtu, opts) // may throw
+                    val ifaceAddresses = getAddresses()
+                    Logger.i(LOG_TAG_VPN, "vpn-adapter doesn't exists, create one, fd: $fd, lockdown: $lockdown, protos: $protos, ifaddr: $ifaceAddresses, opts: $opts")
+                    vpnAdapter = GoVpnAdapter(ctx, vpnScope, fd, ifaceAddresses, mtu, opts) // may throw
                     GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
                     vpnAdapter?.initResolverProxiesPcap(opts)
                     //checkForPlusSubscription()
@@ -2797,6 +2801,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         vpnRestartTrigger.value = reason
         // pause mobile-only wgs on no network
         pauseMobileOnlyWireGuardOnNoNw()
+        pauseSsidEnabledWireGuardOnNoNw()
         setNetworkAndDefaultDnsIfNeeded(true)
         VpnController.onConnectionStateChanged(null)
     }
@@ -3763,6 +3768,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         }*/
     }
 
+    private fun getAddresses(): String {
+        val ipv4 = IPAddressString("${LanIp.GATEWAY.make(IPV4_TEMPLATE)}/$IPV4_PREFIX_LENGTH")
+        val ipv6 = IPAddressString("${LanIp.GATEWAY.make(IPV6_TEMPLATE)}/$IPV6_PREFIX_LENGTH")
+        return "${ipv4.address.toNormalizedString()},${ipv6.address.toNormalizedString()}"
+    }
+
     private fun <T> go2kt(co: CoFactory<T>, f: suspend() -> T): T = runBlocking {
         // runBlocking blocks the current thread until all coroutines within it are complete
         // an call a suspending function from a non-suspending context and obtain the result.
@@ -3914,7 +3925,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             Logger.vv(LOG_TAG_VPN, "$TAG; onQuery: bypassing local blocklists for $fqdn, $uid")
             return makeNsOpts(uid, tid, fqdn, true)
         }
-        if (persistentState.bypassBlockInDns) {
+        // requires alg to be enabled, as the go-tun adds the secondary ip (blocked by upstream).
+        // so check if alg is enabled along with bypassBlockInDns
+        if (persistentState.bypassBlockInDns && persistentState.enableDnsAlg) {
             // if bypassBlockInDns is enabled, bypass local blocklist as true, so that the domain
             // is resolved and the decision is made by in flow()
             Logger.vv(LOG_TAG_VPN, "$TAG; onQuery: bypass block in onquery $fqdn, $uid")
@@ -3948,25 +3961,25 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             if (connectionStatus.blocked()) {
                 // if the app is blocked by both wifi and mobile data, then the block the request
                 // block wifi/metered decision can be made by in flow() function
-                Logger.vv(LOG_TAG_VPN, "$TAG; onQuery, $uid is blocked, $fqdn")
+                Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid is blocked, $fqdn")
                 return makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn)
             }
 
             val appStatus = FirewallManager.appStatus(uid)
             if (appStatus.bypassDnsFirewall()) {
                 // in case of bypass dns, bypass the local blocklists and set only block-free
-                Logger.vv(LOG_TAG_VPN, "$TAG; onQuery, $uid bypasses dns+firewall, $fqdn")
+                Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid bypasses dns+firewall, $fqdn")
                 return makeNsOpts(uid, getTransportIdToBypass(tid), fqdn, true)
             }
 
             val appDomainRule =  getDomainRule(fqdn, uid)
             when (appDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
-                    Logger.vv(LOG_TAG_VPN, "$TAG; onQuery, $uid, domain trusted: $fqdn")
+                    Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid, domain trusted: $fqdn")
                     return makeNsOpts(uid, getTransportIdToBypass(tid), fqdn, true)
                 }
                 DomainRulesManager.Status.BLOCK -> {
-                    Logger.vv(LOG_TAG_VPN, "$TAG; onQuery, $uid, domain blocked: $fqdn")
+                    Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid, domain blocked: $fqdn")
                     return makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn)
                 }
                 DomainRulesManager.Status.NONE -> {
@@ -3977,11 +3990,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val globalDomainRule = getDomainRule(fqdn, UID_EVERYBODY)
             when (globalDomainRule) {
                 DomainRulesManager.Status.TRUST -> {
-                    Logger.vv(LOG_TAG_VPN, "$TAG; onQuery, $uid, univ domain trusted: $fqdn")
+                    Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid, univ domain trusted: $fqdn")
                     return makeNsOpts(uid, getTransportIdToBypass(tid), fqdn, true)
                 }
                 DomainRulesManager.Status.BLOCK -> {
-                    Logger.vv(LOG_TAG_VPN, "$TAG; onQuery, $uid, univ domain blocked: $fqdn")
+                    Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid, univ domain blocked: $fqdn")
                     return makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn)
                 }
                 DomainRulesManager.Status.NONE -> {
@@ -3989,7 +4002,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 }
             }
 
-            Logger.vv(LOG_TAG_VPN, "$TAG; onQuery, $uid, no rules, use $tid for $fqdn")
+            Logger.vv(LOG_TAG_VPN, "$TAG onQuery, $uid, no rules, use $tid for $fqdn")
             return makeNsOpts(uid, tid, fqdn)
         }
 
@@ -4080,7 +4093,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             }
             // only when there is an uid, we need to calculate wireguard ids
             // gives all the possible wgs for the app regardless of usesMobileNetwork
-            val ssid = underlyingNetworks?.activeSsid ?: underlyingNetworks?.ipv4Net?.firstOrNull { it.ssid != null }?.ssid ?: underlyingNetworks?.ipv6Net?.firstOrNull() { it.ssid != null }?.ssid ?: ""
+            val ssid = getUnderlyingSsid() ?: ""
             val ids = WireguardManager.getAllPossibleConfigIdsForApp(uid, ip = "", port = 0, domain, true, ssid, defaultTid)
             val wgOrDefaultTid = if (ids.isEmpty()) {
                 Logger.d(LOG_TAG_VPN, "(onQuery-pid)no wg found, return $defaultTid")
@@ -4092,6 +4105,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             Logger.d(LOG_TAG_VPN, "(onQuery)wg ids($ids) found for uid: $uid")
             return Pair(wgOrDefaultTid, "")
         }
+    }
+
+    private fun getUnderlyingSsid(): String? {
+        return underlyingNetworks?.activeSsid ?: underlyingNetworks?.ipv4Net?.firstOrNull { it.ssid != null }?.ssid ?: underlyingNetworks?.ipv6Net?.firstOrNull() { it.ssid != null }?.ssid
     }
 
     private suspend fun makeNsOpts(
@@ -4395,6 +4412,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // disable crash logging for now
             if (false) Logger.crash(LOG_GO_LOGGER, msg) // write to in-mem db
             EnhancedBugReport.writeLogsToFile(this, msg)
+            FirebaseErrorReporting.recordException(Throwable(msg))
         } else if (l.user()) {
             showNwEngineNotification(msg)
             // consider all the notifications from go as failure and stop the service
@@ -5116,7 +5134,23 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return@forEach
             }
             val id = ID_WG_BASE + config.getId()
-            logd("pause wg from tunnel: $id")
+            logd("pause wg from tunnel (mobile): $id")
+            // pause the wireguard proxy, so that it won't be used for new connections
+            vpnAdapter?.pauseWireguard(id)
+        }
+    }
+
+    suspend fun pauseSsidEnabledWireGuardOnNoNw() {
+        val activeWgs = WireguardManager.getActiveConfigs()
+        activeWgs.forEach { config ->
+            val map = WireguardManager.getConfigFilesById(config.getId())
+            if (map == null || !map.ssidEnabled) {
+                // if the config is not using ssid restriction, then skip it
+                logd("pause wg from tunnel: ${config.getId()} is not using ssid restriction")
+                return@forEach
+            }
+            val id = ID_WG_BASE + config.getId()
+            logd("pause wg from tunnel (ssid): $id")
             // pause the wireguard proxy, so that it won't be used for new connections
             vpnAdapter?.pauseWireguard(id)
         }
@@ -5132,8 +5166,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val v4Mobile = v4first?.capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ?: false
             val v6Mobile = v6first?.capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ?: false
             val isActiveMobile = v4Mobile || (v4first == null && v6Mobile)
-            val activeSsid = newNet?.activeSsid ?: newNet?.ipv4Net?.firstOrNull()?.ssid ?: newNet?.ipv6Net?.firstOrNull()?.ssid ?: ""
-            Logger.v(LOG_TAG_VPN, "refreshOrPauseOrResumeOrReAddProxies: canResumeMobileOnlyWg? $isActiveMobile, $activeSsid")
+            val activeSsid = getUnderlyingSsid() ?: ""
+            Logger.v(LOG_TAG_VPN, "refreshOrPauseOrResumeOrReAddProxies: canResumeMobileOnlyWg? $isActiveMobile, curr-ssid: $activeSsid")
             io("refreshWg") { vpnAdapter?.refreshOrPauseOrResumeOrReAddProxies(isActiveMobile, activeSsid) }
         }
     }
@@ -5176,7 +5210,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val containsMultipleProxy = proxyIds
                 .split(",")
                 .map { it.trim() }.count { it.isNotEmpty() } > 1
-            if (containsMultipleProxy) {
+            if (containsMultipleProxy && !cm.isBlocked) {
                 trackedConnMetaData.put(cm.connId, cm)
                 if (DEBUG) logd("flow/inflow/postflow: multiple proxies for connId: $connId, proxies: $proxyIds, uid: $uid, cache-size: ${trackedConnMetaData.size()}, cm: $cm")
             } else {
@@ -5210,7 +5244,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         } else {
             Logger.i(
                 LOG_TAG_VPN,
-                "flow/inflow: returning mark: $mark for src(${cm.sourceIP}: ${cm.sourcePort}), dest(${cm.destIP}:${cm.destPort})"
+                "flow/inflow: returning mark: $mark for src(${cm.sourceIP}: ${cm.sourcePort}), dest(${cm.destIP}:${cm.destPort}, ${cm.query})"
             )
         }
         return mark
@@ -5442,13 +5476,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         stats.append("VPN Stats:\n")
         stats.append("Builder:\n${builderStats()}\n")
         stats.append("General:\n${generalStats()}\n")
-        stats.append("Firewall:\n${firewallStats()}\n")
-        //stats.append("DNS: ${dnsStats()}\n")
-        stats.append("Proxy:\n${proxyStats()}\n")
-        stats.append("WireGuard:\n${wireguardStats()}\n")
         //stats.append("RPN:\n${rpnStats()}\n")
+        stats.append("Firewall:\n${firewallStats()}\n")
         stats.append("IpRules:\n${ipRulesStats()}\n")
         stats.append("DomainRules:\n${domainRulesStats()}\n")
+        stats.append("Proxy:\n${proxyStats()}\n")
+        stats.append("WireGuard:\n${wireguardStats()}\n")
         return stats.toString()
     }
 
@@ -5525,6 +5558,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val linkAddresses6 = n.underlyingNws?.ipv6Net?.map { it.linkProperties?.linkAddresses?.filter { IPAddressString(it.address.hostAddress).isIPv6 } } ?: emptyList()
         val link4Mtu = if (isAtleastQ()) n.underlyingNws?.ipv4Net?.map { it.linkProperties?.mtu ?: 0 } ?: listOf(-1) else listOf(-1)
         val link6Mtu = if (isAtleastQ()) n.underlyingNws?.ipv6Net?.map { it.linkProperties?.mtu ?: 0 } ?: listOf(-1) else listOf(-1)
+        val ssid = getUnderlyingSsid() ?: "N/A"
 
         val linkAddr4String = if (linkAddresses4.isEmpty()) {
             "N/A"
@@ -5572,6 +5606,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         sb.append("   Link MTU\n")
         sb.append("      4: $link4Mtu\n")
         sb.append("      6: $link6Mtu\n")
+        sb.append("   SSID: $ssid\n")
         return sb.toString()
     }
 

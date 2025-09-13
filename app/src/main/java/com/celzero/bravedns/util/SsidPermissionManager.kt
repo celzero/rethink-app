@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.util
 
+import Logger.LOG_TAG_UI
 import android.Manifest
 import android.app.Activity
 import android.content.Context
@@ -116,12 +117,30 @@ object SsidPermissionManager {
     }
 
     /**
-     * Check if SSID settings should be enabled based on permissions
-     * @param context The context to check permissions
-     * @return true if SSID settings should be enabled, false otherwise
+     * Open the app's settings page for manual permission management
+     * @param context The context to start the settings intent
      */
-    fun isSsidSettingsEnabled(context: Context): Boolean {
-        return hasRequiredPermissions(context)
+    fun openAppSettings(context: Context) {
+        try {
+            val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.data = android.net.Uri.fromParts("package", context.packageName, null)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            // Fallback to general app settings if specific intent fails
+            try {
+                val fallbackIntent = Intent(android.provider.Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)
+                context.startActivity(fallbackIntent)
+            } catch (ignored: Exception) {
+                // If all else fails, show a toast message
+                if (context is Activity) {
+                    Utilities.showToastUiCentered(
+                        context,
+                        context.getString(R.string.intent_launch_error, "App Settings"),
+                        android.widget.Toast.LENGTH_LONG
+                    )
+                }
+            }
+        }
     }
 
     /**
@@ -159,14 +178,17 @@ object SsidPermissionManager {
             hasRequiredPermissions(activity) -> {
                 // Permissions already granted
                 callback.onPermissionsGranted()
+                Logger.d(LOG_TAG_UI, "SSID permissions already granted")
             }
             shouldShowPermissionRationale(activity) -> {
                 // Show rationale before requesting
                 callback.onPermissionsRationale()
+                Logger.d(LOG_TAG_UI, "Showing rationale for SSID permissions")
             }
             else -> {
                 // Request permissions directly
                 requestSsidPermissions(activity)
+                Logger.d(LOG_TAG_UI, "Requested SSID permissions")
             }
         }
     }
@@ -191,17 +213,17 @@ object SsidPermissionManager {
         try {
             val intent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             context.startActivity(intent)
-        } catch (e: Exception) {
+        } catch (ignored: Exception) {
             // Fallback to general location settings if specific intent fails
             try {
                 val fallbackIntent = Intent(android.provider.Settings.ACTION_PRIVACY_SETTINGS)
                 context.startActivity(fallbackIntent)
-            } catch (ex: Exception) {
+            } catch (ignored: Exception) {
                 // If all else fails, show a toast message
                 if (context is Activity) {
                     android.widget.Toast.makeText(
                         context,
-                        "Please enable location services in Settings",
+                        getPermissionExplanation(context),
                         android.widget.Toast.LENGTH_LONG
                     ).show()
                 }

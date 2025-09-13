@@ -436,6 +436,50 @@
 
                     </RelativeLayout>
 
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/one_wg_info_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:text="@string/one_wg_dialog_desc"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view" />
+
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/mobile_ssid_settings_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp"
+                app:cardUseCompatPadding="true"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/other_settings_card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="20dp">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/ms_wg_header_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:paddingTop="15dp"
+                        android:text="Mobile / SSID settings"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textColor="?attr/primaryTextColor" />
+
                     <RelativeLayout
                         android:id="@+id/use_mobile_rl"
                         android:layout_width="wrap_content"
@@ -594,21 +638,78 @@
                             android:src="@drawable/ic_edit_icon_grey" />
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/one_wg_info_tv"
-                        android:layout_width="wrap_content"
+                    <!-- SSID Permission Error Section -->
+                    <LinearLayout
+                        android:id="@+id/ssid_permission_error_layout"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
+                        android:layout_marginTop="5dp"
                         android:layout_marginEnd="15dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
-                        android:text="@string/one_wg_dialog_desc"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
+                        android:background="?attr/selectableItemBackground"
+                        android:orientation="horizontal"
+                        android:padding="8dp"
+                        android:visibility="gone">
 
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/ssid_permission_error_text"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/ssid_permission_error"
+                            android:textColor="?attr/accentBad"
+                            android:textSize="@dimen/default_font_text_view" />
 
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/ssid_permission_error_action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="4dp"
+                            android:text="@string/ssid_permission_error_action"
+                            android:textColor="?attr/accentGood"
+                            android:textSize="@dimen/default_font_text_view"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <!-- SSID Location Error Section -->
+                    <LinearLayout
+                        android:id="@+id/ssid_location_error_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="15dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:orientation="horizontal"
+                        android:padding="8dp"
+                        android:visibility="gone">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/ssid_location_error_text"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/ssid_location_error"
+                            android:textColor="?attr/accentBad"
+                            android:textSize="@dimen/default_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/ssid_location_error_action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="4dp"
+                            android:text="@string/ssid_location_error_action"
+                            android:textColor="?attr/accentGood"
+                            android:textSize="@dimen/default_font_text_view"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -617,7 +718,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/other_settings_card" />
+                app:layout_constraintTop_toBottomOf="@+id/mobile_ssid_settings_card" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
