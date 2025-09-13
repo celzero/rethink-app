@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <!-- Content wrapper for tablets with max width constraint -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/home_screen_side_margin"
+        android:paddingEnd="@dimen/home_screen_side_margin">
+
+        <LinearLayout
+            android:id="@+id/ffa_search_view_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/default_padding">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:orientation="horizontal"
+                        android:weightSum="1">
+
+                        <androidx.appcompat.widget.SearchView
+                            android:id="@+id/ffa_search"
+                            android:layout_width="0dp"
+                            android:layout_height="56dp"
+                            android:layout_gravity="start"
+                            android:layout_weight="0.8"
+                            android:fontFamily="sans-serif"
+                            android:focusable="false"
+                            android:isScrollContainer="true"
+                            app:iconifiedByDefault="false"
+                            app:queryHint="@string/search_firewall_all_apps" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ffa_refresh_list"
+                            android:layout_width="0dp"
+                            android:layout_height="56dp"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.1"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:padding="14dp"
+                            android:src="@drawable/ic_refresh_white" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ffa_filter_icon"
+                            android:layout_width="0dp"
+                            android:layout_height="56dp"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.1"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:padding="14dp"
+                            android:src="@drawable/ic_filter"
+                            android:visibility="visible" />
+                    </LinearLayout>
+
+                    <HorizontalScrollView
+                        android:id="@+id/ffa_sort_chip_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="12dp"
+                        android:scrollbars="none">
+
+                        <com.google.android.material.chip.ChipGroup
+                            android:id="@+id/ffa_firewall_chip_group"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:elevation="5dp"
+                            android:paddingBottom="8dp"
+                            android:visibility="visible"
+                            app:selectionRequired="true"
+                            app:singleLine="true"
+                            app:singleSelection="true" />
+                    </HorizontalScrollView>
+
+                    <TextView
+                        android:id="@+id/firewall_app_label_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:ellipsize="marquee"
+                        android:fontFamily="sans-serif"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:maxLines="1"
+                        android:padding="8dp"
+                        android:scrollHorizontally="true"
+                        android:singleLine="true"
+                        android:text="@string/fapps_firewall_filter_hint"
+                        android:textAlignment="textStart"
+                        android:textSize="@dimen/default_font_text_view" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- Enhanced toggle controls with better spacing for tablets -->
+        <RelativeLayout
+            android:id="@+id/ffa_toggle_all_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:minHeight="56dp"
+            android:padding="12dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ffa_app_info_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="6dp"
+                android:src="@drawable/ic_info"
+                android:tag="info" />
+
+            <TextView
+                android:id="@+id/ffa_app_list_heading_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="16dp"
+                android:layout_toEndOf="@id/ffa_app_info_icon"
+                android:text="@string/fapps_firewall_toggle_group_label"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view"
+                android:textStyle="bold" />
+
+            <!-- Enhanced toggle buttons with better touch targets for tablets -->
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ffa_toggle_all_mobile_data"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="8dp"
+                android:src="@drawable/ic_firewall_data_on_grey"
+                android:tag="0" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ffa_toggle_all_isolate"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_toStartOf="@id/ffa_toggle_all_mobile_data"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="8dp"
+                android:src="@drawable/ic_firewall_exclude_off"
+                android:tag="0" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ffa_toggle_all_bypass"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_toStartOf="@id/ffa_toggle_all_isolate"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="8dp"
+                android:src="@drawable/ic_firewall_bypass_off"
+                android:tag="0" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ffa_toggle_all_bypass_dns_firewall"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_toStartOf="@id/ffa_toggle_all_bypass"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="8dp"
+                android:src="@drawable/ic_bypass_dns_firewall_off"
+                android:tag="0" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ffa_toggle_all_wifi"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_toStartOf="@id/ffa_toggle_all_bypass_dns_firewall"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="8dp"
+                android:src="@drawable/ic_firewall_data_on_grey"
+                android:tag="0" />
+
+        </RelativeLayout>
+
+        <!-- RecyclerView with enhanced fast scroll for tablets -->
+        <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+            android:id="@+id/ffa_app_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:scrollbarSize="8dp"
+            app:fastScrollAutoHide="true"
+            app:fastScrollAutoHideDelay="1500"
+            app:fastScrollEnabled="true"
+            app:fastScrollEnableThumbInactiveColor="true"
+            app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
+            app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_line_drawable"
+            app:fastScrollPopupBgColor="?attr/background"
+            app:fastScrollPopupTextColor="?attr/primaryLightColorText"
+            app:fastScrollThumbColor="?attr/chipColorBgNormal"
+            app:fastScrollThumbEnabled="true"
+            app:fastScrollThumbInactiveColor="?attr/chipColorBgNormal"
+            app:fastScrollTrackColor="?attr/background"
+            app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
+            app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_line_drawable" />
+
+    </LinearLayout>
+
+</RelativeLayout>
