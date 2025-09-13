@@ -89,7 +89,4 @@ interface CustomDomainDAO {
 
     @Query("SELECT COUNT(*) FROM CustomDomain WHERE proxyCC = :cc")
     fun getRulesCountByCC(cc: String): Int
-
-    @Query("UPDATE CustomDomain SET uid = :newUid where uid = :oldUid")
-    fun tombstoneRulesByUid(oldUid: Int, newUid: Int)
 }

@@ -484,6 +484,7 @@ object IpRulesManager : KoinComponent {
         }
         db.deleteRulesByUid(uid)
         resultsCache.invalidateAll()
+        Logger.i(LOG_TAG_FIREWALL, "deleted all ip rules for uid: $uid")
     }
 
     suspend fun deleteRules(list: List<CustomIp>) {
@@ -638,14 +639,24 @@ object IpRulesManager : KoinComponent {
     }
 
     suspend fun updateUids(uids: List<Int>, newUids: List<Int>) {
+        val ips = db.getIpRules()
         for (i in uids.indices) {
             val u = uids[i]
             val n = newUids[i]
-            db.updateUid(u, n)
+            if (ips.any { it.uid == u }) {
+                db.updateUid(u, n)
+            }
         }
         resultsCache.invalidateAll()
         load()
         Logger.i(LOG_TAG_FIREWALL, "ip rules updated")
+    }
+
+    suspend fun updateUid(oldUid: Int, newUid: Int) {
+        db.updateUid(oldUid, newUid)
+        resultsCache.invalidateAll()
+        load()
+        Logger.i(LOG_TAG_FIREWALL, "ip rules updated for $oldUid to $newUid")
     }
 
     suspend fun replaceIpRule(
@@ -786,6 +797,10 @@ object IpRulesManager : KoinComponent {
         // this is used when the app is uninstalled, so that the rules are not deleted
         // but the uid is set to (-1 * uid), so that the rules are not applied
         val newUid = if (oldUid > 0) -1 * oldUid else oldUid
+        if (newUid == oldUid) {
+            Logger.w(LOG_TAG_FIREWALL, "tombstone: same uids, old: $oldUid, new: $newUid, no-op")
+            return
+        }
         db.tombstoneRulesByUid(oldUid, newUid)
         resultsCache.invalidateAll()
         load()

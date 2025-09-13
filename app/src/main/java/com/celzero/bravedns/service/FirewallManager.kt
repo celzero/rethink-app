@@ -476,7 +476,7 @@ object FirewallManager : KoinComponent {
         // while updating the package reset the tombstone timestamp
         var cacheok = false
         val appInfo = getAppInfoByUid(oldUid)
-        Logger.i(LOG_TAG_FIREWALL, "updateUidAndResetTombstone: $oldUid -> $newUid; has? ${appInfo?.packageName} == pkg: $pkg")
+        Logger.i(LOG_TAG_FIREWALL, "updateUidAndResetTombstone: $oldUid -> $newUid; has? ${appInfo?.packageName} == $pkg")
         mutex.withLock {
             val iter = appInfos.get(oldUid).iterator()
             while (iter.hasNext()) {

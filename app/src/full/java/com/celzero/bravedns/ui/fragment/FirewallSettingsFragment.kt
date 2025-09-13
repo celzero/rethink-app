@@ -19,17 +19,26 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.FragmentFirewallSettingsBinding
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings) {
+class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings), KoinComponent {
     private val b by viewBinding(FragmentFirewallSettingsBinding::bind)
+    private val persistentState by inject<PersistentState>()
+    private val rdb by inject<RefreshDatabase>()
 
     companion object {
         fun newInstance() = FirewallSettingsFragment()
@@ -37,6 +46,7 @@ class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        b.settingsHeading.text = getString(R.string.title_settings).lowercase()
         setupClickListeners()
     }
 
@@ -46,6 +56,15 @@ class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings) {
         b.universalFirewallRl.setOnClickListener { openUniversalFirewallScreen() }
 
         b.appWiseIpDomainRl.setOnClickListener { openAppWiseIpScreen() }
+
+        b.tombstoneAppRl.setOnClickListener {
+            b.tombstoneAppSwitch.isChecked = !b.tombstoneAppSwitch.isChecked
+        }
+
+        b.tombstoneAppSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.tombstoneApps = isChecked
+            io { rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE) }
+        }
     }
 
     private fun openCustomIpScreen() {
@@ -77,4 +96,7 @@ class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings) {
         val intent = Intent(requireContext(), UniversalFirewallSettingsActivity::class.java)
         startActivity(intent)
     }
+
+    private fun io(f: suspend () -> Unit) = lifecycleScope.launch(Dispatchers.IO) { f() }
+
 }
