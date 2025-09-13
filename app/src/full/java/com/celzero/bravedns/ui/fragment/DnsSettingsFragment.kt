@@ -205,6 +205,13 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     }
 
     private fun showSplitDnsUi() {
+        if (persistentState.enableDnsAlg) {
+            b.dvBypassDnsBlockRl.visibility = View.VISIBLE
+            b.dvBypassDnsBlockSwitch.isChecked = persistentState.bypassBlockInDns
+        } else {
+            b.dvBypassDnsBlockRl.visibility = View.GONE
+        }
+
         if (isAtleastR()) {
             // show split dns by default only if the device is running on Android 12 or above
             b.dcSplitDnsRl.visibility = View.VISIBLE
@@ -213,11 +220,8 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             if (persistentState.enableDnsAlg) {
                 b.dcSplitDnsRl.visibility = View.VISIBLE
                 b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
-                b.dvBypassDnsBlockRl.visibility = View.VISIBLE
-                b.dvBypassDnsBlockSwitch.isChecked = persistentState.bypassBlockInDns
             } else {
                 b.dcSplitDnsRl.visibility = View.GONE
-                b.dcSplitDnsSwitch.isChecked = false
             }
         }
     }
