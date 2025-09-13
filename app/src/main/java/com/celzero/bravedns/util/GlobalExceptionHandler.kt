@@ -17,6 +17,9 @@ package com.celzero.bravedns.util
 
 import Logger
 import Logger.LOG_TAG_APP
+import android.content.Context
+import com.celzero.bravedns.scheduler.EnhancedBugReport
+import java.lang.ref.WeakReference
 import kotlin.system.exitProcess
 
 /**
@@ -24,8 +27,11 @@ import kotlin.system.exitProcess
  * and reporting them to Firebase Analytics/Crashlytics
  */
 class GlobalExceptionHandler private constructor(
-    private val defaultHandler: Thread.UncaughtExceptionHandler?
+    private val defaultHandler: Thread.UncaughtExceptionHandler?,
+    contextRef: Context?
 ) : Thread.UncaughtExceptionHandler {
+
+    private val contextRef: WeakReference<Context>? = contextRef?.let { WeakReference(it) }
 
     companion object {
         private var instance: GlobalExceptionHandler? = null
@@ -34,14 +40,14 @@ class GlobalExceptionHandler private constructor(
          * Initialize the global exception handler
          * This should be called early in the application lifecycle
          */
-        fun initialize() {
+        fun initialize(ctx: Context) {
             if (instance != null) {
                 Logger.w(LOG_TAG_APP, "err-handler already initialized")
                 return
             }
 
             val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
-            instance = GlobalExceptionHandler(defaultHandler)
+            instance = GlobalExceptionHandler(defaultHandler, ctx.applicationContext)
             Thread.setDefaultUncaughtExceptionHandler(instance)
 
             Logger.i(LOG_TAG_APP, "err-handler initialized successfully")
@@ -96,13 +102,15 @@ class GlobalExceptionHandler private constructor(
             val stackTrace = exception.stackTraceToString()
             val threadInfo = "Thread: ${thread.name} (ID: ${thread.id}, State: ${thread.state})"
 
-            Logger.e(LOG_TAG_APP, "=== UNCAUGHT EXCEPTION DETAILS ===")
-            Logger.e(LOG_TAG_APP, "exception type: ${exception.javaClass.name}")
-            Logger.e(LOG_TAG_APP, "exception msg: ${exception.message}")
-            Logger.e(LOG_TAG_APP, threadInfo)
-            Logger.e(LOG_TAG_APP, "stack trace:")
-            Logger.e(LOG_TAG_APP, stackTrace)
-            Logger.e(LOG_TAG_APP, "================================")
+            val stringBuilder = StringBuilder()
+            stringBuilder.appendLine("---Uncaught Exception ${thread.name}---")
+            stringBuilder.appendLine("Exception Type: ${exception.javaClass.name}")
+            stringBuilder.appendLine("Exception Message: ${exception.message}")
+            stringBuilder.appendLine(threadInfo)
+            stringBuilder.appendLine("Stack Trace:")
+            stringBuilder.appendLine(stackTrace)
+            stringBuilder.appendLine("--------------------------------------------")
+            val msg = stringBuilder.toString()
 
             // Log cause chain if available
             var cause = exception.cause
@@ -112,9 +120,44 @@ class GlobalExceptionHandler private constructor(
                 cause = cause.cause
                 causeLevel++
             }
-            // TODO: write logs to file for later analysis, bug report collector?
+            val ex = Logger.throwableToException(exception)
+            Logger.crash(LOG_TAG_APP, msg, ex)
+
+            // Try to write logs to file with context
+            writeLogsToFileWithFallback(msg)
         } catch (e: Exception) {
             Logger.e(LOG_TAG_APP, "err while logging exception context", e)
+        }
+    }
+
+    /**
+     * Attempt to write logs to file with fallback options when context is unavailable
+     */
+    private fun writeLogsToFileWithFallback(msg: String) {
+        try {
+            // First try: get context from WeakReference
+            val context = contextRef?.get()
+            if (context != null) {
+                EnhancedBugReport.writeLogsToFile(context, msg)
+                Logger.i(LOG_TAG_APP, "crash logs written to file successfully")
+                return
+            }
+
+            // Fallback: log warning and ensure the crash info is at least logged
+            Logger.w(LOG_TAG_APP, "context is null or has been garbage collected during crash handling")
+            Logger.w(LOG_TAG_APP, "attempting to preserve crash info in system logs")
+
+            // Additional fallback: try to write to standard error as last resort
+            try {
+                System.err.println("=== CRITICAL CRASH INFO (Context Unavailable) ===")
+                System.err.println(msg)
+                System.err.println("=== END CRITICAL CRASH INFO ===")
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_APP, "failed to write crash info to stderr", e)
+            }
+
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_APP, "err in writeLogsToFileWithFallback", e)
         }
     }
 }

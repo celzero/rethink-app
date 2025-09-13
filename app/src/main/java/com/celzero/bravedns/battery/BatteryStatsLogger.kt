@@ -16,15 +16,17 @@
 package com.celzero.bravedns.battery
 
 import android.content.Context
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 import java.io.File
 import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledFuture
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -32,17 +34,17 @@ import java.util.concurrent.atomic.AtomicBoolean
  * rotating file under: <filesDir>/data/battery/battery_<timestamp>.txt
  *
  * - Keeps only one file at any point in time.
- * - Ensures file size never exceeds 1 MB; rolls over (deletes old, creates new) before exceeding.
+ * - Ensures file size never exceeds 256 KB; rolls over (deletes old, creates new) before exceeding.
  */
 object BatteryStatsLogger {
-    private const val MAX_BYTES: Long = 1024 * 1024 // 1 MB
-    private const val LOG_INTERVAL_MINUTES: Long = 5 // adjust as needed
+    private const val MAX_BYTES: Long = 256 * 1024 // 256 KB
 
     private val started = AtomicBoolean(false)
-    private val scheduler = Executors.newSingleThreadScheduledExecutor { r ->
-        Thread(r, "battery-stats-logger").apply { isDaemon = true }
-    }
-    private var scheduledTask: ScheduledFuture<*>? = null
+
+    private const val BATTERY_FOLDER = "battery"
+    private const val BATTERY_FILE_PREFIX = "battery_"
+    private const val BATTERY_FILE_SUFFIX = ".txt"
+
     @Volatile private var logFile: File? = null
 
     private val tsFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
@@ -56,13 +58,6 @@ object BatteryStatsLogger {
             try {
                 BatteryStatsProvider.init(context.applicationContext)
                 prepareLogFile(context)
-                scheduledTask = scheduler.scheduleWithFixedDelay({
-                    try {
-                        writeOnce("start")
-                    } catch (_: Throwable) {
-                        // ignore individual write errors
-                    }
-                }, 1, LOG_INTERVAL_MINUTES * 60, TimeUnit.SECONDS)
                 started.set(true)
             } catch (_: Throwable) {
                 // best effort only
@@ -71,14 +66,14 @@ object BatteryStatsLogger {
     }
 
     private fun prepareLogFile(context: Context) {
-        val dir = File(File(context.filesDir, "data"), "battery")
+        val dir = File(File(context.filesDir, "data"), BATTERY_FOLDER)
         if (!dir.exists()) dir.mkdirs()
         // Remove any stray older files (keep none as per requirement)
-        dir.listFiles { f -> f.isFile && f.name.startsWith("battery_") && f.name.endsWith(".txt") }?.forEach { it.delete() }
+        dir.listFiles { f -> f.isFile && f.name.startsWith(BATTERY_FILE_PREFIX) && f.name.endsWith(BATTERY_FILE_SUFFIX) }?.forEach { it.delete() }
         logFile = File(dir, fileName())
     }
 
-    private fun fileName(): String = "battery_${System.currentTimeMillis()}.txt"
+    private fun fileName(): String = "$BATTERY_FILE_PREFIX${System.currentTimeMillis()}$BATTERY_FILE_SUFFIX"
 
     private fun forceNewFile() {
         val current = logFile
@@ -94,8 +89,9 @@ object BatteryStatsLogger {
         }
     }
 
-    fun writeOnce(snapshot: String) {
-        val f = logFile ?: return
+    fun writeOnce(snapshot: String): Job = CoroutineScope(Dispatchers.IO).launch{
+        val f = logFile ?: return@launch
+
         rolloverIfNeeded() // handle case where previous write filled file exactly
         val nowIso = tsFormatter.format(Date())
         val entry = buildString {
@@ -119,7 +115,7 @@ object BatteryStatsLogger {
         val f = logFile ?: return null
         return try {
             f.readText()
-        } catch (e: Throwable) {
+        } catch (ignored: Throwable) {
             null
         }
     }

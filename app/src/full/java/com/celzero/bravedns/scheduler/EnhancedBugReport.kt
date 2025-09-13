@@ -81,7 +81,11 @@ object EnhancedBugReport {
         Log.i(LOG_TAG_BUG_REPORT, "logs added to zip file")
     }
 
-    fun writeLogsToFile(context: Context, logs: String) {
+    fun writeLogsToFile(context: Context?, logs: String) {
+        if (context == null) {
+            Log.e(LOG_TAG_BUG_REPORT, "context is null, cannot write logs to file")
+            return
+        }
         try {
             val file = getFileToWrite(context)
             if (file == null) {

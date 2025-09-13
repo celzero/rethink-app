@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.util
 
-import android.R.attr.tag
+import Logger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope

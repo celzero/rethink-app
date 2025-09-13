@@ -140,16 +140,21 @@ object BatteryStatsProvider {
     }
 
     fun logMetrics(tag: String?) = CoroutineScope(Dispatchers.IO).launch {
-        // Note -- this gets the difference from the last call / initialization of the StatefulCollector
-        val update: CompositeMetrics? = mStatefulCollector.getLatestDiffAndReset()
+        try {
+            // Note -- this gets the difference from the last call / initialization of the StatefulCollector
+            val update: CompositeMetrics? = mStatefulCollector.getLatestDiffAndReset()
 
-        // Check out the Event class in this folder: it should be able to wrap most analytics
-        // implementations comfortably; this one simply logs everything to logcat.
-        mEvent.acquireEvent(null, "BatteryMetrics")
-        if (mEvent.isSampled) {
-            mEvent.add("dimension", tag)
-            mMetricsReporter.reportTo(update, mEvent)
-            mEvent.logAndRelease()
+            // Check out the Event class in this folder: it should be able to wrap most analytics
+            // implementations comfortably; this one simply logs everything to logcat.
+            mEvent.acquireEvent(null, "BatteryMetrics")
+            if (mEvent.isSampled) {
+                mEvent.add("dimension", tag)
+                mMetricsReporter.reportTo(update, mEvent)
+                mEvent.logAndRelease()
+            }
+        } catch (e: Exception) {
+            // Log and move on -- we don't want battery metrics to crash the app
+            Logger.w("BatteryStatsProvider", "err collecting battery metrics: ${e.message}" )
         }
     }
 }
