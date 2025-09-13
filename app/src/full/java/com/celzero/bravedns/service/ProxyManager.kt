@@ -328,6 +328,10 @@ object ProxyManager : KoinComponent {
     suspend fun tombstoneApp(oldUid: Int) {
         // tombstone the app in the database and reload the cache
         val newUid = if (oldUid > 0) -1 * oldUid else oldUid // negative uid to indicate tombstone app
+        if (newUid == oldUid) {
+            Logger.w(LOG_TAG_PROXY, "no change in uid, not tombstoning: $oldUid")
+            return
+        }
         db.tombstoneApp(oldUid, newUid)
         // reload the cache
         load()
