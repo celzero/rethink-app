@@ -47,6 +47,7 @@ class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings), 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         b.settingsHeading.text = getString(R.string.title_settings).lowercase()
+        b.tombstoneAppSwitch.isChecked = persistentState.tombstoneApps
         setupClickListeners()
     }
 
