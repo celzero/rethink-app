@@ -186,7 +186,7 @@ internal constructor(
             val probableTombstonePkgs =
                 findPackagesToTombstone(trackedApps, installedApps, action != ACTION_REFRESH_RESTORE && canTombstone)
             val packagesToDelete =
-                findPackagesToDelete(trackedApps, installedApps, action == ACTION_REFRESH_RESTORE || canTombstone)
+                findPackagesToDelete(trackedApps, installedApps, action == ACTION_REFRESH_RESTORE || !canTombstone)
             // remove packages from delete list which are part of the probable tombstone
             val packagesToTombstone = probableTombstonePkgs.filter {
                 !packagesToDelete.map { x -> x.packageName }.contains(it.packageName)
@@ -201,7 +201,7 @@ internal constructor(
 
             Logger.i(
                 LOG_TAG_APP_DB,
-                "sizes: rmv: ${packagesToDelete.size}; add: ${packagesToAdd.size}; update: ${packagesToUpdate.size}, tombstone: ${packagesToTombstone.size}"
+                "sizes: rmv: ${packagesToDelete.size}; add: ${packagesToAdd.size}; update: ${packagesToUpdate.size}, tombstone: ${packagesToTombstone.size}, action: $action, tombstoneEnabled? $canTombstone"
             )
             tombstonePackages(packagesToTombstone, action == ACTION_REFRESH_RESTORE || !canTombstone)
             deletePackages(packagesToDelete, action == ACTION_REFRESH_RESTORE)
@@ -276,13 +276,19 @@ internal constructor(
     ): Set<FirewallManager.AppInfoTuple> {
         return if (ignoreUid) {
             val latestPkgs = latest.map { it.packageName }.toSet()
-            old.filter { latestPkgs.contains(it.packageName) }
+            val pkgs = old.filter { latestPkgs.contains(it.packageName) }
                 .toSet() // find old package names that appear in latest
+            // return the latest uid's for the package names
+            latest.filter { x -> pkgs.map { it.packageName }.contains(x.packageName) }
+                .toSet()
         } else {
             // Sets.intersection(old, latest); need not update apps already tracked
-            old.filter { x ->
+            val pkgs = old.filter { x ->
                 latest.any { y -> y.packageName == x.packageName && y.uid != x.uid }
             }.toSet() // find old package names that appear in latest with different uid
+            // return the latest uid's for the package names
+            latest.filter { x -> pkgs.map { it.packageName }.contains(x.packageName) }
+                .toSet()
         }
     }
 
@@ -292,7 +298,7 @@ internal constructor(
     ) {
         if (skipTombstone) {
             // if restore, then no need to tombstone the app, delete should take care of it
-            Logger.i(LOG_TAG_APP_DB, "tombstonePackages: restore is true, no-op")
+            Logger.i(LOG_TAG_APP_DB, "tombstonePackages: skip tombstone, no-op")
             return
         }
         // if not restore then mark the app as tombstone
@@ -521,7 +527,7 @@ internal constructor(
         val pxm = ProxyManager.trackedApps()
         val tombstoneApps = findPackagesToTombstone(pxm, trackedApps, !restore && canTombstone)
         // apps which are tombstone, but not yet deleted will be deleted now
-        val del = findPackagesToDelete(pxm, trackedApps, restore || canTombstone)
+        val del = findPackagesToDelete(pxm, trackedApps, restore || !canTombstone)
         val update = findPackagesToUpdate(pxm, trackedApps, restore)
         val add =
             findPackagesToAdd(pxm, trackedApps).map {
