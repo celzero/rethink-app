@@ -17,7 +17,10 @@ package com.celzero.bravedns.ui.dialog
 
 import android.app.Activity
 import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.Window
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
@@ -29,6 +32,9 @@ import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.databinding.DialogWgSsidBinding
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 
 class WgSsidDialog(
     private val activity: Activity,
@@ -47,6 +53,7 @@ class WgSsidDialog(
 
         b = DialogWgSsidBinding.inflate(layoutInflater)
         setContentView(b.root)
+        setCancelable(false)
 
         setupDialog()
         setupRecyclerView()
@@ -55,10 +62,17 @@ class WgSsidDialog(
     }
 
     private fun setupDialog() {
-        val lp = window?.attributes
-        lp?.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp?.height = WindowManager.LayoutParams.WRAP_CONTENT
-        window?.attributes = lp
+        window?.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        //window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable()) // allow rounded bg
+        window?.setGravity(Gravity.CENTER)
+        ViewCompat.setOnApplyWindowInsetsListener(b.root) { view, insets ->
+            val sysInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(0, sysInsets.top, 0, sysInsets.bottom)
+            insets
+        }
     }
 
     private fun setupRecyclerView() {
@@ -148,6 +162,7 @@ class WgSsidDialog(
         // Reset to string type as default
         b.radioString.isChecked = true
     }
+
     private fun isValidSsidName(ssidName: String): Boolean {
         // Basic validation - no commas, no ## (our delimiter), reasonable length
         return ssidName.length <= 32 &&
