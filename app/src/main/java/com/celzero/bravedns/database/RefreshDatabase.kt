@@ -276,19 +276,13 @@ internal constructor(
     ): Set<FirewallManager.AppInfoTuple> {
         return if (ignoreUid) {
             val latestPkgs = latest.map { it.packageName }.toSet()
-            val pkgs = old.filter { latestPkgs.contains(it.packageName) }
+            old.filter { latestPkgs.contains(it.packageName) }
                 .toSet() // find old package names that appear in latest
-            // return the latest uid's for the package names
-            latest.filter { x -> pkgs.map { it.packageName }.contains(x.packageName) }
-                .toSet()
         } else {
             // Sets.intersection(old, latest); need not update apps already tracked
-            val pkgs = old.filter { x ->
+            old.filter { x ->
                 latest.any { y -> y.packageName == x.packageName && y.uid != x.uid }
             }.toSet() // find old package names that appear in latest with different uid
-            // return the latest uid's for the package names
-            latest.filter { x -> pkgs.map { it.packageName }.contains(x.packageName) }
-                .toSet()
         }
     }
 

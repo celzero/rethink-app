@@ -210,7 +210,12 @@ object ProxyManager : KoinComponent {
     }
 
     suspend fun updateApps(m: Collection<FirewallManager.AppInfoTuple>) {
-        m.forEach { updateApp(it.uid, it.packageName) }
+        m.forEach {
+            val newInfo = FirewallManager.getAppInfoByPackage(it.packageName) ?: return@forEach
+            if (newInfo.uid == it.uid) return@forEach // no change in uid
+
+            updateApp(newInfo.uid, it.packageName)
+        }
     }
 
     suspend fun addApp(appInfo: AppInfo?) {
