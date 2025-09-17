@@ -90,6 +90,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import com.celzero.firestack.settings.Settings
 import java.net.URI
+import java.net.URLEncoder
 import kotlin.text.substring
 
 /**
@@ -679,6 +680,10 @@ class GoVpnAdapter : KoinComponent {
     ) {
         try {
             val url = constructSocks5ProxyUrl(userName, password, ipAddress, port)
+            if (url.isEmpty()) {
+                Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: err empty socks5 url")
+                return
+            }
             val id =
                 if (tunProxyMode.isTunProxyOrbot()) {
                     ProxyManager.ID_ORBOT_BASE
@@ -702,22 +707,29 @@ class GoVpnAdapter : KoinComponent {
         ipAddress: String?,
         port: Int
     ): String {
-        // socks5://<username>:<password>@<ip>:<port>
-        // convert string to url
-        val proxyUrl = StringBuilder()
-        proxyUrl.append("socks5://")
-        if (!userName.isNullOrEmpty()) {
-            proxyUrl.append(userName)
-            if (!password.isNullOrEmpty()) {
-                proxyUrl.append(":")
-                proxyUrl.append(password)
+        try {
+            // socks5://<username>:<password>@<ip>:<port>
+            // convert string to url
+            val proxyUrl = StringBuilder()
+            proxyUrl.append("socks5://")
+            if (!userName.isNullOrEmpty()) {
+                val encUser = URLEncoder.encode(userName, Charsets.UTF_8.name())
+                proxyUrl.append(encUser)
+                if (!password.isNullOrEmpty()) {
+                    val encPass = URLEncoder.encode(password, Charsets.UTF_8.name())
+                    proxyUrl.append(":")
+                    proxyUrl.append(encPass)
+                }
+                proxyUrl.append("@")
             }
-            proxyUrl.append("@")
+            proxyUrl.append(ipAddress)
+            proxyUrl.append(":")
+            proxyUrl.append(port)
+            return URI.create(proxyUrl.toString()).toASCIIString()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err construct sock5 url: ${e.message}")
         }
-        proxyUrl.append(ipAddress)
-        proxyUrl.append(":")
-        proxyUrl.append(port)
-        return URI.create(proxyUrl.toString()).toASCIIString()
+        return ""
     }
 
     private fun showDnscryptConnectionFailureToast() {
