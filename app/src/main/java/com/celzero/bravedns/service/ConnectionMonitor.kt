@@ -17,7 +17,13 @@ package com.celzero.bravedns.service
 
 import Logger
 import Logger.LOG_TAG_CONNECTION
+import Logger.LOG_TAG_VPN
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Context.NOTIFICATION_SERVICE
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
@@ -29,10 +35,23 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.VpnBuilderPolicy.Companion.getNetworkBehaviourDuration
+import com.celzero.bravedns.service.WireguardManager.NOTIF_CHANNEL_ID_WIREGUARD_ALERTS
+import com.celzero.bravedns.ui.NotificationHandlerActivity
+import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.ConnectivityCheckHelper
+import com.celzero.bravedns.util.Constants.Companion.NOTIF_WG_PERMISSION_NAME
+import com.celzero.bravedns.util.Constants.Companion.NOTIF_WG_PERMISSION_VALUE
 import com.celzero.bravedns.util.InternetProtocol
+import com.celzero.bravedns.util.SsidPermissionManager
+import com.celzero.bravedns.util.UIUtils.getAccentColor
+import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastS
@@ -55,7 +74,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
 
-class ConnectionMonitor(private val networkListener: NetworkListener, private val serializer: CoroutineDispatcher, private val scope: CoroutineScope) : KoinComponent, DiagnosticsManager.DiagnosticsListener {
+class ConnectionMonitor(private val context: Context, private val networkListener: NetworkListener, private val serializer: CoroutineDispatcher, private val scope: CoroutineScope) : KoinComponent, DiagnosticsManager.DiagnosticsListener {
 
     private val networkSet: MutableSet<NetworkAndSsid> = ConcurrentHashMap.newKeySet()
     data class NetworkAndSsid(val network: Network, val ssid: String?)
@@ -272,11 +291,20 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             }
 
             val ssid = wifiInfo.ssid
-            if (ssid.isNullOrEmpty() || ssid == "<unknown ssid>") {
+            if (ssid.isNullOrEmpty()) {
                 Logger.v(
                     LOG_TAG_CONNECTION,
-                    "getNetworkSSID: SSID is unknown or empty for network ${network.networkHandle}, ssid: $ssid, wifiInfo: $wifiInfo"
+                    "getNetworkSSID: SSID is empty for network ${network.networkHandle}, ssid: $ssid, wifiInfo: $wifiInfo"
                 )
+                return null
+            }
+
+            if (ssid == "<unknown ssid>") {
+                Logger.v(
+                    LOG_TAG_CONNECTION,
+                    "getNetworkSSID: SSID is unknown for network ${network.networkHandle}"
+                )
+                showNotificationIfNeeded()
                 return null
             }
 
@@ -300,6 +328,70 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
             )
             return null
         }
+    }
+
+    private fun showNotificationIfNeeded() {
+        val wgs = WireguardManager.getActiveSsidEnabledConfigs()
+        if (wgs.isEmpty()) return
+
+        val hasPermission = SsidPermissionManager.hasRequiredPermissions(context)
+        val locationEnabled = SsidPermissionManager.isLocationEnabled(context)
+        if (hasPermission && locationEnabled) return
+
+        Logger.w(LOG_TAG_VPN, "ssid wgs: missing permissions, show notification")
+        val intent = Intent(context, NotificationHandlerActivity::class.java)
+        intent.putExtra(
+            NOTIF_WG_PERMISSION_NAME,
+            NOTIF_WG_PERMISSION_VALUE
+        )
+        val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val pendingIntent =
+            Utilities.getActivityPendingIntent(
+                context,
+                Intent(context, AppLockActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                mutable = false
+            )
+
+        var builder: NotificationCompat.Builder
+        if (isAtleastO()) {
+            val name: CharSequence = context.getString(R.string.notif_channel_firewall_alerts)
+            val description = context.resources.getString(R.string.notif_channel_desc_firewall_alerts)
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(NOTIF_CHANNEL_ID_WIREGUARD_ALERTS, name, importance)
+            channel.description = description
+            notificationManager.createNotificationChannel(channel)
+            builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_WIREGUARD_ALERTS)
+        } else {
+            builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_WIREGUARD_ALERTS)
+        }
+
+        val contentTitle: String = context.resources.getString(R.string.lbl_action_required)
+        val contentText: String =
+            context.resources.getString(R.string.permission_missing_notification_desc)
+
+        builder
+            .setSmallIcon(R.drawable.ic_notification_icon)
+            .setContentTitle(contentTitle)
+            .setContentIntent(pendingIntent)
+            .setContentText(contentText)
+
+        builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+        builder.color = ContextCompat.getColor(context, getAccentColor(persistentState.theme))
+
+        // Secret notifications are not shown on the lock screen.  No need for this app to show
+        // there.
+        // Only available in API >= 21
+        builder = builder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
+
+        // Cancel the notification after clicking.
+        builder.setAutoCancel(true)
+
+        notificationManager.notify(
+            NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
+            NOTIF_ID_ACCESSIBILITY_FAILURE,
+            builder.build()
+        )
     }
 
     private val networkRequest: NetworkRequest =
@@ -343,6 +435,8 @@ class ConnectionMonitor(private val networkListener: NetworkListener, private va
         const val SCHEME_HTTP = "http"
         const val SCHEME_HTTPS = "https"
         const val SCHEME_IP = "ip"
+
+        private const val NOTIF_ID_ACCESSIBILITY_FAILURE = 104
 
         // variable to check whether to rely on the TCP/UDP reachability checks from
         // kotlin end instead of tunnel reachability checks, set false by default for now

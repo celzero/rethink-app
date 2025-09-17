@@ -186,7 +186,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     // used mostly for service to adapter creation and updates
     private var serializer: CoroutineDispatcher = Daemons.make("vpnser")
 
-    private var connectionMonitor: ConnectionMonitor = ConnectionMonitor(this, serializer, vpnScope)
+    private var connectionMonitor: ConnectionMonitor = ConnectionMonitor(this, this, serializer, vpnScope)
     private val connTrackRepository by inject<ConnectionTrackerRepository>()
 
     private var userPresentReceiver: UserPresentReceiver = UserPresentReceiver()
@@ -1151,7 +1151,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         Logger.w(LOG_TAG_VPN, "ssid wgs: missing permissions, show notification")
         showPermissionMissingNotificationForWg()
-        return
     }
 
     private fun showPermissionMissingNotificationForWg() {
