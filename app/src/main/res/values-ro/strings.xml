@@ -114,7 +114,7 @@
     <string name="slide_2_title" translatable="true">Bun venit</string>
     <string name="slide_2_desc" translatable="true">Rethink e cea mai ușoară cale pentru monitorizarea activității din rețea, ocolirea cenzurii pe internet și protejarea aplicațiilor pe dispozitivul tău Android.</string>
     <string name="slide_1_title" translatable="true">Gratuit și Open-Source</string>
-    <string name="slide_1_desc" translatable="true">Rethink e un software open-source, susținut prin programul Mozilla Builders MVP.</string>
+    <string name="slide_1_desc" translatable="true">Rethink e un software open-source, susținut prin programul Mozilla Builders MVP, FOSS United Foundation.</string>
     <string name="allow" translatable="true">permite</string>
     <string name="block" translatable="true">blochează</string>
     <string name="bypass_universal" translatable="true">ocolire universală</string>
@@ -487,7 +487,7 @@
     <string name="about_settings_notification" translatable="true">Setări Notificare</string>
     <string name="about_whats_new" translatable="true">Ce e nou în %1$s</string>
     <string name="about_twitter" translatable="true">Urmărește-ne pe Twitter</string>
-    <string name="about_mozilla" translatable="true">Rethink este susținut de Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
+    <string name="about_mozilla" translatable="true">Rethink este susținut de Mozilla Builders, FOSS United Foundation</string>
     <string name="about_app_update_check" translatable="true">Verifică pentru actualizări ale aplicației</string>
     <string name="about_app_translate" translatable="true">Traduceți</string>
     <string name="about_mail_to" translatable="true">hello@celzero.com</string>
@@ -512,7 +512,7 @@
     <string name="cd_custom_doh_dialog_title" translatable="true">Server URL personalizat</string>
     <string name="cd_custom_dns_proxy_title" translatable="true">Proxy DNS personalizat</string>
     <string name="hsf_vpn_dialog_header" translatable="true">Atenție!</string>
-    <string name="hsf_vpn_dialog_message" translatable="true">Rethink cere permisiunea de a stabili o VPN locală pentru criptarea cererile DNS ale dispozitivului, implementarea monitorizării rețelei și impunerea regulilor Firewall-ului.\n\nRethink nu colectează informații și nu vă spionează în nici un fel.</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">Rethink cere permisiunea de a stabili o VPN locală pentru a cripta cererile DNS ale dispozitivului, a implementa monitorizarea rețelei și a impune regulile Firewall-ului.\n\nRethink nu colectează informații și nu vă spionează în nici un fel.</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Proxy eliminat</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> poate duce la pierderea conexiunii. Modifică setarea pentru a permite Rethink să folosească datele și alte resurse când rulează în background.</string>
     <string name="dc_local_block_desc_1" translatable="true">Alege din peste 195 liste de filtre. Click aici pentru descărcarea sau configurarea lor.</string>
@@ -529,7 +529,74 @@
     <string name="about_dialog_positive_button" translatable="true">Să începem</string>
     <string name="about_mail_bugreport_text" translatable="true">Trimite acest e-mail la: hello@celzero.com</string>
     <string name="notification_screen_error" translatable="true">Nu pot deschide ecranul Notificări Aplicație.</string>
-    <string name="contributors_list" translatable="true">&lt;i&gt;Proiectul Open Source Rethink&lt;/i&gt; își datorează existența voluntarilor care au dedicat nenumărate ore pentru dezvoltarea sa.&lt;br/&gt; &lt;br/&gt;🛡️ Aplicația Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Motor de rețea &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Lanius-collaris&gt;Lanius-collaris&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolvator &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Moderatorii comunității &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;Andersen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Traduceri &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Icon-uri &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Servere dezvoltare &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list" translatable="true"><![CDATA[The <i>Rethink Open Source Project</i> își datorează existența acestor voluntari care au dedicat nenumărate ore pentru dezvoltarea sa.<br/>
+                                              <br/>🛡️ Android app <br/>
+                                              <a href="https://github.com/anthonyryan1">Anthony Ryan</a> /
+                                              <a href="https://github.com/BayLee4">BayLee4</a> /
+                                              <a href="https://github.com/Ch4t4r">Ch4t4r</a> /
+                                              <a href="https://github.com/samthesamman">CodingAttack</a> /
+                                              <a href="https://github.com/HrBDev">HrBDev</a> /
+                                              <a href="https://github.com/hussainmohd-a">hussainmohd-a</a> /
+                                              <a href="https://github.com/ignoramous">ignoramous</a> /
+                                              <a href="https://github.com/ironveil">ironveil</a> /
+                                              <a href="https://github.com/markwmuller">markwmuller</a> /
+                                              <a href="https://github.com/mohammaduvez">Mohammaduvez</a> /
+                                              <a href="https://github.com/Mygod">Mygod</a> /
+                                              <a href="https://github.com/Poussinou">Poussinou</a> /
+                                              <a href="https://github.com/pjosingh">pjosingh</a> /
+                                              <a href="https://github.com/RohitSurwase">RohitSurwase</a> /
+                                              <a href="https://github.com/ShantanuVichare">Shantanu</a> /
+                                              <a href="https://github.com/Uldiniad">Uldiniad</a><br/> /
+                                              <a href="https://github.com/yurtpage">yurtpage</a><br/>
+                                              <br/>🚂 Network engine <br/>
+                                              <a href="https://github.com/alalamav">alalamav</a> /
+                                              <a href="https://github.com/bemasc">bemasc</a> /
+                                              <a href="https://github.com/dmcardle">dmcardle</a> /
+                                              <a href="https://github.com/fortuna">fortuna</a> /
+                                              <a href="https://github.com/ignoramous">ignoramous</a> /
+                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
+                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
+                                              <a href="https://github.com/SeanBurford">SeanBurford</a><br/>
+                                              <br/>📚 Resolver <br/>
+                                              <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /
+                                              <a href="https://github.com/amithm7">amithm7</a> /
+                                              <a href="https://github.com/arfshl">arfshl</a> /
+                                              <a href="https://github.com/badmojr">badmojr</a> /
+                                              <a href="https://github.com/bongochong">bongochong</a> /
+                                              <a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> /
+                                              <a href="https://github.com/georgyo">georgyo</a> /
+                                              <a href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> /
+                                              <a href="https://github.com/Harish-Narayan">Harish-Narayan</a> /
+                                              <a href="https://github.com/ignoramous">ignoramous</a> /
+                                              <a href="https://github.com/JakeChampion">JakeChampion</a> /
+                                              <a href="https://github.com/MasterKia">MasterKia</a> /
+                                              <a href="https://github.com/mtxadmin">mtxadmin</a> /
+                                              <a href="https://github.com/neneeen">neneeen</a> /
+                                              <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
+                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
+                                              <a href="https://github.com/shruuub">shruuub</a> /
+                                              <a href="https://github.com/shuvashish76">shuvashish76</a><br/>
+                                              <br/>⚜ Community mods <br/>
+                                              <a href="https://t.me/amithm7">amithm7</a> /
+                                              <a href="https://t.me/TronSlayer">Andersen</a> /
+                                              <a href="https://t.me/ppatra">ppatra</a> /
+                                               <a href="https://t.me/InFamous23">InFamous23</a> /
+                                              <a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> /
+                                              <a href="https://t.me/Ch4t4r">Ch4t4r</a> /
+                                              <a href="https://t.me/Billi_ance">Billi_ance</a> /
+                                              <a href="https://t.me/kaliangel">kaliangel</a> /
+                                              <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
+                                              <br/>📌 Geo-IP <br/>
+                                              <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a><br/>
+                                              <br/>❇ Translations <br/>
+                                              <a href="https://weblate.org/en/">Weblate</a><br/>
+                                              <br/>🦆 Icons <br/>
+                                              <a href="https://github.com/celzero/rethink-app/issues/346">Icons</a><br/>
+                                              <br/>📦 Build servers <br/>
+                                              <a href="https://jitpack.io/">JitPack</a> /
+                                              <a href="https://github.com/">GitHub</a> /
+                                              <a href="https://central.sonatype.com/">Sonatype</a><br/>
+                                              ]]></string>
     <string name="cd_custom_dns_proxy_name_default" translatable="true">Proxy</string>
     <string name="cd_custom_dns_proxy_name" translatable="true">Proxy %1$s</string>
     <string name="cd_custom_dns_proxy_default_app" translatable="true">Nici una</string>
@@ -567,7 +634,7 @@
     <string name="dns_btm_resolved_crypt" translatable="true">rezolvat <u>anonim</u> %1$s de %2$s via %3$s</string>
     <string name="dns_btm_resolved_doh" translatable="true">rezolvat %1$s de %2$s</string>
     <string name="dns_btm_resolved_doh_no_server" translatable="true">rezolvat %1$s</string>
-    <string name="dns_btm_latency_ms" translatable="true">%1$sms</string>
+    <string name="dns_btm_latency_ms" translatable="true">%1$ss</string>
     <string name="dns_btm_record_type" translatable="true">Tip cerere: %1$s</string>
     <string name="hs_download_positive_default" translatable="true">ok</string>
     <string name="hs_download_positive_play_store" translatable="true">Actualizare completă</string>
@@ -631,7 +698,7 @@
     <string name="fapps_unmetered_block_dialog_title" translatable="true">Blochează în necontorizate</string>
     <string name="fapps_unmetered_unblock_dialog_message">Permiți conexiunile în rețele necontorizate (WiFi) pentru aplicațiile <i>din listă</i>\?</string>
     <string name="fapps_unmetered_block_dialog_message" translatable="true">Blochezi conexiunile în rețele necontorizate (WiFi) pentru aplicațiile <i>din listă</i>\?</string>
-    <string name="fapps_firewall_filter_desc_category" translatable="true">Arată aplicațiile <u>%1$s</u> %2$s în categoriile: %3$s</string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true"><![CDATA[Arată aplicațiile <u>%1$s</u> %2$s în categoriile: %3$s]]></string>
     <string name="rules_load_failure_heading" translatable="true">Notă</string>
     <string name="network_log_app_name_unknown" translatable="true">Necunoscut</string>
     <string name="dns_proxy_connection_failure_lockdown" translatable="true">Excluderea %1$s din %2$s în modul lockdown poate cauza probleme de conectare la internet.</string>
@@ -639,9 +706,9 @@
     <string name="other_dns_list_tab2" translatable="true">Dnscrypt</string>
     <string name="other_dns_list_tab3" translatable="true">Proxy Dns</string>
     <string name="firewall_rule_block_app_exception" translatable="true">Eroare</string>
-    <string name="firewall_rule_block_ip_desc" translatable="true">O regulă firewall setată de utilizator blochează <i>IP-ul destinație</i>.<br/><br/> Pentru a schimba, mergi la tab-ul <i>Firewall per Aplicație</i>.</string>
+    <string name="firewall_rule_block_ip_desc" translatable="true"><![CDATA[O regulă firewall setată de utilizator blochează <i>IP-ul destinație</i>.<br/><br/> Pentru a schimba, mergi la tab-ul <i>Firewall per Aplicație</i>.]]></string>
     <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">Această conexiune a fost permisă pentru că &lt;i&gt;IP-ul destinație&lt;/i&gt; este setat să ocolească toate regulile firewall.&lt;br/&gt;&lt;br/&gt; Pentru a schimba, mergi la &lt;i&gt;Reguli IP&lt;i&gt; în tab-ul &lt;i&gt;Universal&lt;/i&gt;.</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Această conexiune a fost permisă pentru că the <i>aplicația solicitantă</i> este setată pe <i>ocolirea regulilor dns și firewall</i>.<br/><br/> Pentru a schimba, mergi la ecranul <i>Firewall per Aplicație</i>.</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Această conexiune a fost permisă pentru că the <i>aplicația solicitantă</i> este setată pe <i>ocolirea regulilor dns și firewall</i>.<br/><br/> Pentru a schimba, mergi la ecranul <i>Firewall per Aplicație</i>.]]></string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Această conexiune a fost permisă pentru că <i>domeniul</i> este setat de încredere de regulile Universale de domeniu.<br/><br/> Pentru modificare, mergi la tab-ul<i>Configurare DNS</i>.</string>
     <string name="new_app_bulk_notification_title" translatable="true">Atenție</string>
     <string name="new_app_notification_action_toast_deny" translatable="true">Conexiune de rețea refuzată pentru aplicație</string>
@@ -657,7 +724,7 @@
     <string name="fapps_isolate_block_dialog_title" translatable="true">Izolare aplicatii</string>
     <string name="fapps_isolate_block_dialog_message" translatable="true">Izolezi aplicațiile <i>din listă</i>\?</string>
     <string name="fapps_firewall_filter_hint" translatable="true">Arată toate aplicațiile</string>
-    <string name="fapps_firewall_filter_desc" translatable="true">Arată aplicațiile <u>%1$s</u> %2$s</string>
+    <string name="fapps_firewall_filter_desc" translatable="true"><![CDATA[Arată aplicațiile <u>%1$s</u> %2$s]]></string>
     <string name="fapps_metered_block_dialog_title" translatable="true">Blocare în contorizate</string>
     <string name="fapps_metered_unblock_dialog_title" translatable="true">Permis în contorizate</string>
     <string name="fapps_metered_unblock_dialog_message" translatable="true">Permiți conexiunile în rețelele contorizate (mobile) pentru aplicațiile <i>din listă</i>\?</string>
@@ -684,7 +751,7 @@
     <string name="pause_text" translatable="true">în pauză</string>
     <string name="pause_desc" translatable="true">Notă: %1$s aplicații blocate vor fi protejate de firewall în continuare.</string>
     <string name="other_dns_list_tab1" translatable="true">DoH</string>
-    <string name="hs_btm_sheet_lock_down" translatable="true">Nu se pot schimba modurile când VPN este în <i>lockdown</i>. Tap pentru <u>a schimba setările VPN</u>.</string>
+    <string name="hs_btm_sheet_lock_down" translatable="true">Nu se pot schimba modurile când VPN este în <i>lockdown</i>. Tap pentru &lt;u&gt;a schimba setările VPN&lt;/u&gt;.</string>
     <string name="firewall_rule_no_rule" translatable="true">Fără reguli</string>
     <string name="firewall_rule_block_app" translatable="true">Aplicație blocată</string>
     <string name="firewall_rule_block_unmetered" translatable="true">Necontorizat (WiFi)</string>
@@ -714,13 +781,13 @@
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Domeniu de încredere (Universal)</string>
     <string name="firewall_rule_proxied" translatable="true">Prin Proxy</string>
     <string name="firewall_rule_no_rule_desc" translatable="true">Nici o regulă firewall pentru această conexiune.</string>
-    <string name="firewall_rule_new_app_desc" translatable="true">Această aplicație se conectează <i>întâia</i> oară.<br/><br/> Pentru a-i schimba setările, mergi la tab-ul <i>Universal</i>.</string>
-    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">O regulă firewall setată de utilizator blochează conectarea acestei <i>aplicații</i> în rețelele <i>necontorizate</i>.<br/><br/>Pentru a schimba, mergi la tab-ul <i>Toate</i> (aplicațiile).</string>
-    <string name="firewall_rule_block_app_desc" translatable="true">O regulă firewall setată de utilizator blochează această <i>aplicație</i>.<br/><br/>Pentru a schimba, mergi la tab-ul <i>Toate</i> (aplicațiile).</string>
-    <string name="firewall_rule_block_app_mobile_desc" translatable="true">O regulă firewall setată de utilizator blochează conectarea acestei <i>aplicații</i> în rețelele <i>contorizate</i>.<br/><br/>Pentru a schimba, mergi la tab-ul <i>Toate</i> (aplicațiile).</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">O regulă firewall setată de utilizator blochează conectarea acestei <i>aplicații</i> în rețelele <i>contorizate</i> (mobile).<br/><br/>Pentru a schimba, mergi la tab-ul <i>Universal</i>.</string>
-    <string name="firewall_rule_isolate_desc" translatable="true">O regulă firewall setată de utilizator blochează conectarea acestei <i>aplicații</i> la alte IP-uri în afară celor <i>ocolite</i>.<br/><br/>Pentru a schimba, mergi la tab-ul <i>Toate</i> (aplicațiile).</string>
-    <string name="firewall_rule_block_ip_univ_desc" translatable="true">O regulă firewall setată de utilizator blochează <i>IP-ul/Portul destinație</i>.<br/><br/> Pentru a schimba, mergi la tab-ul <i>Universal</i>.</string>
+    <string name="firewall_rule_new_app_desc" translatable="true"><![CDATA[Această aplicație se conectează <i>întâia</i> oară.<br/><br/> Pentru a-i schimba setările, mergi la tab-ul <i>Universal</i>.]]></string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true"><![CDATA[O regulă firewall setată de utilizator blochează conectarea acestei <i>aplicații</i> în rețelele <i>necontorizate</i>.<br/><br/>Pentru a schimba, mergi la tab-ul <i>Toate</i> (aplicațiile).]]></string>
+    <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[O regulă firewall setată de utilizator blochează această <i>aplicație</i>.<br/><br/>Pentru a schimba, mergi la tab-ul <i>Toate</i> (aplicațiile).]]></string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true"><![CDATA[O regulă firewall setată de utilizator blochează conectarea acestei <i>aplicații</i> în rețelele <i>contorizate</i>.<br/><br/>Pentru a schimba, mergi la tab-ul <i>Toate</i> (aplicațiile).]]></string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true"><![CDATA[O regulă firewall setată de utilizator blochează conectarea acestei <i>aplicații</i> în rețelele <i>contorizate</i> (mobile).<br/><br/>Pentru a schimba, mergi la tab-ul <i>Universal</i>.]]></string>
+    <string name="firewall_rule_isolate_desc" translatable="true"><![CDATA[O regulă firewall setată de utilizator blochează conectarea acestei <i>aplicații</i> la alte IP-uri în afară celor <i>ocolite</i>.<br/><br/>Pentru a schimba, mergi la tab-ul <i>Toate</i> (aplicațiile).]]></string>
+    <string name="firewall_rule_block_ip_univ_desc" translatable="true"><![CDATA[O regulă firewall setată de utilizator blochează <i>IP-ul/Portul destinație</i>.<br/><br/> Pentru a schimba, mergi la tab-ul <i>Universal</i>.]]></string>
     <string name="firewall_rule_trusted_ip_desc" translatable="true">Această conexiune a fost permisă pentru că <i>IP-ul destinație</i> este setat ca IP de încredere.<br/><br/> Pentru a schimba, mergi la ecranul <i>Firewall per Aplicație</i>.</string>
     <string name="firewall_rule_device_lock_desc" translatable="true">Această conexiune a fost blocată de firewall pentru că <i>dispozitivul era blocat</i> la acel moment.<br/><br/> Pentru a schimba regula, mergi la tab-ul <i>Universal</i>.</string>
     <string name="firewall_rule_unknown_desc" translatable="true">Această conexiune a fost blocată de firewall pentru că <i>sursa aplicației</i> este necunoscută.<br/><br/> Pentru a schimba regula, mergi la tab-ul <i>Universal</i>.</string>
@@ -972,4 +1039,120 @@
     <string name="lbl_test" translatable="true">test</string>
     <string name="lbl_protos" translatable="true">protos</string>
     <string name="lbl_experimental" translatable="true">Auto (experimental)</string>
+    <string name="lbl_service_providers" translatable="true">Furnizori de Internet</string>
+    <string name="wireguard_title" translatable="true">Internet securizat prin WireGuard</string>
+    <string name="wireguard_desc" translatable="true">Criptează traficul tău de internet prin WireGuard. Alege diferite rute pentru diferite aplicații.</string>
+    <string name="firewall_title" translatable="true">Protejează sistemul Android prin Firewall</string>
+    <string name="firewall_desc" translatable="true">Controlează utilizarea internetului de către aplicații; restricționează conexiunile în funcție de aplicație sau activitatea în rețea.</string>
+    <string name="dns_title" translatable="true">Blochează reclame și malware prin DNS</string>
+    <string name="dns_desc" translatable="true">Alege din peste 190 liste pentru a bloca reclame, trackers și malware.</string>
+    <string name="status_no_network" translatable="true">fără rețea</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">Ștergi înregistrările pentru această regulă?</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">Aceasta va șterge numai înregistrările pentru regula de firewall curentă. Operația e ireversibilă. Vrei să continui?</string>
+    <string name="settings_mobile_metered_heading" translatable="true">Contorizează rețelele mobile</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Consideră contorizate numai rețelele mobile, iar celelalte necontorizate.</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">Luminos Plus</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">Întunecat Plus</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">Autentificare Biometrică</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">Nimic</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">Imediat</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">După 5 minute</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">După 15 minute</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">Ai utilizat Rethink de <b>%1$s days</b>, care înseamnă un cost de utilizare de <b>$%2$s</b>. Consideri oportună o sponsorizare pentru susținerea dezvoltării sale?</string>
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Utilizează DNS de sistem pentru domenii nedelegate</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">Utilizează DNS de sistem pentru domenii nedelegate precum <i>.lan</i>, <i>.internal</i>, etc.</string>
+    <string name="dc_filtering_heading" translatable="true">filtrare</string>
+    <string name="cd_split_dns_heading" translatable="true">DNS ramificat (experimental)</string>
+    <string name="cd_split_dns_desc" translatable="true">Redirecționează cererile DNS de la aplicațiile care folosesc proxy către serverele DNS proxy.</string>
+    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">Tratează regulile DNS ca reguli de firewall (experimental)</string>
+    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">Blocarea prin DNS va fi ocolită pe timpul soluționării; decizia va fi luată la momentul conectării.</string>
+    <string name="univ_firewall_rule_11" translatable="true">Blochează toate conexiunile la local-host</string>
+    <string name="univ_delete_domain_dialog_title" translatable="true">Ștergi toate regulile de domeniu?</string>
+    <string name="univ_delete_domain_dialog_message" translatable="true">Eliminarea acestor reguli va permite oricărei aplicații să se conecteze la domeniile blocate în prezent.</string>
+    <string name="firewall_rule_private_dns" translatable="true">DNS privat</string>
+    <string name="firewall_rule_bypass_proxy" translatable="true">Ocolire proxy</string>
+    <string name="firewall_rule_paused_app" translatable="true">Aplicație în repaus</string>
+    <string name="firewall_rule_lockdown_wg" translatable="true">Proxy izolat</string>
+    <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[Această conexiune caută un server <i>DNS privat</i> care nu există]]></string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Această conexiune a fost permisă pentru că <i>aplicația solicitantă</i> este setată să <i>ocolească regulile</i>.<br/><br/> Pentru a modifica , mergi la setările de <i>Firewall ale aplicației.</i>]]></string>
+    <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Această conexiune a fost permisă pentru că <i>aplicația</i>este în stare de <i>repaus</i>.]]></string>
+    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Această conexiune a fost blocată pentru că WireGuard este pus în <i>izolare</i>.<br/><br/> Pentru a modifica, mergi la setările <i>WireGuard</i>.]]></string>
+    <string name="wireguard_disable_failure_relay" translatable="true">\"Releul WireGuard\" nu poate fi închis</string>
+    <string name="config_invalid_desc" translatable="true">Configurare WireGuard incorectă</string>
+    <string name="console_log_title" translatable="true">Jurnale aplicații</string>
+    <string name="console_log_desc" translatable="true">Jurnalele pot conține informații sensibile.</string>
+    <string name="do_not_randomize_listen_port_title" translatable="true">Nu lăsa la întâmplare porturile de ascultare WireGuard</string>
+    <string name="do_not_randomize_listen_port_desc" translatable="true">În modul Avansat, păstrează porturile de ascultare WireGuard fixe (nu la întâmplare).</string>
+    <string name="endpoint_independent_mapping_title" translatable="true">Endpoint-Independent mapping</string>
+    <string name="endpoint_independent_mapping_desc" translatable="true">Când este activat, socket-urile UDP mențin adresă și port fixe pentru toate destinațiile.</string>
+    <string name="anti_censorship_title" translatable="true">Anti-cenzură</string>
+    <string name="anti_censorship_desc" translatable="true">Alege din variatele tehnici anti-cenzură.</string>
+    <string name="tcp_keep_alive_title" translatable="true">Scurtare durată TCP activ</string>
+    <string name="tcp_keep_alive_desc" translatable="true">Închide rapid socket-urile TCP fără activitate recentă.</string>
+    <string name="ac_title" translatable="true">anti-cenzură</string>
+    <string name="ac_desc" translatable="true">Uneltele anti-cenzură pot garanta libertatea internetului, dar s-ar putea să nu funcționeze peste tot. Încercare efectuată doar pe conexiuni non-proxy.</string>
+    <string name="ac_never_split_desc" translatable="true">Nu modifica pachetele.</string>
+    <string name="ac_split_auto_desc" translatable="true">Modifică pachetele la nevoie.</string>
+    <string name="ac_split_tcp" translatable="true">TCP</string>
+    <string name="ac_split_tcp_desc" translatable="true">Modifică pachetele TCP.</string>
+    <string name="ac_split_tls" translatable="true">TCP/TLS</string>
+    <string name="ac_split_tls_desc" translatable="true">Modifică pachetele TCP sau TLS.</string>
+    <string name="ac_desync" translatable="true">Desincronizare</string>
+    <string name="ac_desync_desc" translatable="true">Trimite pachete false la nevoie.</string>
+    <string name="ac_retry_options_title" translatable="true">strategie</string>
+    <string name="ac_retry_options_desc" translatable="true">Setează cum se fac reîncercările în cazul conexiunilor cenzurate.</string>
+    <string name="ac_retry_options_never_desc" translatable="true">În caz de nereușită, nu reîncerca cu tehnici anti-cenzură.</string>
+    <string name="ac_retry_options_with_split_desc" translatable="true">Încearcă tehnici anti-cenzură la nevoie.</string>
+    <string name="lbl_always" translatable="true">Întotdeauna</string>
+    <string name="ac_retry_options_after_split_desc" translatable="true">Aplică întotdeauna tehnici anti-cenzură.</string>
+    <string name="ac_toast_retry_disabled" translatable="true">Alege orice opțiune anti-cenzură pentru a adopta strategia.</string>
+    <string name="exclude_no_package_err_toast" translatable="true">Pentru a exclude aplicații, se cere un nume de pachet.</string>
+    <string name="hop_error_toast_msg_1" translatable="true">Nu poate fi retransmis, este deja %1$s</string>
+    <string name="hop_error_toast_msg_2" translatable="true">WireGuard indisponibil pentru retransmitere; te rog adaugă.</string>
+    <string name="hop_error_toast_msg_3" translatable="true">Disable Mobile only to use Relays</string>
+    <string name="mode_change_error_proxy_enabled" translatable="true">Nu se poate schimba modul când proxy este în uz. Apasă pentru <u>editarea setărilor proxy</u>.</string>
+    <string name="blocklist_not_available_toast" translatable="true">Pentru actualizarea listelor, descarcă ultima versiune a aplicației.</string>
+    <string name="lbl_ultra_secure" translatable="true">ultra securizat</string>
+    <string name="adv_set_dial_timeout_title" translatable="true">Timp de așteptare pentru inactivitate</string>
+    <string name="adv_set_dial_timeout_desc" translatable="true">Închide socket-urile TCP și UDP în așteptare după această perioadă.</string>
+    <string name="no_stats_available" translatable="true">Fără statistici</string>
+    <string name="hop_failure_toast" translatable="true">Eroare retransmitere: %1$s -&gt; %2$s</string>
+    <string name="wg_setting_use_on_mobile" translatable="true">Numai pe date mobile</string>
+    <string name="wg_setting_use_on_mobile_desc" translatable="true">Utilizează acest WireGuard numai cu date mobile.</string>
+    <string name="hop_add_remove_title" translatable="true">Adaugă / Elimină releu</string>
+    <string name="about_terms_of_service" translatable="true">Termeni serviciu</string>
+    <string name="bypasses_network_restrictions" translatable="true">Verificările de accesibilitate ocolesc toate restricțiile de rețea. În modul <i>Auto</i> , Rethink utilizează la întâmplare IP-uri și nume-gazdă conectate anterior.</string>
+    <string name="most_contacted_asn" translatable="true">cei mai contactați ISP</string>
+    <string name="most_blocked_asn" translatable="true">cei mai blocați ISP</string>
+    <string name="adv_tasker_dialog_msg" translatable="true">Introduce numele pachetelor (separate prin virgulă) admise să pornească sau să oprească Rethink.</string>
+    <string name="adv_tasker_dialog_instructions" translatable="true">Instructiuni:\n Extras cerute la transmitere:\n • Key: expeditor\n • Value: Numele de pachet al aplicației solicitante\n\n Exemplu: key:expeditor value:com.termux\n\n Acțiuni suportate:\n • Start VPN – com.celzero.bravedns.intent.action.VPN_START\n • Stop VPN – com.celzero.bravedns.intent.action.VPN_STOP</string>
+    <string name="adv_tasker_dialog_edit_hint" translatable="true">Introdu numele de pachet (example: net.dinglisch.android.taskerm)</string>
+    <string name="download_ip_info_title" translatable="true">Arată informații despre ISP</string>
+    <string name="download_ip_info_desc" translatable="true">Realizează detalii ISP pentru website-uri de la <i>rethinkdns.com</i>, cu sprijinul <i>%1$s</i></string>
+    <string name="adv_taster_title" translatable="true">Automatizare</string>
+    <string name="adv_taster_desc" translatable="true">Configurează aplicațiile care pot porni sau opri rethink.</string>
+    <string name="top_active_conns" translatable="true">top conexiuni active</string>
+    <string name="load_more" translatable="true">Încarcă tot</string>
+    <string name="close_conns_dialog_title" translatable="true">Închide conexiunile</string>
+    <string name="close_conns_dialog_desc" translatable="true">Închizi toate conexiunile pentru %1$s?</string>
+    <string name="local_blocklist_delete_desc" translatable="true">Ștergi listele de filtre de pe dispozitiv?</string>
+    <string name="fail_open_network_title" translatable="true">Blocaj la pierderea rețelei</string>
+    <string name="fail_open_network_desc" translatable="true">Când este activat, Rethink blochează toate datele când conectivitatea este întreruptă, ca în <i>Modul Avione</i>.</string>
+    <string name="about_license" translatable="true">Licențiat sub Apache-2.0</string>
+    <string name="close_all" translatable="true">Închide tot</string>
+    <string name="smart_dns" translatable="true">Smart DNS</string>
+    <string name="processing_dialog_title" translatable="true">Procesare</string>
+    <string name="processing_dialog_desc" translatable="true">Te rog să aștepți până procesăm cererea ta.</string>
+    <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> utilizează la întâmplare oricare din acești rezolvatori DNS:</string>
+    <string name="wg_mobile_only_hop_err" translatable="true">Modul Date-Mobile nu este acceptat pentru retransmitere</string>
+    <string name="vpn_policy_auto_desc" translatable="true">Reacționează la schimbări importante ale rețelei și conectivității.</string>
+    <string name="vpn_policy_sensitive" translatable="true">Sensibil</string>
+    <string name="vpn_policy_sensitive_desc" translatable="true">Reacționează la toate schimbări rețelei și conectivității.</string>
+    <string name="vpn_policy_relaxed" translatable="true">Relaxat</string>
+    <string name="vpn_policy_relaxed_desc" translatable="true">Reacționează la schimbări interesante ale rețelei și conectivității.</string>
+    <string name="vpn_policy_title" translatable="true">Politica la schimbările de conexiune</string>
+    <string name="use_fallback_dns_to_bypass" translatable="true">Folosește DNS de rezervă pentru ocolire</string>
+    <string name="use_fallback_dns_to_bypass_desc" translatable="true">Când este activat, folosește întotdeauna DNS de rezervă la ocolire pentru aplicații , domenii și ISP.</string>
+    <string name="title_database_dump" translatable="true">Stare bază date</string>
+    <string name="copied_clipboard" translatable="true">Copiat</string>
 </resources>
