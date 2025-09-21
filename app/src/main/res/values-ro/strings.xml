@@ -165,7 +165,7 @@
     <string name="settings_socks5_dialog_hint_password" translatable="true">Parola (opțional)</string>
     <string name="settings_theme_dialog_title" translatable="true">Aspect</string>
     <string name="settings_theme_dialog_themes_2" translatable="true">Alb</string>
-    <string name="settings_theme_dialog_themes_3" translatable="true">Întunecat</string>
+    <string name="settings_theme_dialog_themes_3" translatable="true">Întuneric</string>
     <string name="settings_ip_text_ipv46" translatable="true">Automat</string>
     <string name="settings_notification_desc3" translatable="true">Nici una</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">Dezactivat (prestabilit)</string>
@@ -1053,7 +1053,7 @@
     <string name="settings_mobile_metered_desc" translatable="true">Consideră contorizate numai rețelele mobile, iar celelalte necontorizate.</string>
     <string name="settings_theme_dialog_themes_5" translatable="true">Luminos Plus</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">Întunecat Plus</string>
-    <string name="settings_biometric_dialog_heading" translatable="true">Autentificare Biometrică</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">Eroare la autentificarea biometrică</string>
     <string name="settings_biometric_dialog_option_0" translatable="true">Nimic</string>
     <string name="settings_biometric_dialog_option_1" translatable="true">Imediat</string>
     <string name="settings_biometric_dialog_option_2" translatable="true">După 5 minute</string>
