@@ -128,10 +128,10 @@
     <string name="wireguard_connection_error" translatable="true">VPN-ul WireGuard nu a reușit să se conecteze</string>
     <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
     <string name="title_about" translatable="true">Despre</string>
-    <string name="status_no_internet" translatable="true">fără internet</string>
+    <string name="status_no_internet" translatable="true">Fără internet</string>
     <string name="notification_action_dns_mode" translatable="true">DNS</string>
     <string name="dns_mode_info_title" translatable="true">DNS</string>
-    <string name="firewall_mode_info_title" translatable="true">Firewall</string>
+    <string name="firewall_mode_info_title" translatable="true">firewall</string>
     <string name="apps_info_title" translatable="true">Aplicații</string>
     <string name="custom_url_error_invalid_url" translatable="true">URL invalid</string>
     <string name="bsct_app_info" translatable="true">Informații aplicație</string>
@@ -145,7 +145,7 @@
     <string name="download_update_dialog_failure_title" translatable="true">Ceva n-a mers bine!</string>
     <string name="app_mode_dns" translatable="true">DNS</string>
     <string name="app_mode_firewall" translatable="true">Firewall</string>
-    <string name="relative_time_today" translatable="true">Astăzi</string>
+    <string name="relative_time_today" translatable="true">Astazi</string>
     <string name="relative_time_yesterday" translatable="true">Ieri</string>
     <string name="settings_proxy_header" translatable="true">proxy</string>
     <string name="orbot" translatable="true">Orbot</string>
@@ -153,8 +153,8 @@
     <string name="orbot_status_arg_2" translatable="true">TCP</string>
     <string name="orbot_install_dialog_title" translatable="true">Instalezi Orbot?</string>
     <string name="orbot_install_dialog_neutral" translatable="true">website</string>
-    <string name="settings_general_customize" translatable="true">personalizează</string>
-    <string name="settings_check_update_heading" translatable="true">Caută actualizări ale aplicației</string>
+    <string name="settings_general_customize" translatable="true">Customize</string>
+    <string name="settings_check_update_heading" translatable="true">Caută actualizări</string>
     <string name="settings_theme_heading" translatable="true">Aspect</string>
     <string name="settings_go_log_heading" translatable="true">Nivele de jurnalizare</string>
     <string name="settings_dns_proxy_dialog_hostname" translatable="true">Nume gazdă</string>
@@ -164,7 +164,7 @@
     <string name="settings_socks5_dialog_hint_username" translatable="true">Nume utilizator (opțional)</string>
     <string name="settings_socks5_dialog_hint_password" translatable="true">Parola (opțional)</string>
     <string name="settings_theme_dialog_title" translatable="true">Aspect</string>
-    <string name="settings_theme_dialog_themes_2" translatable="true">Luminos</string>
+    <string name="settings_theme_dialog_themes_2" translatable="true">Alb</string>
     <string name="settings_theme_dialog_themes_3" translatable="true">Întunecat</string>
     <string name="settings_ip_text_ipv46" translatable="true">Automat</string>
     <string name="settings_notification_desc3" translatable="true">Nici una</string>
@@ -174,11 +174,11 @@
     <string name="hs_biometeric_feature_not_supported" translatable="true">Autentificarea biometrică pe acest dispozitiv este dezactivată sau nu e acceptată</string>
     <string name="always_on_dialog_positive" translatable="true">Stop</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Rețea</string>
-    <string name="orbot_install_dialog_positive" translatable="true">Instalează</string>
+    <string name="orbot_install_dialog_positive" translatable="true">Instaleaza</string>
     <string name="settings_dns_proxy_dialog_username" translatable="true">Nume de utilizator</string>
-    <string name="settings_general_header" translatable="true">general</string>
+    <string name="settings_general_header" translatable="true">General</string>
     <string name="firewall_status_unknown" translatable="true">necunoscute</string>
-    <string name="settings_import_export_heading" translatable="true">Copie de rezervă și restaurare</string>
+    <string name="settings_import_export_heading" translatable="true">Backup și restaurare</string>
     <string name="settings_dns_proxy_dialog_password" translatable="true">Parolă</string>
     <string name="settings_locale_heading" translatable="true">Schimbă limba</string>
     <string name="hsf_start_btn_state" translatable="true">start</string>
@@ -971,5 +971,5 @@
     <string name="lbl_fallback" translatable="true">Rezervă</string>
     <string name="lbl_test" translatable="true">test</string>
     <string name="lbl_protos" translatable="true">protos</string>
-    <string name="lbl_experimental" translatable="true">(experimental)</string>
+    <string name="lbl_experimental" translatable="true">Auto (experimental)</string>
 </resources>
