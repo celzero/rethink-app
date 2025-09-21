@@ -208,14 +208,14 @@
     <string name="dc_entries">%1$s entrées »</string>
     <string name="dc_rethink_dns_radio">Rethink DNS</string>
     <string name="dc_other_dns_heading">type</string>
-    <string name="firewall_rule_block_app_unmetered_desc">Une règle de pare-feu définie par l’utilisateur a bloqué cette <i>application</i> lors de la tentative de connexion sur un réseau <i>Sans abonnement</i>.<br></br><br></br> Pour la modifier, allez dans l’onglet <i>Toutes les applications</i>.</string>
+    <string name="firewall_rule_block_app_unmetered_desc">Une règle de pare-feu définie par l’utilisateur a bloqué cette <i>application</i> lors de la tentative de connexion sur un réseau <i>Sans abonnement</i>.<br/><br/> Pour la modifier, allez dans l’onglet <i>Toutes les applications</i>.</string>
     <string name="fapps_info_dialog_message">Empêchez les applications de se connecter à l’Internet. Limiter l’accès à Internet permet d’éviter une utilisation injustifiée des données et d’économiser la batterie.</string>
     <string name="dns_proxy_connection_failure_lockdown">L’exclusion de %1$s pour %2$s en mode confinement peut provoquer des problèmes de connectivité à Internet.</string>
-    <string name="firewall_rule_block_ip_desc">Une règle de pare-feu définie par l’utilisateur a bloqué <i>l’IP de destination</i>.<br></br><br></br> Pour la modifier, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
-    <string name="firewall_rule_bypass_universal_ip_desc">Cette connexion a été autorisée car <i>l’IP de destination</i> est configurée pour contourner les règles du pare-feu global.<br></br><br></br>Pour modifier cela, allez dans <i>Règles IP</i> dans l’onglet <i>Global</i>.</string>
-    <string name="firewall_rule_unknown_desc">Cette connexion a été bloquée par un pare-feu car <i>l’application source</i> n’a pas pu être déterminée.<br></br><br></br> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
-    <string name="firewall_rule_trusted_ip_desc">Cette connexion a été autorisée car <i>l’IP de destination</i> est autorisée.<br></br><br></br> Pour modifier cela, allez à l’écran <i>Pare-feu de l’application</i>.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">Cette connexion a été autorisée car <i>l’application source</i> est configurée pour <i>contourner les règles du pare-feu global</i>.<br></br><br></br> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i> .</string>
+    <string name="firewall_rule_block_ip_desc">Une règle de pare-feu définie par l’utilisateur a bloqué <i>l’IP de destination</i>.<br/><br/> Pour la modifier, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
+    <string name="firewall_rule_bypass_universal_ip_desc">Cette connexion a été autorisée car <i>l’IP de destination</i> est configurée pour contourner les règles du pare-feu global.<br/><br/>Pour modifier cela, allez dans <i>Règles IP</i> dans l’onglet <i>Global</i>.</string>
+    <string name="firewall_rule_unknown_desc">Cette connexion a été bloquée par un pare-feu car <i>l’application source</i> n’a pas pu être déterminée.<br/><br/> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
+    <string name="firewall_rule_trusted_ip_desc">Cette connexion a été autorisée car <i>l’IP de destination</i> est autorisée.<br/><br/> Pour modifier cela, allez à l’écran <i>Pare-feu de l’application</i>.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc">Cette connexion a été autorisée car <i>l’application source</i> est configurée pour <i>contourner les règles du pare-feu global</i>.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i> .</string>
     <string name="lbbs_download">Mettre à jour les listes de blocage</string>
     <string name="brbs_backup_title">Sauvegarder</string>
     <string name="info_dialog_rethink_toast_msg">Copié en tant qu’URL RDNS+ DNS over HTTPS</string>
@@ -254,7 +254,7 @@
     <string name="ada_noapp_dialog_title">Aucune application correspondante</string>
     <string name="dns_connected_rethink_plus">Connecté. %1$s listes de blocage en cours d’utilisation</string>
     <string name="ada_app_metered">Avec abonnement</string>
-    <string name="firewall_rule_block_app_desc">Une règle de pare-feu définie par l’utilisateur a bloqué cette <i>application</i> .<br></br><br></br> Pour la modifier, allez dans l’onglet <i>Toutes les applications</i>.</string>
+    <string name="firewall_rule_block_app_desc">Une règle de pare-feu définie par l’utilisateur a bloqué cette <i>application</i> .<br/><br/> Pour la modifier, allez dans l’onglet <i>Toutes les applications</i>.</string>
     <string name="ci_no_rule_txt">Sans règle</string>
     <string name="notif_channel_vpn_notification">VPN actif</string>
     <string name="doh_custom_url_remove_success">Point de terminaison supprimé.</string>
@@ -298,7 +298,7 @@
     <string name="firewall_rule_block_app_new_install">Nouvelle appli</string>
     <string name="firewall_rule_block_udp_ntp">UDP bloqué</string>
     <string name="firewall_rule_exempt_dns_proxied">DNS redirigé</string>
-    <string name="firewall_rule_block_http_desc">Cette connexion a été bloquée car elle utilisait probablement <i>une liaison HTTP non sécurisée</i>.<br></br><br></br> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
+    <string name="firewall_rule_block_http_desc">Cette connexion a été bloquée car elle utilisait probablement <i>une liaison HTTP non sécurisée</i>.<br/><br/> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
     <string name="new_app_bulk_notification_title">Attention</string>
     <string name="rt_dialog_message">Voulez-vous appliquer les listes de blocage nouvellement configurées \?</string>
     <string name="radio_max_btn">🪂 Max</string>
@@ -319,7 +319,7 @@
     <string name="dns_proxy_toast_parameter">Proxy DNS</string>
     <string name="accessibility_notification_content">Le service d’accessibilité Rethink s’est arrêté ou a planté. Il ne bloque plus les applications en arrière-plan. Appuyez pour le réactiver.</string>
     <string name="other_dns_list_tab1">DoH</string>
-    <string name="firewall_rule_global_lockdown_desc">Cette connexion a été bloquée car le confinement global est activé.<br></br><br></br> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
+    <string name="firewall_rule_global_lockdown_desc">Cette connexion a été bloquée car le confinement global est activé.<br/><br/> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
     <string name="cd_toast_deleted">Domaine supprimé de la liste personnalisée</string>
     <string name="ci_dialog_title">Ajouter une règle IP / Port</string>
     <string name="ci_bypass_universal_txt">Exception globale</string>
@@ -347,8 +347,8 @@
     <string name="dns_connected_no_count">Connecté</string>
     <string name="fapps_unmetered_unblock_dialog_title">Autoriser sur réseau sans facturation à l\'usage</string>
     <string name="firewall_rule_exempt_app_bypass_univ">Appli avec exception(s)</string>
-    <string name="firewall_rule_foreground_desc">Cette connexion était protégée par un pare-feu car l’application source <i>n’était pas au premier plan</i> .<br></br><br></br> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc">Cette connexion DNS a été redirigée et transmise au point de terminaison DNS spécifié par l’utilisateur.<br></br><br></br> Pour modifier cela, désactivez <i>Empêcher les fuites DNS</i> de l’écran DNS <i>Configurer</i>.</string>
+    <string name="firewall_rule_foreground_desc">Cette connexion était protégée par un pare-feu car l’application source <i>n’était pas au premier plan</i> .<br/><br/> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc">Cette connexion DNS a été redirigée et transmise au point de terminaison DNS spécifié par l’utilisateur.<br/><br/> Pour modifier cela, désactivez <i>Empêcher les fuites DNS</i> de l’écran DNS <i>Configurer</i>.</string>
     <string name="notif_channel_desc_vpn_failure">Informer lorsque Rethink est arrêté par Android ou par une autre application de VPN</string>
     <string name="cd_dialog_title">Ajouter une règle de domaine</string>
     <string name="ci_delete">supprimer</string>
@@ -416,7 +416,7 @@
     <string name="firewall_rule_block_metered">Avec abonnement (Mobile, Appli)</string>
     <string name="socks5_proxy_toast_parameter">Proxy SOCKS5</string>
     <string name="settings_local_blocklist_dialog_positive">Télécharger</string>
-    <string name="firewall_rule_isolate_desc">Une règle de pare-feu définie par l’utilisateur a bloqué la connexion de cette <i>application</i> à des adresses IP qui ne sont pas de <i>confiance</i>.<br></br><br></br> Pour la modifier, allez sur l’onglet <i>Toutes les applications</i>.</string>
+    <string name="firewall_rule_isolate_desc">Une règle de pare-feu définie par l’utilisateur a bloqué la connexion de cette <i>application</i> à des adresses IP qui ne sont pas de <i>confiance</i>.<br/><br/> Pour la modifier, allez sur l’onglet <i>Toutes les applications</i>.</string>
     <string name="category_name_others">Autre</string>
     <string name="ci_block">Bloquer</string>
     <string name="ada_app_bypass_univ">Exception globale</string>
@@ -489,8 +489,8 @@
     <string name="about_mail_bugreport_subject">[Rethink] : Rapport de bogue</string>
     <string name="cd_doh_dialog_resolver_name">Nom du résolveur</string>
     <string name="settings_notification_heading">Choisir l’action de notification</string>
-    <string name="firewall_rule_block_ip_univ_desc">Une règle de pare-feu définie par l’utilisateur a bloqué <i>l’IP de destination / le port</i>.<br></br><br></br> Pour la modifier, allez sur l’onglet <i>Global</i>.</string>
-    <string name="firewall_rule_block_dns_bypass_desc">Cette connexion a été bloquée car <i>l’application source</i> contournait le DNS spécifié par l’utilisateur.<br></br><br></br> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
+    <string name="firewall_rule_block_ip_univ_desc">Une règle de pare-feu définie par l’utilisateur a bloqué <i>l’IP de destination / le port</i>.<br/><br/> Pour la modifier, allez sur l’onglet <i>Global</i>.</string>
+    <string name="firewall_rule_block_dns_bypass_desc">Cette connexion a été bloquée car <i>l’application source</i> contournait le DNS spécifié par l’utilisateur.<br/><br/> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
     <string name="category_name_non_app_sys">Services système</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="brbs_backup_dialog_positive">Sauvegarder</string>
@@ -545,7 +545,7 @@
     <string name="univ_delete_firewall_dialog_title">Supprimer toutes les règles IP \?</string>
     <string name="dns_proxy_dialog_header_dns">Ajouter un proxy DNS</string>
     <string name="fapps_unmetered_block_dialog_message">Bloquer les connexions sur réseau sans abonnement (Wi-Fi) pour les applications <i>listées</i> \?</string>
-    <string name="firewall_rule_block_app_mobile_desc">Une règle de pare-feu définie par l’utilisateur a bloqué cette <i>application</i> lors de la tentative de connexion sur un réseau <i>Avec abonnement</i>.<br></br><br></br> Pour la modifier, allez sur l’onglet <i>Toutes les applications</i>.</string>
+    <string name="firewall_rule_block_app_mobile_desc">Une règle de pare-feu définie par l’utilisateur a bloqué cette <i>application</i> lors de la tentative de connexion sur un réseau <i>Avec abonnement</i>.<br/><br/> Pour la modifier, allez sur l’onglet <i>Toutes les applications</i>.</string>
     <string name="ada_app_status_block_wifi">est bloquée sur les réseaux sans abonnement (Wi-Fi)</string>
     <string name="fapps_firewall_filter_desc_category">Affichage des applis <u>%1$s</u> %2$s dans les catégories : %3$s</string>
     <string name="unicode_warning_sign">⚠</string>
@@ -576,7 +576,7 @@
     <string name="fapps_firewall_filter_isolate">Confinées</string>
     <string name="accessibility_failure_toast">Le service d’accessibilité Rethink s’est arrêté ou a planté. Il ne bloque plus les applications en arrière-plan.</string>
     <string name="firewall_rule_no_rule">Aucune règle</string>
-    <string name="firewall_rule_new_app_desc">Cette application a établi la connexion pour la <i>première fois</i>.<br></br><br></br> Pour la modifier, allez sur l’onglet <i>Global</i>.</string>
+    <string name="firewall_rule_new_app_desc">Cette application a établi la connexion pour la <i>première fois</i>.<br/><br/> Pour la modifier, allez sur l’onglet <i>Global</i>.</string>
     <string name="new_app_bulk_notification_content">Rethink a bloqué %1$s nouvelles applications. Appuyez pour afficher ou modifier.</string>
     <string name="notif_channed_desc_download">Alerte sur la progression du téléchargement des listes de blocage embarquées</string>
     <string name="build__flavor_fdroid">fdroid</string>
@@ -600,7 +600,7 @@
     <string name="other_dns_list_tab3">Proxy DNS</string>
     <string name="firewall_rule_block_app_exception">Erreur</string>
     <string name="firewall_rule_block_ip">IP / Port (Appli)</string>
-    <string name="firewall_rule_block_udp_ntp_desc">Une règle de pare-feu définie par l’utilisateur a bloqué cette connexion <i>UDP</i>.<br></br><br></br> Pour la modifier, allez sur l’onglet <i>Global</i>.</string>
+    <string name="firewall_rule_block_udp_ntp_desc">Une règle de pare-feu définie par l’utilisateur a bloqué cette connexion <i>UDP</i>.<br/><br/> Pour la modifier, allez sur l’onglet <i>Global</i>.</string>
     <string name="new_app_notification_action_toast_deny">Connexion réseau refusée pour l’application</string>
     <string name="notif_dialog_pause_dialog_negative">Abandonner</string>
     <string name="notif_channel_firewall_alerts">Alertes du pare-feu</string>
@@ -622,7 +622,7 @@
     <string name="fapps_filter_parent_system">Système</string>
     <string name="fapps_unmetered_block_dialog_title">Bloquer sur réseau sans abonnement</string>
     <string name="fapps_metered_unblock_dialog_title">Autoriser sur réseau avec abonnement</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc">Une règle de pare-feu global définie par l’utilisateur a bloqué cette <i>application</i> lors de la tentative de connexion sur un réseau <i>Avec abonnement</i> (Mobile).<br></br><br></br> Pour la modifier, allez sur l’onglet <i>Global</i>.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc">Une règle de pare-feu global définie par l’utilisateur a bloqué cette <i>application</i> lors de la tentative de connexion sur un réseau <i>Avec abonnement</i> (Mobile).<br/><br/> Pour la modifier, allez sur l’onglet <i>Global</i>.</string>
     <string name="system_dns_connection_failure">Impossible de déterminer le serveur DNS actuel</string>
     <string name="firewall_rule_foreground">Application non utilisée</string>
     <string name="firewall_rule_block_http">HTTP non sécurisé</string>
@@ -679,7 +679,7 @@
     <string name="update_complete_action_snack">REDÉMARRER</string>
     <string name="pause_text">en pause</string>
     <string name="firewall_rule_trusted_ip">IP avec exception (Appli)</string>
-    <string name="firewall_rule_device_lock_desc">Cette connexion était protégée par un pare-feu car <i>l’appareil était verrouillé</i> à ce moment-là.<br></br><br></br> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
+    <string name="firewall_rule_device_lock_desc">Cette connexion était protégée par un pare-feu car <i>l’appareil était verrouillé</i> à ce moment-là.<br/><br/> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
     <string name="dc_dns_leaks_heading">Empêcher les fuites DNS</string>
     <string name="new_app_notification_content">Rethink a bloqué l’application récemment installée, %1$s.</string>
     <string name="notif_channel_download">Alertes de téléchargement</string>
@@ -796,8 +796,8 @@
     <string name="lbl_domain_rules" translatable="true">Règles de domaines</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Domaine de confiance (Appli)</string>
     <string name="cd_no_rules_text" translatable="true">Aucune règles de domaine.</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">Cette connexion a été autorisée car <i>le domaine</i> est autorisé.<br></br><br></br> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">Une règle de pare-feu définie par l’utilisateur a bloqué le <i>domaine</i>.<br></br><br></br> Pour la modifier, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Cette connexion a été autorisée car <i>le domaine</i> est autorisé.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Une règle de pare-feu définie par l’utilisateur a bloqué le <i>domaine</i>.<br/><br/> Pour la modifier, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
     <string name="bsdl_block_desc" translatable="true">Bloquer, tolérer <u>ce domaine</u></string>
     <string name="lbl_rules" translatable="true">règles</string>
     <string name="lbl_configure" translatable="true">Configurer</string>
@@ -835,10 +835,10 @@
     <string name="hsf_packet_capture_chip_text" translatable="true">Capture de paquets active</string>
     <string name="cd_dns_alg_desc" translatable="true">Attribution d\'une IP unique par requête DNS</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Domaine de confiance (Univ)</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Cette connexion a été autorisée car <i>l’application source</i> est configurée pour <i>contourner les règles du pare-feu global</i>.<br></br><br></br> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Cette connexion a été bloquée parce que le domaine <i></i> est défini comme bloqué dans les règles de domaine universel.<br></br><br></br> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">Cette connexion a été bloquée parce que le domaine <i></i> est bloqué par le DNS préféré de l\'utilisateur.<br></br><br></br> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Cette connexion a été bloquée parce que le domaine <i></i> est défini comme étant de confiance dans les règles du domaine universel.<br></br><br></br> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Cette connexion a été autorisée car <i>l’application source</i> est configurée pour <i>contourner les règles du pare-feu global</i>.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Cette connexion a été bloquée parce que le domaine <i/> est défini comme bloqué dans les règles de domaine universel.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">Cette connexion a été bloquée parce que le domaine <i/> est bloqué par le DNS préféré de l\'utilisateur.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Cette connexion a été bloquée parce que le domaine <i/> est défini comme étant de confiance dans les règles du domaine universel.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">contournera les règles universelles de DNS et de pare-feu</string>
     <string name="lbl_network" translatable="true">réseau</string>
     <string name="lbl_maybe_blocked" translatable="true">Peut-être bloqué</string>
@@ -897,7 +897,7 @@
     <string name="quad9_dns_desc" translatable="true">Quad9 dirige vos requêtes DNS via un réseau sécurisé de serveurs à travers le monde.</string>
     <string name="univ_firewall_heading" translatable="true">Règles universelles du pare-feu</string>
     <string name="cloudflare_security_dns_desc" translatable="true">Bloque le contenu malveillant. Utilise le paramètre DNS 1.1.1.2 de Cloudflare.</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">Cette connexion a été transmise à Proxy <br></br><br></br> Pour changer, allez à <i>Proxy</i> de l\'écran <i>Configure</i>.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">Cette connexion a été transmise à Proxy <br/><br/> Pour changer, allez à <i>Proxy</i> de l\'écran <i>Configure</i>.</string>
     <string name="lbl_allowed_ips" translatable="true">IP autorisées</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
     <string name="lbl_http" translatable="true">HTTP</string>
@@ -1027,4 +1027,5 @@
     <string name="exclude_apps_from_proxy_failure_toast">Cette application contourne tous les proxys</string>
     <string name="lbl_notification" translatable="true">notification</string>
     <string name="memory_notification_text">Rethink connaît une mémoire insuffisante. Les actions du système peuvent être limitées.</string>
+    <string name="lbl_test" translatable="true">test</string>
 </resources>
