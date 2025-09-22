@@ -892,6 +892,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             val stats = BatteryStatsProvider.formattedStats()
             uiCtx {
                 if (!isAdded) return@uiCtx
+                if (stats.isEmpty()) {
+                    textView.text = "No battery stats available"
+                    return@uiCtx
+                }
                 textView.text = stats
             }
         }

@@ -136,7 +136,11 @@ object BatteryStatsProvider {
     }
 
     suspend fun formattedStats(): String {
-        return BatteryStatsLogger.readLogFile() + "\n" + mStatefulCollector.latestDiffAndReset?.metrics.toString()
+        return try {
+            BatteryStatsLogger.readLogFile() + "\n" + mStatefulCollector.latestDiffAndReset?.metrics.toString()
+        } catch (e: Exception) {
+            ""
+        }
     }
 
     fun logMetrics(tag: String?) = CoroutineScope(Dispatchers.IO).launch {
