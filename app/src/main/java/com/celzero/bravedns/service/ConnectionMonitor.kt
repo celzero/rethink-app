@@ -663,7 +663,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 diagsMgr?.unregister()
                 diagsMgr = null
             } catch (e: Exception) {
-                Logger.w(LOG_TAG_CONNECTION, "DiagnosticsManager; err while unregistering diag network callback", e)
+                Logger.w(LOG_TAG_CONNECTION, "DiagnosticsManager; err while unregistering diag network callback")
             }
         }
     }
@@ -675,8 +675,12 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             try {
                 // check if connectivity manager is initialized as it is lazy initialized
                 if (::cm.isInitialized) {
-                    cm.unregisterNetworkCallback(internetValidatedCallback())
-                    cm.unregisterNetworkCallback(transportCallback())
+                    try {
+                        cm.unregisterNetworkCallback(internetValidatedCallback())
+                    } catch (ignored: Exception) { }
+                    try {
+                        cm.unregisterNetworkCallback(transportCallback())
+                    } catch (ignored: Exception) { }
                 }
                 if (isAtleastR()) {
                     unregisterDiags()
