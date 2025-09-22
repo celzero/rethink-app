@@ -66,7 +66,7 @@ class WgSsidDialog(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT
         )
-        //window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable()) // allow rounded bg
+
         window?.setGravity(Gravity.CENTER)
         ViewCompat.setOnApplyWindowInsetsListener(b.root) { view, insets ->
             val sysInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
