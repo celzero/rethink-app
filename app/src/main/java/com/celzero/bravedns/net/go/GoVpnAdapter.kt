@@ -41,6 +41,7 @@ import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.BraveVPNService.Companion.FIRESTACK_MUST_DUP_TUNFD
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
@@ -49,6 +50,7 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
@@ -79,9 +81,11 @@ import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.backend.Proxies
 import com.celzero.firestack.backend.RDNS
 import com.celzero.firestack.backend.RouterStats
+import com.celzero.firestack.backend.RpnProxy
 import com.celzero.firestack.intra.Controller
 import com.celzero.firestack.intra.DefaultDNS
 import com.celzero.firestack.intra.Intra
+import com.celzero.firestack.intra.Intra.panicAtRandom
 import com.celzero.firestack.intra.Tunnel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -89,6 +93,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import com.celzero.firestack.settings.Settings
+import com.celzero.firestack.settings.Settings.setAutoDialsParallel
 import java.net.URI
 import java.net.URLEncoder
 import kotlin.text.substring
@@ -1114,7 +1119,7 @@ class GoVpnAdapter : KoinComponent {
                 val isWireGuardMobileOnly = files?.useOnlyOnMetered == true && !files.oneWireGuard
                 val canResumeMobileWg = isWireGuardMobileOnly && isMobileActive
 
-                val useOnlyOnSsid = files?.ssidEnabled == true && files.ssids.isNotEmpty() && !files.oneWireGuard
+                val useOnlyOnSsid = files?.ssidEnabled == true && !files.oneWireGuard
                 val ssidList = files?.ssids?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
                 val ssidMatch = useOnlyOnSsid && WireguardManager.matchesSsidList(files.ssids, ssid)
                 val canResumeSsidWg = useOnlyOnSsid && ssidMatch
