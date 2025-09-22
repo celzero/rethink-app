@@ -171,14 +171,27 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {
-            val currentAppLocales: LocaleList =
-                getSystemService(LocaleManager::class.java).applicationLocales
-            b.settingsLocaleDesc.text =
-                currentAppLocales[0]?.displayName ?: getString(R.string.settings_locale_desc)
+            try {
+                val localeManager = getSystemService(LocaleManager::class.java)
+                val currentAppLocales: LocaleList = localeManager?.applicationLocales ?: LocaleList.getEmptyLocaleList()
+                b.settingsLocaleDesc.text =
+                    if (currentAppLocales.isEmpty) {
+                        getString(R.string.settings_locale_desc)
+                    } else {
+                        currentAppLocales[0]?.displayName ?: getString(R.string.settings_locale_desc)
+                    }
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_UI, "error getting app locales for Android T+", e)
+                b.settingsLocaleDesc.text = getString(R.string.settings_locale_desc)
+            }
         } else {
+            val appLocales = AppCompatDelegate.getApplicationLocales()
             b.settingsLocaleDesc.text =
-                AppCompatDelegate.getApplicationLocales().get(0)?.displayName
-                    ?: getString(R.string.settings_locale_desc)
+                if (appLocales.isEmpty) {
+                    getString(R.string.settings_locale_desc)
+                } else {
+                    appLocales.get(0)?.displayName ?: getString(R.string.settings_locale_desc)
+                }
         }
         // biometric authentication
         if (
@@ -841,7 +854,10 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         alertBuilder.setTitle(getString(R.string.settings_locale_dialog_title))
         val languages = getLocaleEntries()
         val items = languages.keys.toTypedArray()
-        val selectedKey = AppCompatDelegate.getApplicationLocales().get(0)?.toLanguageTag()
+        val selectedKey = AppCompatDelegate.getApplicationLocales()
+            .takeIf { !it.isEmpty }
+            ?.get(0)
+            ?.toLanguageTag()
         var checkedItem = 0
         languages.values.forEachIndexed { index, s ->
             if (s == selectedKey) {
@@ -851,9 +867,14 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             dialog.dismiss()
             val item = items[which]
-            // https://developer.android.com/guide/topics/resources/app-languages#app-language-settings
-            val locale = Locale.forLanguageTag(languages.getOrDefault(item, "en-US"))
-            AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(locale))
+            val tag = languages[item] ?: ""
+            if (tag.isBlank()) {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
+            } else {
+                // https://developer.android.com/guide/topics/resources/app-languages#app-language-settings
+                val locale = Locale.forLanguageTag(languages.getOrDefault(item, "en-US"))
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(locale))
+            }
         }
         alertBuilder.setNeutralButton(getString(R.string.settings_locale_dialog_neutral)) { dialog, _ ->
             dialog.dismiss()
@@ -888,8 +909,14 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
           val localeList = getLocalesFromLocaleConfig()
           val map = mutableMapOf<String, String>()
 
-          for (a in 0 until localeList.size()) {
-              localeList[a].let { it?.let { it1 -> map.put(it1.displayName, it1.toLanguageTag()) } }
+          // Add default/system locale option first
+          map[getString(R.string.settings_locale_dialog_default)] = ""
+          
+          // Add all available locales from locale_config.xml
+          for (i in 0 until localeList.size()) {
+              localeList[i]?.let { locale ->
+                  map[locale.displayName] = locale.toLanguageTag()
+              }
           }
           return map
       }

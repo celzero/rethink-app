@@ -9,7 +9,7 @@
     <locale android:name="fr" /> <!-- French (France) -->
     <locale android:name="de" /> <!-- German -->
     <locale android:name="hi" /> <!-- Hindi -->
-    <locale android:name="in" /> <!-- Indonesian -->
+    <locale android:name="id" /> <!-- Indonesian -->
     <locale android:name="it" /> <!-- Italian -->
     <locale android:name="ja" /> <!-- Japanese -->
     <locale android:name="lt" /> <!-- Lithuanian -->
