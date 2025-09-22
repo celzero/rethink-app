@@ -199,13 +199,40 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) ==
             BiometricManager.BIOMETRIC_SUCCESS
         ) {
-            val txt =
-                getString(
-                    R.string.two_argument_colon,
-                    getString(R.string.settings_biometric_desc),
-                    BioMetricType.fromValue(persistentState.biometricAuthType).name
-                )
-            b.settingsBiometricDesc.text = txt
+            val bioMetricType = BioMetricType.fromValue(persistentState.biometricAuthType)
+            when (bioMetricType) {
+                BioMetricType.OFF -> {
+                    val txt = getString(
+                        R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_0)
+                    )
+                    b.settingsBiometricDesc.text = txt
+                }
+
+                BioMetricType.IMMEDIATE -> {
+                    val txt = getString(
+                        R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_1)
+                    )
+                    b.settingsBiometricDesc.text = txt
+                }
+
+                BioMetricType.FIVE_MIN -> {
+                    val txt = getString(
+                        R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_2)
+                    )
+                    b.settingsBiometricDesc.text = txt
+                }
+
+                BioMetricType.FIFTEEN_MIN -> {
+                    val txt = getString(
+                        R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_3)
+                    )
+                    b.settingsBiometricDesc.text = txt
+                }
+            }
         } else {
             b.settingsBiometricRl.visibility = View.GONE
         }

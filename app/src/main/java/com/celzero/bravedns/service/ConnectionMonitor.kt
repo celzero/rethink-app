@@ -272,15 +272,31 @@ class ConnectionMonitor(private val context: Context, private val networkListene
 
         try {
             if (isAtleastS()) {
-                val wi = cap.transportInfo as WifiInfo
-                val ssid = wi.ssid
-                if (!ssid.isNullOrEmpty() && ssid != "<unknown ssid>") {
-                    val cleanSSID = ssid.removeSurrounding("\"")
-                    Logger.i(
+                // Check if transportInfo is actually WifiInfo before casting
+                val transportInfo = cap.transportInfo
+                if (transportInfo is WifiInfo) {
+                    val ssid = transportInfo.ssid
+                    if (ssid == UNKNOWN_SSID) {
+                        Logger.v(
+                            LOG_TAG_CONNECTION,
+                            "getNetworkSSID: SSID is unknown for network ${network.networkHandle}, falling back to WifiManager"
+                        )
+                        showNotificationIfNeeded()
+                        return null
+                    }
+                    if (!ssid.isNullOrEmpty()) {
+                        val cleanSSID = ssid.removeSurrounding("\"")
+                        Logger.i(
+                            LOG_TAG_CONNECTION,
+                            "getNetworkSSID: SSID for network ${network.networkHandle} is: $cleanSSID"
+                        )
+                        return cleanSSID
+                    }
+                } else {
+                    Logger.d(
                         LOG_TAG_CONNECTION,
-                        "getNetworkSSID: SSID for network ${network.networkHandle} is: $cleanSSID"
+                        "getNetworkSSID: transportInfo is not WifiInfo (${transportInfo?.javaClass?.simpleName}), falling back to WifiManager"
                     )
-                    return cleanSSID
                 }
             }
 
@@ -299,7 +315,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 return null
             }
 
-            if (ssid == "<unknown ssid>") {
+            if (ssid == UNKNOWN_SSID) {
                 Logger.v(
                     LOG_TAG_CONNECTION,
                     "getNetworkSSID: SSID is unknown for network ${network.networkHandle}"
@@ -338,17 +354,28 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         val locationEnabled = SsidPermissionManager.isLocationEnabled(context)
         if (hasPermission && locationEnabled) return
 
+        val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+        // check if notification is already active to prevent duplicates
+        val activeNotifications = notificationManager.activeNotifications
+        val isNotificationAlreadyActive = activeNotifications.any { notification ->
+            notification.id == NOTIF_ID_SSID_LOCATION_PERMISSION
+        }
+        if (isNotificationAlreadyActive) {
+            Logger.i(LOG_TAG_VPN, "ssid wgs: notification already active, skipping")
+            return
+        }
+
         Logger.w(LOG_TAG_VPN, "ssid wgs: missing permissions, show notification")
         val intent = Intent(context, NotificationHandlerActivity::class.java)
         intent.putExtra(
             NOTIF_WG_PERMISSION_NAME,
             NOTIF_WG_PERMISSION_VALUE
         )
-        val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val pendingIntent =
             Utilities.getActivityPendingIntent(
                 context,
-                Intent(context, AppLockActivity::class.java),
+                intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                 mutable = false
             )
@@ -389,7 +416,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
 
         notificationManager.notify(
             NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
-            NOTIF_ID_ACCESSIBILITY_FAILURE,
+            NOTIF_ID_SSID_LOCATION_PERMISSION,
             builder.build()
         )
     }
@@ -436,7 +463,9 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         const val SCHEME_HTTPS = "https"
         const val SCHEME_IP = "ip"
 
-        private const val NOTIF_ID_ACCESSIBILITY_FAILURE = 104
+        private const val UNKNOWN_SSID = "<unknown ssid>"
+
+        const val NOTIF_ID_SSID_LOCATION_PERMISSION = 105
 
         // variable to check whether to rely on the TCP/UDP reachability checks from
         // kotlin end instead of tunnel reachability checks, set false by default for now
