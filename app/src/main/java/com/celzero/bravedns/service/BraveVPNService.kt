@@ -81,6 +81,7 @@ import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.receiver.UserPresentReceiver
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
@@ -1140,76 +1141,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
         return !allowed
     }
-    
-    private fun handlePermissionCheckForSsidWgsIfNeeded() {
-        val wgs = WireguardManager.getActiveSsidEnabledConfigs()
-        if (wgs.isEmpty()) return
-
-        val hasPermission = SsidPermissionManager.hasRequiredPermissions(this)
-        val locationEnabled = SsidPermissionManager.isLocationEnabled(this)
-        if (hasPermission && locationEnabled) return
-
-        Logger.w(LOG_TAG_VPN, "ssid wgs: missing permissions, show notification")
-        showPermissionMissingNotificationForWg()
-    }
-
-    private fun showPermissionMissingNotificationForWg() {
-        Logger.i(LOG_TAG_VPN, "wg permission missing, show notification")
-
-        val intent = Intent(this, NotificationHandlerActivity::class.java)
-        intent.putExtra(
-            NOTIF_WG_PERMISSION_NAME,
-            NOTIF_WG_PERMISSION_VALUE
-        )
-
-        val pendingIntent =
-            Utilities.getActivityPendingIntent(
-                this,
-                Intent(this, AppLockActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-                mutable = false
-            )
-
-        var builder: NotificationCompat.Builder
-        if (isAtleastO()) {
-            val name: CharSequence = getString(R.string.notif_channel_firewall_alerts)
-            val description = this.resources.getString(R.string.notif_channel_desc_firewall_alerts)
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(NOTIF_CHANNEL_ID_WIREGUARD_ALERTS, name, importance)
-            channel.description = description
-            notificationManager.createNotificationChannel(channel)
-            builder = NotificationCompat.Builder(this, NOTIF_CHANNEL_ID_WIREGUARD_ALERTS)
-        } else {
-            builder = NotificationCompat.Builder(this, NOTIF_CHANNEL_ID_WIREGUARD_ALERTS)
-        }
-
-        val contentTitle: String = this.resources.getString(R.string.lbl_action_required)
-        val contentText: String =
-            this.resources.getString(R.string.permission_missing_notification_desc)
-
-        builder
-            .setSmallIcon(R.drawable.ic_notification_icon)
-            .setContentTitle(contentTitle)
-            .setContentIntent(pendingIntent)
-            .setContentText(contentText)
-
-        builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
-
-        // Secret notifications are not shown on the lock screen.  No need for this app to show
-        // there.
-        // Only available in API >= 21
-        builder = builder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
-
-        // Cancel the notification after clicking.
-        builder.setAutoCancel(true)
-
-        notificationManager.notify(
-            NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
-            NOTIF_ID_ACCESSIBILITY_FAILURE,
-            builder.build()
-        )
-    }
 
     private fun handleAccessibilityFailure() {
         // Disable app not in use behaviour when the accessibility failure is detected.
@@ -1229,7 +1160,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         val pendingIntent =
             Utilities.getActivityPendingIntent(
                 this,
-                Intent(this, AppLockActivity::class.java),
+                intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                 mutable = false
             )
@@ -4985,8 +4916,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 return persistAndConstructFlowResponse(connTracker, baseOrExit, connId, uid)
             } else {
                 logd("flow/inflow: wg is active, returning $wgs, $connId, $uid")
-                // see if there is a wg enabled with ssid restriction, if so, check for permission
-                io("perm-check") { handlePermissionCheckForSsidWgsIfNeeded() }
                 return persistAndConstructFlowResponse(connTracker, ids, connId, uid)
             }
         } else {
