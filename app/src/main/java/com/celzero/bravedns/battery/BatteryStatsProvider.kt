@@ -15,8 +15,10 @@
  */
 package com.celzero.bravedns.battery
 
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.os.Build
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.facebook.battery.metrics.composite.CompositeMetrics
 import com.facebook.battery.metrics.composite.CompositeMetricsCollector
 import com.facebook.battery.metrics.core.StatefulSystemMetricsCollector
@@ -139,6 +141,7 @@ object BatteryStatsProvider {
         return try {
             BatteryStatsLogger.readLogFile() + "\n" + mStatefulCollector.latestDiffAndReset?.metrics.toString()
         } catch (e: Exception) {
+            if (DEBUG) Logger.e(LOG_TAG_UI, "err getting formatted stats: ${e.message}", e)
             ""
         }
     }

@@ -33,7 +33,7 @@ object FirebaseErrorReporting : KoinComponent {
     /**
      * Initialize Firebase Crashlytics if available and enabled
      */
-    fun initialize(context: Context) {
+    fun initialize() {
         try {
             val crashlytics = FirebaseCrashlytics.getInstance()
             crashlytics.setCrashlyticsCollectionEnabled(persistentState.firebaseErrorReportingEnabled)
