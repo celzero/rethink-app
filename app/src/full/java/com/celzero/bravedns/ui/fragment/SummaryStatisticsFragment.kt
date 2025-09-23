@@ -723,6 +723,10 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 appConfig,
                 SummaryStatisticsType.MOST_CONTACTED_COUNTRIES
             )
+
+        val timeCategory = viewModel.getTimeCategory()
+        contactedCountriesAdapter?.setTimeCategory(timeCategory)
+
         viewModel.getMostContactedCountries.observe(viewLifecycleOwner) {
             contactedCountriesAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
         }
