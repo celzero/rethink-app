@@ -18,7 +18,6 @@ package com.celzero.bravedns.service
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.ui.activity.AntiCensorshipActivity

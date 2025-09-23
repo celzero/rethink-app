@@ -17,14 +17,14 @@ package com.celzero.bravedns.ui.dialog
 
 import android.app.Activity
 import android.app.Dialog
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.Window
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SsidAdapter
@@ -32,9 +32,7 @@ import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.databinding.DialogWgSsidBinding
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import androidx.core.graphics.drawable.toDrawable
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import kotlin.text.replaceFirstChar
 
 class WgSsidDialog(
     private val activity: Activity,
@@ -73,6 +71,8 @@ class WgSsidDialog(
             view.setPadding(0, sysInsets.top, 0, sysInsets.bottom)
             insets
         }
+
+        b.radioString.text = context.getString(R.string.parse_error_generic).replaceFirstChar(Char::titlecase)
     }
 
     private fun setupRecyclerView() {
