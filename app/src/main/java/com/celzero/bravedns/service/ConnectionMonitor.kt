@@ -91,7 +91,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(1S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
 
@@ -99,7 +99,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmIntLink") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(1S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
 
@@ -113,7 +113,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmIntAvl") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onAvailable(1S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
 
@@ -127,7 +127,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmIntLost") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onLost(1S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         removeFromNwSet(network)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
             }
@@ -139,7 +139,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
 
@@ -147,7 +147,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransAvl") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onAvailable(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
 
@@ -155,7 +155,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransLost") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onLost(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         removeFromNwSet(network)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
 
@@ -166,7 +166,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransLink") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
             }
@@ -181,7 +181,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
 
@@ -189,7 +189,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransAvl") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onAvailable(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
 
@@ -197,7 +197,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransLost") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onLost(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         removeFromNwSet(network)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
 
@@ -205,7 +205,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransLink") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
             }
@@ -216,7 +216,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
 
@@ -224,7 +224,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransAvl") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onAvailable(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
 
@@ -232,7 +232,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransLost") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onLost(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         removeFromNwSet(network)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
 
@@ -240,7 +240,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransLink") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges(isForceUpdate = true)
+                        sendNetworkChanges()
                     }
                 }
             }
@@ -507,7 +507,6 @@ class ConnectionMonitor(private val context: Context, private val networkListene
     data class OpPrefs(
         val msgType: Int,
         val networkSet: Set<NetworkAndSsid>,
-        val isForceUpdate: Boolean,
         val testReachability: Boolean,
         val stallOnNoNetwork: Boolean,
         val useAutoConnectivityChecks: Boolean
@@ -621,8 +620,8 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         .filter { it.isNotEmpty() }
                 )
 
-                val hdl = NetworkRequestHandler(cm, wm, networkListener, ips, ::sendNetworkChanges)
-                sendNetworkChanges(isForceUpdate = true)
+                val hdl = NetworkRequestHandler(cm, networkListener, ips, ::sendNetworkChanges)
+                sendNetworkChanges()
                 for (m in channel) {
                     // process the message in a coroutine context
                     val deferred = async { hdl.handleMessage(m) }
@@ -726,7 +725,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
         }
     }
 
-    private suspend fun sendNetworkChanges(isForceUpdate: Boolean = true) {
+    private suspend fun sendNetworkChanges() {
         val dualStack =
             InternetProtocol.getInternetProtocol(persistentState.internetProtocolType).isIPv46()
         val testReachability = dualStack && persistentState.connectivityChecks
@@ -736,7 +735,6 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             constructNetworkMessage(
                 if (persistentState.useMultipleNetworks) MSG_ADD_ALL_NETWORKS
                 else MSG_ADD_ACTIVE_NETWORK,
-                isForceUpdate,
                 testReachability,
                 failOpenOnNoNetwork,
                 useAutoConnectivityChecks
@@ -750,7 +748,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             return
         }
         // TODO: process after a delay to avoid processing multiple network changes in short bursts
-        if (DEBUG) Logger.v(LOG_TAG_CONNECTION, "sendNetworkChanges, channel closed? ${channel.isClosedForSend} msg: ${msg.msgType}, force: ${msg.isForceUpdate}, test: ${msg.testReachability}, stall: ${msg.stallOnNoNetwork}, useAutoChecks: ${msg.useAutoConnectivityChecks}, networks: ${msg.networkSet.size}")
+        if (DEBUG) Logger.v(LOG_TAG_CONNECTION, "sendNetworkChanges, channel closed? ${channel.isClosedForSend} msg: ${msg.msgType}, test: ${msg.testReachability}, stall: ${msg.stallOnNoNetwork}, useAutoChecks: ${msg.useAutoConnectivityChecks}, networks: ${msg.networkSet.size}")
         try {
             channel.send(msg)
         } catch (e: Exception) {
@@ -764,12 +762,11 @@ class ConnectionMonitor(private val context: Context, private val networkListene
      */
     private fun constructNetworkMessage(
         what: Int,
-        isForceUpdate: Boolean,
         testReachability: Boolean,
         failOpenOnNoNetwork: Boolean,
         useAutoConnectivityChecks: Boolean
     ): OpPrefs {
-        return OpPrefs(what, networkSet.toSet(), isForceUpdate, testReachability, failOpenOnNoNetwork, useAutoConnectivityChecks)
+        return OpPrefs(what, networkSet.toSet(), testReachability, failOpenOnNoNetwork, useAutoConnectivityChecks)
     }
 
     override suspend fun maybeNetworkStall() {
@@ -835,7 +832,6 @@ class ConnectionMonitor(private val context: Context, private val networkListene
      */// Handles the network messages from the callback from the connectivity manager
     private class NetworkRequestHandler(
         val cm: ConnectivityManager,
-        val wm: WifiManager,
         val listener: NetworkListener,
         ipsAndUrl: IpsAndUrlToProbe,
         val redrive: suspend () -> Unit
@@ -910,7 +906,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 LOG_TAG_CONNECTION,
                 "Connected network: ${newActiveNetwork?.networkHandle} ${
                     networkType(newActiveNetworkCap)
-                }, netid: ${netId(newActiveNetwork?.networkHandle)}, new? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}," +
+                }, netid: ${netId(newActiveNetwork?.networkHandle)}, new? $isNewNetwork, test? ${opPrefs.testReachability}," +
                  "cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged, link-address-changed? $isLinkAddressChanged, activeSsid: $activeSsid"
             )
 
@@ -951,7 +947,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             }
 
             Logger.i(LOG_TAG_CONNECTION, "process message all nws, currNws: $newNetworks")
-            Logger.i(LOG_TAG_CONNECTION, "process message all nws, newNws: $newNetworks \nnew? $isNewNetwork, force? ${opPrefs.isForceUpdate}, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged, link-addr-changed? $isLinkAddressChanged, activeSsid: $activeSsid")
+            Logger.i(LOG_TAG_CONNECTION, "process message all nws, newNws: $newNetworks \nnew? $isNewNetwork, test? ${opPrefs.testReachability}, cellular? $isActiveNetworkCellular, metered? $isActiveNetworkMetered, dns-changed? $isDnsChanged, link-addr-changed? $isLinkAddressChanged, activeSsid: $activeSsid")
 
             currentNetworks = newNetworks
             repopulateTrackedNetworks(opPrefs, currentNetworks)
