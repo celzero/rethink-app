@@ -1,10 +1,10 @@
 Bucură-te de un Android mai sigur, transparent și securizat.
 
-VPN: Conectează-te la multiple VPN-uri WireGuartd, la alegere.
+VPN: Conectează-te la multiple VPN-uri WireGuard, la alegerea ta.
 
 Sigur: Arată activitatea din rețea a aplicațiilor instalate și permite dezactivarea, dezinstalarea sau blocarea lor.
 
-Securizat: Prima linie de apărare împotriva spyware, ransomware și malware care fură informații personale și conturi. Protejează împotriva manipulării DNS folosită, de regulă, pentru a cenzura site-urile web, social-media și aplicațiile de mesagerie.
+Securizat: Prima linie de apărare împotriva spyware, ransomware și malware care sustrag informații personale și piratează conturi. Protejează împotriva manipulării DNS folosită, de regulă, pentru a cenzura site-urile web, social-media și aplicațiile de mesagerie.
 
 Rapid: Servere DNS amplasate în peste 300 de locații din întreaga lume pentru a te asigura că internetul tău este cât se poate de rapid și disponibil.
 
