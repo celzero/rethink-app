@@ -1117,7 +1117,7 @@ class GoVpnAdapter : KoinComponent {
                 val useOnlyOnSsid = files?.ssidEnabled == true && !files.oneWireGuard
                 val ssidList = files?.ssids?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
                 val ssidMatch = useOnlyOnSsid && WireguardManager.matchesSsidList(files.ssids, ssid)
-                val canResumeSsidWg = useOnlyOnSsid && ssidMatch
+                val canResumeSsidWg = useOnlyOnSsid && ssidMatch && !isMobileActive
 
                 val canResume = canResumeMobileWg || canResumeSsidWg
 
@@ -1149,7 +1149,7 @@ class GoVpnAdapter : KoinComponent {
                     // and the wg-config is set to useOnlyOnMetered
                     val res = getProxies()?.getProxy(id.togs())?.pause()
                     Logger.i(LOG_TAG_VPN, "$TAG paused proxy (mobile): $id, res: $res")
-                } else if (useOnlyOnSsid && !ssidMatch) {
+                } else if (useOnlyOnSsid && !ssidMatch && !isMobileActive) {
                     // when the ssidEnabled is set and the ssid does not match
                     val res = getProxies()?.getProxy(id.togs())?.pause()
                     Logger.i(LOG_TAG_VPN, "$TAG paused proxy (ssid): $id, res: $res")

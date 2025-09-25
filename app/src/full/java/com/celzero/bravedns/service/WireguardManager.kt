@@ -378,6 +378,7 @@ object WireguardManager : KoinComponent {
             return Pair(idStr, true)
         }
 
+        Logger.v(LOG_TAG_PROXY, "wg for $type not active or not eligible nw, return empty, for id: $idStr, usesMtrdNw: $usesMtrdNw, ssid: $ssid")
         return Pair("", true)
     }
 
