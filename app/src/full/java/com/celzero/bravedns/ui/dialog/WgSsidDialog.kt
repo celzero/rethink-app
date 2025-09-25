@@ -159,8 +159,8 @@ class WgSsidDialog(
         ssidAdapter.addSsidItem(newSsidItem)
         b.ssidEditText.text?.clear()
 
-        // Reset to string type as default
-        b.radioString.isChecked = true
+        // Reset to wildcard type as default
+        b.radioWildcard.isChecked = true
     }
 
     private fun isValidSsidName(ssidName: String): Boolean {
