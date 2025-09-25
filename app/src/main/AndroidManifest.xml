@@ -68,6 +68,9 @@
             <meta-data
                 android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
                 android:value="true" />
+            <meta-data
+                android:name="android.net.VpnService.SUPPORTS_LOCKDOWN"
+                android:value="true" />
         </service>
         <service
             android:name=".service.BraveTileService"
