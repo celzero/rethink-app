@@ -1014,7 +1014,6 @@
     <string name="lbl_unselected" translatable="true">Désélectionné</string>
     <string name="settings_connectivity_checks" translatable="true">Effectuer des vérifications de connectivité</string>
     <string name="settings_connectivity_checks_desc" translatable="true">Des contrôles de connectivité sont envoyés pour vérifier la joignabilité.</string>
-    <string name="lbl_background_data" translatable="true">Restreindre les données d\'arrière-plan</string>
     <string name="lbl_battery_optimization" translatable="true">Optimisation de la batterie</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> peut entraîner une perte de connectivité. Modifiez le paramètre pour permettre à Rethink d\'utiliser les données et d\'autres ressources en arrière-plan.</string>
     <string name="lbl_idle" translatable="true">Au repos</string>

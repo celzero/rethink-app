@@ -476,7 +476,6 @@
     <string name="hsf_start_dialog_message" translatable="true">شما یک قدم با اندروید امن و مطمئن فاصله دارید: فوراً فعالیت شبکه را مشاهده کنید، وب‌سایت‌ها، آی پی ها و برنامه‌های دارای رفتار نامناسب را مسدود کنید.</string>
     <string name="hsf_start_dialog_positive" translatable="true">شروع</string>
     <string name="hsf_pause_vpn_failure" translatable="true">نمی‌توان مکث کرد: Rethink فعال نیست</string>
-    <string name="lbl_background_data" translatable="true">محدود کردن داده‌های پس‌زمینه</string>
     <string name="lbl_battery_optimization" translatable="true">بهینه‌سازی باتری</string>
     <string name="battery_optimization_dialog_heading" translatable="true">غیرفعال کردن %1$s</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> ممکن است منجر به قطع اتصال شود. تنظیمات را تغییر دهید تا Rethink در پس‌زمینه از داده‌ها و سایر منابع استفاده کند.</string>
