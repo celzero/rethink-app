@@ -77,7 +77,7 @@ class RethinkGlideModule : AppGlideModule() {
 
         val factory: OkHttpUrlLoader.Factory = OkHttpUrlLoader.Factory(client)
         registry.replace(GlideUrl::class.java, InputStream::class.java, factory)
-
+        
         // handle com.bumptech.glide.Registry$NoModelLoaderAvailableException:
         // Failed to find any ModelLoaders registered for model class: class kotlin.Unit
         registry.append(Unit::class.java, InputStream::class.java, UnitModelLoaderFactory())

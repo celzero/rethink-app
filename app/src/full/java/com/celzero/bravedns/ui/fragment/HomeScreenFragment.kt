@@ -529,7 +529,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 var idle = 0
                 val now = System.currentTimeMillis()
                 Logger.v(LOG_TAG_UI, "$TAG wg active proxies: ${proxies.size}")
-
+                
                 // If no proxies are configured but WireGuard is enabled, show appropriate message
                 if (proxies.isEmpty()) {
                     uiCtx {
@@ -540,7 +540,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     }
                     return@io
                 }
-
+                
                 proxies.forEach {
                     val proxyId = "${ProxyManager.ID_WG_BASE}${it.getId()}"
                     Logger.vv(LOG_TAG_UI, "$TAG init stats check for $proxyId")
@@ -575,7 +575,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         failing++
                         return@forEach
                     }
-
+                    
                     if (status != null) {
                         // consider starting and up as active
                         when (status) {
@@ -669,7 +669,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         )
                     }
                     Logger.v(LOG_TAG_UI, "$TAG overall wg proxy status: $text, proxies: ${proxies.size}, active: $active, failing: $failing, idle: $idle")
-
+                    
                     // If we have proxies but no status text, something went wrong - show a fallback
                     if (text.isEmpty() && proxies.isNotEmpty()) {
                         b.fhsCardProxyCount.text = getString(R.string.lbl_active)
