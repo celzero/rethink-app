@@ -1019,7 +1019,6 @@
     <string name="settings_connectivity_checks" translatable="true">Verbindungstests durchführen</string>
     <string name="settings_connectivity_checks_desc" translatable="true">Verbindungstests werden durchgeführt, um die Erreichbarkeit zu ermitteln.</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Rethinks eigenen Netzwerkverkehr in den Tunnel zurüclleiten. Schalte diese Einstellung aus, außer du weißt was du tust.</string>
-    <string name="lbl_background_data" translatable="true">Hintergrunddaten einschränken</string>
     <string name="orbot_no_app_toast" translatable="true">Mindestens eine App aktivieren, um Orbot zu starten</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> kann zu Verbindungsabbrüchen führen. Ändere die Einstellung, um Rethink Daten und andere Ressourcen nutzen zu lassen, wenn es sich im Hintergrund befindet.</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback Proxy-Forwarder-Apps</string>

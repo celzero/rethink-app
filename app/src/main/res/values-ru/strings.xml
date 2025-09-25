@@ -819,11 +819,11 @@
     <string name="fapps_info_exclude_msg">Исключить из DNS и брандмауэра.</string>
     <string name="fapps_info_isolate_msg">Блокировать все, кроме доверенных IP.</string>
     <string name="fapps_bypass_block_dialog_title">Обходные приложения</string>
-    <string name="fapps_bypass_block_dialog_message">Как обойти правила универсального брандмауэра для приложений из списка <i></i> \?</string>
+    <string name="fapps_bypass_block_dialog_message">Как обойти правила универсального брандмауэра для приложений из списка <i/> \?</string>
     <string name="fapps_unblock_dialog_message">Разрешить подключения для <i>перечисленных</i> приложений\?</string>
     <string name="fapps_unblock_dialog_title">Разрешить приложения</string>
     <string name="fapps_exclude_block_dialog_title">Исключение приложений</string>
-    <string name="fapps_exclude_block_dialog_message">Исключить приложения из списка <i></i> из DNS и брандмауэра\?</string>
+    <string name="fapps_exclude_block_dialog_message">Исключить приложения из списка <i/> из DNS и брандмауэра\?</string>
     <string name="fapps_isolate_block_dialog_title">Изолировать приложения</string>
     <string name="fapps_isolate_block_dialog_message">Изолировать <i>перечисленные</i> приложения\?</string>
     <string name="ci_trust_initial">T</string>
@@ -1078,7 +1078,6 @@
     <string name="battery_optimization_dialog_heading" translatable="true">Отключить %1$s</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Приложения для переадресации прокси-серверов с обратной связью</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Когда этот параметр отключен, приложения для пересылки прокси-серверов (SOCKS5, HTTP, DNS) исключаются из VPN-туннеля Rethink.</string>
-    <string name="lbl_background_data" translatable="true">Ограничение фоновых данных</string>
     <string name="exclude_apps_from_proxy">Обход приложения со всех прокси-серверов</string>
     <string name="exclude_apps_from_proxy_failure_toast">Это приложение обходит прокси-серверы</string>
     <string name="lbl_notification" translatable="true">уведомление</string>

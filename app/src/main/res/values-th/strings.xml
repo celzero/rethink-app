@@ -38,7 +38,7 @@
     <string name="dns_proxy_app" translatable="true">แอป</string>
     <string name="fapps_unmetered_unblock_dialog_title" translatable="true">อนุญาตให้ใช้แบบไม่มีมิเตอร์</string>
     <string name="other_dns_list_tab2" translatable="true">การเข้ารหัส DNS</string>
-    <string name="firewall_rule_global_lockdown_desc" translatable="true">This connection was blocked because universal lockdown is set.<br></br><br></br> To change go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_global_lockdown_desc" translatable="true">This connection was blocked because universal lockdown is set.<br/><br/> To change go to <i>Universal</i> tab.</string>
     <string name="category_name_installed" translatable="true">แอปที่ติดตั้ง</string>
     <string name="ci_dialog_title" translatable="true">เพิ่มกฎ IP / พอร์ต</string>
     <string name="ci_trust_initial" translatable="true">T</string>
@@ -87,8 +87,8 @@
     <string name="cd_custom_doh_dialog_title" translatable="true">ตัวแก้ปัญหา</string>
     <string name="dns_btm_sheet_dialog_message" translatable="true"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s blocklist(s)</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
     <string name="dns_proxy_name" translatable="true">ชื่อพร็อกซี</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">A user-set universal firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> (Mobile) network.<br></br><br></br> To change go to <i>Universal</i> tab.</string>
-    <string name="firewall_rule_isolate_desc" translatable="true">A user-set firewall rule blocked this <i>app</i> connecting to other than <i>bypassed IPs</i>.<br></br><br></br> To change go to <i>All Apps</i> tab.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">A user-set universal firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> (Mobile) network.<br/><br/> To change go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_isolate_desc" translatable="true">A user-set firewall rule blocked this <i>app</i> connecting to other than <i>bypassed IPs</i>.<br/><br/> To change go to <i>All Apps</i> tab.</string>
     <string name="new_app_notification_action_deny" translatable="true">บล็อคต่อไป</string>
     <string name="ci_blocked_initial" translatable="true">B</string>
     <string name="ci_no_rule_initial" translatable="true">N</string>
@@ -229,17 +229,17 @@
     <string name="firewall_rule_block_app_new_install" translatable="true">แอปใหม่</string>
     <string name="firewall_rule_block_app_exception" translatable="true">ข้อผิดพลาด</string>
     <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">แอปที่ถูกข้ามไป</string>
-    <string name="firewall_rule_new_app_desc" translatable="true">แอป นี้สร้างการเชื่อมต่อเป็นครั้งแรก <br></br><br></br> หากต้องการเปลี่ยน ให้ไปที่แท็บ<i>สากล</i></string>
+    <string name="firewall_rule_new_app_desc" translatable="true">แอป นี้สร้างการเชื่อมต่อเป็นครั้งแรก <br/><br/> หากต้องการเปลี่ยน ให้ไปที่แท็บ<i>สากล</i></string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS ถูกบล็อค</string>
-    <string name="firewall_rule_trusted_ip_desc" translatable="true">This connection was allowed because the <i>destination IP</i> is set as Trusted IP.<br></br><br></br> To change go to <i>App-specific Firewall</i> screen.</string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true">This connection was allowed because the <i>destination IP</i> is set as Trusted IP.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
     <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">This connection was allowed because the &lt;i&gt;destination IP&lt;/i&gt; is set to bypass all universal firewall rules.&lt;br/&gt;&lt;br/&gt; To change go to &lt;i&gt;IP Rules&lt;i&gt; in &lt;i&gt;Universal&lt;/i&gt; tab.</string>
-    <string name="firewall_rule_device_lock_desc" translatable="true">This connection was firewalled because <i>device was locked</i> at the time.<br></br><br></br> To change this behaviour go to <i>Universal</i> tab.</string>
-    <string name="firewall_rule_foreground_desc" translatable="true">This connection was firewalled because the source app was <i>not in the foreground</i>.<br></br><br></br> To change this behaviour go to <i>Universal</i> tab.</string>
-    <string name="firewall_rule_block_udp_ntp_desc" translatable="true">A user-set firewall rule blocked this <i>UDP</i> connection.<br></br><br></br> To change go to <i>Universal</i> tab.</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">A user-set firewall rule blocked the <i>domain</i>.<br></br><br></br> To change go to <i>App-specific Firewall</i> screen.</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">This connection was allowed because the <i>domain</i> is set as Trusted domain.<br></br><br></br> To change go to <i>App-specific Firewall</i> screen.</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">This connection was allowed because the <i>domain</i> is set as trusted in Universal domain rules.<br></br><br></br> To change this behaviour go to <i>Configure DNS</i> tab.</string>
-    <string name="firewall_rule_proxied_desc" translatable="true">This connection was forwarded to user-preferred Proxy.<br></br><br></br> To change go to <i>Proxy</i> from <i>Configure</i> screen.</string>
+    <string name="firewall_rule_device_lock_desc" translatable="true">This connection was firewalled because <i>device was locked</i> at the time.<br/><br/> To change this behaviour go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_foreground_desc" translatable="true">This connection was firewalled because the source app was <i>not in the foreground</i>.<br/><br/> To change this behaviour go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_block_udp_ntp_desc" translatable="true">A user-set firewall rule blocked this <i>UDP</i> connection.<br/><br/> To change go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">A user-set firewall rule blocked the <i>domain</i>.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">This connection was allowed because the <i>domain</i> is set as Trusted domain.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">This connection was allowed because the <i>domain</i> is set as trusted in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">This connection was forwarded to user-preferred Proxy.<br/><br/> To change go to <i>Proxy</i> from <i>Configure</i> screen.</string>
     <string name="new_app_bulk_notification_title" translatable="true">ความสนใจ</string>
     <string name="new_app_notification_action_toast_allow" translatable="true">การเชื่อมต่อเครือข่ายได้รับอนุญาตสำหรับแอป</string>
     <string name="new_app_bulk_notification_content" translatable="true">Rethink บล็อกแอปใหม่ %1$s แตะเพื่อดูหรือแก้ไข</string>
@@ -355,7 +355,7 @@
     <string name="firewall_rule_block_http" translatable="true">HTTP ที่ไม่ปลอดภัย</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">โดเมน (มหาวิทยาลัย)</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">โดเมนที่เชื่อถือได้ (Univ)</string>
-    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>Unmetered</i> network.<br></br><br></br> To change go to <i>All Apps</i> tab.</string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>Unmetered</i> network.<br/><br/> To change go to <i>All Apps</i> tab.</string>
     <string name="bypass_universal" translatable="true">บายพาสสากล</string>
     <string name="isolate" translatable="true">แยกตัว</string>
     <string name="untracked" translatable="true">ไม่ได้ติดตาม</string>
@@ -405,7 +405,7 @@
     <string name="settings_notification_desc3" translatable="true">ไม่มี</string>
     <string name="settings_notification_dialog_title" translatable="true">เลือกการดำเนินการแจ้งเตือน</string>
     <string name="settings_default_dns_heading" translatable="true">เลือก DNS สำรอง</string>
-    <string name="firewall_rule_block_http_desc" translatable="true">This connection was blocked because it likely used <i>insecure HTTP</i>.<br></br><br></br> To change go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_block_http_desc" translatable="true">This connection was blocked because it likely used <i>insecure HTTP</i>.<br/><br/> To change go to <i>Universal</i> tab.</string>
     <string name="ci_block" translatable="true">ปิดกั้น</string>
     <string name="ci_trust_rule" translatable="true">เชื่อมั่น</string>
     <string name="ada_ip_connection_count_zero" translatable="true">0 ที่อยู่ IP</string>
@@ -718,7 +718,6 @@
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">ปิดการใช้งานการจับแพ็กเก็ต</string>
     <string name="hsf_whats_new_remove_text" translatable="true">ปิดการขาย…</string>
     <string name="hsf_pause_vpn_failure" translatable="true">หยุดชั่วคราวไม่ได้: คิดใหม่ไม่ได้ใช้งาน</string>
-    <string name="lbl_background_data" translatable="true">การจำกัดข้อมูลพื้นหลัง</string>
     <string name="lbl_battery_optimization" translatable="true">การเพิ่มประสิทธิภาพแบตเตอรี่</string>
     <string name="battery_optimization_dialog_heading" translatable="true">ปิดการใช้งาน %1$s</string>
     <string name="dc_local_block_desc_1" translatable="true">เลือกจากรายการบล็อกมากกว่า 195 รายการ คลิกที่นี่เพื่อดาวน์โหลดหรือกำหนดค่ารายการบล็อก</string>
@@ -811,14 +810,14 @@
     <string name="firewall_rule_proxied" translatable="true">พร็อกซี</string>
     <string name="firewall_rule_no_rule_desc" translatable="true">ไม่มีกฎไฟร์วอลล์ที่ตรงกับการเชื่อมต่อนี้</string>
     <string name="firewall_rule_block_app_desc" translatable="true">กฎไฟร์วอลล์ที่ผู้ใช้ตั้งไว้บล็อกแอปนี้&lt;i&gt;.&lt;br/&gt;&lt;br/&gt; หากต้องการเปลี่ยน ให้ไปที่แท็บ&lt;i&gt;แอปทั้งหมด&lt;/i&gt;</string>
-    <string name="firewall_rule_block_ip_univ_desc" translatable="true">A user-set firewall rule blocked the <i>destination IP / Port</i>.<br></br><br></br> To change go to <i>Universal</i> tab.</string>
-    <string name="firewall_rule_block_ip_desc" translatable="true">A user-set firewall rule blocked the <i>destination IP</i>.<br></br><br></br> To change go to <i>App-specific Firewall</i> screen.</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">This connection was allowed because the <i>source app</i> is set to <i>bypass dns and firewall</i> rules.<br></br><br></br> To change go to <i>App-specific Firewall</i> screen.</string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true">This connection was blocked because the <i>domain</i> is blocked by user-preferred DNS.<br></br><br></br> To change this behaviour go to <i>Configure DNS</i> tab.</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">This DNS connection was proxied and forwarded to user-preferred DNS endpoint.<br></br><br></br> To change disable <i>Prevent DNS leaks</i> from DNS <i>Configure</i> screen.</string>
+    <string name="firewall_rule_block_ip_univ_desc" translatable="true">A user-set firewall rule blocked the <i>destination IP / Port</i>.<br/><br/> To change go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_block_ip_desc" translatable="true">A user-set firewall rule blocked the <i>destination IP</i>.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">This connection was allowed because the <i>source app</i> is set to <i>bypass dns and firewall</i> rules.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">This connection was blocked because the <i>domain</i> is blocked by user-preferred DNS.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc" translatable="true">This DNS connection was proxied and forwarded to user-preferred DNS endpoint.<br/><br/> To change disable <i>Prevent DNS leaks</i> from DNS <i>Configure</i> screen.</string>
     <string name="notif_dialog_pause_dialog_positive" translatable="true">ประวัติย่อ</string>
     <string name="notif_channel_desc_firewall_alerts" translatable="true">การแจ้งเตือนเกี่ยวกับข้อผิดพลาดและสิ่งผิดปกติของไฟร์วอลล์</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">This connection was allowed because the <i>source app</i> is set to <i>bypass universal</i> firewall rules.<br></br><br></br> To change go to <i>App-specific Firewall</i> screen.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">This connection was allowed because the <i>source app</i> is set to <i>bypass universal</i> firewall rules.<br/><br/> To change go to <i>App-specific Firewall</i> screen.</string>
     <string name="category_name_others" translatable="true">อื่น</string>
     <string name="build__flavor_play_store" translatable="true">เล่น</string>
     <string name="category_name_non_app_sys" translatable="true">การบริการระบบ</string>
@@ -984,10 +983,10 @@
     <string name="fapps_firewall_filter_desc" translatable="true">กำลังแสดงแอป <u>%1$s</u> %2$s</string>
     <string name="fapps_firewall_filter_excluded" translatable="true">ไม่รวม</string>
     <string name="bad_config_reason_invalid_value" translatable="true">ค่าไม่ถูกต้อง</string>
-    <string name="firewall_rule_block_app_mobile_desc" translatable="true">A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> network.<br></br><br></br> To change go to <i>All Apps</i> tab.</string>
-    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">This connection was blocked because the <i>source app</i> bypassed user-preferred DNS.<br></br><br></br> To change this behaviour go to <i>Universal</i> tab.</string>
-    <string name="firewall_rule_unknown_desc" translatable="true">This connection was firewalled because the <i>source app</i> could not be determined.<br></br><br></br> To change this behaviour go to <i>Universal</i> tab.</string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">This connection was blocked because the <i>domain</i> is set as blocked in Universal domain rules.<br></br><br></br> To change this behaviour go to <i>Configure DNS</i> tab.</string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true">A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> network.<br/><br/> To change go to <i>All Apps</i> tab.</string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">This connection was blocked because the <i>source app</i> bypassed user-preferred DNS.<br/><br/> To change this behaviour go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_unknown_desc" translatable="true">This connection was firewalled because the <i>source app</i> could not be determined.<br/><br/> To change this behaviour go to <i>Universal</i> tab.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">This connection was blocked because the <i>domain</i> is set as blocked in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.</string>
     <string name="notif_dialog_pause_dialog_message" translatable="true">แอปพลิเคชันอยู่ในสถานะหยุดชั่วคราว ให้ดำเนินการต่อเพื่อดำเนินการต่อ</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">การเชื่อมต่อและแอปทั้งหมดที่ไม่ได้ถูกกำหนดเส้นทางโดย WireGuard VPN อื่น ๆ จะถูกกำหนดเส้นทางโดย VPN นี้</string>
     <string name="routing_remaining_apps" translatable="true">การกำหนดเส้นทางแอปที่เหลือ</string>

@@ -611,7 +611,6 @@
     <string name="fapps_info_metered_msg" translatable="true">Cho phép / Chặn ở mạng có đồng hồ đo (Di động).</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">đã được bảo vệ bởi wireguard và dns riêng tư</string>
     <string name="orbot_no_app_toast" translatable="true">Thêm ít nhất một ứng dụng để kích hoạt Orbot</string>
-    <string name="lbl_background_data" translatable="true">Đang giới hạn Dữ liệu di động nền</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Tắt %1$s</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> có thể dẫn đến mất kết nối mạng. Thay đổi cài đặt để cho phép Rethink sử dụng dữ liệu di động và các tài nguyên khác khi chạy trong nền.</string>
     <string name="lbl_battery_optimization" translatable="true">Tối ưu hóa pin</string>
