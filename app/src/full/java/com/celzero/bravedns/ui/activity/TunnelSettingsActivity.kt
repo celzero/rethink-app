@@ -46,7 +46,6 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
@@ -529,6 +528,16 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                     b.settingsActivityPingIpsBtn.visibility = View.GONE
                 }
             }
+            InternetProtocol.ALWAYSv46.id -> {
+                b.genSettingsIpDesc.text =
+                    getString(
+                        R.string.settings_selected_ip_desc,
+                        getString(R.string.settings_ip_text_ipv4) + " & " + getString(R.string.settings_ip_text_ipv6)
+                    )
+                b.settingsActivityPtransRl.visibility = View.VISIBLE
+                b.settingsActivityConnectivityChecksRl.visibility = View.GONE
+                b.settingsActivityPingIpsBtn.visibility = View.GONE
+            }
             else -> {
                 b.genSettingsIpDesc.text =
                     getString(
@@ -554,11 +563,13 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     private fun showIpDialog() {
         val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_ip_dialog_title))
+        val alwaysv46Txt = getString(R.string.settings_ip_text_ipv4) + " & " + getString(R.string.settings_ip_text_ipv6) + " " + getString(R.string.lbl_experimental)
         val items =
             arrayOf(
                 getString(R.string.settings_ip_dialog_ipv4),
                 getString(R.string.settings_ip_dialog_ipv6),
-                getString(R.string.settings_ip_dialog_ipv46)
+                getString(R.string.settings_ip_dialog_ipv46),
+                alwaysv46Txt
             )
         val checkedItem = persistentState.internetProtocolType
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->

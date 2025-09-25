@@ -81,12 +81,10 @@ import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.receiver.UserPresentReceiver
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.ProxyManager.isNotLocalAndRpnProxy
-import com.celzero.bravedns.service.WireguardManager.NOTIF_CHANNEL_ID_WIREGUARD_ALERTS
 import com.celzero.bravedns.ui.NotificationHandlerActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
@@ -99,8 +97,6 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
-import com.celzero.bravedns.util.Constants.Companion.NOTIF_WG_PERMISSION_NAME
-import com.celzero.bravedns.util.Constants.Companion.NOTIF_WG_PERMISSION_VALUE
 import com.celzero.bravedns.util.Constants.Companion.PRIMARY_USER
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Daemons
@@ -111,7 +107,6 @@ import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Protocol
-import com.celzero.bravedns.util.SsidPermissionManager
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
@@ -146,8 +141,6 @@ import com.google.common.cache.RemovalCause
 import com.google.common.cache.RemovalNotification
 import com.google.common.collect.Sets
 import inet.ipaddr.HostName
-import inet.ipaddr.IPAddress
-import inet.ipaddr.IPAddressSeqRange
 import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
@@ -950,6 +943,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             }
 
             InternetProtocol.IPv46.id -> {
+                ip == fakeDnsIpv4 || ip == fakeDnsIpv6
+            }
+
+            InternetProtocol.ALWAYSv46.id -> {
                 ip == fakeDnsIpv4 || ip == fakeDnsIpv6
             }
 
@@ -3438,6 +3435,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 true
             }
 
+            InternetProtocol.ALWAYSv46 -> {
+                true
+            }
+
             InternetProtocol.IPv46 -> {
                 // null overlayNetwork means no active wireguard network, default to true so
                 // that the route is added based on the underlying network
@@ -3517,6 +3518,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
             InternetProtocol.IPv6 -> {
                 false
+            }
+
+            InternetProtocol.ALWAYSv46 -> {
+                true
             }
 
             InternetProtocol.IPv46 -> {
