@@ -597,7 +597,7 @@
     <string name="settings_locale_desc" translatable="true">Voorkeurstaal kiezen</string>
     <string name="settings_biometric_desc" translatable="true">Beveilig deze app met uw schermvergrendeling</string>
     <string name="hs_biometeric_title" translatable="true">Ontgrendel Rethink</string>
-    <string name="lbl_background_data" translatable="true">Achtergrond gegevens beperken</string>
+    <string name="lbl_background_data" translatable="true"></string>
     <string name="lbl_battery_optimization" translatable="true">Batterij optimalisatie</string>
     <string name="about_sponsor_link_text" translatable="true">Sponsor</string>
     <string name="cd_dns_crypt_relay_name" translatable="true">DNSRelay %1$s</string>

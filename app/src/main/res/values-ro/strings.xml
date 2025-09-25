@@ -451,7 +451,7 @@
     <string name="hsf_whats_new_remove_text" translatable="true">Se închide…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">Se activează…</string>
     <string name="hsf_chip_appearance" translatable="true">Tema: %1$s</string>
-    <string name="lbl_background_data" translatable="true">Datele în background vor fi restricționate</string>
+    <string name="lbl_background_data" translatable="true"></string>
     <string name="lbl_battery_optimization" translatable="true">Optimizare baterie</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Dezactivare %1$s</string>
     <string name="dc_block_heading" translatable="true">reguli</string>

@@ -491,7 +491,7 @@
     <string name="dc_dns_leaks_desc" translatable="true">활성화되면, Rethink는 포트 53에서 모든 패킷을 캡처하고 사용자가 설정한 DNS 엔드포인트로 전달합니다</string>
     <string name="cd_dns_proxy_error_text_3" translatable="true">잘못된 포트</string>
     <string name="cd_dns_crypt_dialog_title" translatable="true">DNSCrypt 리졸버 또는 릴레이 추가</string>
-    <string name="lbl_background_data" translatable="true">백그라운드 데이터 제한</string>
+    <string name="lbl_background_data" translatable="true"></string>
     <string name="dc_entries" translatable="true">%1$s 항목 »</string>
     <string name="dc_proxy_dns_heading" translatable="true">DNS 프록시 사용 안 함</string>
     <string name="cd_custom_dns_proxy_default_app" translatable="true">없음</string>

@@ -1007,7 +1007,7 @@
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s está desativado porque os proxies estão ativos</string>
     <string name="lbl_unselected" translatable="true">Não selecionado</string>
     <string name="lbl_battery_optimization" translatable="true">Otimização da Bateria</string>
-    <string name="lbl_background_data" translatable="true">Restringindo dados em segundo plano</string>
+    <string name="lbl_background_data" translatable="true"></string>
     <string name="battery_optimization_dialog_heading" translatable="true">Desativar %1$s</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> pode resultar em perda de conectividade. Altere a configuração para permitir que o Rethink use dados e outros recursos quando estiver em segundo plano.</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplicativos de encaminhamento proxy loopback</string>
