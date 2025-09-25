@@ -1078,7 +1078,6 @@
     <string name="battery_optimization_dialog_heading" translatable="true">Отключить %1$s</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Приложения для переадресации прокси-серверов с обратной связью</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Когда этот параметр отключен, приложения для пересылки прокси-серверов (SOCKS5, HTTP, DNS) исключаются из VPN-туннеля Rethink.</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="exclude_apps_from_proxy">Обход приложения со всех прокси-серверов</string>
     <string name="exclude_apps_from_proxy_failure_toast">Это приложение обходит прокси-серверы</string>
     <string name="lbl_notification" translatable="true">уведомление</string>

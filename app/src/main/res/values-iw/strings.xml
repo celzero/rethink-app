@@ -556,7 +556,6 @@
     <string name="settings_exclude_proxy_apps_heading" translatable="true">העברת תנועה מישומי פרוקסי חזרה דרך המנהרה</string>
     <string name="hsf_blocklist_updating_text" translatable="true">מפעיל…</string>
     <string name="hsf_chip_appearance" translatable="true">נושא: %1$s</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="about_mail_bugreport_text" translatable="true">שלח דוא\"ל זה אל: hello@celzero.com</string>
     <string name="about_mail_subject" translatable="true">[Rethink]:</string>
     <string name="about_mail_bugreport_share_title" translatable="true">בחר ספק דוא\"ל</string>

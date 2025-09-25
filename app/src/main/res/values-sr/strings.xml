@@ -340,7 +340,6 @@
     <string name="hsf_whats_new_remove_text" translatable="true">Затварање…</string>
     <string name="hsf_chip_appearance" translatable="true">Тема: %1$s</string>
     <string name="hsf_pause_vpn_failure" translatable="true">Није могуће паузирање: Rethink није активан</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="lbl_battery_optimization" translatable="true">Оптимизација батерије</string>
     <string name="dc_block_heading" translatable="true">правила</string>
     <string name="dc_other_dns_heading" translatable="true">врста</string>

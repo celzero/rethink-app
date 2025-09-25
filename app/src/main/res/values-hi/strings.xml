@@ -882,7 +882,6 @@
     <string name="wireguard_connection_error" translatable="true">वायरगार्ड वीपीएन कनेक्ट करने में विफल</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">सुरक्षित! DNS + फ़ायरवॉल + प्रॉक्सी से कनेक्टेड।</string>
     <string name="logs_card_duration" translatable="true">%1$s से</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="lbl_battery_optimization" translatable="true">बैटरी अनुकूलन</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> के कारण कनेक्टिविटी में कमी आ सकती है। सेटिंग बदलें ताकि बैकग्राउंड में होने पर Rethink डेटा और अन्य संसाधनों का उपयोग कर सके।</string>
     <string name="bad_config_reason_invalid_value" translatable="true">अमान्य मान</string>

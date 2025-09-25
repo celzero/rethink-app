@@ -426,7 +426,6 @@
     <string name="hsf_blocklist_updating_text" translatable="true">Povoluji…</string>
     <string name="hsf_chip_appearance" translatable="true">Motiv: %1$s</string>
     <string name="hsf_pause_vpn_failure" translatable="true">Nelze pozastavit: Rethink není aktivní</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="lbl_battery_optimization" translatable="true">Optimalizace baterie</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Vypnout %1$s</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> může vést ke ztrátě konektivity. Změňte nastavení, abyste Rethinku povolili používat data a další prostředky na pozadí.</string>

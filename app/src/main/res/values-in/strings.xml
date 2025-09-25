@@ -1015,7 +1015,6 @@
     <string name="dc_proxy_dns_heading" translatable="true">Jangan pernah melakukan proksi DNS</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Matikan %1$s</string>
     <string name="lbl_unselected" translatable="true">Tidak dipilih</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="lbl_battery_optimization" translatable="true">Optimalisasi baterai</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> dapat mengakibatkan hilangnya sambungan. Ubah pengaturan untuk membiarkan Rethink menggunakan data dan sumber daya lain saat berada di latar belakang.</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplikasi penerus putar-balik proksi</string>

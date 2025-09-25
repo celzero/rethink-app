@@ -593,7 +593,6 @@
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">RDNS+ ஐ இயக்கவும்</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">பாக்கெட் பிடிப்பு முடக்கப்பட்டது</string>
     <string name="hsf_chip_appearance" translatable="true">தீம்: %1$s</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="lbl_battery_optimization" translatable="true">பேட்டரி தேர்வுமுறை</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s </i> இணைப்பு இழப்பை ஏற்படுத்தக்கூடும். பின்னணியில் இருக்கும்போது தரவு மற்றும் பிற வளங்களைப் பயன்படுத்த ரீடிங்க் அனுமதிக்க அமைப்பை மாற்றவும்.</string>
     <string name="dc_dns_website_desc" translatable="true"><i> nextdns.io </i> மற்றும் <i> duckduckgo.com </i> ஆகியவற்றிலிருந்து வலைத்தள ஐகான்களைப் பெறுகிறது. வட்டு இடத்தில் 350 எம்பி வரை பயன்படுத்துகிறது</string>

@@ -1014,6 +1014,5 @@
     <string name="lbl_unselected" translatable="true">冇揀嘅</string>
     <string name="lbl_battery_optimization" translatable="true">電池優化</string>
     <string name="battery_optimization_dialog_heading" translatable="true">禁用 %1$s</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="lbl_notification" translatable="true">通知</string>
 </resources>

@@ -718,7 +718,6 @@
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">ปิดการใช้งานการจับแพ็กเก็ต</string>
     <string name="hsf_whats_new_remove_text" translatable="true">ปิดการขาย…</string>
     <string name="hsf_pause_vpn_failure" translatable="true">หยุดชั่วคราวไม่ได้: คิดใหม่ไม่ได้ใช้งาน</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="lbl_battery_optimization" translatable="true">การเพิ่มประสิทธิภาพแบตเตอรี่</string>
     <string name="battery_optimization_dialog_heading" translatable="true">ปิดการใช้งาน %1$s</string>
     <string name="dc_local_block_desc_1" translatable="true">เลือกจากรายการบล็อกมากกว่า 195 รายการ คลิกที่นี่เพื่อดาวน์โหลดหรือกำหนดค่ารายการบล็อก</string>

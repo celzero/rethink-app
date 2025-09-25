@@ -1018,7 +1018,6 @@
     <string name="settings_connectivity_checks" translatable="true">检查连接</string>
     <string name="settings_connectivity_checks_desc" translatable="true">发送连接检查以确保网络连通性。</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">已保护！已连接至 DNS + 防火牆 + 代理。</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">环回转发代理应用</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">禁用后，将转发代理（ SOCKS5 、 HTTP 、 DNS ）应用从 Rethink 的 VPN 隧道中排除。</string>
     <string name="lbl_notification" translatable="true">通知</string>

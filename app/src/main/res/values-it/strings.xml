@@ -924,7 +924,6 @@
     <string name="univ_firewall_heading" translatable="true">Regole firewall universali</string>
     <string name="settings_exclude_proxy_apps_desc" translatable="true">Se disattivato, esclude le applicazioni forwarder proxy (SOCKS5, HTTP, DNS) dal tunnel VPN di Rethink.</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Instradamento del traffico di Rethink attraverso il tunnel. A meno che non sappiate cosa state facendo, lasciatelo disattivato.</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="lbl_battery_optimization" translatable="true">Ottimizzazione batteria</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s è disabilitato perché i proxy sono attivi</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> potrebbe causare una perdita di connettività. Modificare l\'impostazione per consentire a Rethink di utilizzare dati e altre risorse quando è in background.</string>

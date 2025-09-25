@@ -1013,7 +1013,6 @@
     <string name="dc_proxy_dns_desc" translatable="true">Não fazer proxy de DNS em proxies WireGuard, SOCKS5, HTTP sempre ativos.</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s está desativado porque os proxies estão ativos</string>
     <string name="lbl_unselected" translatable="true">Não selecionado</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="battery_optimization_dialog_heading" translatable="true">Desativar %1$s</string>
     <string name="lbl_battery_optimization" translatable="true">Otimização de bateria</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplicações do reencaminhador proxy de retorno</string>

@@ -1010,7 +1010,6 @@
     <string name="settings_connectivity_checks_desc" translatable="true">Se envían comprobaciones de conectividad para determinar la accesibilidad.</string>
     <string name="lbl_unselected" translatable="true">No seleccionado</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> puede provocar la pérdida de conectividad. Cambia la configuración para permitir que Rethink utilice datos y otros recursos cuando esté en segundo plano.</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="lbl_battery_optimization" translatable="true">Optimización de la batería</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Deshabilitar %1$s</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Aplicaciones de reenvío proxy en bucle invertido</string>

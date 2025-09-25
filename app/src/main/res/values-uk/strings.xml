@@ -948,7 +948,6 @@
     <string name="hsf_exclude_error" translatable="true">Вимкнути неможливо в режимі \"блокування без VPN\"</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">Проксі вилучено</string>
     <string name="hsf_proxy_chip_remove_text" translatable="true">Припинення…</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="lbl_battery_optimization" translatable="true">Оптимізація акумулятора</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Вимкнути %1$s</string>
     <string name="dc_local_block_desc_1" translatable="true">Виберіть з 195+ блоклистів. Натисніть тут, щоб завантажити або налаштувати їх.</string>

@@ -1024,7 +1024,6 @@
     <string name="lbl_notification" translatable="true">bildirim</string>
     <string name="memory_notification_text">Rethink düşük bellekle çalışıyor. Sistem eylemleri sınırlı olabilir.</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">Loopback proxy yönlendirme uygulamaları</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="lbl_battery_optimization" translatable="true">Pil optimizasyonu</string>
     <string name="settings_connectivity_checks_desc" translatable="true">Bağlantı kontrolleri, erişilebilirliği doğrulamak için gönderilir.</string>
     <string name="toast_allow_bypass_disabled" translatable="true">%1$s, proxy\'ler aktif olduğu için devre dışı bırakıldı.</string>

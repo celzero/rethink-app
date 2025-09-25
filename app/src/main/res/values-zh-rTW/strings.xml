@@ -987,7 +987,6 @@
     <string name="lbl_split" translatable="true">分割</string>
     <string name="lbl_on_device" translatable="true">在裝置上</string>
     <string name="settings_connectivity_checks" translatable="true">檢查連線</string>
-    <string name="lbl_background_data" translatable="true"></string>
     <string name="lbl_battery_optimization" translatable="true">電池最佳化</string>
     <string name="battery_optimization_dialog_heading" translatable="true">停用 %1$s</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">已保護！已連線至 DNS + 防火牆 + 代理。</string>
