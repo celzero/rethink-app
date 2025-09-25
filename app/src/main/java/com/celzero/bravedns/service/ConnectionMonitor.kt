@@ -79,8 +79,72 @@ class ConnectionMonitor(private val context: Context, private val networkListene
     private val networkSet: MutableSet<NetworkAndSsid> = ConcurrentHashMap.newKeySet()
     data class NetworkAndSsid(val network: Network, val ssid: String?)
 
+    // Connectivity check tracking
+    private data class ConnectivityCheckState(
+        val lastCheckTime: Long,
+        val networkHandles: Set<Long>
+    )
+
+    private var lastConnectivityCheckState: ConnectivityCheckState? = null
+
     // create drop oldest channel to handle the network changes from the connectivity manager
     private lateinit var channel: Channel<OpPrefs>
+
+    /**
+     * Checks if connectivity check should be performed based on event type and timing
+     */
+    private fun shouldPerformConnectivityCheck(eventType: String): Boolean {
+        val currentTime = SystemClock.elapsedRealtime()
+        val currentNetworkHandles = networkSet.map { it.network.networkHandle }.toSet()
+
+        when (eventType) {
+            EVENT_ON_AVAILABLE, EVENT_ON_LOST, EVENT_ON_LINK_PROPERTIES_CHANGED -> {
+                // Always perform connectivity check for these events
+                updateLastConnectivityCheckState(currentTime, currentNetworkHandles)
+                Logger.d(LOG_TAG_CONNECTION, "Connectivity check approved for $eventType")
+                return true
+            }
+            EVENT_ON_CAPABILITIES_CHANGED -> {
+                val lastState = lastConnectivityCheckState
+
+                // Check if 15 seconds have passed since last check
+                val timeSinceLastCheck = if (lastState != null) {
+                    currentTime - lastState.lastCheckTime
+                } else {
+                    Long.MAX_VALUE // First time, always check
+                }
+
+                // Check if network handles have changed
+                val networkHandlesChanged = if (lastState != null) {
+                    lastState.networkHandles != currentNetworkHandles
+                } else {
+                    true // First time, consider as changed
+                }
+
+                val shouldCheck = timeSinceLastCheck >= CONNECTIVITY_CHECK_INTERVAL_MS || networkHandlesChanged
+
+                if (shouldCheck) {
+                    updateLastConnectivityCheckState(currentTime, currentNetworkHandles)
+                    Logger.d(LOG_TAG_CONNECTION, "Connectivity check approved for $eventType - time since last: ${timeSinceLastCheck}ms, network changed: $networkHandlesChanged")
+                } else {
+                    Logger.d(LOG_TAG_CONNECTION, "Connectivity check skipped for $eventType - time since last: ${timeSinceLastCheck}ms, network changed: $networkHandlesChanged")
+                }
+
+                return shouldCheck
+            }
+            else -> {
+                Logger.w(LOG_TAG_CONNECTION, "Unknown event type: $eventType")
+                return false
+            }
+        }
+    }
+
+    /**
+     * Updates the last connectivity check state
+     */
+    private fun updateLastConnectivityCheckState(time: Long, networkHandles: Set<Long>) {
+        lastConnectivityCheckState = ConnectivityCheckState(time, networkHandles)
+    }
 
     fun internetValidatedCallback(): ConnectivityManager.NetworkCallback {
         return if (isAtleastS()) {
@@ -91,7 +155,9 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(1S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
 
@@ -99,7 +165,9 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmIntLink") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(1S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_LINK_PROPERTIES_CHANGED)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
 
@@ -113,7 +181,9 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmIntAvl") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onAvailable(1S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_AVAILABLE)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
 
@@ -127,7 +197,9 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmIntLost") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onLost(1S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         removeFromNwSet(network)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_LOST)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
             }
@@ -136,26 +208,32 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             object : ConnectivityManager.NetworkCallback() {
                 override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
                     scope.launch(CoroutineName("cmTransCap") + serializer) {
-                        Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
 
                 override fun onAvailable(network: Network) {
                     scope.launch(CoroutineName("cmTransAvl") + serializer) {
-                        Logger.d(LOG_TAG_CONNECTION, "onAvailable(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        Logger.d(LOG_TAG_CONNECTION, "onAvailable(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_AVAILABLE)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
 
                 override fun onLost(network: Network) {
                     scope.launch(CoroutineName("cmTransLost") + serializer) {
-                        Logger.d(LOG_TAG_CONNECTION, "onLost(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        Logger.d(LOG_TAG_CONNECTION, "onLost(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         removeFromNwSet(network)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_LOST)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
 
@@ -164,9 +242,11 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     linkProperties: LinkProperties
                 ) {
                     scope.launch(CoroutineName("cmTransLink") + serializer) {
-                        Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
+                        Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_LINK_PROPERTIES_CHANGED)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
             }
@@ -181,7 +261,9 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
 
@@ -189,7 +271,9 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransAvl") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onAvailable(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_AVAILABLE)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
 
@@ -197,7 +281,9 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransLost") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onLost(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         removeFromNwSet(network)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_LOST)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
 
@@ -205,7 +291,9 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransLink") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(2S), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_LINK_PROPERTIES_CHANGED)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
             }
@@ -216,7 +304,9 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                         Logger.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         val ssid = getNetworkSSID(network, capabilities)
                         addToNwSet(network, ssid)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_CAPABILITIES_CHANGED)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
 
@@ -224,7 +314,9 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransAvl") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onAvailable(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_AVAILABLE)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
 
@@ -232,7 +324,9 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransLost") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onLost(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         removeFromNwSet(network)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_LOST)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
 
@@ -240,7 +334,9 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                     scope.launch(CoroutineName("cmTransLink") + serializer) {
                         Logger.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged(2), ${network.networkHandle}, netId: ${netId(network.networkHandle)}")
                         addToNwSet(network)
-                        sendNetworkChanges()
+                        if (shouldPerformConnectivityCheck(EVENT_ON_LINK_PROPERTIES_CHANGED)) {
+                            sendNetworkChanges()
+                        }
                     }
                 }
             }
@@ -500,6 +596,14 @@ class ConnectionMonitor(private val context: Context, private val networkListene
             // ref: cs.android.com/android/platform/superproject/main/+/main:packages/modules/Connectivity/framework/src/android/net/Network.java;drc=0209c366627e98d6311629a0592c6e22be7d13e0;l=491
             return nwHandle shr (32)
         }
+
+        const val CONNECTIVITY_CHECK_INTERVAL_MS = 15_000L // 15 seconds
+
+        // Network callback event types for connectivity checks
+        const val EVENT_ON_CAPABILITIES_CHANGED = "onCapabilitiesChanged"
+        const val EVENT_ON_AVAILABLE = "onAvailable"
+        const val EVENT_ON_LOST = "onLost"
+        const val EVENT_ON_LINK_PROPERTIES_CHANGED = "onLinkPropertiesChanged"
     }
 
     // data class that holds the below information for handlers to process the network changes
