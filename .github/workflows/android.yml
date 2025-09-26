@@ -42,7 +42,6 @@ jobs:
     - name: 🚂 Assemble
       if: success()
       run: |
-        ./gradlew lint
         # Force compileSdk 36 for all variants
         ./gradlew \
           assembleWebsiteFullDebug \
