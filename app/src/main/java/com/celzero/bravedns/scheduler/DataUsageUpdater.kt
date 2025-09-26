@@ -52,7 +52,7 @@ class DataUsageUpdater(context: Context, workerParams: WorkerParameters) :
             persistentState.prevDataUsageCheck = currentTimestamp
             return
         }
-        
+
         dataUsageList.forEach {
             if (it.uid == Constants.INVALID_UID) return@forEach
 
@@ -68,7 +68,7 @@ class DataUsageUpdater(context: Context, workerParams: WorkerParameters) :
                 Logger.d(LOG_TAG_SCHEDULER, "Data usage for ${it.uid}, $upload, $download")
                 appInfoRepository.updateDataUsageByUid(it.uid, upload, download)
             } catch (e: Exception) {
-                Logger.e(LOG_TAG_SCHEDULER, "err in data usage updater: ${e.message}", e)
+                Logger.e(LOG_TAG_SCHEDULER, "err in data usage updater: ${e.message}")
             }
         }
 
