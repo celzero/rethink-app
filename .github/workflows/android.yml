@@ -33,20 +33,11 @@ jobs:
         wc -lwm app/src/debug/google-services.json
       env:
         GSCV_TEST_JSON: ${{ secrets.GOOGLE_SERVICES_TEST_JSON }}
-    - name: 📦 Setup Android SDK 36
-      uses: android-actions/setup-android@v2
-      with:
-        api-level: 36
-        build-tools: "36.0.0"
-        components: "platform-tools,build-tools;36.0.0,platforms;android-36"
     - name: 🚂 Assemble
       if: success()
       run: |
         # Force compileSdk 36 for all variants
         ./gradlew \
           assembleWebsiteFullDebug \
-          -Pandroid.compileSdk=36 \
-          -Pandroid.buildToolsVersion=36.0.0 \
-          -Pandroid.targetSdk=36 \
           --info \
           --warning-mode all
