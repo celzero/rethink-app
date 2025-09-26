@@ -289,13 +289,13 @@
             android:fontFamily="sans-serif-light"
             android:gravity="center"
             android:marqueeRepeatLimit="marquee_forever"
-            android:maxLines="3"
+            android:maxLines="5"
             android:paddingStart="8dp"
             android:paddingEnd="10dp"
             android:scrollHorizontally="true"
             android:singleLine="false"
             android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/small_font_text_view" />
+            android:textSize="@dimen/mini_font_text_view" />
 
     </LinearLayout>
 

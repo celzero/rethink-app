@@ -21,6 +21,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.databinding.FragmentConfigureBinding
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.ui.activity.AdvancedSettingActivity
@@ -46,7 +47,8 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
         VPN,
         OTHERS,
         LOGS,
-        ANTI_CENSORSHIP
+        ANTI_CENSORSHIP,
+        ADVANCED
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,9 +63,16 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
     }
 
     private fun initView() {
+        if (DEBUG) {
+            b.fsAdvancedCard.visibility = View.VISIBLE
+            b.fsAdvancedTv.text = getString(R.string.lbl_advanced).replaceFirstChar(Char::titlecase)
+        } else {
+            b.fsAdvancedCard.visibility = View.GONE
+        }
         b.fsNetworkTv.text = getString(R.string.lbl_network).replaceFirstChar(Char::titlecase)
         b.fsLogsTv.text = getString(R.string.lbl_logs).replaceFirstChar(Char::titlecase)
-        b.fsAntiCensorshipTv.text = getString(R.string.anti_censorship_title).replaceFirstChar(Char::titlecase)
+        b.fsAntiCensorshipTv.text =
+            getString(R.string.anti_censorship_title).replaceFirstChar(Char::titlecase)
     }
 
     private fun showNewBadgeIfNeeded() {
@@ -114,6 +123,11 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
             startActivity(ScreenType.ANTI_CENSORSHIP)
             NewSettingsManager.markSettingSeen(NewSettingsManager.ANTI_CENSORSHIP)
         }
+
+        b.fsAdvancedCard.setOnClickListener {
+            // open developer options configuration
+            startActivity(ScreenType.ADVANCED)
+        }
     }
 
     private fun startActivity(type: ScreenType) {
@@ -127,6 +141,7 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
                 ScreenType.OTHERS -> Intent(requireContext(), MiscSettingsActivity::class.java)
                 ScreenType.LOGS -> Intent(requireContext(), NetworkLogsActivity::class.java)
                 ScreenType.ANTI_CENSORSHIP -> Intent(requireContext(), AntiCensorshipActivity::class.java)
+                ScreenType.ADVANCED -> Intent(requireContext(), AdvancedSettingActivity::class.java)
             }
         startActivity(intent)
     }

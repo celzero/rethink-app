@@ -174,7 +174,12 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:imeOptions="actionDone"
-                        android:inputType="textNoSuggestions|textVisiblePassword" />
+                        android:gravity="top|start"
+                        android:maxLines="4"
+                        android:minLines="1"
+                        android:overScrollMode="ifContentScrolls"
+                        android:scrollbars="vertical"
+                        android:inputType="textMultiLine|textNoSuggestions|textVisiblePassword" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 

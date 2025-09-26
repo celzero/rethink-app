@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.pm.ApplicationInfo
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.service.ServiceModule
+import com.celzero.bravedns.util.GlobalExceptionHandler
 import com.celzero.bravedns.util.LocalBlocklistUtil
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
@@ -32,7 +33,6 @@ class RethinkDnsApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
         DEBUG =
             applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE == ApplicationInfo.FLAG_DEBUGGABLE
 
@@ -43,6 +43,10 @@ class RethinkDnsApplication : Application() {
             LocalBlocklistUtil(this@RethinkDnsApplication, get()).init()
             koin.loadModules(AppModules)
         }
+
+        // Initialize global exception handler
+        GlobalExceptionHandler.initialize(this)
+        FirebaseErrorReporting.initialize()
         get<ScheduleManager>().scheduleDatabaseRefreshJob()
     }
 }

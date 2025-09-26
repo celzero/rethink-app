@@ -274,7 +274,7 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun tombstoneApp(uid: Int, packageName: String?, ts: Long = System.currentTimeMillis()) {
-        val newUid = -1 * uid // use negative uid to mark the app as tombstone
+        val newUid = if (uid > 0) -1 * uid else uid // use negative uid to mark the app as tombstone
         mutex.withLock {
             val iter = appInfos.get(uid).iterator()
             while (iter.hasNext()) {
@@ -462,11 +462,11 @@ object FirewallManager : KoinComponent {
         connectionStatus: ConnectionStatus
     ) {
         if (firewallStatus == FirewallStatus.ISOLATE) {
-            VpnController.closeConnectionsIfNeeded(uid)
+            VpnController.closeConnectionsIfNeeded(uid, "isolate-manual-close")
         } else if (
             firewallStatus == FirewallStatus.NONE && connectionStatus != ConnectionStatus.ALLOW
         ) {
-            VpnController.closeConnectionsIfNeeded(uid)
+            VpnController.closeConnectionsIfNeeded(uid, "block-manual-close")
         } else {
             // no-op, no need to close existing connections, if the app is not isolated or blocked
         }
@@ -476,7 +476,7 @@ object FirewallManager : KoinComponent {
         // while updating the package reset the tombstone timestamp
         var cacheok = false
         val appInfo = getAppInfoByUid(oldUid)
-        Logger.i(LOG_TAG_FIREWALL, "updateUidAndResetTombstone: $oldUid -> $newUid; has? ${appInfo?.packageName} == pkg: $pkg")
+        Logger.i(LOG_TAG_FIREWALL, "updateUidAndResetTombstone: $oldUid -> $newUid; has? ${appInfo?.packageName} == $pkg")
         mutex.withLock {
             val iter = appInfos.get(oldUid).iterator()
             while (iter.hasNext()) {
@@ -541,7 +541,7 @@ object FirewallManager : KoinComponent {
                 }
             }
             val isAppUid = AndroidUidConfig.isUidAppRange(uid)
-            Logger.d(LOG_TAG_FIREWALL, "app in foreground with uid? $isAppUid")
+            Logger.d(LOG_TAG_FIREWALL, "app in foreground; uid($uid)? $isAppUid")
 
             // Only track packages within app uid range.
             if (!isAppUid) return@io
@@ -555,13 +555,13 @@ object FirewallManager : KoinComponent {
         // When the user engages the app and locks the screen, the app is
         // considered to be in background and the connections for those apps
         // should be blocked.
-        val locked = keyguardManager?.isKeyguardLocked == false
-        val isForeground = foregroundUids.contains(uid)
+        val locked = keyguardManager?.isKeyguardLocked == true
+        val inForegroundList = foregroundUids.contains(uid)
         Logger.d(
             LOG_TAG_FIREWALL,
-            "is app $uid foreground? ${locked && isForeground}, isLocked? $locked, is available in foreground list? $isForeground"
+            "is app $uid foreground? ${!locked && inForegroundList}, isLocked? $locked, in foreground list? $inForegroundList"
         )
-        return locked && isForeground
+        return !locked && inForegroundList
     }
 
     suspend fun updateFirewalledApps(uid: Int, connectionStatus: ConnectionStatus) {

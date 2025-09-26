@@ -19,7 +19,6 @@ package com.celzero.bravedns.net.go
 import Logger
 import Logger.LOG_TAG_PROXY
 import Logger.LOG_TAG_VPN
-import android.R.attr.level
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -27,7 +26,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.net.VpnService.NOTIFICATION_SERVICE
-import android.os.ParcelFileDescriptor
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -61,7 +59,6 @@ import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_MAX
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_SKY
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
-import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.blocklistDir
@@ -93,6 +90,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import com.celzero.firestack.settings.Settings
 import java.net.URI
+import java.net.URLEncoder
 import kotlin.text.substring
 
 /**
@@ -113,6 +111,7 @@ class GoVpnAdapter : KoinComponent {
         context: Context,
         externalScope: CoroutineScope,
         tunFd: Long,
+        ifaceAddresses: String,
         mtu: Int,
         opts: TunnelOptions) {
         this.context = context
@@ -126,6 +125,7 @@ class GoVpnAdapter : KoinComponent {
             Intra.connect(
                 tunFd,
                 mtu.toLong(),
+                ifaceAddresses,
                 opts.fakeDns,
                 defaultDns,
                 opts.bridge
@@ -680,6 +680,10 @@ class GoVpnAdapter : KoinComponent {
     ) {
         try {
             val url = constructSocks5ProxyUrl(userName, password, ipAddress, port)
+            if (url.isEmpty()) {
+                Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: err empty socks5 url")
+                return
+            }
             val id =
                 if (tunProxyMode.isTunProxyOrbot()) {
                     ProxyManager.ID_ORBOT_BASE
@@ -703,22 +707,29 @@ class GoVpnAdapter : KoinComponent {
         ipAddress: String?,
         port: Int
     ): String {
-        // socks5://<username>:<password>@<ip>:<port>
-        // convert string to url
-        val proxyUrl = StringBuilder()
-        proxyUrl.append("socks5://")
-        if (!userName.isNullOrEmpty()) {
-            proxyUrl.append(userName)
-            if (!password.isNullOrEmpty()) {
-                proxyUrl.append(":")
-                proxyUrl.append(password)
+        try {
+            // socks5://<username>:<password>@<ip>:<port>
+            // convert string to url
+            val proxyUrl = StringBuilder()
+            proxyUrl.append("socks5://")
+            if (!userName.isNullOrEmpty()) {
+                val encUser = URLEncoder.encode(userName, Charsets.UTF_8.name())
+                proxyUrl.append(encUser)
+                if (!password.isNullOrEmpty()) {
+                    val encPass = URLEncoder.encode(password, Charsets.UTF_8.name())
+                    proxyUrl.append(":")
+                    proxyUrl.append(encPass)
+                }
+                proxyUrl.append("@")
             }
-            proxyUrl.append("@")
+            proxyUrl.append(ipAddress)
+            proxyUrl.append(":")
+            proxyUrl.append(port)
+            return URI.create(proxyUrl.toString()).toASCIIString()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err construct sock5 url: ${e.message}")
         }
-        proxyUrl.append(ipAddress)
-        proxyUrl.append(":")
-        proxyUrl.append(port)
-        return URI.create(proxyUrl.toString()).toASCIIString()
+        return ""
     }
 
     private fun showDnscryptConnectionFailureToast() {
@@ -1039,7 +1050,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun closeConnections(connIds: List<String>, isUid: Boolean = false) {
+    suspend fun closeConnections(connIds: List<String>, isUid: Boolean = false, reason: String) {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip closeConns")
             return
@@ -1047,17 +1058,18 @@ class GoVpnAdapter : KoinComponent {
 
         if (connIds.isEmpty()) {
             val res = tunnel.closeConns("") // closes all connections
-            Logger.i(LOG_TAG_VPN, "$TAG close all connections, res: $res")
+            Logger.i(LOG_TAG_VPN, "$TAG close all connections($connIds), res: $res")
             return
         }
 
         val connIdsStr = connIds.joinToString(",")
         // there maybe chance that the res can be empty, when the conns are already closed
         val res = tunnel.closeConns(connIdsStr)
+        val closedConns = res.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
         // check if all connections are closed. for any connIds not present in the result,
         // mark their database entries as closed. These connections were either closed when
         // the tunnel was disconnected or were missed during database update.
-        val diff = connIds.filter { it !in res }
+        val diff = connIds.filter { !closedConns.contains(it) }
         // check if the elements in the diff has the size equal to the connIds size,
         // there can be case where the connIds contains uid,
         if (diff.isNotEmpty()) {
@@ -1065,11 +1077,11 @@ class GoVpnAdapter : KoinComponent {
                 if (isUid) {
                     // close the connections for all the uids in the diff
                     val uids = diff.mapNotNull { it.toIntOrNull() }
-                    connTrackerDb.closeConnectionForUids(uids)
-                    Logger.i(LOG_TAG_VPN, "$TAG closeConns: $connIds, res: $res, uids: $uids")
+                    connTrackerDb.closeConnectionForUids(uids, reason)
+                    Logger.i(LOG_TAG_VPN, "$TAG closeConns: $connIds, res: $res, uids: $uids, reason: $reason")
                 } else {
-                    connTrackerDb.closeConnections(diff)
-                    Logger.i(LOG_TAG_VPN, "$TAG closeConns: $connIds, res: $res, ids: $diff")
+                    connTrackerDb.closeConnections(diff, reason)
+                    Logger.i(LOG_TAG_VPN, "$TAG closeConns: $connIds, res: $res, ids: $diff, reason: $reason")
                 }
             } catch (e: Exception) {
                 Logger.i(LOG_TAG_VPN, "$TAG err closing connections: ${e.message}")
@@ -1078,7 +1090,7 @@ class GoVpnAdapter : KoinComponent {
         Logger.i(LOG_TAG_VPN, "$TAG close connection: $connIds, res: $res")
     }
 
-    suspend fun refreshOrPauseOrResumeOrReAddProxies(canResumeMobileOnlyWg: Boolean) {
+    suspend fun refreshOrPauseOrResumeOrReAddProxies(isMobileActive: Boolean, ssid: String) {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip refreshing proxies")
             return
@@ -1086,7 +1098,7 @@ class GoVpnAdapter : KoinComponent {
         try {
             // refresh proxies should never return error/exception
             val res = getProxies()?.refreshProxies()
-            Logger.i(LOG_TAG_VPN, "$TAG wg refresh proxies: $res, can resume mobile? $canResumeMobileOnlyWg")
+            Logger.i(LOG_TAG_VPN, "$TAG wg refresh proxies: $res, can resume mobile? $isMobileActive")
             // re-add the proxies if the its not available in the tunnel
             val wgConfigs: List<Config> = WireguardManager.getActiveConfigs()
             if (wgConfigs.isEmpty()) {
@@ -1095,31 +1107,52 @@ class GoVpnAdapter : KoinComponent {
             }
             // re-add wireguard proxies in case of failure, consider proxy stats TNT as a failure
             // TNT means proxy UP but not responding
-            wgConfigs.forEach {
+            wgConfigs.forEach { it ->
                 val id = ID_WG_BASE + it.getId()
                 val files = WireguardManager.getConfigFilesById(it.getId())
                 // skip one-wg proxy, mobile-only doesn't apply
                 val isWireGuardMobileOnly = files?.useOnlyOnMetered == true && !files.oneWireGuard
-                val canResume = isWireGuardMobileOnly && canResumeMobileOnlyWg
+                val canResumeMobileWg = isWireGuardMobileOnly && isMobileActive
 
+                val useOnlyOnSsid = files?.ssidEnabled == true && !files.oneWireGuard
+                val ssidList = files?.ssids?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
+                val ssidMatch = useOnlyOnSsid && WireguardManager.matchesSsidList(files.ssids, ssid)
+                val canResumeSsidWg = useOnlyOnSsid && ssidMatch && !isMobileActive
+
+                val canResume = canResumeMobileWg || canResumeSsidWg
+
+                Logger.d(
+                    LOG_TAG_VPN,
+                    "$TAG refresh proxy: $id, mobileOnly: $isWireGuardMobileOnly, " +
+                        "canResumeMobileWg: $canResumeMobileWg, isMobileActive: $isMobileActive, " +
+                        "useOnlyOnSsid: $useOnlyOnSsid, ssidMatch: $ssidMatch, ssid: $ssid, canResume: $canResume, wg-ssids: $ssidList"
+                )
                 val stats = getProxyStatusById(id).first
                 if (stats == null || stats == Backend.TNT) {
                     Logger.w(LOG_TAG_VPN, "$TAG proxy stats for $id is null or tnt, $stats, re-adding")
                     // there are cases where the proxy needs to be re-added, so pingOrReAddProxy
-                    // case: some of the wg proxies are added to tunnel but not erring out, so
+                    // case: some of the wg proxies are added to tunnel but erring out, so
                     // re-adding those proxies seems working, work around for now
                     // now re-add logic is handled in go-tun
                     addWgProxy(id, true)
-                } else if (stats == Backend.TPU && canResume) {
+                }
+                if (stats == Backend.TPU && canResume) {
                     // if the proxy is paused, then resume it
                     // this is needed when the tunnel is reconnected and the proxies are paused
-                    // so resume them
+                    // so resume them, also when there is switch in wg-config for useOnlyOnMetered
+                    // or ssid change for ssidEnabled wgs
                     val res = getProxies()?.getProxy(id.togs())?.resume()
                     Logger.i(LOG_TAG_VPN, "$TAG resumed proxy: $id, res: $res")
-                } else if (isWireGuardMobileOnly && !canResumeMobileOnlyWg) {
+                } else if (isWireGuardMobileOnly && !isMobileActive) {
                     // if the proxy is not paused, then pause it
+                    // this is needed when the network is on mobile data
+                    // and the wg-config is set to useOnlyOnMetered
                     val res = getProxies()?.getProxy(id.togs())?.pause()
-                    Logger.i(LOG_TAG_VPN, "$TAG paused proxy: $id, res: $res")
+                    Logger.i(LOG_TAG_VPN, "$TAG paused proxy (mobile): $id, res: $res")
+                } else if (useOnlyOnSsid && !ssidMatch && !isMobileActive) {
+                    // when the ssidEnabled is set and the ssid does not match
+                    val res = getProxies()?.getProxy(id.togs())?.pause()
+                    Logger.i(LOG_TAG_VPN, "$TAG paused proxy (ssid): $id, res: $res")
                 }
             }
         } catch (e: Exception) {
@@ -1600,7 +1633,11 @@ class GoVpnAdapter : KoinComponent {
             // 0 - very verbose, 1 - verbose, 2 - debug, 3 - info, 4 - warn, 5 - error, 6 - stacktrace, 7 - user, 8 - none
             // from UI, if none is selected, set the log level to 7 (user), usr will send only
             // user notifications
-            Intra.logLevel(l1, l2)
+            // there is no user level shown in UI, so if the user selects none, set the log level
+            // to 8 (none)
+            val goLogLevel = if (l1 == 7) 8 else l1
+            val consoleLogLevel = if (l2 == 7) 8 else l2
+            Intra.logLevel(goLogLevel, consoleLogLevel)
             Logger.i(LOG_TAG_VPN, "$TAG set go-log level: $l1, $l2")
         }
     }

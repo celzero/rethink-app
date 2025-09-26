@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/ssidNameText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="16sp"
+        android:textColor="?android:attr/textColorPrimary" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/ssidTypeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textSize="12sp"
+        android:textColor="?attr/primaryLightColorText"
+        android:padding="4dp" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/deleteSsidBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_delete"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/lbl_delete" />
+
+</LinearLayout>

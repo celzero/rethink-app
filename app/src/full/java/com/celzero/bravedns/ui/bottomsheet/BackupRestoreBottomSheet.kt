@@ -149,8 +149,9 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = INTENT_TYPE_OCTET
         val sdf = SimpleDateFormat(BACKUP_FILE_NAME_DATETIME, Locale.ROOT)
-        // filename format (Rethink_DATA_FORMAT.bk)
-        val zipFileName: String = BACKUP_FILE_NAME + sdf.format(Date()) + BACKUP_FILE_EXTN
+        // filename format (Rethink_version_DATA_FORMAT.bk)
+        val version = getVersionName().replace(' ', '_')
+        val zipFileName: String = BACKUP_FILE_NAME + version + sdf.format(Date()) + BACKUP_FILE_EXTN
 
         intent.putExtra(Intent.EXTRA_TITLE, zipFileName)
 

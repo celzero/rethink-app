@@ -866,7 +866,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             .setMessage(getString(R.string.close_conns_dialog_desc, appName))
             .setPositiveButton(R.string.lbl_proceed) { _, _ ->
                 // close the connection
-                VpnController.closeConnectionsIfNeeded(uid)
+                VpnController.closeConnectionsIfNeeded(uid, "app-info-dialog-manual-close")
                 Logger.i(LOG_TAG_UI, "$TAG closed connection for uid: $uid")
                 showToastUiCentered(this, getString(R.string.config_add_success_toast), Toast.LENGTH_LONG)
             }

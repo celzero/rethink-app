@@ -140,6 +140,13 @@ object DomainRulesManager : KoinComponent {
         trustedTrie.clear()
         trustedMap.clear()
         db.getAllCustomDomains().forEach { cd ->
+            // adding as part of defensive programming, even adding these rules to cache will
+            // not cause any issues, but to avoid unnecessary entries in the trie, skipping these
+            // entries
+            if (cd.uid < 0 && cd.uid != Constants.UID_EVERYBODY) {
+                Logger.w(LOG_TAG_DNS, "skipping domain rule for uid: ${cd.uid}")
+                return@forEach
+            }
             val key = mkTrieKey(cd.domain, cd.uid)
             val value = mkTrieValue(cd.status.toString(), cd.proxyId, cd.proxyCC)
             trie.set(key, value)
@@ -426,10 +433,13 @@ object DomainRulesManager : KoinComponent {
     }
 
     suspend fun updateUids(uids: List<Int>, newUids: List<Int>) {
+        val dms = db.getAllCustomDomains()
         for (i in uids.indices) {
             val uid = uids[i]
             val newUid = newUids[i]
-            updateUid(uid, newUid)
+            if (dms.any { it.uid == uid }) {
+                updateUid(uid, newUid)
+            }
         }
     }
 
@@ -485,7 +495,11 @@ object DomainRulesManager : KoinComponent {
         // here tombstone means negating the uid of the rule
         // this is used when the app is uninstalled, so that the rules are not deleted
         // but the uid is set to (-1 * uid), so that the rules are not applied
-        val newUid = -1 * oldUid
+        val newUid = if (oldUid > 0) -1 * oldUid else oldUid
+        if (oldUid == newUid) {
+            Logger.w(LOG_TAG_FIREWALL, "tombstone: same uids, old: $oldUid, new: $newUid, no-op")
+            return
+        }
         db.tombstoneRulesByUid(oldUid, newUid)
         load()
     }

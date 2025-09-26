@@ -76,33 +76,38 @@ class RethinkGlideModule : AppGlideModule() {
                 .build()
 
         val factory: OkHttpUrlLoader.Factory = OkHttpUrlLoader.Factory(client)
-        registry.replace(GlideUrl::class.java, java.io.InputStream::class.java, factory)
+        registry.replace(GlideUrl::class.java, InputStream::class.java, factory)
+        
         // handle com.bumptech.glide.Registry$NoModelLoaderAvailableException:
         // Failed to find any ModelLoaders registered for model class: class kotlin.Unit
-        registry.replace(Unit::class.java, InputStream::class.java, UnitModelLoaderFactory())
+        registry.append(Unit::class.java, InputStream::class.java, UnitModelLoaderFactory())
     }
 
     // handle com.bumptech.glide.Registry$NoModelLoaderAvailableException for kotlin.Unit
     inner class UnitModelLoaderFactory : ModelLoaderFactory<Unit, InputStream> {
         override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<Unit, InputStream> {
-            return object : ModelLoader<Unit, InputStream> {
-                override fun handles(model: Unit): Boolean {
-                    return true
-                }
-
-                override fun buildLoadData(
-                    model: Unit,
-                    width: Int,
-                    height: Int,
-                    options: com.bumptech.glide.load.Options
-                ): ModelLoader.LoadData<InputStream>? {
-                    return null
-                }
-            }
+            return UnitModelLoader()
         }
 
         override fun teardown() {
             // no-op
+        }
+    }
+
+    // Custom ModelLoader for Unit class
+    inner class UnitModelLoader : ModelLoader<Unit, InputStream> {
+        override fun handles(model: Unit): Boolean {
+            return model == Unit
+        }
+
+        override fun buildLoadData(
+            model: Unit,
+            width: Int,
+            height: Int,
+            options: com.bumptech.glide.load.Options
+        ): ModelLoader.LoadData<InputStream>? {
+            // Return null to indicate that this model cannot be loaded
+            return null
         }
     }
 }
