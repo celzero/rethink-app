@@ -203,7 +203,7 @@ def firestackDependency = { suffix = "" ->
 }
 
 dependencies {
-    def room_version = "2.8.0"
+    def room_version = "2.8.1"
     def paging_version = "3.3.6"
 
     implementation 'com.google.guava:guava:33.5.0-android'
@@ -283,7 +283,7 @@ dependencies {
     playImplementation firestackDependency()
 
     // Work manager
-    implementation('androidx.work:work-runtime-ktx:2.10.4') {
+    implementation('androidx.work:work-runtime-ktx:2.10.5') {
         modules {
             module("com.google.guava:listenablefuture") {
                 replacedBy("com.google.guava:guava", "listenablefuture is part of guava")
@@ -300,11 +300,15 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
     androidTestImplementation 'androidx.test:rules:1.7.0'
+    testImplementation 'org.robolectric:robolectric:4.16'
+    testImplementation 'androidx.test:core:1.7.0'
+    testImplementation 'androidx.test.ext:junit:1.3.0'
+    testImplementation 'org.mockito:mockito-core:5.20.0'
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
 
-    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.9.4'
-    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.9.4'
+    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.9.5'
+    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.9.5'
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
