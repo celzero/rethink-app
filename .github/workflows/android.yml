@@ -42,10 +42,10 @@ jobs:
     - name: 🚂 Assemble
       if: success()
       run: |
+        ./gradlew lint
         # Force compileSdk 36 for all variants
         ./gradlew \
           assembleWebsiteFullDebug \
-          assembleFdroidFullDebug \
           -Pandroid.compileSdk=36 \
           -Pandroid.buildToolsVersion=36.0.0 \
           -Pandroid.targetSdk=36 \
