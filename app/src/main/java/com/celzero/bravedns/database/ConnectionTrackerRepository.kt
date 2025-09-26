@@ -93,7 +93,7 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         connectionTrackerDAO.clearLogsByRule(rule)
     }
 
-    suspend fun getDataUsage(before: Long, current: Long): List<DataUsage> {
+    suspend fun getDataUsage(before: Long, current: Long): List<DataUsage>? {
         return connectionTrackerDAO.getDataUsage(before, current)
     }
 
