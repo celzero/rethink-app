@@ -304,6 +304,14 @@ dependencies {
     testImplementation 'androidx.test:core:1.7.0'
     testImplementation 'androidx.test.ext:junit:1.3.0'
     testImplementation 'org.mockito:mockito-core:5.20.0'
+    // Added test dependencies for comprehensive testing
+    testImplementation 'io.mockk:mockk:1.14.5'
+    testImplementation 'io.mockk:mockk-android:1.14.5'
+    testImplementation 'androidx.arch.core:core-testing:2.2.0'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2'
+    testImplementation 'io.insert-koin:koin-test:4.1.1'
+    testImplementation 'io.insert-koin:koin-test-junit4:4.1.1'
+    androidTestImplementation 'io.mockk:mockk-android:1.14.5'
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
 
