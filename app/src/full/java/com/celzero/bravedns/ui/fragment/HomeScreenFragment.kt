@@ -989,11 +989,20 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val exemptFromBatteryOptimization = pm.isIgnoringBatteryOptimizations(context.packageName)
         Logger.d(LOG_TAG_UI, "ignore battery optimization: $exemptFromBatteryOptimization")
 
-        return if (isAtleastU()) {
+        val standardOptimizationActive = if (isAtleastU()) {
             !pm.isExemptFromLowPowerStandby || !exemptFromBatteryOptimization
         } else {
             !exemptFromBatteryOptimization
         }
+
+        // Log OEM information for debugging
+        val hasOemOptimization = OemBatteryOptimizationHelper.isOemWithCustomBatteryOptimization()
+        val deviceOem = OemBatteryOptimizationHelper.getDeviceOem()
+        Logger.d(LOG_TAG_UI, "Device OEM: $deviceOem, has custom optimization: $hasOemOptimization, standard active: $standardOptimizationActive")
+
+        // Only show dialog if standard battery optimization is active
+        // The dialog will include OEM-specific guidance if applicable
+        return standardOptimizationActive
     }
 
     private fun showBatteryOptimizationDialog() {
@@ -1005,14 +1014,21 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 R.string.battery_optimization_dialog_heading,
                 getString(R.string.lbl_battery_optimization)
             )
-        val msg =
+        
+        // Use OEM-specific instructions if available
+        val msg = if (OemBatteryOptimizationHelper.isOemWithCustomBatteryOptimization()) {
+            OemBatteryOptimizationHelper.getOemSpecificInstructions(requireContext())
+        } else {
             getString(
                 R.string.restrict_dialog_message,
                 getString(R.string.lbl_battery_optimization)
             )
+        }
+        
         builder.setTitle(title)
         builder.setMessage(msg)
         builder.setCancelable(false)
+        
         builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
             Logger.v(LOG_TAG_UI, "launch battery optimization settings")
             val ok =
@@ -1025,6 +1041,22 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // launch app settings if the above settings is not available
                 Logger.v(LOG_TAG_UI, "launch app info, battery optimization settings not available")
                 openAppInfo(requireContext())
+            }
+        }
+
+        // Add OEM-specific settings button if available
+        if (OemBatteryOptimizationHelper.isOemWithCustomBatteryOptimization()) {
+            builder.setNeutralButton(R.string.oem_battery_settings_button) { _, _ ->
+                Logger.v(LOG_TAG_UI, "launch OEM battery optimization settings")
+                val oemOk = OemBatteryOptimizationHelper.openOemBatterySettings(requireContext())
+                Logger.v(LOG_TAG_UI, "OEM battery settings launched: $oemOk")
+                if (!oemOk) {
+                    Utilities.showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.oem_settings_open_error),
+                        Toast.LENGTH_LONG
+                    )
+                }
             }
         }
 
