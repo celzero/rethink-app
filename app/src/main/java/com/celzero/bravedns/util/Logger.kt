@@ -23,7 +23,23 @@ import org.koin.core.component.inject
 
 object Logger : KoinComponent {
     private val persistentState by inject<PersistentState>()
-    private var logLevel = persistentState.goLoggerLevel
+
+    private var _logLevel: Long? = null
+    private var logLevel: Long
+        get() {
+            if (_logLevel == null) {
+                _logLevel = try {
+                    persistentState.goLoggerLevel
+                } catch (e: Exception) {
+                    // Fallback for tests or when Koin is not initialized
+                    LoggerLevel.ERROR.id
+                }
+            }
+            return _logLevel!!
+        }
+        set(value) {
+            _logLevel = value
+        }
 
     var uiLogLevel = LoggerLevel.ERROR.id
 
