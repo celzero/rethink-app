@@ -28,7 +28,7 @@ object FirebaseErrorReporting : KoinComponent {
     /**
      * Initialize Firebase Crashlytics - No-op for F-Droid variant
      */
-    fun initialize(context: Context) {
+    fun initialize() {
         Logger.i(LOG_FIREBASE, "crashlytics not available in F-Droid variant")
     }
 
