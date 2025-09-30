@@ -67,7 +67,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
     companion object {
         private const val DELAY_MS = 1500L
-        private const val TAG = "OneWgConfigAdapter"
+        private const val TAG = "OneWgCfgAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
 
@@ -115,7 +115,8 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         private var job: Job? = null
 
         fun update(config: WgConfigFiles) {
-            b.interfaceNameText.text = config.name.take(12)
+            b.interfaceNameText.text = config.name
+            b.interfaceNameText.isSelected = true
             b.interfaceIdText.text = context.getString(R.string.single_argument_parenthesis, config.id.toString())
             val isWgActive = config.isActive && VpnController.hasTunnel()
             b.oneWgCheck.isChecked = isWgActive

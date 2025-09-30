@@ -41,14 +41,19 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/interface_name_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginStart="3dp"
-                        android:ellipsize="end"
-                        android:maxLength="16"
+                        android:ellipsize="marquee"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:singleLine="true"
+                        android:scrollHorizontally="true"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:ems="10"
                         android:padding="5dp"
                         android:textAppearance="?attr/textAppearanceHeadline6" />
 
@@ -116,7 +121,7 @@
                     </com.google.android.material.chip.ChipGroup>
                 </LinearLayout>
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/interface_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -127,7 +132,7 @@
                     android:textSize="@dimen/default_font_text_view"
                     android:textStyle="italic" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/interface_apps_count"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

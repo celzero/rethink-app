@@ -66,7 +66,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
     companion object {
         private const val DELAY_MS = 1500L
-        private const val TAG = "WgConfigAdapter"
+        private const val TAG = "WgCfgAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
 
@@ -115,7 +115,8 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
         private var job: Job? = null
 
         fun update(config: WgConfigFiles) {
-            b.interfaceNameText.text = config.name.take(12)
+            b.interfaceNameText.text = config.name
+            b.interfaceNameText.isSelected = true
             b.interfaceIdText.text = context.getString(R.string.single_argument_parenthesis, config.id.toString())
             b.interfaceSwitch.isChecked = config.isActive && VpnController.hasTunnel()
             setupClickListeners(config)
