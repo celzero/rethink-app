@@ -240,7 +240,8 @@ class AppWiseDomainsAdapter(
                 b.progress.visibility = View.GONE
                 return
             }
-            val status = DomainRulesManager.getDomainRule(conn.appOrDnsName, uid)
+            val status = DomainRulesManager.status(conn.appOrDnsName, uid)
+            Logger.vv(LOG_TAG_UI, "$TAG domain: ${conn.appOrDnsName}, status: $status")
             when (status) {
                 DomainRulesManager.Status.NONE -> {
                     b.progress.setIndicatorColor(
