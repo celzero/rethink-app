@@ -182,7 +182,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     }
 
     private fun displayProxyStatus() {
-        val proxy = ProxyManager.getProxyIdForApp(appInfo.uid)
+        val proxy = ProxyManager.getProxyIdForApp(uid)
         if (proxy.isEmpty() || proxy == ID_NONE) {
             b.aadProxyDetails.visibility = View.GONE
             return
@@ -222,6 +222,15 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     }
 
     private fun displayDataUsage() {
+        if (!::appInfo.isInitialized) {
+            Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in displayDataUsage")
+            // Set default values when appInfo is not available
+            b.aadDataUsageStatus.text = getString(R.string.two_argument,
+                getString(R.string.symbol_upload, "0 B"),
+                getString(R.string.symbol_download, "0 B"))
+            return
+        }
+
         val u = Utilities.humanReadableByteCount(appInfo.uploadBytes, true)
         val uploadBytes = getString(R.string.symbol_upload, u)
         val d = Utilities.humanReadableByteCount(appInfo.downloadBytes, true)
@@ -274,8 +283,18 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     private fun setupClickListeners() {
 
         b.aadAppInfoIcon.setOnClickListener {
+            if (!::appInfo.isInitialized) {
+                Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in aadAppInfoIcon click listener, using uid: $uid")
+                showToastUiCentered(
+                    this,
+                    this.getString(R.string.ctbs_app_info_not_available_toast),
+                    Toast.LENGTH_SHORT
+                )
+                return@setOnClickListener
+            }
+
             io {
-                val appNames = FirewallManager.getAppNamesByUid(appInfo.uid)
+                val appNames = FirewallManager.getAppNamesByUid(uid)
                 uiCtx {
                     if (appNames.count() == 1) {
                         openAndroidAppInfo(this, appInfo.packageName)
@@ -417,13 +436,19 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
 
         b.aadCloseConnsChip.setOnClickListener {
+            if (!::appInfo.isInitialized) {
+                Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in aadCloseConnsChip click listener, using uid: $uid")
+                showCloseConnectionDialog(uid, "Unknown App")
+                return@setOnClickListener
+            }
+
             showCloseConnectionDialog(uid, appInfo.appName)
         }
     }
 
     private fun updateExcludeProxyStatus(isExcluded: Boolean) {
         io {
-            FirewallManager.updateIsProxyExcluded(appInfo.uid, isExcluded)
+            FirewallManager.updateIsProxyExcluded(uid, isExcluded)
         }
     }
 
