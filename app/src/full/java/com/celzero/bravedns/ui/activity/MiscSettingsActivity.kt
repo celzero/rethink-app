@@ -874,6 +874,12 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     fun showAppTriggerPackageDialog(context: Context, onPackageSet: (String) -> Unit) {
+        // Detect tablet and adjust padding accordingly
+        val isTablet = context.resources.configuration.smallestScreenWidthDp >= 720
+        val dialogPadding = if (isTablet) 80 else 50
+        val scrollPadding = if (isTablet) 60 else 40
+        val textSize = if (isTablet) 18f else 16f
+
         val editText = AppCompatEditText(context).apply {
             hint = context.getString(R.string.adv_tasker_dialog_edit_hint)
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
@@ -881,23 +887,24 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             if (persistentState.appTriggerPackages.isNotEmpty()) {
                 setText(persistentState.appTriggerPackages)
             }
-            setPadding(50, 40, 50, 40)
+            setPadding(dialogPadding, 40, dialogPadding, 40)
             gravity = Gravity.TOP or Gravity.START
             android.R.style.Widget_Material_EditText
+            this.textSize = textSize
         }
 
         val selectableTextView = AppCompatTextView(context).apply {
             text = context.getString(R.string.adv_tasker_dialog_msg)
             setTextIsSelectable(true)
-            setPadding(50, 40, 50, 0)
-            textSize = 16f
+            setPadding(dialogPadding, 40, dialogPadding, 0)
+            textSize = this@apply.textSize
         }
 
         val instructionsTextView = AppCompatTextView(context).apply {
             text = context.getString(R.string.adv_tasker_dialog_instructions)
             setTextIsSelectable(true)
-            setPadding(50, 40, 50, 0)
-            textSize = 16f
+            setPadding(dialogPadding, 40, dialogPadding, 0)
+            textSize = this@apply.textSize
         }
 
         // add a LinearLayout as the single child of the ScrollView, then add the text view and
@@ -910,7 +917,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         }
 
         val scrollView = ScrollView(context).apply {
-            setPadding(40, 10, 40, 0)
+            setPadding(scrollPadding, 10, scrollPadding, 0)
             addView(linearLayout)
         }
 
