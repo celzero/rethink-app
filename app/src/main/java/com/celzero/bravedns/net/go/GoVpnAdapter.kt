@@ -1157,6 +1157,12 @@ class GoVpnAdapter : KoinComponent {
                     val res = getProxies()?.getProxy(id.togs())?.pause()
                     Logger.i(LOG_TAG_VPN, "$TAG paused proxy (ssid+mobile): $id, res: $res")
                 }
+                if (stats == Backend.TPU && !isWireGuardMobileOnly && !useOnlyOnSsid) {
+                    // if the proxy is paused, then resume it
+                    // this is needed when the tunnel is reconnected and the proxies are paused
+                    val res = getProxies()?.getProxy(id.togs())?.resume()
+                    Logger.i(LOG_TAG_VPN, "$TAG resumed proxy (non-metered/ssid): $id, res: $res")
+                }
             }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG err refreshing proxies: ${e.message}", e)
