@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_about" translatable="true">Par lietotni</string>
+    <string name="title_settings" translatable="true">Iestatījumi</string>
+    <string name="title_statistics" translatable="true">Statistika</string>
+    <string name="skip" translatable="true">Izlaist</string>
+    <string name="finish" translatable="true">Pabeigt</string>
+    <string name="lbl_cancel" translatable="true">Atcelt</string>
+    <string name="lbl_dismiss" translatable="true">Noraidīt</string>
+    <string name="lbl_allowed" translatable="true">Atļauts</string>
+    <string name="lbl_blocked" translatable="true">Bloķēts</string>
+    <string name="lbl_disabled" translatable="true">Atspējots</string>
+    <string name="lbl_domain" translatable="true">Domēns</string>
+    <string name="lbl_wildcard" translatable="true">Aizstājējzīme</string>
+    <string name="lbl_rules" translatable="true">Noteikumi</string>
+    <string name="lbl_configure" translatable="true">Pielāgot</string>
+    <string name="lbl_logs" translatable="true">Aktivitātes žurnāli</string>
+    <string name="lbl_network" translatable="true">Tīkls</string>
+    <string name="lbl_create" translatable="true">Izveidot</string>
+    <string name="lbl_import" translatable="true">Ievietot</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_addresses" translatable="true">Adreses</string>
+    <string name="lbl_applications" translatable="true">Lietotnes</string>
+    <string name="lbl_delete" translatable="true">Dzēst</string>
+    <string name="lbl_proceed" translatable="true">Turpināt</string>
+    <string name="lbl_random" translatable="true">(nejauši)</string>
+    <string name="lbl_mtu" translatable="true">MTU bloks</string>
+    <string name="lbl_auto" translatable="true">(automātiski)</string>
+    <string name="lbl_include" translatable="true">Iekļaut</string>
+    <string name="lbl_active" translatable="true">Aktīvs</string>
+    <string name="lbl_inactive" translatable="true">Neaktīvs</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_add" translatable="true">pievienot</string>
+    <string name="lbl_sec" translatable="true">sek.</string>
+    <string name="lbl_min" translatable="true">min.</string>
+    <string name="lbl_hour" translatable="true">st.</string>
+    <string name="lbl_day" translatable="true">diena</string>
+    <string name="lbl_insecure" translatable="true">(nedrošs)</string>
+    <string name="lbl_optional" translatable="true">(neobligāts)</string>
+    <string name="lbl_save" translatable="true">saglabāt</string>
+    <string name="lbl_cache" translatable="true">Kešatmiņa</string>
+    <string name="lbl_status" translatable="true">Statuss</string>
+    <string name="lbl_remove" translatable="true">Noņemt</string>
+    <string name="settings_title_desc" translatable="true">Ļoti pielāgojams DNS un ugunsmūris</string>
+    <string name="about_title_desc" translatable="true">Atklāj un bloķē tīkla drošības draudus</string>
+    <string name="lbl_maybe_blocked" translatable="true">Varbūt bloķēts</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS un SOCKS5</string>
+    <string name="lbl_qr_code" translatable="true">QR kods</string>
+    <string name="lbl_dns_servers" translatable="true">DNS serveri</string>
+    <string name="lbl_ip_rules" translatable="true">IP noteikumi</string>
+    <string name="lbl_domain_rules" translatable="true">Domēna noteikumi</string>
+    <string name="firewall_rules" translatable="true">Tīkla noteikumi</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">Vai tiešām dzēst šī noteikuma žurnālus?</string>
+    <string name="univ_firewall_dialog_title" translatable="true">Vai tiešām dzēst IP noteikumu?</string>
+</resources>
