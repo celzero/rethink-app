@@ -162,19 +162,19 @@
         <activity
             android:name=".ui.activity.DomainConnectionsActivity"
             android:finishOnTaskLaunch="true" />
-        <activity
+        <!--<activity
             android:name=".ui.activity.PingTestActivity"
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.RpnCountriesActivity"
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.RpnAvailabilityCheckActivity"
-            android:finishOnTaskLaunch="true" />
+            android:finishOnTaskLaunch="true" />-->
         <activity android:name=".ui.activity.FragmentHostActivity"
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.RpnWinProxyDetailsActivity"
             android:finishOnTaskLaunch="true" />
-        <activity android:name=".ui.location.LocationSelectorActivity"
-            android:finishOnTaskLaunch="true" />
+       <!-- <activity android:name=".ui.location.LocationSelectorActivity"
+            android:finishOnTaskLaunch="true" />-->
 
         <receiver
             android:name=".receiver.BraveAutoStartReceiver"
