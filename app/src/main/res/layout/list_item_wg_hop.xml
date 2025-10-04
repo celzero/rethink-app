@@ -30,7 +30,7 @@
                 android:layout_toStartOf="@id/wg_hop_list_checkbox"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/wg_hop_list_name_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/wg_hop_list_desc_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -16,7 +16,7 @@
         android:paddingBottom="60dp"
         android:orientation="vertical">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/settings_activity_vpn_heading_text"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
@@ -31,7 +31,7 @@
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/settings_activity_vpn_lockdown_desc"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
@@ -97,7 +97,7 @@
                         android:layout_toEndOf="@id/ac_radio_never_split"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
@@ -107,7 +107,7 @@
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
@@ -150,7 +150,7 @@
                         android:layout_toEndOf="@id/ac_radio_split_auto"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
@@ -160,7 +160,7 @@
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
@@ -203,7 +203,7 @@
                         android:layout_toEndOf="@id/ac_radio_split_tcp"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
@@ -213,7 +213,7 @@
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
@@ -256,7 +256,7 @@
                         android:layout_toEndOf="@id/ac_radio_split_tls"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
@@ -269,7 +269,7 @@
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
@@ -312,7 +312,7 @@
                         android:layout_toEndOf="@id/ac_radio_desync"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
@@ -325,7 +325,7 @@
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
@@ -340,7 +340,7 @@
             </RadioGroup>
         </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/ac_retry_title_text"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
@@ -355,7 +355,7 @@
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/ac_retry_title_desc"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
@@ -420,7 +420,7 @@
                         android:layout_toEndOf="@id/ac_radio_never_retry"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
@@ -433,7 +433,7 @@
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
@@ -476,7 +476,7 @@
                         android:layout_toEndOf="@id/ac_radio_retry_with_split"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
@@ -486,7 +486,7 @@
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
@@ -528,7 +528,7 @@
                         android:layout_toEndOf="@id/ac_radio_retry_after_split"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
@@ -538,7 +538,7 @@
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"

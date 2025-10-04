@@ -230,7 +230,7 @@ class WelcomeActivityTest {
             try {
                 val dotsField = WelcomeActivity::class.java.getDeclaredField("dots")
                 dotsField.isAccessible = true
-                val dots = dotsField.get(activity) as? Array<TextView?>
+                val dots = dotsField.get(activity) as? Array<androidx.appcompat.widget.AppCompatTextView?>
 
                 dots?.let {
                     assertEquals("Should have 4 dots for 4 layouts", 4, it.size)
@@ -526,7 +526,7 @@ class WelcomeActivityTest {
             val adapter = constructor.newInstance(activity)
 
             // Create a test view
-            val testView = TextView(context)
+            val testView = androidx.appcompat.widget.AppCompatTextView(context)
 
             // Test isViewFromObject method
             val isViewFromObjectMethod = myPagerAdapterClass.getMethod("isViewFromObject", android.view.View::class.java, Any::class.java)
@@ -536,7 +536,7 @@ class WelcomeActivityTest {
             assertTrue("Should return true for same view object", resultSame)
 
             // Test with different object
-            val differentView = TextView(context)
+            val differentView = androidx.appcompat.widget.AppCompatTextView(context)
             val resultDifferent = isViewFromObjectMethod.invoke(adapter, testView, differentView) as Boolean
             assertFalse("Should return false for different view object", resultDifferent)
 
@@ -806,7 +806,7 @@ class WelcomeActivityTest {
                     // Verify dots array is properly sized
                     val dotsField = WelcomeActivity::class.java.getDeclaredField("dots")
                     dotsField.isAccessible = true
-                    val dots = dotsField.get(activity) as? Array<TextView?>
+                    val dots = dotsField.get(activity) as? Array<androidx.appcompat.widget.AppCompatTextView?>
 
                     dots?.let {
                         assertEquals("Dots array should have 4 elements", 4, it.size)

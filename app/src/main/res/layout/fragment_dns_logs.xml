@@ -81,7 +81,7 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/query_list_logs_disabled_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -41,7 +41,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/rpnc_flag_text"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
@@ -93,7 +93,7 @@
 
                 </com.google.android.material.chip.ChipGroup>
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/rpnc_status_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -112,7 +112,7 @@
                     android:layout_marginEnd="5dp"
                     android:visibility="visible">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/rpnc_uptime_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -124,7 +124,7 @@
                         android:textSize="@dimen/default_font_text_view"
                         android:visibility="visible" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/rpnc_rx_tx_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

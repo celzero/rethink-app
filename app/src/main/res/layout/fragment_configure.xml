@@ -152,7 +152,7 @@
                     android:layout_centerInParent="true"
                     android:src="@drawable/firewall_home_screen" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/fs_firewall_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -196,7 +196,7 @@
                     android:src="@drawable/ic_proxy" />
 
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/fs_proxy_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -239,7 +239,7 @@
                     android:layout_centerInParent="true"
                     android:src="@drawable/ic_network_tunnel" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/fs_network_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -283,7 +283,7 @@
                     android:src="@drawable/ic_other_settings" />
 
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/fs_others_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

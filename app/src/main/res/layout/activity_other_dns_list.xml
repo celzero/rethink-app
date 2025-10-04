@@ -39,7 +39,7 @@
                     android:layout_height="match_parent"
                     android:padding="16dp">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/initial_doh"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/rethink_header_text" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/abbr_doh"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -102,7 +102,7 @@
                     android:layout_height="match_parent"
                     android:padding="16dp">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/initial_dot"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -112,7 +112,7 @@
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/rethink_header_text" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/abbr_dot"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -180,7 +180,7 @@
                     android:gravity="center"
                     android:padding="16dp">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/initial_dnscrypt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -190,7 +190,7 @@
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/rethink_header_text" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/abbr_dnscrypt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -249,7 +249,7 @@
                     android:layout_height="match_parent"
                     android:padding="16dp">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/initial_dnsproxy"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -259,7 +259,7 @@
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/rethink_header_text" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/abbr_dnsproxy"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -320,7 +320,7 @@
                     android:layout_height="match_parent"
                     android:padding="16dp">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/initial_odoh"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -330,7 +330,7 @@
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/rethink_header_text" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/abbr_odoh"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -395,7 +395,7 @@
                     android:layout_height="match_parent"
                     android:padding="16dp">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/initial_rethink_dns"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -405,7 +405,7 @@
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/rethink_header_text" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/abbr_rethink_dns"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

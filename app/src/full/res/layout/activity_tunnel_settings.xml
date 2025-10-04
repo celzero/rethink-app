@@ -86,14 +86,14 @@
                         android:layout_toEndOf="@id/settings_activity_allow_bypass_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/settings_allow_bypass_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/settings_activity_allow_bypass_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -209,7 +209,7 @@
                         android:layout_toEndOf="@id/settings_activity_lan_traffic_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_lan_traffic_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -217,7 +217,7 @@
                             android:text="@string/settings_allow_lan_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
@@ -265,7 +265,7 @@
                         android:layout_toEndOf="@id/settings_activity_all_network_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_all_network_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -273,7 +273,7 @@
                             android:text="@string/settings_network_all_networks"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
@@ -377,7 +377,7 @@
                         android:layout_toEndOf="@id/settings_r_in_r_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_r_in_r_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -385,7 +385,7 @@
                             android:text="@string/settings_rinr_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_r_in_r_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -435,7 +435,7 @@
                         android:layout_toEndOf="@id/settings_activity_default_dns_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/settings_activity_default_dns_heading"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -444,7 +444,7 @@
                             android:text="@string/settings_default_dns_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/settings_activity_default_dns_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -526,7 +526,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/settings_activity_wireguard_text"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
@@ -671,7 +671,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/settings_activity_tcp_text"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
@@ -928,7 +928,7 @@
                         android:layout_toEndOf="@id/settings_activity_ip_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_ip_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -936,7 +936,7 @@
                             android:text="@string/settings_ip_network_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_ip_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -986,7 +986,7 @@
                         android:layout_toEndOf="@id/settings_activity_ptrans_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_ptrans_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -994,7 +994,7 @@
                             android:text="@string/settings_ptrans_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_ptrans_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

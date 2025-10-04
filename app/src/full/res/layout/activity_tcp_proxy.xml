@@ -13,7 +13,7 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/settings_proxy"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
@@ -63,7 +63,7 @@
                     android:layout_marginStart="7dp"
                     android:layout_toEndOf="@id/tcp_proxy_icon">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
                         android:padding="10dp" />
                 </RelativeLayout>
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tcp_proxy_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
                     android:text="Controlled access over the internet. Improves the security and enhances the privacy of the user. Ensured Privacy. Blocked Sites Becomes Accessible."
                     android:textSize="@dimen/default_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tcp_proxy_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -138,7 +138,7 @@
                     android:layout_below="@id/tcp_proxy_add_apps"
                     android:layout_toEndOf="@id/tcp_proxy_icon">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tcp_error_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -189,7 +189,7 @@
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@id/warp_icon">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -208,7 +208,7 @@
                         android:padding="10dp" />
                 </RelativeLayout>
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/warp_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

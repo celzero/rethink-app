@@ -369,7 +369,7 @@
                             android:layout_toStartOf="@id/lockdown_check"
                             android:orientation="vertical">
 
-                            <TextView
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/global_lockdown_title_tv"
                                 style="@style/TextAppearance.AppCompat.Subhead"
                                 android:layout_width="wrap_content"
@@ -377,7 +377,7 @@
                                 android:text="@string/firewall_rule_global_lockdown"
                                 android:textSize="@dimen/large_font_text_view" />
 
-                            <TextView
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="5dp"
@@ -414,7 +414,7 @@
                             android:layout_toStartOf="@id/catch_all_check"
                             android:orientation="vertical">
 
-                            <TextView
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/catch_all_title_tv"
                                 style="@style/TextAppearance.AppCompat.Subhead"
                                 android:layout_width="wrap_content"
@@ -422,7 +422,7 @@
                                 android:text="@string/catch_all_wg_dialog_title"
                                 android:textSize="@dimen/large_font_text_view" />
 
-                            <TextView
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="5dp"

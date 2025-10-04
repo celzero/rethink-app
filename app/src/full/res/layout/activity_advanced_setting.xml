@@ -13,7 +13,7 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/settings_heading"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
@@ -71,7 +71,7 @@
                         android:layout_toEndOf="@id/settings_experimental_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_experimental_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -79,7 +79,7 @@
                             android:text="@string/adv_set_experimental_title"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_experimental_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -128,7 +128,7 @@
                         android:layout_toEndOf="@id/settings_auto_dial_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_auto_dial_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -136,7 +136,7 @@
                             android:text="@string/set_auto_dial_title"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_auto_dial_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -205,7 +205,7 @@
                         android:layout_toEndOf="@id/settings_clear_residue_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_clear_residue_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -213,7 +213,7 @@
                             android:text=""
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_clear_residue_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

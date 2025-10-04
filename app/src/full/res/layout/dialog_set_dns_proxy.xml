@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:visibility="visible">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
         android:padding="10dp"
         android:weightSum="1">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -91,7 +91,7 @@
         android:padding="10dp"
         android:weightSum="1">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -118,7 +118,7 @@
         android:padding="10dp"
         android:weightSum="1">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -140,7 +140,7 @@
 
     </LinearLayout>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dialog_dns_proxy_error_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

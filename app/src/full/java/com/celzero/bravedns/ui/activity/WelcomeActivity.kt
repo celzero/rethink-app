@@ -46,7 +46,7 @@ import org.koin.android.ext.android.inject
 class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
 
     private val b by viewBinding(ActivityWelcomeBinding::bind)
-    private lateinit var dots: Array<TextView?>
+    private lateinit var dots: Array<androidx.appcompat.widget.AppCompatTextView?>
     private val layouts: IntArray = intArrayOf(
         R.layout.welcome_slide1,
         R.layout.welcome_slide2,
@@ -146,7 +146,7 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
         b.layoutDots.removeAllViews()
 
         for (i in dots.indices) {
-            dots[i] = TextView(this)
+            dots[i] = androidx.appcompat.widget.AppCompatTextView(this)
             dots[i]?.text = updateHtmlEncodedText("&#8226;")
             dots[i]?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30F)
             dots[i]?.setTextColor(colorInActive[currentPage])

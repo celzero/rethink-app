@@ -57,7 +57,7 @@
                     android:layout_weight="0.65"
                     android:orientation="horizontal">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/connection_app_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
                     android:layout_weight="0.2"
                     android:orientation="vertical">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/conn_latency_txt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
                     android:layout_weight="0.15"
                     android:orientation="vertical">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/connection_flag"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -138,7 +138,7 @@
                     android:layout_weight="0.65"
                     android:orientation="vertical">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/connection_ip_address"
                         style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="match_parent"
@@ -155,7 +155,7 @@
                         android:textSize="@dimen/large_font_text_view"
                         android:typeface="monospace" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/connection_domain"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -182,7 +182,7 @@
                     android:layout_weight="0.20"
                     android:orientation="vertical">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/connection_response_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -227,7 +227,7 @@
                     android:layout_weight="0.65"
                     android:orientation="horizontal">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/connection_data_usage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -253,7 +253,7 @@
                     android:layout_weight="0.2"
                     android:orientation="vertical">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/connection_duration"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -273,7 +273,7 @@
                     android:layout_weight="0.15"
                     android:orientation="vertical">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/connection_delay"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -290,7 +290,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?attr/divider" />

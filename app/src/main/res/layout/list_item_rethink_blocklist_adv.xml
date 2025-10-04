@@ -62,7 +62,7 @@
                 android:minWidth="0dp"
                 android:minHeight="0dp" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/crp_label_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

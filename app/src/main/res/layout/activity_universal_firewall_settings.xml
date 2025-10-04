@@ -17,7 +17,7 @@
         android:orientation="vertical"
         android:paddingBottom="5dp">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/settings_activity_vpn_heading_text"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
@@ -33,7 +33,7 @@
             android:textStyle="bold" />
 
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
@@ -52,7 +52,7 @@
             android:layout_marginTop="2dp"
             android:layout_marginRight="2dp">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/firewall_all_apps_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -114,7 +114,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?attr/homeScreenBtnBackground"
@@ -131,7 +131,7 @@
             android:layout_marginTop="2dp"
             android:layout_marginRight="2dp">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/firewall_background_mode_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -194,7 +194,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?attr/homeScreenBtnBackground"
@@ -211,7 +211,7 @@
             android:layout_marginTop="2dp"
             android:layout_marginRight="2dp">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/firewall_unknown_connection_mode_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -273,7 +273,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?attr/homeScreenBtnBackground"
@@ -290,7 +290,7 @@
             android:layout_marginTop="2dp"
             android:layout_marginRight="2dp">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/firewall_udp_connection_mode_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -352,7 +352,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?attr/homeScreenBtnBackground"
@@ -368,7 +368,7 @@
             android:layout_marginTop="2dp"
             android:layout_marginRight="2dp">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/firewall_disallow_dns_bypass_mode_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -430,7 +430,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?attr/homeScreenBtnBackground"
@@ -446,7 +446,7 @@
             android:layout_marginTop="2dp"
             android:layout_marginRight="2dp">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/firewall_block_new_app_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -508,7 +508,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?attr/homeScreenBtnBackground"
@@ -525,7 +525,7 @@
             android:layout_marginRight="2dp"
             android:visibility="gone">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/firewall_check_ipv4_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -558,7 +558,7 @@
             android:layout_marginRight="2dp"
             android:layout_marginBottom="2dp">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/firewall_block_metered_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -620,7 +620,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?attr/homeScreenBtnBackground"
@@ -637,7 +637,7 @@
             android:layout_marginRight="2dp"
             android:layout_marginBottom="2dp">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/firewall_block_http_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -699,7 +699,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?attr/homeScreenBtnBackground"
@@ -716,7 +716,7 @@
             android:layout_marginRight="2dp"
             android:layout_marginBottom="2dp">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/firewall_univ_lockdown_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -779,7 +779,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?attr/homeScreenBtnBackground"

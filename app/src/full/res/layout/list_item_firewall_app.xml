@@ -116,7 +116,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?attr/divider" />

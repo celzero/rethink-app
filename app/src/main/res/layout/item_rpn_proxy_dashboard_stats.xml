@@ -30,7 +30,7 @@
                 android:background="@drawable/bg_glow_ring"
                 android:contentDescription="Proxy Icon" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/proxy_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
                 android:textColor="?attr/primaryTextColor"
                 android:paddingHorizontal="8dp" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/proxy_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
                     android:layout_height="18dp"
                     android:src="@drawable/ic_wireguard_icon"
                     android:tint="?attr/accentGood" />
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/proxy_protocol"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
                     android:layout_height="18dp"
                     android:src="@drawable/ic_firewall_lockdown_off"
                     android:tint="?attr/secondaryTextColor" />
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/proxy_country"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -130,7 +130,7 @@
                     android:layout_height="18dp"
                     android:src="@drawable/ic_firewall_lockdown_off"
                     android:tint="?attr/secondaryTextColor" />
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/proxy_port"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -156,7 +156,7 @@
                     android:layout_height="18dp"
                     android:src="@drawable/ic_firewall_lockdown_off"
                     android:tint="?attr/secondaryTextColor" />
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/proxy_latency"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

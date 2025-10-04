@@ -8,7 +8,7 @@
     android:orientation="vertical"
     android:paddingBottom="40dp">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="60dp"
         android:layout_height="3dp"
         android:layout_gravity="center"
@@ -25,7 +25,7 @@
         android:orientation="horizontal"
         android:padding="5dp">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/brbs_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
                 android:layout_toEndOf="@id/brbs_backup_icon"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="5dp"
@@ -87,7 +87,7 @@
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="5dp"
@@ -145,7 +145,7 @@
                 android:layout_toEndOf="@id/brbs_restore_icon"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/textView3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -155,7 +155,7 @@
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/textView4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
