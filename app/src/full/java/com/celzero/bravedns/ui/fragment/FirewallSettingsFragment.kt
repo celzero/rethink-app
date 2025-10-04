@@ -30,6 +30,8 @@ import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
+import com.celzero.bravedns.util.NewSettingsManager
+import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -59,10 +61,12 @@ class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings), 
         b.appWiseIpDomainRl.setOnClickListener { openAppWiseIpScreen() }
 
         b.tombstoneAppRl.setOnClickListener {
+            NewSettingsManager.markSettingSeen(NewSettingsManager.TOMBSTONE_APP_SETTING)
             b.tombstoneAppSwitch.isChecked = !b.tombstoneAppSwitch.isChecked
         }
 
         b.tombstoneAppSwitch.setOnCheckedChangeListener { _, isChecked ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.TOMBSTONE_APP_SETTING)
             persistentState.tombstoneApps = isChecked
             io { rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE) }
         }
@@ -96,6 +100,16 @@ class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings), 
     private fun openUniversalFirewallScreen() {
         val intent = Intent(requireContext(), UniversalFirewallSettingsActivity::class.java)
         startActivity(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        showNewBadgeIfNeeded()
+    }
+
+    private fun showNewBadgeIfNeeded() {
+        val tombstoneSetting = NewSettingsManager.shouldShowBadge(NewSettingsManager.TOMBSTONE_APP_SETTING)
+        b.tombstoneAppTxt.setBadgeDotVisible(requireContext(), tombstoneSetting)
     }
 
     private fun io(f: suspend () -> Unit) = lifecycleScope.launch(Dispatchers.IO) { f() }

@@ -32,8 +32,6 @@ import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.activity.ProxySettingsActivity
 import com.celzero.bravedns.ui.activity.TunnelSettingsActivity
-import com.celzero.bravedns.util.NewSettingsManager
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 
 class ConfigureFragment : Fragment(R.layout.fragment_configure) {
 
@@ -57,11 +55,6 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
         setupClickListeners()
     }
 
-    override fun onResume() {
-        super.onResume()
-        showNewBadgeIfNeeded()
-    }
-
     private fun initView() {
         if (DEBUG) {
             b.fsAdvancedCard.visibility = View.VISIBLE
@@ -73,13 +66,6 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
         b.fsLogsTv.text = getString(R.string.lbl_logs).replaceFirstChar(Char::titlecase)
         b.fsAntiCensorshipTv.text =
             getString(R.string.anti_censorship_title).replaceFirstChar(Char::titlecase)
-    }
-
-    private fun showNewBadgeIfNeeded() {
-        val antiCensorship = NewSettingsManager.shouldShowBadge(NewSettingsManager.ANTI_CENSORSHIP)
-        if (antiCensorship) {
-            b.fsAntiCensorshipTv.setBadgeDotVisible(requireContext(), true)
-        }
     }
 
     private fun setupClickListeners() {
@@ -121,7 +107,6 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
         b.fsAntiCensorshipCard.setOnClickListener {
             // open developer options configuration
             startActivity(ScreenType.ANTI_CENSORSHIP)
-            NewSettingsManager.markSettingSeen(NewSettingsManager.ANTI_CENSORSHIP)
         }
 
         b.fsAdvancedCard.setOnClickListener {

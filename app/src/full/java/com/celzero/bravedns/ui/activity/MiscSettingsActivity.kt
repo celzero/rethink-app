@@ -659,11 +659,13 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
         // Firebase error reporting toggle
         b.settingsFirebaseErrorReportingRl.setOnClickListener {
+            NewSettingsManager.markSettingSeen(NewSettingsManager.ERROR_REPORTING)
             b.settingsFirebaseErrorReportingSwitch.isChecked =
                 !b.settingsFirebaseErrorReportingSwitch.isChecked
         }
 
         b.settingsFirebaseErrorReportingSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.ERROR_REPORTING)
             handleFirebaseErrorReportingToggle(isChecked)
         }
 
@@ -1141,13 +1143,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showNewBadgeIfNeeded() {
-        val providerInfo = NewSettingsManager.shouldShowBadge(NewSettingsManager.PROVIDER_INFO)
-        val appLogs = NewSettingsManager.shouldShowBadge(NewSettingsManager.APP_LOGS)
-        val automation = NewSettingsManager.shouldShowBadge(NewSettingsManager.AUTOMATION)
-
-        b.genSettingsIpInfoTxt.setBadgeDotVisible(this, providerInfo)
-        b.genSettingsConsoleLogTxt.setBadgeDotVisible(this, appLogs)
-        b.genSettingsTaskerTxt.setBadgeDotVisible(this, automation)
+        val errorReporting = NewSettingsManager.shouldShowBadge(NewSettingsManager.ERROR_REPORTING)
+        b.genSettingsFirebaseErrorReportingTxt.setBadgeDotVisible(this, errorReporting)
     }
 
     private fun registerForActivityResult() {

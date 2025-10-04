@@ -549,7 +549,7 @@
                             android:layout_toStartOf="@id/ssid_check"
                             android:orientation="vertical">
 
-                            <TextView
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/ssid_title_tv"
                                 style="@style/TextAppearance.AppCompat.Subhead"
                                 android:layout_width="wrap_content"
@@ -557,7 +557,7 @@
                                 android:text="@string/wg_setting_ssid_title"
                                 android:textSize="@dimen/large_font_text_view" />
 
-                            <TextView
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/ssid_desc_tv"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"

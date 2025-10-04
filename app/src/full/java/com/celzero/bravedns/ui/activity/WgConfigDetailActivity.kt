@@ -179,9 +179,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun showNewBadgeIfNeeded() {
-        val mobile = NewSettingsManager.shouldShowBadge(NewSettingsManager.WG_MOBILE_SETTING)
-
-        b.useMobileTitleTv.setBadgeDotVisible(this, mobile)
+        val ssid = NewSettingsManager.shouldShowBadge(NewSettingsManager.WG_SSID_SETTING)
+        b.ssidTitleTv.setBadgeDotVisible(this, ssid)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {

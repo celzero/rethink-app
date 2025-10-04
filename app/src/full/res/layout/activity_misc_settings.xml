@@ -1067,7 +1067,7 @@
                         android:layout_toEndOf="@id/settings_firebase_error_reporting_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_firebase_error_reporting_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -1075,7 +1075,7 @@
                             android:text="@string/settings_firebase_error_reporting_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_firebase_error_reporting_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
