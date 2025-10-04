@@ -4346,8 +4346,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         if (l.stacktrace()) {
             // disable crash logging for now
             if (false) Logger.crash(LOG_GO_LOGGER, msg) // write to in-mem db
+            FirebaseErrorReporting.recordException(RuntimeException(msg))
             EnhancedBugReport.writeLogsToFile(this, msg)
-            FirebaseErrorReporting.recordException(Throwable(msg))
         } else if (l.user()) {
             showNwEngineNotification(msg)
             // consider all the notifications from go as failure and stop the service
