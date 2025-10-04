@@ -33,11 +33,13 @@ object NewSettingsManager: KoinComponent {
     const val ERROR_REPORTING = "error_reporting"
     const val WG_SSID_SETTING = "wg_ssid_settings"
     const val TOMBSTONE_APP_SETTING = "tombstone_app_setting"
+    const val BLOCK_INCOMING_WG_PACKETS = "block_incoming_wg_packets"
 
     private val newSettingsList = listOf(
         WG_SSID_SETTING,
         ERROR_REPORTING,
-        TOMBSTONE_APP_SETTING
+        TOMBSTONE_APP_SETTING,
+        BLOCK_INCOMING_WG_PACKETS
     )
 
     init {

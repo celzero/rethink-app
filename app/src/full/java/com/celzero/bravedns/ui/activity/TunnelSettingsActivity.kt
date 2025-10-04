@@ -43,6 +43,7 @@ import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -77,6 +78,12 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     override fun onResume() {
         super.onResume()
         handleLockdownModeIfNeeded()
+        showNewBadgeIfNeeded()
+    }
+
+    private fun showNewBadgeIfNeeded() {
+        val blockIncomingWg = NewSettingsManager.shouldShowBadge(NewSettingsManager.BLOCK_INCOMING_WG_PACKETS)
+        b.dvWgBlockIncomingTxt.setBadgeDotVisible(this, blockIncomingWg)
     }
 
     private fun initView() {
@@ -110,6 +117,13 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         // endpoint independent mapping (eim) / endpoint independent filtering (eif)
         b.dvEimfSwitch.isChecked = persistentState.endpointIndependence
+        if (persistentState.endpointIndependence) {
+            b.dvWgBlockIncomingRl.visibility = View.VISIBLE
+            b.dvWgBlockIncomingTxt.text = getString(R.string.two_argument_space, getString(R.string.settings_block_incoming_wg_packets), getString(R.string.lbl_experimental))
+            b.dvWgBlockIncomingSwitch.isChecked = !persistentState.nwEngExperimentalFeatures
+        } else {
+            b.dvWgBlockIncomingRl.visibility = View.GONE
+        }
 
         b.dvTcpKeepAliveSwitch.isChecked = persistentState.tcpKeepAlive
         b.dvTimeoutSeekbar.progress = persistentState.dialTimeoutSec / 60
@@ -337,9 +351,26 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.dvEimfSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.endpointIndependence = isChecked
+            if (isChecked) {
+                b.dvWgBlockIncomingRl.visibility = View.VISIBLE
+                b.dvWgBlockIncomingSwitch.isChecked = !persistentState.nwEngExperimentalFeatures
+            } else {
+                b.dvWgBlockIncomingRl.visibility = View.GONE
+                persistentState.nwEngExperimentalFeatures = false
+            }
         }
 
         b.dvEimfRl.setOnClickListener { b.dvEimfSwitch.isChecked = !b.dvEimfSwitch.isChecked }
+
+        b.dvWgBlockIncomingSwitch.setOnCheckedChangeListener { _, isChecked ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.BLOCK_INCOMING_WG_PACKETS)
+            persistentState.nwEngExperimentalFeatures = !isChecked
+        }
+
+        b.dvWgBlockIncomingRl.setOnClickListener {
+            NewSettingsManager.markSettingSeen(NewSettingsManager.BLOCK_INCOMING_WG_PACKETS)
+            b.dvWgBlockIncomingSwitch.isChecked = !b.dvWgBlockIncomingSwitch.isChecked
+        }
 
         b.dvTcpKeepAliveSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.tcpKeepAlive = isChecked
