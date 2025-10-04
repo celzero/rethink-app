@@ -4,9 +4,7 @@
     android:id="@+id/proxy_info_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="8dp"
     app:cardUseCompatPadding="true"
-    app:cardElevation="8dp"
     app:cardBackgroundColor="?attr/background"
     app:cardCornerRadius="16dp">
 
@@ -201,7 +199,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp" />
 
-        <!-- Action Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -215,7 +212,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Use"
+                android:text="Apps"
                 android:textColor="?attr/primaryTextColor"
                 android:textAllCaps="false"
                 android:icon="@drawable/ic_import_conf"

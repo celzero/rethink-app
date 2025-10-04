@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.fragment
+/*
 
-/*import Logger
+import Logger
 import Logger.LOG_IAB
 import android.content.Intent
 import android.graphics.Color
@@ -24,12 +25,16 @@ import android.os.Bundle
 import android.text.Html
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -44,9 +49,12 @@ import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.GooglePlaySubsAdapter
 import com.celzero.bravedns.adapter.GooglePlaySubsAdapter.SubscriptionChangeListener
 import com.celzero.bravedns.databinding.FragmentRethinkPlusBinding
+import com.celzero.bravedns.iab.BillingListener
 import com.celzero.bravedns.iab.InAppBillingHandler
 import com.celzero.bravedns.iab.InAppBillingHandler.fetchPurchases
+import com.celzero.bravedns.iab.InAppBillingHandler.purchaseSubs
 import com.celzero.bravedns.iab.ProductDetail
+import com.celzero.bravedns.iab.PurchaseDetail
 import com.celzero.bravedns.rpnproxy.PipKeyManager
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.VpnController
@@ -54,9 +62,11 @@ import com.celzero.bravedns.subscription.SubscriptionStateMachineV2
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.activity.RpnAvailabilityCheckActivity
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
+import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.underline
 import com.celzero.bravedns.util.Utilities
 import com.facebook.shimmer.Shimmer
+import com.google.android.gms.common.GooglePlayServicesUtilLight.isGooglePlayServicesAvailable
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -68,7 +78,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), SubscriptionChangeListener {
+class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), SubscriptionChangeListener, BillingListener {
     private val b by viewBinding(FragmentRethinkPlusBinding::bind)
     private var productId = ""
     private var planId = ""
@@ -138,7 +148,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
         return InAppBillingHandler.hasValidSubscription()
     }
 
-    *//*private fun setBanner() {
+    */
+/*private fun setBanner() {
         b.shimmerViewBanner.setShimmer(Shimmer.AlphaHighlightBuilder()
             .setDuration(2000)
             .setBaseAlpha(0.85f)
@@ -197,6 +208,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
         }
     }*//*
 
+
     private fun initTermsAndPolicy() {
         b.termsText.text = updateHtmlEncodedText(getString(R.string.rethink_terms))
         b.termsText.movementMethod = LinkMovementMethod.getInstance()
@@ -251,7 +263,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
             return
         }
 
-        InAppBillingHandler.initiate(requireContext().applicationContext)
+        InAppBillingHandler.initiate(requireContext().applicationContext, this)
         Logger.i(LOG_IAB, "ensureBillingSetup: billing client initiated")
     }
 
@@ -287,7 +299,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
         Logger.v(LOG_IAB, "purchaseSubs: initiated for $productId, $planId")
     }
 
-    *//*private lateinit var dots: Array<TextView?>
+    */
+/*private lateinit var dots: Array<TextView?>
     private val layouts: IntArray = intArrayOf(
         R.drawable.rethink_plus_home_banner,
         R.drawable.rethink_plus_banner_anti_censorship,
@@ -314,6 +327,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
             dots[currentPage]?.setTextColor(colorActive)
         }
     }*//*
+
 
     private fun showLoadingDialog() {
         val builder = MaterialAlertDialogBuilder(requireContext())
@@ -384,6 +398,9 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
         hideLoadingDialog()
         hideErrorDialog()
         hideMsgDialog()
+        if (b.paymentContainer.visibility != View.VISIBLE) {
+            showPaymentContainerUi()
+        }
         if (adapter == null) {
             Logger.d(LOG_IAB, "Adapter is null, initializing it")
             setAdapter(subsProduct)
@@ -498,7 +515,8 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
     }
 
     private fun initObservers() {
-        *//*io {
+        */
+/*io {
             Result.getResultStateFlow().collect { i ->
                 Logger.d(LOG_IAB, "res state: ${i.name}, ${i.message};p? ${i.priority}")
                 if (i.priority == InAppBillingHandler.Priority.HIGH) {
@@ -513,6 +531,7 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
                 }
             }
         }*//*
+
 
         InAppBillingHandler.connectionResultLiveData.distinctUntilChanged().observe(viewLifecycleOwner) { i ->
             if (!i.isSuccess) {
@@ -605,13 +624,15 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
             }
         }
 
-        *//*InAppBillingHandler.transactionErrorLiveData.observe(viewLifecycleOwner) { billingResult ->
+        */
+/*InAppBillingHandler.transactionErrorLiveData.observe(viewLifecycleOwner) { billingResult ->
             if (isAdded && isVisible) {
                 hideLoadingDialog()
                 val error = getTransactionError(billingResult)
                 showErrorDialog(error.title, error.message)
             }
         }*//*
+
     }
 
     private fun handleStateChange(state: SubscriptionStateMachineV2.SubscriptionState) {
@@ -820,4 +841,58 @@ class RethinkPlusFragment : Fragment(R.layout.fragment_rethink_plus), Subscripti
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(SupervisorJob() + Dispatchers.IO) { f() }
     }
-}*/
+
+    override fun onConnectionResult(isSuccess: Boolean, message: String) {
+        if (!isSuccess) {
+            Logger.e(LOG_IAB, "Billing connection failed: $message")
+            ui {
+                if (isAdded && isVisible) {
+                    hideLoadingDialog()
+                    Utilities.showToastUiCentered(
+                        requireContext(),
+                        message,
+                        Toast.LENGTH_SHORT
+                    )
+                    showNotAvailableUi()
+                }
+            }
+            return
+        }
+    }
+
+    override fun purchasesResult(
+        isSuccess: Boolean,
+        purchaseDetailList: List<PurchaseDetail>
+    ) {
+        if (!isSuccess) {
+            Logger.e(LOG_IAB, "purchasesResult: failed to fetch purchases")
+            return
+        }
+    }
+
+    override fun productResult(
+        isSuccess: Boolean,
+        productList: List<ProductDetail>
+    ) {
+        if (!isSuccess) {
+            Logger.e(LOG_IAB, "productResult: failed to fetch product details")
+            ui {
+                if (isAdded && isVisible) {
+                    hideLoadingDialog()
+                    Utilities.showToastUiCentered(
+                        requireContext(),
+                        requireContext().getString(R.string.product_details_error),
+                        Toast.LENGTH_SHORT
+                    )
+                    showNotAvailableUi()
+                    showRethinkNotAvailableUi(
+                        requireContext().getString(R.string.product_details_error)
+                    )
+                    return@ui
+                }
+            }
+            return
+        }
+    }
+}
+*/

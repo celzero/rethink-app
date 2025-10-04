@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.activity
+/*
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -117,3 +118,4 @@ class RpnCountriesActivity: AppCompatActivity(R.layout.activity_rpn_countries) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }
+*/

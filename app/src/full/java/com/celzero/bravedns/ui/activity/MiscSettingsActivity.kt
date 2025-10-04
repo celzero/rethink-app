@@ -149,6 +149,11 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         } else {
             // Show Firebase error reporting for play and website variants
             b.settingsFirebaseErrorReportingRl.visibility = View.VISIBLE
+            // Firebase error reporting
+            b.settingsFirebaseErrorReportingSwitch.isChecked = persistentState.firebaseErrorReportingEnabled
+            b.settingsActivityCheckUpdateRl.visibility = View.VISIBLE
+            // check for app updates
+            b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
         }
 
         // add ipInfo inc to the desc
@@ -162,12 +167,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt()).name.lowercase()
                 .replaceFirstChar(Char::titlecase).replace("_", " ")
 
-        // check for app updates
-        b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
         // camera and microphone access
         b.settingsMicCamAccessSwitch.isChecked = persistentState.micCamAccess
-        // Firebase error reporting
-        b.settingsFirebaseErrorReportingSwitch.isChecked = persistentState.firebaseErrorReportingEnabled
 
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {

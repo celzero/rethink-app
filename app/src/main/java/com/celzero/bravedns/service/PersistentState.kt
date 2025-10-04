@@ -388,7 +388,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var useFallbackDnsToBypass by booleanPref("use_fallback_dns_to_bypass").withDefault<Boolean>(true)
 
     // Firebase error reporting enabled (only for play and website variants)
-    var firebaseErrorReportingEnabled by booleanPref("firebase_error_reporting").withDefault<Boolean>(true)
+    var firebaseErrorReportingEnabled by booleanPref("firebase_error_reporting").withDefault<Boolean>(!Utilities.isFdroidFlavour())
 
     // setting to enable/disable tombstone apps feature
     var tombstoneApps by booleanPref("tombstone_apps").withDefault<Boolean>(false)
