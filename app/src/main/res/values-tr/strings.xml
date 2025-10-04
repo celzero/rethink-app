@@ -1030,4 +1030,10 @@
     <string name="lbl_unselected" translatable="true">Seçilmemiş</string>
     <string name="exclude_apps_from_proxy">Uygulamayı tüm proxy\'lerden hariç tut</string>
     <string name="exclude_apps_from_proxy_failure_toast">Bu uygulama proxy\'leri atlar (bypass)</string>
+    <string name="lbl_test" translatable="true">test</string>
+    <string name="lbl_protos" translatable="true">protolar</string>
+    <string name="lbl_experimental" translatable="true">(deneysel)</string>
+    <string name="lbl_service_providers" translatable="true">Hizmet Sağlayıcıları</string>
+    <string name="lbl_hop" translatable="true">Aktarıcılar</string>
+    <string name="lbl_manual" translatable="true">Talimatlar</string>
 </resources>
