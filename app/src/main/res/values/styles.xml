@@ -111,12 +111,6 @@
 
         <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDark</item>
         <item name="homeScreenBtnGradientStart">@color/colorPrimary</item>
-
-        <!-- Force switch colors -->
-        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
-        <!-- Also override SwitchMaterial style -->
-        <item name="switchStyle">@style/CustomMaterialSwitch</item>
-        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
     </style>
 
     <style name="AppThemeWhite" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
@@ -215,12 +209,6 @@
 
         <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDarkLight</item>
         <item name="homeScreenBtnGradientStart">@color/accentGoodLight</item>
-
-        <!-- Force switch colors -->
-        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
-        <!-- Also override SwitchMaterial style -->
-        <item name="switchStyle">@style/CustomMaterialSwitch</item>
-        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
     </style>
 
     <style name="AppThemeTrueBlack" parent="Theme.MaterialComponents.NoActionBar.Bridge">
@@ -392,12 +380,6 @@
 
         <item name="homeScreenBtnGradientEnd">@color/accentGoodLightPlus</item>
         <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkLightPlus</item>
-
-        <!-- Force switch colors -->
-        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
-        <!-- Also override SwitchMaterial style -->
-        <item name="switchStyle">@style/CustomMaterialSwitch</item>
-        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
     </style>
 
     <style name="AppThemeTrueBlackPlus" parent="Theme.MaterialComponents.NoActionBar.Bridge">
