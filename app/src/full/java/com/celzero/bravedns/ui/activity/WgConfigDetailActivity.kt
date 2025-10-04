@@ -578,7 +578,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 b.useMobileCheck.isChecked = !b.useMobileCheck.isChecked
                 return@setOnClickListener
             }
-            NewSettingsManager.markSettingSeen(NewSettingsManager.WG_MOBILE_SETTING)
             updateUseOnMobileNetwork(b.useMobileCheck.isChecked)
         }
 
@@ -587,7 +586,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }
 
         b.hopBtn.setOnClickListener {
-            NewSettingsManager.markSettingSeen(NewSettingsManager.WG_HOP_SETTING)
             val mapping = WireguardManager.getConfigFilesById(configId)
             if (mapping == null) {
                 showInvalidConfigDialog()
@@ -895,6 +893,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         updateErrorLayouts(hasPermissions, isLocationEnabled, permissionErrorLayout, locationErrorLayout)
 
         sw.setOnCheckedChangeListener { _, isChecked ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.WG_SSID_SETTING)
             val mapping = WireguardManager.getConfigFilesById(configId)
             if (mapping?.useOnlyOnMetered == true && isChecked) {
                 Utilities.showToastUiCentered(
