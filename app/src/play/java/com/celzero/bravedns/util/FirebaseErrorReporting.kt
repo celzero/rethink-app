@@ -36,7 +36,7 @@ object FirebaseErrorReporting : KoinComponent {
     fun initialize() {
         try {
             val crashlytics = FirebaseCrashlytics.getInstance()
-            crashlytics.setCrashlyticsCollectionEnabled(persistentState.firebaseErrorReportingEnabled)
+            crashlytics.isCrashlyticsCollectionEnabled = persistentState.firebaseErrorReportingEnabled
             Logger.i(LOG_FIREBASE, "crashlytics initialized, enabled: ${persistentState.firebaseErrorReportingEnabled}")
         } catch (e: Exception) {
             Logger.w(LOG_FIREBASE, "crashlytics not available: ${e.message}")
