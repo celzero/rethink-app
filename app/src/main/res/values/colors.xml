@@ -100,6 +100,35 @@
     <color name="defaultToggleBtnTxt">#FDFDFD</color>
     <color name="defaultToggleBtnBg">#393939</color>
 
+    <!-- Material 3 Color System - Dark Theme -->
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorPrimaryContainer">#4f4f4f</color>
+    <color name="colorOnPrimaryContainer">#FFFFFF</color>
+
+    <color name="colorSecondaryContainer">#565656</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
+    <color name="colorOnSecondaryContainer">#FFFFFF</color>
+
+    <color name="colorTertiary">#18ffff</color>
+    <color name="colorOnTertiary">#000000</color>
+    <color name="colorTertiaryContainer">#005f5c</color>
+    <color name="colorOnTertiaryContainer">#18ffff</color>
+
+    <color name="colorError">#ff4081</color>
+    <color name="colorOnError">#FFFFFF</color>
+    <color name="colorErrorContainer">#93003a</color>
+    <color name="colorOnErrorContainer">#ffdade</color>
+
+    <color name="colorSurfaceVariant">#4a4a4a</color>
+    <color name="colorOnSurface">#FDFDFD</color>
+    <color name="colorOnSurfaceVariant">#c4c7c5</color>
+
+    <color name="colorOutline">#8e9291</color>
+    <color name="colorOutlineVariant">#44474e</color>
+
+    <color name="colorSurfaceBright">#5d5d5d</color>
+    <color name="colorSurfaceDim">#2f2f2f</color>
+
     <!-- theme light -->
     <color name="colorPrimaryLight">#ececec</color>
     <color name="colorPrimaryDarkLight">#1e88e5</color>
@@ -360,5 +389,92 @@
     <color name="firewallExcludeToggleBtnBgBlackPlus">#8A2D49</color>
     <color name="defaultToggleBtnTxtBlackPlus">#D0E1F2</color>
     <color name="defaultToggleBtnBgBlackPlus">#0E1B21</color>
+
+    <!-- Material 3 Color System - Light Theme -->
+    <color name="colorOnPrimaryLight">#000000</color>
+    <color name="colorPrimaryContainerLight">#e8e8e8</color>
+    <color name="colorOnPrimaryContainerLight">#000000</color>
+
+    <color name="colorSecondaryContainerLight">#b3e5fc</color>
+    <color name="colorOnSecondaryLight">#000000</color>
+    <color name="colorOnSecondaryContainerLight">#000000</color>
+
+    <color name="colorTertiaryLight">#005cb2</color>
+    <color name="colorOnTertiaryLight">#FFFFFF</color>
+    <color name="colorTertiaryContainerLight">#d1e4ff</color>
+    <color name="colorOnTertiaryContainerLight">#001d35</color>
+
+    <color name="colorErrorLight">#ba1a1a</color>
+    <color name="colorOnErrorLight">#FFFFFF</color>
+    <color name="colorErrorContainerLight">#ffdad6</color>
+    <color name="colorOnErrorContainerLight">#410002</color>
+
+    <color name="colorSurfaceVariantLight">#f0f0f0</color>
+    <color name="colorOnSurfaceLight">#000000</color>
+    <color name="colorOnSurfaceVariantLight">#424940</color>
+
+    <color name="colorOutlineLight">#73796e</color>
+    <color name="colorOutlineVariantLight">#c4c7c5</color>
+
+    <color name="colorSurfaceBrightLight">#fafafa</color>
+    <color name="colorSurfaceDimLight">#dbdbdb</color>
+
+    <!-- Material 3 Color System - Light Theme Plus -->
+    <color name="colorOnPrimaryLightPlus">#000000</color>
+    <color name="colorPrimaryContainerLightPlus">#e8f5f2</color>
+    <color name="colorOnPrimaryContainerLightPlus">#000000</color>
+
+    <color name="colorSecondaryContainerLightPlus">#c8edea</color>
+    <color name="colorOnSecondaryLightPlus">#000000</color>
+    <color name="colorOnSecondaryContainerLightPlus">#000000</color>
+
+    <color name="colorTertiaryLightPlus">#21a095</color>
+    <color name="colorOnTertiaryLightPlus">#FFFFFF</color>
+    <color name="colorTertiaryContainerLightPlus">#d9f7f5</color>
+    <color name="colorOnTertiaryContainerLightPlus">#183531</color>
+
+    <color name="colorErrorLightPlus">#ba1a1a</color>
+    <color name="colorOnErrorLightPlus">#FFFFFF</color>
+    <color name="colorErrorContainerLightPlus">#ffdad6</color>
+    <color name="colorOnErrorContainerLightPlus">#410002</color>
+
+    <color name="colorSurfaceVariantLightPlus">#f5fffe</color>
+    <color name="colorOnSurfaceLightPlus">#000000</color>
+    <color name="colorOnSurfaceVariantLightPlus">#183531</color>
+
+    <color name="colorOutlineLightPlus">#8ca9a6</color>
+    <color name="colorOutlineVariantLightPlus">#d0e5e3</color>
+
+    <color name="colorSurfaceBrightLightPlus">#ffffff</color>
+    <color name="colorSurfaceDimLightPlus">#e6f4f2</color>
+
+    <!-- Material 3 Color System - Dark Theme Plus -->
+    <color name="colorOnPrimaryBlackPlus">#FFFFFF</color>
+    <color name="colorPrimaryContainerBlackPlus">#1E3A4B</color>
+    <color name="colorOnPrimaryContainerBlackPlus">#D0E1F2</color>
+
+    <color name="colorSecondaryContainerBlackPlus">#293541</color>
+    <color name="colorOnSecondaryBlackPlus">#FFFFFF</color>
+    <color name="colorOnSecondaryContainerBlackPlus">#D0E1F2</color>
+
+    <color name="colorTertiaryBlackPlus">#00A859</color>
+    <color name="colorOnTertiaryBlackPlus">#000000</color>
+    <color name="colorTertiaryContainerBlackPlus">#1C3328</color>
+    <color name="colorOnTertiaryContainerBlackPlus">#8EE6A9</color>
+
+    <color name="colorErrorBlackPlus">#FF5A5E</color>
+    <color name="colorOnErrorBlackPlus">#FFFFFF</color>
+    <color name="colorErrorContainerBlackPlus">#3B2127</color>
+    <color name="colorOnErrorContainerBlackPlus">#FFB3B6</color>
+
+    <color name="colorSurfaceVariantBlackPlus">#293541</color>
+    <color name="colorOnSurfaceBlackPlus">#D0E1F2</color>
+    <color name="colorOnSurfaceVariantBlackPlus">#A3BEC9</color>
+
+    <color name="colorOutlineBlackPlus">#495966</color>
+    <color name="colorOutlineVariantBlackPlus">#243341</color>
+
+    <color name="colorSurfaceBrightBlackPlus">#2D404E</color>
+    <color name="colorSurfaceDimBlackPlus">#0E1B21</color>
 
 </resources>

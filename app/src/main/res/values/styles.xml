@@ -21,6 +21,32 @@
         <item name="colorBackgroundFloating">@color/colorBackgroundFloating</item>
         <item name="android:colorBackgroundFloating">@color/colorBackgroundFloating</item>
 
+        <!-- Material 3 Color System -->
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorPrimaryContainer">@color/colorPrimaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/colorOnPrimaryContainer</item>
+
+        <item name="colorSecondaryContainer">@color/colorSecondaryContainer</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
+        <item name="colorOnSecondaryContainer">@color/colorOnSecondaryContainer</item>
+
+        <item name="colorTertiary">@color/colorTertiary</item>
+        <item name="colorOnTertiary">@color/colorOnTertiary</item>
+        <item name="colorTertiaryContainer">@color/colorTertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/colorOnTertiaryContainer</item>
+
+        <item name="colorError">@color/colorError</item>
+        <item name="colorOnError">@color/colorOnError</item>
+        <item name="colorErrorContainer">@color/colorErrorContainer</item>
+        <item name="colorOnErrorContainer">@color/colorOnErrorContainer</item>
+
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariant</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+        <item name="colorOnSurfaceVariant">@color/colorOnSurfaceVariant</item>
+
+        <item name="colorOutline">@color/colorOutline</item>
+        <item name="colorOutlineVariant">@color/colorOutlineVariant</item>
+
         <item name="android:colorAccent">@color/accentGood</item>
         <item name="colorAccent">@color/accentGood</item>
         <item name="accentGood">@color/accentGood</item>
@@ -85,6 +111,12 @@
 
         <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDark</item>
         <item name="homeScreenBtnGradientStart">@color/colorPrimary</item>
+
+        <!-- Force switch colors -->
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <!-- Also override SwitchMaterial style -->
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
     </style>
 
     <style name="AppThemeWhite" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
@@ -93,6 +125,32 @@
         <item name="colorSecondary">@color/colorSecondaryLight</item>
         <item name="colorBackgroundFloating">@color/colorBackgroundFloatingLight</item>
         <item name="android:colorBackgroundFloating">@color/colorBackgroundFloatingLight</item>
+
+        <!-- Material 3 Color System - Light Theme -->
+        <item name="colorOnPrimary">@color/colorOnPrimaryLight</item>
+        <item name="colorPrimaryContainer">@color/colorPrimaryContainerLight</item>
+        <item name="colorOnPrimaryContainer">@color/colorOnPrimaryContainerLight</item>
+
+        <item name="colorSecondaryContainer">@color/colorSecondaryContainerLight</item>
+        <item name="colorOnSecondary">@color/colorOnSecondaryLight</item>
+        <item name="colorOnSecondaryContainer">@color/colorOnSecondaryContainerLight</item>
+
+        <item name="colorTertiary">@color/colorTertiaryLight</item>
+        <item name="colorOnTertiary">@color/colorOnTertiaryLight</item>
+        <item name="colorTertiaryContainer">@color/colorTertiaryContainerLight</item>
+        <item name="colorOnTertiaryContainer">@color/colorOnTertiaryContainerLight</item>
+
+        <item name="colorError">@color/colorErrorLight</item>
+        <item name="colorOnError">@color/colorOnErrorLight</item>
+        <item name="colorErrorContainer">@color/colorErrorContainerLight</item>
+        <item name="colorOnErrorContainer">@color/colorOnErrorContainerLight</item>
+
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantLight</item>
+        <item name="colorOnSurface">@color/colorOnSurfaceLight</item>
+        <item name="colorOnSurfaceVariant">@color/colorOnSurfaceVariantLight</item>
+
+        <item name="colorOutline">@color/colorOutlineLight</item>
+        <item name="colorOutlineVariant">@color/colorOutlineVariantLight</item>
 
         <item name="android:colorAccent">@color/accentGoodLight</item>
         <item name="colorAccent">@color/accentGoodLight</item>
@@ -157,6 +215,12 @@
 
         <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDarkLight</item>
         <item name="homeScreenBtnGradientStart">@color/accentGoodLight</item>
+
+        <!-- Force switch colors -->
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <!-- Also override SwitchMaterial style -->
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
     </style>
 
     <style name="AppThemeTrueBlack" parent="Theme.MaterialComponents.NoActionBar.Bridge">
@@ -239,6 +303,32 @@
         <item name="colorBackgroundFloating">@color/colorBackgroundFloatingLightPlus</item>
         <item name="android:colorBackgroundFloating">@color/colorBackgroundFloatingLightPlus</item>
 
+        <!-- Material 3 Color System - Light Theme -->
+        <item name="colorOnPrimary">@color/colorOnPrimaryLightPlus</item>
+        <item name="colorPrimaryContainer">@color/colorPrimaryContainerLightPlus</item>
+        <item name="colorOnPrimaryContainer">@color/colorOnPrimaryContainerLightPlus</item>
+
+        <item name="colorSecondaryContainer">@color/colorSecondaryContainerLightPlus</item>
+        <item name="colorOnSecondary">@color/colorOnSecondaryLightPlus</item>
+        <item name="colorOnSecondaryContainer">@color/colorOnSecondaryContainerLightPlus</item>
+
+        <item name="colorTertiary">@color/colorTertiaryLightPlus</item>
+        <item name="colorOnTertiary">@color/colorOnTertiaryLightPlus</item>
+        <item name="colorTertiaryContainer">@color/colorTertiaryContainerLightPlus</item>
+        <item name="colorOnTertiaryContainer">@color/colorOnTertiaryContainerLightPlus</item>
+
+        <item name="colorError">@color/colorErrorLightPlus</item>
+        <item name="colorOnError">@color/colorOnErrorLightPlus</item>
+        <item name="colorErrorContainer">@color/colorErrorContainerLightPlus</item>
+        <item name="colorOnErrorContainer">@color/colorOnErrorContainerLightPlus</item>
+
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariantLightPlus</item>
+        <item name="colorOnSurface">@color/colorOnSurfaceLightPlus</item>
+        <item name="colorOnSurfaceVariant">@color/colorOnSurfaceVariantLightPlus</item>
+
+        <item name="colorOutline">@color/colorOutlineLightPlus</item>
+        <item name="colorOutlineVariant">@color/colorOutlineVariantLightPlus</item>
+
         <item name="android:colorAccent">@color/accentGoodLightPlus</item>
         <item name="colorAccent">@color/accentGoodLightPlus</item>
         <item name="accentGood">@color/accentGoodLightPlus</item>
@@ -302,6 +392,12 @@
 
         <item name="homeScreenBtnGradientEnd">@color/accentGoodLightPlus</item>
         <item name="homeScreenBtnGradientStart">@color/colorPrimaryDarkLightPlus</item>
+
+        <!-- Force switch colors -->
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <!-- Also override SwitchMaterial style -->
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
     </style>
 
     <style name="AppThemeTrueBlackPlus" parent="Theme.MaterialComponents.NoActionBar.Bridge">
@@ -386,6 +482,45 @@
         <item name="colorSurface">?attr/colorSwitchThumbNormal</item>
         <item name="colorOnSurface">?attr/switchNormal</item>
         <item name="colorControlActivated">?attr/controlActivated</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
+        <item name="colorOutline">@color/colorOutline</item>
+    </style>
+
+    <!-- Custom Material Switch to override purple colors -->
+    <style name="CustomMaterialSwitch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="thumbTint">@color/accentGood</item>
+        <item name="trackTint">@color/colorSurface</item>
+        <item name="thumbTintMode">src_in</item>
+        <item name="trackTintMode">src_in</item>
+        <item name="materialThemeOverlay">@style/CustomSwitchThemeOverlay</item>
+    </style>
+
+    <!-- Theme overlay to force switch colors -->
+    <style name="CustomSwitchThemeOverlay">
+        <item name="colorPrimary">@color/accentGood</item>
+        <item name="colorSecondary">@color/accentGood</item>
+        <item name="colorOnSurface">@color/primaryText</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOutline">@color/colorOutline</item>
+    </style>
+
+    <!-- Light theme switch style -->
+    <style name="CustomMaterialSwitchLight" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="thumbTint">@color/accentGoodLight</item>
+        <item name="trackTint">@color/colorSurfaceLight</item>
+        <item name="thumbTintMode">src_in</item>
+        <item name="trackTintMode">src_in</item>
+        <item name="materialThemeOverlay">@style/CustomSwitchThemeOverlayLight</item>
+    </style>
+
+    <!-- Light theme overlay to force switch colors -->
+    <style name="CustomSwitchThemeOverlayLight">
+        <item name="colorPrimary">@color/accentGoodLight</item>
+        <item name="colorSecondary">@color/accentGoodLight</item>
+        <item name="colorOnSurface">@color/primaryTextLight</item>
+        <item name="colorSurface">@color/colorSurfaceLight</item>
+        <item name="colorOutline">@color/colorOutlineLight</item>
     </style>
 
     <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
@@ -480,6 +615,15 @@
         <item name="firewallExcludeToggleBtnBg">@color/firewallExcludeToggleBtnBgLightPlus</item>
         <item name="defaultToggleBtnTxt">@color/defaultToggleBtnTxtLightPlus</item>
         <item name="defaultToggleBtnBg">@color/defaultToggleBtnBgLightPlus</item>
+
+        <item name="homeScreenBtnGradientEnd">@color/colorPrimaryDarkLightPlus</item>
+        <item name="homeScreenBtnGradientStart">@color/colorPrimary</item>
+
+        <!-- Force switch colors -->
+        <item name="materialSwitchStyle">@style/CustomMaterialSwitch</item>
+        <!-- Also override SwitchMaterial style -->
+        <item name="switchStyle">@style/CustomMaterialSwitch</item>
+        <item name="android:switchStyle">@style/CustomMaterialSwitch</item>
     </style>
 
     <style name="BottomSheetDialogThemeTrueBlackPlus" parent="BaseBottomSheetDialog">

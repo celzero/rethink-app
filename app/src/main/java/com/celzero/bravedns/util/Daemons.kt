@@ -15,16 +15,20 @@
  */
 package com.celzero.bravedns.util
 
+import Logger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.atomic.AtomicInteger
@@ -47,6 +51,18 @@ class CoFactory<T>(
 
     init {
         tasks()
+        monitorCancellation()
+    }
+
+    private fun monitorCancellation() = scope.launch(Dispatchers.Default) {
+        try {
+            awaitCancellation()
+        } finally {
+            withContext(NonCancellable) {
+                // close the task channel to stop accepting new tasks
+                taskChannel.close()
+            }
+        }
     }
 
     private fun <T> ioAsync(f: suspend () -> T): Deferred<T> {
@@ -108,7 +124,7 @@ class CoFactory<T>(
 }
 
 // adopted from: java.util.concurrent.Executors.DefaultThreadFactory
-class Factory(tag: String = "d") : ThreadFactory {
+class Factory(tag: String = "d"): ThreadFactory {
     private val group: ThreadGroup?
     private val threadNumber = AtomicInteger(1)
     private val namePrefix: String

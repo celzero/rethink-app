@@ -103,8 +103,21 @@ interface CustomIpDao {
     )
     fun getAllCustomIpRules(query: String): PagingSource<Int, CustomIp>
 
-    @Query("update CustomIp set uid = :newUid where uid = :uid")
-    fun updateUid(uid: Int, newUid: Int)
+    @Transaction
+    fun updateUid(uid: Int, newUid: Int) {
+        // Use INSERT OR REPLACE to handle conflicts properly
+        // First, insert all entries from oldUid with newUid (this will replace any existing conflicts)
+        insertOrReplaceWithNewUid(uid, newUid)
+        // Then delete the original entries
+        deleteRulesByUid(uid)
+    }
+
+    @Query("""
+        INSERT OR REPLACE INTO CustomIp (uid, ipAddress, port, protocol, isActive, status, ruleType, wildcard, proxyId, proxyCC, modifiedDateTime)
+        SELECT :newUid, ipAddress, port, protocol, isActive, status, ruleType, wildcard, proxyId, proxyCC, modifiedDateTime 
+        FROM CustomIp WHERE uid = :oldUid
+    """)
+    fun insertOrReplaceWithNewUid(oldUid: Int, newUid: Int)
 
     @Query("delete from CustomIp where uid != $UID_EVERYBODY") fun deleteAllAppsRules()
 
@@ -112,6 +125,12 @@ interface CustomIpDao {
 
     @Query("select count(*) from CustomIp where proxyCC = :cc") fun getRulesCountByCC(cc: String): Int
 
-    @Query("update CustomIp set uid = :newUid where uid = :oldUid")
-    fun tombstoneRulesByUid(oldUid: Int, newUid: Int)
+    @Transaction
+    fun tombstoneRulesByUid(oldUid: Int, newUid: Int) {
+        // Use INSERT OR REPLACE to handle conflicts properly
+        // First, insert all entries from oldUid with newUid (this will replace any existing conflicts)
+        insertOrReplaceWithNewUid(oldUid, newUid)
+        // Then delete the original entries
+        deleteRulesByUid(oldUid)
+    }
 }

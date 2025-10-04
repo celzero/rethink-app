@@ -76,9 +76,9 @@ internal constructor(
     // a single thread to run sig and batch co-routines in;
     // to avoid use of mutex/semaphores over shared-state
     // looper is never closed / cancelled and is always active
-    private val looper = Daemons.make("netlog")
+    private val looper = Daemons.make("netl")
 
-    private val consoleLogLooper = Daemons.make("consoleLog")
+    private val consoleLogLooper = Daemons.make("consl")
 
     suspend fun restart(s: CoroutineScope) {
         this.scope = s

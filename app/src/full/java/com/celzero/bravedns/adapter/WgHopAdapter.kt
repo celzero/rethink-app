@@ -17,6 +17,7 @@ package com.celzero.bravedns.adapter
 
 import Logger
 import Logger.LOG_TAG_UI
+import android.R.attr.visible
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -145,6 +146,7 @@ class WgHopAdapter(
                         false
                     }
                 uiCtx {
+                    updatePropertiesChip(config)
                     updateAmzChip(config)
                     updateProtocolChip(pair)
                     updateSplitTunnelChip(isSplitTunnel)
@@ -152,6 +154,46 @@ class WgHopAdapter(
                     updateHoppingChip(config)
                 }
             }
+        }
+
+        private fun updatePropertiesChip(config: Config) {
+            val mapping = WireguardManager.getConfigFilesById(config.getId()) ?: return
+            if (!mapping.isCatchAll && !mapping.isLockdown && !mapping.useOnlyOnMetered && !mapping.ssidEnabled) {
+                b.chipProperties.visibility = View.GONE
+                return
+            }
+            b.chipProperties.text = ""
+            if (mapping.isCatchAll) {
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(R.string.symbol_lightening)
+            }
+            if (mapping.isLockdown) {
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(
+                    R.string.two_argument_space,
+                    b.chipProperties.text.toString(),
+                    context.getString(R.string.symbol_lockdown)
+                )
+            }
+            if (mapping.useOnlyOnMetered) {
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(
+                    R.string.two_argument_space,
+                    b.chipProperties.text.toString(),
+                    context.getString(R.string.symbol_mobile)
+                )
+            }
+            if (mapping.ssidEnabled) {
+                b.chipProperties.visibility = View.VISIBLE
+                b.chipProperties.text = context.getString(
+                    R.string.two_argument_space,
+                    b.chipProperties.text.toString(),
+                    context.getString(R.string.symbol_id)
+                )
+            }
+
+            val visible = if (b.chipProperties.text.isNotEmpty()) View.VISIBLE else View.GONE
+            b.chipProperties.visibility = visible
         }
 
         private fun updateAmzChip(config: Config) {
@@ -233,12 +275,24 @@ class WgHopAdapter(
 
         private suspend fun handleHop(config: Config, isChecked: Boolean, isActive: Boolean) {
             val srcConfig = WireguardManager.getConfigById(srcId)
-
-            if (srcConfig == null) {
+            val mapping = WireguardManager.getConfigFilesById(config.getId())
+            if (srcConfig == null || mapping == null) {
                 Logger.i(LOG_TAG_UI, "$TAG; source config($srcId) not found to hop")
                 uiCtx {
                     if (!isAttached) return@uiCtx
                     Utilities.showToastUiCentered(context, context.getString(R.string.config_invalid_desc), Toast.LENGTH_LONG)
+                }
+                return
+            }
+
+            if (mapping.useOnlyOnMetered || mapping.ssidEnabled) {
+                uiCtx {
+                    if (!isAttached) return@uiCtx
+                    Utilities.showToastUiCentered(
+                        context,
+                        context.getString(R.string.hop_error_toast_msg_3),
+                        Toast.LENGTH_LONG
+                    )
                 }
                 return
             }
