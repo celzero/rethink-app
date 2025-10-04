@@ -59,9 +59,9 @@ class GlobalExceptionHandler private constructor(
         fun getInstance(): GlobalExceptionHandler? = instance
     }
 
-    override fun uncaughtException(thread: Thread, exception: Throwable) {
+    override fun uncaughtException(thread: Thread, throwable: Throwable) {
         try {
-            val exception = Logger.throwableToException(exception)
+            val exception = Logger.throwableToException(throwable)
             Logger.e(LOG_TAG_APP, "uncaught exception in thread ${thread.name}", exception)
 
             // Report to Firebase if available
@@ -74,7 +74,7 @@ class GlobalExceptionHandler private constructor(
             Logger.e(LOG_TAG_APP, "err while handling uncaught exception", e)
         } finally {
             // Call the default handler to ensure proper app termination
-            defaultHandler?.uncaughtException(thread, exception) ?: run {
+            defaultHandler?.uncaughtException(thread, throwable) ?: run {
                 // If no default handler, terminate the process
                 Logger.e(LOG_TAG_APP, "no default exception handler found, terminating process")
                 exitProcess(1)
@@ -85,7 +85,7 @@ class GlobalExceptionHandler private constructor(
     /**
      * Report the uncaught exception to Firebase
      */
-    private fun reportToFirebase(exception: Throwable) {
+    private fun reportToFirebase(exception: Exception) {
         try {
             FirebaseErrorReporting.recordException(exception)
         } catch (e: Exception) {
