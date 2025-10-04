@@ -122,7 +122,7 @@
     <string name="hybrid_mode_notification_title" translatable="true">Chráněno! Připojeno k DNS + Firewallu.</string>
     <string name="dns_mode_notification_title" translatable="true">Chráněno! Připojeno k rychlému a zabezpečenému DNS.</string>
     <string name="firewall_mode_notification_title" translatable="true">Chráněno! Připojeno k Firewallu.</string>
-    <string name="slide_1_desc" translatable="true">Rethink je open source software podpořený programem Mozilla Builders MVP.</string>
+    <string name="slide_1_desc" translatable="true">Rethink je open source software podpořený programem Mozilla Builders MVP a FOSS United Foundation.</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Klepnutím změníte nastavení ochrany</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Chráněno! Připojeno k DNS + Firewall + Proxy.</string>
     <string name="pause_mode_notification_title" translatable="true">Pozastaveno! Blokované aplikace budou nadále firewallovány.</string>
@@ -965,4 +965,8 @@
     <string name="ada_firewall_status" translatable="true">Tato aplikace <b><i>%1$s</i></b>.</string>
     <string name="rt_filter_desc_subgroups" translatable="true">Zobrazuji <u>%1$s</u> seznamy blokování ve skupině: %2$s a podskupině: %3$s</string>
     <string name="firewall_rule_block_udp_ntp_desc" translatable="true">Uživatelem nastavené pravidlo firewallu zablokovalo toto <i>UDP</i> připojení.<br/><br/> Pro změnu přejděte na záložku <i>Univerzální</i>.</string>
+    <string name="lbl_test" translatable="true">test</string>
+    <string name="lbl_experimental" translatable="true">(experimentální)</string>
+    <string name="lbl_manual" translatable="true">Manuál</string>
+    <string name="wireguard_title" translatable="true">Zabezpečný internet s WireGuard</string>
 </resources>
