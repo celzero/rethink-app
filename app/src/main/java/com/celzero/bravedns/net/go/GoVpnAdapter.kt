@@ -1098,7 +1098,7 @@ class GoVpnAdapter : KoinComponent {
         try {
             // refresh proxies should never return error/exception
             val res = getProxies()?.refreshProxies()
-            Logger.i(LOG_TAG_VPN, "$TAG wg refresh proxies: $res, can resume mobile? $isMobileActive")
+            Logger.i(LOG_TAG_VPN, "$TAG wg refresh proxies: $res, mobile? $isMobileActive, ssid? $ssid")
             // re-add the proxies if the its not available in the tunnel
             val wgConfigs: List<Config> = WireguardManager.getActiveConfigs()
             if (wgConfigs.isEmpty()) {
@@ -1116,7 +1116,7 @@ class GoVpnAdapter : KoinComponent {
 
                 val useOnlyOnSsid = files?.ssidEnabled == true && !files.oneWireGuard
                 val ssidList = files?.ssids?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
-                val ssidMatch = useOnlyOnSsid && WireguardManager.matchesSsidList(files.ssids, ssid)
+                val ssidMatch = useOnlyOnSsid && WireguardManager.matchesSsidList(files.ssids, ssid) && ssid.isNotEmpty()
                 val canResumeSsidWg = useOnlyOnSsid && ssidMatch && !isMobileActive
 
                 val canResume = canResumeMobileWg || canResumeSsidWg
@@ -1124,7 +1124,7 @@ class GoVpnAdapter : KoinComponent {
                 Logger.d(
                     LOG_TAG_VPN,
                     "$TAG refresh proxy: $id, mobileOnly: $isWireGuardMobileOnly, " +
-                        "canResumeMobileWg: $canResumeMobileWg, isMobileActive: $isMobileActive, " +
+                        "canResumeMobileWg: $canResumeMobileWg, canResumeSsidWg: $canResumeSsidWg, isMobileActive: $isMobileActive, " +
                         "useOnlyOnSsid: $useOnlyOnSsid, ssidMatch: $ssidMatch, ssid: $ssid, canResume: $canResume, wg-ssids: $ssidList"
                 )
                 val stats = getProxyStatusById(id).first
@@ -1149,10 +1149,13 @@ class GoVpnAdapter : KoinComponent {
                     // and the wg-config is set to useOnlyOnMetered
                     val res = getProxies()?.getProxy(id.togs())?.pause()
                     Logger.i(LOG_TAG_VPN, "$TAG paused proxy (mobile): $id, res: $res")
-                } else if (useOnlyOnSsid && !ssidMatch && !isMobileActive) {
+                } else if (useOnlyOnSsid && !ssidMatch) {
                     // when the ssidEnabled is set and the ssid does not match
                     val res = getProxies()?.getProxy(id.togs())?.pause()
                     Logger.i(LOG_TAG_VPN, "$TAG paused proxy (ssid): $id, res: $res")
+                } else if (useOnlyOnSsid && isMobileActive) {
+                    val res = getProxies()?.getProxy(id.togs())?.pause()
+                    Logger.i(LOG_TAG_VPN, "$TAG paused proxy (ssid+mobile): $id, res: $res")
                 }
             }
         } catch (e: Exception) {
