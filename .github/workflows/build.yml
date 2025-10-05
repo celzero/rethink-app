@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Проверяем исходный код
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -37,32 +38,57 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 4. Декодируем keystore из секрета
+      # 4. Проверяем наличие секрета KEYSTORE_FILE_BASE64
+      - name: Check Keystore Secret
+        run: |
+          if [ -z "${{ secrets.KEYSTORE_FILE_BASE64 }}" ]; then
+            echo "Error: KEYSTORE_FILE_BASE64 secret is not set"
+            exit 1
+          fi
+
+      # 5. Декодируем keystore из секрета
       - name: Decode Keystore
         run: echo "${{ secrets.KEYSTORE_FILE_BASE64 }}" | base64 -d > app/keystore.jks
 
-      # 5. Создаём keystore.properties
+      # 6. Проверяем, что keystore.jks создан
+      - name: Verify Keystore File
+        run: |
+          if [ ! -f app/keystore.jks ]; then
+            echo "Error: keystore.jks was not created"
+            exit 1
+          fi
+          ls -l app/keystore.jks
+
+      # 7. Создаём keystore.properties
       - name: Create keystore.properties
         run: |
           echo "keyAlias=${{ secrets.KEYSTORE_ALIAS }}" > app/keystore.properties
           echo "keyPassword=${{ secrets.KEYSTORE_KEY_PASSWORD }}" >> app/keystore.properties
           echo "storeFile=app/keystore.jks" >> app/keystore.properties
           echo "storePassword=${{ secrets.KEYSTORE_STORE_PASSWORD }}" >> app/keystore.properties
+          cat app/keystore.properties
 
-      # 6. Делаем gradlew исполняемым
+      # 8. Делаем gradlew исполняемым
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # 7. Собираем APK
+      # 9. Собираем APK
       - name: Build APK
         env:
           VERSION_CODE: ${{ github.run_number }}
-        run: ./gradlew clean assembleWebsiteFullRelease
+        run: ./gradlew clean assembleWebsiteFullRelease --stacktrace
 
-      # 8. Загружаем APK
+      # 10. Загружаем APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: rethinkdns-nightly-arm64-v8a
           path: app/build/outputs/apk/websiteFullRelease/arm64-v8a/*.apk
           retention-days: 7
+
+      # 11. Логи для отладки при ошибке
+      - name: Debug Gradle logs
+        if: failure()
+        run: |
+          cat app/build/reports/*.log || true
+          find app/build -type f -name "*.txt" -exec cat {} \;
