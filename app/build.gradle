@@ -28,15 +28,11 @@ def getVersionCode = {
     return code
 }
 
-try {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-} catch (Exception ex) {
-    logger.info("missing keystore prop: $ex.message")
-    keystoreProperties['keyAlias'] = ''
-    keystoreProperties['keyPassword'] = ''
-    keystoreProperties['storeFile'] = '/dev/null'
-    keystoreProperties['storePassword'] = ''
+// Проверяем наличие keystore.properties
+if (!keystorePropertiesFile.exists()) {
+    throw new GradleException("Keystore file 'keystore.properties' not found. Please ensure it exists or secrets are properly configured.")
 }
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
     compileSdk 36
