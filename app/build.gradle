@@ -1,5 +1,5 @@
 plugins {
-    id 'com.android.application' version '8.2.2' apply false // Указываем версию AGP
+    id 'com.android.application'
     id 'com.google.devtools.ksp'
     id 'kotlin-android'
 }
@@ -28,9 +28,9 @@ def getVersionCode = {
     return code
 }
 
-// Загружаем keystore.properties только в signingConfigs, без жёсткой проверки
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+// Проверяем наличие keystore.properties
+if (!keystorePropertiesFile.exists()) {
+    throw new GradleException("Keystore file 'keystore.properties' not found. Please ensure it exists or secrets are properly configured.")
 }
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
@@ -47,10 +47,10 @@ android {
 
     signingConfigs {
         release {
-            keyAlias keystoreProperties['keyAlias'] ?: System.getenv("KEYSTORE_ALIAS")
-            keyPassword keystoreProperties['keyPassword'] ?: System.getenv("KEYSTORE_KEY_PASSWORD")
-            storeFile file(keystoreProperties['storeFile'] ?: "app/keystore.jks")
-            storePassword keystoreProperties['storePassword'] ?: System.getenv("KEYSTORE_STORE_PASSWORD")
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
         }
     }
 
