@@ -1125,8 +1125,8 @@ abstract class AppDatabase : RoomDatabase() {
                     db.execSQL("UPDATE DnsCryptEndpoint SET dnsCryptExplanation = '' WHERE dnsCryptExplanation IS NULL")
                     // Обновление DnsCryptRelayEndpoint
                     db.execSQL("UPDATE DnsCryptRelayEndpoint SET dnsCryptRelayExplanation = '' WHERE dnsCryptRelayExplanation IS NULL")
-                    // Обновление ODoHEndpoint
-                    db.execSQL("UPDATE ODoHEndpoint SET desc = '' WHERE desc IS NULL")
+                    // Обновление DnsProxyEndpoint
+                    db.execSQL("UPDATE DnsProxyEndpoint SET proxyAppName = '' WHERE proxyAppName IS NULL")
 
                     
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: Updated ProxyEndpoint, DoHEndpoint, DoTEndpoint, ODoHEndpoint to replace NULL with empty strings")
