@@ -44,7 +44,7 @@ try {
 }
 
 android {
-    compileSdk 35
+    compileSdk 36
     // https://developer.android.com/studio/build/configure-app-module
     namespace 'com.celzero.bravedns'
 
