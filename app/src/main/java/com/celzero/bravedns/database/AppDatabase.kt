@@ -1116,16 +1116,11 @@ abstract class AppDatabase : RoomDatabase() {
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: Updated ProxyEndpoint schema to non-nullable fields")
 
                         // Обновление DoHEndpoint
-                    db.execSQL("UPDATE DoHEndpoint SET dohName = '' WHERE dohName IS NULL")
-                    db.execSQL("UPDATE DoHEndpoint SET dohURL = '' WHERE dohURL IS NULL")
+                    db.execSQL("UPDATE DoHEndpoint SET dohExplanation = '' WHERE dohExplanation IS NULL")
             // Обновление DoTEndpoint
-                    db.execSQL("UPDATE DoTEndpoint SET name = '' WHERE name IS NULL")
-                    db.execSQL("UPDATE DoTEndpoint SET url = '' WHERE url IS NULL")
+                    db.execSQL("UPDATE DoTEndpoint SET desc = '' WHERE desc IS NULL")
             // Обновление ODoHEndpoint
-                    db.execSQL("UPDATE ODoHEndpoint SET name = '' WHERE name IS NULL")
-                    db.execSQL("UPDATE ODoHEndpoint SET proxy = '' WHERE proxy IS NULL")
-                    db.execSQL("UPDATE ODoHEndpoint SET resolver = '' WHERE resolver IS NULL")
-                    db.execSQL("UPDATE ODoHEndpoint SET proxyIps = '' WHERE proxyIps IS NULL")
+                    db.execSQL("UPDATE ODoHEndpoint SET desc = '' WHERE desc IS NULL"
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: Updated DoHEndpoint, DoTEndpoint, ODoHEndpoint to replace NULL with empty strings")
     
                 }
