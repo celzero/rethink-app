@@ -53,7 +53,7 @@ import com.celzero.bravedns.util.Constants
         SubscriptionStatus::class,
         SubscriptionStateHistory::class
     ],
-    version = 25,
+    version = 26,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -99,6 +99,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_22_23)
                 .addMigrations(MIGRATION_23_24)
                 .addMigrations(MIGRATION_24_25)
+                .addMigrations(MIGRATION_25_26)
                 .build()
 
         private val roomCallback: Callback =
@@ -1056,6 +1057,85 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                 }
             }
+
+             // Новая миграция для изменения полей proxy_app_name, proxy_ip, user_name, password на NOT NULL
+        private val MIGRATION_25_26: Migration =
+            object : Migration(25, 26) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    // Создаём временную таблицу с новой схемой (все поля NOT NULL)
+                    db.execSQL(
+                        """
+                        CREATE TABLE ProxyEndpoint_backup (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                            proxy_name TEXT NOT NULL DEFAULT '',
+                            proxy_mode INTEGER NOT NULL,
+                            proxy_type TEXT NOT NULL DEFAULT '',
+                            proxy_app_name TEXT NOT NULL DEFAULT '',
+                            proxy_ip TEXT NOT NULL DEFAULT '',
+                            user_name TEXT NOT NULL DEFAULT '',
+                            password TEXT NOT NULL DEFAULT '',
+                            proxy_port INTEGER NOT NULL,
+                            is_selected INTEGER NOT NULL,
+                            is_custom INTEGER NOT NULL,
+                            is_udp INTEGER NOT NULL,
+                            modified_data_time INTEGER NOT NULL,
+                            latency INTEGER NOT NULL
+                        )
+                        """.trimIndent()
+                    )
+                    // Копируем данные, заменяя NULL на пустую строку
+                    db.execSQL(
+                        """
+                        INSERT INTO ProxyEndpoint_backup (
+                            id, proxy_name, proxy_mode, proxy_type, proxy_app_name, proxy_ip, 
+                            user_name, password, proxy_port, is_selected, is_custom, is_udp, 
+                            modified_data_time, latency
+                        )
+                        SELECT 
+                            id, 
+                            COALESCE(proxy_name, '') AS proxy_name,
+                            proxy_mode,
+                            COALESCE(proxy_type, '') AS proxy_type,
+                            COALESCE(proxy_app_name, '') AS proxy_app_name,
+                            COALESCE(proxy_ip, '') AS proxy_ip,
+                            COALESCE(user_name, '') AS user_name,
+                            COALESCE(password, '') AS password,
+                            proxy_port,
+                            is_selected,
+                            is_custom,
+                            is_udp,
+                            modified_data_time,
+                            latency
+                        FROM ProxyEndpoint
+                        """.trimIndent()
+                    )
+                    // Удаляем старую таблицу
+                    db.execSQL("DROP TABLE ProxyEndpoint")
+                    // Переименовываем временную таблицу
+                    db.execSQL("ALTER TABLE ProxyEndpoint_backup RENAME TO ProxyEndpoint")
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: Updated ProxyEndpoint schema to non-nullable fields")
+                }
+            }
+
+
+
+         private val roomCallback: Callback =
+            object : Callback() {
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                    super.onCreate(db)
+                    Logger.i(LOG_TAG_APP_DB, "Database created, ${db.version}")
+                }
+
+                override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
+                    super.onDestructiveMigration(db)
+                    Logger.i(LOG_TAG_APP_DB, "Database destructively migrated, ${db.version}")
+                }
+
+                override fun onOpen(db: SupportSQLiteDatabase) {
+                    super.onOpen(db)
+                    Logger.i(LOG_TAG_APP_DB, "Database opened, ${db.version}")
+                }
+            }   
 
 
         // ref: stackoverflow.com/a/57204285
