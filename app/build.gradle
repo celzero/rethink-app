@@ -7,20 +7,15 @@ plugins {
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 
-// https://github.com/celzero/rethink-app/issues/1032
-// https://docs.gradle.org/8.2/userguide/configuration_cache.html#config_cache:requirements:external_processes
-// get the git version from the command line
+// Получаем версию из git describe
 def gitVersion = providers.exec {
     commandLine("git", "describe", "--tags", "--always")
 }.standardOutput.asText.get().toString().trim()
 
-// for github builds, the version code is set in the github action via env
-// for local builds, the version code is set in gradle.properties
+// Получаем versionCode из переменной окружения (для GitHub) или gradle.properties
 def getVersionCode = {
     def code = 0
     try {
-        // parseInt throws NumberFormatException if the string does not contain a parsable integer
-        // but "as Integer" is a wrapper class, which silently returns null
         code = Integer.parseInt(System.getenv("VERSION_CODE"))
         logger.info("env version code: $code")
     } catch (NumberFormatException ex) {
@@ -45,7 +40,6 @@ try {
 
 android {
     compileSdk 36
-    // https://developer.android.com/studio/build/configure-app-module
     namespace 'com.celzero.bravedns'
 
     defaultConfig {
@@ -56,82 +50,40 @@ android {
     }
 
     signingConfigs {
-        config {
+        release {
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
             storeFile file(keystoreProperties['storeFile'])
             storePassword keystoreProperties['storePassword']
         }
-        // archive.is/wlwD8
-        alpha {
-            keyAlias System.getenv("ALPHA_KS_ALIAS") // rdnsAlpha
-            keyPassword System.getenv("ALPHA_KS_PASSPHRASE")
-            // https://stackoverflow.com/a/34640602
-            storeFile file(String.valueOf(System.getenv("ALPHA_KS_FILE"))) // rdnsAlpha.jks in app/
-            storePassword System.getenv("ALPHA_KS_STORE_PASSPHRASE")
-        }
     }
 
-    // https://developer.android.com/studio/build/configure-apk-splits
+    // Настройка для сборки только arm64-v8a
     splits.abi {
-        println('Create separate apks')
-        // generates multiple APKs based on the ABIs you define
         enable true
         reset()
-        // comma-separated list of ABIs that you want Gradle to generate APKs for
-        include 'x86', 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86_64'
-        // generates a universal APK in addition to per-ABI APKs
-        universalApk true
+        include 'arm64-v8a' // Можно добавить другие ABI, например: 'x86', 'x86_64', 'armeabi-v7a'
+        universalApk false
     }
-    // version codes for each ABI variant
-    project.ext.versionCodes = [
-            'armeabi'    : 1,
-            'armeabi-v7a': 2,
-            'arm64-v8a'  : 3,
-            'x86'        : 8,
-            'x86_64'     : 9
-    ]
+
+    // Устанавливаем versionCode для arm64-v8a
+    project.ext.versionCodes = ['arm64-v8a': 3]
     android.applicationVariants.configureEach { variant ->
-        println("variant name: ${variant.name}")
         variant.outputs.configureEach { output ->
-            // def abi = output.filters.find { it.filterType.name == "ABI" }?.identifier
-            def abi = variant.outputs.first().getFilter(com.android.build.OutputFile.ABI)
-            def baseAbiVersionCode = project.ext.versionCodes.get(abi)
-            println("base version code: $baseAbiVersionCode")
+            def abi = output.getFilter(com.android.build.OutputFile.ABI)
             if (abi != null) {
-                println("variant name: ${variant.name}, abi: $abi")
-                // assign different version code for each output
-                // eg for arm64-v8a, version code will be 30000000 + variant.versionCode
-                def v = baseAbiVersionCode * 10000000 + variant.versionCode
-                // API 'ApkVariantOutput.getVersionCodeOverride()' is obsolete and has been replaced
-                // with 'VariantOutput.versionCode()'
-                output.versionCodeOverride = v
-                println("version code override: $v")
-            } else {
-                println("no ABI filter applied for variant: ${variant.name}")
+                def baseAbiVersionCode = project.ext.versionCodes.get(abi)
+                output.versionCodeOverride = baseAbiVersionCode * 10000000 + variant.versionCode
             }
         }
     }
 
     buildTypes {
         release {
-            // modified as part of #352, now webview is removed from app, flipping back
-            // the setting to true
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-        leakCanary {
-            matchingFallbacks = ['debug']
-            initWith buildTypes.debug
-        }
-        alpha {
-            // archive.is/y8uCB
-            applicationIdSuffix ".alpha"
-            minifyEnabled true
-            shrinkResources true
-            signingConfig signingConfigs.alpha
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
@@ -154,20 +106,11 @@ android {
 
     flavorDimensions = ["releaseChannel", "releaseType"]
     productFlavors {
-        play {
-            dimension "releaseChannel"
-        }
-        fdroid {
-            dimension "releaseChannel"
-        }
         website {
             dimension "releaseChannel"
         }
         full {
             dimension "releaseType"
-            // getPackageInfo().versionCode not returning the correct value (in prod builds) when
-            // value is set in AndroidManifest.xml so setting it here
-            // for build type alpha, versionCode is set in env overriding gradle.properties
             versionCode = getVersionCode()
             versionName = gitVersion
             vectorDrawables.useSupportLibrary = true
@@ -205,9 +148,6 @@ dependencies {
     def paging_version = "3.3.6"
 
     implementation 'com.google.guava:guava:33.4.8-android'
-
-    // https://developer.android.com/studio/write/java8-support
-    // included to fix issues with Android 6 support, issue#563
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
     fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20'
@@ -220,7 +160,6 @@ dependencies {
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
 
-    // LiveData
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.2'
 
     implementation 'com.google.code.gson:gson:2.13.1'
@@ -233,7 +172,6 @@ dependencies {
     fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2'
     fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.2'
 
-    // Pagers Views
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
     fullImplementation 'androidx.fragment:fragment-ktx:1.8.9'
     implementation 'com.google.android.material:material:1.12.0'
@@ -246,41 +184,31 @@ dependencies {
     fullImplementation 'com.squareup.retrofit2:converter-gson:3.0.0'
 
     implementation 'com.squareup.okio:okio-jvm:3.16.0'
-    // Glide
+
     fullImplementation('com.github.bumptech.glide:glide:4.16.0') {
         exclude group: 'glide-parent'
     }
     fullImplementation('com.github.bumptech.glide:okhttp3-integration:4.16.0') {
         exclude group: 'glide-parent'
     }
-
-    // Ref: https://stackoverflow.com/a/46638213
     kspFull 'com.github.bumptech.glide:compiler:4.16.0'
 
-    // Swipe button animation
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
 
-    // Koin core
     download 'io.insert-koin:koin-core:4.1.0'
     implementation 'io.insert-koin:koin-core:4.1.0'
-    // Koin main (Scope, ViewModel ...)
     download 'io.insert-koin:koin-android:4.1.0'
     implementation 'io.insert-koin:koin-android:4.1.0'
 
     download 'hu.autsoft:krate:2.0.0'
     implementation 'hu.autsoft:krate:2.0.0'
 
-    // viewBinding without reflection
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.9'
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
-    // add ":debug" suffix to the dependency to include debug symbols
     download firestackDependency()
     websiteImplementation firestackDependency()
-    fdroidImplementation firestackDependency()
-    playImplementation firestackDependency()
 
-    // Work manager
     implementation('androidx.work:work-runtime-ktx:2.10.3') {
         modules {
             module("com.google.guava:listenablefuture") {
@@ -289,8 +217,6 @@ dependencies {
         }
     }
 
-    // for handling IP addresses and subnets, both IPv4 and IPv6
-    // seancfoley.github.io/IPAddress/ipaddress.html
     download 'com.github.seancfoley:ipaddress:5.5.1'
     implementation 'com.github.seancfoley:ipaddress:5.5.1'
 
@@ -299,33 +225,19 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
     androidTestImplementation 'androidx.test:rules:1.7.0'
 
-    leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
-
     fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.9.3'
     fullImplementation 'androidx.navigation:navigation-ui-ktx:2.9.3'
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
-    playImplementation 'com.google.android.play:app-update:2.1.0'
-    playImplementation 'com.google.android.play:app-update-ktx:2.1.0'
-
-    // for encrypting wireguard configuration files
     implementation("androidx.security:security-crypto:1.1.0")
     implementation("androidx.security:security-app-authenticator:1.0.0")
     androidTestImplementation("androidx.security:security-app-authenticator:1.0.0")
 
-    // barcode scanner for wireguard
     fullImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
     fullImplementation 'com.simplecityapps:recyclerview-fastscroll:2.0.1'
 
-    // for confetti animation
     fullImplementation 'nl.dionsegijn:konfetti-xml:2.0.5'
-    // for in-app purchases
-    //playImplementation 'com.android.billingclient:billing:8.0.0'
-    //websiteImplementation 'com.android.billingclient:billing:8.0.0'
-    // for stripe payment gateway
-    //websiteImplementation 'com.stripe:stripe-android:21.21.0'
-    //fdroidImplementation 'com.stripe:stripe-android:21.21.0'
 
     lintChecks 'com.android.security.lint:lint:1.0.3'
 }
