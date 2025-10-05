@@ -38,13 +38,33 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 4. Проверяем наличие секрета KEYSTORE_FILE_BASE64
-      - name: Check Keystore Secret
+      # 4. Проверяем наличие секретов
+      - name: Check Secrets
         run: |
           if [ -z "${{ secrets.KEYSTORE_FILE_BASE64 }}" ]; then
             echo "Error: KEYSTORE_FILE_BASE64 secret is not set"
             exit 1
           fi
+          if [ -z "${{ secrets.KEYSTORE_ALIAS }}" ]; then
+            echo "Error: KEYSTORE_ALIAS secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.KEYSTORE_KEY_PASSWORD }}" ]; then
+            echo "Error: KEYSTORE_KEY_PASSWORD secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.KEYSTORE_STORE_PASSWORD }}" ]; then
+            echo "Error: KEYSTORE_STORE_PASSWORD secret is not set"
+            exit 1
+          fi
+          if [ "${{ env.FIRESTACK_REPO }}" == "github" ]; then
+            if [ -z "${{ secrets.GITHUB_TOKEN }}" ]; then
+              echo "Error: GITHUB_TOKEN secret is not set for GitHub Packages"
+              exit 1
+            fi
+          fi
+        env:
+          FIRESTACK_REPO: ${{ github.event.inputs.firestackRepo || 'github' }}
 
       # 5. Декодируем keystore из секрета
       - name: Decode Keystore
@@ -68,17 +88,33 @@ jobs:
           echo "storePassword=${{ secrets.KEYSTORE_STORE_PASSWORD }}" >> app/keystore.properties
           cat app/keystore.properties
 
-      # 8. Делаем gradlew исполняемым
+      # 8. Выводим build.gradle для диагностики
+      - name: Show app/build.gradle
+        run: cat app/build.gradle
+
+      # 9. Выводим корневой build.gradle для диагностики
+      - name: Show root build.gradle
+        run: cat build.gradle || echo "No root build.gradle found"
+
+      # 10. Очищаем Gradle кэш
+      - name: Clear Gradle Cache
+        run: |
+          rm -rf ~/.gradle/caches
+          ./gradlew cleanBuildCache
+
+      # 11. Делаем gradlew исполняемым
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # 9. Собираем APK
+      # 12. Собираем APK
       - name: Build APK
         env:
           VERSION_CODE: ${{ github.run_number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FIRESTACK_REPO: ${{ github.event.inputs.firestackRepo || 'github' }}
         run: ./gradlew clean assembleWebsiteFullRelease --stacktrace
 
-      # 10. Загружаем APK
+      # 13. Загружаем APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
@@ -86,7 +122,7 @@ jobs:
           path: app/build/outputs/apk/websiteFullRelease/arm64-v8a/*.apk
           retention-days: 7
 
-      # 11. Логи для отладки при ошибке
+      # 14. Логи для отладки при ошибке
       - name: Debug Gradle logs
         if: failure()
         run: |
