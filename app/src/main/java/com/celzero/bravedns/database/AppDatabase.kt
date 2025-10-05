@@ -1062,61 +1062,12 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_25_26: Migration =
             object : Migration(25, 26) {
                 override fun migrate(db: SupportSQLiteDatabase) {
-                    
-                    db.execSQL(
-                        """
-                        CREATE TABLE ProxyEndpoint_backup (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                            proxy_name TEXT NOT NULL DEFAULT '',
-                            proxy_mode INTEGER NOT NULL,
-                            proxy_type TEXT NOT NULL DEFAULT '',
-                            proxy_app_name TEXT NOT NULL DEFAULT '',
-                            proxy_ip TEXT NOT NULL DEFAULT '',
-                            user_name TEXT NOT NULL DEFAULT '',
-                            password TEXT NOT NULL DEFAULT '',
-                            proxy_port INTEGER NOT NULL,
-                            is_selected INTEGER NOT NULL,
-                            is_custom INTEGER NOT NULL,
-                            is_udp INTEGER NOT NULL,
-                            modified_data_time INTEGER NOT NULL,
-                            latency INTEGER NOT NULL
-                        )
-                        """.trimIndent()
-                    )
-                    // Копируем данные, заменяя NULL на пустую строку
-                    db.execSQL(
-                        """
-                        INSERT INTO ProxyEndpoint_backup (
-                            id, proxy_name, proxy_mode, proxy_type, proxy_app_name, proxy_ip, 
-                            user_name, password, proxy_port, is_selected, is_custom, is_udp, 
-                            modified_data_time, latency
-                        )
-                        SELECT 
-                            id, 
-                            COALESCE(proxy_name, '') AS proxy_name,
-                            proxy_mode,
-                            COALESCE(proxy_type, '') AS proxy_type,
-                            COALESCE(proxy_app_name, '') AS proxy_app_name,
-                            COALESCE(proxy_ip, '') AS proxy_ip,
-                            COALESCE(user_name, '') AS user_name,
-                            COALESCE(password, '') AS password,
-                            proxy_port,
-                            is_selected,
-                            is_custom,
-                            is_udp,
-                            modified_data_time,
-                            latency
-                        FROM ProxyEndpoint
-                        """.trimIndent()
-                    )
-                    // Удаляем старую таблицу
-                    db.execSQL("DROP TABLE ProxyEndpoint")
-
-
-                    
-                    
-                    db.execSQL("ALTER TABLE ProxyEndpoint_backup RENAME TO ProxyEndpoint")
-                    
+                    // ProxyEndpoint
+                    db.execSQL("UPDATE ProxyEndpoint SET proxyAppName = '' WHERE proxyAppName IS NULL")
+                    db.execSQL("UPDATE ProxyEndpoint SET proxyIP = '' WHERE proxyIP IS NULL")
+                    db.execSQL("UPDATE ProxyEndpoint SET userName = '' WHERE userName IS NULL")
+                    db.execSQL("UPDATE ProxyEndpoint SET password = '' WHERE password IS NULL")
+                        
                     // DoHEndpoint
                     db.execSQL("UPDATE DoHEndpoint SET dohExplanation = '' WHERE dohExplanation IS NULL")
                     // DoTEndpoint
