@@ -30,11 +30,11 @@ class ProxyEndpoint {
     // NONE for now, later we can add other types
     // ideally this should be an enum (ProxyType)
     var proxyType: String = ""
-    var proxyAppName: String? = null
-    var proxyIP: String? = null
+    var proxyAppName: String = ""
+    var proxyIP: String = ""
     var proxyPort: Int = 0
-    var userName: String? = null
-    var password: String? = null
+    var userName: String = ""
+    var password: String = ""
     var isSelected: Boolean = true
     var isCustom: Boolean = true
     var isUDP: Boolean = false
