@@ -359,7 +359,7 @@ class ConnectionTrackerFragment :
             // Rule-specific deletion for Universal Firewall Settings
         if (fromUniversalFirewallScreen && filterCategories.size == 1) {
             // Rule-specific deletion for Universal Firewall Settings
-            val rule = filterCategories[0]
+            val rule = filterCategories.first()
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.conn_track_clear_rule_logs_title)
                 .setMessage(R.string.conn_track_clear_rule_logs_message)
@@ -382,7 +382,7 @@ class ConnectionTrackerFragment :
                 .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
                 .create()
                 .show()
-        }
+        }}
     }
 
     private fun remakeChildFilterChipsUi(categories: List<FirewallRuleset>) {
