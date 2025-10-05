@@ -1123,8 +1123,8 @@ abstract class AppDatabase : RoomDatabase() {
 
                     // Обновление DnsCryptEndpoint
                     db.execSQL("UPDATE DnsCryptEndpoint SET dnsCryptExplanation = '' WHERE dnsCryptExplanation IS NULL")
-                    // Обновление DoTEndpoint
-                    db.execSQL("UPDATE DoTEndpoint SET desc = '' WHERE desc IS NULL")
+                    // Обновление DnsCryptRelayEndpoint
+                    db.execSQL("UPDATE DnsCryptRelayEndpoint SET dnsCryptRelayExplanation = '' WHERE dnsCryptRelayExplanation IS NULL")
                     // Обновление ODoHEndpoint
                     db.execSQL("UPDATE ODoHEndpoint SET desc = '' WHERE desc IS NULL")
 
