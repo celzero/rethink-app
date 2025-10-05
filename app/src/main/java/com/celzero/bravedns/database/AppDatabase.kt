@@ -1119,24 +1119,6 @@ abstract class AppDatabase : RoomDatabase() {
 
 
 
-         private val roomCallback: Callback =
-            object : Callback() {
-                override fun onCreate(db: SupportSQLiteDatabase) {
-                    super.onCreate(db)
-                    Logger.i(LOG_TAG_APP_DB, "Database created, ${db.version}")
-                }
-
-                override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
-                    super.onDestructiveMigration(db)
-                    Logger.i(LOG_TAG_APP_DB, "Database destructively migrated, ${db.version}")
-                }
-
-                override fun onOpen(db: SupportSQLiteDatabase) {
-                    super.onOpen(db)
-                    Logger.i(LOG_TAG_APP_DB, "Database opened, ${db.version}")
-                }
-            }   
-
 
         // ref: stackoverflow.com/a/57204285
         private fun doesColumnExistInTable(
