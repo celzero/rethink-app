@@ -1114,6 +1114,20 @@ abstract class AppDatabase : RoomDatabase() {
                     // Переименовываем временную таблицу
                     db.execSQL("ALTER TABLE ProxyEndpoint_backup RENAME TO ProxyEndpoint")
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: Updated ProxyEndpoint schema to non-nullable fields")
+
+                        // Обновление DoHEndpoint
+                    db.execSQL("UPDATE DoHEndpoint SET dohName = '' WHERE dohName IS NULL")
+                    db.execSQL("UPDATE DoHEndpoint SET dohURL = '' WHERE dohURL IS NULL")
+            // Обновление DoTEndpoint
+                    db.execSQL("UPDATE DoTEndpoint SET name = '' WHERE name IS NULL")
+                    db.execSQL("UPDATE DoTEndpoint SET url = '' WHERE url IS NULL")
+            // Обновление ODoHEndpoint
+                    db.execSQL("UPDATE ODoHEndpoint SET name = '' WHERE name IS NULL")
+                    db.execSQL("UPDATE ODoHEndpoint SET proxy = '' WHERE proxy IS NULL")
+                    db.execSQL("UPDATE ODoHEndpoint SET resolver = '' WHERE resolver IS NULL")
+                    db.execSQL("UPDATE ODoHEndpoint SET proxyIps = '' WHERE proxyIps IS NULL")
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: Updated DoHEndpoint, DoTEndpoint, ODoHEndpoint to replace NULL with empty strings")
+    
                 }
             }
 
