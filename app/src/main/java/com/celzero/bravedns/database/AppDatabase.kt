@@ -1113,15 +1113,23 @@ abstract class AppDatabase : RoomDatabase() {
                     db.execSQL("DROP TABLE ProxyEndpoint")
                     // Переименовываем временную таблицу
                     db.execSQL("ALTER TABLE ProxyEndpoint_backup RENAME TO ProxyEndpoint")
-                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: Updated ProxyEndpoint schema to non-nullable fields")
-
-                        // Обновление DoHEndpoint
+                    
+                    // Обновление DoHEndpoint
                     db.execSQL("UPDATE DoHEndpoint SET dohExplanation = '' WHERE dohExplanation IS NULL")
-            // Обновление DoTEndpoint
+                    // Обновление DoTEndpoint
                     db.execSQL("UPDATE DoTEndpoint SET desc = '' WHERE desc IS NULL")
-            // Обновление ODoHEndpoint
-                    db.execSQL("UPDATE ODoHEndpoint SET desc = '' WHERE desc IS NULL"
-                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: Updated DoHEndpoint, DoTEndpoint, ODoHEndpoint to replace NULL with empty strings")
+                    // Обновление ODoHEndpoint
+                    db.execSQL("UPDATE ODoHEndpoint SET desc = '' WHERE desc IS NULL")
+
+                    // Обновление DnsCryptEndpoint
+                    db.execSQL("UPDATE DnsCryptEndpoint SET dnsCryptExplanation = '' WHERE dnsCryptExplanation IS NULL")
+                    // Обновление DoTEndpoint
+                    db.execSQL("UPDATE DoTEndpoint SET desc = '' WHERE desc IS NULL")
+                    // Обновление ODoHEndpoint
+                    db.execSQL("UPDATE ODoHEndpoint SET desc = '' WHERE desc IS NULL")
+
+                    
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: Updated ProxyEndpoint, DoHEndpoint, DoTEndpoint, ODoHEndpoint to replace NULL with empty strings")
     
                 }
             }
