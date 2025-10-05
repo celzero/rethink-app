@@ -189,7 +189,6 @@ class ConnectionTrackerFragment :
         setupRecyclerScrollListener()
     }
 
-
     private fun hideSearchLayout() {
         b.connectionCardViewTop.visibility = View.GONE
     }
@@ -200,7 +199,7 @@ class ConnectionTrackerFragment :
         // some ROMs kill or freeze the keyboard/IME process to save memory or battery,
         // causing SearchView to stop receiving input events
         // this is a workaround to restart the IME process
-        //b.connectionSearch.setQuery("", false)
+        b.connectionSearch.setQuery("", false)
         b.connectionSearch.clearFocus()
 
         val imm = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
@@ -211,7 +210,6 @@ class ConnectionTrackerFragment :
     private fun setupRecyclerScrollListener() {
         val scrollListener =
             object : RecyclerView.OnScrollListener() {
-
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
 
@@ -357,31 +355,32 @@ class ConnectionTrackerFragment :
     private fun showDeleteDialog() {
         if (fromUniversalFirewallScreen && filterCategories.isNotEmpty()) {
             // Rule-specific deletion for Universal Firewall Settings
-        if (fromUniversalFirewallScreen && filterCategories.size == 1) {
-            // Rule-specific deletion for Universal Firewall Settings
-            val rule = filterCategories[0]
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.conn_track_clear_rule_logs_title)
-                .setMessage(R.string.conn_track_clear_rule_logs_message)
-                .setCancelable(true)
-                .setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
-                    io { connectionTrackerRepository.clearLogsByRule(rule) }
-                }
-                .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
-                .create()
-                .show()
-        } else {
-            // Default deletion behavior - delete all logs
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.conn_track_clear_logs_title)
-                .setMessage(R.string.conn_track_clear_logs_message)
-                .setCancelable(true)
-                .setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
-                    io { connectionTrackerRepository.clearAllData() }
-                }
-                .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
-                .create()
-                .show()
+            if (fromUniversalFirewallScreen && filterCategories.size == 1) {
+                // Rule-specific deletion for Universal Firewall Settings
+                val rule = filterCategories[0]
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.conn_track_clear_rule_logs_title)
+                    .setMessage(R.string.conn_track_clear_rule_logs_message)
+                    .setCancelable(true)
+                    .setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
+                        io { connectionTrackerRepository.clearLogsByRule(rule) }
+                    }
+                    .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
+                    .create()
+                    .show()
+            } else {
+                // Default deletion behavior - delete all logs
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.conn_track_clear_logs_title)
+                    .setMessage(R.string.conn_track_clear_logs_message)
+                    .setCancelable(true)
+                    .setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
+                        io { connectionTrackerRepository.clearAllData() }
+                    }
+                    .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
+                    .create()
+                    .show()
+            }
         }
     }
 
@@ -403,9 +402,6 @@ class ConnectionTrackerFragment :
         viewModel.setFilter(filterQuery, filterCategories, filterType)
     }
 
-    // chips: all, allowed, blocked
-    // when any chip other than "all" is selected, show the child chips.
-    // ignore unselect events from allowed and blocked chip
     private fun unselectParentsChipsUi(tag: Any) {
         when (tag) {
             TopLevelFilter.ALL.id -> {
