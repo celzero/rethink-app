@@ -1058,11 +1058,11 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
-             // Новая миграция для изменения полей proxy_app_name, proxy_ip, user_name, password на NOT NULL
+             
         private val MIGRATION_25_26: Migration =
             object : Migration(25, 26) {
                 override fun migrate(db: SupportSQLiteDatabase) {
-                    // Создаём временную таблицу с новой схемой (все поля NOT NULL)
+                    
                     db.execSQL(
                         """
                         CREATE TABLE ProxyEndpoint_backup (
@@ -1111,21 +1111,23 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                     // Удаляем старую таблицу
                     db.execSQL("DROP TABLE ProxyEndpoint")
-                    // Переименовываем временную таблицу
+
+
+                    
+                    
                     db.execSQL("ALTER TABLE ProxyEndpoint_backup RENAME TO ProxyEndpoint")
                     
-                    // Обновление DoHEndpoint
+                    // DoHEndpoint
                     db.execSQL("UPDATE DoHEndpoint SET dohExplanation = '' WHERE dohExplanation IS NULL")
-                    // Обновление DoTEndpoint
+                    // DoTEndpoint
                     db.execSQL("UPDATE DoTEndpoint SET desc = '' WHERE desc IS NULL")
-                    // Обновление ODoHEndpoint
+                    // ODoHEndpoint
                     db.execSQL("UPDATE ODoHEndpoint SET desc = '' WHERE desc IS NULL")
-
-                    // Обновление DNSCryptEndpoint
+                    // DNSCryptEndpoint
                     db.execSQL("UPDATE DNSCryptEndpoint SET dnsCryptExplanation = '' WHERE dnsCryptExplanation IS NULL")
-                    // Обновление DNSCryptRelayEndpoint
+                    // DNSCryptRelayEndpoint
                     db.execSQL("UPDATE DNSCryptRelayEndpoint SET dnsCryptRelayExplanation = '' WHERE dnsCryptRelayExplanation IS NULL")
-                    // Обновление DNSProxyEndpoint
+                    // DNSProxyEndpoint
                     db.execSQL("UPDATE DNSProxyEndpoint SET proxyAppName = '' WHERE proxyAppName IS NULL")
                     db.execSQL("UPDATE DNSProxyEndpoint SET proxyIP = '' WHERE proxyIP IS NULL")
                     
