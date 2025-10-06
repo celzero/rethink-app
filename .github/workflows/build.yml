@@ -184,7 +184,7 @@ jobs:
 # 20. Проверяем содержимое APK (arm64-v8a)
       - name: Inspect arm64-v8a APK Contents
         run: |
-          APK_PATH=app/build/outputs/apk/websiteFullRelease/arm64-v8a/app-website-full-release-arm64-v8a.apk
+          APK_PATH=app/build/outputs/apk/websiteFull/release/app-website-full-arm64-v8a-release.apk
           if [ ! -f "$APK_PATH" ]; then
            echo "Error: arm64-v8a APK not found at $APK_PATH"
            exit 1
@@ -203,7 +203,7 @@ jobs:
 # 21. Проверяем подпись APK (arm64-v8a)
       - name: Verify APK Signature
         run: |
-          APK_PATH=app/build/outputs/apk/websiteFullRelease/arm64-v8a/app-website-full-release-arm64-v8a.apk
+          APK_PATH=app/build/outputs/apk/websiteFull/release/app-website-full-arm64-v8a-release.apk
           if [ ! -f "$APK_PATH" ]; then
             echo "Error: arm64-v8a APK not found at $APK_PATH"
             exit 1
