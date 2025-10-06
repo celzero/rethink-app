@@ -7,6 +7,13 @@ plugins {
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 
+// Загружаем keystore.properties только если он существует
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+} else {
+    logger.warn("keystore.properties not found, relying on environment variables")
+}
+
 // Получаем версию из git describe
 def gitVersion = providers.exec {
     commandLine("git", "describe", "--tags", "--always")
@@ -28,11 +35,6 @@ def getVersionCode = {
     return code
 }
 
-// Загружаем keystore.properties только если он существует
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-}
-
 android {
     compileSdk 36
     namespace 'com.celzero.bravedns'
@@ -46,9 +48,23 @@ android {
 
     signingConfigs {
         release {
+            // Проверяем наличие всех необходимых свойств
+            if (!keystoreProperties['storePassword'] && !System.getenv("KEYSTORE_STORE_PASSWORD")) {
+                throw new GradleException("Missing storePassword in keystore.properties or KEYSTORE_STORE_PASSWORD environment variable")
+            }
+            if (!keystoreProperties['keyPassword'] && !System.getenv("KEYSTORE_KEY_PASSWORD")) {
+                throw new GradleException("Missing keyPassword in keystore.properties or KEYSTORE_KEY_PASSWORD environment variable")
+            }
+            if (!keystoreProperties['keyAlias'] && !System.getenv("KEYSTORE_ALIAS")) {
+                throw new GradleException("Missing keyAlias in keystore.properties or KEYSTORE_ALIAS environment variable")
+            }
+            if (!keystoreProperties['storeFile'] && !file("app/keystore.jks").exists()) {
+                throw new GradleException("Missing storeFile in keystore.properties or app/keystore.jks not found")
+            }
+
             keyAlias keystoreProperties['keyAlias'] ?: System.getenv("KEYSTORE_ALIAS")
             keyPassword keystoreProperties['keyPassword'] ?: System.getenv("KEYSTORE_KEY_PASSWORD")
-            storeFile file(keystoreProperties['storeFile'] ?: "keystore.jks")
+            storeFile file(keystoreProperties['storeFile'] ?: "app/keystore.jks")
             storePassword keystoreProperties['storePassword'] ?: System.getenv("KEYSTORE_STORE_PASSWORD")
         }
     }
@@ -57,7 +73,7 @@ android {
     splits.abi {
         enable true
         reset()
-        include 'arm64-v8a' // Можно добавить другие ABI, например: 'x86', 'x86_64', 'armeabi-v7a'
+        include 'arm64-v8a'
         universalApk false
     }
 
@@ -91,6 +107,10 @@ android {
         coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
     }
 
     packagingOptions {
@@ -145,7 +165,7 @@ dependencies {
     implementation 'com.google.guava:guava:33.4.8-android'
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
-    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.20'
+    fullImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.20"
     fullImplementation 'androidx.appcompat:appcompat:1.7.1'
     fullImplementation 'androidx.core:core-ktx:1.17.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
@@ -195,8 +215,8 @@ dependencies {
     download 'io.insert-koin:koin-android:4.1.1'
     implementation 'io.insert-koin:koin-android:4.1.1'
 
-    download 'hu.autsoft:krate:2.0.0'
-    implementation 'hu.autsoft:krate:2.0.0'
+    download 'hu.autsoft:krate:2.4.0'
+    implementation 'hu.autsoft:krate:2.4.0'
 
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.9'
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
@@ -242,4 +262,6 @@ repositories {
     google()
     maven { url 'https://jitpack.io' }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    // Укажи кастомный репозиторий для версий 2.2.20 и 8.13.0
+    // maven { url 'https://your-custom-repo' }
 }

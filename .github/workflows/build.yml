@@ -78,6 +78,8 @@ jobs:
             exit 1
           fi
           ls -l app/keystore.jks
+          cp app/keystore.jks keystore.jks
+          cp app/keystore.jks app/app/keystore.jks
 
       # 7. Создаём keystore.properties
       - name: Create keystore.properties
@@ -86,40 +88,59 @@ jobs:
           echo "keyPassword=${{ secrets.KEYSTORE_KEY_PASSWORD }}" >> app/keystore.properties
           echo "storeFile=app/keystore.jks" >> app/keystore.properties
           echo "storePassword=${{ secrets.KEYSTORE_STORE_PASSWORD }}" >> app/keystore.properties
+          echo "Created keystore.properties:"
           cat app/keystore.properties
 
-      # 8. Выводим build.gradle для диагностики
+      # 8. Проверяем содержимое keystore.properties
+      - name: Verify keystore.properties
+        run: |
+          if [ ! -f app/keystore.properties ]; then
+            echo "Error: keystore.properties was not created"
+            exit 1
+          fi
+          echo "Contents of keystore.properties:"
+          cat app/keystore.properties
+          if ! grep -q "storePassword" app/keystore.properties; then
+            echo "Error: storePassword not found in keystore.properties"
+            exit 1
+          fi
+
+      # 9. Выводим build.gradle для диагностики
       - name: Show app/build.gradle
         run: cat app/build.gradle
 
-      # 9. Выводим корневой build.gradle для диагностики
+      # 10. Выводим корневой build.gradle для диагностики
       - name: Show root build.gradle
         run: cat build.gradle || echo "No root build.gradle found"
 
-      # 10. Выводим gradle-wrapper.properties
+      # 11. Выводим gradle-wrapper.properties
       - name: Show gradle-wrapper.properties
         run: cat gradle/wrapper/gradle-wrapper.properties
 
-      # 11. Очищаем Gradle кэш
+      # 12. Выводим proguard-rules.pro
+      - name: Show proguard-rules.pro
+        run: cat app/proguard-rules.pro || echo "No proguard-rules.pro found"
+
+      # 13. Очищаем Gradle кэш
       - name: Clear Gradle Cache
         run: |
           rm -rf ~/.gradle/caches
           rm -rf ~/.gradle/wrapper
           ./gradlew clean --no-daemon
 
-      # 12. Делаем gradlew исполняемым
+      # 14. Делаем gradlew исполняемым
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # 13. Собираем APK
+      # 15. Собираем APK
       - name: Build APK
         env:
           VERSION_CODE: ${{ github.run_number }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FIRESTACK_REPO: ${{ github.event.inputs.firestackRepo || 'github' }}
-        run: ./gradlew clean assembleWebsiteFullRelease --stacktrace --no-daemon
+        run: ./gradlew clean assembleWebsiteFullRelease --stacktrace --no-daemon --no-build-cache
 
-      # 14. Загружаем APK
+      # 16. Загружаем APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
@@ -127,7 +148,7 @@ jobs:
           path: app/build/outputs/apk/websiteFullRelease/arm64-v8a/*.apk
           retention-days: 7
 
-      # 15. Логи для отладки при ошибке
+      # 17. Логи для отладки при ошибке
       - name: Debug Gradle logs
         if: failure()
         run: |
