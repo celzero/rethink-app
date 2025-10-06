@@ -1090,8 +1090,8 @@
     <string name="lbl_hop" translatable="true">Узлы</string>
     <string name="lbl_manual" translatable="true">Вручную</string>
     <string name="wireguard_title" translatable="true">Безопасный Интернет с WireGuard</string>
-    <string name="wireguard_desc" translatable="true">Шифруйте свой интернет-трафик с помощью WireGuard. Выбирайте разные маршруты для разных приложений.</string>
-    <string name="firewall_title" translatable="true">Защитите свой Android с помощью firewall</string>
+    <string name="wireguard_desc" translatable="true">Зашифруйте свой интернет-трафик с WireGuard. Выберите различные маршруты для различных приложений.</string>
+    <string name="firewall_title" translatable="true">Защитите свой Android с помощью Firewall</string>
     <string name="firewall_desc" translatable="true">Контролируйте использование интернет-трафика ваших приложений; ограничивайте соединения на основе приложений или сетевой активности.</string>
     <string name="dns_title" translatable="true">Блокируйте рекламу и вредоносное ПО с помощью DNS</string>
     <string name="dns_desc" translatable="true">Выбирайте из 190+ списков, чтобы остановить рекламу, трекеры и вредоносное ПО.</string>
