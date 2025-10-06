@@ -29,7 +29,7 @@ jobs:
       run: |
         mkdir -p app/src/debug
         echo "${GSCV_TEST_JSON}" > app/src/debug/google-services.json
-        # expected:  l:29 w:45 m:691
+        # expected: l:29 w:45 m:691
         wc -lwm app/src/debug/google-services.json
       env:
         GSCV_TEST_JSON: ${{ secrets.GOOGLE_SERVICES_TEST_JSON }}
