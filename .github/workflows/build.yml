@@ -117,7 +117,7 @@ jobs:
           VERSION_CODE: ${{ github.run_number }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FIRESTACK_REPO: ${{ github.event.inputs.firestackRepo || 'github' }}
-        run: ./gradlew clean assembleWebsiteFullRelease --stacktrace --debug --no-daemon
+        run: ./gradlew clean assembleWebsiteFullRelease --stacktrace --no-daemon
 
       # 14. Загружаем APK
       - name: Upload APK
