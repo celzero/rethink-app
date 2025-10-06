@@ -70,28 +70,48 @@ jobs:
       - name: Decode Keystore
         run: echo "${{ secrets.KEYSTORE_FILE_BASE64 }}" | base64 -d > app/keystore.jks
 
-      # 6. Проверяем, что keystore.jks создан
+      # 6. Копируем keystore.jks в корневую директорию и app/app/
+      - name: Copy Keystore to Root Directory and app/app/
+        run: |
+          cp app/keystore.jks keystore.jks
+          cp app/keystore.jks app/app/keystore.jks
+          echo "Copied keystore.jks to root directory and app/app/"
+          ls -l keystore.jks
+          ls -l app/app/keystore.jks
+
+      # 7. Проверяем, что keystore.jks создан и скопирован
       - name: Verify Keystore File
         run: |
           if [ ! -f app/keystore.jks ]; then
-            echo "Error: keystore.jks was not created"
+            echo "Error: app/keystore.jks was not created"
             exit 1
           fi
+          if [ ! -f keystore.jks ]; then
+            echo "Error: keystore.jks was not copied to root directory"
+            exit 1
+          fi
+          if [ ! -f app/app/keystore.jks ]; then
+            echo "Error: keystore.jks was not copied to app/app/"
+            exit 1
+          fi
+          echo "keystore.jks files:"
           ls -l app/keystore.jks
-          cp app/keystore.jks keystore.jks
-          cp app/keystore.jks app/app/keystore.jks
+          ls -l keystore.jks
+          ls -l app/app/keystore.jks
 
-      # 7. Создаём keystore.properties
+      # 8. Создаём keystore.properties
       - name: Create keystore.properties
         run: |
           echo "keyAlias=${{ secrets.KEYSTORE_ALIAS }}" > app/keystore.properties
           echo "keyPassword=${{ secrets.KEYSTORE_KEY_PASSWORD }}" >> app/keystore.properties
-          echo "storeFile=app/keystore.jks" >> app/keystore.properties
+          echo "storeFile=keystore.jks" >> app/keystore.properties
           echo "storePassword=${{ secrets.KEYSTORE_STORE_PASSWORD }}" >> app/keystore.properties
           echo "Created keystore.properties:"
           cat app/keystore.properties
+          cp app/keystore.properties keystore.properties
+          cp app/keystore.properties app/app/keystore.properties
 
-      # 8. Проверяем содержимое keystore.properties
+      # 9. Проверяем содержимое keystore.properties
       - name: Verify keystore.properties
         run: |
           if [ ! -f app/keystore.properties ]; then
@@ -104,35 +124,47 @@ jobs:
             echo "Error: storePassword not found in keystore.properties"
             exit 1
           fi
+          if ! grep -q "keyPassword" app/keystore.properties; then
+            echo "Error: keyPassword not found in keystore.properties"
+            exit 1
+          fi
+          if ! grep -q "keyAlias" app/keystore.properties; then
+            echo "Error: keyAlias not found in keystore.properties"
+            exit 1
+          fi
+          if ! grep -q "storeFile=keystore.jks" app/keystore.properties; then
+            echo "Error: storeFile=keystore.jks not found in keystore.properties"
+            exit 1
+          fi
 
-      # 9. Выводим build.gradle для диагностики
+      # 10. Выводим build.gradle для диагностики
       - name: Show app/build.gradle
         run: cat app/build.gradle
 
-      # 10. Выводим корневой build.gradle для диагностики
+      # 11. Выводим корневой build.gradle для диагностики
       - name: Show root build.gradle
         run: cat build.gradle || echo "No root build.gradle found"
 
-      # 11. Выводим gradle-wrapper.properties
+      # 12. Выводим gradle-wrapper.properties
       - name: Show gradle-wrapper.properties
         run: cat gradle/wrapper/gradle-wrapper.properties
 
-      # 12. Выводим proguard-rules.pro
+      # 13. Выводим proguard-rules.pro
       - name: Show proguard-rules.pro
         run: cat app/proguard-rules.pro || echo "No proguard-rules.pro found"
 
-      # 13. Очищаем Gradle кэш
+      # 14. Очищаем Gradle кэш
       - name: Clear Gradle Cache
         run: |
           rm -rf ~/.gradle/caches
           rm -rf ~/.gradle/wrapper
           ./gradlew clean --no-daemon
 
-      # 14. Делаем gradlew исполняемым
+      # 15. Делаем gradlew исполняемым
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # 15. Собираем APK
+      # 16. Собираем APK
       - name: Build APK
         env:
           VERSION_CODE: ${{ github.run_number }}
@@ -140,7 +172,7 @@ jobs:
           FIRESTACK_REPO: ${{ github.event.inputs.firestackRepo || 'github' }}
         run: ./gradlew clean assembleWebsiteFullRelease --stacktrace --no-daemon --no-build-cache
 
-      # 16. Загружаем APK
+      # 17. Загружаем APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
@@ -148,7 +180,7 @@ jobs:
           path: app/build/outputs/apk/websiteFullRelease/arm64-v8a/*.apk
           retention-days: 7
 
-      # 17. Логи для отладки при ошибке
+      # 18. Логи для отладки при ошибке
       - name: Debug Gradle logs
         if: failure()
         run: |
