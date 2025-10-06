@@ -210,13 +210,13 @@ dependencies {
 
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
 
-    download 'io.insert-koin:koin-core:4.4.1'
-    implementation 'io.insert-koin:koin-core:4.4.1'
-    download 'io.insert-koin:koin-android:4.4.1'
-    implementation 'io.insert-koin:koin-android:4.4.1'
+    download 'io.insert-koin:koin-core:4.1.1'
+    implementation 'io.insert-koin:koin-core:4.1.1'
+    download 'io.insert-koin:koin-android:4.1.1'
+    implementation 'io.insert-koin:koin-android:4.1.1'
 
-    download 'hu.autsoft:krate:2.4.0'
-    implementation 'hu.autsoft:krate:2.4.0'
+    download 'hu.autsoft:krate:2.0.0'
+    implementation 'hu.autsoft:krate:2.0.0'
 
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.9'
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
