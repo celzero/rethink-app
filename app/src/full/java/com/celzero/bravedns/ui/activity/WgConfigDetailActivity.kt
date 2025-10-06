@@ -321,7 +321,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                             getString(R.string.status_waiting).replaceFirstChar(Char::titlecase)
                     } else {
                         val txt =
-                            getString(R.string.status_waiting).replaceFirstChar(Char::titlecase) + "(${statusPair.second})"
+                            getString(R.string.status_waiting).replaceFirstChar(Char::titlecase) + " (${statusPair.second})"
                         b.statusText.text = txt
                     }
                 }
