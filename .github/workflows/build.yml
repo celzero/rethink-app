@@ -105,7 +105,7 @@ jobs:
         run: |
           rm -rf ~/.gradle/caches
           rm -rf ~/.gradle/wrapper
-          ./gradlew cleanBuildCache --no-daemon
+          ./gradlew clean --no-daemon
 
       # 12. Делаем gradlew исполняемым
       - name: Make gradlew executable
@@ -117,7 +117,7 @@ jobs:
           VERSION_CODE: ${{ github.run_number }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FIRESTACK_REPO: ${{ github.event.inputs.firestackRepo || 'github' }}
-        run: ./gradlew clean assembleWebsiteFullRelease --stacktrace --debug
+        run: ./gradlew clean assembleWebsiteFullRelease --stacktrace --debug --no-daemon
 
       # 14. Загружаем APK
       - name: Upload APK
