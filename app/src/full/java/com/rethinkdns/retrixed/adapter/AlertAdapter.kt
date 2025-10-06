@@ -14,16 +14,16 @@
  * limitations under the License.
  *//*
 
-   package com.celzero.bravedns.adapter
+   package com.rethinkdns.retrixed.adapter
 
    import android.content.Context
    import android.view.LayoutInflater
    import android.view.View
    import android.view.ViewGroup
    import androidx.recyclerview.widget.RecyclerView
-   import com.celzero.bravedns.database.AlertRegistry
-   import com.celzero.bravedns.databinding.ListItemAlertRegistryBinding
-   import com.celzero.bravedns.service.AlertCategory
+   import com.rethinkdns.retrixed.database.AlertRegistry
+   import com.rethinkdns.retrixed.databinding.ListItemAlertRegistryBinding
+   import com.rethinkdns.retrixed.service.AlertCategory
    import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
    class AlertAdapter(
