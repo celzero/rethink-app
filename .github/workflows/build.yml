@@ -1,4 +1,4 @@
-name: Build APK for arm64-v8a
+name: Build APK for universal
 
 on:
   push:
@@ -27,7 +27,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Кэшируем Gradle
+      # 3. Устанавливаем Android SDK (для apksigner)
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          sdk-version: '34'
+
+      # 4. Кэшируем Gradle
       - name: Cache Gradle
         uses: actions/cache@v4
         with:
@@ -38,7 +44,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 4. Проверяем наличие секретов
+      # 5. Проверяем наличие секретов
       - name: Check Secrets
         run: |
           if [ -z "${{ secrets.KEYSTORE_FILE_BASE64 }}" ]; then
@@ -66,11 +72,11 @@ jobs:
         env:
           FIRESTACK_REPO: ${{ github.event.inputs.firestackRepo || 'github' }}
 
-      # 5. Декодируем keystore из секрета
+      # 6. Декодируем keystore из секрета
       - name: Decode Keystore
         run: echo "${{ secrets.KEYSTORE_FILE_BASE64 }}" | base64 -d > app/keystore.jks
 
-      # 6. Копируем keystore.jks в корневую директорию и app/app/
+      # 7. Копируем keystore.jks и создаём костыль
       - name: Copy Keystore to Root Directory and app/app/
         run: |
           cp app/keystore.jks keystore.jks
@@ -79,7 +85,7 @@ jobs:
           ls -l keystore.jks
           ls -l app/app/keystore.jks
 
-      # 7. Проверяем, что keystore.jks создан и скопирован
+      # 8. Проверяем, что keystore.jks создан и скопирован
       - name: Verify Keystore File
         run: |
           if [ ! -f app/keystore.jks ]; then
@@ -99,73 +105,73 @@ jobs:
           ls -l keystore.jks
           ls -l app/app/keystore.jks
 
-      # 8. Создаём keystore.properties
+      # 9. Создаём keystore.properties (костыль)
       - name: Create keystore.properties
         run: |
           echo "keyAlias=${{ secrets.KEYSTORE_ALIAS }}" > app/keystore.properties
           echo "keyPassword=${{ secrets.KEYSTORE_KEY_PASSWORD }}" >> app/keystore.properties
           echo "storeFile=keystore.jks" >> app/keystore.properties
           echo "storePassword=${{ secrets.KEYSTORE_STORE_PASSWORD }}" >> app/keystore.properties
-          echo "Created keystore.properties:"
-          cat app/keystore.properties
-          cp app/keystore.properties app/app/keystore.properties
+          # Костыль: копируем в корень и app/app/
           cp app/keystore.properties keystore.properties
-          
+          cp app/keystore.properties app/app/keystore.properties
+          echo "Created and copied keystore.properties:"
+          cat app/keystore.properties
+          cat keystore.properties
+          cat app/app/keystore.properties
 
-      # 9. Проверяем содержимое keystore.properties
+      # 10. Проверяем содержимое keystore.properties
       - name: Verify keystore.properties
         run: |
           if [ ! -f app/keystore.properties ]; then
-            echo "Error: keystore.properties was not created"
+            echo "Error: app/keystore.properties was not created"
+            exit 1
+          fi
+          if [ ! -f keystore.properties ]; then
+            echo "Error: keystore.properties was not copied to root"
+            exit 1
+          fi
+          if [ ! -f app/app/keystore.properties ]; then
+            echo "Error: keystore.properties was not copied to app/app/"
             exit 1
           fi
           echo "Contents of keystore.properties:"
           cat app/keystore.properties
-          if ! grep -q "storePassword" app/keystore.properties; then
-            echo "Error: storePassword not found in keystore.properties"
-            exit 1
-          fi
-          if ! grep -q "keyPassword" app/keystore.properties; then
-            echo "Error: keyPassword not found in keystore.properties"
-            exit 1
-          fi
-          if ! grep -q "keyAlias" app/keystore.properties; then
-            echo "Error: keyAlias not found in keystore.properties"
-            exit 1
-          fi
-          if ! grep -q "storeFile=keystore.jks" app/keystore.properties; then
-            echo "Error: storeFile=keystore.jks not found in keystore.properties"
-            exit 1
-          fi
+          cat keystore.properties
+          cat app/app/keystore.properties
 
-      # 10. Выводим build.gradle для диагностики
+      # 11. Выводим build.gradle для диагностики
       - name: Show app/build.gradle
         run: cat app/build.gradle
 
-      # 11. Выводим корневой build.gradle для диагностики
+      # 12. Выводим корневой build.gradle для диагностики
       - name: Show root build.gradle
         run: cat build.gradle || echo "No root build.gradle found"
 
-      # 12. Выводим gradle-wrapper.properties
+      # 13. Выводим gradle-wrapper.properties
       - name: Show gradle-wrapper.properties
         run: cat gradle/wrapper/gradle-wrapper.properties
 
-      # 13. Выводим proguard-rules.pro
+      # 14. Выводим proguard-rules.pro
       - name: Show proguard-rules.pro
         run: cat app/proguard-rules.pro || echo "No proguard-rules.pro found"
 
-      # 14. Очищаем Gradle кэш
+      # 15. Проверяем AndroidManifest.xml
+      - name: Show AndroidManifest.xml
+        run: cat app/src/main/AndroidManifest.xml || echo "No AndroidManifest.xml found"
+
+      # 16. Очищаем Gradle кэш
       - name: Clear Gradle Cache
         run: |
           rm -rf ~/.gradle/caches
           rm -rf ~/.gradle/wrapper
           ./gradlew clean --no-daemon
 
-      # 15. Делаем gradlew исполняемым
+      # 17. Делаем gradlew исполняемым
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # 16. Собираем APK
+      # 18. Собираем APK
       - name: Build APK
         env:
           VERSION_CODE: ${{ github.run_number }}
@@ -173,23 +179,57 @@ jobs:
           FIRESTACK_REPO: ${{ github.event.inputs.firestackRepo || 'github' }}
         run: ./gradlew clean assembleWebsiteFullRelease --stacktrace --no-daemon --no-build-cache
 
-      # 17. Выводим содержимое директории с APK для диагностики
+      # 19. Выводим содержимое директории с APK и проверяем размеры
       - name: List APK Output Directory
         run: |
           echo "Listing contents of app/build/outputs/apk/:"
-          find app/build/outputs/apk/ -type f || echo "No files found in app/build/outputs/apk/"
+          find app/build/outputs/apk/ -type f -exec ls -lh {} \; || echo "No files found in app/build/outputs/apk/"
           echo "Listing all APK files in project:"
-          find . -type f -name "*.apk" || echo "No APK files found"
+          find . -type f -name "*.apk" -exec ls -lh {} \; || echo "No APK files found"
 
-      # 18. Загружаем APK
+      # 20. Проверяем содержимое универсального APK
+      - name: Inspect Universal APK Contents
+        run: |
+          APK_PATH=app/build/outputs/apk/websiteFullRelease/universal/app-website-full-release-universal.apk
+          if [ ! -f "$APK_PATH" ]; then
+            echo "Error: Universal APK not found at $APK_PATH"
+            exit 1
+          fi
+          echo "Unzipping $APK_PATH for inspection"
+          unzip -q "$APK_PATH" -d apk_contents
+          echo "Contents of APK:"
+          ls -lh apk_contents
+          echo "Checking for critical files:"
+          ls -lh apk_contents/META-INF/ || echo "No META-INF/ directory (signature missing)"
+          ls -lh apk_contents/classes.dex || echo "No classes.dex"
+          ls -lh apk_contents/lib/ || echo "No lib/ directory"
+          ls -lh apk_contents/res/ || echo "No res/ directory"
+          ls -lh apk_contents/resources.arsc || echo "No resources.arsc"
+
+      # 21. Проверяем подпись универсального APK
+      - name: Verify APK Signature
+        run: |
+          APK_PATH=app/build/outputs/apk/websiteFullRelease/universal/app-website-full-release-universal.apk
+          if [ ! -f "$APK_PATH" ]; then
+            echo "Error: Universal APK not found at $APK_PATH"
+            exit 1
+          fi
+          echo "Verifying signature of $APK_PATH"
+          $ANDROID_HOME/build-tools/34.0.0/apksigner verify --verbose "$APK_PATH" || {
+            echo "Error: APK signature verification failed"
+            exit 1
+          }
+          echo "APK is signed successfully"
+
+      # 22. Загружаем универсальный APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: rethinkdns-nightly-arm64-v8a
-          path: app/build/outputs/apk/**/*.apk
+          name: rethinkdns-nightly-universal
+          path: app/build/outputs/apk/websiteFullRelease/universal/app-website-full-release-universal.apk
           retention-days: 7
 
-      # 19. Логи для отладки при ошибке
+      # 23. Логи для отладки при ошибке
       - name: Debug Gradle logs
         if: failure()
         run: |
