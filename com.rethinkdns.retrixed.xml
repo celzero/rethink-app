@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <permissions>
-    <privapp-permissions package="com.celzero.bravedns">
+    <privapp-permissions package="com.rethinkdns.retrixed">
         <permission name="android.permission.INTERACT_ACROSS_USERS"/>
     </privapp-permissions>
 </permissions>
