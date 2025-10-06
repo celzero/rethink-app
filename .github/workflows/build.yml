@@ -221,7 +221,49 @@ jobs:
           }
           echo "APK is signed successfully"
 
-      # 22. Загружаем универсальный APK
+# 20. Проверяем содержимое APK (arm64-v8a)
+      - name: Inspect arm64-v8a APK Contents
+        run: |
+          APK_PATH=app/build/outputs/apk/websiteFull/release/app-website-full-arm64-v8a-release.apk
+          if [ ! -f "$APK_PATH" ]; then
+           echo "Error: arm64-v8a APK not found at $APK_PATH"
+           exit 1
+          fi
+          echo "Unzipping $APK_PATH for inspection"
+          unzip -q "$APK_PATH" -d apk_contents
+          echo "Contents of APK:"
+          ls -lh apk_contents
+          echo "Checking for critical files:"
+          ls -lh apk_contents/META-INF/ || echo "No META-INF/ directory (signature missing)"
+          ls -lh apk_contents/classes.dex || echo "No classes.dex"
+          ls -lh apk_contents/lib/arm64-v8a/ || echo "No lib/arm64-v8a/ directory"
+          ls -lh apk_contents/res/ || echo "No res/ directory"
+          ls -lh apk_contents/resources.arsc || echo "No resources.arsc"
+
+# 21. Проверяем подпись APK (arm64-v8a)
+      - name: Verify APK Signature
+        run: |
+          APK_PATH=app/build/outputs/apk/websiteFull/release/app-website-full-arm64-v8a-release.apk
+          if [ ! -f "$APK_PATH" ]; then
+            echo "Error: arm64-v8a APK not found at $APK_PATH"
+            exit 1
+          fi
+          echo "Verifying signature of $APK_PATH"
+          $ANDROID_HOME/build-tools/34.0.0/apksigner verify --verbose "$APK_PATH" || {
+            echo "Error: APK signature verification failed"
+            exit 1
+          }
+          echo "APK is signed successfully"
+
+# 22. Загружаем APK (arm64-v8a)
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: rethinkdns-nightly-arm64-v8a
+          path: app/build/outputs/apk/websiteFullRelease/arm64-v8a/app-website-full-release-arm64-v8a.apk
+          retention-days: 7
+
+      # 18. Загружаем APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
