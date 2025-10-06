@@ -815,7 +815,7 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/dv_wg_block_incoming_rl"
+                    android:id="@+id/dv_wg_allow_incoming_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
@@ -823,7 +823,7 @@
                     android:paddingBottom="15dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/dv_wg_block_incoming_icon"
+                        android:id="@+id/dv_wg_allow_incoming_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
@@ -838,29 +838,29 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/dv_wg_block_incoming_switch"
-                        android:layout_toEndOf="@id/dv_wg_block_incoming_icon"
+                        android:layout_toStartOf="@id/dv_wg_allow_incoming_switch"
+                        android:layout_toEndOf="@id/dv_wg_allow_incoming_icon"
                         android:orientation="vertical">
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/dv_wg_block_incoming_txt"
+                            android:id="@+id/dv_wg_allow_incoming_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/settings_block_incoming_wg_packets"
+                            android:text="@string/settings_allow_incoming_wg_packets"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/dv_wg_block_incoming_desc"
+                            android:id="@+id/dv_wg_allow_incoming_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
-                            android:text="@string/settings_block_incoming_wg_packets_desc"
+                            android:text="@string/settings_allow_incoming_wg_packets_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/dv_wg_block_incoming_switch"
+                        android:id="@+id/dv_wg_allow_incoming_switch"
                         style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -869,7 +869,6 @@
                         android:padding="10dp" />
 
                 </RelativeLayout>
-
 
                 <RelativeLayout
                     android:id="@+id/dv_timeout_rl"

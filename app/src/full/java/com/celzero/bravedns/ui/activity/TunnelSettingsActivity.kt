@@ -82,8 +82,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     }
 
     private fun showNewBadgeIfNeeded() {
-        val blockIncomingWg = NewSettingsManager.shouldShowBadge(NewSettingsManager.BLOCK_INCOMING_WG_PACKETS)
-        b.dvWgBlockIncomingTxt.setBadgeDotVisible(this, blockIncomingWg)
+        val allowIncomingWg = NewSettingsManager.shouldShowBadge(NewSettingsManager.ALLOW_INCOMING_WG_PACKETS)
+        b.dvWgAllowIncomingTxt.setBadgeDotVisible(this, allowIncomingWg)
     }
 
     private fun initView() {
@@ -118,11 +118,11 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         // endpoint independent mapping (eim) / endpoint independent filtering (eif)
         b.dvEimfSwitch.isChecked = persistentState.endpointIndependence
         if (persistentState.endpointIndependence) {
-            b.dvWgBlockIncomingRl.visibility = View.VISIBLE
-            b.dvWgBlockIncomingTxt.text = getString(R.string.two_argument_space, getString(R.string.settings_block_incoming_wg_packets), getString(R.string.lbl_experimental))
-            b.dvWgBlockIncomingSwitch.isChecked = !persistentState.nwEngExperimentalFeatures
+            b.dvWgAllowIncomingRl.visibility = View.VISIBLE
+            b.dvWgAllowIncomingTxt.text = getString(R.string.two_argument_space, getString(R.string.settings_allow_incoming_wg_packets), getString(R.string.lbl_experimental))
+            b.dvWgAllowIncomingSwitch.isChecked = persistentState.nwEngExperimentalFeatures
         } else {
-            b.dvWgBlockIncomingRl.visibility = View.GONE
+            b.dvWgAllowIncomingRl.visibility = View.GONE
         }
 
         b.dvTcpKeepAliveSwitch.isChecked = persistentState.tcpKeepAlive
@@ -352,24 +352,24 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.dvEimfSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.endpointIndependence = isChecked
             if (isChecked) {
-                b.dvWgBlockIncomingRl.visibility = View.VISIBLE
-                b.dvWgBlockIncomingSwitch.isChecked = !persistentState.nwEngExperimentalFeatures
+                b.dvWgAllowIncomingRl.visibility = View.VISIBLE
+                b.dvWgAllowIncomingSwitch.isChecked = persistentState.nwEngExperimentalFeatures
             } else {
-                b.dvWgBlockIncomingRl.visibility = View.GONE
+                b.dvWgAllowIncomingRl.visibility = View.GONE
                 persistentState.nwEngExperimentalFeatures = false
             }
         }
 
         b.dvEimfRl.setOnClickListener { b.dvEimfSwitch.isChecked = !b.dvEimfSwitch.isChecked }
 
-        b.dvWgBlockIncomingSwitch.setOnCheckedChangeListener { _, isChecked ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.BLOCK_INCOMING_WG_PACKETS)
-            persistentState.nwEngExperimentalFeatures = !isChecked
+        b.dvWgAllowIncomingSwitch.setOnCheckedChangeListener { _, isChecked ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.ALLOW_INCOMING_WG_PACKETS)
+            persistentState.nwEngExperimentalFeatures = isChecked
         }
 
-        b.dvWgBlockIncomingRl.setOnClickListener {
-            NewSettingsManager.markSettingSeen(NewSettingsManager.BLOCK_INCOMING_WG_PACKETS)
-            b.dvWgBlockIncomingSwitch.isChecked = !b.dvWgBlockIncomingSwitch.isChecked
+        b.dvWgAllowIncomingRl.setOnClickListener {
+            NewSettingsManager.markSettingSeen(NewSettingsManager.ALLOW_INCOMING_WG_PACKETS)
+            b.dvWgAllowIncomingSwitch.isChecked = !b.dvWgAllowIncomingSwitch.isChecked
         }
 
         b.dvTcpKeepAliveSwitch.setOnCheckedChangeListener { _, isChecked ->

@@ -16,11 +16,7 @@
 package com.celzero.bravedns.util
 
 import Logger.LOG_TAG_UI
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.PersistentState.Companion.TCP_KEEP_ALIVE
-import com.celzero.bravedns.service.PersistentState.Companion.TUN_NETWORK_POLICY
-import com.celzero.bravedns.ui.fragment.ConfigureFragment
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -33,13 +29,13 @@ object NewSettingsManager: KoinComponent {
     const val ERROR_REPORTING = "error_reporting"
     const val WG_SSID_SETTING = "wg_ssid_settings"
     const val TOMBSTONE_APP_SETTING = "tombstone_app_setting"
-    const val BLOCK_INCOMING_WG_PACKETS = "block_incoming_wg_packets"
+    const val ALLOW_INCOMING_WG_PACKETS = "allow_incoming_wg_packets"
 
     private val newSettingsList = listOf(
         WG_SSID_SETTING,
         ERROR_REPORTING,
         TOMBSTONE_APP_SETTING,
-        BLOCK_INCOMING_WG_PACKETS
+        ALLOW_INCOMING_WG_PACKETS
     )
 
     init {
