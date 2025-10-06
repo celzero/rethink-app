@@ -41,7 +41,7 @@ android {
 
     defaultConfig {
         applicationId "com.celzero.bravedns"
-        minSdkVersion 28
+        minSdkVersion 35
         targetSdkVersion 36
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
