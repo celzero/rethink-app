@@ -1,4 +1,5 @@
 plugins {
+    id 'com.android.application'
     id 'com.google.devtools.ksp'
     id 'kotlin-android'
 }
@@ -144,7 +145,7 @@ dependencies {
     implementation 'com.google.guava:guava:33.4.8-android'
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
-    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20'
+    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.20'
     fullImplementation 'androidx.appcompat:appcompat:1.7.1'
     fullImplementation 'androidx.core:core-ktx:1.17.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
