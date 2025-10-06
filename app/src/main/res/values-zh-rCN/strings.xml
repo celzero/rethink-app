@@ -1105,7 +1105,7 @@
     <string name="settings_biometric_dialog_option_1" translatable="true">现在</string>
     <string name="settings_biometric_dialog_option_2" translatable="true">5分钟后</string>
     <string name="settings_biometric_dialog_option_3" translatable="true">15分钟后</string>
-    <string name="lbl_background_data" translatable="true">限制后台数据</string>
+    <string name="lbl_background_data" translatable="true"></string>
     <string name="sponser_dialog_usage_msg" translatable="true">您使用Rethink已<b>%1$s天</b>，折合使用成本约为<b>$%2$s</b>。您是否愿意通过赞助来支持它的持续开发？</string>
     <string name="dc_use_sys_dns_undelegated_heading" translatable="true">对未授权域使用系统DNS</string>
     <string name="dc_use_sys_dns_undelegated_desc" translatable="true">对未授权域（如<i>.lan</i>、<i>.internal</i>等）使用系统DNS。</string>
