@@ -2057,6 +2057,19 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
+    suspend fun setHappyEyeballs(value: Boolean = false) {
+        if (!tunnel.isConnected) {
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip happy eyeballs setting")
+            return
+        }
+        try {
+            Intra.happyEyeballs(value)
+            Logger.i(LOG_TAG_VPN, "$TAG set happy eyeballs as $value")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err; happy eyeballs: ${e.message}", e)
+        }
+    }
+
     suspend fun setAutoDialsParallel(value: Boolean = persistentState.autoDialsParallel) {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set auto dial option")

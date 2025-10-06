@@ -2407,6 +2407,16 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // or onNetworkDisconnected. onNetworkConnected may call restartVpn
             notifyConnectionMonitor()
         }
+        // with alwaysV4V6, builder will have both v4 and v6 addresses, so apps need to do
+        // perform connectivity checks to decide which protocol to use. To aid that,
+        // set happy eyeballs to true
+        if (InternetProtocol.isAlwaysV46(persistentState.internetProtocolType)) {
+            // set happy eyeballs in case of always v4v6
+            vpnAdapter?.setHappyEyeballs(true)
+        } else {
+            // false in all other cases, including Auto
+            vpnAdapter?.setHappyEyeballs(false)
+        }
         val reason = "ipProto: ${persistentState.internetProtocolType}"
         vpnRestartTrigger.value = reason
     }

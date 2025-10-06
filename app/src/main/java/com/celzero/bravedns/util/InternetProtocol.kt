@@ -55,6 +55,10 @@ enum class InternetProtocol(val id: Int) {
         fun isAuto(id: Int): Boolean {
             return id == IPv46.id
         }
+
+        fun isAlwaysV46(id: Int): Boolean {
+            return id == ALWAYSv46.id
+        }
     }
 
     // preferred network engine id (go-module)
