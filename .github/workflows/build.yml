@@ -96,25 +96,30 @@ jobs:
       - name: Show root build.gradle
         run: cat build.gradle || echo "No root build.gradle found"
 
-      # 10. Очищаем Gradle кэш
+      # 10. Выводим gradle-wrapper.properties
+      - name: Show gradle-wrapper.properties
+        run: cat gradle/wrapper/gradle-wrapper.properties
+
+      # 11. Очищаем Gradle кэш
       - name: Clear Gradle Cache
         run: |
           rm -rf ~/.gradle/caches
-          ./gradlew cleanBuildCache
+          rm -rf ~/.gradle/wrapper
+          ./gradlew cleanBuildCache --no-daemon
 
-      # 11. Делаем gradlew исполняемым
+      # 12. Делаем gradlew исполняемым
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # 12. Собираем APK
+      # 13. Собираем APK
       - name: Build APK
         env:
           VERSION_CODE: ${{ github.run_number }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FIRESTACK_REPO: ${{ github.event.inputs.firestackRepo || 'github' }}
-        run: ./gradlew clean assembleWebsiteFullRelease --stacktrace
+        run: ./gradlew clean assembleWebsiteFullRelease --stacktrace --debug
 
-      # 13. Загружаем APK
+      # 14. Загружаем APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
@@ -122,7 +127,7 @@ jobs:
           path: app/build/outputs/apk/websiteFullRelease/arm64-v8a/*.apk
           retention-days: 7
 
-      # 14. Логи для отладки при ошибке
+      # 15. Логи для отладки при ошибке
       - name: Debug Gradle logs
         if: failure()
         run: |
