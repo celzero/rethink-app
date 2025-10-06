@@ -7,11 +7,11 @@ plugins {
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 
-// Загружаем keystore.properties только если он существует
+// Загружаем keystore.properties
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 } else {
-    logger.warn("keystore.properties not found, relying on environment variables")
+    throw new GradleException("keystore.properties not found at ${keystorePropertiesFile}")
 }
 
 // Получаем версию из git describe
@@ -41,31 +41,31 @@ android {
 
     defaultConfig {
         applicationId "com.celzero.bravedns"
-        minSdkVersion 28
+        minSdkVersion 23
         targetSdkVersion 36
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         release {
-            // Проверяем наличие всех необходимых свойств
-            if (!keystoreProperties['storePassword'] && !System.getenv("KEYSTORE_STORE_PASSWORD")) {
-                throw new GradleException("Missing storePassword in keystore.properties or KEYSTORE_STORE_PASSWORD environment variable")
+            // Проверяем наличие всех необходимых свойств в keystore.properties
+            if (!keystoreProperties['storePassword']) {
+                throw new GradleException("Missing storePassword in keystore.properties")
             }
-            if (!keystoreProperties['keyPassword'] && !System.getenv("KEYSTORE_KEY_PASSWORD")) {
-                throw new GradleException("Missing keyPassword in keystore.properties or KEYSTORE_KEY_PASSWORD environment variable")
+            if (!keystoreProperties['keyPassword']) {
+                throw new GradleException("Missing keyPassword in keystore.properties")
             }
-            if (!keystoreProperties['keyAlias'] && !System.getenv("KEYSTORE_ALIAS")) {
-                throw new GradleException("Missing keyAlias in keystore.properties or KEYSTORE_ALIAS environment variable")
+            if (!keystoreProperties['keyAlias']) {
+                throw new GradleException("Missing keyAlias in keystore.properties")
             }
-            if (!keystoreProperties['storeFile'] && !file("app/keystore.jks").exists()) {
-                throw new GradleException("Missing storeFile in keystore.properties or app/keystore.jks not found")
+            if (!keystoreProperties['storeFile'] || !file(keystoreProperties['storeFile']).exists()) {
+                throw new GradleException("Missing or invalid storeFile in keystore.properties: ${keystoreProperties['storeFile']}")
             }
 
-            keyAlias keystoreProperties['keyAlias'] ?: System.getenv("KEYSTORE_ALIAS")
-            keyPassword keystoreProperties['keyPassword'] ?: System.getenv("KEYSTORE_KEY_PASSWORD")
-            storeFile file(keystoreProperties['storeFile'] ?: "app/keystore.jks")
-            storePassword keystoreProperties['storePassword'] ?: System.getenv("KEYSTORE_STORE_PASSWORD")
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
         }
     }
 
@@ -210,10 +210,10 @@ dependencies {
 
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
 
-    download 'io.insert-koin:koin-core:4.1.1'
-    implementation 'io.insert-koin:koin-core:4.1.1'
-    download 'io.insert-koin:koin-android:4.1.1'
-    implementation 'io.insert-koin:koin-android:4.1.1'
+    download 'io.insert-koin:koin-core:4.4.1'
+    implementation 'io.insert-koin:koin-core:4.4.1'
+    download 'io.insert-koin:koin-android:4.4.1'
+    implementation 'io.insert-koin:koin-android:4.4.1'
 
     download 'hu.autsoft:krate:2.4.0'
     implementation 'hu.autsoft:krate:2.4.0'
