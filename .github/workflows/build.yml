@@ -108,6 +108,9 @@ jobs:
           echo "storePassword=${{ secrets.KEYSTORE_STORE_PASSWORD }}" >> app/keystore.properties
           echo "Created keystore.properties:"
           cat app/keystore.properties
+          cp app/keystore.properties app/app/keystore.properties
+          cp app/keystore.properties keystore.properties
+          
 
       # 9. Проверяем содержимое keystore.properties
       - name: Verify keystore.properties
