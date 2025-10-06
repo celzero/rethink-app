@@ -382,6 +382,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun updateNewVersion() {
         if (!isNewVersion()) return
 
+        // no need to show new settings on first time launch
         if (persistentState.appVersion != 0) {
             // if app version is not 0, then it means the app is updated
             NewSettingsManager.initializeNewSettings()
