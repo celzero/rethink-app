@@ -64,6 +64,31 @@
 -keep class com.google.gson.** { *; }
 -keep class com.celzero.bravedns.data.FileTag { *; }
 
+# Добавлено: Правила для Koin, чтобы сохранить классы и методы для Dependency Injection
+-keep class org.koin.** { *; }
+-keep interface org.koin.** { *; }
+-dontwarn org.koin.**
+-keep class **$$Module { *; }
+-keep class **$$Factory { *; }
+-keep class **$$KoinComponent { *; }
+
+# Добавлено: Сохраняем методы Scope и Koin, упомянутые в логе R8
+-keepclassmembers class org.koin.core.scope.Scope {
+    public *;
+}
+-keepclassmembers class org.koin.core.Koin {
+    public *;
+}
+-keepclassmembers class org.koin.core.registry.ScopeRegistry {
+    public *;
+}
+
+# Добавлено: Сохраняем NotificationActionReceiver, упомянутый в логе R8
+-keep class com.celzero.bravedns.receiver.NotificationActionReceiver { *; }
+-keepclassmembers class com.celzero.bravedns.receiver.NotificationActionReceiver {
+    public *;
+}
+
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
