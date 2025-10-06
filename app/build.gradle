@@ -37,10 +37,10 @@ def getVersionCode = {
 
 android {
     compileSdk 36
-    namespace 'com.celzero.bravedns'
+    namespace 'com.rethinkdns.retrixed'
 
     defaultConfig {
-        applicationId "com.celzero.bravedns"
+        applicationId "com.rethinkdns.retrixed"
         minSdkVersion 23
         targetSdkVersion 36
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -69,21 +69,21 @@ android {
         }
     }
 
-    // Настройка для сборки только arm64-v8a
+    // Настройка для сборки универсального APK и всех ABI
     splits.abi {
         enable true
         reset()
-        include 'arm64-v8a'
-        universalApk false
+        include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        universalApk true
     }
 
-    // Устанавливаем versionCode для arm64-v8a
-    project.ext.versionCodes = ['arm64-v8a': 3]
+    // Устанавливаем versionCode для каждого ABI
+    project.ext.versionCodes = ['armeabi-v7a': 1, 'arm64-v8a': 3, 'x86': 5, 'x86_64': 7]
     android.applicationVariants.configureEach { variant ->
         variant.outputs.configureEach { output ->
             def abi = output.getFilter(com.android.build.OutputFile.ABI)
             if (abi != null) {
-                def baseAbiVersionCode = project.ext.versionCodes.get(abi)
+                def baseAbiVersionCode = project.ext.versionCodes.get(abi, 0)
                 output.versionCodeOverride = baseAbiVersionCode * 10000000 + variant.versionCode
             }
         }
@@ -262,6 +262,4 @@ repositories {
     google()
     maven { url 'https://jitpack.io' }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-    // Укажи кастомный репозиторий для версий 2.2.20 и 8.13.0
-    // maven { url 'https://your-custom-repo' }
 }
