@@ -1087,12 +1087,12 @@
     <string name="lbl_test" translatable="true">тест</string>
     <string name="lbl_protos" translatable="true">протос</string>
     <string name="lbl_experimental" translatable="true">(эксперементально)</string>
-    <string name="lbl_hop" translatable="true">relays</string>
+    <string name="lbl_hop" translatable="true">Узлы</string>
     <string name="lbl_manual" translatable="true">Вручную</string>
     <string name="wireguard_title" translatable="true">Безопасный Интернет с WireGuard</string>
-    <string name="wireguard_desc" translatable="true">Шифруйте свой интернет-трафик с помощью WireGuard. Выбирайте разные маршруты для разных приложений.</string>
-    <string name="firewall_title" translatable="true">Защитите свой Android с помощью firewall</string>
-    <string name="firewall_desc" translatable="true">Контроль использования приложения в Интернете; Ограничьте подключения на основе активности в приложении или сети.</string>
+    <string name="wireguard_desc" translatable="true">Зашифруйте свой интернет-трафик с WireGuard. Выберите различные маршруты для различных приложений.</string>
+    <string name="firewall_title" translatable="true">Защитите свой Android с помощью Firewall</string>
+    <string name="firewall_desc" translatable="true">Контролируйте использование интернет-трафика ваших приложений; ограничивайте соединения на основе приложений или сетевой активности.</string>
     <string name="dns_title" translatable="true">Блокируйте рекламу и вредоносное ПО с помощью DNS</string>
     <string name="dns_desc" translatable="true">Выбирайте из 190+ списков, чтобы остановить рекламу, трекеры и вредоносное ПО.</string>
     <string name="status_no_network" translatable="true">нет подключения к сети</string>
@@ -1206,5 +1206,4 @@
     <string name="copied_clipboard" translatable="true">Скопировано</string>
     <string name="conn_track_clear_rule_logs_title" translatable="true">Удалить журнал для этого правила?</string>
     <string name="conn_track_clear_rule_logs_message" translatable="true">Это приведет к удалению только сетевых журналов для текущего правила фаервола. Эта операция необратима. Продолжить?</string>
-    <string name="lbl_background_data" translatable="true">Ограничение фоновых данных</string>
 </resources>
