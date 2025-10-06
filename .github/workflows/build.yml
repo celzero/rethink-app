@@ -108,8 +108,6 @@ jobs:
           echo "storePassword=${{ secrets.KEYSTORE_STORE_PASSWORD }}" >> app/keystore.properties
           echo "Created keystore.properties:"
           cat app/keystore.properties
-          cp app/keystore.properties keystore.properties
-          cp app/keystore.properties app/app/keystore.properties
 
       # 9. Проверяем содержимое keystore.properties
       - name: Verify keystore.properties
@@ -172,15 +170,23 @@ jobs:
           FIRESTACK_REPO: ${{ github.event.inputs.firestackRepo || 'github' }}
         run: ./gradlew clean assembleWebsiteFullRelease --stacktrace --no-daemon --no-build-cache
 
-      # 17. Загружаем APK
+      # 17. Выводим содержимое директории с APK для диагностики
+      - name: List APK Output Directory
+        run: |
+          echo "Listing contents of app/build/outputs/apk/:"
+          find app/build/outputs/apk/ -type f || echo "No files found in app/build/outputs/apk/"
+          echo "Listing all APK files in project:"
+          find . -type f -name "*.apk" || echo "No APK files found"
+
+      # 18. Загружаем APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: rethinkdns-nightly-arm64-v8a
-          path: app/build/outputs/apk/websiteFullRelease/arm64-v8a/*.apk
+          path: app/build/outputs/apk/**/*.apk
           retention-days: 7
 
-      # 18. Логи для отладки при ошибке
+      # 19. Логи для отладки при ошибке
       - name: Debug Gradle logs
         if: failure()
         run: |
