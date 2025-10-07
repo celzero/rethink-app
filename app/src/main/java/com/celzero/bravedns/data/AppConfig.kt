@@ -538,7 +538,8 @@ internal constructor(
             DnsType.DNS_PROXY -> {
                 val endpoint = getDNSProxyServerDetails() ?: return
 
-                val url = endpoint.proxyIP + ":" + endpoint.proxyPort
+                val ip = endpoint.proxyIP?.split(",")?.firstOrNull() ?: ""
+                val url = ip + ":" + endpoint.proxyPort
                 postConnectedDnsName(endpoint.proxyName, url)
             }
             DnsType.RETHINK_REMOTE -> {
