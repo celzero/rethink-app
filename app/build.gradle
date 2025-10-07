@@ -2,8 +2,24 @@ plugins {
     id 'com.android.application'
     id 'com.google.devtools.ksp'
     id 'kotlin-android'
-    id 'com.google.gms.google-services'
-    id 'com.google.firebase.crashlytics'
+}
+
+// apply Google Services and Firebase Crashlytics plugins conditionally
+// strategy: For command-line builds, check task names. For IDE, always apply plugins
+// but they'll only process play/website variants (Firebase deps are scoped to those variants)
+def taskNames = gradle.startParameter.taskNames.join(',').toLowerCase()
+def isFdroidBuild = taskNames.contains("fdroid")
+
+println("app-task names: '$taskNames'")
+println("app; is fdroid build? $isFdroidBuild")
+
+// don't apply firebase plugins for fdroid CLI builds
+if (!isFdroidBuild) {
+    apply plugin: 'com.google.gms.google-services'
+    apply plugin: 'com.google.firebase.crashlytics'
+    println("app firebase plugins applied")
+} else {
+    println("app firebase plugins SKIPPED")
 }
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -212,7 +228,7 @@ dependencies {
     // included to fix issues with Android 6 support, issue#563
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
-    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.0'
+    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20'
     fullImplementation 'androidx.appcompat:appcompat:1.7.1'
     fullImplementation 'androidx.core:core-ktx:1.16.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'

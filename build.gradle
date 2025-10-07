@@ -11,9 +11,15 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:8.13.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        // Add Firebase plugin
-        classpath 'com.google.gms:google-services:4.4.3'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.6'
+        // add firebase plugins - will be conditionally applied in app/build.gradle
+        def taskNames = gradle.startParameter.taskNames.join(',').toLowerCase()
+        def isFdroidBuild = taskNames.contains("fdroid")
+        println("gradle-task names: $taskNames")
+        println("is fdroid build? $isFdroidBuild")
+        if (!isFdroidBuild) {
+            classpath 'com.google.gms:google-services:4.4.3'
+            classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.6'
+        }
     }
 }
 
