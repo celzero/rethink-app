@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.util
+package com.rethinkdns.retrixed.util
 
 import Logger
 import Logger.LOG_TAG_APP_OPS
@@ -41,16 +41,16 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.MicCamAccessIndicatorBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.ui.activity.AppLockActivity
-import com.celzero.bravedns.util.Utilities.isAtleastN
-import com.celzero.bravedns.util.Utilities.isAtleastP
-import com.celzero.bravedns.util.Utilities.isAtleastT
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.databinding.MicCamAccessIndicatorBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.ui.HomeScreenActivity
+import com.rethinkdns.retrixed.ui.activity.AppLockActivity
+import com.rethinkdns.retrixed.util.Utilities.isAtleastN
+import com.rethinkdns.retrixed.util.Utilities.isAtleastP
+import com.rethinkdns.retrixed.util.Utilities.isAtleastT
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 

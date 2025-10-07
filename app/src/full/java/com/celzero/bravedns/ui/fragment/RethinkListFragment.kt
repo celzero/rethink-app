@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.fragment
+package com.rethinkdns.retrixed.ui.fragment
 
 import Logger
 import android.content.Intent
@@ -32,24 +32,24 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.RethinkEndpointAdapter
-import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator
-import com.celzero.bravedns.customdownloader.RemoteBlocklistCoordinator
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.FragmentRethinkListBinding
-import com.celzero.bravedns.download.AppDownloadManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
-import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
-import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.UID
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.RethinkEndpointAdapter
+import com.rethinkdns.retrixed.customdownloader.LocalBlocklistCoordinator
+import com.rethinkdns.retrixed.customdownloader.RemoteBlocklistCoordinator
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.databinding.FragmentRethinkListBinding
+import com.rethinkdns.retrixed.download.AppDownloadManager
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.RethinkBlocklistManager
+import com.rethinkdns.retrixed.ui.activity.ConfigureRethinkBasicActivity
+import com.rethinkdns.retrixed.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
+import com.rethinkdns.retrixed.ui.activity.ConfigureRethinkBasicActivity.Companion.UID
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Constants.Companion.INIT_TIME_MS
+import com.rethinkdns.retrixed.util.Constants.Companion.MAX_ENDPOINT
+import com.rethinkdns.retrixed.util.UIUtils.fetchColor
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.viewmodel.RethinkEndpointViewModel
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

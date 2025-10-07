@@ -1,13 +1,13 @@
-package com.celzero.bravedns.wireguard
+package com.rethinkdns.retrixed.wireguard
 
 import Logger
 import Logger.LOG_TAG_PROXY
-import com.celzero.bravedns.database.WgHopMap
-import com.celzero.bravedns.database.WgHopMapRepository
-import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
+import com.rethinkdns.retrixed.database.WgHopMap
+import com.rethinkdns.retrixed.database.WgHopMapRepository
+import com.rethinkdns.retrixed.service.ProxyManager.ID_WG_BASE
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.service.WireguardManager
+import com.rethinkdns.retrixed.service.WireguardManager.INVALID_CONF_ID
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

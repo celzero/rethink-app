@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.customdownloader
+package com.rethinkdns.retrixed.customdownloader
 
 import Logger
 import Logger.LOG_TAG_DOWNLOAD
 import Logger.LOG_TAG_VPN
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.database.IpInfo
-import com.celzero.bravedns.database.IpInfoRepository
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
-import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
+import com.rethinkdns.retrixed.RethinkDnsApplication.Companion.DEBUG
+import com.rethinkdns.retrixed.database.IpInfo
+import com.rethinkdns.retrixed.database.IpInfoRepository
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.util.Constants.Companion.UNSPECIFIED_IP_IPV4
+import com.rethinkdns.retrixed.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException

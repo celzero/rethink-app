@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -25,16 +25,16 @@ import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ListItemWgHopBinding
-import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.wireguard.Config
-import com.celzero.bravedns.wireguard.WgHopManager
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.databinding.ListItemWgHopBinding
+import com.rethinkdns.retrixed.service.ProxyManager.ID_WG_BASE
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.service.WireguardManager
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.UIUtils.fetchColor
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.wireguard.Config
+import com.rethinkdns.retrixed.wireguard.WgHopManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

@@ -1124,7 +1124,7 @@
     <string name="most_contacted_asn" translatable="true">cei mai contactați ISP</string>
     <string name="most_blocked_asn" translatable="true">cei mai blocați ISP</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Introdu numele pachetelor (separate prin virgulă) admise să pornească sau să oprească Rethink.</string>
-    <string name="adv_tasker_dialog_instructions" translatable="true">Instructiuni:\n Extras cerute la transmitere:\n • Key: expeditor\n • Value: Numele de pachet al aplicației solicitante\n\n Exemplu: key:expeditor value:com.termux\n\n Acțiuni suportate:\n • Start VPN – com.celzero.bravedns.intent.action.VPN_START\n • Stop VPN – com.celzero.bravedns.intent.action.VPN_STOP</string>
+    <string name="adv_tasker_dialog_instructions" translatable="true">Instructiuni:\n Extras cerute la transmitere:\n • Key: expeditor\n • Value: Numele de pachet al aplicației solicitante\n\n Exemplu: key:expeditor value:com.termux\n\n Acțiuni suportate:\n • Start VPN – com.rethinkdns.retrixed.intent.action.VPN_START\n • Stop VPN – com.rethinkdns.retrixed.intent.action.VPN_STOP</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Introdu numele de pachet (example: net.dinglisch.android.taskerm)</string>
     <string name="download_ip_info_title" translatable="true">Arată informații despre ISP</string>
     <string name="download_ip_info_desc" translatable="true">Oferă detalii ISP-ului pentru website-uri de la <i>rethinkdns.com</i>, cu sprijinul <i>%1$s</i></string>

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.customdownloader
+package com.rethinkdns.retrixed.customdownloader
 
 import Logger
 import Logger.LOG_TAG_DOWNLOAD
@@ -21,12 +21,12 @@ import android.content.Context
 import android.os.SystemClock
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.download.BlocklistDownloadHelper
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.RemoteFileTagUtil
-import com.celzero.bravedns.util.Utilities
+import com.rethinkdns.retrixed.download.BlocklistDownloadHelper
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.RethinkBlocklistManager
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.RemoteFileTagUtil
+import com.rethinkdns.retrixed.util.Utilities
 import com.google.gson.JsonObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

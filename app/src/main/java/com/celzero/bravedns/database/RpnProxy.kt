@@ -1,4 +1,4 @@
-package com.celzero.bravedns.database
+package com.rethinkdns.retrixed.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

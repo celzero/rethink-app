@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.fragment
+package com.rethinkdns.retrixed.ui.fragment
 
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -23,17 +23,17 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.data.DataUsageSummary
-import com.celzero.bravedns.databinding.FragmentSummaryStatisticsBinding
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.activity.DetailedStatisticsActivity
-import com.celzero.bravedns.util.CustomLinearLayoutManager
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.SummaryStatisticsAdapter
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.data.DataUsageSummary
+import com.rethinkdns.retrixed.databinding.FragmentSummaryStatisticsBinding
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.ui.activity.DetailedStatisticsActivity
+import com.rethinkdns.retrixed.util.CustomLinearLayoutManager
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.viewmodel.SummaryStatisticsViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import kotlinx.coroutines.Dispatchers

@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.receiver
+package com.rethinkdns.retrixed.receiver
 
 import Logger
 import Logger.LOG_TAG_UI
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.celzero.bravedns.service.VpnController
+import com.rethinkdns.retrixed.service.VpnController
 
 /**
  * BroadcastReceiver to handle user presence events.

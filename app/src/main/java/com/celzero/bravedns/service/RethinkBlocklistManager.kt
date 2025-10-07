@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import Logger
 import Logger.LOG_TAG_DNS
@@ -21,23 +21,23 @@ import Logger.LOG_TAG_VPN
 import android.content.Context
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.RDNS
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.FileTag
-import com.celzero.bravedns.data.FileTagDeserializer
-import com.celzero.bravedns.database.LocalBlocklistPacksMap
-import com.celzero.bravedns.database.LocalBlocklistPacksMapRepository
-import com.celzero.bravedns.database.RemoteBlocklistPacksMap
-import com.celzero.bravedns.database.RemoteBlocklistPacksMapRepository
-import com.celzero.bravedns.database.RethinkLocalFileTag
-import com.celzero.bravedns.database.RethinkLocalFileTagRepository
-import com.celzero.bravedns.database.RethinkRemoteFileTag
-import com.celzero.bravedns.database.RethinkRemoteFileTagRepository
-import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
-import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
-import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.togs
-import com.celzero.bravedns.util.Utilities.tos
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.FileTag
+import com.rethinkdns.retrixed.data.FileTagDeserializer
+import com.rethinkdns.retrixed.database.LocalBlocklistPacksMap
+import com.rethinkdns.retrixed.database.LocalBlocklistPacksMapRepository
+import com.rethinkdns.retrixed.database.RemoteBlocklistPacksMap
+import com.rethinkdns.retrixed.database.RemoteBlocklistPacksMapRepository
+import com.rethinkdns.retrixed.database.RethinkLocalFileTag
+import com.rethinkdns.retrixed.database.RethinkLocalFileTagRepository
+import com.rethinkdns.retrixed.database.RethinkRemoteFileTag
+import com.rethinkdns.retrixed.database.RethinkRemoteFileTagRepository
+import com.rethinkdns.retrixed.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
+import com.rethinkdns.retrixed.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
+import com.rethinkdns.retrixed.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.togs
+import com.rethinkdns.retrixed.util.Utilities.tos
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson

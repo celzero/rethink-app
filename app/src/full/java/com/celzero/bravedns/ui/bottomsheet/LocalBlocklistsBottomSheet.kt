@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.bottomsheet
+package com.rethinkdns.retrixed.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_DNS
@@ -33,29 +33,29 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.celzero.bravedns.R
-import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator
-import com.celzero.bravedns.databinding.BottomSheetLocalBlocklistsBinding
-import com.celzero.bravedns.download.AppDownloadManager
-import com.celzero.bravedns.download.DownloadConstants
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
-import com.celzero.bravedns.ui.fragment.DnsSettingsFragment
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
-import com.celzero.bravedns.util.Constants.Companion.RETHINK_SEARCH_URL
-import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
-import com.celzero.bravedns.util.UIUtils.clipboardCopy
-import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
-import com.celzero.bravedns.util.UIUtils.openUrl
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.blocklistCanonicalPath
-import com.celzero.bravedns.util.Utilities.convertLongToTime
-import com.celzero.bravedns.util.Utilities.deleteRecursive
-import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.customdownloader.LocalBlocklistCoordinator
+import com.rethinkdns.retrixed.databinding.BottomSheetLocalBlocklistsBinding
+import com.rethinkdns.retrixed.download.AppDownloadManager
+import com.rethinkdns.retrixed.download.DownloadConstants
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.RethinkBlocklistManager
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.ui.activity.ConfigureRethinkBasicActivity
+import com.rethinkdns.retrixed.ui.fragment.DnsSettingsFragment
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Constants.Companion.INIT_TIME_MS
+import com.rethinkdns.retrixed.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
+import com.rethinkdns.retrixed.util.Constants.Companion.RETHINK_SEARCH_URL
+import com.rethinkdns.retrixed.util.Themes.Companion.getBottomsheetCurrentTheme
+import com.rethinkdns.retrixed.util.UIUtils.clipboardCopy
+import com.rethinkdns.retrixed.util.UIUtils.fetchToggleBtnColors
+import com.rethinkdns.retrixed.util.UIUtils.openUrl
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.blocklistCanonicalPath
+import com.rethinkdns.retrixed.util.Utilities.convertLongToTime
+import com.rethinkdns.retrixed.util.Utilities.deleteRecursive
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers

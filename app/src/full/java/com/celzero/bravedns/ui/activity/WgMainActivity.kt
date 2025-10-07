@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import Logger
 import Logger.LOG_TAG_PROXY
@@ -32,22 +32,22 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.OneWgConfigAdapter
-import com.celzero.bravedns.adapter.WgConfigAdapter
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.ActivityWireguardMainBinding
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.util.QrCodeFromFileScanner
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.TunnelImporter
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.viewmodel.WgConfigViewModel
-import com.celzero.bravedns.wireguard.WgHopManager
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.OneWgConfigAdapter
+import com.rethinkdns.retrixed.adapter.WgConfigAdapter
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.databinding.ActivityWireguardMainBinding
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.WireguardManager
+import com.rethinkdns.retrixed.util.QrCodeFromFileScanner
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.TunnelImporter
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.UIUtils.fetchToggleBtnColors
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.viewmodel.WgConfigViewModel
+import com.rethinkdns.retrixed.wireguard.WgHopManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.qrcode.QRCodeReader

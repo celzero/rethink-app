@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui
+package com.rethinkdns.retrixed.ui
 
 import Logger
 import Logger.LOG_TAG_UI

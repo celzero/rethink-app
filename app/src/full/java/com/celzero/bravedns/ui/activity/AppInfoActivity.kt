@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -37,29 +37,29 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.AppWiseDomainsAdapter
-import com.celzero.bravedns.adapter.AppWiseIpsAdapter
-import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.ProxyManager.ID_NONE
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
-import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
-import com.celzero.bravedns.viewmodel.CustomDomainViewModel
-import com.celzero.bravedns.viewmodel.CustomIpViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.AppWiseDomainsAdapter
+import com.rethinkdns.retrixed.adapter.AppWiseIpsAdapter
+import com.rethinkdns.retrixed.database.AppInfo
+import com.rethinkdns.retrixed.databinding.ActivityAppDetailsBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.FirewallManager.updateFirewallStatus
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.ProxyManager
+import com.rethinkdns.retrixed.service.ProxyManager.ID_NONE
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Constants.Companion.INVALID_UID
+import com.rethinkdns.retrixed.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.UIUtils.openAndroidAppInfo
+import com.rethinkdns.retrixed.util.UIUtils.htmlToSpannedText
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.util.Utilities.showToastUiCentered
+import com.rethinkdns.retrixed.viewmodel.AppConnectionsViewModel
+import com.rethinkdns.retrixed.viewmodel.CustomDomainViewModel
+import com.rethinkdns.retrixed.viewmodel.CustomIpViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

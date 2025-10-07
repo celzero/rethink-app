@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.fragment
+package com.rethinkdns.retrixed.ui.fragment
 
 import Logger
 import android.os.Bundle
@@ -26,18 +26,18 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.DnsProxyEndpointAdapter
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.DnsProxyEndpoint
-import com.celzero.bravedns.databinding.DialogSetDnsProxyBinding
-import com.celzero.bravedns.databinding.FragmentDnsProxyListBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.viewmodel.DnsProxyEndpointViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.DnsProxyEndpointAdapter
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.database.DnsProxyEndpoint
+import com.rethinkdns.retrixed.databinding.DialogSetDnsProxyBinding
+import com.rethinkdns.retrixed.databinding.FragmentDnsProxyListBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.viewmodel.DnsProxyEndpointViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.Dispatchers

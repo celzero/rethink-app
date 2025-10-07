@@ -1,6 +1,6 @@
-package com.celzero.bravedns.iab.stripe
+package com.rethinkdns.retrixed.iab.stripe
 
-import com.celzero.bravedns.customdownloader.RetrofitManager
+import com.rethinkdns.retrixed.customdownloader.RetrofitManager
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

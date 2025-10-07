@@ -1,4 +1,4 @@
-package com.celzero.bravedns.iab.stripe
+package com.rethinkdns.retrixed.iab.stripe
 
 import com.google.gson.annotations.SerializedName
 import okhttp3.FormBody

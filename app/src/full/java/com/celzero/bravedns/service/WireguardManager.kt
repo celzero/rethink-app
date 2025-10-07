@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import Logger
 import Logger.LOG_TAG_PROXY
 import android.content.Context
 import android.text.format.DateUtils
 import com.celzero.firestack.backend.Backend
-import com.celzero.bravedns.backup.BackupHelper.Companion.TEMP_WG_DIR
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.WgConfigFiles
-import com.celzero.bravedns.database.WgConfigFilesImmutable
-import com.celzero.bravedns.database.WgConfigFilesRepository
-import com.celzero.bravedns.service.ProxyManager.ID_NONE
-import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
-import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.wireguard.Config
-import com.celzero.bravedns.wireguard.Peer
-import com.celzero.bravedns.wireguard.WgHopManager
-import com.celzero.bravedns.wireguard.WgInterface
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.TEMP_WG_DIR
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.database.WgConfigFiles
+import com.rethinkdns.retrixed.database.WgConfigFilesImmutable
+import com.rethinkdns.retrixed.database.WgConfigFilesRepository
+import com.rethinkdns.retrixed.service.ProxyManager.ID_NONE
+import com.rethinkdns.retrixed.service.ProxyManager.ID_WG_BASE
+import com.rethinkdns.retrixed.util.Constants.Companion.WIREGUARD_FOLDER_NAME
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.wireguard.Config
+import com.rethinkdns.retrixed.wireguard.Peer
+import com.rethinkdns.retrixed.wireguard.WgHopManager
+import com.rethinkdns.retrixed.wireguard.WgInterface
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

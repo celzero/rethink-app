@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.viewmodel
+package com.rethinkdns.retrixed.viewmodel
 
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module

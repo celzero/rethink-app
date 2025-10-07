@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -32,22 +32,22 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.ActivityTunnelSettingsBinding
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.dialog.NetworkReachabilityDialog
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.InternetProtocol
-import com.celzero.bravedns.util.NewSettingsManager
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.isAtleastS
-import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.databinding.ActivityTunnelSettingsBinding
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.ui.dialog.NetworkReachabilityDialog
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.InternetProtocol
+import com.rethinkdns.retrixed.util.NewSettingsManager
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.UIUtils.setBadgeDotVisible
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.util.Utilities.isAtleastS
+import com.rethinkdns.retrixed.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit

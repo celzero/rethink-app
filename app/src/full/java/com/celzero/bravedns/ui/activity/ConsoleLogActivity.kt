@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import Logger
 import Logger.LOG_TAG_BUG_REPORT
@@ -38,19 +38,19 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.ConsoleLogAdapter
-import com.celzero.bravedns.database.ConsoleLogRepository
-import com.celzero.bravedns.databinding.ActivityConsoleLogBinding
-import com.celzero.bravedns.net.go.GoVpnAdapter
-import com.celzero.bravedns.scheduler.WorkScheduler
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import com.celzero.bravedns.viewmodel.ConsoleLogViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.ConsoleLogAdapter
+import com.rethinkdns.retrixed.database.ConsoleLogRepository
+import com.rethinkdns.retrixed.databinding.ActivityConsoleLogBinding
+import com.rethinkdns.retrixed.net.go.GoVpnAdapter
+import com.rethinkdns.retrixed.scheduler.WorkScheduler
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.util.Utilities.showToastUiCentered
+import com.rethinkdns.retrixed.viewmodel.ConsoleLogViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview

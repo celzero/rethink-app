@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.customdownloader
+package com.rethinkdns.retrixed.customdownloader
 
 import com.google.gson.JsonObject
 import retrofit2.Response

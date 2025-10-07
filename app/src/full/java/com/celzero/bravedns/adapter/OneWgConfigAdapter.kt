@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import Logger.LOG_TAG_PROXY
 import android.content.Context
@@ -31,25 +31,25 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.firestack.backend.RouterStats
-import com.celzero.bravedns.R
-import com.celzero.bravedns.database.WgConfigFiles
-import com.celzero.bravedns.databinding.ListItemWgOneInterfaceBinding
-import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
-import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
-import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
-import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
-import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
-import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
-import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.Utilities
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.database.WgConfigFiles
+import com.rethinkdns.retrixed.databinding.ListItemWgOneInterfaceBinding
+import com.rethinkdns.retrixed.net.doh.Transaction
+import com.rethinkdns.retrixed.service.ProxyManager
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.service.WireguardManager
+import com.rethinkdns.retrixed.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
+import com.rethinkdns.retrixed.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
+import com.rethinkdns.retrixed.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
+import com.rethinkdns.retrixed.service.WireguardManager.ERR_CODE_WG_INVALID
+import com.rethinkdns.retrixed.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
+import com.rethinkdns.retrixed.service.WireguardManager.WG_UPTIME_THRESHOLD
+import com.rethinkdns.retrixed.ui.activity.WgConfigDetailActivity
+import com.rethinkdns.retrixed.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
+import com.rethinkdns.retrixed.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.UIUtils.fetchColor
+import com.rethinkdns.retrixed.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

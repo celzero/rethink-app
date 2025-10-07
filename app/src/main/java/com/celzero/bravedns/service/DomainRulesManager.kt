@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import Logger
 import Logger.LOG_TAG_DNS
@@ -22,13 +22,13 @@ import android.content.Context
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import com.celzero.firestack.backend.Backend
-import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.database.CustomDomain
-import com.celzero.bravedns.database.CustomDomainRepository
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Utilities.togs
-import com.celzero.bravedns.util.Utilities.tos
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.RethinkDnsApplication.Companion.DEBUG
+import com.rethinkdns.retrixed.database.CustomDomain
+import com.rethinkdns.retrixed.database.CustomDomainRepository
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Utilities.togs
+import com.rethinkdns.retrixed.util.Utilities.tos
 import com.celzero.firestack.backend.Gostr
 import com.celzero.firestack.backend.RadixTree
 import kotlinx.coroutines.CoroutineScope

@@ -1,4 +1,4 @@
-package com.celzero.bravedns.net.manager
+package com.rethinkdns.retrixed.net.manager
 
 import Logger
 import Logger.LOG_TAG_VPN
@@ -7,9 +7,9 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Build
 import android.text.TextUtils
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Protocol
-import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Protocol
+import com.rethinkdns.retrixed.util.Utilities.isUnspecifiedIp
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import inet.ipaddr.IPAddressString

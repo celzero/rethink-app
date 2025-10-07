@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -28,17 +28,17 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.databinding.ListItemAppDomainDetailsBinding
-import com.celzero.bravedns.service.DomainRulesManager
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.bottomsheet.AppDomainRulesBottomSheet
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
-import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.AppConnection
+import com.rethinkdns.retrixed.databinding.ListItemAppDomainDetailsBinding
+import com.rethinkdns.retrixed.service.DomainRulesManager
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.ui.bottomsheet.AppDomainRulesBottomSheet
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.removeBeginningTrailingCommas
+import com.rethinkdns.retrixed.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.math.log2
 

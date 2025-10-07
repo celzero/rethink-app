@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.celzero.bravedns.scheduler
+package com.rethinkdns.retrixed.scheduler
 
 import Logger
 import Logger.LOG_TAG_BUG_REPORT
@@ -22,10 +22,10 @@ import android.app.ApplicationExitInfo
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.celzero.bravedns.BuildConfig
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Utilities
+import com.rethinkdns.retrixed.BuildConfig
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Utilities
 import com.celzero.firestack.intra.Intra
 import com.google.common.io.Files
 import java.io.File

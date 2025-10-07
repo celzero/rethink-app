@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -23,14 +23,14 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
-import com.celzero.bravedns.R
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.ui.fragment.RethinkBlocklistFragment
-import com.celzero.bravedns.ui.fragment.RethinkListFragment
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.RethinkBlocklistManager
+import com.rethinkdns.retrixed.ui.fragment.RethinkBlocklistFragment
+import com.rethinkdns.retrixed.ui.fragment.RethinkListFragment
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
 import org.koin.android.ext.android.inject
 
 class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethink_basic) {

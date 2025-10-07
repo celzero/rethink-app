@@ -1158,7 +1158,7 @@
     <string name="most_contacted_asn" translatable="true">meistkontaktierten Anbieter</string>
     <string name="most_blocked_asn" translatable="true">meist blockierte Anbieter</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Paketnamen eingeben (kommagetrennt), die Rethink starten oder stoppen dürfen.</string>
-    <string name="adv_tasker_dialog_instructions" translatable="true">Anleitung:\nErforderliche Extras in der Broadcast-Nachricht:\n • Schlüssel: sender\n • Wert: Der Paketname der aufrufenden App\n\n Beispiel: key:sender value:com.termux\n\n Unterstützte Aktionen:\n • VPN starten – com.celzero.bravedns.intent.action.VPN_START\n • VPN stoppen – com.celzero.bravedns.intent.action.VPN_STOP</string>
+    <string name="adv_tasker_dialog_instructions" translatable="true">Anleitung:\nErforderliche Extras in der Broadcast-Nachricht:\n • Schlüssel: sender\n • Wert: Der Paketname der aufrufenden App\n\n Beispiel: key:sender value:com.termux\n\n Unterstützte Aktionen:\n • VPN starten – com.rethinkdns.retrixed.intent.action.VPN_START\n • VPN stoppen – com.rethinkdns.retrixed.intent.action.VPN_STOP</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Paketnamen eingeben (Beispiel: net.dinglisch.android.taskerm)</string>
     <string name="download_ip_info_title" translatable="true">Providerinformationen anzeigen</string>
     <string name="download_ip_info_desc" translatable="true">Ruft Details zu Dienstanbietern für Websites von <i>rethinkdns.com</i> ab, bereitgestellt von <i>%1$s</i></string>

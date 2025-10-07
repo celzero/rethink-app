@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.fragment
+package com.rethinkdns.retrixed.ui.fragment
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.FragmentFirewallSettingsBinding
-import com.celzero.bravedns.ui.activity.CustomRulesActivity
-import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
-import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.databinding.FragmentFirewallSettingsBinding
+import com.rethinkdns.retrixed.ui.activity.CustomRulesActivity
+import com.rethinkdns.retrixed.ui.activity.UniversalFirewallSettingsActivity
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Constants.Companion.INTENT_UID
+import com.rethinkdns.retrixed.util.Constants.Companion.UID_EVERYBODY
 
 class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings) {
     private val b by viewBinding(FragmentFirewallSettingsBinding::bind)

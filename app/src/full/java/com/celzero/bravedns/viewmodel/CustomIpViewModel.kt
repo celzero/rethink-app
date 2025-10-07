@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.viewmodel
+package com.rethinkdns.retrixed.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,10 +25,10 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.celzero.bravedns.database.CustomIp
-import com.celzero.bravedns.database.CustomIpDao
-import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
-import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
+import com.rethinkdns.retrixed.database.CustomIp
+import com.rethinkdns.retrixed.database.CustomIpDao
+import com.rethinkdns.retrixed.util.Constants.Companion.LIVEDATA_PAGE_SIZE
+import com.rethinkdns.retrixed.util.Constants.Companion.UID_EVERYBODY
 
 class CustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
 

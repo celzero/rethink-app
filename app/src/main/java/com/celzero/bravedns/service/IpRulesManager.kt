@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import Logger
 import Logger.LOG_TAG_FIREWALL
 import android.content.Context
 import androidx.lifecycle.LiveData
 import com.celzero.firestack.backend.Backend
-import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.database.CustomIp
-import com.celzero.bravedns.database.CustomIpRepository
-import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
-import com.celzero.bravedns.util.Utilities.togs
-import com.celzero.bravedns.util.Utilities.tos
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.RethinkDnsApplication.Companion.DEBUG
+import com.rethinkdns.retrixed.database.CustomIp
+import com.rethinkdns.retrixed.database.CustomIpRepository
+import com.rethinkdns.retrixed.util.Constants.Companion.UNSPECIFIED_PORT
+import com.rethinkdns.retrixed.util.Utilities.togs
+import com.rethinkdns.retrixed.util.Utilities.tos
 import com.celzero.firestack.backend.Gostr
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder

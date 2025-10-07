@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.celzero.bravedns.util
+package com.rethinkdns.retrixed.util
 
 import Logger.LOG_BATCH_LOGGER
 import android.util.Log

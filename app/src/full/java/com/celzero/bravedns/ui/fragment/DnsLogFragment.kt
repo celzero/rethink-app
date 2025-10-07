@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.fragment
+package com.rethinkdns.retrixed.ui.fragment
 
 import Logger.LOG_TAG_UI
 import android.content.Context.INPUT_METHOD_SERVICE
@@ -29,17 +29,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.DnsLogAdapter
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.DnsLogRepository
-import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.viewmodel.DnsLogViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.DnsLogAdapter
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.database.DnsLogRepository
+import com.rethinkdns.retrixed.databinding.FragmentDnsLogsBinding
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.ui.activity.UniversalFirewallSettingsActivity
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.UIUtils.formatToRelativeTime
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers

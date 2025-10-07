@@ -1727,8 +1727,8 @@
         Example: key:"sender" value:"com.termux"\n\n
 
         Supported actions:\n
-        • Start VPN – com.celzero.bravedns.intent.action.VPN_START\n
-        • Stop VPN – com.celzero.bravedns.intent.action.VPN_STOP
+        • Start VPN – com.rethinkdns.retrixed.intent.action.VPN_START\n
+        • Stop VPN – com.rethinkdns.retrixed.intent.action.VPN_STOP
     </string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Enter package name (example: net.dinglisch.android.taskerm)</string>
 

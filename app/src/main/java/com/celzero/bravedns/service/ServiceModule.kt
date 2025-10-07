@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
-import com.celzero.bravedns.database.RefreshDatabase
+import com.rethinkdns.retrixed.database.RefreshDatabase
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 

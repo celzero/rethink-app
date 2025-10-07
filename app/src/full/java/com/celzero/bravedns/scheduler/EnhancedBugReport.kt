@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.scheduler
+package com.rethinkdns.retrixed.scheduler
 
 import Logger.LOG_TAG_BUG_REPORT
 import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Utilities
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Utilities
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException

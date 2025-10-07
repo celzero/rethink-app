@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.fragment
+package com.rethinkdns.retrixed.ui.fragment
 
 import Logger
 import Logger.LOG_TAG_DNS
@@ -29,30 +29,30 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.data.AppConfig.Companion.DOH_INDEX
-import com.celzero.bravedns.data.AppConfig.Companion.DOT_INDEX
-import com.celzero.bravedns.databinding.FragmentDnsConfigureBinding
-import com.celzero.bravedns.scheduler.WorkScheduler
-import com.celzero.bravedns.scheduler.WorkScheduler.Companion.BLOCKLIST_UPDATE_CHECK_JOB_TAG
-import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
-import com.celzero.bravedns.ui.activity.DnsListActivity
-import com.celzero.bravedns.ui.activity.PauseActivity
-import com.celzero.bravedns.ui.bottomsheet.LocalBlocklistsBottomSheet
-import com.celzero.bravedns.util.NewSettingsManager
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastR
-import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
-import com.celzero.bravedns.util.Utilities.tos
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.data.AppConfig.Companion.DOH_INDEX
+import com.rethinkdns.retrixed.data.AppConfig.Companion.DOT_INDEX
+import com.rethinkdns.retrixed.databinding.FragmentDnsConfigureBinding
+import com.rethinkdns.retrixed.scheduler.WorkScheduler
+import com.rethinkdns.retrixed.scheduler.WorkScheduler.Companion.BLOCKLIST_UPDATE_CHECK_JOB_TAG
+import com.rethinkdns.retrixed.service.BraveVPNService
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.ProxyManager
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.service.WireguardManager
+import com.rethinkdns.retrixed.ui.activity.ConfigureRethinkBasicActivity
+import com.rethinkdns.retrixed.ui.activity.DnsListActivity
+import com.rethinkdns.retrixed.ui.activity.PauseActivity
+import com.rethinkdns.retrixed.ui.bottomsheet.LocalBlocklistsBottomSheet
+import com.rethinkdns.retrixed.util.NewSettingsManager
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.UIUtils.fetchColor
+import com.rethinkdns.retrixed.util.UIUtils.setBadgeDotVisible
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.isAtleastR
+import com.rethinkdns.retrixed.util.Utilities.isPlayStoreFlavour
+import com.rethinkdns.retrixed.util.Utilities.tos
 import com.celzero.firestack.backend.Backend
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers

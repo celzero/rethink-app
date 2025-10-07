@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.customdownloader
+package com.rethinkdns.retrixed.customdownloader
 
 import Logger
 import Logger.LOG_TAG_DOWNLOAD
@@ -28,23 +28,23 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.customdownloader.RetrofitManager.Companion.getBlocklistBaseBuilder
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.download.BlocklistDownloadHelper
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.ui.activity.AppLockActivity
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.blocklistDownloadBasePath
-import com.celzero.bravedns.util.Utilities.calculateMd5
-import com.celzero.bravedns.util.Utilities.getTagValueFromJson
-import com.celzero.bravedns.util.Utilities.tempDownloadBasePath
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.RethinkDnsApplication.Companion.DEBUG
+import com.rethinkdns.retrixed.customdownloader.RetrofitManager.Companion.getBlocklistBaseBuilder
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.download.BlocklistDownloadHelper
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.RethinkBlocklistManager
+import com.rethinkdns.retrixed.ui.activity.AppLockActivity
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Constants.Companion.INIT_TIME_MS
+import com.rethinkdns.retrixed.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.blocklistDownloadBasePath
+import com.rethinkdns.retrixed.util.Utilities.calculateMd5
+import com.rethinkdns.retrixed.util.Utilities.getTagValueFromJson
+import com.rethinkdns.retrixed.util.Utilities.tempDownloadBasePath
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream

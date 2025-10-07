@@ -1140,7 +1140,7 @@
     <string name="most_contacted_asn" translatable="true">найчастіше контактовані постачальники</string>
     <string name="most_blocked_asn" translatable="true">більшість заблокованих провайдерів</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Введіть назви пакетів (розділені комами), яким дозволено запускати або зупиняти Rethink.</string>
-    <string name="adv_tasker_dialog_instructions" translatable="true">Інструкції:\nНеобхідні додаткові елементи в трансляції:\n• Ключ: відправник\n• Значення: Назва пакета програми, що викликає\n\nПриклад: ключ: відправник значення: com.termux\n\nПідтримувані дії:\n• Запустити VPN – com.celzero.bravedns.intent.action.VPN_START\n• Зупинити VPN – com.celzero.bravedns.intent.action.VPN_STOP</string>
+    <string name="adv_tasker_dialog_instructions" translatable="true">Інструкції:\nНеобхідні додаткові елементи в трансляції:\n• Ключ: відправник\n• Значення: Назва пакета програми, що викликає\n\nПриклад: ключ: відправник значення: com.termux\n\nПідтримувані дії:\n• Запустити VPN – com.rethinkdns.retrixed.intent.action.VPN_START\n• Зупинити VPN – com.rethinkdns.retrixed.intent.action.VPN_STOP</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Введіть назву пакета (приклад: net.dinglisch.android.taskerm)</string>
     <string name="download_ip_info_title" translatable="true">Показати інформацію про постачальника</string>
     <string name="download_ip_info_desc" translatable="true">Отримує інформацію про постачальників послуг для веб-сайтів з <i>rethinkdns.com</i>, що працює на <i>%1$s</i></string>

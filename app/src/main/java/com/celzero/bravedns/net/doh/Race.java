@@ -13,11 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.celzero.bravedns.net.doh;
+package com.rethinkdns.retrixed.net.doh;
 
 import android.content.Context;
 
-import com.celzero.bravedns.net.go.GoProber;
+import com.rethinkdns.retrixed.net.go.GoProber;
 
 /**
  * This class performs parallel probes to all of the specified servers and calls the listener when

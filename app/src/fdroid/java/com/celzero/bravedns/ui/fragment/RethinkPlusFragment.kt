@@ -14,7 +14,7 @@
  * limitations under the License.
  *//*
 
-package com.celzero.bravedns.ui.fragment
+package com.rethinkdns.retrixed.ui.fragment
 
 import Logger
 import Logger.LOG_IAB
@@ -33,28 +33,28 @@ import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.Purchase
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.GooglePlaySubsAdapter
-import com.celzero.bravedns.databinding.FragmentRethinkPlusBinding
-import com.celzero.bravedns.iab.InAppBillingHandler
-import com.celzero.bravedns.iab.PricingPhase
-import com.celzero.bravedns.iab.stripe.CustomerCreateParams
-import com.celzero.bravedns.iab.stripe.PaymentIntentResponse
-import com.celzero.bravedns.iab.stripe.PricesAdapter
-import com.celzero.bravedns.iab.stripe.RetrofitInstance
-import com.celzero.bravedns.iab.stripe.RetrofitInstance.CustomerResponse
-import com.celzero.bravedns.iab.stripe.SubscriptionViewModel
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.RPN_AMZ_ID
-import com.celzero.bravedns.rpnproxy.RpnProxyManager.WARP_ID
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.ui.activity.PingTestActivity
-import com.celzero.bravedns.ui.activity.TroubleshootActivity
-import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
-import com.celzero.bravedns.util.UIUtils.underline
-import com.celzero.bravedns.util.Utilities
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.GooglePlaySubsAdapter
+import com.rethinkdns.retrixed.databinding.FragmentRethinkPlusBinding
+import com.rethinkdns.retrixed.iab.InAppBillingHandler
+import com.rethinkdns.retrixed.iab.PricingPhase
+import com.rethinkdns.retrixed.iab.stripe.CustomerCreateParams
+import com.rethinkdns.retrixed.iab.stripe.PaymentIntentResponse
+import com.rethinkdns.retrixed.iab.stripe.PricesAdapter
+import com.rethinkdns.retrixed.iab.stripe.RetrofitInstance
+import com.rethinkdns.retrixed.iab.stripe.RetrofitInstance.CustomerResponse
+import com.rethinkdns.retrixed.iab.stripe.SubscriptionViewModel
+import com.rethinkdns.retrixed.rpnproxy.RpnProxyManager
+import com.rethinkdns.retrixed.rpnproxy.RpnProxyManager.RPN_AMZ_ID
+import com.rethinkdns.retrixed.rpnproxy.RpnProxyManager.WARP_ID
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.service.WireguardManager
+import com.rethinkdns.retrixed.ui.activity.PingTestActivity
+import com.rethinkdns.retrixed.ui.activity.TroubleshootActivity
+import com.rethinkdns.retrixed.ui.dialog.SubscriptionAnimDialog
+import com.rethinkdns.retrixed.util.UIUtils.underline
+import com.rethinkdns.retrixed.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.stripe.android.PaymentConfiguration
 import com.stripe.android.paymentsheet.PaymentSheet

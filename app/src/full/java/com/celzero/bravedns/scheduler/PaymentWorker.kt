@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.scheduler
+package com.rethinkdns.retrixed.scheduler
 
 import Logger
 import Logger.LOG_IAB
@@ -21,11 +21,11 @@ import android.content.Context
 import android.os.SystemClock
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.customdownloader.ITcpProxy
-import com.celzero.bravedns.customdownloader.RetrofitManager
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.TcpProxyHelper
+import com.rethinkdns.retrixed.customdownloader.ITcpProxy
+import com.rethinkdns.retrixed.customdownloader.RetrofitManager
+import com.rethinkdns.retrixed.rpnproxy.RpnProxyManager
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.TcpProxyHelper
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.scheduler
+package com.rethinkdns.retrixed.scheduler
 
 import Logger
 import Logger.LOG_TAG_BUG_REPORT
@@ -22,7 +22,7 @@ import android.database.Cursor
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.database.ConsoleLogDAO
+import com.rethinkdns.retrixed.database.ConsoleLogDAO
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry

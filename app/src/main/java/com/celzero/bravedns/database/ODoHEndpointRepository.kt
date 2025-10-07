@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.celzero.bravedns.database
+package com.rethinkdns.retrixed.database
 
 import androidx.room.Transaction
 

@@ -232,7 +232,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.rethinkdns.bravedns.provider;com.celzero.bravedns.backup.BackupAgent"
+            android:authorities="com.rethinkdns.bravedns.provider;com.rethinkdns.retrixed.backup.BackupAgent"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

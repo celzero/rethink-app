@@ -16,12 +16,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.wireguard
+package com.rethinkdns.retrixed.wireguard
 
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.WgKey
-import com.celzero.bravedns.RethinkDnsApplication
-import com.celzero.bravedns.wireguard.BadConfigException.*
+import com.rethinkdns.retrixed.RethinkDnsApplication
+import com.rethinkdns.retrixed.wireguard.BadConfigException.*
 import inet.ipaddr.IPAddressString
 import java.util.*
 import java.util.function.Consumer

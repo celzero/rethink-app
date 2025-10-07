@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import android.content.Context
 import android.content.DialogInterface
@@ -27,13 +27,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.DnsProxyEndpoint
-import com.celzero.bravedns.databinding.DnsProxyListItemBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.util.UIUtils.clipboardCopy
-import com.celzero.bravedns.util.Utilities
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.database.DnsProxyEndpoint
+import com.rethinkdns.retrixed.databinding.DnsProxyListItemBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.util.UIUtils.clipboardCopy
+import com.rethinkdns.retrixed.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

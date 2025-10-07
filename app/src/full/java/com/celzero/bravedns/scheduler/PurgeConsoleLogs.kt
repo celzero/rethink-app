@@ -1,13 +1,13 @@
-package com.celzero.bravedns.scheduler
+package com.rethinkdns.retrixed.scheduler
 
 import Logger.LOG_BATCH_LOGGER
 import android.content.Context
 import androidx.paging.LOG_TAG
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.database.ConsoleLogRepository
-import com.celzero.bravedns.net.go.GoVpnAdapter
-import com.celzero.bravedns.service.PersistentState
+import com.rethinkdns.retrixed.database.ConsoleLogRepository
+import com.rethinkdns.retrixed.net.go.GoVpnAdapter
+import com.rethinkdns.retrixed.service.PersistentState
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.concurrent.TimeUnit

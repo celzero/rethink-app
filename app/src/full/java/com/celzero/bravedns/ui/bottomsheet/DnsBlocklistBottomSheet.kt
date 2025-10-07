@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.celzero.bravedns.ui.bottomsheet
+package com.rethinkdns.retrixed.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_DNS
@@ -41,27 +41,27 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
-import com.celzero.bravedns.database.DnsLog
-import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
-import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
-import com.celzero.bravedns.databinding.DialogIpDetailsLayoutBinding
-import com.celzero.bravedns.glide.FavIconDownloader
-import com.celzero.bravedns.service.DomainRulesManager
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
-import com.celzero.bravedns.ui.activity.DomainConnectionsActivity.Companion.INTENT_EXTRA_IS_BLOCKED
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.ResourceRecordTypes
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.getIcon
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.FirewallStatusSpinnerAdapter
+import com.rethinkdns.retrixed.database.DnsLog
+import com.rethinkdns.retrixed.databinding.BottomSheetDnsLogBinding
+import com.rethinkdns.retrixed.databinding.DialogInfoRulesLayoutBinding
+import com.rethinkdns.retrixed.databinding.DialogIpDetailsLayoutBinding
+import com.rethinkdns.retrixed.glide.FavIconDownloader
+import com.rethinkdns.retrixed.service.DomainRulesManager
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.ui.activity.DomainConnectionsActivity
+import com.rethinkdns.retrixed.ui.activity.DomainConnectionsActivity.Companion.INTENT_EXTRA_IS_BLOCKED
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.ResourceRecordTypes
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.UIUtils.fetchColor
+import com.rethinkdns.retrixed.util.UIUtils.htmlToSpannedText
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.getIcon
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.viewmodel.DomainConnectionsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

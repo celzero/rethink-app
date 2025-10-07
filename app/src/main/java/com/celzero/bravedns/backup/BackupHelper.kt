@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.backup
+package com.rethinkdns.retrixed.backup
 
 import Logger
 import android.content.Context
-import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.service.VpnController
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.database.AppDatabase
+import com.rethinkdns.retrixed.service.VpnController
 import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File

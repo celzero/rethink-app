@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui
+package com.rethinkdns.retrixed.ui
 
 import Logger
 import Logger.LOG_TAG_VPN
@@ -25,15 +25,15 @@ import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.celzero.bravedns.R
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.activity.AppInfoActivity
-import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.INTENT_UID
-import com.celzero.bravedns.ui.activity.AppListActivity
-import com.celzero.bravedns.ui.activity.AppLockActivity
-import com.celzero.bravedns.ui.activity.PauseActivity
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.ui.activity.AppInfoActivity
+import com.rethinkdns.retrixed.ui.activity.AppInfoActivity.Companion.INTENT_UID
+import com.rethinkdns.retrixed.ui.activity.AppListActivity
+import com.rethinkdns.retrixed.ui.activity.AppLockActivity
+import com.rethinkdns.retrixed.ui.activity.PauseActivity
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class NotificationHandlerActivity : AppCompatActivity() {

@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.celzero.bravedns.ui.fragment
+package com.rethinkdns.retrixed.ui.fragment
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -30,19 +30,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.ConnectionTrackerAdapter
-import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.celzero.bravedns.databinding.FragmentConnectionTrackerBinding
-import com.celzero.bravedns.service.FirewallRuleset
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.activity.NetworkLogsActivity
-import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
-import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel.TopLevelFilter
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.ConnectionTrackerAdapter
+import com.rethinkdns.retrixed.database.ConnectionTrackerRepository
+import com.rethinkdns.retrixed.databinding.FragmentConnectionTrackerBinding
+import com.rethinkdns.retrixed.service.FirewallRuleset
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.ui.activity.NetworkLogsActivity
+import com.rethinkdns.retrixed.ui.activity.UniversalFirewallSettingsActivity
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.UIUtils.formatToRelativeTime
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.viewmodel.ConnectionTrackerViewModel
+import com.rethinkdns.retrixed.viewmodel.ConnectionTrackerViewModel.TopLevelFilter
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers

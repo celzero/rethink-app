@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.bottomsheet
+package com.rethinkdns.retrixed.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -28,18 +28,18 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.activity.ProxySettingsActivity
-import com.celzero.bravedns.ui.activity.WgMainActivity
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
-import com.celzero.bravedns.util.UIUtils.openVpnProfile
-import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
-import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.databinding.BottomSheetHomeScreenBinding
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.ui.activity.ProxySettingsActivity
+import com.rethinkdns.retrixed.ui.activity.WgMainActivity
+import com.rethinkdns.retrixed.util.Constants.Companion.INIT_TIME_MS
+import com.rethinkdns.retrixed.util.Themes.Companion.getBottomsheetCurrentTheme
+import com.rethinkdns.retrixed.util.UIUtils.openVpnProfile
+import com.rethinkdns.retrixed.util.UIUtils.htmlToSpannedText
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

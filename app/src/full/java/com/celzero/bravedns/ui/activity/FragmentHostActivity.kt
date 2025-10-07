@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import Logger.LOG_TAG_UI
 import android.content.Context
@@ -23,9 +23,9 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.celzero.bravedns.R
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.util.Themes.Companion.getCurrentTheme
 import org.koin.android.ext.android.inject
 import kotlin.getValue
 

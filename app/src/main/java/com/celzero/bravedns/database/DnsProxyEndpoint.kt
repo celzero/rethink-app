@@ -14,12 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.celzero.bravedns.database
+package com.rethinkdns.retrixed.database
 
 import android.content.Context
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.celzero.bravedns.R
+import com.rethinkdns.retrixed.R
 
 @Entity(tableName = "DNSProxyEndpoint")
 class DnsProxyEndpoint {

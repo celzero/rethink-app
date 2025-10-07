@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.dialog
+package com.rethinkdns.retrixed.ui.dialog
 
 import Logger
 import android.app.Activity
@@ -26,13 +26,13 @@ import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.celzero.bravedns.databinding.DialogWgAddPeerBinding
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.tos
-import com.celzero.bravedns.wireguard.Peer
-import com.celzero.bravedns.wireguard.util.ErrorMessages
+import com.rethinkdns.retrixed.databinding.DialogWgAddPeerBinding
+import com.rethinkdns.retrixed.service.WireguardManager
+import com.rethinkdns.retrixed.util.UIUtils.getDurationInHumanReadableFormat
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.tos
+import com.rethinkdns.retrixed.wireguard.Peer
+import com.rethinkdns.retrixed.wireguard.util.ErrorMessages
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

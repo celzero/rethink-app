@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.fragment
+package com.rethinkdns.retrixed.ui.fragment
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.FragmentConfigureBinding
-import com.celzero.bravedns.ui.activity.AppListActivity
-import com.celzero.bravedns.ui.activity.AdvancedSettingActivity
-import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
-import com.celzero.bravedns.ui.activity.DnsDetailActivity
-import com.celzero.bravedns.ui.activity.FirewallActivity
-import com.celzero.bravedns.ui.activity.MiscSettingsActivity
-import com.celzero.bravedns.ui.activity.NetworkLogsActivity
-import com.celzero.bravedns.ui.activity.ProxySettingsActivity
-import com.celzero.bravedns.ui.activity.TunnelSettingsActivity
-import com.celzero.bravedns.util.NewSettingsManager
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.databinding.FragmentConfigureBinding
+import com.rethinkdns.retrixed.ui.activity.AppListActivity
+import com.rethinkdns.retrixed.ui.activity.AdvancedSettingActivity
+import com.rethinkdns.retrixed.ui.activity.AntiCensorshipActivity
+import com.rethinkdns.retrixed.ui.activity.DnsDetailActivity
+import com.rethinkdns.retrixed.ui.activity.FirewallActivity
+import com.rethinkdns.retrixed.ui.activity.MiscSettingsActivity
+import com.rethinkdns.retrixed.ui.activity.NetworkLogsActivity
+import com.rethinkdns.retrixed.ui.activity.ProxySettingsActivity
+import com.rethinkdns.retrixed.ui.activity.TunnelSettingsActivity
+import com.rethinkdns.retrixed.util.NewSettingsManager
+import com.rethinkdns.retrixed.util.UIUtils.setBadgeDotVisible
 
 class ConfigureFragment : Fragment(R.layout.fragment_configure) {
 

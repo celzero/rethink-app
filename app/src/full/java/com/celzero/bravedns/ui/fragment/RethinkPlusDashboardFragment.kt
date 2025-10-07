@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.fragment
+package com.rethinkdns.retrixed.ui.fragment
 
 import androidx.fragment.app.Fragment
-import com.celzero.bravedns.R
+import com.rethinkdns.retrixed.R
 
 class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_dashboard) {
     /*private val b by viewBinding(ActivityRethinkPlusDashboardBinding::bind)

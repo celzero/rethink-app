@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.viewmodel
+package com.rethinkdns.retrixed.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.database.ConnectionTrackerDAO
-import com.celzero.bravedns.database.DnsLogDAO
+import com.rethinkdns.retrixed.data.AppConnection
+import com.rethinkdns.retrixed.database.ConnectionTrackerDAO
+import com.rethinkdns.retrixed.database.DnsLogDAO
 
 class AlertsViewModel(
     private val connectionTrackerDao: ConnectionTrackerDAO,

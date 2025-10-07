@@ -1121,7 +1121,7 @@
     <string name="most_contacted_asn" translatable="true">Legutóbb elért szolgáltatók</string>
     <string name="most_blocked_asn" translatable="true">Leggyakrabban blokkolt szolgáltatók</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Adja meg vesszővel elválasztva azoknak a csomagoknak a nevét, amelyek elindíthatják vagy leállíthatják a Rethink alkalmazást.</string>
-    <string name="adv_tasker_dialog_instructions" translatable="true">Utasítások:\nKötelező extra adatok a broadcast üzenetben:\n• Kulcs: sender\n• Érték: A hívó alkalmazás csomagneve\n\nPélda: key:sender value:com.termux\n\nTámogatott műveletek:\n• VPN indítása– com.celzero.bravedns.intent.action.VPN_START\n• VPN leállítása – com.celzero.bravedns.intent.action.VPN_STOP</string>
+    <string name="adv_tasker_dialog_instructions" translatable="true">Utasítások:\nKötelező extra adatok a broadcast üzenetben:\n• Kulcs: sender\n• Érték: A hívó alkalmazás csomagneve\n\nPélda: key:sender value:com.termux\n\nTámogatott műveletek:\n• VPN indítása– com.rethinkdns.retrixed.intent.action.VPN_START\n• VPN leállítása – com.rethinkdns.retrixed.intent.action.VPN_STOP</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Adja meg a csomag nevét (például: net.dinglisch.android.taskerm), amely jogosult a Rethink VPN indítására vagy leállítására</string>
     <string name="download_ip_info_title" translatable="true">Szolgáltató információinak megjelenítése</string>
     <string name="download_ip_info_desc" translatable="true">Lekéri a weboldalak szolgáltatói adatait a <i>rethinkdns.com</i> oldalról, a következő által működtetve: <i>%1$s</i></string>

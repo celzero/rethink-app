@@ -14,11 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.celzero.bravedns.database
+package com.rethinkdns.retrixed.database
 
 import android.database.Cursor
 import androidx.room.Transaction
-import com.celzero.bravedns.data.FileTag
+import com.rethinkdns.retrixed.data.FileTag
 
 class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkLocalFileTagDao) {
 

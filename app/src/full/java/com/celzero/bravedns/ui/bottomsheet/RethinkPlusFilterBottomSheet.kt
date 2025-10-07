@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.bottomsheet
+package com.rethinkdns.retrixed.ui.bottomsheet
 
 import android.content.res.Configuration
 import android.graphics.PorterDuff
@@ -25,13 +25,13 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.FileTag
-import com.celzero.bravedns.databinding.BottomSheetRethinkPlusFilterBinding
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.fragment.RethinkBlocklistFragment
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.FileTag
+import com.rethinkdns.retrixed.databinding.BottomSheetRethinkPlusFilterBinding
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.ui.fragment.RethinkBlocklistFragment
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import org.koin.android.ext.android.inject

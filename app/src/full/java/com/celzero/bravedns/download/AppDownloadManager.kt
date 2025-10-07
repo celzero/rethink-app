@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.celzero.bravedns.download
+package com.rethinkdns.retrixed.download
 
 import Logger
 import Logger.LOG_TAG_DNS
@@ -30,18 +30,18 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
-import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator
-import com.celzero.bravedns.customdownloader.RemoteBlocklistCoordinator
-import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.checkBlocklistUpdate
-import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.getDownloadableTimestamp
-import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_TAG
-import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
-import com.celzero.bravedns.scheduler.WorkScheduler
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.RethinkBlocklistManager.DownloadType
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLISTS_ADM
-import com.celzero.bravedns.util.Utilities
+import com.rethinkdns.retrixed.customdownloader.LocalBlocklistCoordinator
+import com.rethinkdns.retrixed.customdownloader.RemoteBlocklistCoordinator
+import com.rethinkdns.retrixed.download.BlocklistDownloadHelper.Companion.checkBlocklistUpdate
+import com.rethinkdns.retrixed.download.BlocklistDownloadHelper.Companion.getDownloadableTimestamp
+import com.rethinkdns.retrixed.download.DownloadConstants.Companion.DOWNLOAD_TAG
+import com.rethinkdns.retrixed.download.DownloadConstants.Companion.FILE_TAG
+import com.rethinkdns.retrixed.scheduler.WorkScheduler
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.RethinkBlocklistManager.DownloadType
+import com.rethinkdns.retrixed.util.Constants.Companion.INIT_TIME_MS
+import com.rethinkdns.retrixed.util.Constants.Companion.ONDEVICE_BLOCKLISTS_ADM
+import com.rethinkdns.retrixed.util.Utilities
 import java.util.concurrent.TimeUnit
 
 /**

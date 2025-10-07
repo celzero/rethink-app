@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.fragment
+package com.rethinkdns.retrixed.ui.fragment
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -24,20 +24,20 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.WgNwStatsAdapter
-import com.celzero.bravedns.data.DataUsageSummary
-import com.celzero.bravedns.databinding.FragmentDnsCryptListBinding
-import com.celzero.bravedns.databinding.FragmentWgNwStatsBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
-import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
-import com.celzero.bravedns.viewmodel.WgNwActivityViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.WgNwStatsAdapter
+import com.rethinkdns.retrixed.data.DataUsageSummary
+import com.rethinkdns.retrixed.databinding.FragmentDnsCryptListBinding
+import com.rethinkdns.retrixed.databinding.FragmentWgNwStatsBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.ProxyManager
+import com.rethinkdns.retrixed.service.WireguardManager
+import com.rethinkdns.retrixed.service.WireguardManager.INVALID_CONF_ID
+import com.rethinkdns.retrixed.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.viewmodel.SummaryStatisticsViewModel
+import com.rethinkdns.retrixed.viewmodel.WgNwActivityViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

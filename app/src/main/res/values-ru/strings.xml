@@ -1169,7 +1169,7 @@
     <string name="most_contacted_asn" translatable="true">самые соеденяемые провайдеры</string>
     <string name="most_blocked_asn" translatable="true">самые блокируемые провайдеры</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Введите имена пакетов (через запятую), которым разрешено запускать или остановливать Rethink.</string>
-    <string name="adv_tasker_dialog_instructions" translatable="true">Инструкции:\n Обязательные дополнительные услуги в трансляции:\n • keK: sender\n • Value: имя пакета вызывающего приложения.\n\n Пример: key:sender value:com.termux\n\n Поддерживаемые действия:\n • Запустить VPN – com.celzero.bravedns.intent.action.VPN_START\n • Остановить VPN – com.celzero.bravedns.intent.action.VPN_STOP</string>
+    <string name="adv_tasker_dialog_instructions" translatable="true">Инструкции:\n Обязательные дополнительные услуги в трансляции:\n • keK: sender\n • Value: имя пакета вызывающего приложения.\n\n Пример: key:sender value:com.termux\n\n Поддерживаемые действия:\n • Запустить VPN – com.rethinkdns.retrixed.intent.action.VPN_START\n • Остановить VPN – com.rethinkdns.retrixed.intent.action.VPN_STOP</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">Введите имя пакета (пример: net.dinglisch.android.taskerm)</string>
     <string name="download_ip_info_title" translatable="true">Показать информацию о провайдере</string>
     <string name="download_ip_info_desc" translatable="true">Получает данные провайдеров для веб-сайтов с сайта <i>rethinkdns.com</i>, работающего на <i>%1$s</i></string>

@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.celzero.bravedns.glide
+package com.rethinkdns.retrixed.glide
 
 import Logger
 import Logger.LOG_TAG_DNS
@@ -22,7 +22,7 @@ import android.os.Process
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
-import com.celzero.bravedns.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import java.io.File

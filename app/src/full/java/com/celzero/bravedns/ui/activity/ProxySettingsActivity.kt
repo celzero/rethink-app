@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import Logger
 import Logger.LOG_TAG_PROXY
@@ -39,29 +39,29 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.ProxyEndpoint
-import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
-import com.celzero.bravedns.databinding.DialogSetProxyBinding
-import com.celzero.bravedns.databinding.FragmentProxyConfigureBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.TcpProxyHelper
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.ui.bottomsheet.OrbotBottomSheet
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.OrbotHelper
-import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.UIUtils.openUrl
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.delay
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.isValidPort
-import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.database.ProxyEndpoint
+import com.rethinkdns.retrixed.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
+import com.rethinkdns.retrixed.databinding.DialogSetProxyBinding
+import com.rethinkdns.retrixed.databinding.FragmentProxyConfigureBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.ProxyManager
+import com.rethinkdns.retrixed.service.TcpProxyHelper
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.service.WireguardManager
+import com.rethinkdns.retrixed.ui.bottomsheet.OrbotBottomSheet
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.OrbotHelper
+import com.rethinkdns.retrixed.util.Themes.Companion.getCurrentTheme
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.UIUtils.openUrl
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.delay
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.util.Utilities.isValidPort
+import com.rethinkdns.retrixed.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

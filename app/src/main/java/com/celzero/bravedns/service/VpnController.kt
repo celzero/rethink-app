@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import Logger
 import Logger.LOG_TAG_VPN
@@ -27,10 +27,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.celzero.firestack.backend.RDNS
 import com.celzero.firestack.backend.RouterStats
-import com.celzero.bravedns.R
-import com.celzero.bravedns.database.ConsoleLog
-import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Utilities
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.database.ConsoleLog
+import com.rethinkdns.retrixed.util.Constants.Companion.INVALID_UID
+import com.rethinkdns.retrixed.util.Utilities
 import com.celzero.firestack.backend.DNSTransport
 import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.intra.Controller

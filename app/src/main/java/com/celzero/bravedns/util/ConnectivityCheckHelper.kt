@@ -1,4 +1,4 @@
-package com.celzero.bravedns.util
+package com.rethinkdns.retrixed.util
 
 import Logger
 import Logger.LOG_TAG_CONNECTION
@@ -7,11 +7,11 @@ import android.net.NetworkCapabilities
 import android.net.TrafficStats
 import android.system.ErrnoException
 import android.system.OsConstants.ECONNREFUSED
-import com.celzero.bravedns.service.ConnectionMonitor.Companion.netId
-import com.celzero.bravedns.service.ConnectionMonitor.NetworkProperties
-import com.celzero.bravedns.service.ConnectionMonitor.ProbeResult
-import com.celzero.bravedns.service.ProbeController
-import com.celzero.bravedns.service.VpnController
+import com.rethinkdns.retrixed.service.ConnectionMonitor.Companion.netId
+import com.rethinkdns.retrixed.service.ConnectionMonitor.NetworkProperties
+import com.rethinkdns.retrixed.service.ConnectionMonitor.ProbeResult
+import com.rethinkdns.retrixed.service.ProbeController
+import com.rethinkdns.retrixed.service.VpnController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

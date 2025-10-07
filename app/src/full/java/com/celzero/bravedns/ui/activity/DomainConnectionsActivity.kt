@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import android.content.Context
 import android.content.res.Configuration
@@ -23,15 +23,15 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.DomainConnectionsAdapter
-import com.celzero.bravedns.databinding.ActivityDomainConnectionsBinding
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.CustomLinearLayoutManager
-import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.DomainConnectionsAdapter
+import com.rethinkdns.retrixed.databinding.ActivityDomainConnectionsBinding
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.util.CustomLinearLayoutManager
+import com.rethinkdns.retrixed.util.Themes.Companion.getCurrentTheme
+import com.rethinkdns.retrixed.util.UIUtils.getCountryNameFromFlag
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.viewmodel.DomainConnectionsViewModel
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

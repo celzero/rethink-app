@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.celzero.bravedns.ui.bottomsheet
+package com.rethinkdns.retrixed.ui.bottomsheet
 
 import android.content.Intent
 import android.content.res.Configuration
@@ -24,13 +24,13 @@ import android.view.ViewGroup
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.adapter.RethinkEndpointAdapter
-import com.celzero.bravedns.databinding.BottomSheetRethinkListBinding
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
+import com.rethinkdns.retrixed.adapter.RethinkEndpointAdapter
+import com.rethinkdns.retrixed.databinding.BottomSheetRethinkListBinding
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.ui.activity.ConfigureRethinkBasicActivity
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.viewmodel.RethinkEndpointViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject

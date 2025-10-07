@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import Logger
 import Logger.LOG_TAG_FIREWALL
@@ -26,13 +26,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivityAntiCensorshipBinding
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.isOsVersionAbove412
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.databinding.ActivityAntiCensorshipBinding
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.util.Utilities.isOsVersionAbove412
 import org.koin.android.ext.android.inject
 import com.celzero.firestack.settings.Settings
 

@@ -39,8 +39,8 @@ android_app {
     ],
 
     required: [
-        "privapp_whitelist_com.celzero.bravedns",
-        "com.celzero.bravedns_whitelist",
+        "privapp_whitelist_com.rethinkdns.retrixed",
+        "com.rethinkdns.retrixed_whitelist",
     ],
 
     static_libs: [
@@ -91,17 +91,17 @@ java_import {
 }
 
 prebuilt_etc {
-    name: "privapp_whitelist_com.celzero.bravedns",
+    name: "privapp_whitelist_com.rethinkdns.retrixed",
     system_ext_specific: true,
     sub_dir: "permissions",
-    src: "com.celzero.bravedns.xml",
+    src: "com.rethinkdns.retrixed.xml",
     filename_from_src: true,
 }
 
 prebuilt_etc {
-    name: "com.celzero.bravedns_whitelist",
+    name: "com.rethinkdns.retrixed_whitelist",
     system_ext_specific: true,
     sub_dir: "sysconfig",
-    src: "com.celzero.bravedns_whitelist.xml",
+    src: "com.rethinkdns.retrixed_whitelist.xml",
     filename_from_src: true,
 }

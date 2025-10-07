@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.bottomsheet
+package com.rethinkdns.retrixed.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_BACKUP_RESTORE
@@ -40,24 +40,24 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.celzero.bravedns.R
-import com.celzero.bravedns.backup.BackupAgent
-import com.celzero.bravedns.backup.BackupHelper
-import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
-import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_NAME
-import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_NAME_DATETIME
-import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_BACKUP_URI
-import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
-import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
-import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_TYPE_OCTET
-import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_TYPE_XZIP
-import com.celzero.bravedns.backup.RestoreAgent
-import com.celzero.bravedns.databinding.ActivityBackupRestoreBinding
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.delay
-import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.backup.BackupAgent
+import com.rethinkdns.retrixed.backup.BackupHelper
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.BACKUP_FILE_NAME
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.BACKUP_FILE_NAME_DATETIME
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.DATA_BUILDER_BACKUP_URI
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.INTENT_RESTART_APP
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.INTENT_TYPE_OCTET
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.INTENT_TYPE_XZIP
+import com.rethinkdns.retrixed.backup.RestoreAgent
+import com.rethinkdns.retrixed.databinding.ActivityBackupRestoreBinding
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.delay
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat

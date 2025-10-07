@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.celzero.bravedns.receiver
+package com.rethinkdns.retrixed.receiver
 
 import Logger
 import Logger.LOG_TAG_VPN
@@ -22,8 +22,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.VpnController
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

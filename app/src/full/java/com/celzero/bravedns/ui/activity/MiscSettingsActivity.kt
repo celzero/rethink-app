@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import Logger
 import Logger.LOG_TAG_APP_OPS
@@ -55,27 +55,27 @@ import androidx.core.os.LocaleListCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.backup.BackupHelper
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
-import com.celzero.bravedns.net.go.GoVpnAdapter
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.bottomsheet.BackupRestoreBottomSheet
-import com.celzero.bravedns.util.BackgroundAccessibilityService
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.NotificationActionType
-import com.celzero.bravedns.util.PcapMode
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.UIUtils.openUrl
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.delay
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.isAtleastR
-import com.celzero.bravedns.util.Utilities.isAtleastT
-import com.celzero.bravedns.util.Utilities.isFdroidFlavour
-import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.backup.BackupHelper
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.databinding.ActivityMiscSettingsBinding
+import com.rethinkdns.retrixed.net.go.GoVpnAdapter
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.ui.bottomsheet.BackupRestoreBottomSheet
+import com.rethinkdns.retrixed.util.BackgroundAccessibilityService
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.NotificationActionType
+import com.rethinkdns.retrixed.util.PcapMode
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.Themes.Companion.getCurrentTheme
+import com.rethinkdns.retrixed.util.UIUtils.openUrl
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.delay
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.util.Utilities.isAtleastR
+import com.rethinkdns.retrixed.util.Utilities.isAtleastT
+import com.rethinkdns.retrixed.util.Utilities.isFdroidFlavour
+import com.rethinkdns.retrixed.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
 import org.xmlpull.v1.XmlPullParser
@@ -87,11 +87,11 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import androidx.core.net.toUri
-import com.celzero.bravedns.ui.LauncherSwitcher
-import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
-import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
-import com.celzero.bravedns.util.NewSettingsManager
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
+import com.rethinkdns.retrixed.ui.LauncherSwitcher
+import com.rethinkdns.retrixed.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
+import com.rethinkdns.retrixed.ui.activity.AppLockActivity.Companion.HOME_ALIAS
+import com.rethinkdns.retrixed.util.NewSettingsManager
+import com.rethinkdns.retrixed.util.UIUtils.setBadgeDotVisible
 
 
 class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) {

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.database
+package com.rethinkdns.retrixed.database
 
 import android.content.ContentValues
 import android.os.SystemClock
 import androidx.room.Entity
-import com.celzero.bravedns.service.DomainRulesManager
-import com.celzero.bravedns.util.Constants
+import com.rethinkdns.retrixed.service.DomainRulesManager
+import com.rethinkdns.retrixed.util.Constants
 
 @Entity(primaryKeys = ["domain", "uid"], tableName = "CustomDomain")
 class CustomDomain {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.fragment
+package com.rethinkdns.retrixed.ui.fragment
 
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
@@ -31,19 +31,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.CustomIpAdapter
-import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
-import com.celzero.bravedns.databinding.FragmentCustomIpBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.IpRulesManager
-import com.celzero.bravedns.ui.activity.CustomRulesActivity
-import com.celzero.bravedns.ui.bottomsheet.CustomIpRulesBtmSheet
-import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
-import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
-import com.celzero.bravedns.util.CustomLinearLayoutManager
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.viewmodel.CustomIpViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.CustomIpAdapter
+import com.rethinkdns.retrixed.databinding.DialogAddCustomIpBinding
+import com.rethinkdns.retrixed.databinding.FragmentCustomIpBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.IpRulesManager
+import com.rethinkdns.retrixed.ui.activity.CustomRulesActivity
+import com.rethinkdns.retrixed.ui.bottomsheet.CustomIpRulesBtmSheet
+import com.rethinkdns.retrixed.util.Constants.Companion.INTENT_UID
+import com.rethinkdns.retrixed.util.Constants.Companion.UID_EVERYBODY
+import com.rethinkdns.retrixed.util.CustomLinearLayoutManager
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.viewmodel.CustomIpViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import inet.ipaddr.IPAddress
 import kotlinx.coroutines.Dispatchers

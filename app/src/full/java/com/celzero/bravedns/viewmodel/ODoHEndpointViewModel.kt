@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.viewmodel
+package com.rethinkdns.retrixed.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,8 +21,8 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.celzero.bravedns.database.ODoHEndpointDAO
-import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
+import com.rethinkdns.retrixed.database.ODoHEndpointDAO
+import com.rethinkdns.retrixed.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class ODoHEndpointViewModel(private val endpointDao: ODoHEndpointDAO) : ViewModel() {
     val dohEndpointList =

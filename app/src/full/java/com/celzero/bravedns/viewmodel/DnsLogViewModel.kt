@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.viewmodel
+package com.rethinkdns.retrixed.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,11 +25,11 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.celzero.bravedns.database.DnsLog
-import com.celzero.bravedns.database.DnsLogDAO
-import com.celzero.bravedns.ui.fragment.DnsLogFragment
-import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
-import com.celzero.bravedns.util.ResourceRecordTypes.Companion.getHandledTypes
+import com.rethinkdns.retrixed.database.DnsLog
+import com.rethinkdns.retrixed.database.DnsLogDAO
+import com.rethinkdns.retrixed.ui.fragment.DnsLogFragment
+import com.rethinkdns.retrixed.util.Constants.Companion.LIVEDATA_PAGE_SIZE
+import com.rethinkdns.retrixed.util.ResourceRecordTypes.Companion.getHandledTypes
 
 class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
 

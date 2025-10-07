@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.fragment
+package com.rethinkdns.retrixed.ui.fragment
 
 import android.os.Bundle
 import android.view.View
@@ -24,13 +24,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.ODoHEndpointAdapter
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.ODoHEndpoint
-import com.celzero.bravedns.databinding.DialogSetCustomOdohBinding
-import com.celzero.bravedns.databinding.FragmentOdohListBinding
-import com.celzero.bravedns.viewmodel.ODoHEndpointViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.ODoHEndpointAdapter
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.database.ODoHEndpoint
+import com.rethinkdns.retrixed.databinding.DialogSetCustomOdohBinding
+import com.rethinkdns.retrixed.databinding.FragmentOdohListBinding
+import com.rethinkdns.retrixed.viewmodel.ODoHEndpointViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

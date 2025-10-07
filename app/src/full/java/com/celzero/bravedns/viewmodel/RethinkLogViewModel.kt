@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.viewmodel
+package com.rethinkdns.retrixed.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,9 +25,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.celzero.bravedns.database.RethinkLog
-import com.celzero.bravedns.database.RethinkLogDao
-import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
+import com.rethinkdns.retrixed.database.RethinkLog
+import com.rethinkdns.retrixed.database.RethinkLogDao
+import com.rethinkdns.retrixed.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class RethinkLogViewModel(private val rlogDao: RethinkLogDao) : ViewModel() {
 

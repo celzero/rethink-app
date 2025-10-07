@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import android.content.Context
 import android.content.res.Configuration
@@ -25,18 +25,18 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingData
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.databinding.ActivityDetailedStatisticsBinding
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
-import com.celzero.bravedns.util.CustomLinearLayoutManager
-import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.viewmodel.DetailedStatisticsViewModel
-import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.SummaryStatisticsAdapter
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.data.AppConnection
+import com.rethinkdns.retrixed.databinding.ActivityDetailedStatisticsBinding
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.ui.fragment.SummaryStatisticsFragment
+import com.rethinkdns.retrixed.util.CustomLinearLayoutManager
+import com.rethinkdns.retrixed.util.Themes.Companion.getCurrentTheme
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.viewmodel.DetailedStatisticsViewModel
+import com.rethinkdns.retrixed.viewmodel.SummaryStatisticsViewModel
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

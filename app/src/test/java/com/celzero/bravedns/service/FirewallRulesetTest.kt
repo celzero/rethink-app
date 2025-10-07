@@ -1,4 +1,4 @@
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import org.junit.Test
 import org.junit.Assert.assertEquals
@@ -35,10 +35,10 @@ class FirewallRulesetTest {
     @Test
     fun testRuleActions() {
         // RULE1B should be a blocking rule (not an allow rule)
-        assertEquals(com.celzero.bravedns.R.integer.block, FirewallRuleset.RULE1B.act)
+        assertEquals(com.rethinkdns.retrixed.R.integer.block, FirewallRuleset.RULE1B.act)
         
         // RULE8 should be an allow rule
-        assertEquals(com.celzero.bravedns.R.integer.allow, FirewallRuleset.RULE8.act)
+        assertEquals(com.rethinkdns.retrixed.R.integer.allow, FirewallRuleset.RULE8.act)
         
         // Verify RULE1B is indeed a grounding (blocking) rule
         assertEquals(true, FirewallRuleset.ground(FirewallRuleset.RULE1B))
