@@ -208,13 +208,21 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                         b.dnsUnicodeHint.text,
                         getRethinkUnicode(log)
                     )
-            } else if (isInternalResolverUsed(log)) {
+            } else if (isGoosOrSystemUsed(log)) {
                 // show duck icon in case of system or goos transport
                 b.dnsUnicodeHint.text =
                     context.getString(
                         R.string.ci_desc,
                         b.dnsUnicodeHint.text,
                         context.getString(R.string.symbol_duck)
+                    )
+            } else if (isDefaultResolverUsed(log)) {
+                // show globe icon in case of default or bootstrap resolver
+                b.dnsUnicodeHint.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.dnsUnicodeHint.text,
+                        context.getString(R.string.symbol_diamond)
                     )
             } else if (containsMultipleIPs(log)) {
                 b.dnsUnicodeHint.text =
@@ -265,13 +273,21 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
             }
         }
 
-        private fun isInternalResolverUsed(log: DnsLog): Boolean {
+        private fun isGoosOrSystemUsed(log: DnsLog): Boolean {
             if (log.status != Transaction.Status.COMPLETE.name) {
                 return false
             }
 
-            return log.resolverId.contains(Backend.Goos) || log.resolverId.contains(Backend.Default) ||
-                    log.resolverId.contains(Backend.System) || log.resolverId.contains(Backend.Bootstrap)
+            return log.resolverId.contains(Backend.Goos) || log.resolverId.contains(Backend.System)
+        }
+
+        private fun isDefaultResolverUsed(log: DnsLog): Boolean {
+            if (log.status != Transaction.Status.COMPLETE.name) {
+                return false
+            }
+
+            // ideally bootstrap will not be sent from go-tun, just in case check for it
+            return log.resolverId.contains(Backend.Default) || log.resolverId.contains(Backend.Bootstrap)
         }
 
         private fun getRethinkUnicode(log: DnsLog): String {
