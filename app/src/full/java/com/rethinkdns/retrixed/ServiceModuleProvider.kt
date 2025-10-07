@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns
+package com.rethinkdns.retrixed
 
 import android.content.ContentResolver
-import com.celzero.bravedns.data.DataModule
-import com.celzero.bravedns.database.DatabaseModule
-import com.celzero.bravedns.download.AppDownloadManager
-import com.celzero.bravedns.scheduler.ScheduleManager
-import com.celzero.bravedns.scheduler.WorkScheduler
-import com.celzero.bravedns.service.AppUpdater
-import com.celzero.bravedns.service.ServiceModule
-import com.celzero.bravedns.subscription.StateMachineDatabaseSyncService
-import com.celzero.bravedns.subscription.SubscriptionStateMachineV2
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.OrbotHelper
-import com.celzero.bravedns.viewmodel.ViewModelModule
+import com.rethinkdns.retrixed.data.DataModule
+import com.rethinkdns.retrixed.database.DatabaseModule
+import com.rethinkdns.retrixed.download.AppDownloadManager
+import com.rethinkdns.retrixed.scheduler.ScheduleManager
+import com.rethinkdns.retrixed.scheduler.WorkScheduler
+import com.rethinkdns.retrixed.service.AppUpdater
+import com.rethinkdns.retrixed.service.ServiceModule
+import com.rethinkdns.retrixed.subscription.StateMachineDatabaseSyncService
+import com.rethinkdns.retrixed.subscription.SubscriptionStateMachineV2
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.OrbotHelper
+import com.rethinkdns.retrixed.viewmodel.ViewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.dsl.module

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -31,13 +31,13 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.celzero.bravedns.R
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.ui.LauncherSwitcher
-import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.ui.HomeScreenActivity
+import com.rethinkdns.retrixed.ui.LauncherSwitcher
+import com.rethinkdns.retrixed.util.Themes.Companion.getCurrentTheme
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.util.Utilities.showToastUiCentered
 import org.koin.android.ext.android.inject
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit

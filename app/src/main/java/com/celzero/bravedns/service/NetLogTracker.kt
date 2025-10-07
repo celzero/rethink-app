@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import Logger.LOG_BATCH_LOGGER
 import android.content.Context
 import android.util.Log
 import com.celzero.firestack.backend.DNSSummary
-import com.celzero.bravedns.data.ConnTrackerMetaData
-import com.celzero.bravedns.data.ConnectionSummary
-import com.celzero.bravedns.database.ConnectionTracker
-import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.celzero.bravedns.database.ConsoleLog
-import com.celzero.bravedns.database.ConsoleLogRepository
-import com.celzero.bravedns.database.DnsLog
-import com.celzero.bravedns.database.DnsLogRepository
-import com.celzero.bravedns.database.RethinkLog
-import com.celzero.bravedns.database.RethinkLogRepository
-import com.celzero.bravedns.util.Daemons
-import com.celzero.bravedns.util.NetLogBatcher
+import com.rethinkdns.retrixed.data.ConnTrackerMetaData
+import com.rethinkdns.retrixed.data.ConnectionSummary
+import com.rethinkdns.retrixed.database.ConnectionTracker
+import com.rethinkdns.retrixed.database.ConnectionTrackerRepository
+import com.rethinkdns.retrixed.database.ConsoleLog
+import com.rethinkdns.retrixed.database.ConsoleLogRepository
+import com.rethinkdns.retrixed.database.DnsLog
+import com.rethinkdns.retrixed.database.DnsLogRepository
+import com.rethinkdns.retrixed.database.RethinkLog
+import com.rethinkdns.retrixed.database.RethinkLogRepository
+import com.rethinkdns.retrixed.util.Daemons
+import com.rethinkdns.retrixed.util.NetLogBatcher
 import java.util.Calendar
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.viewmodel
+package com.rethinkdns.retrixed.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,10 +25,10 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.celzero.bravedns.database.ConnectionTracker
-import com.celzero.bravedns.database.ConnectionTrackerDAO
-import com.celzero.bravedns.ui.fragment.ConnectionTrackerFragment
-import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
+import com.rethinkdns.retrixed.database.ConnectionTracker
+import com.rethinkdns.retrixed.database.ConnectionTrackerDAO
+import com.rethinkdns.retrixed.ui.fragment.ConnectionTrackerFragment
+import com.rethinkdns.retrixed.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

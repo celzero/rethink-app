@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.bottomsheet
+package com.rethinkdns.retrixed.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_FIREWALL
@@ -31,25 +31,25 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import com.celzero.bravedns.R
-import com.celzero.bravedns.database.ConnectionTracker
-import com.celzero.bravedns.database.RethinkLog
-import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
-import com.celzero.bravedns.service.DomainRulesManager
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.activity.AppInfoActivity
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Protocol
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.getIcon
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.database.ConnectionTracker
+import com.rethinkdns.retrixed.database.RethinkLog
+import com.rethinkdns.retrixed.databinding.BottomSheetConnTrackBinding
+import com.rethinkdns.retrixed.service.DomainRulesManager
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.ui.activity.AppInfoActivity
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Protocol
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.UIUtils.fetchColor
+import com.rethinkdns.retrixed.util.UIUtils.htmlToSpannedText
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.getIcon
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers

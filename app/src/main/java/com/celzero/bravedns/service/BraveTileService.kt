@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import Logger
 import android.app.PendingIntent
@@ -26,10 +26,10 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
-import com.celzero.bravedns.ui.PrepareVpnActivity
-import com.celzero.bravedns.ui.activity.AppLockActivity
-import com.celzero.bravedns.ui.activity.MiscSettingsActivity
-import com.celzero.bravedns.util.Utilities
+import com.rethinkdns.retrixed.ui.PrepareVpnActivity
+import com.rethinkdns.retrixed.ui.activity.AppLockActivity
+import com.rethinkdns.retrixed.ui.activity.MiscSettingsActivity
+import com.rethinkdns.retrixed.util.Utilities
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

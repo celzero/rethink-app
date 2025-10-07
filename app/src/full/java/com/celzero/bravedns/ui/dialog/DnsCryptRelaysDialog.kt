@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.celzero.bravedns.ui.dialog
+package com.rethinkdns.retrixed.ui.dialog
 
 import android.app.Activity
 import android.app.Dialog
@@ -22,7 +22,7 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.databinding.DialogDnscryptRelaysBinding
+import com.rethinkdns.retrixed.databinding.DialogDnscryptRelaysBinding
 
 class DnsCryptRelaysDialog(
     private var activity: Activity,

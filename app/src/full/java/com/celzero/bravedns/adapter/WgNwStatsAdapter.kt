@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import Logger.LOG_TAG_UI
 import android.content.Context
@@ -27,14 +27,14 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.databinding.ListItemStatisticsSummaryBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastN
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.AppConnection
+import com.rethinkdns.retrixed.database.AppInfo
+import com.rethinkdns.retrixed.databinding.ListItemStatisticsSummaryBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.util.UIUtils.fetchToggleBtnColors
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.isAtleastN
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

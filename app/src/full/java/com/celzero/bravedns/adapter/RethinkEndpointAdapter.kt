@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import Logger
 import Logger.LOG_TAG_DNS
@@ -32,16 +32,16 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.firestack.backend.Backend
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.RethinkDnsEndpoint
-import com.celzero.bravedns.databinding.RethinkEndpointListItemBinding
-import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.UIUtils.clipboardCopy
-import com.celzero.bravedns.util.Utilities
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.database.RethinkDnsEndpoint
+import com.rethinkdns.retrixed.databinding.RethinkEndpointListItemBinding
+import com.rethinkdns.retrixed.service.RethinkBlocklistManager
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.ui.activity.ConfigureRethinkBasicActivity
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.UIUtils.clipboardCopy
+import com.rethinkdns.retrixed.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

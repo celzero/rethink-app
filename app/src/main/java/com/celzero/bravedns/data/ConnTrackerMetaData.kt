@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.data
+package com.rethinkdns.retrixed.data
 
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.rethinkdns.retrixed.util.Constants.Companion.INIT_TIME_MS
 import java.io.Serializable
 
 // do not use it as key in the map or set, as it is mutable

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.celzero.bravedns.database
+package com.rethinkdns.retrixed.database
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
@@ -24,7 +24,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.celzero.bravedns.data.FileTag
+import com.rethinkdns.retrixed.data.FileTag
 
 @Dao
 interface RethinkRemoteFileTagDao {

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
-import com.celzero.bravedns.R
+import com.rethinkdns.retrixed.R
 
 // TODO: Add label and description from strings.xml
 enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val act: Int) {

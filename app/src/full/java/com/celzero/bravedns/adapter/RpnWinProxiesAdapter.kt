@@ -14,7 +14,7 @@
  * limitations under the License.
  *//*
 
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -22,13 +22,13 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ListItemRpnCountriesBinding
-import com.celzero.bravedns.databinding.ListItemRpnWinProxyBinding
-import com.celzero.bravedns.databinding.ListItemWgHopBinding
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.Utilities.getFlag
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.databinding.ListItemRpnCountriesBinding
+import com.rethinkdns.retrixed.databinding.ListItemRpnWinProxyBinding
+import com.rethinkdns.retrixed.databinding.ListItemWgHopBinding
+import com.rethinkdns.retrixed.rpnproxy.RpnProxyManager
+import com.rethinkdns.retrixed.util.UIUtils.fetchColor
+import com.rethinkdns.retrixed.util.Utilities.getFlag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

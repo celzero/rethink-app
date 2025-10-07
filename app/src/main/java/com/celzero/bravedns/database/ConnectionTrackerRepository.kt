@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.database
+package com.rethinkdns.retrixed.database
 
 import androidx.lifecycle.LiveData
-import com.celzero.bravedns.data.ConnectionSummary
-import com.celzero.bravedns.data.DataUsage
-import com.celzero.bravedns.service.PersistentState
+import com.rethinkdns.retrixed.data.ConnectionSummary
+import com.rethinkdns.retrixed.data.DataUsage
+import com.rethinkdns.retrixed.service.PersistentState
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

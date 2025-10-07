@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import android.content.Context
 import android.content.Intent
@@ -25,20 +25,20 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.ActivityNetworkLogsBinding
-import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity.Companion.RULES_SEARCH_ID
-import com.celzero.bravedns.ui.fragment.ConnectionTrackerFragment
-import com.celzero.bravedns.ui.fragment.DnsLogFragment
-import com.celzero.bravedns.ui.fragment.RethinkLogFragment
-import com.celzero.bravedns.ui.fragment.WgNwStatsFragment
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.databinding.ActivityNetworkLogsBinding
+import com.rethinkdns.retrixed.service.BraveVPNService
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.ui.activity.UniversalFirewallSettingsActivity.Companion.RULES_SEARCH_ID
+import com.rethinkdns.retrixed.ui.fragment.ConnectionTrackerFragment
+import com.rethinkdns.retrixed.ui.fragment.DnsLogFragment
+import com.rethinkdns.retrixed.ui.fragment.RethinkLogFragment
+import com.rethinkdns.retrixed.ui.fragment.WgNwStatsFragment
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Themes.Companion.getCurrentTheme
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 

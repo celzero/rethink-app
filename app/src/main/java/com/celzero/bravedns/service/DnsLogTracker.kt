@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import Logger
 import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.os.SystemClock
 import com.celzero.firestack.backend.Backend
-import com.celzero.bravedns.R
-import com.celzero.bravedns.database.DnsLog
-import com.celzero.bravedns.database.DnsLogRepository
-import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.util.AndroidUidConfig
-import com.celzero.bravedns.util.Constants.Companion.EMPTY_PACKAGE_NAME
-import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
-import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
-import com.celzero.bravedns.util.ResourceRecordTypes
-import com.celzero.bravedns.util.UIUtils.fetchFavIcon
-import com.celzero.bravedns.util.Utilities.getCountryCode
-import com.celzero.bravedns.util.Utilities.getFlag
-import com.celzero.bravedns.util.Utilities.makeAddressPair
-import com.celzero.bravedns.util.Utilities.normalizeIp
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.database.DnsLog
+import com.rethinkdns.retrixed.database.DnsLogRepository
+import com.rethinkdns.retrixed.net.doh.Transaction
+import com.rethinkdns.retrixed.util.AndroidUidConfig
+import com.rethinkdns.retrixed.util.Constants.Companion.EMPTY_PACKAGE_NAME
+import com.rethinkdns.retrixed.util.Constants.Companion.INVALID_UID
+import com.rethinkdns.retrixed.util.Constants.Companion.UNSPECIFIED_IP_IPV4
+import com.rethinkdns.retrixed.util.Constants.Companion.UNSPECIFIED_IP_IPV6
+import com.rethinkdns.retrixed.util.ResourceRecordTypes
+import com.rethinkdns.retrixed.util.UIUtils.fetchFavIcon
+import com.rethinkdns.retrixed.util.Utilities.getCountryCode
+import com.rethinkdns.retrixed.util.Utilities.getFlag
+import com.rethinkdns.retrixed.util.Utilities.makeAddressPair
+import com.rethinkdns.retrixed.util.Utilities.normalizeIp
 import com.celzero.firestack.backend.DNSSummary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

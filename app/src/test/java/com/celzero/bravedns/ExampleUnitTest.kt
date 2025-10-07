@@ -1,4 +1,4 @@
-package com.celzero.bravedns
+package com.rethinkdns.retrixed
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

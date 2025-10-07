@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import android.app.Activity
 import android.content.Context
@@ -23,13 +23,13 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ListItemWgPeersBinding
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.Utilities.tos
-import com.celzero.bravedns.wireguard.Peer
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.databinding.ListItemWgPeersBinding
+import com.rethinkdns.retrixed.service.WireguardManager
+import com.rethinkdns.retrixed.ui.dialog.WgAddPeerDialog
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.Utilities.tos
+import com.rethinkdns.retrixed.wireguard.Peer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

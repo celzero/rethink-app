@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.celzero.bravedns.receiver
+package com.rethinkdns.retrixed.receiver
 
 import android.content.Context
 import android.content.Intent
@@ -97,7 +97,7 @@ class BraveAutoStartReceiverTest {
     fun `receiver package should be correct`() {
         // Test that the receiver is in the correct package
         assertEquals("Package should be correct", 
-                    "com.celzero.bravedns.receiver", 
+                    "com.rethinkdns.retrixed.receiver", 
                     receiver.javaClass.packageName)
     }
 

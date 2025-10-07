@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.rpnproxy
+package com.rethinkdns.retrixed.rpnproxy
 
 import Logger
 import Logger.LOG_TAG_PROXY
 import android.content.Context
-import com.celzero.bravedns.customdownloader.ITcpProxy
-import com.celzero.bravedns.customdownloader.RetrofitManager
-import com.celzero.bravedns.service.EncryptedFileManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Utilities.togb
-import com.celzero.bravedns.util.Utilities.togs
-import com.celzero.bravedns.util.Utilities.tos
+import com.rethinkdns.retrixed.customdownloader.ITcpProxy
+import com.rethinkdns.retrixed.customdownloader.RetrofitManager
+import com.rethinkdns.retrixed.service.EncryptedFileManager
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.util.Utilities.togb
+import com.rethinkdns.retrixed.util.Utilities.togs
+import com.rethinkdns.retrixed.util.Utilities.tos
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.PipKey
 import com.celzero.firestack.backend.PipMsg

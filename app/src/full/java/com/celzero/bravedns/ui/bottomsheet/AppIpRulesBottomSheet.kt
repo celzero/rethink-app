@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.bottomsheet
+package com.rethinkdns.retrixed.ui.bottomsheet
 
 import Logger
 import Logger.LOG_TAG_FIREWALL
@@ -28,22 +28,22 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.AppWiseIpsAdapter
-import com.celzero.bravedns.adapter.DomainRulesBtmSheetAdapter
-import com.celzero.bravedns.database.CustomIp
-import com.celzero.bravedns.database.WgConfigFilesImmutable
-import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.IpRulesManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.CustomLinearLayoutManager
-import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
-import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.AppWiseIpsAdapter
+import com.rethinkdns.retrixed.adapter.DomainRulesBtmSheetAdapter
+import com.rethinkdns.retrixed.database.CustomIp
+import com.rethinkdns.retrixed.database.WgConfigFilesImmutable
+import com.rethinkdns.retrixed.databinding.BottomSheetAppConnectionsBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.IpRulesManager
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.WireguardManager
+import com.rethinkdns.retrixed.util.Constants.Companion.INVALID_UID
+import com.rethinkdns.retrixed.util.CustomLinearLayoutManager
+import com.rethinkdns.retrixed.util.Themes.Companion.getBottomsheetCurrentTheme
+import com.rethinkdns.retrixed.util.UIUtils.htmlToSpannedText
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

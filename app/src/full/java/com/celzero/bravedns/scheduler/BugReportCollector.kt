@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.celzero.bravedns.scheduler
+package com.rethinkdns.retrixed.scheduler
 
 import Logger
 import Logger.LOG_TAG_SCHEDULER
@@ -26,9 +26,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastO
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.isAtleastO
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import Logger
 import Logger.LOG_TAG_DNS
@@ -36,25 +36,25 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.databinding.ListItemStatisticsSummaryBinding
-import com.celzero.bravedns.glide.FavIconDownloader
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.activity.AppInfoActivity
-import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
-import com.celzero.bravedns.ui.activity.NetworkLogsActivity
-import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment.SummaryStatisticsType
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
-import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.getFlag
-import com.celzero.bravedns.util.Utilities.isAtleastN
-import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.data.AppConnection
+import com.rethinkdns.retrixed.database.AppInfo
+import com.rethinkdns.retrixed.databinding.ListItemStatisticsSummaryBinding
+import com.rethinkdns.retrixed.glide.FavIconDownloader
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.ui.activity.AppInfoActivity
+import com.rethinkdns.retrixed.ui.activity.DomainConnectionsActivity
+import com.rethinkdns.retrixed.ui.activity.NetworkLogsActivity
+import com.rethinkdns.retrixed.ui.fragment.SummaryStatisticsFragment.SummaryStatisticsType
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.UIUtils.fetchToggleBtnColors
+import com.rethinkdns.retrixed.util.UIUtils.getCountryNameFromFlag
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.getFlag
+import com.rethinkdns.retrixed.util.Utilities.isAtleastN
+import com.rethinkdns.retrixed.viewmodel.SummaryStatisticsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

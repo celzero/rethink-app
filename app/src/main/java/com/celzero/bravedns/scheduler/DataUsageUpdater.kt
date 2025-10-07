@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.scheduler
+package com.rethinkdns.retrixed.scheduler
 
 import Logger
 import Logger.LOG_TAG_SCHEDULER
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.database.AppInfoRepository
-import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.celzero.bravedns.database.RethinkLogRepository
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants
+import com.rethinkdns.retrixed.database.AppInfoRepository
+import com.rethinkdns.retrixed.database.ConnectionTrackerRepository
+import com.rethinkdns.retrixed.database.RethinkLogRepository
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.util.Constants
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

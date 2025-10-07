@@ -1,4 +1,4 @@
-package com.celzero.bravedns.ui.dialog
+package com.rethinkdns.retrixed.ui.dialog
 
 import android.graphics.Color
 import android.os.Bundle
@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.DialogSubscriptionAnimBinding
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.databinding.DialogSubscriptionAnimBinding
 import nl.dionsegijn.konfetti.core.Angle
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position

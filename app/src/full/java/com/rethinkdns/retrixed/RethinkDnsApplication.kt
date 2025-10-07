@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns
+package com.rethinkdns.retrixed
 
 import Logger
 import Logger.LOG_TAG_SCHEDULER
 import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.os.StrictMode
-import com.celzero.bravedns.scheduler.ScheduleManager
-import com.celzero.bravedns.scheduler.WorkScheduler
+import com.rethinkdns.retrixed.scheduler.ScheduleManager
+import com.rethinkdns.retrixed.scheduler.WorkScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch

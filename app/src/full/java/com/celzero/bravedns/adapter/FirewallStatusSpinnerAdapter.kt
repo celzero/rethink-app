@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -22,8 +22,8 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.SpinnerItemFirewallStatusBinding
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.databinding.SpinnerItemFirewallStatusBinding
 
 class FirewallStatusSpinnerAdapter(val context: Context, private val spinnerLabels: Array<String>) :
     BaseAdapter() {

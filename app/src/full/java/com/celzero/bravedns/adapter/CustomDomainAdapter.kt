@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -38,21 +38,21 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.celzero.bravedns.R
-import com.celzero.bravedns.database.CustomDomain
-import com.celzero.bravedns.databinding.DialogAddCustomDomainBinding
-import com.celzero.bravedns.databinding.ListItemCustomAllDomainBinding
-import com.celzero.bravedns.databinding.ListItemCustomDomainBinding
-import com.celzero.bravedns.service.DomainRulesManager
-import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
-import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.ui.activity.CustomRulesActivity
-import com.celzero.bravedns.ui.bottomsheet.CustomDomainRulesBtmSheet
-import com.celzero.bravedns.ui.bottomsheet.CustomDomainRulesBtmSheet.ToggleBtnUi
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.Utilities
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.database.CustomDomain
+import com.rethinkdns.retrixed.databinding.DialogAddCustomDomainBinding
+import com.rethinkdns.retrixed.databinding.ListItemCustomAllDomainBinding
+import com.rethinkdns.retrixed.databinding.ListItemCustomDomainBinding
+import com.rethinkdns.retrixed.service.DomainRulesManager
+import com.rethinkdns.retrixed.service.DomainRulesManager.isValidDomain
+import com.rethinkdns.retrixed.service.DomainRulesManager.isWildCardEntry
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.ui.activity.CustomRulesActivity
+import com.rethinkdns.retrixed.ui.bottomsheet.CustomDomainRulesBtmSheet
+import com.rethinkdns.retrixed.ui.bottomsheet.CustomDomainRulesBtmSheet.ToggleBtnUi
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.UIUtils.fetchColor
+import com.rethinkdns.retrixed.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers

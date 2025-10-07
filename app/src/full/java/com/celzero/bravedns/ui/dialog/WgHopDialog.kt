@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.dialog
+package com.rethinkdns.retrixed.ui.dialog
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -25,9 +25,9 @@ import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.celzero.bravedns.adapter.WgHopAdapter
-import com.celzero.bravedns.databinding.DialogWgHopBinding
-import com.celzero.bravedns.wireguard.Config
+import com.rethinkdns.retrixed.adapter.WgHopAdapter
+import com.rethinkdns.retrixed.databinding.DialogWgHopBinding
+import com.rethinkdns.retrixed.wireguard.Config
 import org.koin.core.component.KoinComponent
 
 class WgHopDialog(

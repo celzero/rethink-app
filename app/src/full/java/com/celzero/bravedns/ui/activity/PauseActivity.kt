@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -26,16 +26,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivityPauseBinding
-import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.PauseTimer.PAUSE_VPN_EXTRA_MILLIS
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.databinding.ActivityPauseBinding
+import com.rethinkdns.retrixed.service.BraveVPNService
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.PauseTimer.PAUSE_VPN_EXTRA_MILLIS
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.util.Constants.Companion.INIT_TIME_MS
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

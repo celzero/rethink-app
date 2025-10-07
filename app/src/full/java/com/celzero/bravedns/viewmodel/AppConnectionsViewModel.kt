@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.viewmodel
+package com.rethinkdns.retrixed.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,12 +25,12 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.database.ConnectionTrackerDAO
-import com.celzero.bravedns.database.RethinkLogDao
-import com.celzero.bravedns.database.StatsSummaryDao
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Constants
+import com.rethinkdns.retrixed.data.AppConnection
+import com.rethinkdns.retrixed.database.ConnectionTrackerDAO
+import com.rethinkdns.retrixed.database.RethinkLogDao
+import com.rethinkdns.retrixed.database.StatsSummaryDao
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.util.Constants
 
 class AppConnectionsViewModel(
     private val nwlogDao: ConnectionTrackerDAO,

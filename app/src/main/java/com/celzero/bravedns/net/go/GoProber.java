@@ -15,11 +15,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.celzero.bravedns.net.go;
+package com.rethinkdns.retrixed.net.go;
 
 import android.content.Context;
 
-import com.celzero.bravedns.net.doh.Prober;
+import com.rethinkdns.retrixed.net.doh.Prober;
 
 /**
  * Implements a Probe using the Go-based DoH client.

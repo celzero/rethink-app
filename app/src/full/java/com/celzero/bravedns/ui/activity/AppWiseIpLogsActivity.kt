@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import Logger.LOG_TAG_UI
 import android.content.Context
@@ -32,18 +32,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.AppWiseIpsAdapter
-import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.databinding.ActivityAppWiseIpLogsBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.AppWiseIpsAdapter
+import com.rethinkdns.retrixed.database.AppInfo
+import com.rethinkdns.retrixed.databinding.ActivityAppWiseIpLogsBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.util.Constants.Companion.INVALID_UID
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.viewmodel.AppConnectionsViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

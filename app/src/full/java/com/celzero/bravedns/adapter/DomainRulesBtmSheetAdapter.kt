@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import Logger
 import Logger.LOG_TAG_FIREWALL
@@ -24,9 +24,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.DomainItemBottomSheetBinding
-import com.celzero.bravedns.service.DomainRulesManager
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.databinding.DomainItemBottomSheetBinding
+import com.rethinkdns.retrixed.service.DomainRulesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

@@ -9,7 +9,7 @@
 # and specify the fully qualified class name to the JavaScript interface
 # class:
 # commenting below, webview removed from version v053i
-#-keepclassmembers class com.celzero.bravedns.ui.DnsConfigureWebViewActivity$JSInterface {
+#-keepclassmembers class com.rethinkdns.retrixed.ui.DnsConfigureWebViewActivity$JSInterface {
 #   public *;
 #}
 
@@ -62,7 +62,7 @@
 -keepattributes Signature
 -keepattributes *Annotation*
 -keep class com.google.gson.** { *; }
--keep class com.celzero.bravedns.data.FileTag { *; }
+-keep class com.rethinkdns.retrixed.data.FileTag { *; }
 
 # Добавлено: Правила для Koin, чтобы сохранить классы и методы для Dependency Injection
 -keep class org.koin.** { *; }
@@ -84,8 +84,8 @@
 }
 
 # Добавлено: Сохраняем NotificationActionReceiver, упомянутый в логе R8
--keep class com.celzero.bravedns.receiver.NotificationActionReceiver { *; }
--keepclassmembers class com.celzero.bravedns.receiver.NotificationActionReceiver {
+-keep class com.rethinkdns.retrixed.receiver.NotificationActionReceiver { *; }
+-keepclassmembers class com.rethinkdns.retrixed.receiver.NotificationActionReceiver {
     public *;
 }
 

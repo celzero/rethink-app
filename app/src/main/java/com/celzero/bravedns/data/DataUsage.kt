@@ -13,6 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.data
+package com.rethinkdns.retrixed.data
 
 data class DataUsage(val uid: Int, val uploadBytes: Long, val downloadBytes: Long)

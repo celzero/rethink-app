@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.dialog
+package com.rethinkdns.retrixed.ui.dialog
 
 import android.app.Activity
 import android.app.Dialog
@@ -24,7 +24,7 @@ import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.databinding.DialogRpnWinServersBinding
+import com.rethinkdns.retrixed.databinding.DialogRpnWinServersBinding
 
 class RpnProxySelectionDialog(private var activity: Activity,
     internal var adapter: RecyclerView.Adapter<*>,

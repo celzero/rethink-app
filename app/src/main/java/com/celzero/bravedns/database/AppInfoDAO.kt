@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.celzero.bravedns.database
+package com.rethinkdns.retrixed.database
 
 import android.database.Cursor
 import androidx.paging.PagingSource
@@ -23,7 +23,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.celzero.bravedns.data.DataUsage
+import com.rethinkdns.retrixed.data.DataUsage
 
 @Dao
 interface AppInfoDAO {
@@ -31,7 +31,7 @@ interface AppInfoDAO {
     @Update fun update(appInfo: AppInfo): Int
 
     @Query(
-        "update AppInfo set firewallStatus = :firewallStatus, connectionStatus = :connectionStatus where uid = :uid and packageName != 'com.celzero.bravedns'"
+        "update AppInfo set firewallStatus = :firewallStatus, connectionStatus = :connectionStatus where uid = :uid and packageName != 'com.rethinkdns.retrixed'"
     )
     fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int)
 
@@ -165,7 +165,7 @@ interface AppInfoDAO {
     @Query("update AppInfo set isProxyExcluded = :isProxyExcluded where uid = :uid")
     fun updateProxyExcluded(uid: Int, isProxyExcluded: Boolean)
 
-    @Query("update AppInfo set firewallStatus = 5, connectionStatus = 3 where packageName = 'com.celzero.bravedns'")
+    @Query("update AppInfo set firewallStatus = 5, connectionStatus = 3 where packageName = 'com.rethinkdns.retrixed'")
     fun resetRethinkAppFirewallMode()
 
     @Query("select uid from AppInfo where packageName = :packageName")

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -25,13 +25,13 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.RpnCountriesAdapter
-import com.celzero.bravedns.databinding.ActivityRpnCountriesBinding
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.RpnCountriesAdapter
+import com.rethinkdns.retrixed.databinding.ActivityRpnCountriesBinding
+import com.rethinkdns.retrixed.rpnproxy.RpnProxyManager
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

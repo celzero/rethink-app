@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.viewmodel
+package com.rethinkdns.retrixed.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,9 +24,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.celzero.bravedns.database.WgConfigFiles
-import com.celzero.bravedns.database.WgConfigFilesDAO
-import com.celzero.bravedns.util.Constants
+import com.rethinkdns.retrixed.database.WgConfigFiles
+import com.rethinkdns.retrixed.database.WgConfigFilesDAO
+import com.rethinkdns.retrixed.util.Constants
 
 class WgConfigViewModel(private val wgConfigFilesDAO: WgConfigFilesDAO) : ViewModel() {
 

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/rethinkPlus"
-        android:name="com.celzero.bravedns.ui.fragment.RethinkPlusFragment"
+        android:name="com.rethinkdns.retrixed.ui.fragment.RethinkPlusFragment"
         android:label="Rethink Plus" >
         <action
             android:id="@+id/action_rethinkPlus_to_rethinkPlusDashboardFragment"
@@ -16,6 +16,6 @@
 
     <fragment
         android:id="@+id/rethinkPlusDashboardFragment"
-        android:name="com.celzero.bravedns.ui.fragment.RethinkPlusDashboardFragment"
+        android:name="com.rethinkdns.retrixed.ui.fragment.RethinkPlusDashboardFragment"
         android:label="Rethink Plus Dashboard" />
 </navigation>

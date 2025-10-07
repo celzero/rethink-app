@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.dialog
+package com.rethinkdns.retrixed.ui.dialog
 
 import Logger
 import Logger.LOG_TAG_PROXY
@@ -34,12 +34,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.R
-import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.databinding.DialogWgAppsBinding
-import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.database.RefreshDatabase
+import com.rethinkdns.retrixed.databinding.DialogWgAppsBinding
+import com.rethinkdns.retrixed.service.ProxyManager
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.viewmodel.ProxyAppsMappingViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers

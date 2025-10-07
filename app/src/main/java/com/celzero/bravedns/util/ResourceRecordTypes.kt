@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.celzero.bravedns.util
+package com.rethinkdns.retrixed.util
 
 // From https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-4
 // additional ref: https://www.netmeister.org/blog/dns-rrs.html

@@ -16,9 +16,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.wireguard
+package com.rethinkdns.retrixed.wireguard
 
-import com.celzero.bravedns.wireguard.BadConfigException.*
+import com.rethinkdns.retrixed.wireguard.BadConfigException.*
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream

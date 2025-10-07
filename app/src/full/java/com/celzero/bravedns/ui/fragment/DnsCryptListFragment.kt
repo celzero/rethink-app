@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.fragment
+package com.rethinkdns.retrixed.ui.fragment
 
 import Logger
 import android.content.res.Configuration
@@ -26,19 +26,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.DnsCryptEndpointAdapter
-import com.celzero.bravedns.adapter.DnsCryptRelayEndpointAdapter
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.DnsCryptEndpoint
-import com.celzero.bravedns.database.DnsCryptRelayEndpoint
-import com.celzero.bravedns.databinding.DialogSetDnsCryptBinding
-import com.celzero.bravedns.databinding.FragmentDnsCryptListBinding
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.dialog.DnsCryptRelaysDialog
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.viewmodel.DnsCryptEndpointViewModel
-import com.celzero.bravedns.viewmodel.DnsCryptRelayEndpointViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.DnsCryptEndpointAdapter
+import com.rethinkdns.retrixed.adapter.DnsCryptRelayEndpointAdapter
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.database.DnsCryptEndpoint
+import com.rethinkdns.retrixed.database.DnsCryptRelayEndpoint
+import com.rethinkdns.retrixed.databinding.DialogSetDnsCryptBinding
+import com.rethinkdns.retrixed.databinding.FragmentDnsCryptListBinding
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.ui.dialog.DnsCryptRelaysDialog
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.viewmodel.DnsCryptEndpointViewModel
+import com.rethinkdns.retrixed.viewmodel.DnsCryptRelayEndpointViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

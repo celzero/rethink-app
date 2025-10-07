@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.util
+package com.rethinkdns.retrixed.util
 
 import Logger
 import Logger.LOG_TAG_VPN
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.rethinkdns.retrixed.RethinkDnsApplication.Companion.DEBUG
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
 import java.net.InetAddress

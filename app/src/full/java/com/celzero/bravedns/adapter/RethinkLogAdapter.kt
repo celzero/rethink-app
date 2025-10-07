@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -32,21 +32,21 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.celzero.bravedns.R
-import com.celzero.bravedns.database.ConnectionTracker
-import com.celzero.bravedns.database.RethinkLog
-import com.celzero.bravedns.databinding.ListItemConnTrackBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.bottomsheet.ConnTrackerBottomSheet
-import com.celzero.bravedns.ui.bottomsheet.RethinkLogBottomSheet
-import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
-import com.celzero.bravedns.util.KnownPorts
-import com.celzero.bravedns.util.Protocol
-import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.getIcon
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.database.ConnectionTracker
+import com.rethinkdns.retrixed.database.RethinkLog
+import com.rethinkdns.retrixed.databinding.ListItemConnTrackBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.ProxyManager
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.ui.bottomsheet.ConnTrackerBottomSheet
+import com.rethinkdns.retrixed.ui.bottomsheet.RethinkLogBottomSheet
+import com.rethinkdns.retrixed.util.Constants.Companion.TIME_FORMAT_1
+import com.rethinkdns.retrixed.util.KnownPorts
+import com.rethinkdns.retrixed.util.Protocol
+import com.rethinkdns.retrixed.util.UIUtils.getDurationInHumanReadableFormat
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.getIcon
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

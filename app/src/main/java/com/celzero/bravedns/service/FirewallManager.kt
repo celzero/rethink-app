@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import Logger
 import Logger.LOG_TAG_FIREWALL
 import android.app.KeyguardManager
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
-import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.AppInfoRepository
-import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
-import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfos
-import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfosLiveData
-import com.celzero.bravedns.service.FirewallManager.GlobalVariable.foregroundUids
-import com.celzero.bravedns.util.AndroidUidConfig
-import com.celzero.bravedns.util.Constants.Companion.RETHINK_PACKAGE
-import com.celzero.bravedns.util.OrbotHelper
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.database.AppInfo
+import com.rethinkdns.retrixed.database.AppInfoRepository
+import com.rethinkdns.retrixed.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
+import com.rethinkdns.retrixed.service.FirewallManager.GlobalVariable.appInfos
+import com.rethinkdns.retrixed.service.FirewallManager.GlobalVariable.appInfosLiveData
+import com.rethinkdns.retrixed.service.FirewallManager.GlobalVariable.foregroundUids
+import com.rethinkdns.retrixed.util.AndroidUidConfig
+import com.rethinkdns.retrixed.util.Constants.Companion.RETHINK_PACKAGE
+import com.rethinkdns.retrixed.util.OrbotHelper
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Multimap

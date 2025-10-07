@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.util
+package com.rethinkdns.retrixed.util
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -38,11 +38,11 @@ import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import com.celzero.firestack.backend.Backend
-import com.celzero.bravedns.R
-import com.celzero.bravedns.database.DnsLog
-import com.celzero.bravedns.glide.FavIconDownloader
-import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.service.DnsLogTracker
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.database.DnsLog
+import com.rethinkdns.retrixed.glide.FavIconDownloader
+import com.rethinkdns.retrixed.net.doh.Transaction
+import com.rethinkdns.retrixed.service.DnsLogTracker
 import com.celzero.firestack.backend.NetStat
 import com.google.android.material.radiobutton.MaterialRadioButton
 import java.util.Calendar

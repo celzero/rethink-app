@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import Logger
 import android.content.Context
@@ -32,17 +32,17 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.celzero.firestack.backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivityCheckoutProxyBinding
-import com.celzero.bravedns.service.EncryptedFileManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.TcpProxyHelper
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.togb
-import com.celzero.bravedns.util.Utilities.togs
-import com.celzero.bravedns.util.Utilities.tos
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.databinding.ActivityCheckoutProxyBinding
+import com.rethinkdns.retrixed.service.EncryptedFileManager
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.TcpProxyHelper
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.UIUtils.fetchColor
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.util.Utilities.togb
+import com.rethinkdns.retrixed.util.Utilities.togs
+import com.rethinkdns.retrixed.util.Utilities.tos
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

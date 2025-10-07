@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.util
+package com.rethinkdns.retrixed.util
 
 import Logger
 import Logger.LOG_TAG_APP_DB
@@ -45,23 +45,23 @@ import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleCoroutineScope
-import com.celzero.bravedns.BuildConfig
-import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
-import com.celzero.bravedns.net.doh.CountryMap
-import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.DnsLogTracker
-import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
-import com.celzero.bravedns.util.Constants.Companion.FLAVOR_HEADLESS
-import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
-import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
-import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
-import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
-import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
-import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
-import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
+import com.rethinkdns.retrixed.BuildConfig
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.RethinkDnsApplication.Companion.DEBUG
+import com.rethinkdns.retrixed.database.AppInfoRepository.Companion.NO_PACKAGE_PREFIX
+import com.rethinkdns.retrixed.net.doh.CountryMap
+import com.rethinkdns.retrixed.service.BraveVPNService
+import com.rethinkdns.retrixed.service.DnsLogTracker
+import com.rethinkdns.retrixed.util.Constants.Companion.FLAVOR_FDROID
+import com.rethinkdns.retrixed.util.Constants.Companion.FLAVOR_HEADLESS
+import com.rethinkdns.retrixed.util.Constants.Companion.FLAVOR_PLAY
+import com.rethinkdns.retrixed.util.Constants.Companion.FLAVOR_WEBSITE
+import com.rethinkdns.retrixed.util.Constants.Companion.INVALID_UID
+import com.rethinkdns.retrixed.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
+import com.rethinkdns.retrixed.util.Constants.Companion.MISSING_UID
+import com.rethinkdns.retrixed.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
+import com.rethinkdns.retrixed.util.Constants.Companion.UNSPECIFIED_IP_IPV4
+import com.rethinkdns.retrixed.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.celzero.firestack.backend.Backend
 import com.celzero.firestack.backend.Gobyte
 import com.celzero.firestack.backend.Gostr

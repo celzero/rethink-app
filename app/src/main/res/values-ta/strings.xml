@@ -1113,7 +1113,7 @@
     <string name="most_contacted_asn" translatable="true">பெரும்பாலானவர்கள் தொடர்பு கொண்ட வழங்குநர்கள்</string>
     <string name="most_blocked_asn" translatable="true">பெரும்பாலான தடுக்கப்பட்ட வழங்குநர்கள்</string>
     <string name="adv_tasker_dialog_msg" translatable="true">ரீதிங்கைத் தொடங்க அல்லது நிறுத்த அனுமதிக்கப்பட்ட தொகுப்பு பெயர்களை (கமாவால் பிரிக்கப்பட்ட) உள்ளிடவும்.</string>
-    <string name="adv_tasker_dialog_instructions" translatable="true">வழிமுறைகள்: \nஒளிபரப்பில் தேவையான கூடுதல்: \n• விசை: அனுப்புநர் \n• மதிப்பு: அழைப்பு பயன்பாட்டின் தொகுப்பு பெயர் \n\nஎடுத்துக்காட்டு: விசை: அனுப்புநர் மதிப்பு: com.termux \n\nஆதரிக்கப்பட்ட செயல்கள்: \nV VPN ஐத் தொடங்குங்கள் - com.celzero.bravedns.intent.action.vpn_start \nV VPN ஐ நிறுத்துங்கள் - com.celzero.bravedns.intent.action.vpn_stop</string>
+    <string name="adv_tasker_dialog_instructions" translatable="true">வழிமுறைகள்: \nஒளிபரப்பில் தேவையான கூடுதல்: \n• விசை: அனுப்புநர் \n• மதிப்பு: அழைப்பு பயன்பாட்டின் தொகுப்பு பெயர் \n\nஎடுத்துக்காட்டு: விசை: அனுப்புநர் மதிப்பு: com.termux \n\nஆதரிக்கப்பட்ட செயல்கள்: \nV VPN ஐத் தொடங்குங்கள் - com.rethinkdns.retrixed.intent.action.vpn_start \nV VPN ஐ நிறுத்துங்கள் - com.rethinkdns.retrixed.intent.action.vpn_stop</string>
     <string name="adv_tasker_dialog_edit_hint" translatable="true">தொகுப்பு பெயரை உள்ளிடவும் (எடுத்துக்காட்டு: net.dinglisch.android.taskerm)</string>
     <string name="download_ip_info_title" translatable="true">வழங்குநரின் தகவலைக் காட்டு</string>
     <string name="download_ip_info_desc" translatable="true"><i> rethinkdns.com </i> இலிருந்து வலைத்தளங்களுக்கான பணி வழங்குநரின் விவரங்களைப் பெறுகிறது, <i>%1$s </i> ஆல் இயக்கப்படுகிறது</string>

@@ -5,15 +5,15 @@
     app:startDestination="@id/homeScreenFragment">
     <fragment
         android:id="@+id/homeScreenFragment"
-        android:name="com.celzero.bravedns.ui.fragment.HomeScreenFragment"
+        android:name="com.rethinkdns.retrixed.ui.fragment.HomeScreenFragment"
         android:label="HomeScreenFragment" />
     <fragment
         android:id="@+id/aboutFragment"
-        android:name="com.celzero.bravedns.ui.fragment.AboutFragment"
+        android:name="com.rethinkdns.retrixed.ui.fragment.AboutFragment"
         android:label="AboutFragment" />
     <fragment
         android:id="@+id/rethinkPlus"
-        android:name="com.celzero.bravedns.ui.fragment.RethinkPlusFragment"
+        android:name="com.rethinkdns.retrixed.ui.fragment.RethinkPlusFragment"
         android:label="RethinkPlusFragment">
         <action
             android:id="@+id/action_switch_to_rethinkPlusDashboardFragment"
@@ -21,15 +21,15 @@
     </fragment>
     <fragment
         android:id="@+id/summaryStatisticsFragment"
-        android:name="com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment"
+        android:name="com.rethinkdns.retrixed.ui.fragment.SummaryStatisticsFragment"
         android:label="SummaryStatisticsFragment" />
     <fragment
         android:id="@+id/configureFragment"
-        android:name="com.celzero.bravedns.ui.fragment.ConfigureFragment"
+        android:name="com.rethinkdns.retrixed.ui.fragment.ConfigureFragment"
         android:label="ConfigureFragment" />
     <fragment
         android:id="@+id/rethinkPlusDashboardFragment"
-        android:name="com.celzero.bravedns.ui.fragment.RethinkPlusDashboardFragment"
+        android:name="com.rethinkdns.retrixed.ui.fragment.RethinkPlusDashboardFragment"
         android:label="RethinkPlusDashboardFragment" />
     <action
         android:id="@+id/action_switch_to_homeScreenFragment"

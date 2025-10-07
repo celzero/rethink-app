@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns
+package com.rethinkdns.retrixed
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.ui.activity.AntiCensorshipActivity
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test

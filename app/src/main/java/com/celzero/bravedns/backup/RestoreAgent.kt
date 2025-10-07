@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.backup
+package com.rethinkdns.retrixed.backup
 
 import Logger
 import Logger.LOG_TAG_BACKUP_RESTORE
@@ -24,20 +24,20 @@ import android.net.Uri
 import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
-import com.celzero.bravedns.backup.BackupHelper.Companion.METADATA_FILENAME
-import com.celzero.bravedns.backup.BackupHelper.Companion.SHARED_PREFS_BACKUP_FILE_NAME
-import com.celzero.bravedns.backup.BackupHelper.Companion.TEMP_WG_DIR
-import com.celzero.bravedns.backup.BackupHelper.Companion.VERSION
-import com.celzero.bravedns.backup.BackupHelper.Companion.deleteResidue
-import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
-import com.celzero.bravedns.backup.BackupHelper.Companion.stopVpn
-import com.celzero.bravedns.backup.BackupHelper.Companion.unzip
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.database.LogDatabase
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Utilities
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.METADATA_FILENAME
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.SHARED_PREFS_BACKUP_FILE_NAME
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.TEMP_WG_DIR
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.VERSION
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.deleteResidue
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.getTempDir
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.stopVpn
+import com.rethinkdns.retrixed.backup.BackupHelper.Companion.unzip
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.database.AppDatabase
+import com.rethinkdns.retrixed.database.LogDatabase
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.util.Utilities
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -46,10 +46,10 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.ObjectInputStream
 import androidx.core.net.toUri
-import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.RemoteFileTagUtil
-import com.celzero.bravedns.util.Utilities.deleteRecursive
+import com.rethinkdns.retrixed.service.RethinkBlocklistManager
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.RemoteFileTagUtil
+import com.rethinkdns.retrixed.util.Utilities.deleteRecursive
 
 class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), KoinComponent {

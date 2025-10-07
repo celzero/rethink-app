@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import Logger.LOG_TAG_UI
 import android.content.Context
@@ -22,13 +22,13 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.database.ConsoleLog
-import com.celzero.bravedns.databinding.ListItemConsoleLogBinding
-import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.Utilities
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.RethinkDnsApplication.Companion.DEBUG
+import com.rethinkdns.retrixed.database.ConsoleLog
+import com.rethinkdns.retrixed.databinding.ListItemConsoleLogBinding
+import com.rethinkdns.retrixed.util.Constants.Companion.TIME_FORMAT_1
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.Utilities
 
 class ConsoleLogAdapter(private val context: Context) :
     PagingDataAdapter<ConsoleLog, ConsoleLogAdapter.ConsoleLogViewHolder>(DIFF_CALLBACK) {

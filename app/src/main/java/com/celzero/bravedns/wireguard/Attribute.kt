@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.wireguard
+package com.rethinkdns.retrixed.wireguard
 
 import java.util.Optional
 import java.util.regex.Pattern

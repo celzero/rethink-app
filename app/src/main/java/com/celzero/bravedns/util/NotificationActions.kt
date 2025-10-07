@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.util
+package com.rethinkdns.retrixed.util
 
 enum class NotificationActionType(val action: Int) {
     PAUSE_STOP(0),

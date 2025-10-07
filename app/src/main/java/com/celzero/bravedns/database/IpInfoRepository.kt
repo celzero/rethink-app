@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.celzero.bravedns.database
+package com.rethinkdns.retrixed.database
 
 class IpInfoRepository(private val dao: IpInfoDAO) {
 

@@ -1,4 +1,4 @@
-package com.celzero.bravedns.viewmodel
+package com.rethinkdns.retrixed.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,11 +10,11 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.AppInfoDAO
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.ui.activity.AppListActivity
-import com.celzero.bravedns.util.Constants
+import com.rethinkdns.retrixed.database.AppInfo
+import com.rethinkdns.retrixed.database.AppInfoDAO
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.ui.activity.AppListActivity
+import com.rethinkdns.retrixed.util.Constants
 
 class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 

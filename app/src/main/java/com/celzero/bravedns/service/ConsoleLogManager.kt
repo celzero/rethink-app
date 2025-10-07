@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
-import com.celzero.bravedns.database.ConsoleLog
-import com.celzero.bravedns.database.ConsoleLogRepository
+import com.rethinkdns.retrixed.database.ConsoleLog
+import com.rethinkdns.retrixed.database.ConsoleLogRepository
 
 class ConsoleLogManager(private val repository: ConsoleLogRepository) {
 

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui
+package com.rethinkdns.retrixed.ui
 
 import android.net.VpnService
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
-import com.celzero.bravedns.service.VpnController
+import com.rethinkdns.retrixed.service.VpnController
 
 class PrepareVpnActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

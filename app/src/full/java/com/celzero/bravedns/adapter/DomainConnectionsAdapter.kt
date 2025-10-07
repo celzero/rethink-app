@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import android.content.Context
 import android.content.Intent
@@ -27,18 +27,18 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.databinding.ListItemStatisticsSummaryBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.ui.activity.AppInfoActivity
-import com.celzero.bravedns.ui.activity.DomainConnectionsActivity
-import com.celzero.bravedns.ui.activity.NetworkLogsActivity
-import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment.SummaryStatisticsType
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.getFlag
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.AppConnection
+import com.rethinkdns.retrixed.databinding.ListItemStatisticsSummaryBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.ui.activity.AppInfoActivity
+import com.rethinkdns.retrixed.ui.activity.DomainConnectionsActivity
+import com.rethinkdns.retrixed.ui.activity.NetworkLogsActivity
+import com.rethinkdns.retrixed.ui.fragment.SummaryStatisticsFragment.SummaryStatisticsType
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.UIUtils.getCountryNameFromFlag
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.getFlag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

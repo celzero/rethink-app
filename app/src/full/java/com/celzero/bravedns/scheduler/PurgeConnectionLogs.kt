@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.scheduler
+package com.rethinkdns.retrixed.scheduler
 
 import Logger
 import Logger.LOG_TAG_SCHEDULER
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.database.RefreshDatabase
+import com.rethinkdns.retrixed.database.RefreshDatabase
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.Calendar

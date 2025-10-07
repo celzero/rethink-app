@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.bottomsheet
+package com.rethinkdns.retrixed.ui.bottomsheet
 
 import android.content.DialogInterface
 import android.content.Intent
@@ -31,24 +31,24 @@ import android.widget.Toast
 import androidx.core.text.HtmlCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
-import com.celzero.bravedns.animation.Rotate3dAnimation
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.BottomSheetOrbotBinding
-import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.activity.DnsDetailActivity
-import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.OrbotHelper
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.WgIncludeAppsAdapter
+import com.rethinkdns.retrixed.animation.Rotate3dAnimation
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.databinding.BottomSheetOrbotBinding
+import com.rethinkdns.retrixed.databinding.DialogInfoRulesLayoutBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.ProxyManager
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.ui.activity.DnsDetailActivity
+import com.rethinkdns.retrixed.ui.dialog.WgIncludeAppsDialog
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.OrbotHelper
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.viewmodel.ProxyAppsMappingViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers

@@ -1,4 +1,4 @@
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import Logger
 import Logger.LOG_TAG_PROXY
@@ -11,13 +11,13 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.celzero.firestack.backend.Backend
-import com.celzero.bravedns.customdownloader.ITcpProxy
-import com.celzero.bravedns.customdownloader.RetrofitManager
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.TcpProxyEndpoint
-import com.celzero.bravedns.database.TcpProxyRepository
-import com.celzero.bravedns.scheduler.PaymentWorker
-import com.celzero.bravedns.util.Utilities.togs
+import com.rethinkdns.retrixed.customdownloader.ITcpProxy
+import com.rethinkdns.retrixed.customdownloader.RetrofitManager
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.database.TcpProxyEndpoint
+import com.rethinkdns.retrixed.database.TcpProxyRepository
+import com.rethinkdns.retrixed.scheduler.PaymentWorker
+import com.rethinkdns.retrixed.util.Utilities.togs
 import com.celzero.firestack.backend.IpTree
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -16,15 +16,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.wireguard.util
+package com.rethinkdns.retrixed.wireguard.util
 
 import android.content.Context
 import android.os.RemoteException
-import com.celzero.bravedns.R
-import com.celzero.bravedns.wireguard.BadConfigException
-import com.celzero.bravedns.wireguard.InetEndpoint
-import com.celzero.bravedns.wireguard.InetNetwork
-import com.celzero.bravedns.wireguard.ParseException
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.wireguard.BadConfigException
+import com.rethinkdns.retrixed.wireguard.InetEndpoint
+import com.rethinkdns.retrixed.wireguard.InetNetwork
+import com.rethinkdns.retrixed.wireguard.ParseException
 import java.net.InetAddress
 
 object ErrorMessages {

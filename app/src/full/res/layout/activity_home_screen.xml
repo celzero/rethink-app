@@ -17,7 +17,7 @@
 
    <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_view"
-        android:name="com.celzero.bravedns.ui.HomeScreenActivity"
+        android:name="com.rethinkdns.retrixed.ui.HomeScreenActivity"
         style="@style/Widget.MaterialComponents.BottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

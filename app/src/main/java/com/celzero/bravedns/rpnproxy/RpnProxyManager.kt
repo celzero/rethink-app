@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.rpnproxy
+package com.rethinkdns.retrixed.rpnproxy
 
 import org.koin.core.component.KoinComponent
 

@@ -13,16 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.celzero.bravedns.database
+package com.rethinkdns.retrixed.database
 
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.rethinkdns.retrixed.net.doh.Transaction
+import com.rethinkdns.retrixed.service.ProxyManager
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Constants.Companion.INIT_TIME_MS
+import com.rethinkdns.retrixed.util.Constants.Companion.INVALID_UID
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

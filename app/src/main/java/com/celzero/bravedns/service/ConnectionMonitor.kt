@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import Logger
 import Logger.LOG_TAG_CONNECTION
@@ -27,14 +27,14 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import androidx.annotation.RequiresApi
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.service.VpnBuilderPolicy.Companion.getNetworkBehaviourDuration
-import com.celzero.bravedns.util.ConnectivityCheckHelper
-import com.celzero.bravedns.util.InternetProtocol
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.isAtleastR
-import com.celzero.bravedns.util.Utilities.isAtleastS
-import com.celzero.bravedns.util.Utilities.isNetworkSame
+import com.rethinkdns.retrixed.RethinkDnsApplication.Companion.DEBUG
+import com.rethinkdns.retrixed.service.VpnBuilderPolicy.Companion.getNetworkBehaviourDuration
+import com.rethinkdns.retrixed.util.ConnectivityCheckHelper
+import com.rethinkdns.retrixed.util.InternetProtocol
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.util.Utilities.isAtleastR
+import com.rethinkdns.retrixed.util.Utilities.isAtleastS
+import com.rethinkdns.retrixed.util.Utilities.isNetworkSame
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope

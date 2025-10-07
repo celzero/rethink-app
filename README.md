@@ -3,10 +3,10 @@ A [WireGuard](https://github.com/wireguard/wireguard-go) client, an [OpenSnitch]
 
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
      alt="Get it on F-Droid"
-     height="70">](https://f-droid.org/packages/com.celzero.bravedns/)
+     height="70">](https://f-droid.org/packages/com.rethinkdns.retrixed/)
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
      alt="Get it on Google Play"
-     height="70">](https://play.google.com/store/apps/details?id=com.celzero.bravedns)
+     height="70">](https://play.google.com/store/apps/details?id=com.rethinkdns.retrixed)
 
 <sup>*Release certificate SHA-256 digest*: `1f32d432e81a1dc5c00aafeb0c6636cd7819965d174420e59db9675dff7a88e9`.</sup>
 

@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import Logger
 import Logger.LOG_TAG_PROXY
 import com.celzero.firestack.backend.Backend
-import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.ProxyAppMappingRepository
-import com.celzero.bravedns.database.ProxyApplicationMapping
+import com.rethinkdns.retrixed.database.AppInfo
+import com.rethinkdns.retrixed.database.ProxyAppMappingRepository
+import com.rethinkdns.retrixed.database.ProxyApplicationMapping
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.concurrent.CopyOnWriteArraySet

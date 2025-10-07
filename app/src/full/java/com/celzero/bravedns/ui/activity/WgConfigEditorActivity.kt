@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import Logger
 import Logger.LOG_TAG_PROXY
@@ -26,19 +26,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.ActivityWgConfigEditorBinding
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils.clipboardCopy
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.Utilities.tos
-import com.celzero.bravedns.wireguard.Config
-import com.celzero.bravedns.wireguard.WgInterface
-import com.celzero.bravedns.wireguard.util.ErrorMessages
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.databinding.ActivityWgConfigEditorBinding
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.WireguardManager
+import com.rethinkdns.retrixed.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.UIUtils.clipboardCopy
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.util.Utilities.tos
+import com.rethinkdns.retrixed.wireguard.Config
+import com.rethinkdns.retrixed.wireguard.WgInterface
+import com.rethinkdns.retrixed.wireguard.util.ErrorMessages
 import com.celzero.firestack.backend.Backend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

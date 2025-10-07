@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.celzero.bravedns.database
+package com.rethinkdns.retrixed.database
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
@@ -24,9 +24,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.celzero.bravedns.database.RethinkDnsEndpoint.Companion.RETHINK_DEFAULT
-import com.celzero.bravedns.database.RethinkDnsEndpoint.Companion.RETHINK_PLUS
-import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
+import com.rethinkdns.retrixed.database.RethinkDnsEndpoint.Companion.RETHINK_DEFAULT
+import com.rethinkdns.retrixed.database.RethinkDnsEndpoint.Companion.RETHINK_PLUS
+import com.rethinkdns.retrixed.util.Constants.Companion.MISSING_UID
 
 @Dao
 interface RethinkDnsEndpointDao {

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- package com.celzero.bravedns.ui.fragment
+ package com.rethinkdns.retrixed.ui.fragment
 
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.databinding.FragmentManageSubscriptionBinding
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.databinding.FragmentManageSubscriptionBinding
 
 class ManageSubscriptionFragment : Fragment(R.layout.fragment_manage_subscription) {
     private val b by viewBinding(FragmentManageSubscriptionBinding::bind)

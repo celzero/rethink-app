@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import Logger
 import Logger.LOG_TAG_UI
@@ -36,21 +36,21 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.celzero.bravedns.R
-import com.celzero.bravedns.database.CustomIp
-import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
-import com.celzero.bravedns.databinding.ListItemCustomAllIpBinding
-import com.celzero.bravedns.databinding.ListItemCustomIpBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.IpRulesManager
-import com.celzero.bravedns.ui.activity.CustomRulesActivity
-import com.celzero.bravedns.ui.bottomsheet.CustomIpRulesBtmSheet
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.getCountryCode
-import com.celzero.bravedns.util.Utilities.getFlag
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.database.CustomIp
+import com.rethinkdns.retrixed.databinding.DialogAddCustomIpBinding
+import com.rethinkdns.retrixed.databinding.ListItemCustomAllIpBinding
+import com.rethinkdns.retrixed.databinding.ListItemCustomIpBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.IpRulesManager
+import com.rethinkdns.retrixed.ui.activity.CustomRulesActivity
+import com.rethinkdns.retrixed.ui.bottomsheet.CustomIpRulesBtmSheet
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Constants.Companion.UID_EVERYBODY
+import com.rethinkdns.retrixed.util.UIUtils.fetchColor
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.getCountryCode
+import com.rethinkdns.retrixed.util.Utilities.getFlag
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString

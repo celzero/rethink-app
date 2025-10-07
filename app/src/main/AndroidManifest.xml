@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.celzero.bravedns"
+    package="com.rethinkdns.retrixed"
     android:versionCode="51"
     android:versionName="v055t"> <!-- 51 for v055t -->
 
@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
+        android:maxSdkVersion="36" />
     <!-- https://developer.android.com/about/versions/13/behavior-changes-all#notification-permission -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
@@ -69,7 +69,7 @@
             android:icon="@drawable/shield_green"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
-            tools:targetApi="24">
+            tools:targetApi="28">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>

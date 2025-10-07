@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -24,13 +24,13 @@ import androidx.cardview.widget.CardView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.celzero.bravedns.R
-import com.celzero.bravedns.database.RemoteBlocklistPacksMap
-import com.celzero.bravedns.databinding.ListItemRethinkBlocklistSimpleBinding
-import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.ui.fragment.RethinkBlocklistFragment
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.database.RemoteBlocklistPacksMap
+import com.rethinkdns.retrixed.databinding.ListItemRethinkBlocklistSimpleBinding
+import com.rethinkdns.retrixed.service.RethinkBlocklistManager
+import com.rethinkdns.retrixed.ui.fragment.RethinkBlocklistFragment
+import com.rethinkdns.retrixed.util.UIUtils.fetchColor
+import com.rethinkdns.retrixed.util.UIUtils.fetchToggleBtnColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

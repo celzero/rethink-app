@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import Logger
 import Logger.LOG_TAG_DNS
@@ -38,19 +38,19 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withC
 import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
-import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.DnsLogAdapter.DnsLogViewHolder
-import com.celzero.bravedns.database.DnsLog
-import com.celzero.bravedns.databinding.ListItemDnsLogBinding
-import com.celzero.bravedns.glide.FavIconDownloader
-import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.ui.bottomsheet.DnsBlocklistBottomSheet
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.Utilities.getDefaultIcon
-import com.celzero.bravedns.util.Utilities.getIcon
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.adapter.DnsLogAdapter.DnsLogViewHolder
+import com.rethinkdns.retrixed.database.DnsLog
+import com.rethinkdns.retrixed.databinding.ListItemDnsLogBinding
+import com.rethinkdns.retrixed.glide.FavIconDownloader
+import com.rethinkdns.retrixed.net.doh.Transaction
+import com.rethinkdns.retrixed.service.ProxyManager
+import com.rethinkdns.retrixed.ui.bottomsheet.DnsBlocklistBottomSheet
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Constants.Companion.MAX_ENDPOINT
+import com.rethinkdns.retrixed.util.UIUtils.fetchColor
+import com.rethinkdns.retrixed.util.Utilities.getDefaultIcon
+import com.rethinkdns.retrixed.util.Utilities.getIcon
 import com.google.gson.Gson
 
 class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethinkDns: Boolean) :

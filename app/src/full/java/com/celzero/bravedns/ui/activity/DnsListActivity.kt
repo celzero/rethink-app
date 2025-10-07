@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.rethinkdns.retrixed.ui.activity
 
 import android.content.Context
 import android.content.Intent
@@ -23,16 +23,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.databinding.ActivityOtherDnsListBinding
-import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.databinding.ActivityOtherDnsListBinding
+import com.rethinkdns.retrixed.net.doh.Transaction
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.VpnController
+import com.rethinkdns.retrixed.util.Themes
+import com.rethinkdns.retrixed.util.UIUtils
+import com.rethinkdns.retrixed.util.UIUtils.fetchColor
+import com.rethinkdns.retrixed.util.Utilities.isAtleastQ
 import com.celzero.firestack.backend.Backend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

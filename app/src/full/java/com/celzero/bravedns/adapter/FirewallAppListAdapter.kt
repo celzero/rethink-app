@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.adapter
+package com.rethinkdns.retrixed.adapter
 
 import android.content.Context
 import android.content.DialogInterface
@@ -33,17 +33,17 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.celzero.bravedns.R
-import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.databinding.ListItemFirewallAppBinding
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
-import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.ProxyManager.ID_NONE
-import com.celzero.bravedns.ui.activity.AppInfoActivity
-import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.INTENT_UID
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.getIcon
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.database.AppInfo
+import com.rethinkdns.retrixed.databinding.ListItemFirewallAppBinding
+import com.rethinkdns.retrixed.service.FirewallManager
+import com.rethinkdns.retrixed.service.FirewallManager.updateFirewallStatus
+import com.rethinkdns.retrixed.service.ProxyManager
+import com.rethinkdns.retrixed.service.ProxyManager.ID_NONE
+import com.rethinkdns.retrixed.ui.activity.AppInfoActivity
+import com.rethinkdns.retrixed.ui.activity.AppInfoActivity.Companion.INTENT_UID
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.getIcon
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView.SectionedAdapter
 import java.util.concurrent.TimeUnit

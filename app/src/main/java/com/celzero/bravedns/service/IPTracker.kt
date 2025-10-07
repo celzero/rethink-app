@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import Logger
 import Logger.LOG_TAG_FIREWALL
 import android.content.Context
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.ConnTrackerMetaData
-import com.celzero.bravedns.data.ConnectionSummary
-import com.celzero.bravedns.database.ConnectionTracker
-import com.celzero.bravedns.database.ConnectionTrackerRepository
-import com.celzero.bravedns.database.RethinkLog
-import com.celzero.bravedns.database.RethinkLogRepository
-import com.celzero.bravedns.util.AndroidUidConfig
-import com.celzero.bravedns.util.Constants.Companion.EMPTY_PACKAGE_NAME
-import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.IPUtil
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.getCountryCode
-import com.celzero.bravedns.util.Utilities.getFlag
-import com.celzero.bravedns.util.Utilities.getPackageInfoForUid
-import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.ConnTrackerMetaData
+import com.rethinkdns.retrixed.data.ConnectionSummary
+import com.rethinkdns.retrixed.database.ConnectionTracker
+import com.rethinkdns.retrixed.database.ConnectionTrackerRepository
+import com.rethinkdns.retrixed.database.RethinkLog
+import com.rethinkdns.retrixed.database.RethinkLogRepository
+import com.rethinkdns.retrixed.util.AndroidUidConfig
+import com.rethinkdns.retrixed.util.Constants.Companion.EMPTY_PACKAGE_NAME
+import com.rethinkdns.retrixed.util.Constants.Companion.INVALID_UID
+import com.rethinkdns.retrixed.util.IPUtil
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.getCountryCode
+import com.rethinkdns.retrixed.util.Utilities.getFlag
+import com.rethinkdns.retrixed.util.Utilities.getPackageInfoForUid
+import com.rethinkdns.retrixed.util.Utilities.isUnspecifiedIp
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import org.koin.core.component.KoinComponent

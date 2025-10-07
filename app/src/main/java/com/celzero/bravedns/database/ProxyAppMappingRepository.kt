@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.database
+package com.rethinkdns.retrixed.database
 
 class ProxyAppMappingRepository(
     private val proxyApplicationMappingDAO: ProxyApplicationMappingDAO

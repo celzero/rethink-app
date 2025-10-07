@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import android.util.Log
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.database.ConsoleLog
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
+import com.rethinkdns.retrixed.RethinkDnsApplication.Companion.DEBUG
+import com.rethinkdns.retrixed.database.ConsoleLog
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.VpnController
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

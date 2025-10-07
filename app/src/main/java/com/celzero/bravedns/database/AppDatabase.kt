@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.database
+package com.rethinkdns.retrixed.database
 
 import Logger
 import Logger.LOG_TAG_APP_DB
@@ -25,7 +25,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.celzero.bravedns.util.Constants
+import com.rethinkdns.retrixed.util.Constants
 
 @Database(
     entities =

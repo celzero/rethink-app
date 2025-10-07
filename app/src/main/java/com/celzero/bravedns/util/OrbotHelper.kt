@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.util
+package com.rethinkdns.retrixed.util
 
 import Logger
 import Logger.LOG_TAG_VPN
@@ -33,24 +33,24 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.ProxyEndpoint
-import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
-import com.celzero.bravedns.receiver.NotificationActionReceiver
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.ui.activity.AppLockActivity
-import com.celzero.bravedns.util.Constants.Companion.HTTP_PROXY_PORT
-import com.celzero.bravedns.util.Constants.Companion.SOCKS_DEFAULT_PORT
-import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
-import com.celzero.bravedns.util.Utilities.getBroadcastPendingIntent
-import com.celzero.bravedns.util.Utilities.isAtleastO
-import com.celzero.bravedns.util.Utilities.isAtleastT
-import com.celzero.bravedns.util.Utilities.isFdroidFlavour
-import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
-import com.celzero.bravedns.util.Utilities.isValidPort
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.database.ProxyEndpoint
+import com.rethinkdns.retrixed.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
+import com.rethinkdns.retrixed.receiver.NotificationActionReceiver
+import com.rethinkdns.retrixed.service.PersistentState
+import com.rethinkdns.retrixed.service.ProxyManager
+import com.rethinkdns.retrixed.ui.HomeScreenActivity
+import com.rethinkdns.retrixed.ui.activity.AppLockActivity
+import com.rethinkdns.retrixed.util.Constants.Companion.HTTP_PROXY_PORT
+import com.rethinkdns.retrixed.util.Constants.Companion.SOCKS_DEFAULT_PORT
+import com.rethinkdns.retrixed.util.Utilities.getActivityPendingIntent
+import com.rethinkdns.retrixed.util.Utilities.getBroadcastPendingIntent
+import com.rethinkdns.retrixed.util.Utilities.isAtleastO
+import com.rethinkdns.retrixed.util.Utilities.isAtleastT
+import com.rethinkdns.retrixed.util.Utilities.isFdroidFlavour
+import com.rethinkdns.retrixed.util.Utilities.isPlayStoreFlavour
+import com.rethinkdns.retrixed.util.Utilities.isValidPort
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

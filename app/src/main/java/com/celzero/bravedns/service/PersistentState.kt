@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.service
+package com.rethinkdns.retrixed.service
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
-import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.DnsCryptRelayEndpoint
-import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
-import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
-import com.celzero.bravedns.util.InternetProtocol
-import com.celzero.bravedns.util.PcapMode
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastR
+import com.rethinkdns.retrixed.R
+import com.rethinkdns.retrixed.data.AppConfig
+import com.rethinkdns.retrixed.database.DnsCryptRelayEndpoint
+import com.rethinkdns.retrixed.ui.activity.AntiCensorshipActivity
+import com.rethinkdns.retrixed.util.Constants
+import com.rethinkdns.retrixed.util.Constants.Companion.INIT_TIME_MS
+import com.rethinkdns.retrixed.util.Constants.Companion.INVALID_PORT
+import com.rethinkdns.retrixed.util.InternetProtocol
+import com.rethinkdns.retrixed.util.PcapMode
+import com.rethinkdns.retrixed.util.Utilities
+import com.rethinkdns.retrixed.util.Utilities.isAtleastR
 import hu.autsoft.krate.SimpleKrate
 import hu.autsoft.krate.booleanPref
 import hu.autsoft.krate.default.withDefault
