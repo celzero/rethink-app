@@ -41,7 +41,7 @@ android {
 
     defaultConfig {
         applicationId "com.rethinkdns.retrixed"
-        minSdkVersion 23
+        minSdkVersion 35
         targetSdkVersion 36
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
