@@ -45,6 +45,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_centerHorizontal="true"
+                        android:importantForAccessibility="noHideDescendants"
                         android:orientation="horizontal">
 
                         <androidx.appcompat.widget.AppCompatImageView
@@ -113,6 +114,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_centerHorizontal="true"
+                        android:importantForAccessibility="noHideDescendants"
                         android:orientation="horizontal">
 
                         <androidx.appcompat.widget.AppCompatImageView
@@ -150,6 +152,7 @@
                         android:gravity="center"
                         android:maxLines="2"
                         android:text="@string/lbl_dot_abbr"
+                        android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/extra_large_font_text_view" />
 
                 </RelativeLayout>
@@ -196,6 +199,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_centerHorizontal="true"
+                        android:importantForAccessibility="noHideDescendants"
                         android:orientation="horizontal">
 
                         <androidx.appcompat.widget.AppCompatImageView
@@ -270,6 +274,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_centerHorizontal="true"
+                        android:importantForAccessibility="noHideDescendants"
                         android:orientation="horizontal">
 
                         <androidx.appcompat.widget.AppCompatImageView
@@ -346,6 +351,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_centerHorizontal="true"
+                        android:importantForAccessibility="noHideDescendants"
                         android:orientation="horizontal">
 
                         <androidx.appcompat.widget.AppCompatImageView
@@ -426,6 +432,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_centerHorizontal="true"
+                        android:importantForAccessibility="noHideDescendants"
                         android:orientation="horizontal">
 
                         <androidx.appcompat.widget.AppCompatImageView
