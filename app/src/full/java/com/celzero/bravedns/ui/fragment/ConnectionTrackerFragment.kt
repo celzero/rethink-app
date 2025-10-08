@@ -177,6 +177,7 @@ class ConnectionTrackerFragment :
                 b.recyclerConnection.visibility = View.GONE
             } else {
                 b.connectionListLogsDisabledTv.visibility = View.GONE
+                if (!b.recyclerConnection.isVisible) b.recyclerConnection.visibility = View.VISIBLE
                 b.connectionCardViewTop.visibility = View.VISIBLE
             }
         }
