@@ -424,7 +424,7 @@ class GoVpnAdapter : KoinComponent {
                 context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
             if (isAtleastO()) {
-                val channelName = "DNS Connection Failure"
+                val channelName = context.getString(R.string.status_dns_error)
                 val importance = NotificationManager.IMPORTANCE_DEFAULT
                 val channel = NotificationChannel(notifChannelId, channelName, importance)
                 notificationManager.createNotificationChannel(channel)
@@ -437,10 +437,19 @@ class GoVpnAdapter : KoinComponent {
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                     mutable = false
                 )
+            val dnsErrorTxt = context.getString(R.string.status_dns_error)
+            // capitalize first 3 letter of the error message (dns error => DNS Error)
+            val formattedErrTxt =
+                if (dnsErrorTxt.length >= 5) {
+                    dnsErrorTxt.replaceRange(0, 5, dnsErrorTxt.substring(0, 5).uppercase())
+                } else {
+                    dnsErrorTxt
+                }
+            val title = context.getString(R.string.two_argument_colon, formattedErrTxt, dnsType)
             val builder =
                 NotificationCompat.Builder(context, notifChannelId)
                     .setSmallIcon(R.drawable.ic_notification_icon)
-                    .setContentTitle("$dnsType Connection Failed")
+                    .setContentTitle(title)
                     .setContentText(message)
                     .setStyle(NotificationCompat.BigTextStyle().bigText(message))
                     .setContentIntent(pendingIntent)
