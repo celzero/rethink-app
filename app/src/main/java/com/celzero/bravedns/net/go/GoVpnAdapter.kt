@@ -304,6 +304,7 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: doh failure, url: $url", e)
             getResolver()?.remove(id.togs())
+            showDnsFailureNotification(context.getString(R.string.other_dns_list_tab1), e.message ?: context.getString(R.string.system_dns_connection_failure))
             showDnsFailureToast(url ?: "")
         }
         Logger.v(LOG_TAG_VPN, "$TAG addDohTransport done")
@@ -334,6 +335,7 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: dot failure, url: $url", e)
             getResolver()?.remove(id.togs())
+            showDnsFailureNotification(context.getString(R.string.lbl_dot), e.message ?: context.getString(R.string.system_dns_connection_failure))
             showDnsFailureToast(url ?: "")
         }
         Logger.v(LOG_TAG_VPN, "$TAG addDotTransport done")
@@ -359,6 +361,7 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: odoh failure, res: $resolver", e)
             getResolver()?.remove(id.togs())
+            showDnsFailureNotification(context.getString(R.string.lbl_odoh), e.message ?: context.getString(R.string.system_dns_connection_failure))
             showDnsFailureToast(resolver ?: "")
         }
         Logger.v(LOG_TAG_VPN, "$TAG addOdohTransport done")
@@ -383,44 +386,10 @@ class GoVpnAdapter : KoinComponent {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: dns crypt failure for $id", e)
             getResolver()?.remove(id.togs())
             removeDnscryptRelaysIfAny()
-            showDnscryptFailureNotification(e.message ?: context.getString(R.string.dns_crypt_connection_failure))
+            showDnsFailureNotification(context.getString(R.string.dc_dns_crypt), e.message ?: context.getString(R.string.dns_crypt_connection_failure))
             showDnscryptConnectionFailureToast()
         }
         Logger.v(LOG_TAG_VPN, "$TAG addDnscryptTransport done")
-    }
-
-    private fun showDnscryptFailureNotification(msg: String) {
-        val notifChannelId = "DNSCrypt failure"
-        ui {
-            val notificationManager =
-                context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-
-            if (isAtleastO()) {
-                val channelName = context.getString(R.string.lbl_dc_abbr)
-                val importance = NotificationManager.IMPORTANCE_DEFAULT
-                val channel = NotificationChannel(notifChannelId, channelName, importance)
-                notificationManager.createNotificationChannel(channel)
-            }
-
-            val pendingIntent =
-                Utilities.getActivityPendingIntent(
-                    context,
-                    Intent(context, AppLockActivity::class.java),
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-                    mutable = false
-                )
-            val builder =
-                NotificationCompat.Builder(context, notifChannelId)
-                    .setSmallIcon(R.drawable.ic_notification_icon)
-                    .setContentTitle(context.getString(R.string.lbl_dc_abbr))
-                    .setContentText(msg)
-                    .setStyle(NotificationCompat.BigTextStyle().bigText(msg))
-                    .setContentIntent(pendingIntent)
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setAutoCancel(true)
-            builder.color = ContextCompat.getColor(context, getAccentColor(persistentState.theme))
-            notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
-        }
     }
 
     private suspend fun addDnsProxyTransport(id: String) {
@@ -442,9 +411,44 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: dns proxy failure", e)
             getResolver()?.remove(id.togs())
+            showDnsFailureNotification(context.getString(R.string.dc_dns_proxy), e.message ?: context.getString(R.string.dns_proxy_connection_failure))
             showDnsProxyConnectionFailureToast()
         }
         Logger.v(LOG_TAG_VPN, "$TAG addDnsProxyTransport done")
+    }
+
+    private fun showDnsFailureNotification(dnsType: String, message: String) {
+        val notifChannelId = "DNS_failure_channel"
+        ui {
+            val notificationManager =
+                context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+            if (isAtleastO()) {
+                val channelName = "DNS Connection Failure"
+                val importance = NotificationManager.IMPORTANCE_DEFAULT
+                val channel = NotificationChannel(notifChannelId, channelName, importance)
+                notificationManager.createNotificationChannel(channel)
+            }
+
+            val pendingIntent =
+                Utilities.getActivityPendingIntent(
+                    context,
+                    Intent(context, AppLockActivity::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                    mutable = false
+                )
+            val builder =
+                NotificationCompat.Builder(context, notifChannelId)
+                    .setSmallIcon(R.drawable.ic_notification_icon)
+                    .setContentTitle("$dnsType Connection Failed")
+                    .setContentText(message)
+                    .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+                    .setContentIntent(pendingIntent)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setAutoCancel(true)
+            builder.color = ContextCompat.getColor(context, getAccentColor(persistentState.theme))
+            notificationManager.notify(NW_ENGINE_NOTIFICATION_ID, builder.build())
+        }
     }
 
     private suspend fun addRdnsTransport(id: String, url: String) {
@@ -463,6 +467,7 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: rdns failure, url: $url", e)
             getResolver()?.remove(id.togs())
+            showDnsFailureNotification(context.getString(R.string.dc_rethink_dns_radio), e.message ?: context.getString(R.string.system_dns_connection_failure))
             showDnsFailureToast(url)
         }
         Logger.v(LOG_TAG_VPN, "$TAG addRdnsTransport done")
@@ -2193,8 +2198,6 @@ class GoVpnAdapter : KoinComponent {
                 Logger.i(LOG_TAG_VPN, "$TAG smart-dns; new dot: $id (${dot.name}), url: $url, ips: $ips")
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_VPN, "$TAG smart-dns; dot failure, url: $url", e)
-                getResolver()?.remove(id.togs())
-                showDnsFailureToast(url ?: "")
             }
         }
         Logger.v(LOG_TAG_VPN, "$TAG smart-dns; done")
