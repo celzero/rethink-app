@@ -401,13 +401,15 @@ class GoVpnAdapter : KoinComponent {
                 fallbackToRethinkDefault()
                 return
             }
+            // append port number to each ip if multiple ips are present else add the single ip:port
+            val port = dnsProxy.proxyPort
+            val ipPortCsv = dnsProxy.proxyIP?.split(",")?.joinToString(",") {
+                "${it.trim()}:$port"
+            }
             // add replaces the existing transport with the same id if successful
             // so no need to remove the transport before adding
-            Intra.addDNSProxy(tunnel, id.togs(), dnsProxy.proxyIP.togs(), dnsProxy.proxyPort.toString().togs())
-            Logger.i(
-                LOG_TAG_VPN,
-                "$TAG new dns proxy: $id(${dnsProxy.proxyName}), ip: ${dnsProxy.proxyIP}, port: ${dnsProxy.proxyPort}"
-            )
+            Intra.addDNSProxy(tunnel, id.togs(), ipPortCsv.togs())
+            Logger.i(LOG_TAG_VPN, "$TAG new dns proxy: $id(${dnsProxy.proxyName}), ip: $ipPortCsv")
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG connect-tunnel: dns proxy failure", e)
             getResolver()?.remove(id.togs())
