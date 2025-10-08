@@ -190,11 +190,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     @Volatile
     private var vpnAdapter: GoVpnAdapter? = null
 
-    private var flowDispatcher = Daemons.ioDispatcher("flow", Mark(),  vpnScope)
-    private var inflowDispatcher = Daemons.ioDispatcher("inflow", Mark(), vpnScope)
-    private var preflowDispatcher = Daemons.ioDispatcher("preflow", PreMark(), vpnScope)
-    private var dnsQueryDispatcher = Daemons.ioDispatcher("onQuery", DNSOpts(), vpnScope)
-    private var proxyAddedDispatcher = Daemons.ioDispatcher("proxyAdded", Unit, vpnScope)
+    private val flowDispatcher by lazy { Daemons.ioDispatcher("flow", Mark(),  vpnScope) }
+    private val inflowDispatcher by lazy { Daemons.ioDispatcher("inflow", Mark(), vpnScope) }
+    private val preflowDispatcher by lazy { Daemons.ioDispatcher("preflow", PreMark(), vpnScope) }
+    private val dnsQueryDispatcher by lazy { Daemons.ioDispatcher("onQuery", DNSOpts(), vpnScope) }
+    private val proxyAddedDispatcher by lazy { Daemons.ioDispatcher("proxyAdded", Unit, vpnScope) }
 
     // TODO: remove volatile
     @Volatile
