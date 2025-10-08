@@ -532,7 +532,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                         R.string.settings_selected_ip_desc,
                         getString(R.string.settings_ip_text_ipv4) + " & " + getString(R.string.settings_ip_text_ipv6)
                     )
-                b.settingsActivityPtransRl.visibility = View.VISIBLE
+                b.settingsActivityPtransRl.visibility = View.GONE
                 b.settingsActivityConnectivityChecksRl.visibility = View.GONE
                 b.settingsActivityPingIpsBtn.visibility = View.GONE
             }
@@ -566,18 +566,44 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             arrayOf(
                 getString(R.string.settings_ip_dialog_ipv4),
                 getString(R.string.settings_ip_dialog_ipv6),
+                alwaysv46Txt,
                 getString(R.string.settings_ip_dialog_ipv46),
-                alwaysv46Txt
             )
-        val checkedItem = persistentState.internetProtocolType
+        val chosenProtocol = persistentState.internetProtocolType
+        val checkedItem = when (chosenProtocol) {
+            InternetProtocol.ALWAYSv46.id -> {
+                2 // alwaysV46 is at pos 2
+            }
+            InternetProtocol.IPv46.id -> {
+                3 // ipv46 is at pos 3
+            }
+            else -> {
+                when (chosenProtocol) {
+                    InternetProtocol.IPv4.id -> 0
+                    InternetProtocol.IPv6.id -> 1
+                    else -> 0
+                }
+            }
+        }
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             dialog.dismiss()
+            val selectedItem = when (which) {
+                3 -> {
+                    InternetProtocol.IPv46.id // ipv46 is at pos 3
+                }
+                2 -> {
+                    InternetProtocol.ALWAYSv46.id // alwaysV46 is at pos 2
+                }
+                else -> {
+                    which
+                }
+            }
             // return if already selected item is same as current item
-            if (persistentState.internetProtocolType == which) {
+            if (persistentState.internetProtocolType == selectedItem) {
                 return@setSingleChoiceItems
             }
 
-            val protocolType = InternetProtocol.getInternetProtocol(which)
+            val protocolType = InternetProtocol.getInternetProtocol(selectedItem)
             persistentState.internetProtocolType = protocolType.id
 
             displayInternetProtocolUi()
