@@ -138,6 +138,15 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (!isFdroidBuild) {
+                firebaseCrashlytics {
+                    // Enable processing and uploading of native symbols to Firebase servers.
+                    // By default, this is disabled to improve build speeds.
+                    // This flag must be enabled to see properly-symbolicated native
+                    // stack traces in the Crashlytics dashboard.
+                    nativeSymbolUploadEnabled true
+                }
+            }
         }
         leakCanary {
             matchingFallbacks = ['debug']
@@ -370,7 +379,9 @@ dependencies {
     // Firebase dependencies for error reporting (website and play variants only)
     websiteImplementation platform('com.google.firebase:firebase-bom:34.3.0')
     websiteImplementation 'com.google.firebase:firebase-crashlytics'
+    websiteImplementation 'com.google.firebase:firebase-crashlytics-ndk'
 
     playImplementation platform('com.google.firebase:firebase-bom:34.3.0')
     playImplementation 'com.google.firebase:firebase-crashlytics'
+    playImplementation 'com.google.firebase:firebase-crashlytics-ndk'
 }
