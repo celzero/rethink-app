@@ -329,6 +329,12 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
             return rule.id == RULE12.id
         }
 
+        fun isError(rule: String?): Boolean {
+            if (rule == null) return false
+
+            return rule == RULE1C.id
+        }
+
         fun shouldShowHint(rule: String?): Boolean {
             if (rule == null) return false
 
