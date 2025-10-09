@@ -1176,5 +1176,4 @@
     <string name="copied_clipboard" translatable="true">Скопійовано</string>
     <string name="conn_track_clear_rule_logs_title" translatable="true">Видалити журнали для цього правила?</string>
     <string name="conn_track_clear_rule_logs_message" translatable="true">Це видалить лише мережеві журнали для поточного правила брандмауера. Цю операцію неможливо скасувати. Продовжити?</string>
-    <string name="lbl_background_data" translatable="true">Обмеження зовнішніх даних</string>
 </resources>
