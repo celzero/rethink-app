@@ -196,6 +196,36 @@ jobs:
           path: app/build/outputs/apk/websiteFull/release/app-website-full-universal-release.apk
           retention-days: 7
 
+      # 23. Создаём GitHub Release
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: nightly-${{ github.run_number }}-${{ github.sha }}
+          release_name: Nightly Release ${{ github.run_number }}
+          draft: false
+          prerelease: true
+          body: |
+            Nightly build for arm64-v8a
+            - Commit: ${{ github.sha }}
+            - Version: ${{ github.run_number }}
+            - Built on: ${{ github.event.repository.updated_at }}
+
+      # 24. Загружаем APK в GitHub Release
+      - name: Upload APK to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: app/build/outputs/apk/websiteFull/release/app-website-full-universal-release.apk
+          asset_name: rethinkdns-nightly-universal.apk
+          asset_content_type: application/vnd.android.package-archive
+
+      # 25. Логи для
+
       # 23. Логи для отладки при ошибке
       - name: Debug Gradle logs
         if: failure()
