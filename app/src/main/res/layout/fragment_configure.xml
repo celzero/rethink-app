@@ -18,7 +18,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="15dp">
+            android:paddingStart="15dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="15dp"
+            android:paddingBottom="15dp">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_title_rethink"

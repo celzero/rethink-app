@@ -11,33 +11,36 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:gravity="center_horizontal"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="24dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:paddingBottom="16dp">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_doh"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="10dp"
+                android:layout_margin="12dp"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardCornerRadius="8dp"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
                 app:cardUseCompatPadding="true"
                 app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintEnd_toStartOf="@+id/guideline_vertical_row1"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_33"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <LinearLayout
                         android:id="@+id/icon_container_doh"
@@ -51,15 +54,14 @@
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
+                            android:layout_margin="3dp"
                             android:src="@drawable/dot_yellow" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
+                            android:layout_margin="3dp"
                             android:src="@drawable/dot_green" />
-
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -68,7 +70,7 @@
                         android:layout_height="wrap_content"
                         android:layout_above="@id/abbr_doh"
                         android:gravity="center"
-                        android:padding="10dp"
+                        android:padding="12dp"
                         android:text="@string/cd_custom_doh_url_name_default"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/rethink_header_text" />
@@ -78,14 +80,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_above="@id/icon_container_doh"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="12dp"
                         android:ellipsize="end"
                         android:gravity="center"
                         android:maxLines="2"
                         android:text="@string/dc_doh"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/extra_large_font_text_view" />
-
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -93,20 +94,21 @@
                 android:id="@+id/card_dot"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="10dp"
+                android:layout_margin="12dp"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardCornerRadius="8dp"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
                 app:cardUseCompatPadding="true"
                 app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintStart_toEndOf="@+id/guideline_vertical_row1"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_66"
+                app:layout_constraintStart_toEndOf="@+id/guideline_33"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <LinearLayout
                         android:id="@+id/icon_container_dot"
@@ -120,15 +122,14 @@
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
+                            android:layout_margin="3dp"
                             android:src="@drawable/dot_yellow" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
+                            android:layout_margin="3dp"
                             android:src="@drawable/dot_green" />
-
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -137,7 +138,7 @@
                         android:layout_height="wrap_content"
                         android:layout_above="@id/abbr_dot"
                         android:gravity="center"
-                        android:padding="10dp"
+                        android:padding="12dp"
                         android:text="@string/lbl_dot"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/rethink_header_text" />
@@ -147,51 +148,36 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_above="@id/icon_container_dot"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="12dp"
                         android:ellipsize="end"
                         android:gravity="center"
                         android:maxLines="2"
                         android:text="@string/lbl_dot_abbr"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/extra_large_font_text_view" />
-
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
-
-            <!-- Vertical Guideline (for spacing) -->
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_vertical_row1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.5" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_dnscrypt"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="10dp"
+                android:layout_margin="12dp"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardCornerRadius="8dp"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
                 app:cardUseCompatPadding="true"
                 app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintEnd_toStartOf="@+id/guideline_vertical_row2"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/guideline_66"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <LinearLayout
                         android:id="@+id/icon_container_dnscrypt"
@@ -205,21 +191,20 @@
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
+                            android:layout_margin="3dp"
                             android:src="@drawable/dot_yellow" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
+                            android:layout_margin="3dp"
                             android:src="@drawable/dot_green" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
+                            android:layout_margin="3dp"
                             android:src="@drawable/dot_accent" />
-
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -228,7 +213,7 @@
                         android:layout_height="wrap_content"
                         android:layout_above="@id/abbr_dnscrypt"
                         android:gravity="center"
-                        android:padding="10dp"
+                        android:padding="12dp"
                         android:text="@string/lbl_dc"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/rethink_header_text" />
@@ -238,14 +223,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_above="@id/icon_container_dnscrypt"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="12dp"
                         android:ellipsize="end"
                         android:gravity="center"
                         android:maxLines="2"
                         android:text="@string/lbl_dc_abbr"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/extra_large_font_text_view" />
-
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -253,20 +237,21 @@
                 android:id="@+id/card_dnsproxy"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="10dp"
+                android:layout_margin="12dp"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardCornerRadius="8dp"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
                 app:cardUseCompatPadding="true"
                 app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintStart_toEndOf="@+id/guideline_vertical_row2"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintEnd_toStartOf="@+id/guideline_33"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/card_doh">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <LinearLayout
                         android:id="@+id/icon_container_dnsproxy"
@@ -280,9 +265,8 @@
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
+                            android:layout_margin="3dp"
                             android:src="@drawable/dot_red" />
-
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -291,7 +275,7 @@
                         android:layout_height="wrap_content"
                         android:layout_above="@id/abbr_dnsproxy"
                         android:gravity="center"
-                        android:padding="10dp"
+                        android:padding="12dp"
                         android:text="@string/lbl_dp"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/rethink_header_text" />
@@ -301,49 +285,35 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_above="@id/icon_container_dnsproxy"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="12dp"
                         android:ellipsize="end"
                         android:gravity="center"
                         android:maxLines="2"
                         android:text="@string/lbl_dp_abbr"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/extra_large_font_text_view" />
-
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_vertical_row2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.5" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_odoh"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="10dp"
+                android:layout_margin="12dp"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardCornerRadius="8dp"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
                 app:cardUseCompatPadding="true"
                 app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintEnd_toStartOf="@+id/guideline_vertical"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintEnd_toStartOf="@+id/guideline_66"
+                app:layout_constraintStart_toEndOf="@+id/guideline_33"
+                app:layout_constraintTop_toBottomOf="@+id/card_dot">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <LinearLayout
                         android:id="@+id/icon_container_odoh"
@@ -357,21 +327,20 @@
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
+                            android:layout_margin="3dp"
                             android:src="@drawable/dot_yellow" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
+                            android:layout_margin="3dp"
                             android:src="@drawable/dot_green" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
+                            android:layout_margin="3dp"
                             android:src="@drawable/dot_accent" />
-
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -380,7 +349,7 @@
                         android:layout_height="wrap_content"
                         android:layout_above="@id/abbr_odoh"
                         android:gravity="center"
-                        android:padding="10dp"
+                        android:padding="12dp"
                         android:text="@string/lbl_odoh"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/rethink_header_text" />
@@ -390,7 +359,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_above="@id/icon_container_odoh"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="12dp"
                         android:ellipsize="end"
                         android:gravity="center"
                         android:maxLines="2"
@@ -400,31 +369,25 @@
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.5" />
-
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_rethink_dns"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="10dp"
+                android:layout_margin="12dp"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardCornerRadius="8dp"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
                 app:cardUseCompatPadding="true"
                 app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintStart_toEndOf="@+id/guideline_vertical"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/guideline_66"
+                app:layout_constraintTop_toBottomOf="@+id/card_dnscrypt">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <LinearLayout
                         android:id="@+id/icon_container_rethink_dns"
@@ -438,19 +401,19 @@
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
+                            android:layout_margin="3dp"
                             android:src="@drawable/dot_red" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
+                            android:layout_margin="3dp"
                             android:src="@drawable/dot_yellow" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="2dp"
+                            android:layout_margin="3dp"
                             android:src="@drawable/dot_green" />
                     </LinearLayout>
 
@@ -460,7 +423,7 @@
                         android:layout_height="wrap_content"
                         android:layout_above="@id/abbr_rethink_dns"
                         android:gravity="center"
-                        android:padding="10dp"
+                        android:padding="12dp"
                         android:text="@string/lbl_rdns"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/rethink_header_text" />
@@ -470,24 +433,38 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_above="@id/icon_container_rethink_dns"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="12dp"
                         android:ellipsize="end"
                         android:gravity="center"
                         android:maxLines="2"
                         android:text="@string/dc_rethink_dns_radio"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/extra_large_font_text_view" />
-
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_33"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.333" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_66"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.666" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="32dp"
             android:layout_marginEnd="20dp"
+            android:layout_marginBottom="24dp"
             android:alpha="0.9"
             android:gravity="center"
             android:orientation="horizontal">
@@ -497,10 +474,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:drawableStart="@drawable/dot_red"
-                android:drawablePadding="2dp"
+                android:drawablePadding="4dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:gravity="center"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/lbl_fast" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -508,10 +485,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:drawableStart="@drawable/dot_yellow"
-                android:drawablePadding="2dp"
+                android:drawablePadding="4dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:gravity="center"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/lbl_private" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -519,10 +496,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:drawableStart="@drawable/dot_green"
-                android:drawablePadding="2dp"
+                android:drawablePadding="4dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:gravity="center"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/lbl_secure" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -530,12 +507,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:drawableStart="@drawable/dot_accent"
-                android:drawablePadding="2dp"
+                android:drawablePadding="4dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:gravity="center"
-                android:padding="5dp"
+                android:padding="8dp"
                 android:text="@string/lbl_anonymous" />
-
         </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
