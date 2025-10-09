@@ -10,7 +10,7 @@
     android:orientation="vertical"
     android:paddingBottom="40dp">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="60dp"
         android:layout_height="3dp"
         android:layout_gravity="center"
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bs_conn_track_port_detail_chip"
             style="@style/ThinnerChip.Action"
             android:layout_width="wrap_content"
@@ -76,7 +76,7 @@
             android:contentDescription="@string/apps_icon_content_desc"
             android:src="@drawable/default_app_icon" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bs_conn_track_app_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -97,7 +97,7 @@
         android:layout_marginTop="10dp"
         android:gravity="center">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bs_conn_connection_flag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -110,7 +110,7 @@
             android:textAppearance="@android:style/TextAppearance.Material.Subhead"
             android:textSize="26sp" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bs_conn_connection_type_heading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -126,7 +126,7 @@
             tools:ignore="SpeakableTextPresentCheck,SpeakableTextPresentCheck" />
     </RelativeLayout>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/bs_conn_dns_cache_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -263,7 +263,7 @@
             android:paddingBottom="5dp"
             android:weightSum="1">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/bs_conn_block_app_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -298,7 +298,7 @@
         android:orientation="horizontal"
         android:padding="10dp">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bs_conn_unknown_app_txt"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -330,7 +330,7 @@
         android:padding="10dp"
         android:weightSum="1">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bs_conn_block_conn_all_txt"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -365,7 +365,7 @@
         android:padding="10dp"
         android:weightSum="1">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bs_conn_domain_txt"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -399,7 +399,7 @@
         android:padding="10dp"
         android:weightSum="1">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/connection_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -409,13 +409,13 @@
             android:gravity="center"
             android:textIsSelectable="true"
             android:marqueeRepeatLimit="marquee_forever"
-            android:maxLines="3"
+            android:maxLines="5"
             android:paddingStart="8dp"
             android:paddingEnd="10dp"
             android:scrollHorizontally="true"
             android:singleLine="false"
             android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/small_font_text_view" />
+            android:textSize="@dimen/mini_font_text_view" />
 
     </LinearLayout>
 

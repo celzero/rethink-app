@@ -14,12 +14,52 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.iab
-
+/*
+import Logger
+import Logger.LOG_IAB
+import android.app.Activity
+import android.content.Context
+import androidx.lifecycle.MutableLiveData
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingClient.ProductType
+import com.android.billingclient.api.BillingClient.BillingResponseCode
+import com.android.billingclient.api.BillingClientStateListener
+import com.android.billingclient.api.BillingFlowParams
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.GetBillingConfigParams
+import com.android.billingclient.api.InAppMessageParams
+import com.android.billingclient.api.InAppMessageResult
+import com.android.billingclient.api.PendingPurchasesParams
+import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.PurchasesUpdatedListener
+import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.QueryPurchasesParams
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.customdownloader.RetrofitManager
+import com.celzero.bravedns.database.SubscriptionStatus
+import com.celzero.bravedns.rpnproxy.PipKeyManager
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.subscription.SubscriptionStateMachineV2
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import retrofit2.converter.gson.GsonConverterFactory
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.concurrent.CopyOnWriteArrayList
+import com.celzero.bravedns.customdownloader.ITcpProxy
+import org.json.JSONObject
 
 // ref: github.com/hypersoftdev/inappbilling
 object InAppBillingHandler : KoinComponent {
-/*
+
     private lateinit var billingClient: BillingClient
     private var billingListener: BillingListener? = null
 
@@ -134,7 +174,7 @@ object InAppBillingHandler : KoinComponent {
 
     fun enableInAppMessaging(activity: Activity) {
         val inAppParams = InAppMessageParams.newBuilder().addInAppMessageCategoryToShow(
-            InAppMessageCategoryId.TRANSACTIONAL
+            InAppMessageParams.InAppMessageCategoryId.TRANSACTIONAL
         ).addAllInAppMessageCategoriesToShow().build()
         billingClient.showInAppMessages(activity, inAppParams) { it ->
             val mname = this::enableInAppMessaging.name
@@ -142,7 +182,7 @@ object InAppBillingHandler : KoinComponent {
             if (it.responseCode == InAppMessageResult.InAppMessageResponseCode.NO_ACTION_NEEDED) {
                 logd(mname, "enableInAppMessaging: no action needed")
             } else {
-                Log.d(TAG, "enableInAppMessaging: subs status update, fetching purchases")
+                logd(TAG, "enableInAppMessaging: subs status update, fetching purchases")
                 fetchPurchases(listOf(ProductType.SUBS))
             }
         }
@@ -1096,9 +1136,7 @@ object InAppBillingHandler : KoinComponent {
     }
 
     fun hasValidSubscription(): Boolean {
-        val valid = subscriptionStateMachine.hasValidSubscription()
-        Logger.i(LOG_IAB, "Checking valid subscription with state machine, valid? $valid")
-        return valid
+        return RpnProxyManager.hasValidSubscription()
     }
 
     fun getConnectionStatusWithStateMachine(): String {
@@ -1127,7 +1165,7 @@ object InAppBillingHandler : KoinComponent {
         """.trimIndent()
     }
 
-    *//*fun getDetailedErrorInfo(): String? {
+    /*fun getDetailedErrorInfo(): String? {
         return if (isStateMachineInitialized.get()) {
             val statistics = subscriptionStateMachine.getStatistics()
             //val history = subscriptionStateMachine.getTransitionHistory()
@@ -1147,7 +1185,7 @@ object InAppBillingHandler : KoinComponent {
         } else {
             "State machine not initialized"
         }
-    }*//*
+    }*/
 
     fun endConnection() {
         val mname = this::endConnection.name
@@ -1284,5 +1322,6 @@ object InAppBillingHandler : KoinComponent {
         }
 
         return null
-    }*/
+    }
 }
+*/

@@ -14,14 +14,78 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.fragment
-
+/*
+import Logger
+import Logger.LOG_TAG_UI
+import android.content.ClipData
+import android.content.Context
+import android.content.Intent
+import android.content.res.Configuration
+import android.net.Uri
+import android.os.Bundle
+import android.text.method.LinkMovementMethod
+import android.view.LayoutInflater
+import android.view.View
+import android.view.WindowManager
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
+import android.widget.CompoundButton
+import android.widget.Toast
+import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
+import com.celzero.bravedns.databinding.ActivityRethinkPlusDashboardBinding
+import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.scheduler.BugReportZipper.FILE_PROVIDER_NAME
+import com.celzero.bravedns.scheduler.BugReportZipper.getZipFileName
+import com.celzero.bravedns.scheduler.EnhancedBugReport
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.subscription.SubscriptionStateMachineV2
+import com.celzero.bravedns.ui.activity.FragmentHostActivity
+import com.celzero.bravedns.ui.activity.PingTestActivity
+import com.celzero.bravedns.ui.activity.RpnWinProxyDetailsActivity
+import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
+import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
+import com.celzero.bravedns.ui.location.LocationSelectorActivity
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
+import com.celzero.firestack.backend.Backend
+import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.progressindicator.LinearProgressIndicator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.io.File
+import java.util.concurrent.TimeUnit
+import kotlin.getValue
 
 class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_dashboard) {
-    /*private val b by viewBinding(ActivityRethinkPlusDashboardBinding::bind)
+    private val b by viewBinding(ActivityRethinkPlusDashboardBinding::bind)
 
     private val persistentState by inject<PersistentState>()
+    private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
 
     private lateinit var animation: Animation
 
@@ -34,7 +98,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
         private const val ANIMATION_START_DEGREE = 0.0f
         private const val ANIMATION_END_DEGREE = 360.0f
 
-        private const val TAG = "RPNDashboardActivity"
+        private const val TAG = "RPNDashAct"
 
         private const val DELAY = 1500L
         private const val GRACE_DIALOG_REMIND_AFTER_DAYS = 1 // days to remind again
@@ -111,7 +175,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
 
     private fun observeSubscriptionState() {
 
-        *//*InAppBillingHandler.purchasesLiveData.distinctUntilChanged().observe(viewLifecycleOwner) { purchaseDetails ->
+        /*InAppBillingHandler.purchasesLiveData.distinctUntilChanged().observe(viewLifecycleOwner) { purchaseDetails ->
             Logger.v(LOG_TAG_UI, "$TAG subscription state changed: $purchaseDetails")
             if (purchaseDetails == null) {
                 Logger.w(LOG_TAG_UI, "$TAG subscription state is null")
@@ -130,7 +194,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
                     showToastUiCentered(requireContext(), "No active subscription found", Toast.LENGTH_SHORT)
                 }
             }
-        }*//*
+        }*/
 
         io {
             RpnProxyManager.collectSubscriptionState().collect {
@@ -152,7 +216,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
             SubscriptionStateMachineV2.SubscriptionState.Initial -> {
                 Logger.i(LOG_TAG_UI, "$TAG subscription state changed to INACTIVE")
                 // navigate to rethinkplus subscription screen
-                findNavController().navigate(R.id.rethinkPlus)
+                //findNavController().navigate(R.id.rethinkPlus)
                 showToastUiCentered(
                     requireContext(),
                     "No active subscription found",
@@ -291,7 +355,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
                 val infoBtn = rowView.findViewById<AppCompatButton>(R.id.info_button)
                 val statusTv = rowView.findViewById<AppCompatTextView>(R.id.proxy_status)
                 val whoTv = rowView.findViewById<AppCompatTextView>(R.id.proxy_latency)
-                val useThisProxy = rowView.findViewById<AppCompatButton>(R.id.use_button)
+                val addAppsBtn = rowView.findViewById<AppCompatButton>(R.id.use_button)
                 val errorTv = rowView.findViewById<AppCompatTextView>(R.id.error_message)
 
                 b.proxyContainer.addView(rowView)
@@ -305,19 +369,61 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
                     errorTv,
                     lastRefreshChip,
                     whoTv,
-                    useThisProxy
+                    addAppsBtn
                 )
 
-                val type = getType(id)
+                /*val type = getType(id)
                 if (type == null) {
                     Logger.w(LOG_TAG_UI, "$TAG type is null")
                     return@ui
-                }
+                }*/
 
                 statusTv.setOnClickListener {
                     // TODO: the click listener should be inside updateProxiesUi, after fetching the
                     // props it will decide to launch or not
                     launchRpnWinProxyDetailsActivity("US")
+                }
+                val type = getType(id)
+                infoBtn.setOnClickListener {
+                    if (type == null) {
+                        Logger.w(LOG_TAG_UI, "$TAG type is null")
+                        return@setOnClickListener
+                    }
+                    io {
+                        var res: Pair<RpnProxyManager.RpnProps?, String?>? = null
+                        ioCtx {
+                            res = VpnController.getRpnProps(type)
+                        }
+
+                        val props = res?.first ?: return@io
+
+                        uiCtx {  showInfoDialog(type, props) }
+                    }
+                }
+
+                addAppsBtn.setOnClickListener {
+                    Logger.vv(LOG_TAG_UI, "$TAG addAppsBtn clicked for $type")
+                    val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+                    val proxyId = id.toString()
+                    val proxyName = "Win-US"
+                    val appsAdapter = WgIncludeAppsAdapter(requireContext(), proxyId, proxyName)
+                    mappingViewModel.apps.observe(viewLifecycleOwner) {
+                        appsAdapter.submitData(
+                            lifecycle,
+                            it
+                        )
+                    }
+                    val includeAppsDialog =
+                        WgIncludeAppsDialog(
+                            this.requireActivity(),
+                            appsAdapter,
+                            mappingViewModel,
+                            themeId,
+                            proxyId,
+                            proxyName
+                        )
+                    includeAppsDialog.setCanceledOnTouchOutside(false)
+                    includeAppsDialog.show()
                 }
 
 
@@ -376,10 +482,10 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
                 val statusTv = b.proxyContainer.getChildAt(i).findViewById<AppCompatTextView>(R.id.proxy_status)
                 val whoTv = b.proxyContainer.getChildAt(i).findViewById<AppCompatTextView>(R.id.proxy_latency)
                 val lastRefreshChip = b.proxyContainer.getChildAt(i).findViewById<Chip>(R.id.proxy_last_checked)
-                val useThisProxy = b.proxyContainer.getChildAt(i).findViewById<AppCompatButton>(R.id.use_button)
+                val addAppsBtn = b.proxyContainer.getChildAt(i).findViewById<AppCompatButton>(R.id.use_button)
                 val errorTv = b.proxyContainer.getChildAt(i).findViewById<AppCompatTextView>(R.id.error_message)
 
-                updateProxiesUi(i, iv, title, infoBtn, statusTv, errorTv, lastRefreshChip, whoTv, useThisProxy)
+                updateProxiesUi(i, iv, title, infoBtn, statusTv, errorTv, lastRefreshChip, whoTv, addAppsBtn)
             }
             Logger.v(LOG_TAG_UI, "$TAG updating proxies UI every $DELAY ms")
             delay(DELAY)
@@ -403,17 +509,11 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
         errorTv: AppCompatTextView,
         lastRefreshChip: Chip,
         whoTv: AppCompatTextView,
-        useThisProxy: AppCompatButton
+        addAppsBtn: AppCompatButton
     ) {
         val type = getType(id) ?: return // should never happen
 
         title.text = options[id]
-        val preferredId = RpnProxyManager.getPreferredId()
-        if (preferredId == getProxyId(type)) {
-            useThisProxy.text = "Using"
-        } else {
-            useThisProxy.text = "Use"
-        }
 
         iv.setImageDrawable(ContextCompat.getDrawable(requireContext(), getDrawable(type)))
 
@@ -455,22 +555,6 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
             whoTv.text = props.who
         }
         infoBtn.setTextColor(requireContext(), true)
-        infoBtn.setOnClickListener {
-            showInfoDialog(type, props)
-        }
-
-        useThisProxy.setOnClickListener {
-            val prev = RpnProxyManager.getPreferredId()
-            val proxyId = getProxyId(type)
-            if (prev == proxyId) {
-                RpnProxyManager.changePreferredId(Backend.Auto)
-                Logger.i(LOG_TAG_UI, "$TAG changed preferred proxy to ${Backend.Auto}")
-            } else {
-                RpnProxyManager.changePreferredId(proxyId)
-                Logger.i(LOG_TAG_UI, "$TAG changed preferred proxy to $proxyId")
-            }
-        }
-
     }
 
     private fun getProxyId(type: RpnProxyManager.RpnType): String {
@@ -619,62 +703,19 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
             showToastUiCentered(requireContext(), "No valid subscription found", Toast.LENGTH_SHORT)
             return
         }
-        io {
+        /*
             val winProxyServers = RpnProxyManager.getWinServers()
-            val testProxies: MutableList<RpnProxyManager.RpnWinServer> = mutableListOf()
             if (winProxyServers.isEmpty()) {
-                // create a list for testing
-                val testServer = RpnProxyManager.RpnWinServer(
-                    "Server1, Server2, Server3, Server4, Server5",
-                    "US",
-                    "1.2.3.4",
-                    true
-                )
-                val testServer2 = RpnProxyManager.RpnWinServer(
-                    "Server6",
-                    "UK",
-                    "2.3.4.5",
-                    true)
-                val testServer3 = RpnProxyManager.RpnWinServer(
-                    "Server7, Server8, Server9",
-                    "IN",
-                    "3.4.5.6",
-                    true)
-                val testServer4 = RpnProxyManager.RpnWinServer(
-                    "Server10, Server11",
-                    "CA",
-                    "4.5.6.7",
-                    true)
-                val testServer5 = RpnProxyManager.RpnWinServer(
-                    "Server12",
-                    "AU",
-                    "5.6.7.8",
-                    true)
-                testProxies.addAll(listOf(testServer, testServer2, testServer3, testServer4, testServer5))
-            }
-            *//*if (winProxyServers.isEmpty()) {
-                // show dialog to add more proxies
-                uiCtx {
-                    // show toast that issue while retrieving win proxies
-                    showToastUiCentered(
-                        requireContext(),
-                        "Issue while retrieving Rpn proxies, please try again later",
-                        Toast.LENGTH_SHORT
-                    )
-                }
-                return@io
-            }*//*
-
+            // show dialog to add more proxies
             uiCtx {
-                // show new dialog to add more proxies
-                val appsAdapter = RpnWinProxiesAdapter(requireContext(), testProxies, listOf("US", "IN"))
-                val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-                val rpnProxySelectionDialog =
-                    RpnProxySelectionDialog(requireActivity(), appsAdapter, themeId)
-                rpnProxySelectionDialog.setCanceledOnTouchOutside(false)
-                rpnProxySelectionDialog.show()
+                // show toast that issue while retrieving win proxies
+                showToastUiCentered(requireContext(),"Issue while retrieving Rpn proxies, please try again later",Toast.LENGTH_SHORT)
             }
-        }
+            return@io
+        }*/
+
+        val intent = Intent(requireContext(), LocationSelectorActivity::class.java)
+        startActivity(intent)
     }
 
     private fun showInfoDialog(type: RpnProxyManager.RpnType,prop: RpnProxyManager.RpnProps) {
@@ -888,5 +929,6 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
 
     private fun ui(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.Main) { f() }
-    }*/
+    }
 }
+*/

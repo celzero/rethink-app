@@ -115,14 +115,12 @@ object BugReportZipper {
 
             return ZipFile(file)
         } catch (e: FileNotFoundException) {
-            Logger.w(LOG_TAG_BUG_REPORT, "file not found exception while creating zip file", e)
-        } catch (e: NoSuchFileException) {
-            Logger.w(LOG_TAG_BUG_REPORT, "zip file disappeared during access: ${file.absolutePath}", e)
+            Logger.w(LOG_TAG_BUG_REPORT, "file not found exception while creating zip file; ${e.message}")
         } catch (e: ZipException) {
-            Logger.w(LOG_TAG_BUG_REPORT, "err while creating zip file", e)
+            Logger.w(LOG_TAG_BUG_REPORT, "err while creating zip file; ${e.message}")
             Utilities.deleteRecursive(file) // delete corrupted zip file
         } catch (e: Exception) {
-            Logger.w(LOG_TAG_BUG_REPORT, "err while creating zip file", e)
+            Logger.w(LOG_TAG_BUG_REPORT, "err while creating zip file; ${e.message}")
         }
         return null
     }

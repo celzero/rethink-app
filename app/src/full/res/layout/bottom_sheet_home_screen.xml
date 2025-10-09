@@ -9,7 +9,7 @@
     android:orientation="vertical"
     android:paddingBottom="40dp">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="60dp"
         android:layout_height="3dp"
         android:layout_gravity="center"
@@ -24,7 +24,7 @@
         android:orientation="horizontal"
         android:padding="5dp">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bs_home_screen_heading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
             android:textStyle="bold" />
     </RelativeLayout>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/bs_home_screen_vpn_lockdown_desc"
         style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"
@@ -92,7 +92,7 @@
                 android:layout_toEndOf="@id/dns_icon"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="5dp"
@@ -101,7 +101,7 @@
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="5dp"
@@ -158,7 +158,7 @@
                 android:layout_toEndOf="@id/firewall_icon"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/textView3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -168,7 +168,7 @@
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/textView4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -226,7 +226,7 @@
                 android:layout_toEndOf="@id/dns_firewall_icon"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/textView5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -237,7 +237,7 @@
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/textView6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -272,7 +272,7 @@
         android:layout_height="wrap_content"
         android:gravity="center">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bs_home_screen_connected_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -284,7 +284,7 @@
             android:textSize="@dimen/default_font_text_view"
             android:visibility="gone" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bs_home_screen_app_uptime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

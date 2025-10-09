@@ -33,7 +33,6 @@ import android.net.TrafficStats
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
-import android.os.PowerManager
 import android.os.SystemClock
 import android.provider.Settings
 import android.text.format.DateUtils
@@ -47,8 +46,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
-import com.celzero.firestack.backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
@@ -56,7 +55,15 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.scheduler.WorkScheduler
-import com.celzero.bravedns.service.*
+import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.DnsLogTracker
+import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.activity.AlertsActivity
@@ -72,33 +79,35 @@ import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.ProxySettingsActivity
 import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.ui.bottomsheet.HomeScreenSettingBottomSheet
-import com.celzero.bravedns.util.*
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
-import com.celzero.bravedns.util.UIUtils.openAppInfo
+import com.celzero.bravedns.util.NotificationActionType
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.UIUtils.openNetworkSettings
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
-import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.isAtleastN
 import com.celzero.bravedns.util.Utilities.isAtleastP
 import com.celzero.bravedns.util.Utilities.isAtleastR
-import com.celzero.bravedns.util.Utilities.isAtleastU
 import com.celzero.bravedns.util.Utilities.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.firestack.backend.Backend
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import java.util.*
-import java.util.concurrent.TimeUnit
+import com.waseemsabir.betterypermissionhelper.BatteryPermissionHelper
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -112,6 +121,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private lateinit var themeNames: Array<String>
     private lateinit var startForResult: ActivityResultLauncher<Intent>
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
+
+    private val batteryPermissionHelper = BatteryPermissionHelper.getInstance()
 
     companion object {
         private const val TAG = "HSFragment"
@@ -408,14 +419,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun enableProxyCardIfNeeded() {
         if (isVpnActivated && !appConfig.getBraveMode().isDnsMode()) {
-            if (persistentState.getProxyStatus().value != -1) {
+            val isAnyProxyEnabled = appConfig.isProxyEnabled()
+            if (isAnyProxyEnabled) {
                 observeProxyStates()
             } else {
                 disableProxyCard()
             }
         } else {
             disableProxyCard()
-            unobserveProxyStates()
         }
     }
 
@@ -468,7 +479,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private var proxyStateListenerJob: Job? = null
 
     private fun observeProxyStates() {
-        persistentState.getProxyStatus().observe(viewLifecycleOwner) {
+        persistentState.getProxyStatus().distinctUntilChanged().observe(viewLifecycleOwner) {
             Logger.vv(LOG_TAG_UI, "$TAG proxy state changed to $it")
             if (it != -1) {
                 if (proxyStateListenerJob?.isActive == true) {
@@ -479,7 +490,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 proxyStateListenerJob = ui("proxyStates") {
                     while (isVisible && isAdded) {
                         updateUiWithProxyStates(it)
-                        kotlinx.coroutines.delay(2500L)
+                        kotlinx.coroutines.delay(1500L)
                     }
                     proxyStateListenerJob?.cancel()
                 }
@@ -518,15 +529,34 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 var idle = 0
                 val now = System.currentTimeMillis()
                 Logger.v(LOG_TAG_UI, "$TAG wg active proxies: ${proxies.size}")
+                
+                // If no proxies are configured but WireGuard is enabled, show appropriate message
+                if (proxies.isEmpty()) {
+                    uiCtx {
+                        if (!isVisible || !isAdded) return@uiCtx
+                        b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+                        b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
+                        b.fhsCardOtherProxyCount.text = getString(resId)
+                    }
+                    return@io
+                }
+                
                 proxies.forEach {
                     val proxyId = "${ProxyManager.ID_WG_BASE}${it.getId()}"
                     Logger.vv(LOG_TAG_UI, "$TAG init stats check for $proxyId")
                     val stats = VpnController.getProxyStats(proxyId)
+                    val status = VpnController.getProxyStatusById(proxyId).first
                     // check for dns status of the wg if splitDns is enabled
                     val dnsStats = if (isSplitDns()) {
                         VpnController.getDnsStatus(proxyId)
                     } else {
                         null
+                    }
+
+                    // Handle paused state as idle (TPU is the pause status)
+                    if (status == Backend.TPU) {
+                        idle++ // paused proxies are counted as idle
+                        return@forEach
                     }
 
                     if (stats == null) {
@@ -540,36 +570,73 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                     val lastOk = stats.lastOK
                     val since = stats.since
+                    // Only mark as failing if it has been running for a while without success
                     if (now - since > WG_UPTIME_THRESHOLD && lastOk == 0L) {
                         failing++
                         return@forEach
                     }
-                    val status = VpnController.getProxyStatusById(proxyId).first
+                    
                     if (status != null) {
                         // consider starting and up as active
-                        if (status == Backend.TZZ || status == Backend.TPU) {
-                          idle++
-                        } else if (status == Backend.TOK || status == Backend.TUP) {
-                            val isUp = System.currentTimeMillis() - stats.lastOK < WG_HANDSHAKE_TIMEOUT
-                            if (isUp) {
+                        when (status) {
+                            Backend.TZZ -> {
+                                // For TZZ (idle), be more lenient - consider it as idle if it has had any connection
+                                if (stats.lastOK > 0L) {
+                                    // Has had successful handshake before, consider it idle
+                                    idle++
+                                } else if (now - since < WG_UPTIME_THRESHOLD) {
+                                    // Still in startup period, give it more time
+                                    idle++
+                                } else {
+                                    // No recent handshake and been running long enough, consider it failing
+                                    failing++
+                                }
+                            }
+                            Backend.TOK -> {
+                                // For TOK (connected), check if it's recently active
+                                if (stats.lastOK > 0L && (now - stats.lastOK < WG_HANDSHAKE_TIMEOUT)) {
+                                    active++
+                                } else if (stats.lastOK > 0L) {
+                                    // Has connected before but not recently, consider idle
+                                    idle++
+                                } else if (now - since < WG_UPTIME_THRESHOLD) {
+                                    // Still in startup period, consider as starting (active)
+                                    active++
+                                } else {
+                                    failing++
+                                }
+                            }
+                            Backend.TUP -> {
+                                // Starting state - always consider as active (transitioning)
                                 active++
-                            } else {
-                                // some wg conns like free proton, reply to handshakes but do not
-                                // reply to data msgs, in that case the status will be TZZ
+                            }
+                            Backend.TNT -> {
+                                // Waiting state - consider as idle if recently started, otherwise failing
+                                if (now - since < WG_UPTIME_THRESHOLD) {
+                                    idle++
+                                } else {
+                                    failing++
+                                }
+                            }
+                            else -> {
+                                // Unknown or error states
                                 failing++
                             }
+                        }
+                    } else {
+                        // No status available, but if we have recent stats, don't immediately mark as failing
+                        if (stats.lastOK > 0L && (now - stats.lastOK < WG_HANDSHAKE_TIMEOUT)) {
+                            idle++
                         } else {
                             failing++
                         }
-                    } else {
-                        failing++
                     }
                 }
                 uiCtx {
                     if (!isVisible || !isAdded) return@uiCtx
                     b.fhsCardOtherProxyCount.visibility = View.VISIBLE
                     var text = ""
-                    // show as 3 active 1 failing 1 idle, if failing is 0 show as 4 active
+                    // show as 3 active 1 failing 1 idle, prioritize showing something if any proxy exists
                     if (active > 0) {
                         text = getString(
                             R.string.two_argument_space,
@@ -601,8 +668,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             getString(R.string.lbl_idle).replaceFirstChar(Char::titlecase)
                         )
                     }
-                    Logger.v(LOG_TAG_UI, "$TAG overall wg proxy status: $text")
-                    if (text.isEmpty()) {
+                    Logger.v(LOG_TAG_UI, "$TAG overall wg proxy status: $text, proxies: ${proxies.size}, active: $active, failing: $failing, idle: $idle")
+                    
+                    // If we have proxies but no status text, something went wrong - show a fallback
+                    if (text.isEmpty() && proxies.isNotEmpty()) {
+                        b.fhsCardProxyCount.text = getString(R.string.lbl_active)
+                        Logger.w(LOG_TAG_UI, "$TAG proxy status empty but proxies exist, showing fallback active status")
+                    } else if (text.isEmpty()) {
                         b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
                     } else {
                         b.fhsCardProxyCount.text = text
@@ -610,7 +682,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 }
             }
         } else {
-            b.fhsCardProxyCount.text = getString(R.string.lbl_active)
+            // For non-WireGuard proxies, show active if any proxy is enabled
+            if (appConfig.isProxyEnabled()) {
+                b.fhsCardProxyCount.text = getString(R.string.lbl_active)
+            } else {
+                b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
+            }
         }
         b.fhsCardOtherProxyCount.visibility = View.VISIBLE
         b.fhsCardOtherProxyCount.text = getString(resId)
@@ -738,7 +815,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             updateUiWithDnsStates(it)
         }
 
-        VpnController.getRegionLiveData().observe(viewLifecycleOwner) {
+        VpnController.getRegionLiveData().distinctUntilChanged().observe(viewLifecycleOwner) {
             if (it != null) {
                 b.fhsCardRegion.text = it.uppercase()
             }
@@ -965,9 +1042,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         // prompt user to disable battery optimization and restrict background data
-        if (isRestrictBackgroundActive(requireContext()) && !isVpnActivated) {
-            showRestrictBgActiveDialog()
-        } else if (batteryOptimizationActive(requireContext()) && !isVpnActivated) {
+        if (isRestrictBackgroundActive(requireContext()) && batteryOptimizationActive(requireContext()) && !isVpnActivated) {
             showBatteryOptimizationDialog()
         }
 
@@ -985,15 +1060,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun batteryOptimizationActive(context: Context): Boolean {
-        val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        val exemptFromBatteryOptimization = pm.isIgnoringBatteryOptimizations(context.packageName)
-        Logger.d(LOG_TAG_UI, "ignore battery optimization: $exemptFromBatteryOptimization")
-
-        return if (isAtleastU()) {
-            !pm.isExemptFromLowPowerStandby || !exemptFromBatteryOptimization
-        } else {
-            !exemptFromBatteryOptimization
-        }
+        // check whether or not Battery Permission is Available for Device
+        val bph = batteryPermissionHelper.isBatterySaverPermissionAvailable(context = context, onlyIfSupported = true)
+        Logger.d(LOG_TAG_UI, "battery optimization available: $bph")
+        return bph
     }
 
     private fun showBatteryOptimizationDialog() {
@@ -1015,17 +1085,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
             Logger.v(LOG_TAG_UI, "launch battery optimization settings")
-            val ok =
-                openNetworkSettings(
-                    requireContext(),
-                    Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
-                )
-            Logger.v(LOG_TAG_UI, "battery optimization settings launched: $ok")
-            if (!ok) {
-                // launch app settings if the above settings is not available
-                Logger.v(LOG_TAG_UI, "launch app info, battery optimization settings not available")
-                openAppInfo(requireContext())
-            }
+            batteryPermissionHelper.getPermission(requireContext(), open = true, newTask = true)
         }
 
         builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
@@ -1049,35 +1109,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         } else {
             isBackgroundRestricted == ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED
         }
-    }
-
-    private fun showRestrictBgActiveDialog() {
-        if (!isAtleastN()) return
-
-        val builder = MaterialAlertDialogBuilder(requireContext())
-        builder.setTitle(R.string.lbl_background_data)
-        val msg =
-            getString(R.string.restrict_dialog_message, getString(R.string.lbl_background_data))
-        builder.setMessage(msg)
-        builder.setCancelable(false)
-        builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
-            Logger.v(LOG_TAG_UI, "launch restrict background data settings")
-            val ok =
-                openNetworkSettings(
-                    requireContext(),
-                    Settings.ACTION_IGNORE_BACKGROUND_DATA_RESTRICTIONS_SETTINGS
-                )
-            if (!ok) {
-                // launch app settings if the above settings is not available
-                Logger.v(LOG_TAG_UI, "launch app info, restrict bg data settings not available")
-                openAppInfo(requireContext())
-            }
-        }
-
-        builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
-            // no-op
-        }
-        builder.create().show()
     }
 
     private fun showAlwaysOnStopDialog() {

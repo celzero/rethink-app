@@ -16,11 +16,9 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityTcpProxyBinding
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
-import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities

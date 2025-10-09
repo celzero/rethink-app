@@ -7,6 +7,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Build
 import android.text.TextUtils
+import androidx.annotation.RequiresApi
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
@@ -35,28 +36,31 @@ class ConnectionTracer(ctx: Context) {
         .expireAfterWrite(CACHE_BUILDER_WRITE_EXPIRE_SEC, TimeUnit.SECONDS)
         .build()
 
-    @TargetApi(Build.VERSION_CODES.Q)
+    @RequiresApi(Build.VERSION_CODES.Q)
     suspend fun getUidQ(
         proto: Int,
         sourceIp: String,
-        sport: Int,
+        sourcePort: Int,
         destIp: String,
-        dport: Int
+        destPort: Int,
+        retryCount: Int = 0
     ): Int {
         var uid = Constants.INVALID_UID
-        var sourcePort = sport
-        var destPort = dport
         var protocol = proto
 
-        // in-case of ICMP, change the protocol to UDP and source/dest port to 0
-        // ref: github.com/Gedsh/InviZible/blob/82a0618662ed2fec0fcb6ec55d030d1b76155924/tordnscrypt/src/main/java/pan/alexander/tordnscrypt/vpn/service/ServiceVPN.java#L540C26-L540C30
-        if (protocol == Protocol.ICMP.protocolType || protocol == Protocol.ICMPV6.protocolType) {
-            sourcePort = 0
-            destPort = 0
-            protocol = Protocol.UDP.protocolType
-        } else if (protocol != Protocol.TCP.protocolType && protocol != Protocol.UDP.protocolType) {
-            // android.googlesource.com/platform/development/+/da84168fb/ndk/platforms/android-21/include/linux/in.h
-            return uid
+        when (protocol) {
+            Protocol.ICMP.protocolType,
+            Protocol.ICMPV6.protocolType -> protocol = Protocol.UDP.protocolType
+
+            Protocol.TCP.protocolType,
+            Protocol.UDP.protocolType -> {
+            }
+
+            else -> {
+                // android.googlesource.com/platform/development/+/da84168fb/ndk/platforms/android-21/include/linux/in.h
+                Logger.v(LOG_TAG_VPN, "getUidQ; unsupported protocol: $protocol")
+                return uid
+            }
         }
 
         val local: InetSocketAddress
@@ -103,21 +107,36 @@ class ConnectionTracer(ctx: Context) {
             Logger.e(LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
         }
 
-        if (retryRequired(uid, protocol, destIp, key)){
-            // change the destination IP to unspecified IP and try again for unconnected UDP
-            val dip =
-                if (IPAddressString(destIp).isIPv6) {
-                    Constants.UNSPECIFIED_IP_IPV6
-                } else {
-                    Constants.UNSPECIFIED_IP_IPV4
+        if (retryCount >= 2) return uid
+
+        if (retryRequired(uid, protocol, destIp, key)) {
+            when (retryCount) {
+                0 -> {
+                    // change the destination port to 0 and try again
+                    val dport = 0
+                    val retryCount = 1
+                    val res = getUidQ(protocol, sourceIp, sourcePort, destIp, dport, retryCount)
+                    Logger.d(LOG_TAG_VPN, "retrying with: $protocol, $sourceIp, $sourcePort, $destIp, $dport old($destIp, $destPort), res: $res")
+                    return res
                 }
-            val dport = 0
-            val res = getUidQ(protocol, sourceIp, sourcePort, dip, dport)
-            Logger.d(
-                LOG_TAG_VPN,
-                "retrying with: $protocol, $sourceIp, $sourcePort, $dip, $dport old($destIp, $destPort), res: $res"
-            )
-            return res
+                1 -> {
+                    // change the destination IP to unspecified IP and try again for unconnected UDP
+                    val dip = if (IPAddressString(destIp).isIPv6) {
+                        Constants.UNSPECIFIED_IP_IPV6
+                    } else {
+                        Constants.UNSPECIFIED_IP_IPV4
+                    }
+                    val dport = 0
+                    val retryCount = 2
+                    val res = getUidQ(protocol, sourceIp, sourcePort, dip, dport, retryCount)
+                    Logger.d(LOG_TAG_VPN, "retrying with: $protocol, $sourceIp, $sourcePort, $dip, $dport old($destIp, $destPort), res: $res")
+                    return res
+                }
+                else -> {
+                    Logger.w(LOG_TAG_VPN, "retryRequired but retryCount ($retryCount) is not a handled case.")
+                    return uid
+                }
+            }
         }
 
         // If the uid is not in connectivity manager, then return the uid from cache.
@@ -139,7 +158,7 @@ class ConnectionTracer(ctx: Context) {
             return false
         }
 
-        // no need to retry for unspecified IP, as it is already tried
+        // no need to retry for unspecified IP, as it is already tried twice
         return !isUnspecifiedIp(destIp)
     }
 

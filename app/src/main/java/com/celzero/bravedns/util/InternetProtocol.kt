@@ -20,7 +20,8 @@ import com.celzero.firestack.settings.Settings
 enum class InternetProtocol(val id: Int) {
     IPv4(0),
     IPv6(1),
-    IPv46(2);
+    IPv46(2),
+    ALWAYSv46(3);
 
     fun isIPv6(): Boolean {
         return this == IPv6
@@ -36,13 +37,15 @@ enum class InternetProtocol(val id: Int) {
                 0 -> IPv4
                 1 -> IPv6
                 2 -> IPv46
+                3 -> ALWAYSv46
                 else -> IPv4
             }
         }
 
         fun byProtos(has4: Boolean, has6: Boolean): InternetProtocol {
             return when {
-                has4 && has6 -> IPv46
+                has4 && has6 -> IPv46 // ALWAYSv46
+                //has4 && has6 -> IPv4_IPv6
                 has4 -> IPv4
                 has6 -> IPv6
                 else -> IPv4
@@ -52,6 +55,10 @@ enum class InternetProtocol(val id: Int) {
         fun isAuto(id: Int): Boolean {
             return id == IPv46.id
         }
+
+        fun isAlwaysV46(id: Int): Boolean {
+            return id == ALWAYSv46.id
+        }
     }
 
     // preferred network engine id (go-module)
@@ -60,6 +67,7 @@ enum class InternetProtocol(val id: Int) {
             IPv4 -> Settings.Ns4
             IPv6 -> Settings.Ns6
             IPv46 -> Settings.Ns46
+            ALWAYSv46 -> Settings.Ns46
         }
     }
 }

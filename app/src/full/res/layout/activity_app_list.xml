@@ -85,7 +85,7 @@
                         app:singleSelection="true" />
                 </HorizontalScrollView>
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/firewall_app_label_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

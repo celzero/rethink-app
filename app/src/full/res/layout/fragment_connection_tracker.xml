@@ -133,7 +133,7 @@
         android:textColor="?attr/primaryTextColor"
         android:visibility="gone" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/connection_list_logs_disabled_tv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -69,7 +69,7 @@
                 android:minWidth="48dp"
                 android:minHeight="48dp" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/crp_label_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -80,7 +80,7 @@
                 android:textColor="?attr/secondaryTextColor"
                 android:textSize="@dimen/extra_large_font_text_view" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/crp_desc_group_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

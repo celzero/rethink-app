@@ -36,7 +36,7 @@
                 android:layout_gravity="center_vertical"
                 android:src="@android:color/transparent" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ip_details_fqdn_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
 
         </LinearLayout>
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/ip_details_ip_details_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

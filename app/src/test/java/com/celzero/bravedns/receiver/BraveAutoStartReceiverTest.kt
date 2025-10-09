@@ -16,11 +16,13 @@
 
 package com.celzero.bravedns.receiver
 
-import android.content.Context
 import android.content.Intent
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
 
 /**
  * Unit tests for BraveAutoStartReceiver
@@ -42,7 +44,8 @@ class BraveAutoStartReceiverTest {
             Intent.ACTION_BOOT_COMPLETED,
             Intent.ACTION_REBOOT,
             "android.intent.action.LOCKED_BOOT_COMPLETED",
-            Intent.ACTION_USER_UNLOCKED
+            Intent.ACTION_USER_UNLOCKED,
+            Intent.ACTION_MY_PACKAGE_REPLACED
         )
         
         supportedActions.forEach { action ->
@@ -58,6 +61,7 @@ class BraveAutoStartReceiverTest {
         assertEquals("ACTION_BOOT_COMPLETED constant", "android.intent.action.BOOT_COMPLETED", Intent.ACTION_BOOT_COMPLETED)
         assertEquals("ACTION_REBOOT constant", "android.intent.action.REBOOT", Intent.ACTION_REBOOT)
         assertEquals("ACTION_USER_UNLOCKED constant", "android.intent.action.USER_UNLOCKED", Intent.ACTION_USER_UNLOCKED)
+        assertEquals("ACTION_MY_PACKAGE_REPLACED constant", "android.intent.action.MY_PACKAGE_REPLACED", Intent.ACTION_MY_PACKAGE_REPLACED)
     }
 
     @Test
@@ -107,7 +111,8 @@ class BraveAutoStartReceiverTest {
         val expectedActions = mapOf(
             "android.intent.action.BOOT_COMPLETED" to Intent.ACTION_BOOT_COMPLETED,
             "android.intent.action.REBOOT" to Intent.ACTION_REBOOT,
-            "android.intent.action.USER_UNLOCKED" to Intent.ACTION_USER_UNLOCKED
+            "android.intent.action.USER_UNLOCKED" to Intent.ACTION_USER_UNLOCKED,
+            "android.intent.action.MY_PACKAGE_REPLACED" to Intent.ACTION_MY_PACKAGE_REPLACED
         )
         
         expectedActions.forEach { (expectedValue, constant) ->

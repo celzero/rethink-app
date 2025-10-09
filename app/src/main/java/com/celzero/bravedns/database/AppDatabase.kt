@@ -53,7 +53,7 @@ import com.celzero.bravedns.util.Constants
         SubscriptionStatus::class,
         SubscriptionStateHistory::class
     ],
-    version = 25,
+    version = 26,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -99,6 +99,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_22_23)
                 .addMigrations(MIGRATION_23_24)
                 .addMigrations(MIGRATION_24_25)
+                .addMigrations(MIGRATION_25_26)
                 .build()
 
         private val roomCallback: Callback =
@@ -1054,6 +1055,23 @@ abstract class AppDatabase : RoomDatabase() {
                             reason TEXT)
                          """.trimIndent()
                     )
+                }
+            }
+
+        private val MIGRATION_25_26: Migration =
+            object : Migration(25, 26) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    try {
+                        db.execSQL("ALTER TABLE WgConfigFiles ADD COLUMN ssidEnabled INTEGER NOT NULL DEFAULT 0")
+                    } catch (e: Exception) {
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: ssidEnabled already exists")
+                    }
+                    try {
+                        db.execSQL("ALTER TABLE WgConfigFiles ADD COLUMN ssids TEXT NOT NULL DEFAULT ''")
+                    } catch (e: Exception) {
+                        Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: ssids already exists")
+                    }
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: added ssidEnabled & ssids columns")
                 }
             }
 

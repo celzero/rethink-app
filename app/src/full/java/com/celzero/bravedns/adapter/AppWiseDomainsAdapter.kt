@@ -181,7 +181,7 @@ class AppWiseDomainsAdapter(
                 .setMessage(context.getString(R.string.close_conns_dialog_desc, appConn.ipAddress))
                 .setPositiveButton(R.string.lbl_proceed) { _, _ ->
                     // close the connection
-                    VpnController.closeConnectionsByUidDomain(appConn.uid, appConn.ipAddress)
+                    VpnController.closeConnectionsByUidDomain(appConn.uid, appConn.ipAddress, "app-wise-domains-manual-close")
                     Logger.i(
                         LOG_TAG_UI,
                         "$TAG closed connection for uid: ${appConn.uid}, domain: ${appConn.appOrDnsName}"
@@ -240,7 +240,8 @@ class AppWiseDomainsAdapter(
                 b.progress.visibility = View.GONE
                 return
             }
-            val status = DomainRulesManager.getDomainRule(conn.appOrDnsName, uid)
+            val status = DomainRulesManager.status(conn.appOrDnsName, uid)
+            Logger.vv(LOG_TAG_UI, "$TAG domain: ${conn.appOrDnsName}, status: $status")
             when (status) {
                 DomainRulesManager.Status.NONE -> {
                     b.progress.setIndicatorColor(

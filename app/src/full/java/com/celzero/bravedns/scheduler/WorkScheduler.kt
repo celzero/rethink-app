@@ -20,23 +20,18 @@ import Logger
 import Logger.LOG_TAG_SCHEDULER
 import android.content.Context
 import androidx.work.BackoffPolicy
-import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.util.Utilities
 import com.google.common.util.concurrent.ListenableFuture
-import java.util.UUID
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
-import kotlin.collections.remove
 
 class WorkScheduler(val context: Context) {
     companion object {
@@ -222,7 +217,7 @@ class WorkScheduler(val context: Context) {
         WorkManager.getInstance(context.applicationContext)
             .enqueueUniquePeriodicWork(
                 DATA_USAGE_JOB_TAG,
-                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                ExistingPeriodicWorkPolicy.REPLACE,
                 workRequest
             )
     }

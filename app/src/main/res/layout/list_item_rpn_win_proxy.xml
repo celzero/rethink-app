@@ -43,7 +43,7 @@
                 android:layout_toEndOf="@id/rwp_flag"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/rwp_cc_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/rwp_names_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/rwp_addr_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -43,6 +43,7 @@ import com.celzero.bravedns.ui.bottomsheet.ConnTrackerBottomSheet
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.Protocol
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getDefaultIcon
@@ -233,9 +234,16 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 // hint red when blocked
                 isBlocked -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
-                    b.connectionStatusIndicator.setBackgroundColor(
-                        ContextCompat.getColor(context, R.color.colorRed_A400)
-                    )
+                    val isError = FirewallRuleset.isError(ruleName)
+                    if (isError) {
+                        b.connectionStatusIndicator.setBackgroundColor(
+                            UIUtils.fetchColor(context, R.attr.chipTextNeutral)
+                        )
+                    } else {
+                        b.connectionStatusIndicator.setBackgroundColor(
+                            ContextCompat.getColor(context, R.color.colorRed_A400)
+                        )
+                    }
                 }
                 // hint white when whitelisted
                 (FirewallRuleset.shouldShowHint(ruleName)) -> {

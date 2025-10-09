@@ -13,7 +13,7 @@
         android:animateLayoutChanges="true"
         android:minHeight="50dp">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/acd_flag"
             android:layout_width="32dp"
             android:layout_height="32dp"
@@ -43,7 +43,7 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/acd_domain"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
@@ -81,7 +81,7 @@
 
         </LinearLayout>
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/acd_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -115,7 +115,7 @@
 
     </RelativeLayout>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="match_parent"
         android:layout_height="0.75dp"
         android:layout_marginTop="3dp"

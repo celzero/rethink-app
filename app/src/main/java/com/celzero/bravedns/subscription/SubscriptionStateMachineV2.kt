@@ -14,8 +14,24 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.subscription
-
+/*
+import Logger.LOG_IAB
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.Purchase
+import com.celzero.bravedns.database.SubscriptionStatus
+import com.celzero.bravedns.database.SubscriptionStatusRepository
+import com.celzero.bravedns.iab.PurchaseDetail
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Utilities
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 /**
  * Subscription State Machine using the framework
@@ -23,7 +39,7 @@ import org.koin.core.component.KoinComponent
  * for managing subscription states with proper error handling and RPN integration
  */
 class SubscriptionStateMachineV2 : KoinComponent {
-/*
+
     private val subscriptionDb by inject<SubscriptionStatusRepository>()
     private val dbSyncService: StateMachineDatabaseSyncService by inject()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -210,7 +226,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
                     action = { _, data -> handleSubscriptionExpired(data as? SubscriptionData) }
                 )
 
-                *//*addTransition(
+                /*addTransition(
                     fromState = SubscriptionState.Cancelled,
                     event = SubscriptionEvent.PaymentSuccessful(createDummyPurchaseDetail()),
                     toState = SubscriptionState.Active,
@@ -219,7 +235,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
                         val paymentEvent = event as SubscriptionEvent.PaymentSuccessful
                         handlePaymentSuccessful(paymentEvent.purchaseDetail)
                     }
-                )*//*
+                )*/
 
                 addTransition(
                     fromState = SubscriptionState.Cancelled,
@@ -557,7 +573,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
             Logger.i(LOG_IAB, "$TAG: ***Initializing subscription state machine***")
 
             // Load state from database
-            *//*val dbStateInfo = dbSyncService.loadStateFromDatabase()
+            /*val dbStateInfo = dbSyncService.loadStateFromDatabase()
             Logger.i(LOG_IAB, "$TAG: Loaded state from database: $dbStateInfo")
             if (dbStateInfo != null) {
                 Logger.d(LOG_IAB, "$TAG: Found database state: ${dbStateInfo.recommendedState.name} for subscription: ${dbStateInfo.currentSubscription.productId}")
@@ -574,7 +590,7 @@ class SubscriptionStateMachineV2 : KoinComponent {
                 Logger.d(LOG_IAB, "$TAG: No existing subscription data found in database - staying in Initial state")
                 // Transition from Uninitialized to Initial
                 stateMachine.directTransitionTo(SubscriptionState.Initial)
-            }*//*
+            }*/
         } catch (e: Exception) {
             Logger.e(LOG_IAB, "$TAG: Error during initialization: ${e.message}", e)
             // Continue with initial state on error
@@ -1039,9 +1055,9 @@ class SubscriptionStateMachineV2 : KoinComponent {
         }
     }
 
-    *//**
+    /**
      * Get current subscription status - prevents duplicate creation
-     *//*
+     */
     private suspend fun getCurrentSubscriptionStatus(purchaseDetail: PurchaseDetail): SubscriptionStatus? {
         return try {
             // First try by purchase token
@@ -1156,5 +1172,6 @@ class SubscriptionStateMachineV2 : KoinComponent {
 
     private fun io(f: suspend () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch { f() }
-    }*/
+    }
 }
+*/

@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:paddingBottom="30dp">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/recycler_dns_crypt_servers_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
             android:textSize="@dimen/extra_large_font_text_view"
             android:visibility="visible" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/add_relay_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

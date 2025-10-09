@@ -44,7 +44,7 @@ class DnsCryptEndpoint {
         id: Int,
         dnsCryptName: String,
         dnsCryptURL: String,
-        dnsCryptExplanation: String,
+        dnsCryptExplanation: String?,
         isSelected: Boolean,
         isCustom: Boolean,
         modifiedDataTime: Long,

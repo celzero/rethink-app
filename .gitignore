@@ -27,3 +27,4 @@ app/src/headless/assets
 /platforms
 /tools
 /.kotlin/sessions
+app/google-services.json

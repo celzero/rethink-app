@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:paddingBottom="40dp">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="60dp"
         android:layout_height="3dp"
         android:layout_gravity="center"

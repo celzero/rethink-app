@@ -1,9 +1,9 @@
 package com.celzero.bravedns.iab
-
+/*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-/*object Result {
+object Result {
     private var RESULT_STATE = ResultState.NONE
 
     private var _resultState = MutableStateFlow(ResultState.NONE)

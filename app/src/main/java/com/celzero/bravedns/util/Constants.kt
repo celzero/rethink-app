@@ -216,6 +216,8 @@ class Constants {
         const val NOTIF_INTENT_EXTRA_NEW_APP_NAME = "NEW_APP" // new app install name
         const val NOTIF_INTENT_EXTRA_NEW_APP_VALUE =
             "NEW_APP_INSTALL_NOTIFY" // new app install value
+        const val NOTIF_WG_PERMISSION_NAME = "WG_PERMISSION" // wireguard permission name
+        const val NOTIF_WG_PERMISSION_VALUE = "WG_PERMISSION_NOTIFY" // wireguard permission
 
         // new app install intent extra name for uid. see RefreshDatabase#makeNewAppVpnIntent()
         const val NOTIF_INTENT_EXTRA_APP_UID = "NEW_APP_UID"
@@ -296,7 +298,8 @@ class Constants {
                 DefaultDnsServer(0, "System", "", "None"),
                 DefaultDnsServer(1, "Rethink", "https://zero.rethinkdns.com/dns-query", "DoH"),
                 DefaultDnsServer(2, "Google", "https://dns.google/dns-query", "DoH"),
-                DefaultDnsServer(3, "Cloudflare", "https://cloudflare-dns.com/dns-query", "DoH")
+                DefaultDnsServer(3, "Cloudflare", "https://cloudflare-dns.com/dns-query", "DoH"),
+                DefaultDnsServer(4, "Quad9", "https://dns.quad9.net/dns-query", "DoH")
             )
 
         // pcap folder name

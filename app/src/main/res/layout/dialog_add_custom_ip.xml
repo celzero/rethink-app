@@ -6,7 +6,7 @@
     android:background="?attr/background"
     android:padding="10dp">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/daci_ip_title"
         style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/daci_ip_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
             app:layout_constraintRight_toLeftOf="parent" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/daci_failure_text_view"
         style="@style/TextAppearance.AppCompat.Body1"
         android:layout_width="match_parent"

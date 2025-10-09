@@ -1,4 +1,5 @@
 package com.celzero.bravedns.iab
+/*
 
 data class PurchaseDetail(
     val productId: String,
@@ -16,3 +17,4 @@ data class PurchaseDetail(
     val expiryTime: Long,
     val status: Int
 )
+*/

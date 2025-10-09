@@ -23,7 +23,23 @@ import org.koin.core.component.inject
 
 object Logger : KoinComponent {
     private val persistentState by inject<PersistentState>()
-    private var logLevel = persistentState.goLoggerLevel
+
+    private var _logLevel: Long? = null
+    private var logLevel: Long
+        get() {
+            if (_logLevel == null) {
+                _logLevel = try {
+                    persistentState.goLoggerLevel
+                } catch (e: Exception) {
+                    // Fallback for tests or when Koin is not initialized
+                    LoggerLevel.ERROR.id
+                }
+            }
+            return _logLevel!!
+        }
+        set(value) {
+            _logLevel = value
+        }
 
     var uiLogLevel = LoggerLevel.ERROR.id
 
@@ -45,6 +61,8 @@ object Logger : KoinComponent {
     const val LOG_GO_LOGGER = "GoLog"
     const val LOG_TAG_APP_OPS = "AppOpsService"
     const val LOG_IAB = "InAppBilling"
+    const val LOG_FIREBASE = "FirebaseErrorReporting"
+    const val LOG_TAG_APP = "ExceptionHandler"
 
     // github.com/celzero/firestack/blob/bce8de917f/intra/log/logger.go#L76
     enum class LoggerLevel(val id: Long) {

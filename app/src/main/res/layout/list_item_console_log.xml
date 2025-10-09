@@ -14,7 +14,7 @@
         android:padding="5dp"
         android:visibility="visible">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/log_timestamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/default_font_text_view" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/log_detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

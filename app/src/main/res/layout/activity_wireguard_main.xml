@@ -72,7 +72,7 @@
             app:cornerRadius="16dp" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/wg_wireguard_disclaimer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

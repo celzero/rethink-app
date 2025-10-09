@@ -45,6 +45,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.battery.BatteryStatsProvider
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogViewLogsBinding
@@ -134,6 +135,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppTranslate.setOnClickListener(this)
         b.aboutStats.setOnClickListener(this)
         b.aboutDbStats.setOnClickListener(this)
+        b.aboutBatteryStats.setOnClickListener(this)
     }
 
     private fun updateVersionInfo() {
@@ -298,121 +300,13 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutDbStats -> {
                 openDatabaseDumpDialog()
             }
+            b.aboutBatteryStats -> {
+                openBatteryStatsDialog()
+            }
             else -> {
                 Logger.w(LOG_TAG_UI, "unknown view clicked: ${view?.id}")
             }
         }
-    }
-
-    private fun openDatabaseDumpDialog() {
-        io {
-            val dump = buildDatabaseDump()
-            uiCtx {
-                if (!isAdded) return@uiCtx
-                val tv = android.widget.TextView(requireContext())
-                val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
-                tv.setPadding(pad, pad, pad, pad)
-                tv.text = dump
-                tv.setTextIsSelectable(true)
-                tv.typeface = android.graphics.Typeface.MONOSPACE
-                val scroll = android.widget.ScrollView(requireContext())
-                scroll.addView(tv)
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(getString(R.string.title_database_dump))
-                    .setView(scroll)
-                    .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
-                    .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
-                        copyToClipboard("db_dump", dump)
-                        showToastUiCentered(requireContext(), getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
-                    }
-                    .show()
-            }
-        }
-    }
-
-    private fun copyToClipboard(label: String, text: String): ClipboardManager? {
-        val cb = ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
-        cb?.setPrimaryClip(ClipData.newPlainText(label, text))
-        return cb
-    }
-
-    private fun buildDatabaseDump(): String {
-        val db = appDatabase.openHelper.readableDatabase
-        val cursor = db.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")
-        val tablesToSkip = setOf(
-            "android_metadata", // system table
-            "sqlite_sequence", // auto-increment table
-            "room_master_table", // room db table
-            "TcpProxyEndpoint",
-            "RpnProxy",
-            "SubscriptionStatus",
-            "SubscriptionStatusHistory"
-        )
-        val tables = mutableListOf<String>()
-        cursor.use {
-            while (it.moveToNext()) {
-                tables.add(it.getString(0))
-            }
-        }
-        val sb = StringBuilder()
-        val maxRowsPerTable = 500 // safety limit
-        tables.forEach { table ->
-            if (table in tablesToSkip) return@forEach
-            try {
-                sb.append("\n===== TABLE: ").append(table).append(" =====\n")
-                // get column names
-                val pragma = db.query("PRAGMA table_info($table)")
-                val columns = mutableListOf<String>()
-                pragma.use { p ->
-                    while (p.moveToNext()) {
-                        columns.add(p.getString(p.getColumnIndexOrThrow("name")))
-                    }
-                }
-                sb.append(columns.joinToString(separator = " | ")).append('\n')
-                val dataCursor = db.query("SELECT * FROM $table LIMIT $maxRowsPerTable")
-                var rowCount = 0
-                dataCursor.use { dc ->
-                    while (dc.moveToNext()) {
-                        val row = buildString {
-                            columns.forEachIndexed { idx, col ->
-                                if (idx > 0) append(" | ")
-                                val colIndex = dc.getColumnIndex(col)
-                                if (colIndex >= 0) {
-                                    when (dc.getType(colIndex)) {
-                                        android.database.Cursor.FIELD_TYPE_NULL -> append("NULL")
-                                        android.database.Cursor.FIELD_TYPE_INTEGER -> append(dc.getLong(colIndex))
-                                        android.database.Cursor.FIELD_TYPE_FLOAT -> append(dc.getDouble(colIndex))
-                                        android.database.Cursor.FIELD_TYPE_STRING -> {
-                                            var v = dc.getString(colIndex)
-                                            if (v.length > 200) {
-                                                v = v.substring(0, 200) + "…"
-                                            }
-                                            append(v.replace('\n', ' '))
-                                        }
-                                        android.database.Cursor.FIELD_TYPE_BLOB -> append("<BLOB>")
-                                        else -> append("?")
-                                    }
-                                } else append("?")
-                            }
-                        }
-                        sb.append(row).append('\n')
-                        rowCount++
-                    }
-                }
-                // count total rows
-                val countCursor = db.query("SELECT COUNT(1) FROM $table")
-                var total = rowCount
-                countCursor.use { cc -> if (cc.moveToFirst()) total = cc.getInt(0) }
-                if (total > rowCount) {
-                    sb.append("[shown ").append(rowCount).append(" of ").append(total).append(" rows]\n")
-                } else {
-                    sb.append("[rows: ").append(total).append("]\n")
-                }
-            } catch (e: Exception) {
-                sb.append("Error dumping table ").append(table).append(": ").append(e.message).append('\n')
-            }
-        }
-        return sb.toString()
     }
 
     private fun openStatsDialog() {
@@ -448,8 +342,181 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                         )
                     }
                     .show()
-
             }
+        }
+    }
+
+    private fun copyToClipboard(label: String, text: String): ClipboardManager? {
+        val cb = ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
+        cb?.setPrimaryClip(ClipData.newPlainText(label, text))
+        return cb
+    }
+
+    private fun openDatabaseDumpDialog() {
+        io {
+            val tables = getDatabaseTables()
+            uiCtx {
+                if (!isAdded) return@uiCtx
+                if (tables.isEmpty()) {
+                    showToastUiCentered(requireContext(), getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                    return@uiCtx
+                }
+                val appended = mutableSetOf<String>()
+                val ctx = requireContext()
+                val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
+                val tv = android.widget.TextView(ctx)
+                tv.setPadding(pad, pad, pad, pad)
+                tv.text = "Select a table to load its dump"
+                tv.setTextIsSelectable(true)
+                tv.typeface = android.graphics.Typeface.MONOSPACE
+                val scroll = android.widget.ScrollView(ctx)
+                scroll.addView(tv)
+
+                val listView = android.widget.ListView(ctx)
+                val listHeight = (resources.displayMetrics.heightPixels * 0.30).toInt()
+                listView.layoutParams = android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                    listHeight
+                )
+                val adapter = android.widget.ArrayAdapter(ctx, android.R.layout.simple_list_item_1, tables)
+                listView.adapter = adapter
+
+                // load + append dump when a table is tapped
+                listView.onItemClickListener =
+                    android.widget.AdapterView.OnItemClickListener { _, _, position, _ ->
+                        val table = tables[position]
+                        if (appended.contains(table)) {
+                            showToastUiCentered(
+                                ctx,
+                                getString(R.string.config_add_success_toast),
+                                Toast.LENGTH_SHORT
+                            )
+                            return@OnItemClickListener
+                        }
+                        appended.add(table)
+                        tv.append("\nLoading $table ...\n")
+                        io {
+                            val dump = buildTableDump(table)
+                            uiCtx {
+                                if (!isAdded) return@uiCtx
+                                // replace the temporary loading line (not strictly necessary)
+                                tv.text = tv.text.toString().replace("Loading $table ...", "")
+                                tv.append("\n===== TABLE: $table =====\n")
+                                tv.append(dump)
+                            }
+                        }
+                    }
+
+                val container = android.widget.LinearLayout(ctx)
+                container.orientation = android.widget.LinearLayout.VERTICAL
+                container.addView(listView)
+                container.addView(scroll)
+
+                MaterialAlertDialogBuilder(ctx)
+                    .setTitle(getString(R.string.title_database_dump))
+                    .setView(container)
+                    .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
+                    .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
+                        copyToClipboard("db_dump", tv.text.toString())
+                        showToastUiCentered(
+                            ctx,
+                            getString(R.string.copied_clipboard),
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                    .show()
+            }
+        }
+    }
+
+    private fun getDatabaseTables(): List<String> {
+        val db = appDatabase.openHelper.readableDatabase
+        val cursor =
+            db.query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")
+        val tablesToSkip = setOf(
+            "android_metadata",
+            "sqlite_sequence",
+            "room_master_table",
+            "TcpProxyEndpoint",
+            "RpnProxy",
+            "SubscriptionStatus",
+            "SubscriptionStateHistory"
+        )
+        val tables = mutableListOf<String>()
+        cursor.use {
+            while (it.moveToNext()) {
+                val name = it.getString(0)
+                if (!tablesToSkip.contains(name)) tables.add(name)
+            }
+        }
+        return tables
+    }
+
+    private fun buildTableDump(table: String): String {
+        val db = appDatabase.openHelper.readableDatabase
+        val sb = StringBuilder()
+        return try {
+            val pragma = db.query("PRAGMA table_info($table)")
+            val columns = mutableListOf<String>()
+            pragma.use { p ->
+                while (p.moveToNext()) {
+                    val colNameIdx = p.getColumnIndexOrThrow("name")
+                    columns.add(p.getString(colNameIdx))
+                }
+            }
+            sb.append(columns.joinToString(" | ")).append('\n')
+            val maxRowsPerTable = 500
+            val dataCursor = db.query("SELECT * FROM $table LIMIT $maxRowsPerTable")
+            var rowCount = 0
+            dataCursor.use { dc ->
+                while (dc.moveToNext()) {
+                    val row = buildString {
+                        columns.forEachIndexed { idx, col ->
+                            if (idx > 0) append(" | ")
+                            val colIndex = dc.getColumnIndex(col)
+                            if (colIndex >= 0) {
+                                when (dc.getType(colIndex)) {
+                                    android.database.Cursor.FIELD_TYPE_NULL -> append("NULL")
+                                    android.database.Cursor.FIELD_TYPE_INTEGER -> append(
+                                        dc.getLong(
+                                            colIndex
+                                        )
+                                    )
+
+                                    android.database.Cursor.FIELD_TYPE_FLOAT -> append(
+                                        dc.getDouble(
+                                            colIndex
+                                        )
+                                    )
+
+                                    android.database.Cursor.FIELD_TYPE_STRING -> {
+                                        var v = dc.getString(colIndex)
+                                        if (v.length > 200) v = v.substring(0, 200) + "…"
+                                        append(v.replace('\n', ' '))
+                                    }
+
+                                    android.database.Cursor.FIELD_TYPE_BLOB -> append("<BLOB>")
+                                    else -> append("?")
+                                }
+                            } else append("?")
+                        }
+                    }
+                    sb.append(row).append('\n')
+                    rowCount++
+                }
+            }
+            val countCursor = db.query("SELECT COUNT(1) FROM $table")
+            var total = rowCount
+            countCursor.use { cc -> if (cc.moveToFirst()) total = cc.getInt(0) }
+            if (total > rowCount) {
+                sb.append("[shown ").append(rowCount).append(" of ").append(total)
+                    .append(" rows]\n")
+            } else {
+                sb.append("[rows: ").append(total).append("]\n")
+            }
+            sb.toString()
+        } catch (e: Exception) {
+            "Error dumping $table: ${e.message}\n"
         }
     }
 
@@ -499,14 +566,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
             .setTitle(title)
-            .setPositiveButton(getString(R.string.about_dialog_positive_button)) {
-                dialogInterface,
-                _ ->
+            .setPositiveButton(getString(R.string.about_dialog_positive_button)) { dialogInterface,
+                                                                                   _ ->
                 dialogInterface.dismiss()
             }
-            .setNeutralButton(getString(R.string.about_dialog_neutral_button)) {
-                _: DialogInterface,
-                _: Int ->
+            .setNeutralButton(getString(R.string.about_dialog_neutral_button)) { _: DialogInterface,
+                                                                                 _: Int ->
                 sendEmailIntent(requireContext())
             }
             .setCancelable(true)
@@ -518,7 +583,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun emailBugReport() {
         try {
             // get the rethink.tombstone file
-            val tombstoneFile:File? = EnhancedBugReport.getTombstoneZipFile(requireContext())
+            val tombstoneFile: File? = EnhancedBugReport.getTombstoneZipFile(requireContext())
 
             // get the bug_report.zip file
             val dir = requireContext().filesDir
@@ -674,7 +739,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                         break
                     }
                 }
-                Logger.d(LOG_TAG_UI, "bug report content size: ${inputString.length}, $zipPath, ${zipFile.size()}")
+                Logger.d(
+                    LOG_TAG_UI,
+                    "bug report content size: ${inputString.length}, $zipPath, ${zipFile.size()}"
+                )
                 uiCtx {
                     if (!isAdded) return@uiCtx
                     binding.info.visibility = View.VISIBLE
@@ -744,7 +812,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 workManager.pruneWork()
             } else if (
                 WorkInfo.State.CANCELLED == workInfo.state ||
-                    WorkInfo.State.FAILED == workInfo.state
+                WorkInfo.State.FAILED == workInfo.state
             ) {
                 onAppExitInfoFailure()
                 workManager.pruneWork()
@@ -778,7 +846,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         // refrain from calling promptCrashLogAction multiple times
         if (
             SystemClock.elapsedRealtime() - lastAppExitInfoDialogInvokeTime <
-                TimeUnit.SECONDS.toMillis(1L)
+            TimeUnit.SECONDS.toMillis(1L)
         ) {
             return
         }
@@ -794,5 +862,42 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
+    }
+
+    private fun openBatteryStatsDialog() {
+        val ctx = requireContext()
+        val textView = android.widget.TextView(ctx)
+        val pad = resources.getDimensionPixelSize(R.dimen.dots_margin_bottom)
+        textView.setPadding(pad, pad, pad, pad)
+        textView.typeface = android.graphics.Typeface.MONOSPACE
+        textView.setTextIsSelectable(true)
+        textView.text = "Loading battery stats…"
+
+        val scroll = android.widget.ScrollView(ctx)
+        scroll.addView(textView)
+
+        val dialog = MaterialAlertDialogBuilder(ctx)
+            .setTitle("Battery stats")
+            .setView(scroll)
+            .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
+            .setNeutralButton(R.string.dns_info_neutral) { _, _ ->
+                copyToClipboard("battery_stats", textView.text.toString())
+                showToastUiCentered(ctx, getString(R.string.copied_clipboard), Toast.LENGTH_SHORT)
+            }
+            .create()
+        dialog.show()
+
+        // load metrics async to avoid any UI jank
+        io {
+            val stats = BatteryStatsProvider.formattedStats()
+            uiCtx {
+                if (!isAdded) return@uiCtx
+                if (stats.isEmpty()) {
+                    textView.text = "No battery stats available"
+                    return@uiCtx
+                }
+                textView.text = stats
+            }
+        }
     }
 }

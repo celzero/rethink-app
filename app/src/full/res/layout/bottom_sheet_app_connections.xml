@@ -8,7 +8,7 @@
     android:orientation="vertical"
     android:paddingBottom="60dp">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="60dp"
         android:layout_height="3dp"
         android:layout_gravity="center"
@@ -39,7 +39,7 @@
             android:contentDescription="@string/apps_icon_content_desc"
             android:src="@drawable/default_app_icon" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bsac_app_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             android:textSize="@dimen/default_font_text_view" />
     </RelativeLayout>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/bsac_ip_rule_txt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -143,7 +143,7 @@
                 android:layout_toEndOf="@id/choose_proxy_icon"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/choose_proxy_txt"
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
@@ -152,7 +152,7 @@
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/choose_proxy_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -185,7 +185,7 @@
         android:orientation="vertical"
         android:padding="5dp">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bsac_domain_rule_txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -205,7 +205,7 @@
 
     </LinearLayout>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/bsac_desc"
         style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"

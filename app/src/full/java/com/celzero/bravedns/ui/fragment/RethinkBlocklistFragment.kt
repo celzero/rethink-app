@@ -323,8 +323,17 @@ class RethinkBlocklistFragment :
         }
 
         b.lbBlocklistCancelBtn.setOnClickListener {
-            // close the activity associated with the fragment
-            requireActivity().finish()
+            // close the activity associated with the fragment after reverting to old stamp
+            io {
+                val stamp = getStamp()
+                val list = RethinkBlocklistManager.getTagsFromStamp(stamp, type)
+                updateSelectedFileTags(list.toMutableSet())
+                setStamp(stamp)
+                Logger.i(LOG_TAG_UI, "revert to old stamp for blocklist type: ${type.name}, $stamp, $list")
+                uiCtx {
+                    requireActivity().finish()
+                }
+            }
         }
 
         b.lbListToggleGroup.addOnButtonCheckedListener(listViewToggleListener)
@@ -578,10 +587,12 @@ class RethinkBlocklistFragment :
         }
 
         if (type.isLocal()) {
+            RethinkBlocklistManager.clearTagsSelectionLocal()
             RethinkBlocklistManager.updateFiletagsLocal(selectedTags, 1 /* isSelected: true */)
             val list = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
             updateFileTagList(list)
         } else {
+            RethinkBlocklistManager.clearTagsSelectionRemote()
             RethinkBlocklistManager.updateFiletagsRemote(selectedTags, 1 /* isSelected: true */)
             val list = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
             updateFileTagList(list)

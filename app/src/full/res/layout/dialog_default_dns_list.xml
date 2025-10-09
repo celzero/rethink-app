@@ -6,7 +6,7 @@
     android:background="?attr/background"
     android:padding="20dp">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/default_dns_dialog_heading"
         style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"
