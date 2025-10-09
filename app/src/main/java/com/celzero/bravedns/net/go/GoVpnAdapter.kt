@@ -59,6 +59,7 @@ import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_MAX
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_SKY
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
+import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.blocklistDir
@@ -161,6 +162,7 @@ class GoVpnAdapter : KoinComponent {
         undelegatedDomains()
         setExperimentalSettings()
         setAutoDialsParallel()
+        setHappyEyeballs()
         // added for testing, use if needed
         if (DEBUG) panicAtRandom(false) else panicAtRandom(false)
         Logger.v(LOG_TAG_VPN, "$TAG initResolverProxiesPcap done")
@@ -2073,7 +2075,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun setHappyEyeballs(value: Boolean = false) {
+    suspend fun setHappyEyeballs(value: Boolean = InternetProtocol.isAlwaysV46(persistentState.internetProtocolType)) {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip happy eyeballs setting")
             return
