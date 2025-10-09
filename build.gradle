@@ -34,8 +34,8 @@ allprojects {
                 name = 'GitHubPackages'
                 url = uri("https://maven.pkg.github.com/celzero/firestack")
                 credentials {
-                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME_GITHUB")
-                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN_GITHUB")
+                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME_GITHUB") ?: System.getenv("GITHUB_ACTOR") ?: ""
+                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN_GITHUB") ?: System.getenv("GITHUB_TOKEN") ?: ""
                 }
             }
         } else {
