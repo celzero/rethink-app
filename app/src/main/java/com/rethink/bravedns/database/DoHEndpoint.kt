@@ -28,7 +28,7 @@ class DoHEndpoint {
     var dohExplanation: String = ""
     var isSelected: Boolean = true
     var isCustom: Boolean = true
-    var isSecure: Boolean = true
+    @ColumnInfo(name = "isSecure", defaultValue = "1") val isSecure: Boolean = true
     var modifiedDataTime: Long = INIT_TIME_MS
     var latency: Int = 0
 
