@@ -1082,6 +1082,46 @@ abstract class AppDatabase : RoomDatabase() {
                     db.execSQL("UPDATE DNSProxyEndpoint SET proxyAppName = '' WHERE proxyAppName IS NULL")
                     db.execSQL("UPDATE DNSProxyEndpoint SET proxyIP = '' WHERE proxyIP IS NULL")
                     
+                    db.execSQL(
+                        """
+                        CREATE TABLE DoHEndpoint_backup (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                            dohName TEXT NOT NULL,
+                            dohURL TEXT NOT NULL,
+                            dohExplanation TEXT NOT NULL DEFAULT '',
+                            isSelected INTEGER NOT NULL,
+                            isCustom INTEGER NOT NULL,
+                            modifiedDataTime INTEGER NOT NULL DEFAULT 0,
+                            latency INTEGER NOT NULL,
+                            isSecure INTEGER NOT NULL DEFAULT 1
+                        )
+                        """.trimIndent()
+                     )
+                    // Копируем данные, заменяя NULL в dohExplanation на ''
+                    db.execSQL(
+                        """
+                        INSERT INTO DoHEndpoint_backup (
+                            id, dohName, dohURL, dohExplanation, isSelected, isCustom, modifiedDataTime, latency, isSecure
+                        )
+                        SELECT 
+                            id, 
+                            dohName, 
+                            dohURL, 
+                            COALESCE(dohExplanation, '') AS dohExplanation, 
+                            isSelected, 
+                            isCustom, 
+                            modifiedDataTime, 
+                            latency, 
+                            isSecure
+                        FROM DoHEndpoint
+                        """.trimIndent()
+                    )
+                    // Удаляем старую таблицу
+                    db.execSQL("DROP TABLE DoHEndpoint")
+                    // Переименовываем временную таблицу
+                    db.execSQL("ALTER TABLE DoHEndpoint_backup RENAME TO DoHEndpoint")
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_26_27: Updated DoHEndpoint schema to make dohExplanation NOT NULL with default ''")
+                    
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: Updated ProxyEndpoint, DNSCryptEndpoint, DNSCryptRelayEndpoint, DNSProxyEndpoint, DoHEndpoint, DoTEndpoint, ODoHEndpoint to replace NULL with empty strings")
     
                 }
