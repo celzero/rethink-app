@@ -203,12 +203,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: nightly-${{ github.run_number }}-${{ github.sha }}
+          tag_name: nightly-${{ github.run_number }}
           release_name: Nightly Release ${{ github.run_number }}
           draft: false
           prerelease: true
           body: |
-            Nightly build for arm64-v8a
+            Nightly build RetninkDNS Retrixed
             - Commit: ${{ github.sha }}
             - Version: ${{ github.run_number }}
             - Built on: ${{ github.event.repository.updated_at }}
