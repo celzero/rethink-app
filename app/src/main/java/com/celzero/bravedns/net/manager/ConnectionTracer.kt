@@ -2,7 +2,6 @@ package com.celzero.bravedns.net.manager
 
 import Logger
 import Logger.LOG_TAG_VPN
-import android.annotation.TargetApi
 import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Build
@@ -38,19 +37,26 @@ class ConnectionTracer(ctx: Context) {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     suspend fun getUidQ(
-        proto: Int,
-        sourceIp: String,
-        sourcePort: Int,
-        destIp: String,
-        destPort: Int,
+        protocol: Int,
+        srcIp: String,
+        srcPort: Int,
+        dstIp: String,
+        dstPort: Int,
         retryCount: Int = 0
     ): Int {
         var uid = Constants.INVALID_UID
-        var protocol = proto
 
         when (protocol) {
             Protocol.ICMP.protocolType,
-            Protocol.ICMPV6.protocolType -> protocol = Protocol.UDP.protocolType
+            Protocol.ICMPV6.protocolType -> {
+                // workaround for ICMP/ICMPv6
+                // commenting this out as the workaround is not working as expected
+                // revisit if a better workaround is found
+                /* protocol = Protocol.UDP.protocolType
+                updatedDstPort = 0
+                updatedSrcPort = 0 // sourcePort is 0 for ICMP/ICMPv6, still setting for clarity */
+                return uid
+            }
 
             Protocol.TCP.protocolType,
             Protocol.UDP.protocolType -> {
@@ -67,16 +73,16 @@ class ConnectionTracer(ctx: Context) {
         val remote: InetSocketAddress
         try {
             local =
-                if (TextUtils.isEmpty(sourceIp)) {
-                    InetSocketAddress(sourcePort)
+                if (TextUtils.isEmpty(srcIp)) {
+                    InetSocketAddress(srcPort)
                 } else {
-                    InetSocketAddress(sourceIp, sourcePort)
+                    InetSocketAddress(srcIp, srcPort)
                 }
             remote =
-                if (TextUtils.isEmpty(destIp)) {
-                    InetSocketAddress(destPort)
+                if (TextUtils.isEmpty(dstIp)) {
+                    InetSocketAddress(dstPort)
                 } else {
-                    InetSocketAddress(destIp, destPort)
+                    InetSocketAddress(dstIp, dstPort)
                 }
         } catch (ignored: IllegalArgumentException) {
             // InetSocketAddress throws IllegalArgumentException or SecurityException
@@ -88,13 +94,10 @@ class ConnectionTracer(ctx: Context) {
         }
         val key = makeCacheKey(protocol, local, remote)
         try {
+            Logger.v(LOG_TAG_VPN, "getUidQ: used $srcIp, $srcPort, $dstIp, $dstPort, proto: $protocol")
             // must be called from io thread to avoid the NetworkOnMainThreadException issue#853
             uid = cm.getConnectionOwnerUid(protocol, local, remote)
-
-            Logger.d(
-                LOG_TAG_VPN,
-                "getConnectionOwnerUid(): $uid, $key, ${uidCache.getIfPresent(key)}, ${local.address.hostAddress}, ${remote.address.hostAddress}"
-            )
+            Logger.d(LOG_TAG_VPN, "getUidQ: $uid, $key, ${uidCache.getIfPresent(key)}")
             if (uid != Constants.INVALID_UID) {
                 addUidToCache(key, uid)
                 return uid
@@ -109,31 +112,31 @@ class ConnectionTracer(ctx: Context) {
 
         if (retryCount >= 2) return uid
 
-        if (retryRequired(uid, protocol, destIp, key)) {
+        if (retryRequired(uid, protocol, dstIp, key)) {
             when (retryCount) {
                 0 -> {
                     // change the destination port to 0 and try again
                     val dport = 0
                     val retryCount = 1
-                    val res = getUidQ(protocol, sourceIp, sourcePort, destIp, dport, retryCount)
-                    Logger.d(LOG_TAG_VPN, "retrying with: $protocol, $sourceIp, $sourcePort, $destIp, $dport old($destIp, $destPort), res: $res")
+                    val res = getUidQ(protocol, srcIp, srcPort, dstIp, dport, retryCount)
+                    Logger.d(LOG_TAG_VPN, "getUidQ retrying(1st) with: $protocol, $srcIp, $srcPort, $dstIp, $dport, res: $res old($dstPort)")
                     return res
                 }
                 1 -> {
                     // change the destination IP to unspecified IP and try again for unconnected UDP
-                    val dip = if (IPAddressString(destIp).isIPv6) {
+                    val dip = if (IPAddressString(dstIp).isIPv6) {
                         Constants.UNSPECIFIED_IP_IPV6
                     } else {
                         Constants.UNSPECIFIED_IP_IPV4
                     }
                     val dport = 0
                     val retryCount = 2
-                    val res = getUidQ(protocol, sourceIp, sourcePort, dip, dport, retryCount)
-                    Logger.d(LOG_TAG_VPN, "retrying with: $protocol, $sourceIp, $sourcePort, $dip, $dport old($destIp, $destPort), res: $res")
+                    val res = getUidQ(protocol, srcIp, srcPort, dip, dport, retryCount)
+                    Logger.d(LOG_TAG_VPN, "getUidQ retrying(2nd) with: $protocol, $srcIp, $srcPort, $dip, $dport, old($dstIp, $dstPort), res: $res")
                     return res
                 }
                 else -> {
-                    Logger.w(LOG_TAG_VPN, "retryRequired but retryCount ($retryCount) is not a handled case.")
+                    Logger.w(LOG_TAG_VPN, "getUidQ: retryRequired but retryCount ($retryCount) is not a handled case.")
                     return uid
                 }
             }
@@ -141,6 +144,7 @@ class ConnectionTracer(ctx: Context) {
 
         // If the uid is not in connectivity manager, then return the uid from cache.
         uid = uidCache.getIfPresent(key) ?: Constants.INVALID_UID
+        Logger.v(LOG_TAG_VPN, "getUidQ: returning from cache: $uid, $key")
         return uid
     }
 
@@ -166,7 +170,7 @@ class ConnectionTracer(ctx: Context) {
         // do not cache the DNS request (key: 17|10.111.222.1|10.111.222.3|53)
         if (key == DNS_KEY) return
 
-        Logger.d(LOG_TAG_VPN, "getConnectionOwnerUid(): $uid, $key")
+        Logger.d(LOG_TAG_VPN, "getUidQ; cache put: $uid, $key")
         uidCache.put(key, uid)
     }
 
