@@ -1042,7 +1042,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         // prompt user to disable battery optimization and restrict background data
-        if (isRestrictBackgroundActive(requireContext()) && batteryOptimizationActive(requireContext()) && !isVpnActivated) {
+        // disabled the battery optimization check as its confusing for users
+        if (false && isRestrictBackgroundActive(requireContext()) && batteryOptimizationActive(requireContext()) && !isVpnActivated) {
             showBatteryOptimizationDialog()
         }
 
