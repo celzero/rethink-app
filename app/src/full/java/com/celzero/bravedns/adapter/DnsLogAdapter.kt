@@ -191,7 +191,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                         b.dnsUnicodeHint.text,
                         context.getString(R.string.symbol_bunny)
                     )
-            } else if (isConnectionProxied(log.resolver)) {
+            } else if (isConnectionProxied(log.proxyId)) {
                 b.dnsUnicodeHint.text =
                     context.getString(
                         R.string.ci_desc,
@@ -233,11 +233,43 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                     )
             }
 
+            if (dnssecIndicatorRequired(log)) {
+                if (dnssecOk(log)) {
+                    b.dnsUnicodeHint.text =
+                        context.getString(
+                            R.string.ci_desc,
+                            b.dnsUnicodeHint.text,
+                            context.getString(R.string.symbol_lock)
+                        )
+                } else {
+                    b.dnsUnicodeHint.text =
+                        context.getString(
+                            R.string.ci_desc,
+                            b.dnsUnicodeHint.text,
+                            context.getString(R.string.symbol_unlock)
+                        )
+                }
+            }
+
             if (b.dnsUnicodeHint.text.isEmpty() && b.dnsQueryType.text.isEmpty()) {
                 b.dnsSummaryLl.visibility = View.GONE
             } else {
                 b.dnsSummaryLl.visibility = View.VISIBLE
             }
+        }
+
+        private fun dnssecIndicatorRequired(log: DnsLog): Boolean {
+            // dnssec indicator is shown only for complete transactions
+            if (log.status != Transaction.Status.COMPLETE.name) {
+                return false
+            }
+
+            return log.dnssecOk || log.dnssecValid
+        }
+
+        private fun dnssecOk(log: DnsLog): Boolean {
+            // dnssec ok is true only when both dnssecOk and dnssecValid are true
+            return log.dnssecOk && log.dnssecValid
         }
 
         private fun isRoundTripShorter(rtt: Long, blocked: Boolean): Boolean {
