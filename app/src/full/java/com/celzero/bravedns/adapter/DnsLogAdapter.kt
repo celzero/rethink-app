@@ -283,7 +283,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
         private fun isConnectionProxied(proxy: String?): Boolean {
             if (proxy.isNullOrEmpty()) return false
 
-            return !ProxyManager.isNotLocalAndRpnProxy(proxy)
+            return ProxyManager.isNotLocalAndRpnProxy(proxy)
         }
 
         private fun containsMultipleIPs(log: DnsLog): Boolean {
