@@ -562,7 +562,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         if (recdUid != INVALID_UID) {
             return recdUid
         }
-        // caller: true - called from flow, false - called from inflow
         return if (VERSION.SDK_INT >= VERSION_CODES.Q) {
             ioAsync("getUidQ") { connTracer.getUidQ(protocol, srcIp, srcPort, dstIp, dstPort) }
                 .await()
@@ -4510,38 +4509,81 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return cm
     }
 
+    fun parseIpAndPort(endpoint: String?): Pair<String, Int> {
+        if (endpoint.isNullOrBlank()) return "" to 0
+
+        val trimmed = endpoint.trim()
+
+        // handle bracketed IPv6: [2001:db8::1]:443
+        if (trimmed.startsWith("[") && trimmed.contains("]")) {
+            val endBracket = trimmed.indexOf(']')
+            val ipPart = trimmed.substring(1, endBracket)
+            val portPart = trimmed.substring(endBracket + 1).removePrefix(":")
+            val port = portPart.toIntOrNull() ?: 0
+            return ipPart to port
+        }
+
+        // handle unbracketed IPv6 with port, e.g. 2001:db8::1:443
+        // we assume the last colon separates port, but IPv6 can contain many colons.
+        // so, only treat the last part as port if it's numeric.
+        val lastColonIndex = trimmed.lastIndexOf(':')
+        if (lastColonIndex > 0) {
+            val potentialPort = trimmed.substring(lastColonIndex + 1)
+            if (potentialPort.toIntOrNull() != null) {
+                val ipPart = trimmed.substring(0, lastColonIndex)
+                // avoid cutting an IPv6 without port (like 2001:db8::1)
+                val colonCount = ipPart.count { it == ':' }
+                val ip = if (colonCount >= 2) ipPart else trimmed
+                val port = if (colonCount >= 2) potentialPort.toIntOrNull() ?: 0 else 0
+                if (colonCount >= 2) return ip to port
+            }
+        }
+
+        // handle IPv4 or hostname with port, e.g. 10.0.0.1:53
+        val parts = trimmed.split(":")
+        if (parts.size == 2 && parts[1].toIntOrNull() != null) {
+            return parts[0] to (parts[1].toIntOrNull() ?: 0)
+        }
+
+        // use hostName parser for complex cases
+        return try {
+            val host = HostName(trimmed)
+            val ip = host.asAddress()?.toString() ?: trimmed
+            val port = host.port ?: 0
+            ip to port
+        } catch (_: Exception) {
+            trimmed to 0
+        }
+    }
+
+
     override fun preflow(
         protocol: Int,
         uid: Int,
         src: Gostr?,
         dst: Gostr?
     ): PreMark = go2kt(preflowDispatcher) {
-        val first = HostName(src.tos())
-        val second = HostName(dst.tos())
-
-        val srcIp = if (first.asAddress() == null) "" else first.asAddress().toString()
-        val srcPort = first.port ?: 0
-        val dstIp = if (second.asAddress() == null) "" else second.asAddress().toString()
-        val dstPort = second.port ?: 0
-
+        val srcIpPort = parseIpAndPort(src.tos())
+        val dstIpPort = parseIpAndPort(dst.tos())
+        Logger.d(LOG_TAG_VPN, "preflow - init: $uid, rcvd: $src & $dst, parsed: $srcIpPort & $dstIpPort")
         val newUid = if (uid == INVALID_UID) { // fetch uid only if it is invalid
             getUid(
                 uid,
                 protocol,
-                srcIp,
-                srcPort,
-                dstIp,
-                dstPort
+                srcIpPort.first,
+                srcIpPort.second,
+                dstIpPort.first,
+                dstIpPort.second
             )
         } else {
             uid
         }
-        Logger.d(LOG_TAG_VPN, "preflow: $newUid, $srcIp, $srcPort, $dstIp, $dstPort")
+        Logger.d(LOG_TAG_VPN, "preflow: $newUid, $srcIpPort, $dstIpPort")
 
         val p = PreMark()
         p.uid = newUid.toString()
         p.isUidSelf = newUid == rethinkUid
-        Logger.i(LOG_TAG_VPN, "preflow: returning ${p.uid} for src: $srcIp:$srcPort, dst: $dstIp:$dstPort, isRethink? ${p.isUidSelf}")
+        Logger.i(LOG_TAG_VPN, "preflow: returning ${p.uid} for src: $srcIpPort, dst: $dstIpPort, isRethink? ${p.isUidSelf}")
         return@go2kt p
     }
 
@@ -4549,26 +4591,25 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         protocol: Int,
         _uid: Int,
         src: Gostr?,
-        dest: Gostr?,
+        dst: Gostr?,
         realIps: Gostr?,
         d: Gostr?,
         possibleDomains: Gostr?,
         blocklists: Gostr?
     ): Mark = go2kt(flowDispatcher) {
-        logd("flow: $_uid, $src, $dest, $realIps, $d, $blocklists")
+        logd("flow: $_uid, $src, $dst, $realIps, $d, $blocklists")
         handleVpnLockdownStateAsync()
 
         // in case of double loopback, all traffic will be part of rinr instead of just rethink's
         // own traffic. flip the doubleLoopback flag to true if we need that behavior
         val doubleLoopback = false
 
-        val first = HostName(src.tos())
-        val second = HostName(dest.tos())
-
-        val srcIp = if (first.asAddress() == null) "" else first.asAddress().toString()
-        val srcPort = first.port ?: 0
-        val dstIp = if (second.asAddress() == null) "" else second.asAddress().toString()
-        val dstPort = second.port ?: 0
+        val srcIpPort = parseIpAndPort(src.tos())
+        val dstIpPort = parseIpAndPort(dst.tos())
+        val srcIp = srcIpPort.first
+        val srcPort = srcIpPort.second
+        val dstIp = dstIpPort.first
+        val dstPort = dstIpPort.second
 
         val ips = realIps.tos()?.split(",") ?: emptyList()
         // take the first non-unspecified ip as the real destination ip
@@ -4708,13 +4749,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     override fun inflow(protocol: Int, recvdUid: Int, src: Gostr?, dst: Gostr?): Mark =
         go2kt(inflowDispatcher) {
-            val first = HostName(src.tos())
-            val second = HostName(dst.tos())
-
-            val srcIp = if (first.asAddress() == null) "" else first.asAddress().toString()
-            val srcPort = first.port ?: 0
-            val dstIp = if (second.asAddress() == null) "" else second.asAddress().toString()
-            val dstPort = second.port ?: 0
+            val srcIpPort = parseIpAndPort(src.tos())
+            val dstIpPort = parseIpAndPort(dst.tos())
+            val srcIp = srcIpPort.first
+            val srcPort = srcIpPort.second
+            val dstIp = dstIpPort.first
+            val dstPort = dstIpPort.second
 
             var uid = getUid(
                 recvdUid,
@@ -4724,7 +4764,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 dstIp,
                 dstPort
             )
-            uid = FirewallManager.appId(recvdUid, isPrimaryUser())
+            uid = FirewallManager.appId(uid, isPrimaryUser())
             val userId = FirewallManager.userId(uid)
 
             logd("inflow: $uid($recvdUid), $srcIp, $srcPort, $dstIp, $dstPort")
