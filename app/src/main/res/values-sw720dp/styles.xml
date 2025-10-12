@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tablet-specific styles for screens 720dp and wider -->
+    
+    <!-- Bottom Navigation text styles for tablets -->
+    <style name="TabletBottomNavigationTextActive" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">@dimen/bottom_nav_text_size_active</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TabletBottomNavigationTextInactive" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">@dimen/bottom_nav_text_size_inactive</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <!-- Enhanced text appearance for tablets -->
+    <style name="TextAppearance.Heading.HomeScreen.Tablet" parent="TextAppearance.Heading.HomeScreen">
+        <item name="android:textSize">@dimen/rethink_header_text</item>
+        <item name="android:letterSpacing">0.15</item>
+    </style>
+
+    <!-- Tablet-optimized button styles -->
+    <style name="Button.HomeScreen.Main.Tablet" parent="Button.HomeScreen.Main">
+        <item name="android:textSize">@dimen/home_screen_stat_text</item>
+        <item name="android:paddingStart">@dimen/home_screen_button_padding</item>
+        <item name="android:paddingEnd">@dimen/home_screen_button_padding</item>
+        <item name="android:minHeight">@dimen/home_screen_button_height</item>
+    </style>
+
+    <!-- Enhanced card styles for tablets -->
+    <style name="CardView.Tablet" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="cardUseCompatPadding">true</item>
+    </style>
+
+</resources>

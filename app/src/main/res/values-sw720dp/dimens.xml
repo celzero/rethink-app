@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tablet-specific dimensions for screens 720dp and wider -->
+    
+    <!-- Layout dimensions -->
+    <dimen name="activity_horizontal_margin">32dp</dimen>
+    <dimen name="default_padding">24dp</dimen>
+    
+    <!-- Card and UI element sizes -->
+    <dimen name="home_screen_card_height">180dp</dimen>
+    <dimen name="home_screen_card_margin">20dp</dimen>
+    <dimen name="home_screen_side_margin">32dp</dimen>
+    
+    <!-- Text sizes optimized for tablets -->
+    <dimen name="small_font_text_view">12sp</dimen>
+    <dimen name="default_font_text_view">14sp</dimen>
+    <dimen name="large_font_text_view">16sp</dimen>
+    <dimen name="extra_large_font_text_view">18sp</dimen>
+    <dimen name="heading_font_text_view">20sp</dimen>
+    <dimen name="home_screen_stat_text">26sp</dimen>
+    <dimen name="rethink_header_text">28sp</dimen>
+    
+    <!-- Button and touch target sizes -->
+    <dimen name="home_screen_button_height">56dp</dimen>
+    <dimen name="home_screen_button_padding">24dp</dimen>
+    
+    <!-- Bottom sheet and dialog dimensions -->
+    <dimen name="bottom_sheet_corner_radius">20dp</dimen>
+    <dimen name="bottom_sheet_top_padding">16dp</dimen>
+    
+    <!-- Maximum width for dialogs and content on very wide screens -->
+    <dimen name="max_content_width">800dp</dimen>
+    
+    <!-- Navigation and spacing -->
+    <dimen name="home_screen_bottom_margin">120dp</dimen>
+    <dimen name="card_content_padding">20dp</dimen>
+    
+    <!-- Navigation specific sizes -->
+    <dimen name="bottom_nav_text_size_active">14sp</dimen>
+    <dimen name="bottom_nav_text_size_inactive">12sp</dimen>
+</resources>
