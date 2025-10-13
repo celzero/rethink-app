@@ -86,7 +86,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
             io {
                 val appNames: MutableList<String> = ArrayList()
                 appNames.add(getString(R.string.settings_app_list_default_app))
-                appNames.addAll(FirewallManager.getAllAppNames())
+                appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(requireContext()))
                 // fetch the count from repository and increment by 1 to show the
                 // next doh name in the dialog
                 val nextIndex = appConfig.getDnsProxyCount().plus(1)

@@ -194,12 +194,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 if (m?.isCustomSocks5() == true) {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    appNames.addAll(FirewallManager.getAllAppNames())
+                    appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(this@ProxySettingsActivity))
                     uiCtx { showSocks5ProxyDialog(endpoint, appNames, app) }
                 } else {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    appNames.addAll(FirewallManager.getAllAppNames())
+                    appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(this@ProxySettingsActivity))
                     uiCtx { showSocks5ProxyDialog(endpoint, appNames, app) }
                 }
             }
@@ -250,12 +250,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 if (m?.isCustomHttp() == true) {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    appNames.addAll(FirewallManager.getAllAppNames())
+                    appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(this@ProxySettingsActivity))
                     uiCtx { showHttpProxyDialog(endpoint, appNames, app?.appName) }
                 } else {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    appNames.addAll(FirewallManager.getAllAppNames())
+                    appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(this@ProxySettingsActivity))
                     uiCtx { showHttpProxyDialog(endpoint, appNames, app?.appName) }
                 }
             }

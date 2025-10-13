@@ -19,6 +19,9 @@ import Logger
 import Logger.LOG_TAG_FIREWALL
 import android.app.KeyguardManager
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfo
@@ -400,6 +403,52 @@ object FirewallManager : KoinComponent {
 
     suspend fun getAllAppNames(): List<String> {
         return getAppInfos().map { it.appName }.sortedBy { it.lowercase() }
+    }
+
+    suspend fun getAllAppNamesSortedByVpnPermission(context: Context): List<String> {
+        val appInfos = getAppInfos()
+        val packageManager = context.packageManager
+
+        // separate apps with and without VPN permission
+        val appsWithVpnPermission = mutableListOf<String>()
+        val appsWithoutVpnPermission = mutableListOf<String>()
+
+        appInfos.forEach { appInfo ->
+            if (appInfo.packageName == RETHINK_PACKAGE) {
+                // skip the app itself
+                return@forEach
+            }
+            val hasVpnPermission = try {
+                val packageInfo = packageManager.getPackageInfo(appInfo.packageName, PackageManager.GET_SERVICES)
+                packageInfo.isVpnRelatedApp(packageManager)
+            } catch (_: Exception) {
+                false
+            }
+
+            if (hasVpnPermission) {
+                appsWithVpnPermission.add(appInfo.appName)
+            } else {
+                appsWithoutVpnPermission.add(appInfo.appName)
+            }
+        }
+
+        // sort each group alphabetically and combine with the list of apps
+        return appsWithVpnPermission.sortedBy { it.lowercase() } +
+               appsWithoutVpnPermission.sortedBy { it.lowercase() }
+    }
+
+    private fun PackageInfo.isVpnRelatedApp(pm: PackageManager): Boolean {
+        val vpnServiceStr = "android.net.VpnService"
+        val hasVpnService = services?.any {
+            it.permission == android.Manifest.permission.BIND_VPN_SERVICE
+        } ?: false
+
+        val hasVpnIntent = pm.queryIntentServices(
+            Intent(vpnServiceStr).apply { `package` = packageName },
+            PackageManager.MATCH_ALL
+        ).isNotEmpty()
+
+        return hasVpnService || hasVpnIntent
     }
 
     suspend fun getAppNameByUid(uid: Int): String? {
