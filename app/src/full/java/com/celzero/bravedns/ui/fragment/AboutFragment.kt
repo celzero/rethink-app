@@ -45,6 +45,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.battery.BatteryStatsProvider
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
@@ -898,6 +899,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 }
                 textView.text = stats
             }
+        }
+        if (!DEBUG) return
+        io {
+            VpnController.performFlightRecording()
         }
     }
 }

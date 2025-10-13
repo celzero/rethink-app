@@ -90,6 +90,8 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import com.celzero.firestack.settings.Settings
+import kotlinx.coroutines.delay
+import java.io.File
 import java.net.URI
 import java.net.URLEncoder
 import kotlin.text.substring
@@ -2276,7 +2278,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.i(LOG_TAG_VPN, "$TAG auto connectivity check, id($id) for mode($mode): $res")
             return res
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG err; auto connectivity check: ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "$TAG err; auto connectivity check: ${e.message}")
         }
         return false
     }
@@ -2299,6 +2301,32 @@ class GoVpnAdapter : KoinComponent {
             Logger.i(LOG_TAG_VPN, "$TAG panic at random: $shouldPanic")
         } catch (e: Exception) {
             Logger.i(LOG_TAG_VPN, "$TAG err panic at random: ${e.message}")
+        }
+    }
+
+    suspend fun performFlightRecording() {
+        if (!DEBUG) return
+        if (!tunnel.isConnected) {
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip start flight recorder")
+            return
+        }
+
+        try {
+            Intra.flightRecorder(true)
+            // 10 secs delay before stopping the flight recorder
+            delay(10 * 1000L)
+            val logs = Intra.printFlightRecord(true)
+            // write the logs to a file
+            val fileName = "fltrcdr_${System.currentTimeMillis()}.pprof"
+            val path = context.filesDir.toString() + "/" + "flightrecorder" + "/" + fileName
+            val file = File(path)
+            file.parentFile?.mkdirs()
+            Utilities.writeToFile(file, logs)
+            Logger.i(LOG_TAG_VPN, "$TAG flight recorder logs written to: $path")
+            Intra.flightRecorder(false)
+            Logger.i(LOG_TAG_VPN, "$TAG started flight recorder")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "$TAG err start flight recorder: ${e.message}")
         }
     }
 

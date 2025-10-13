@@ -430,4 +430,8 @@ object VpnController : KoinComponent {
     fun screenUnlock() {
         braveVpnService?.screenUnlock()
     }
+
+    suspend fun performFlightRecording() {
+        braveVpnService?.performFlightRecording()
+    }
 }

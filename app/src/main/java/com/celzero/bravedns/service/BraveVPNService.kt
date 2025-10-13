@@ -5414,6 +5414,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         netLogTracker.writeConsoleLog(log)
     }
 
+    suspend fun performFlightRecording() {
+        vpnAdapter?.performFlightRecording()
+    }
+
     suspend fun isProxyReachable(proxyId: String, csv: String): Boolean { // can be ippcsv or hostpcsv
         return vpnAdapter?.isProxyReachable(proxyId, csv) == true
     }
