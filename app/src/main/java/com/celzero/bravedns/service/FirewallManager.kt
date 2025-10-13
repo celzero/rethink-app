@@ -414,8 +414,16 @@ object FirewallManager : KoinComponent {
         val appsWithoutVpnPermission = mutableListOf<String>()
 
         appInfos.forEach { appInfo ->
+            // skip the app itself
             if (appInfo.packageName == RETHINK_PACKAGE) {
-                // skip the app itself
+                return@forEach
+            }
+            // skip apps which do not have internet permission
+            if (!appInfo.hasInternetPermission(packageManager)) {
+                return@forEach
+            }
+            // skip tombstoned apps
+            if (appInfo.tombstoneTs > 0L) {
                 return@forEach
             }
             val hasVpnPermission = try {
