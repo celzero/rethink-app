@@ -25,6 +25,7 @@ import org.koin.core.component.KoinComponent
  */
 object FirebaseErrorReporting : KoinComponent {
 
+    const val TOKEN_REGENERATION_PERIOD_DAYS = 45
     /**
      * Initialize Firebase Crashlytics - No-op for F-Droid variant
      */

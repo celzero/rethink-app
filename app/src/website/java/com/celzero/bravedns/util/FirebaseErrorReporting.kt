@@ -18,6 +18,7 @@ package com.celzero.bravedns.util
 import Logger
 import Logger.LOG_FIREBASE
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Utilities.getRandomString
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -29,6 +30,7 @@ import org.koin.core.component.inject
 object FirebaseErrorReporting : KoinComponent {
 
     private val persistentState by inject<PersistentState>()
+    const val TOKEN_REGENERATION_PERIOD_DAYS: Long = 45
 
     /**
      * Initialize Firebase Crashlytics if available and enabled
@@ -37,6 +39,16 @@ object FirebaseErrorReporting : KoinComponent {
         try {
             val crashlytics = FirebaseCrashlytics.getInstance()
             crashlytics.isCrashlyticsCollectionEnabled = persistentState.firebaseErrorReportingEnabled
+            val token = persistentState.firebaseUserToken
+            if (token.isEmpty()) {
+                val newToken = getRandomString(64)
+                persistentState.firebaseUserToken = newToken
+                crashlytics.setUserId(newToken)
+                Logger.i(LOG_FIREBASE, "Generated new firebase token: $newToken")
+            } else {
+                crashlytics.setUserId(token)
+                Logger.i(LOG_FIREBASE, "Existing firebase token found: $token")
+            }
             Logger.i(LOG_FIREBASE, "crashlytics initialized, enabled: ${persistentState.firebaseErrorReportingEnabled}")
         } catch (e: Exception) {
             Logger.w(LOG_FIREBASE, "crashlytics not available: ${e.message}")

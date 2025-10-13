@@ -113,6 +113,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isAtleastU
+import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isMissingOrInvalidUid
 import com.celzero.bravedns.util.Utilities.isNetworkSame
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
@@ -4356,7 +4357,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             // disable crash logging for now
             if (false) Logger.crash(LOG_GO_LOGGER, msg) // write to in-mem db
             FirebaseErrorReporting.recordException(RuntimeException(msg))
-            EnhancedBugReport.writeLogsToFile(this, msg)
+            val token = if (isFdroidFlavour()) "fdroid" else persistentState.firebaseUserToken
+            EnhancedBugReport.writeLogsToFile(this, token, msg)
         } else if (l.user()) {
             showNwEngineNotification(msg)
             // consider all the notifications from go as failure and stop the service

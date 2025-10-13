@@ -23,6 +23,8 @@ import Logger.updateConfigLevel
 import android.Manifest
 import android.app.LocaleManager
 import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -34,11 +36,13 @@ import android.os.Environment
 import android.os.LocaleList
 import android.provider.Settings
 import android.text.InputType
+import android.util.Base64
 import android.view.Gravity
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.ScrollView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -82,6 +86,7 @@ import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.File
 import java.io.IOException
+import java.security.SecureRandom
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -93,6 +98,8 @@ import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
 import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.FirebaseErrorReporting
+import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
+import com.celzero.bravedns.util.Utilities.getRandomString
 
 
 class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) {
@@ -151,6 +158,11 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             b.settingsFirebaseErrorReportingRl.visibility = View.VISIBLE
             // Firebase error reporting
             b.settingsFirebaseErrorReportingSwitch.isChecked = persistentState.firebaseErrorReportingEnabled
+            if (b.settingsFirebaseErrorReportingSwitch.isChecked) {
+                b.tokenLayout.visibility = View.VISIBLE
+            } else {
+                b.tokenLayout.visibility = View.GONE
+            }
             b.settingsActivityCheckUpdateRl.visibility = View.VISIBLE
             // check for app updates
             b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
@@ -245,6 +257,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         displayPcapUi()
         displayAppThemeUi()
         displayNotificationActionUi()
+        setupTokenUi()
     }
 
     private fun displayNotificationActionUi() {
@@ -669,6 +682,22 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             handleFirebaseErrorReportingToggle(isChecked)
         }
 
+        b.btnRegenerateToken.setOnClickListener {
+            val newToken = getRandomString(64)
+            persistentState.firebaseUserToken = newToken
+            persistentState.firebaseUserTokenTimestamp = System.currentTimeMillis()
+            updateTokenUi(newToken)
+            setFirebaseUserId(newToken)
+            Toast.makeText(this, getString(R.string.config_add_success_toast), Toast.LENGTH_SHORT).show()
+        }
+
+        b.tokenTextView.setOnClickListener {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("Token", b.tokenTextView.text)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(this, getString(R.string.copied_clipboard), Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     private fun handleFirebaseErrorReportingToggle(isChecked: Boolean) {
@@ -676,6 +705,10 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             // enable firebase error reporting
             FirebaseErrorReporting.setEnabled(true)
             b.settingsFirebaseErrorReportingSwitch.isChecked = true
+            persistentState.firebaseErrorReportingEnabled = true
+            val token = persistentState.firebaseUserToken
+            b.tokenLayout.visibility = View.VISIBLE
+            setFirebaseUserId(token)
             showToastUiCentered(
                 this,
                 getString(R.string.config_add_success_toast),
@@ -685,6 +718,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             // disable firebase error reporting
             FirebaseErrorReporting.setEnabled(false)
             b.settingsFirebaseErrorReportingSwitch.isChecked = false
+            persistentState.firebaseErrorReportingEnabled = false
+            b.tokenLayout.visibility = View.GONE
             showToastUiCentered(
                 this,
                 getString(R.string.config_add_success_toast),
@@ -1134,6 +1169,32 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         alertBuilder.create().show()
     }
 
+    fun updateTokenUi(token: String) {
+        b.tokenTextView.text = token
+    }
+
+    fun setFirebaseUserId(token: String) {
+        try {
+            FirebaseErrorReporting.setUserId(token)
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun setupTokenUi() {
+        val now = System.currentTimeMillis()
+        val fortyFiveDaysMs = TimeUnit.DAYS.toMillis(TOKEN_REGENERATION_PERIOD_DAYS)
+
+        var token = persistentState.firebaseUserToken
+        var ts = persistentState.firebaseUserTokenTimestamp
+        if (token.isBlank() || now - ts > fortyFiveDaysMs) {
+            token = getRandomString(64)
+            ts = now
+            persistentState.firebaseUserToken = token
+            persistentState.firebaseUserTokenTimestamp = ts
+        }
+        updateTokenUi(token)
+    }
+
     override fun onResume() {
         super.onResume()
         // app notification permission android 13
@@ -1244,4 +1305,3 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         delay(ms, lifecycleScope) { for (v in views) v.isEnabled = true }
     }
 }
-

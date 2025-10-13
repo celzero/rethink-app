@@ -19,6 +19,9 @@ import Logger
 import Logger.LOG_TAG_APP
 import android.content.Context
 import com.celzero.bravedns.scheduler.EnhancedBugReport
+import com.celzero.bravedns.service.PersistentState
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.lang.ref.WeakReference
 import kotlin.system.exitProcess
 
@@ -29,10 +32,10 @@ import kotlin.system.exitProcess
 class GlobalExceptionHandler private constructor(
     private val defaultHandler: Thread.UncaughtExceptionHandler?,
     contextRef: Context?
-) : Thread.UncaughtExceptionHandler {
+) : Thread.UncaughtExceptionHandler, KoinComponent {
 
     private val contextRef: WeakReference<Context>? = contextRef?.let { WeakReference(it) }
-
+    private val persistentState by inject<PersistentState>()
     companion object {
         private var instance: GlobalExceptionHandler? = null
 
@@ -138,7 +141,8 @@ class GlobalExceptionHandler private constructor(
             // First try: get context from WeakReference
             val context = contextRef?.get()
             if (context != null) {
-                EnhancedBugReport.writeLogsToFile(context, msg)
+                val token = persistentState.firebaseUserToken
+                EnhancedBugReport.writeLogsToFile(context, token,msg)
                 Logger.i(LOG_TAG_APP, "crash logs written to file successfully")
                 return
             }

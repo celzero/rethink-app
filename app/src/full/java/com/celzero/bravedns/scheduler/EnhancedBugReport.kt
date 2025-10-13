@@ -81,7 +81,7 @@ object EnhancedBugReport {
         Log.i(LOG_TAG_BUG_REPORT, "logs added to zip file")
     }
 
-    fun writeLogsToFile(context: Context?, logs: String) {
+    fun writeLogsToFile(context: Context?, token: String, logs: String) {
         if (context == null) {
             Log.e(LOG_TAG_BUG_REPORT, "context is null, cannot write logs to file")
             return
@@ -93,7 +93,7 @@ object EnhancedBugReport {
                 return
             }
             val time = Utilities.convertLongToTime(System.currentTimeMillis(), Constants.TIME_FORMAT_3)
-            val l = "\n$time: $logs"
+            val l = "\n$time \nToken: $token\n$logs"
             file.appendText(l, Charset.defaultCharset())
             Log.v(LOG_TAG_BUG_REPORT, "logs written to file: ${file.absolutePath}")
         } catch (e: Exception) {

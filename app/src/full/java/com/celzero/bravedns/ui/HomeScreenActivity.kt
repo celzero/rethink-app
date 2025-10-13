@@ -70,11 +70,13 @@ import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
+import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
 import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getPackageMetadata
+import com.celzero.bravedns.util.Utilities.getRandomString
 import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
@@ -145,6 +147,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         handleOnBackPressed()
 
         NewSettingsManager.handleNewSettings()
+
+        regenerateFirebaseTokenIfNeeded()
 
         // enable in-app messaging, will be used to show in-app messages in case of billing issues
         //enableInAppMessaging()
@@ -228,6 +232,23 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
 
         showRestoreDialog(uri)
+    }
+
+    private fun regenerateFirebaseTokenIfNeeded() {
+        if (Utilities.isFdroidFlavour()) return
+        if (!persistentState.firebaseErrorReportingEnabled) return
+
+        val now = System.currentTimeMillis()
+        val fortyFiveDaysMs = TimeUnit.DAYS.toMillis(TOKEN_REGENERATION_PERIOD_DAYS)
+
+        var token = persistentState.firebaseUserToken
+        var ts = persistentState.firebaseUserTokenTimestamp
+        if (token.isBlank() || now - ts > fortyFiveDaysMs) {
+            token = getRandomString(64)
+            ts = now
+            persistentState.firebaseUserToken = token
+            persistentState.firebaseUserTokenTimestamp = ts
+        }
     }
 
     private fun showRestoreDialog(uri: Uri) {

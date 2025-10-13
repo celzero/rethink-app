@@ -393,6 +393,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // setting to enable/disable tombstone apps feature
     var tombstoneApps by booleanPref("tombstone_apps").withDefault<Boolean>(false)
 
+    // Token for Firebase userId
+    var firebaseUserToken by stringPref("firebase_user_token").withDefault("")
+    var firebaseUserTokenTimestamp by longPref("firebase_user_token_timestamp").withDefault(0L)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
     var universalRulesCount: MutableLiveData<Int> = MutableLiveData()
