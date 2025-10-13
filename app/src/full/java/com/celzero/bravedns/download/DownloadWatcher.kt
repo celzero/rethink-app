@@ -22,7 +22,9 @@ import android.content.Context
 import android.os.SystemClock
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.celzero.bravedns.service.PersistentState
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.util.concurrent.TimeUnit
 
 /**
@@ -47,6 +49,7 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
     }
 
     private var downloadIds: MutableList<Long>? = mutableListOf()
+    private val persistentState by inject<PersistentState>()
 
     override fun doWork(): Result {
         Logger.i(LOG_TAG_DOWNLOAD, "start download watcher, checking for download status")
@@ -68,11 +71,22 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
                 return Result.failure()
             }
             DOWNLOAD_SUCCESS -> {
+                // Clear the stored download IDs on successful completion
+                clearStoredDownloadIds()
                 return Result.success()
             }
         }
 
         return Result.failure()
+    }
+
+    private fun clearStoredDownloadIds() {
+        try {
+            persistentState.androidDownloadManagerIds = ""
+            Logger.i(LOG_TAG_DOWNLOAD, "cleared stored andr-down-mgr ids")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_DOWNLOAD, "err clearing stored download ids", e)
+        }
     }
 
     private fun checkForDownload(context: Context, downloadIds: MutableList<Long>?): Int {

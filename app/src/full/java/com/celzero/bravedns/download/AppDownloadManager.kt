@@ -127,8 +127,46 @@ class AppDownloadManager(
             WorkManager.getInstance(context.applicationContext)
                 .cancelAllWorkByTag(LocalBlocklistCoordinator.CUSTOM_DOWNLOAD)
         } else {
+            // can android download manager downloads
+            cancelAndroidDownloadManagerDownloads()
+            // cancel the download check workers
             WorkManager.getInstance(context.applicationContext).cancelAllWorkByTag(DOWNLOAD_TAG)
             WorkManager.getInstance(context.applicationContext).cancelAllWorkByTag(FILE_TAG)
+        }
+    }
+
+    private fun cancelAndroidDownloadManagerDownloads() {
+        try {
+            val downloadIdsStr = persistentState.androidDownloadManagerIds
+            if (downloadIdsStr.isEmpty()) {
+                Logger.i(LOG_TAG_DOWNLOAD, "no andr-down-mgr downloads to cancel")
+                return
+            }
+
+            val downloadIds = downloadIdsStr.split(",").mapNotNull { it.toLongOrNull() }
+            if (downloadIds.isEmpty()) {
+                Logger.i(LOG_TAG_DOWNLOAD, "no valid download IDs found to cancel")
+                return
+            }
+
+            downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            var cancelledCount = 0
+            downloadIds.forEach { downloadId ->
+                try {
+                    val removed = downloadManager.remove(downloadId)
+                    if (removed > 0) {
+                        cancelledCount++
+                        Logger.i(LOG_TAG_DOWNLOAD, "cancelled download with id: $downloadId")
+                    }
+                } catch (e: Exception) {
+                    Logger.w(LOG_TAG_DOWNLOAD, "failed to cancel download id: $downloadId", e)
+                }
+            }
+
+            persistentState.androidDownloadManagerIds = ""
+            Logger.i(LOG_TAG_DOWNLOAD, "cancelled $cancelledCount andr-down-mgr downloads")
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_DOWNLOAD, "err cancelling andr-down-mgr downloads", e)
         }
     }
 
@@ -220,6 +258,8 @@ class AppDownloadManager(
                 return DownloadManagerStatus.FAILURE
             }
         }
+        // Store download IDs for later cancellation
+        persistentState.androidDownloadManagerIds = downloadIds.joinToString(",")
         initiateDownloadStatusCheck(downloadIds, timestamp)
         return DownloadManagerStatus.STARTED
     }

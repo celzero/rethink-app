@@ -213,6 +213,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var customDownloaderLastGeneratedId by
         longPref("custom_downloader_last_generated_id").withDefault<Long>(0)
 
+    // android download manager's active download ids (comma-separated)
+    var androidDownloadManagerIds by
+        stringPref("android_download_manager_ids").withDefault<String>("")
+
     // local timestamp for which the update is available
     var newestLocalBlocklistTimestamp by
         longPref("local_blocklist_update_ts").withDefault<Long>(INIT_TIME_MS)
