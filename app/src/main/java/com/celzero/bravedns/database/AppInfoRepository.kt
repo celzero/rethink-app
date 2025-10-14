@@ -63,7 +63,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
                 return
             }
             appInfoDAO.tombstoneApp(oldUid, newUid, packageName, tombstoneTs)
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             // tombstoneApp is called when there is a package name change or uid change
             // in both the cases, we try to update the existing record with new uid or package name
             // if the record is not present, it throws exception, which we catch here

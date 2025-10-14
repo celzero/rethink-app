@@ -44,7 +44,7 @@ object InetAddresses {
                 Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
             ) // noinspection JavaReflectionMemberAccess
              m = InetAddress::class.java.getMethod("parseNumericAddress", String::class.java)
-        } catch (ignored: Exception) {}
+        } catch (_: Exception) {}
         PARSER_METHOD = m
     }
 

@@ -449,8 +449,8 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                             }
                         }
                     )
-            } catch (ignored: Exception) {
-                Logger.d(LOG_TAG_DNS, "Error loading icon, load flag instead")
+            } catch (_: Exception) {
+                Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
                 displayDuckduckgoFavIcon(duckduckGoUrl, duckduckgoDomainURL)
             }
         }
@@ -496,7 +496,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                             }
                         }
                     )
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 Logger.d(LOG_TAG_DNS, "$TAG err loading icon, load flag instead")
                 showFlag()
                 hideFavIcon()

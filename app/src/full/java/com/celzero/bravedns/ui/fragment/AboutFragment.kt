@@ -699,7 +699,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         val zipFile =
             try {
                 ZipFile(zipPath)
-            } catch (ignored: Exception) { // FileNotFound, ZipException
+            } catch (_: Exception) { // FileNotFound, ZipException
                 null
             }
 

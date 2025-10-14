@@ -1434,7 +1434,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         try {
             unregisterReceiver(userPresentReceiver)
             Logger.i(LOG_TAG_VPN, "user present receiver unregistered")
-        } catch (ignored: IllegalArgumentException) {
+        } catch (_: IllegalArgumentException) {
             Logger.w(LOG_TAG_VPN, "user present receiver not registered")
         }
     }
@@ -1667,7 +1667,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return try {
             val uiModeManager: UiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
             uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
@@ -2707,8 +2707,8 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             } finally {
                 try { // close the tunFd as GoVpnAdapter has its own copy
                     if (FIRESTACK_MUST_DUP_TUNFD) tunFd.close()
-                } catch (ignored: IOException) {
-                    Logger.e(LOG_TAG_VPN, "err closing tunFd: ${ignored.message}", ignored)
+                } catch (e: IOException) {
+                    Logger.e(LOG_TAG_VPN, "err closing tunFd: ${e.message}", e)
                 }
             }
         }
@@ -3227,9 +3227,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         try {
             // this will also cancels the restarter state flow
             vpnScope.cancel("vpnDestroy")
-        } catch (ignored: IllegalStateException) {
-        } catch (ignored: CancellationException) {
-        } catch (ignored: Exception) { }
+        } catch (_: IllegalStateException) {
+        } catch (_: CancellationException) {
+        } catch (_: Exception) { }
 
         Logger.w(LOG_TAG_VPN, "Destroying VPN service")
 
@@ -3760,7 +3760,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                         uidStr.toInt()
                     }
                 }
-            } catch (ignored: NumberFormatException) {
+            } catch (_: NumberFormatException) {
                 Logger.w(LOG_TAG_VPN, "onQuery: invalid uid: $uidStr, using default $uid")
             }
 

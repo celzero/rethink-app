@@ -1001,26 +1001,26 @@ abstract class AppDatabase : RoomDatabase() {
                     try {
                         db.execSQL("ALTER TABLE CustomDomain ADD COLUMN proxyId TEXT NOT NULL DEFAULT ''")
                         db.execSQL("ALTER TABLE CustomDomain ADD COLUMN proxyCC TEXT NOT NULL DEFAULT ''")
-                    } catch (ignored: Exception) {
+                    } catch (_: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "proxyId, proxyCC; columns already exist, ignore")
                     }
 
                     try {
                         db.execSQL("ALTER TABLE CustomIp ADD COLUMN proxyId TEXT NOT NULL DEFAULT ''")
                         db.execSQL("ALTER TABLE CustomIp ADD COLUMN proxyCC TEXT NOT NULL DEFAULT ''")
-                    } catch (ignored: Exception) {
+                    } catch (_: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "proxyId, proxyCC; columns already exist, ignore")
                     }
 
                     try {
                         db.execSQL("ALTER TABLE AppInfo ADD COLUMN tombstoneTs INTEGER NOT NULL DEFAULT 0")
-                    } catch (ignored: Exception) {
+                    } catch (_: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "tombstoneTs: column already exists, ignore")
                     }
 
                     try {
                         db.execSQL("ALTER TABLE WgConfigFiles ADD COLUMN useOnlyOnMetered INTEGER NOT NULL DEFAULT 0")
-                    } catch (ignored: Exception) {
+                    } catch (_: Exception) {
                         Logger.i(LOG_TAG_APP_DB, "useOnlyOnMetered: column already exists, ignore")
                     }
 

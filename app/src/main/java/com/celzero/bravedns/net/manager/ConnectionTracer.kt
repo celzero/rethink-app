@@ -84,12 +84,12 @@ class ConnectionTracer(ctx: Context) {
                 } else {
                     InetSocketAddress(dstIp, dstPort)
                 }
-        } catch (ignored: IllegalArgumentException) {
+        } catch (e: IllegalArgumentException) {
             // InetSocketAddress throws IllegalArgumentException or SecurityException
-            Logger.d(LOG_TAG_VPN, "err getUidQ: $ignored")
+            Logger.d(LOG_TAG_VPN, "err getUidQ: ${e.message}")
             return uid
-        } catch (ignored: SecurityException) {
-            Logger.d(LOG_TAG_VPN, "err getUidQ: $ignored")
+        } catch (e: SecurityException) {
+            Logger.d(LOG_TAG_VPN, "err getUidQ: ${e.message}")
             return uid
         }
         val key = makeCacheKey(protocol, local, remote)

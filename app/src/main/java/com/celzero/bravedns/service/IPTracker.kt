@@ -211,7 +211,7 @@ internal constructor(
             Logger.i(LOG_TAG_FIREWALL, "app, $appName, not tracked by FirewallManager")
             appName = try {
                 ctx.packageManager.getApplicationLabel(appInfo).toString()
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 // fallback if base.apk is not accessible
                 ctx.getString(R.string.network_log_app_name_unnamed, uid.toString())
             }

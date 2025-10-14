@@ -130,7 +130,7 @@ object SsidPermissionManager {
             try {
                 val fallbackIntent = Intent(android.provider.Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)
                 context.startActivity(fallbackIntent)
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 // If all else fails, show a toast message
                 if (context is Activity) {
                     Utilities.showToastUiCentered(
@@ -213,12 +213,12 @@ object SsidPermissionManager {
         try {
             val intent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             context.startActivity(intent)
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             // Fallback to general location settings if specific intent fails
             try {
                 val fallbackIntent = Intent(android.provider.Settings.ACTION_PRIVACY_SETTINGS)
                 context.startActivity(fallbackIntent)
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 // If all else fails, show a toast message
                 if (context is Activity) {
                     android.widget.Toast.makeText(

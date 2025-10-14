@@ -108,8 +108,8 @@ object VpnController : KoinComponent {
         try {
             // externalScope?.coroutineContext?.get(Job)?.cancel("VPNController - onVpnDestroyed")
             externalScope?.cancel("VPNController - onVpnDestroyed")
-        } catch (ignored: IllegalStateException) {} catch (
-            ignored: CancellationException) {} catch (ignored: Exception) {}
+        } catch (_: IllegalStateException) {} catch (
+            _: CancellationException) {} catch (_: Exception) {}
     }
 
     fun uptimeMs(): Long {

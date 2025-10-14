@@ -572,8 +572,8 @@ object IpRulesManager : KoinComponent {
             }
             val pair = hostAddr(ipStr)
             return normalize(pair.first) ?: ""
-        } catch (ignored: NullPointerException) {
-            Logger.e(Logger.LOG_TAG_VPN, "Invalid IP address added", ignored)
+        } catch (e: NullPointerException) {
+            Logger.e(Logger.LOG_TAG_VPN, "Invalid IP address added", e)
         }
         return "" // empty ips mean its a port-only rule
     }

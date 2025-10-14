@@ -104,7 +104,7 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
     suspend fun tombstoneRulesByUid(oldUid: Int, newUid: Int) {
         try {
             customDomainDAO.updateUid(oldUid, newUid)
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             // catch the exception to avoid crash
         }
     }

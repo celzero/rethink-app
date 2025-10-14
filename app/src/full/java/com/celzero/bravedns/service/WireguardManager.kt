@@ -640,7 +640,7 @@ object WireguardManager : KoinComponent {
         return try {
             val configId = id.substring(ID_WG_BASE.length)
             configId.toIntOrNull() ?: INVALID_CONF_ID
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             Logger.i(LOG_TAG_PROXY, "err converting string id to int: $id")
             INVALID_CONF_ID
         }

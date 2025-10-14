@@ -959,7 +959,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.d(LOG_TAG_VPN, "$TAG proxy status($id): $status")
             Pair(status, "")
         } catch (ex: Exception) {
-            Logger.i(LOG_TAG_VPN, "$TAG err getProxy($id) ignored: ${ex.message}")
+            Logger.i(LOG_TAG_VPN, "$TAG err getProxy($id), reason: ${ex.message}")
             Pair(null, ex.message ?: "")
         }
     }
@@ -1022,7 +1022,7 @@ class GoVpnAdapter : KoinComponent {
                     Logger.i(LOG_TAG_VPN, "$TAG wg proxy already exists in tunnel $id")
                     return
                 }
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 Logger.i(LOG_TAG_VPN, "$TAG wg proxy not found in tunnel $id, proceed adding")
             }
 
@@ -1066,7 +1066,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.i(LOG_TAG_VPN, "$TAG start hop config: $hop")
             // this will enable the config and initiate the add proxy to the tunnel
             WireguardManager.enableConfig(config)
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
         }
     }
 
@@ -1384,7 +1384,7 @@ class GoVpnAdapter : KoinComponent {
             } else {
                 FALLBACK_DNS_IF_NET_DNS_EMPTY
             }
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             FALLBACK_DNS_IF_NET_DNS_EMPTY
         }
     }
@@ -1937,7 +1937,7 @@ class GoVpnAdapter : KoinComponent {
             val res = tunnel.proxies.rpn().win() != null
             Logger.i(LOG_TAG_PROXY, "$TAG is win(rpn) registered? $res")
             res
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             false
         }
     }

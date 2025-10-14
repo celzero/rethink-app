@@ -809,10 +809,10 @@ class ConnectionMonitor(private val context: Context, private val networkListene
                 if (::cm.isInitialized) {
                     try {
                         cm.unregisterNetworkCallback(internetValidatedCallback())
-                    } catch (ignored: Exception) { }
+                    } catch (_: Exception) { }
                     try {
                         cm.unregisterNetworkCallback(transportCallback())
-                    } catch (ignored: Exception) { }
+                    } catch (_: Exception) { }
                 }
                 if (isAtleastR()) {
                     unregisterDiags()

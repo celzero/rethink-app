@@ -252,7 +252,7 @@ object DomainRulesManager : KoinComponent {
                 proxyCC = wildParts[2]
                 return Pair(proxyId, proxyCC)
             }
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             return Pair("", "")
         }
     }
@@ -427,7 +427,7 @@ object DomainRulesManager : KoinComponent {
     fun isValidDomain(url: String): Boolean {
         return try {
             Patterns.WEB_URL.matcher(url).matches() || Patterns.DOMAIN_NAME.matcher(url).matches()
-        } catch (ignored: MalformedURLException) {
+        } catch (_: MalformedURLException) {
             false
         }
     }

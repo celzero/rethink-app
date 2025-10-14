@@ -199,6 +199,6 @@ object Logger : KoinComponent {
         try {
             val c = ConsoleLog(0, formattedMsg, level.id, now)
             VpnController.writeConsoleLog(c)
-        } catch (ignored: Exception) { }
+        } catch (_: Exception) { }
     }
 }

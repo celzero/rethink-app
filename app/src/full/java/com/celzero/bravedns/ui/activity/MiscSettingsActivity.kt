@@ -354,7 +354,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             // set the file descriptor instead of fd, need to close the file descriptor
             // after tunnel creation
             appConfig.setPcap(PcapMode.EXTERNAL_FILE.id, file.absolutePath)
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             showFileCreationErrorToast()
         }
     }
@@ -401,7 +401,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 val uri = Uri.fromParts(SCHEME_PACKAGE, this.packageName, null)
                 intent.data = uri
                 storageActivityResultLauncher.launch(intent)
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 val intent = Intent()
                 intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
                 storageActivityResultLauncher.launch(intent)

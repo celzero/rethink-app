@@ -193,7 +193,7 @@ class DnsCryptRelayEndpointAdapter(
                 } else {
                     message
                 }
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 ""
             }
         }

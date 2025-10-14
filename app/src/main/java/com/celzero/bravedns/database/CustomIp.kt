@@ -86,7 +86,7 @@ class CustomIp {
         try {
             val ip = IPAddressString(ipAddress).address
             return Pair(ip, port)
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             return null
         }
     }

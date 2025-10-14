@@ -240,7 +240,7 @@ class ODoHEndpointAdapter(private val context: Context, private val appConfig: A
                 } else {
                     message
                 }
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 ""
             }
         }

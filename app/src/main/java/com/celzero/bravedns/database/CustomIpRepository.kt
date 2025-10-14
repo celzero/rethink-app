@@ -70,7 +70,7 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
     suspend fun tombstoneRulesByUid(oldUid: Int, newUid: Int) {
         try {
             customIpDao.tombstoneRulesByUid(oldUid, newUid)
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             // catch the exception to avoid crash
         }
     }

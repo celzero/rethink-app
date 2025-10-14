@@ -65,7 +65,7 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
                 try {
                     Logger.i(LOG_TAG_VPN, "attempting to auto-start VPN after $eventType")
                     VpnService.prepare(context)
-                } catch (ignored: NullPointerException) {
+                } catch (_: NullPointerException) {
                     Logger.w(LOG_TAG_VPN, "device does not support system-wide VPN mode")
                     return
                 }

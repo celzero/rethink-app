@@ -188,7 +188,7 @@ class ConnectionTrackerFragment :
                     recyclerAdapter.stateRestorationPolicy =
                         RecyclerView.Adapter.StateRestorationPolicy.ALLOW
                 }
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 Logger.e(LOG_TAG_UI, "$TAG; err in setting the recycler restoration policy")
             }
         }

@@ -90,7 +90,7 @@ internal constructor(
             } else {
                 summary.uid.toInt()
             }
-        } catch (ignored: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             Logger.w(LOG_TAG_VPN, "onQuery: invalid uid: ${summary.uid}, using default uid: $uid")
         }
 

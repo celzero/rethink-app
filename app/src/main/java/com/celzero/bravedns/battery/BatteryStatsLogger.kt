@@ -115,7 +115,7 @@ object BatteryStatsLogger {
         val f = logFile ?: return null
         return try {
             f.readText()
-        } catch (ignored: Throwable) {
+        } catch (_: Throwable) {
             null
         }
     }

@@ -605,7 +605,7 @@ internal constructor(
     private suspend fun insertApp(ai: ApplicationInfo) {
         val appName: String = try {
             ctx.packageManager.getApplicationLabel(ai).toString()
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             // fallback if base.apk is not accessible
             ctx.getString(R.string.network_log_app_name_unnamed, ai.uid.toString())
         }
@@ -728,7 +728,7 @@ internal constructor(
             } else {
                 try {
                     ctx.packageManager.getApplicationLabel(appInfo).toString()
-                } catch (ignored: Exception) {
+                } catch (_: Exception) {
                     // fallback if base.apk is not accessible
                     ctx.getString(R.string.network_log_app_name_unnamed, appInfo.uid.toString())
                 }

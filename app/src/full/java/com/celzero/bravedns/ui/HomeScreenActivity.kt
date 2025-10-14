@@ -193,7 +193,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         return try {
             val uiModeManager: UiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
             uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
