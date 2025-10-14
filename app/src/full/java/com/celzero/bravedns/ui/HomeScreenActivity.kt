@@ -466,10 +466,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         // Check updates only for play store / website version. Not fDroid.
         if (!isPlayStoreFlavour() && !isWebsiteFlavour()) {
-            Logger.d(
-                LOG_TAG_APP_UPDATE,
-                "Check for update: Not play or website- ${BuildConfig.FLAVOR}"
-            )
+            Logger.i(LOG_TAG_APP_UPDATE, "update check not for ${BuildConfig.FLAVOR}")
             return
         }
 
@@ -611,35 +608,74 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(title)
-        builder.setMessage(message)
-        builder.setCancelable(false)
-        if (
-            message == getString(R.string.download_update_dialog_message_ok) ||
-            message == getString(R.string.download_update_dialog_failure_message) ||
-            message == getString(R.string.download_update_dialog_trylater_message)
-        ) {
-            builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
-                dialogInterface.dismiss()
-            }
+
+        // Determine dialog type based on title to decide if it should be modal
+        val isUpdateAvailable = title == getString(R.string.download_update_dialog_title)
+        val isUpToDate = message == getString(R.string.download_update_dialog_message_ok)
+        val isError = message == getString(R.string.download_update_dialog_failure_message)
+        val isQuotaExceeded = message == getString(R.string.download_update_dialog_trylater_message)
+
+        // Adjust message for Play Store if needed
+        if (isUpdateAvailable && source == AppUpdater.InstallSource.STORE) {
+            // Play Store updates should use native UI, but if we reach here, show appropriate message
+            builder.setMessage("A new version is available. Please update from Play Store.")
         } else {
-            if (source == AppUpdater.InstallSource.STORE) {
-                builder.setPositiveButton(getString(R.string.hs_download_positive_play_store)) { dialogInterface, _ ->
-                    appUpdateManager.completeUpdate()
-                    dialogInterface.dismiss()
+            builder.setMessage(message)
+        }
+
+        // Make dialog non-dismissible (modal) only when an actual update is available
+        // User cannot dismiss by tapping outside or pressing back button
+        // However, user can still choose "Remind me later" button
+        builder.setCancelable(!isUpdateAvailable)
+
+        when {
+            isUpdateAvailable -> {
+                // Update is available - modal dialog with explicit user choice
+                if (source == AppUpdater.InstallSource.STORE) {
+                    // For Play Store updates, this dialog rarely appears as Google's native UI handles it
+                    // But if it does appear, just show OK to dismiss (native UI should have been shown)
+                    builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
+                        appUpdateManager.completeUpdate()
+                        dialogInterface.dismiss()
+                    }
+                    builder.setNegativeButton(getString(R.string.hs_download_negative_default)) { dialogInterface, _ ->
+                        persistentState.lastAppUpdateCheck = System.currentTimeMillis()
+                        dialogInterface.dismiss()
+                    }
+                } else {
+                    // For website version, open browser to download - this is the main use case
+                    builder.setPositiveButton(getString(R.string.hs_download_positive_website)) { dialogInterface, _ ->
+                        initiateDownload()
+                        dialogInterface.dismiss()
+                    }
+                    // Negative button allows user to postpone the update
+                    builder.setNegativeButton(getString(R.string.hs_download_negative_default)) { dialogInterface, _ ->
+                        persistentState.lastAppUpdateCheck = System.currentTimeMillis()
+                        dialogInterface.dismiss()
+                    }
                 }
-            } else {
-                builder.setPositiveButton(getString(R.string.hs_download_positive_website)) { dialogInterface, _ ->
-                    initiateDownload()
+            }
+            isUpToDate || isError || isQuotaExceeded -> {
+                // Informational dialogs - dismissible with OK button
+                builder.setCancelable(true)
+                builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
                     dialogInterface.dismiss()
                 }
             }
-            builder.setNegativeButton(getString(R.string.hs_download_negative_default)) { dialogInterface, _ ->
-                persistentState.lastAppUpdateCheck = System.currentTimeMillis()
-                dialogInterface.dismiss()
+            else -> {
+                // Fallback for any other case - make it dismissible
+                builder.setCancelable(true)
+                builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
+                    dialogInterface.dismiss()
+                }
             }
         }
 
-        builder.create().show()
+        try {
+            builder.create().show()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "err showing download dialog: ${e.message}", e)
+        }
     }
 
     private fun initiateDownload() {
