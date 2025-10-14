@@ -703,5 +703,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         if (!isAdded) return
 
         updateLocalBlocklistUi()
+        // update custom download manager switch
+        b.dcDownloaderSwitch.isChecked = persistentState.useCustomDownloadManager
     }
 }

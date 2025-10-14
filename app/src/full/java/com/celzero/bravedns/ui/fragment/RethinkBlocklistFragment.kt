@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -49,6 +50,7 @@ import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.RethinkBlocklistManager.RethinkBlocklistType.Companion.getType
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_NAME
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_URL
@@ -361,6 +363,35 @@ class RethinkBlocklistFragment :
     }
 
     private fun downloadBlocklist(type: RethinkBlocklistManager.RethinkBlocklistType) {
+        // Check if VPN is in lockdown mode and custom download manager is disabled
+        if (VpnController.isVpnLockdown() && !persistentState.useCustomDownloadManager) {
+            showLockdownDownloadDialog(type)
+            return
+        }
+
+        proceedWithBlocklistDownload(type)
+    }
+
+    private fun showLockdownDownloadDialog(type: RethinkBlocklistManager.RethinkBlocklistType) {
+        val builder = MaterialAlertDialogBuilder(requireContext())
+        builder.setTitle(R.string.wg_lockdown_dialog_title)
+        builder.setMessage(R.string.lockdown_download_message)
+        builder.setCancelable(true)
+        builder.setPositiveButton(R.string.lockdown_download_enable_inapp) { _, _ ->
+            // Enable in-app downloader and proceed with download
+            persistentState.useCustomDownloadManager = true
+            downloadBlocklist(type)
+        }
+        builder.setNegativeButton(R.string.lbl_cancel) { dialog, _ ->
+            dialog.dismiss()
+            // Proceed with Android download manager (useCustomDownloadManager stays false)
+            proceedWithBlocklistDownload(type)
+        }
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.show()
+    }
+
+    private fun proceedWithBlocklistDownload(type: RethinkBlocklistManager.RethinkBlocklistType) {
         ui {
             if (type.isLocal()) {
                 var status = AppDownloadManager.DownloadManagerStatus.NOT_STARTED
