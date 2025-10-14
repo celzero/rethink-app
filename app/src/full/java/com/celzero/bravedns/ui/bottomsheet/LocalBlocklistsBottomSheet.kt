@@ -646,7 +646,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         ) { workInfoList ->
             if (workInfoList != null && workInfoList.isNotEmpty()) {
                 val workInfo = workInfoList[0]
-                if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
+                if (workInfo.state == WorkInfo.State.SUCCEEDED) {
                     Logger.i(
                         Logger.LOG_TAG_DOWNLOAD,
                         "AppDownloadManager Work Manager completed - ${DownloadConstants.FILE_TAG}"
@@ -654,9 +654,8 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
                     onDownloadSuccess()
                     workManager.pruneWork()
                 } else if (
-                    workInfo != null &&
-                        (workInfo.state == WorkInfo.State.CANCELLED ||
-                            workInfo.state == WorkInfo.State.FAILED)
+                    workInfo.state == WorkInfo.State.CANCELLED ||
+                    workInfo.state == WorkInfo.State.FAILED
                 ) {
                     onDownloadFail()
                     workManager.pruneWork()
