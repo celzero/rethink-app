@@ -374,7 +374,7 @@ class RethinkBlocklistFragment :
 
     private fun showLockdownDownloadDialog(type: RethinkBlocklistManager.RethinkBlocklistType) {
         val builder = MaterialAlertDialogBuilder(requireContext())
-        builder.setTitle(R.string.wg_lockdown_dialog_title)
+        builder.setTitle(R.string.lockdown_download_enable_inapp)
         builder.setMessage(R.string.lockdown_download_message)
         builder.setCancelable(true)
         builder.setPositiveButton(R.string.lockdown_download_enable_inapp) { _, _ ->

@@ -294,7 +294,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private fun showLockdownDownloadDialog(isRedownload: Boolean) {
         val builder = MaterialAlertDialogBuilder(requireContext())
-        builder.setTitle(R.string.wg_lockdown_dialog_title)
+        builder.setTitle(R.string.lockdown_download_enable_inapp)
         builder.setMessage(R.string.lockdown_download_message)
         builder.setCancelable(true)
         builder.setPositiveButton(R.string.lockdown_download_enable_inapp) { _, _ ->
