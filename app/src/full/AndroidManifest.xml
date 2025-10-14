@@ -157,6 +157,9 @@
             android:name=".ui.activity.AntiCensorshipActivity"
             android:finishOnTaskLaunch="true" />
         <activity
+            android:name=".ui.TestDialogActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.AdvancedSettingActivity"
             android:finishOnTaskLaunch="true" />
         <activity
