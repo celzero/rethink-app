@@ -1490,7 +1490,9 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) { // this is not expected to happen
             Logger.e(LOG_TAG_VPN, "$TAG set system dns: could not parse: $systemDns", e)
             // remove the system dns, if it could not be set
-            getResolver()?.remove(Backend.System.togs())
+            try {
+                getResolver()?.remove(Backend.System.togs())
+            } catch (_: Exception) { }
         }
     }
 
