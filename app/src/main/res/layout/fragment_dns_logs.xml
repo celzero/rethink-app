@@ -9,13 +9,12 @@
     android:nestedScrollingEnabled="false"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/query_list_card_view_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:elevation="10dp"
+        android:elevation="5dp"
         app:cardCornerRadius="16dp">
 
         <LinearLayout
@@ -99,13 +98,16 @@
         android:layout_height="match_parent"
         android:layout_below="@id/query_list_card_view_top"
         android:layout_marginTop="5dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:nestedScrollingEnabled="true"
+        android:orientation="vertical"
         app:fastScrollAutoHide="true"
         app:fastScrollAutoHideDelay="1500"
-        android:nestedScrollingEnabled="true"
-        app:fastScrollThumbInactiveColor="?attr/chipColorBgNormal"
-        app:fastScrollThumbEnabled="true"
-        app:fastScrollThumbColor="?attr/chipColorBgNormal"
         app:fastScrollEnableThumbInactiveColor="true"
+        app:fastScrollThumbColor="?attr/chipColorBgNormal"
+        app:fastScrollThumbEnabled="true"
+        app:fastScrollThumbInactiveColor="?attr/chipColorBgNormal"
         app:fastScrollTrackColor="?attr/background" />
 
     <androidx.appcompat.widget.AppCompatTextView

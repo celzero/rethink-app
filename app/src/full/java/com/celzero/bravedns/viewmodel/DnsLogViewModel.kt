@@ -41,7 +41,7 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
         filteredList.value = ""
         pagingConfig =
             PagingConfig(
-                enablePlaceholders = false,
+                enablePlaceholders = true,
                 prefetchDistance = 3,
                 initialLoadSize = LIVEDATA_PAGE_SIZE * 2,
                 maxSize = LIVEDATA_PAGE_SIZE * 3,

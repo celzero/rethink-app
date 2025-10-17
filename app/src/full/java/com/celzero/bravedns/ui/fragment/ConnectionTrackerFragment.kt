@@ -40,7 +40,6 @@ import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel.TopLevelFilter
 import com.google.android.material.chip.Chip
@@ -106,6 +105,7 @@ class ConnectionTrackerFragment :
             } else {
                 b.connectionSearch.setQuery(query, true)
                 viewModel.setFilter(query, filterCategories, filterType)
+                setQueryFilter()
             }
         }
         initView()
@@ -143,7 +143,6 @@ class ConnectionTrackerFragment :
 
         remakeParentFilterChipsUi()
         remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
-        setQueryFilter()
     }
 
     private fun setupRecyclerView() {

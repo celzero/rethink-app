@@ -65,14 +65,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                     prev.id == curr.id
 
                 override fun areContentsTheSame(prev: DnsLog, curr: DnsLog): Boolean {
-                    return prev.appName == curr.appName &&
-                            prev.queryStr == curr.queryStr &&
-                            prev.time == curr.time &&
-                            prev.isBlocked == curr.isBlocked &&
-                            prev.blockLists == curr.blockLists &&
-                            prev.latency == curr.latency &&
-                            prev.flag == curr.flag &&
-                            prev.resolverId == curr.resolverId
+                    return prev == curr
                 }
             }
     }
