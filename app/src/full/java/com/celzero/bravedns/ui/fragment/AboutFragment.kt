@@ -17,9 +17,11 @@ package com.celzero.bravedns.ui.fragment
 
 import Logger
 import Logger.LOG_TAG_UI
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -30,13 +32,16 @@ import android.os.SystemClock
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.text.method.LinkMovementMethod
+import android.view.GestureDetector
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -57,11 +62,13 @@ import com.celzero.bravedns.scheduler.BugReportZipper.getZipFileName
 import com.celzero.bravedns.scheduler.EnhancedBugReport
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_4
+import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openUrl
@@ -70,6 +77,7 @@ import com.celzero.bravedns.util.UIUtils.sendEmailIntent
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getPackageMetadata
+import com.celzero.bravedns.util.Utilities.getRandomString
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
@@ -91,6 +99,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private var lastAppExitInfoDialogInvokeTime = INIT_TIME_MS
     private val workScheduler by inject<WorkScheduler>()
     private val appDatabase by inject<AppDatabase>()
+    private val persistentState by inject<PersistentState>()
 
     companion object {
         private const val SCHEME_PACKAGE = "package"
@@ -101,13 +110,14 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         initView()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initView() {
         if (isFdroidFlavour()) {
             b.aboutAppUpdate.visibility = View.GONE
         }
         updateVersionInfo()
-
         updateSponsorInfo()
+        updateTokenUi(persistentState.firebaseUserToken)
 
         b.aboutSponsor.setOnClickListener(this)
         b.aboutWebsite.setOnClickListener(this)
@@ -137,6 +147,44 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutStats.setOnClickListener(this)
         b.aboutDbStats.setOnClickListener(this)
         b.aboutBatteryStats.setOnClickListener(this)
+        b.tokenTextView.setOnClickListener(this)
+
+        val gestureDetector = GestureDetector(
+            requireContext(),
+            object : GestureDetector.SimpleOnGestureListener() {
+                override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                    val text = persistentState.firebaseUserToken
+                    val clipboard =
+                        getSystemService(requireContext(), ClipboardManager::class.java)
+                    val clip = ClipData.newPlainText("token", text)
+                    clipboard?.setPrimaryClip(clip)
+
+                    Toast.makeText(requireContext(), "Copied to clipboard", Toast.LENGTH_SHORT)
+                        .show()
+                    return true
+                }
+
+                override fun onDoubleTap(e: MotionEvent): Boolean {
+                    val newToken = generateNewToken()
+                    b.tokenTextView.text = newToken
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.config_add_success_toast),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return true
+                }
+            })
+
+        // suppress the warning about setting a touch listener
+        b.tokenTextView.setOnTouchListener { v, event ->
+            if (gestureDetector.onTouchEvent(event)) {
+                v.performClick() // important to call this
+                true
+            } else {
+                false // allow text selection
+            }
+        }
     }
 
     private fun updateVersionInfo() {
@@ -157,6 +205,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         } catch (e: PackageManager.NameNotFoundException) {
             Logger.w(LOG_TAG_UI, "err-version-info; pkg name not found: ${e.message}", e)
         }
+    }
+
+    fun updateTokenUi(token: String) {
+        b.tokenTextView.text = token
     }
 
     private fun getLastUpdatedTs(): String {
@@ -304,10 +356,18 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutBatteryStats -> {
                 openBatteryStatsDialog()
             }
-            else -> {
-                Logger.w(LOG_TAG_UI, "unknown view clicked: ${view?.id}")
+            b.tokenTextView -> {
+                // click is handled in gesture detector
             }
         }
+    }
+
+    private fun generateNewToken(): String {
+        val newToken = getRandomString(TOKEN_LENGTH)
+        persistentState.firebaseUserToken = newToken
+        persistentState.firebaseUserTokenTimestamp = System.currentTimeMillis()
+        updateTokenUi(newToken)
+        return newToken
     }
 
     private fun openStatsDialog() {

@@ -4,14 +4,15 @@
     android:layout_width="match_parent"
     android:layout_gravity="center"
     android:foregroundGravity="center"
+    android:background="?attr/background"
     android:layout_height="wrap_content">
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
-        app:cardBackgroundColor="?attr/background"
         app:cardElevation="8dp"
+        android:background="?attr/background"
         app:cardUseCompatPadding="true">
 
         <LinearLayout
@@ -29,10 +30,10 @@
                 android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/descriptionTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:text="@string/wg_ssid_dialog_description"
                 android:textSize="14sp" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -63,7 +64,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/parse_error_generic" />
+                    android:text="@string/wg_ssid_type_exact" />
 
 
             </RadioGroup>
@@ -75,11 +76,11 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/ssidTextInputLayout"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="@string/wg_ssid_input_hint">
+                    android:layout_weight="1">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/ssidEditText"
@@ -114,6 +115,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/lbl_cancel"
+                    android:visibility="gone"
                     android:textColor="?attr/primaryLightColorText" />
 
                 <com.google.android.material.button.MaterialButton

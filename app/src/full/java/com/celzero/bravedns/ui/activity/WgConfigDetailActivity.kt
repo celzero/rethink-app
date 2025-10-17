@@ -153,6 +153,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }
         configId = intent.getIntExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, INVALID_CONF_ID)
         wgType = WgType.fromInt(intent.getIntExtra(INTENT_EXTRA_WG_TYPE, WgType.DEFAULT.value))
+
+        b.ssidDescTv.text = getString(R.string.wg_setting_ssid_desc, getString(R.string.lbl_ssids))
     }
 
     override fun onResume() {
@@ -244,7 +246,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.catchAllRl.visibility = View.VISIBLE
             b.oneWgInfoTv.visibility = View.GONE
             b.hopBtn.visibility = View.VISIBLE
-            b.useMobileRl.visibility = View.VISIBLE
+            b.mobileSsidSettingsCard.visibility = View.VISIBLE
         } else if (wgType.isOneWg()) {
             b.wgHeaderTv.text =
                 getString(R.string.rt_list_simple_btn_txt).replaceFirstChar(Char::titlecase)
@@ -253,7 +255,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.hopBtn.visibility = View.GONE
             b.oneWgInfoTv.visibility = View.VISIBLE
             b.applicationsBtn.isEnabled = false
-            b.useMobileRl.visibility = View.GONE
+            b.mobileSsidSettingsCard.visibility = View.GONE
             b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
         } else {
             // invalid wireguard type, finish the activity
@@ -560,9 +562,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             val mapping = WireguardManager.getConfigFilesById(configId)
             if (mapping?.ssidEnabled == true) {
                 // ssid is enabled, cannot enable mobile only
+                val msg = getString(R.string.wg_ssid_and_mobile_err, getString(R.string.wg_setting_use_on_mobile), getString(R.string.wg_setting_ssid_title))
                 Utilities.showToastUiCentered(
                     this,
-                    getString(R.string.wg_ssid_and_mobile_err),
+                    msg,
                     Toast.LENGTH_LONG
                 )
                 b.useMobileCheck.isChecked = !b.useMobileCheck.isChecked
@@ -874,7 +877,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         if (enabled && hasPermissions && isLocationEnabled) {
             // SSID is enabled and we have all necessary permissions/location
             if (ssidItems.isEmpty()) {
-                val allTxt = getString(R.string.single_argument_parenthesis, getString(R.string.lbl_all))
+                val txt = getString(R.string.two_argument_space, getString(R.string.lbl_all), getString(R.string.lbl_ssids))
+                val allTxt = getString(R.string.single_argument_parenthesis, txt)
                 valueTv.text = allTxt
                 showSsidDisplay(editGroup, displayGroup)
             } else {
@@ -896,9 +900,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             NewSettingsManager.markSettingSeen(NewSettingsManager.WG_SSID_SETTING)
             val mapping = WireguardManager.getConfigFilesById(configId)
             if (mapping?.useOnlyOnMetered == true && isChecked) {
+                val msg = getString(R.string.wg_ssid_and_mobile_err, getString(R.string.wg_setting_ssid_title), getString(R.string.wg_setting_use_on_mobile))
                 Utilities.showToastUiCentered(
                     this,
-                    getString(R.string.wg_ssid_and_mobile_err),
+                    msg,
                     Toast.LENGTH_LONG
                 )
                 sw.isChecked = false
@@ -1015,7 +1020,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private fun showLocationEnableDialog() {
         val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(getString(R.string.ssid_location_error))
-        builder.setMessage(getString(R.string.location_enable_explanation))
+        builder.setMessage(getString(R.string.location_enable_explanation, getString(R.string.lbl_ssids)))
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.ssid_location_error_action)) { dialog, _ ->
             SsidPermissionManager.requestLocationEnable(this)
@@ -1032,8 +1037,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun showSsidPermissionExplanationDialog() {
         val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle(getString(R.string.ssid_permission_error))
-        builder.setMessage(getString(R.string.ssid_permission_explanation))
+        builder.setTitle(getString(R.string.ssid_permission_error_action))
+        builder.setMessage(getString(R.string.ssid_permission_explanation, getString(R.string.lbl_ssids)))
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.ssid_permission_error_action)) { dialog, _ ->
             SsidPermissionManager.requestSsidPermissions(this)
@@ -1091,7 +1096,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun showPermissionDeniedDialog() {
         val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle(getString(R.string.ssid_permission_error))
+        builder.setTitle(getString(R.string.ssid_permission_error_action))
         builder.setMessage(SsidPermissionManager.getPermissionExplanation(this))
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.ssid_permission_error_action)) { _, _ ->

@@ -30,6 +30,7 @@ object FirebaseErrorReporting : KoinComponent {
 
     private val persistentState by inject<PersistentState>()
     const val TOKEN_REGENERATION_PERIOD_DAYS: Long = 45
+    const val TOKEN_LENGTH = 16
 
     /**
      * Initialize Firebase Crashlytics if available and enabled

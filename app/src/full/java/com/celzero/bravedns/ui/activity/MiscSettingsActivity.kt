@@ -54,6 +54,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.biometric.BiometricManager
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -92,14 +93,20 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import androidx.core.net.toUri
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.ui.LauncherSwitcher
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
 import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
 import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.FirebaseErrorReporting
+import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
 import com.celzero.bravedns.util.Utilities.getRandomString
+import com.celzero.firestack.backend.Backend.token
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.koin.core.component.inject
 
 
 class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) {
@@ -107,6 +114,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
+    private val rdb by inject<RefreshDatabase>()
 
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
 
@@ -158,11 +166,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             b.settingsFirebaseErrorReportingRl.visibility = View.VISIBLE
             // Firebase error reporting
             b.settingsFirebaseErrorReportingSwitch.isChecked = persistentState.firebaseErrorReportingEnabled
-            if (b.settingsFirebaseErrorReportingSwitch.isChecked) {
-                b.tokenLayout.visibility = View.VISIBLE
-            } else {
-                b.tokenLayout.visibility = View.GONE
-            }
             b.settingsActivityCheckUpdateRl.visibility = View.VISIBLE
             // check for app updates
             b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
@@ -253,6 +256,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         // Auto start app after reboot
         b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
         b.dvIpInfoSwitch.isChecked = persistentState.downloadIpInfo
+
+        b.tombstoneAppSwitch.isChecked = persistentState.tombstoneApps
 
         displayPcapUi()
         displayAppThemeUi()
@@ -682,20 +687,15 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             handleFirebaseErrorReportingToggle(isChecked)
         }
 
-        b.btnRegenerateToken.setOnClickListener {
-            val newToken = getRandomString(64)
-            persistentState.firebaseUserToken = newToken
-            persistentState.firebaseUserTokenTimestamp = System.currentTimeMillis()
-            updateTokenUi(newToken)
-            setFirebaseUserId(newToken)
-            Toast.makeText(this, getString(R.string.config_add_success_toast), Toast.LENGTH_SHORT).show()
+        b.tombstoneAppRl.setOnClickListener {
+            NewSettingsManager.markSettingSeen(NewSettingsManager.TOMBSTONE_APP_SETTING)
+            b.tombstoneAppSwitch.isChecked = !b.tombstoneAppSwitch.isChecked
         }
 
-        b.tokenTextView.setOnClickListener {
-            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("Token", b.tokenTextView.text)
-            clipboard.setPrimaryClip(clip)
-            Toast.makeText(this, getString(R.string.copied_clipboard), Toast.LENGTH_SHORT).show()
+        b.tombstoneAppSwitch.setOnCheckedChangeListener { _, isChecked ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.TOMBSTONE_APP_SETTING)
+            persistentState.tombstoneApps = isChecked
+            io { rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE) }
         }
 
     }
@@ -706,25 +706,12 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             FirebaseErrorReporting.setEnabled(true)
             b.settingsFirebaseErrorReportingSwitch.isChecked = true
             persistentState.firebaseErrorReportingEnabled = true
-            val token = persistentState.firebaseUserToken
-            b.tokenLayout.visibility = View.VISIBLE
-            setFirebaseUserId(token)
-            showToastUiCentered(
-                this,
-                getString(R.string.config_add_success_toast),
-                Toast.LENGTH_SHORT
-            )
+            setFirebaseUserId(persistentState.firebaseUserToken)
         } else {
             // disable firebase error reporting
             FirebaseErrorReporting.setEnabled(false)
             b.settingsFirebaseErrorReportingSwitch.isChecked = false
             persistentState.firebaseErrorReportingEnabled = false
-            b.tokenLayout.visibility = View.GONE
-            showToastUiCentered(
-                this,
-                getString(R.string.config_add_success_toast),
-                Toast.LENGTH_SHORT
-            )
         }
     }
 
@@ -1169,10 +1156,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         alertBuilder.create().show()
     }
 
-    fun updateTokenUi(token: String) {
-        b.tokenTextView.text = token
-    }
-
     fun setFirebaseUserId(token: String) {
         try {
             FirebaseErrorReporting.setUserId(token)
@@ -1187,12 +1170,11 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         var token = persistentState.firebaseUserToken
         var ts = persistentState.firebaseUserTokenTimestamp
         if (token.isBlank() || now - ts > fortyFiveDaysMs) {
-            token = getRandomString(64)
+            token = getRandomString(TOKEN_LENGTH)
             ts = now
             persistentState.firebaseUserToken = token
             persistentState.firebaseUserTokenTimestamp = ts
         }
-        updateTokenUi(token)
     }
 
     override fun onResume() {
@@ -1206,6 +1188,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     private fun showNewBadgeIfNeeded() {
         val errorReporting = NewSettingsManager.shouldShowBadge(NewSettingsManager.ERROR_REPORTING)
         b.genSettingsFirebaseErrorReportingTxt.setBadgeDotVisible(this, errorReporting)
+        val tombstoneSetting = NewSettingsManager.shouldShowBadge(NewSettingsManager.TOMBSTONE_APP_SETTING)
+        b.tombstoneAppTxt.setBadgeDotVisible(this, tombstoneSetting)
     }
 
     private fun registerForActivityResult() {
@@ -1304,4 +1288,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
         delay(ms, lifecycleScope) { for (v in views) v.isEnabled = true }
     }
+
+    private fun io(f: suspend () -> Unit) = lifecycleScope.launch(Dispatchers.IO) { f() }
 }

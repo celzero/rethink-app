@@ -483,7 +483,7 @@
                         android:layout_marginStart="15dp"
                         android:layout_marginEnd="15dp"
                         android:paddingTop="15dp"
-                        android:text="Mobile / SSID settings"
+                        android:text="@string/adv_taster_title"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?attr/primaryTextColor" />
 
@@ -587,7 +587,7 @@
                         android:layout_marginStart="15dp"
                         android:layout_marginEnd="15dp"
                         android:orientation="horizontal"
-                        android:visibility="gone">
+                        android:visibility="visible">
 
                         <androidx.appcompat.widget.AppCompatEditText
                             android:id="@+id/ssid_edit_text"
@@ -595,7 +595,6 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:background="@drawable/edittext_default"
-                            android:hint="@string/wg_setting_ssid_hint"
                             android:imeOptions="actionDone"
                             android:inputType="text"
                             android:maxLines="4"
@@ -611,7 +610,7 @@
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="8dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/wg_setting_ssid_save_btn"
+                            android:contentDescription="@string/lbl_save"
                             android:src="@drawable/ic_tick" />
                     </LinearLayout>
 
@@ -641,7 +640,7 @@
                             android:layout_marginStart="8dp"
                             android:alpha="0.5"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/wg_setting_ssid_edit_btn"
+                            android:contentDescription="@string/rt_edit_dialog_positive"
                             android:src="@drawable/ic_edit_icon_grey" />
                     </LinearLayout>
 
@@ -663,7 +662,6 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="@string/ssid_permission_error"
                             android:textColor="?attr/accentBad"
                             android:textSize="@dimen/default_font_text_view" />
 

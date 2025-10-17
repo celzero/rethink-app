@@ -31,6 +31,7 @@ object FirebaseErrorReporting : KoinComponent {
 
     private val persistentState by inject<PersistentState>()
     const val TOKEN_REGENERATION_PERIOD_DAYS: Long = 45
+    const val TOKEN_LENGTH = 16
 
     /**
      * Initialize Firebase Crashlytics if available and enabled
@@ -41,7 +42,7 @@ object FirebaseErrorReporting : KoinComponent {
             crashlytics.isCrashlyticsCollectionEnabled = persistentState.firebaseErrorReportingEnabled
             val token = persistentState.firebaseUserToken
             if (token.isEmpty()) {
-                val newToken = getRandomString(64)
+                val newToken = getRandomString(TOKEN_LENGTH)
                 persistentState.firebaseUserToken = newToken
                 crashlytics.setUserId(newToken)
                 Logger.i(LOG_FIREBASE, "Generated new firebase token: $newToken")

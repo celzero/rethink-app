@@ -161,11 +161,11 @@ object SsidPermissionManager {
      * @return Explanation message for permission request
      */
     fun getPermissionExplanation(context: Context): String {
-        return context.getString(R.string.ssid_permission_explanation)
+        return context.getString(R.string.ssid_permission_explanation, context.getString(R.string.lbl_ssids))
     }
 
     fun getLocationEnableExplanation(context: Context): String {
-        return context.getString(R.string.location_enable_explanation)
+        return context.getString(R.string.location_enable_explanation, context.getString(R.string.lbl_ssids))
     }
 
     /**

@@ -70,6 +70,7 @@ import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
+import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
 import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.RemoteFileTagUtil
@@ -244,7 +245,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         var token = persistentState.firebaseUserToken
         var ts = persistentState.firebaseUserTokenTimestamp
         if (token.isBlank() || now - ts > fortyFiveDaysMs) {
-            token = getRandomString(64)
+            token = getRandomString(TOKEN_LENGTH)
             ts = now
             persistentState.firebaseUserToken = token
             persistentState.firebaseUserTokenTimestamp = ts

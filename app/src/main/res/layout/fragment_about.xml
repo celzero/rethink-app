@@ -739,6 +739,20 @@
             android:typeface="monospace" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/token_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:alpha="0.75"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textIsSelectable="true"
+            android:typeface="monospace"
+            android:textSize="@dimen/small_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/about_license"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

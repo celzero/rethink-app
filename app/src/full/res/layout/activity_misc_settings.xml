@@ -154,6 +154,61 @@
                 </RelativeLayout>
 
                 <RelativeLayout
+                    android:id="@+id/tombstone_app_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/tombstone_app_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:alpha="0.5"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_tombstone" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/tombstone_app_switch"
+                        android:layout_toEndOf="@id/tombstone_app_icon"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tombstone_app_txt"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/tombstone_app_title"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="5dp"
+                            android:text="@string/tombstone_app_desc"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/tombstone_app_switch"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:padding="10dp" />
+                </RelativeLayout>
+
+                <RelativeLayout
                     android:id="@+id/settings_ip_info_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -1036,38 +1091,6 @@
                         android:layout_centerVertical="true"
                         android:padding="10dp" />
                 </RelativeLayout>
-
-                <LinearLayout
-                    android:id="@+id/token_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="40dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="5dp"
-                    android:paddingBottom="5dp">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/token_text_view"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ellipsize="end"
-                        android:padding="8dp"
-                        android:layout_marginEnd="10dp"
-                        android:textIsSelectable="true"
-                        android:textSize="@dimen/default_font_text_view" />
-
-                    <androidx.appcompat.widget.AppCompatImageButton
-                        android:id="@+id/btn_regenerate_token"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:alpha="0.5"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:src="@drawable/ic_refresh_white" />
-
-                </LinearLayout>
 
                 <RelativeLayout
                     android:id="@+id/settings_mic_cam_access_rl"
