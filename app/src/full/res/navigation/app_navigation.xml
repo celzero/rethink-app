@@ -15,9 +15,9 @@
         android:id="@+id/rethinkPlus"
         android:name="com.celzero.bravedns.ui.fragment.RethinkPlusFragment"
         android:label="RethinkPlusFragment">
-        <action
+        <!--<action
             android:id="@+id/action_switch_to_rethinkPlusDashboardFragment"
-            app:destination="@id/rethinkPlusDashboardFragment" />
+            app:destination="@id/rethinkPlusDashboardFragment" />-->
     </fragment>
     <fragment
         android:id="@+id/summaryStatisticsFragment"
