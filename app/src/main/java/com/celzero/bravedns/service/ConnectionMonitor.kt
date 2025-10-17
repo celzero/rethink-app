@@ -491,7 +491,7 @@ class ConnectionMonitor(private val context: Context, private val networkListene
 
         val contentTitle: String = context.resources.getString(R.string.lbl_action_required)
         val contentText: String =
-            context.resources.getString(R.string.permission_missing_notification_desc)
+            context.getString(R.string.location_enable_explanation, context.getString(R.string.lbl_ssids))
 
         builder
             .setSmallIcon(R.drawable.ic_notification_icon)
