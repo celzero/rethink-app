@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 RethinkDNS and its authors
+ * Copyright 2025 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,34 +15,40 @@
  */
 package com.celzero.bravedns.data
 
+import org.json.JSONArray
+import org.json.JSONObject
+
 data class SsidItem(
     val name: String,
     val type: SsidType
 ) {
+    // [{"name":"pgdd","type":"wildcard"},{"name":"hhjhy","type":"exact"}]
     enum class SsidType(val id: String, val displayName: String) {
-        STRING("string", "String"),
+        EXACT("exact", "Exact"),
         WILDCARD("wildcard", "Wildcard");
 
         companion object {
             fun fromIdentifier(identifier: String): SsidType {
-                return entries.find { it.id == identifier } ?: STRING
+                return entries.find { it.id == identifier } ?: EXACT
             }
         }
     }
 
-    fun toStorageString(): String {
-        return "$name##${type.id}"
+    fun toJson(): JSONObject {
+        return JSONObject().apply {
+            put("name", name)
+            put("type", type.id)
+        }
     }
 
     companion object {
-        fun fromStorageString(storage: String): SsidItem? {
-            val parts = storage.split("##")
-            if (parts.size != 2) return null
 
-            val name = parts[0].trim()
-            val type = SsidType.fromIdentifier(parts[1].trim())
+        fun fromJson(json: JSONObject): SsidItem? {
+            val name = json.optString("name", "").trim()
+            val typeId = json.optString("type", "").trim()
 
             if (name.isEmpty()) return null
+            val type = SsidType.fromIdentifier(typeId)
 
             return SsidItem(name, type)
         }
@@ -50,15 +56,20 @@ data class SsidItem(
         fun parseStorageList(storageString: String): List<SsidItem> {
             if (storageString.isBlank()) return emptyList()
 
-            return storageString.split(',', '\n', '\r')
-                .map { it.trim() }
-                .filter { it.isNotEmpty() }
-                .mapNotNull { fromStorageString(it) }
-                .distinct()
+            return try {
+                val jsonArray = JSONArray(storageString)
+                (0 until jsonArray.length()).mapNotNull { index ->
+                    fromJson(jsonArray.optJSONObject(index))
+                }.distinct()
+            } catch (_: Exception) {
+                emptyList()
+            }
         }
 
         fun toStorageList(ssidItems: List<SsidItem>): String {
-            return ssidItems.joinToString(",") { it.toStorageString() }
+            val jsonArray = JSONArray()
+            ssidItems.forEach { jsonArray.put(it.toJson()) }
+            return jsonArray.toString()
         }
     }
 }

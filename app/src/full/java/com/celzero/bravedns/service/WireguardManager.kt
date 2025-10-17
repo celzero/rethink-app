@@ -581,7 +581,7 @@ object WireguardManager : KoinComponent {
 
             val matchFound = ssidItems.any { ssidItem ->
                 when (ssidItem.type) {
-                    SsidItem.SsidType.STRING -> {
+                    SsidItem.SsidType.EXACT -> {
                         ssidItem.name.equals(ssid, ignoreCase = true)
                     }
                     SsidItem.SsidType.WILDCARD -> {
@@ -611,7 +611,7 @@ object WireguardManager : KoinComponent {
             .replace("?", ".")    // Convert ? to .
 
         return try {
-            text.matches(Regex(regexPattern, RegexOption.IGNORE_CASE))
+            text.matches(Regex(regexPattern, RegexOption.IGNORE_CASE)) || text.contains(pattern, ignoreCase = true)
         } catch (e: Exception) {
             Logger.w(LOG_TAG_PROXY, "Invalid wildcard pattern: $pattern, error: ${e.message}")
             false
@@ -626,7 +626,7 @@ object WireguardManager : KoinComponent {
 
         return ssidItems.any { ssidItem ->
             when (ssidItem.type) {
-                SsidItem.SsidType.STRING -> {
+                SsidItem.SsidType.EXACT -> {
                     ssidItem.name.equals(ssid, ignoreCase = true)
                 }
                 SsidItem.SsidType.WILDCARD -> {

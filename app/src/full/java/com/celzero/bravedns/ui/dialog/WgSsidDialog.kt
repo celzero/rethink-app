@@ -23,13 +23,16 @@ import android.view.Window
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SsidAdapter
 import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.databinding.DialogWgSsidBinding
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.text.replaceFirstChar
@@ -72,7 +75,13 @@ class WgSsidDialog(
             insets
         }
 
-        b.radioString.text = context.getString(R.string.parse_error_generic).replaceFirstChar(Char::titlecase)
+        b.descriptionTextView.text = context.getString(R.string.wg_ssid_dialog_description, context.getString(R.string.lbl_ssids))
+        b.ssidTextInputLayout.hint = context.getString(R.string.wg_ssid_input_hint, context.getString(R.string.lbl_ssids))
+
+        // set initial state of add button to disabled
+        b.addSsidBtn.isEnabled = false
+        b.addSsidBtn.isClickable = false
+        b.addSsidBtn.setTextColor(UIUtils.fetchColor(context, R.attr.primaryLightColorText))
     }
 
     private fun setupRecyclerView() {
@@ -107,6 +116,21 @@ class WgSsidDialog(
             }
         }
 
+        b.ssidEditText.addTextChangedListener { text ->
+            val isNotEmpty = !text.isNullOrBlank()
+
+            // Enable or disable button based on text
+            b.addSsidBtn.isEnabled = isNotEmpty
+            b.addSsidBtn.isClickable = isNotEmpty
+
+            // Change button background color based on state
+            val context = b.addSsidBtn.context
+            val enabledColor = UIUtils.fetchColor(context, R.attr.accentGood)
+            val disabledColor = UIUtils.fetchColor(context, R.attr.primaryLightColorText)
+
+            b.addSsidBtn.setTextColor(if (isNotEmpty) enabledColor else disabledColor)
+        }
+
         b.cancelBtn.setOnClickListener {
             dismiss()
         }
@@ -122,7 +146,7 @@ class WgSsidDialog(
         if (ssidName.isNullOrBlank()) {
             Utilities.showToastUiCentered(
                 activity,
-                activity.getString(R.string.wg_ssid_empty_error),
+                activity.getString(R.string.wg_ssid_invalid_error, activity.getString(R.string.lbl_ssids)),
                 Toast.LENGTH_SHORT
             )
             return
@@ -132,14 +156,14 @@ class WgSsidDialog(
         if (!isValidSsidName(ssidName)) {
             Utilities.showToastUiCentered(
                 activity,
-                activity.getString(R.string.wg_ssid_invalid_error),
+                activity.getString(R.string.config_add_success_toast),
                 Toast.LENGTH_SHORT
             )
             return
         }
 
         val selectedType = if (b.radioString.isChecked) {
-            SsidItem.SsidType.STRING
+            SsidItem.SsidType.EXACT
         } else {
             SsidItem.SsidType.WILDCARD
         }
@@ -147,12 +171,9 @@ class WgSsidDialog(
         val newSsidItem = SsidItem(ssidName, selectedType)
 
         // Check for duplicates
-        if (ssidItems.any { it.name.equals(ssidName, ignoreCase = true) }) {
-            Utilities.showToastUiCentered(
-                activity,
-                activity.getString(R.string.wg_ssid_duplicate_error),
-                Toast.LENGTH_SHORT
-            )
+        if (ssidItems.any { it.name.equals(ssidName, ignoreCase = true) && it.type == selectedType } ) {
+            b.ssidEditText.text?.clear()
+            b.radioWildcard.isChecked = true
             return
         }
 
@@ -164,10 +185,8 @@ class WgSsidDialog(
     }
 
     private fun isValidSsidName(ssidName: String): Boolean {
-        // Basic validation - no commas, no ## (our delimiter), reasonable length
+        // Basic validation - reasonable length
         return ssidName.length <= 32 &&
-                !ssidName.contains(",") &&
-                !ssidName.contains("##") &&
                 ssidName.isNotBlank()
     }
 
@@ -175,7 +194,7 @@ class WgSsidDialog(
         val builder = MaterialAlertDialogBuilder(activity)
         builder.setTitle(activity.getString(R.string.lbl_delete))
         builder.setMessage(
-            activity.getString(R.string.wg_ssid_delete_confirmation, ssidItem.name)
+            activity.getString(R.string.two_argument_space, activity.getString(R.string.lbl_delete), ssidItem.name)
         )
         builder.setCancelable(true)
         builder.setPositiveButton(activity.getString(R.string.lbl_delete)) { _, _ ->
