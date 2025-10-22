@@ -242,6 +242,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // TODO: should be different for IPv4 and IPv6, but for now it is same
         // IPv4: 576, IPv6: 1280
         const val MIN_MTU: Int = 1280
+        private const val MAX_MTU: Int = 9000
 
         // route v4 in v6 only networks?
         const val ROUTE4IN6 = true
@@ -1965,6 +1966,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
     }
 
     private fun mtu(): Int {
+        if (DEBUG && persistentState.useMaxMtu) {
+            return MAX_MTU
+        }
         val overlayMtu = overlayNetworks.mtu
         val underlyingMtu = underlyingNetworks?.minMtu ?: VPN_INTERFACE_MTU
         val minMtu = min(overlayMtu, underlyingMtu)
@@ -2309,6 +2313,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     // notify connection monitor to update the network policy
                     Logger.i(LOG_TAG_VPN, "tun network policy changed, notify connection monitor")
                     connectionMonitor.onPolicyChanged()
+                }
+            }
+            PersistentState.USE_MAX_MTU -> {
+                io("useMaxMtu") {
+                    val newMtu = mtu()
+                    Logger.i(LOG_TAG_VPN, "use max mtu changed, new mtu: $newMtu")
+                    val reason = "useMaxMtu: ${persistentState.useMaxMtu}"
+                    vpnRestartTrigger.value = reason
                 }
             }
         }
@@ -2959,13 +2971,15 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             logd("tun: new nw is null, using old nw: $old")
             new = old
         }
+
+        val useMaxMtu = persistentState.useMaxMtu
         val tunMtu = tunMtu()
         logd(
-            "tun: tunMtu:${tunMtu}; old: ${old.minMtu}, new: ${new.minMtu}; oldaux: ${overlayNetworks.mtu}, newaux: ${aux.mtu}"
+            "tun: useMaxMtu? $useMaxMtu tunMtu:${tunMtu}; old: ${old.minMtu}, new: ${new.minMtu}; oldaux: ${overlayNetworks.mtu}, newaux: ${aux.mtu}"
         )
 
         // mark mtu changed if any tunMtu differs from min mtu of new underlying & overlay network
-        val mtuChanged = tunMtu != min(new.minMtu, aux.mtu)
+        val mtuChanged = !useMaxMtu && tunMtu != min(new.minMtu, aux.mtu)
 
         // val auxHas4 = aux.has4 || aux.failOpen
         // val auxHas6 = aux.has6 || aux.failOpen

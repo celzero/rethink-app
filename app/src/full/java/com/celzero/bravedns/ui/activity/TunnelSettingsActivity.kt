@@ -90,6 +90,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityWireguardText.text = getString(R.string.settings_proxy_header).lowercase()
         val text = getString(R.string.two_argument, getString(R.string.orbot_status_arg_2).lowercase(), getString(R.string.lbl_ip))
         b.settingsActivityTcpText.text = text.lowercase()
+        b.dvWgAllowIncomingTxt.text = getString(R.string.two_argument_space, getString(R.string.settings_allow_incoming_wg_packets), getString(R.string.lbl_experimental))
 
         b.settingsActivityAllowBypassProgress.visibility = View.GONE
         displayAllowBypassUi()
@@ -127,6 +128,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.dvTcpKeepAliveSwitch.isChecked = persistentState.tcpKeepAlive
         b.dvTimeoutSeekbar.progress = persistentState.dialTimeoutSec / 60
+
+        b.settingsUseMaxMtuSwitch.isChecked = persistentState.useMaxMtu
 
         displayDialerTimeOutUi(persistentState.dialTimeoutSec)
         displayInternetProtocolUi()
@@ -378,6 +381,14 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.dvTcpKeepAliveRl.setOnClickListener {
             b.dvTcpKeepAliveSwitch.isChecked = !b.dvTcpKeepAliveSwitch.isChecked
+        }
+
+        b.settingsUseMaxMtuRl.setOnClickListener {
+            b.settingsUseMaxMtuSwitch.isChecked = !b.settingsUseMaxMtuSwitch.isChecked
+        }
+
+        b.settingsUseMaxMtuSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.useMaxMtu = isChecked
         }
 
         b.dvTimeoutSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {

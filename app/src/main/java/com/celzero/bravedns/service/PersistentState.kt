@@ -74,6 +74,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val AUTO_DIALS_PARALLEL = "auto_dials_parallel"
         const val STALL_ON_NO_NETWORK = "fail_open_on_no_network"
         const val TUN_NETWORK_POLICY = "tun_network_handling_policy"
+        const val USE_MAX_MTU = "use_max_mtu"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -400,6 +401,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // Token for Firebase userId
     var firebaseUserToken by stringPref("firebase_user_token").withDefault("")
     var firebaseUserTokenTimestamp by longPref("firebase_user_token_timestamp").withDefault(0L)
+
+    // experimental feature to use max mtu
+    var useMaxMtu by booleanPref("use_max_mtu").withDefault<Boolean>(false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
