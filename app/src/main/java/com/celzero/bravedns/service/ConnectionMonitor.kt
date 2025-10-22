@@ -1367,17 +1367,22 @@ class ConnectionMonitor(private val context: Context, private val networkListene
          *         valid, `m2` is returned. Otherwise, the minimum of `m1` and `m2` is returned.
          */
         private suspend fun minNonZeroMtu(m1: Int?, m2: Int): Int {
-            return if (m1 != null && m1 > 0) {
+            // treat 0 mtu as 1500 as default mtu is 1500 (android-def) and android will send 0 in
+            // case of default
+            // developer.android.com/reference/android/net/LinkProperties#getMtu()
+            val mtu1 = if (m1 == 0) 1500 else m1
+            val mtu2 = if (m2 == 0) 1500 else m2
+            return if (mtu1 != null && mtu1 > 0) {
                 // mtu can be null when lp is null
                 // mtu can be 0 when the value is not set, see:LinkProperties#getMtu()
-                if (m2 <= 0) m1 else min(m1, m2)
+                if (mtu2 <= 0) mtu1 else min(mtu1, mtu2)
             } else {
-                if (m2 <= 0) {
+                if (mtu2 <= 0) {
                     // both m1 and m2 are invalid, return MIN_MTU
                     MIN_MTU
                 } else {
                     // m1 is invalid, return m2
-                    m2
+                    mtu2
                 }
             }
         }
