@@ -172,6 +172,7 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.random.Random
+import kotlin.text.clear
 import kotlin.time.measureTime
 
 class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge, OnSharedPreferenceChangeListener {
@@ -2958,10 +2959,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             logd("tun: new nw is null, using old nw: $old")
             new = old
         }
-
         val tunMtu = tunMtu()
         logd(
-            "tun: ${tunMtu}; old: ${old.minMtu}, new: ${new.minMtu}; oldaux: ${overlayNetworks.mtu}, newaux: ${aux.mtu}"
+            "tun: tunMtu:${tunMtu}; old: ${old.minMtu}, new: ${new.minMtu}; oldaux: ${overlayNetworks.mtu}, newaux: ${aux.mtu}"
         )
 
         // mark mtu changed if any tunMtu differs from min mtu of new underlying & overlay network
@@ -4486,16 +4486,20 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 // update rethink summary
                 val key = CidKey(connectionSummary.connId, rethinkUid)
                 activeCids.remove(key)
-                trackedCidsToClose.remove(connectionSummary.connId)
                 netLogTracker.updateRethinkSummary(connectionSummary)
+                synchronized(trackedCidsToClose) {
+                    trackedCidsToClose.remove(connectionSummary.connId)
+                }
             } else {
                 // other apps summary
                 // convert the uid to app id
                 val uid = FirewallManager.appId(s.uid.toInt(), isPrimaryUser())
                 val key = CidKey(connectionSummary.connId, uid)
                 activeCids.remove(key)
-                trackedCidsToClose.remove(connectionSummary.connId)
                 netLogTracker.updateIpSummary(connectionSummary)
+                synchronized(trackedCidsToClose) {
+                    trackedCidsToClose.remove(connectionSummary.connId)
+                }
             }
             io("dlIpInfo") {
                 IpInfoDownloader.fetchIpInfoIfRequired(s.target)
@@ -5284,16 +5288,23 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         }
 
         Logger.v(LOG_TAG_VPN, "firewall-rule $rule, adding to trackedCids to close, $cid")
-        trackedCidsToClose.add(cid)
+        synchronized(trackedCidsToClose) {
+            trackedCidsToClose.add(cid)
+        }
     }
 
     // this method is called when the device is locked, so no need to check for device lock here
     private fun closeTrackedConnsOnDeviceLock() {
         io("devLockCloseConns") {
-            // do not call closeConnections with empty list, as it will close all connections
-            if (trackedCidsToClose.isNotEmpty()) {
-                vpnAdapter?.closeConnections(trackedCidsToClose.toList(), isUid = false, "dev-lock-close-conns")
+            val cidsToClose: List<String> = synchronized(trackedCidsToClose) {
+                if (!trackedCidsToClose.isEmpty()) emptyList<String>()
+
+                val snapshot = trackedCidsToClose.toList()
                 trackedCidsToClose.clear()
+                snapshot
+            }
+            if (cidsToClose.isNotEmpty()) {
+                vpnAdapter?.closeConnections(cidsToClose, isUid = false, "dev-lock-close-conns")
             }
         }
     }
