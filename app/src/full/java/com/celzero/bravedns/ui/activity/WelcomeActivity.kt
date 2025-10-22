@@ -172,7 +172,9 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
 
     private fun launchHomeScreen() {
         persistentState.firstTimeLaunch = false
-        startActivity(Intent(this, HomeScreenActivity::class.java))
+        val intent = Intent(this, HomeScreenActivity::class.java)
+        intent.setPackage(this.packageName)
+        startActivity(intent)
         finish()
     }
 

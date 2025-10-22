@@ -39,6 +39,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
+import kotlin.or
 
 class NotificationHandlerActivity: AppCompatActivity() {
 
@@ -146,6 +147,7 @@ class NotificationHandlerActivity: AppCompatActivity() {
     private fun launchHomeScreenAndFinish() {
         // handle the app lock state then launch home screen
         val intent = Intent(this, AppLockActivity::class.java)
+        intent.setPackage(this.packageName)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()

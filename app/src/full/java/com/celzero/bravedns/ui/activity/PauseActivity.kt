@@ -43,6 +43,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
+import kotlin.or
 
 class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
     private val b by viewBinding(ActivityPauseBinding::bind)
@@ -168,6 +169,7 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
 
         lastStopActivityInvokeTime = SystemClock.elapsedRealtime()
         val intent = Intent(this, AppLockActivity::class.java)
+        intent.setPackage(this.packageName)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
