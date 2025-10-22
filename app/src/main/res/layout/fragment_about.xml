@@ -622,6 +622,46 @@
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_app_notification"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_notification"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_settings_notification"
+                android:textSize="@dimen/large_font_text_view" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/title_stats"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="54dp"
+                android:fontFamily="sans-serif-smallcaps"
+                android:gravity="center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/title_statistics"
+                android:textColor="?attr/accentGood"
+                android:textSize="@dimen/extra_large_font_text_view"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_stats"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
@@ -661,30 +701,13 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:background="?android:attr/selectableItemBackground"
-                android:drawableStart="@drawable/ic_log_level"
+                android:drawableStart="@drawable/ic_battery_stats"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="Battery stats"
                 android:textSize="@dimen/large_font_text_view" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/about_app_notification"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:drawableStart="@drawable/ic_notification"
-                android:drawablePadding="20dp"
-                android:gravity="start|center_vertical"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
-                android:text="@string/about_settings_notification"
-                android:textSize="@dimen/large_font_text_view" />
-
 
         </LinearLayout>
 

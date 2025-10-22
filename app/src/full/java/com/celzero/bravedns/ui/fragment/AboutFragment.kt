@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui.fragment
 
 import Logger
 import Logger.LOG_TAG_UI
+import android.R.attr.text
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.ClipData
@@ -92,6 +93,7 @@ import org.koin.core.component.KoinComponent
 import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipFile
+import kotlin.text.replaceFirstChar
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
@@ -118,6 +120,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         updateVersionInfo()
         updateSponsorInfo()
         updateTokenUi(persistentState.firebaseUserToken)
+
+        b.titleStats.text = getString(R.string.title_statistics).lowercase()
+        b.aboutStats.text = getString(R.string.two_argument_space, getString(R.string.settings_general_header).replaceFirstChar(Char::titlecase), getString(R.string.title_statistics))
 
         b.aboutSponsor.setOnClickListener(this)
         b.aboutWebsite.setOnClickListener(this)
@@ -165,6 +170,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 }
 
                 override fun onDoubleTap(e: MotionEvent): Boolean {
+                    if (isFdroidFlavour()) return true
+
                     val newToken = generateNewToken()
                     b.tokenTextView.text = newToken
                     Toast.makeText(
@@ -208,6 +215,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     fun updateTokenUi(token: String) {
+        if (isFdroidFlavour()) {
+            b.tokenTextView.visibility = View.GONE
+            return
+        }
         b.tokenTextView.text = token
     }
 
@@ -363,6 +374,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun generateNewToken(): String {
+        if (isFdroidFlavour()) return ""
+
         val newToken = getRandomString(TOKEN_LENGTH)
         persistentState.firebaseUserToken = newToken
         persistentState.firebaseUserTokenTimestamp = System.currentTimeMillis()
