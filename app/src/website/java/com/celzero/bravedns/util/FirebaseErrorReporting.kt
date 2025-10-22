@@ -37,20 +37,29 @@ object FirebaseErrorReporting : KoinComponent {
      * Initialize Firebase Crashlytics if available and enabled
      */
     fun initialize() {
+        if (!isAvailable()) {
+            Logger.w(LOG_FIREBASE, "crashlytics not available in this build variant")
+            return
+        }
+        if (!persistentState.firebaseErrorReportingEnabled) {
+            Logger.i(LOG_FIREBASE, "crashlytics disabled in settings")
+            return
+        }
         try {
             val crashlytics = FirebaseCrashlytics.getInstance()
-            crashlytics.isCrashlyticsCollectionEnabled = persistentState.firebaseErrorReportingEnabled
             val token = persistentState.firebaseUserToken
             if (token.isEmpty()) {
                 val newToken = getRandomString(TOKEN_LENGTH)
                 persistentState.firebaseUserToken = newToken
+                persistentState.firebaseUserTokenTimestamp = System.currentTimeMillis()
                 crashlytics.setUserId(newToken)
-                Logger.i(LOG_FIREBASE, "Generated new firebase token: $newToken")
+                Logger.i(LOG_FIREBASE, "generated new firebase token: $newToken")
             } else {
                 crashlytics.setUserId(token)
-                Logger.i(LOG_FIREBASE, "Existing firebase token found: $token")
+                Logger.i(LOG_FIREBASE, "existing firebase token found: $token")
             }
-            Logger.i(LOG_FIREBASE, "crashlytics initialized, enabled: ${persistentState.firebaseErrorReportingEnabled}")
+            setEnabled(persistentState.firebaseErrorReportingEnabled)
+            Logger.i(LOG_FIREBASE, "crashlytics initialized, enabled? ${crashlytics.isCrashlyticsCollectionEnabled}")
         } catch (e: Exception) {
             Logger.w(LOG_FIREBASE, "crashlytics not available: ${e.message}")
         }
@@ -70,7 +79,7 @@ object FirebaseErrorReporting : KoinComponent {
             }
             Logger.i(LOG_FIREBASE, "crashlytics enabled state set to: $enabled")
         } catch (e: Exception) {
-            Logger.w(LOG_FIREBASE, "Failed to set crashlytics enabled state: ${e.message}")
+            Logger.w(LOG_FIREBASE, "err setting crashlytics state: ${e.message}")
         }
     }
 
@@ -95,7 +104,7 @@ object FirebaseErrorReporting : KoinComponent {
             val crashlytics = FirebaseCrashlytics.getInstance()
             crashlytics.log(message)
         } catch (e: Exception) {
-            Logger.w(LOG_FIREBASE, "Failed to log message to crashlytics: ${e.message}")
+            Logger.w(LOG_FIREBASE, "err; log message to crashlytics: ${e.message}")
         }
     }
 
@@ -109,7 +118,7 @@ object FirebaseErrorReporting : KoinComponent {
             val crashlytics = FirebaseCrashlytics.getInstance()
             crashlytics.recordException(throwable)
         } catch (e: Exception) {
-            Logger.w(LOG_FIREBASE, "Failed to record exception to crashlytics: ${e.message}")
+            Logger.w(LOG_FIREBASE, "err; rec-ex to crashlytics: ${e.message}")
         }
     }
 
@@ -123,7 +132,7 @@ object FirebaseErrorReporting : KoinComponent {
             val crashlytics = FirebaseCrashlytics.getInstance()
             crashlytics.setUserId(userId)
         } catch (e: Exception) {
-            Logger.w(LOG_FIREBASE, "Failed to set user ID in crashlytics: ${e.message}")
+            Logger.w(LOG_FIREBASE, "err; set user-id crashlytics: ${e.message}")
         }
     }
 
@@ -137,7 +146,7 @@ object FirebaseErrorReporting : KoinComponent {
             val crashlytics = FirebaseCrashlytics.getInstance()
             crashlytics.setCustomKey(key, value)
         } catch (e: Exception) {
-            Logger.w(LOG_FIREBASE, "Failed to set custom key in crashlytics: ${e.message}")
+            Logger.w(LOG_FIREBASE, "err; set custom key: ${e.message}")
         }
     }
 }
