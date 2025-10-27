@@ -261,11 +261,11 @@ dependencies {
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
 
     // Koin core
-    download 'io.insert-koin:koin-core:4.1.0'
-    implementation 'io.insert-koin:koin-core:4.1.0'
+    download 'io.insert-koin:koin-core:4.1.1'
+    implementation 'io.insert-koin:koin-core:4.1.1'
     // Koin main (Scope, ViewModel ...)
-    download 'io.insert-koin:koin-android:4.1.0'
-    implementation 'io.insert-koin:koin-android:4.1.0'
+    download 'io.insert-koin:koin-android:4.1.1'
+    implementation 'io.insert-koin:koin-android:4.1.1'
 
     download 'hu.autsoft:krate:2.0.0'
     implementation 'hu.autsoft:krate:2.0.0'
