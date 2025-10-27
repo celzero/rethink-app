@@ -221,7 +221,7 @@ dependencies {
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
 
     // LiveData
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.2'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.4'
 
     implementation 'com.google.code.gson:gson:2.13.1'
 
@@ -230,8 +230,8 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.room:room-paging:$room_version"
 
-    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2'
-    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.2'
+    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4'
+    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.4'
 
     // Pagers Views
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
