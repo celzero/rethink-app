@@ -235,6 +235,10 @@ object VpnController : KoinComponent {
         return braveVpnService?.getProxyStats(id)
     }
 
+    suspend fun getWireGuardStats(id: String): WireguardManager.WgStats? {
+        return braveVpnService?.getWireGuardStats(id)
+    }
+
     suspend fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean> {
         return braveVpnService?.getSupportedIpVersion(id) ?: Pair(false, false)
     }

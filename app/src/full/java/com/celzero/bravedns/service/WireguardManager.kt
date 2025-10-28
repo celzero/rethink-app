@@ -29,11 +29,13 @@ import com.celzero.bravedns.database.WgConfigFilesRepository
 import com.celzero.bravedns.service.ProxyManager.ID_NONE
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
+import com.celzero.firestack.backend.RouterStats
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -1118,19 +1120,25 @@ object WireguardManager : KoinComponent {
         }
     }
 
+    data class WgStats(val routerStats: RouterStats?, val mtu: Long?, val status: Long?, val ip4: Boolean?, val ip6: Boolean?)
     suspend fun stats(): String {
         val sb = StringBuilder()
         mappings.filter { it.isActive }.forEach {
             val id = ID_WG_BASE + it.id
-            val stats = VpnController.getProxyStats(id)
+            val stats = VpnController.getWireGuardStats(id)
+            val routerStats = stats?.routerStats
             sb.append("   id: ${it.id}, name: ${it.name}\n")
-            sb.append("   addr: ${stats?.addr}").append("\n")
-            sb.append("   rx: ${stats?.rx}\n")
-            sb.append("   tx: ${stats?.tx}\n")
-            sb.append("   lastRx: ${getRelativeTimeSpan(stats?.lastRx)}\n")
-            sb.append("   lastTx: ${getRelativeTimeSpan(stats?.lastTx)}\n")
-            sb.append("   lastOk: ${getRelativeTimeSpan(stats?.lastOK)}\n")
-            sb.append("   since: ${getRelativeTimeSpan(stats?.since)}\n")
+            sb.append("   addr: ${routerStats?.addr}").append("\n")
+            sb.append("   mtu: ${stats?.mtu}\n")
+            sb.append("   status: ${stats?.status}\n")
+            sb.append("   ip4: ${stats?.ip4}\n")
+            sb.append("   ip6: ${stats?.ip6}\n")
+            sb.append("   rx: ${routerStats?.rx}\n")
+            sb.append("   tx: ${routerStats?.tx}\n")
+            sb.append("   lastRx: ${getRelativeTimeSpan(routerStats?.lastRx)}\n")
+            sb.append("   lastTx: ${getRelativeTimeSpan(routerStats?.lastTx)}\n")
+            sb.append("   lastOk: ${getRelativeTimeSpan(routerStats?.lastOK)}\n")
+            sb.append("   since: ${getRelativeTimeSpan(routerStats?.since)}\n\n")
         }
         return sb.toString()
     }

@@ -5407,6 +5407,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         return vpnAdapter?.getProxyStats(id)
     }
 
+    suspend fun getWireGuardStats(id: String): WireguardManager.WgStats? {
+        return vpnAdapter?.getWireGuardStats(id)
+    }
+
     suspend fun getSupportedIpVersion(id: String): Pair<Boolean, Boolean>? {
         return vpnAdapter?.getSupportedIpVersion(id) ?: return Pair(false, false)
     }

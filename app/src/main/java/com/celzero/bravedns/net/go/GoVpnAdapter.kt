@@ -1208,6 +1208,24 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
+    suspend fun getWireGuardStats(id: String): WireguardManager.WgStats? {
+        return try {
+            val proxy = getProxies()?.getProxy(id.togs())
+            val status = proxy?.status()
+
+            val router = proxy?.router()
+            val stat = router?.stat()
+            val mtu = router?.mtu()
+            val ip4 = router?.iP4()
+            val ip6 = router?.iP6()
+
+            WireguardManager.WgStats(stat, mtu, status, ip4, ip6)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_VPN, "$TAG err getting wg stats($id): ${e.message}")
+            null
+        }
+    }
+
     suspend fun pauseWireguard(id: String): Boolean {
         return try {
             val res = getProxies()?.getProxy(id.togs())?.pause()
@@ -1589,7 +1607,6 @@ class GoVpnAdapter : KoinComponent {
             }
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "$TAG could not set local stamp: ${e.message}", e)
-        } finally {
             resetLocalBlocklistStampFromTunnel()
         }
     }
