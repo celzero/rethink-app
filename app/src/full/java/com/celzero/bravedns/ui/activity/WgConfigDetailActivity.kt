@@ -66,6 +66,7 @@ import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.tos
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
@@ -145,6 +146,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -235,9 +238,14 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 mobileOnlyExperimentalTxt,
                 getString(R.string.symbol_mobile)
             )
-        b.ssidTitleTv.text = getString(
+        val ssidExperimentalTxt = getString(
             R.string.two_argument_space,
             getString(R.string.wg_setting_ssid_title),
+            getString(R.string.lbl_experimental)
+        )
+        b.ssidTitleTv.text = getString(
+            R.string.two_argument_space,
+            ssidExperimentalTxt,
             getString(R.string.symbol_id)
         )
         if (wgType.isDefault()) {
@@ -419,7 +427,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun showInvalidConfigDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.lbl_wireguard))
         builder.setMessage(getString(R.string.config_invalid_desc))
         builder.setCancelable(false)
@@ -429,7 +437,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         builder.setNeutralButton(getString(R.string.lbl_delete)) { _, _ ->
             WireguardManager.deleteConfig(configId)
         }
-        builder.create().show()
+        val dialog = builder.create()
+        dialog.show()
     }
 
     private fun shouldObserveAppsCount(): Boolean {
@@ -582,6 +591,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 return@setOnClickListener
             }
             updateUseOnMobileNetwork(b.useMobileCheck.isChecked)
+            if (b.useMobileCheck.isChecked) {
+                // Enable experimental-dependent settings when experimental features are enabled
+                persistentState.enableStabilityDependentSettings(this)
+            }
         }
 
         b.logsBtn.setOnClickListener {
@@ -740,10 +753,13 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun openAppsDialog(proxyName: String) {
-        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         val proxyId = ID_WG_BASE + configId
         val appsAdapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
         mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
+        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        if (Themes.isFrostTheme(themeId)) {
+            themeId = R.style.App_Dialog_NoDim
+        }
         val includeAppsDialog =
             WgIncludeAppsDialog(this, appsAdapter, mappingViewModel, themeId, proxyId, proxyName)
         includeAppsDialog.setCanceledOnTouchOutside(false)
@@ -760,14 +776,17 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             )
             return
         }
-        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        if (Themes.isFrostTheme(themeId)) {
+            themeId = R.style.App_Dialog_NoDim
+        }
         val hopDialog = WgHopDialog(this, themeId, configId, hopables, selectedId)
         hopDialog.setCanceledOnTouchOutside(false)
         hopDialog.show()
     }
 
     private fun showDeleteInterfaceDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         val delText =
             getString(
                 R.string.two_argument_space,
@@ -794,11 +813,15 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         builder.setNegativeButton(this.getString(R.string.lbl_cancel)) { _, _ ->
             // no-op
         }
-        builder.create().show()
+        val dialog = builder.create()
+        dialog.show()
     }
 
     private fun openAddPeerDialog() {
-        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        if (Themes.isFrostTheme(themeId)) {
+            themeId = R.style.App_Dialog_NoDim
+        }
         val addPeerDialog = WgAddPeerDialog(this, themeId, configId, null)
         addPeerDialog.setCanceledOnTouchOutside(false)
         addPeerDialog.show()
@@ -934,6 +957,9 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             io { WireguardManager.updateSsidEnabled(configId, isChecked) }
 
             if (isChecked && currentHasPermissions && currentLocationEnabled) {
+                // Enable experimental-dependent settings when experimental features are enabled
+                persistentState.enableStabilityDependentSettings(this)
+
                 // Enabling with proper permissions, load and display SSIDs
                 io {
                     val cur = WireguardManager.getConfigFilesById(configId)?.ssids ?: ""
@@ -995,8 +1021,11 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun openSsidDialog() {
-        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         val currentSsids = WireguardManager.getConfigFilesById(configId)?.ssids ?: ""
+        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        if (Themes.isFrostTheme(themeId)) {
+            themeId = R.style.App_Dialog_NoDim
+        }
         val ssidDialog = WgSsidDialog(this, themeId, currentSsids) { newSsids ->
             // Save callback - update the SSID configuration
             io {
@@ -1018,7 +1047,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun showLocationEnableDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.ssid_location_error))
         builder.setMessage(getString(R.string.location_enable_explanation, getString(R.string.lbl_ssids)))
         builder.setCancelable(true)
@@ -1032,11 +1061,12 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.ssidCheck.isChecked = false
             io { WireguardManager.updateSsidEnabled(configId, false) }
         }
-        builder.create().show()
+        val dialog = builder.create()
+        dialog.show()
     }
 
     private fun showSsidPermissionExplanationDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.ssid_permission_error_action))
         builder.setMessage(getString(R.string.ssid_permission_explanation, getString(R.string.lbl_ssids)))
         builder.setCancelable(true)
@@ -1050,7 +1080,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.ssidCheck.isChecked = false
             io { WireguardManager.updateSsidEnabled(configId, false) }
         }
-        builder.create().show()
+        val dialog = builder.create()
+        dialog.show()
     }
 
     private fun updateErrorLayouts(
@@ -1095,7 +1126,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun showPermissionDeniedDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.ssid_permission_error_action))
         builder.setMessage(SsidPermissionManager.getPermissionExplanation(this))
         builder.setCancelable(true)
@@ -1107,6 +1138,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.ssidCheck.isChecked = false
             io { WireguardManager.updateSsidEnabled(configId, false) }
         }
-        builder.create().show()
+        val dialog = builder.create()
+        dialog.show()
     }
 }

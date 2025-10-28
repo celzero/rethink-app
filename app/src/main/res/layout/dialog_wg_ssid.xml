@@ -11,7 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
-        app:cardElevation="8dp"
         android:background="?attr/background"
         app:cardUseCompatPadding="true">
 
@@ -44,30 +43,76 @@
                 android:layout_weight="1"
                 android:maxHeight="200dp" />
 
-            <RadioGroup
-                android:id="@+id/ssidTypeRadioGroup"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <RadioButton
-                    android:id="@+id/radioWildcard"
-                    android:layout_width="0dp"
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:checked="true"
-                    android:text="@string/lbl_wildcard" />
+                    android:text="@string/wg_ssid_condition_label"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="?attr/primaryLightColorText" />
 
-                <RadioButton
-                    android:id="@+id/radioString"
-                    android:layout_width="0dp"
+                <RadioGroup
+                    android:id="@+id/ssidConditionRadioGroup"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/wg_ssid_type_exact" />
+                    android:layout_marginBottom="12dp"
+                    android:orientation="horizontal">
 
+                    <RadioButton
+                        android:id="@+id/radioEqual"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="@string/wg_ssid_condition_equal" />
 
-            </RadioGroup>
+                    <RadioButton
+                        android:id="@+id/radioNotEqual"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/wg_ssid_type_not_equal" />
+
+                </RadioGroup>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/wg_ssid_match_type_label"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="?attr/primaryLightColorText" />
+
+                <RadioGroup
+                    android:id="@+id/ssidMatchTypeRadioGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/radioExact"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/wg_ssid_type_exact" />
+
+                    <RadioButton
+                        android:id="@+id/radioWildcard"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="@string/lbl_wildcard" />
+
+                </RadioGroup>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

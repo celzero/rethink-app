@@ -34,6 +34,7 @@ import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.databinding.DialogWgSsidBinding
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.text.replaceFirstChar
 
@@ -55,7 +56,7 @@ class WgSsidDialog(
         b = DialogWgSsidBinding.inflate(layoutInflater)
         setContentView(b.root)
         setCancelable(false)
-
+        useTransparentNoDimBackground()
         setupDialog()
         setupRecyclerView()
         loadCurrentSsids()
@@ -162,25 +163,50 @@ class WgSsidDialog(
             return
         }
 
-        val selectedType = if (b.radioString.isChecked) {
-            SsidItem.SsidType.EXACT
-        } else {
-            SsidItem.SsidType.WILDCARD
+        // Determine the selected type based on both radio groups
+        val isEqual = b.radioEqual.isChecked
+        val isExact = b.radioExact.isChecked
+        
+        val selectedType = when {
+            isEqual && isExact -> SsidItem.SsidType.EQUAL_EXACT
+            isEqual && !isExact -> SsidItem.SsidType.EQUAL_WILDCARD
+            !isEqual && isExact -> SsidItem.SsidType.NOTEQUAL_EXACT
+            else -> SsidItem.SsidType.NOTEQUAL_WILDCARD
         }
 
         val newSsidItem = SsidItem(ssidName, selectedType)
 
-        // Check for duplicates
-        if (ssidItems.any { it.name.equals(ssidName, ignoreCase = true) && it.type == selectedType } ) {
+        // Check if same name and type already exists
+        val existingWithSameType = ssidItems.find { 
+            it.name.equals(ssidName, ignoreCase = true) && it.type == selectedType 
+        }
+        
+        if (existingWithSameType != null) {
+            // Same name and type already exists, just clear input
             b.ssidEditText.text?.clear()
-            b.radioWildcard.isChecked = true
+            resetToDefaultSelection()
             return
+        }
+
+        // Check if same name exists with different type
+        val existingWithDifferentType = ssidItems.find { 
+            it.name.equals(ssidName, ignoreCase = true) && it.type != selectedType 
+        }
+        
+        if (existingWithDifferentType != null) {
+            // Remove the existing one and add the new one (update)
+            ssidAdapter.removeSsidItem(existingWithDifferentType)
         }
 
         ssidAdapter.addSsidItem(newSsidItem)
         b.ssidEditText.text?.clear()
 
-        // Reset to wildcard type as default
+        // Reset to default selection
+        resetToDefaultSelection()
+    }
+
+    private fun resetToDefaultSelection() {
+        b.radioEqual.isChecked = true
         b.radioWildcard.isChecked = true
     }
 
@@ -191,7 +217,7 @@ class WgSsidDialog(
     }
 
     private fun showDeleteConfirmation(ssidItem: SsidItem) {
-        val builder = MaterialAlertDialogBuilder(activity)
+        val builder = MaterialAlertDialogBuilder(activity, R.style.App_Dialog_NoDim)
         builder.setTitle(activity.getString(R.string.lbl_delete))
         builder.setMessage(
             activity.getString(R.string.two_argument_space, activity.getString(R.string.lbl_delete), ssidItem.name)

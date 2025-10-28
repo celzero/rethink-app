@@ -22,14 +22,26 @@ data class SsidItem(
     val name: String,
     val type: SsidType
 ) {
-    // [{"name":"pgdd","type":"wildcard"},{"name":"hhjhy","type":"exact"}]
-    enum class SsidType(val id: String, val displayName: String) {
-        EXACT("exact", "Exact"),
-        WILDCARD("wildcard", "Wildcard");
+    // [{"name":"pgdd","type":"equal_wildcard"},{"name":"hhjhy","type":"equal_exact"},{"name":"test","type":"notequal_exact"}]
+    enum class SsidType(val id: String, val displayName: String, val isEqual: Boolean, val isExact: Boolean) {
+        EQUAL_EXACT("equal_exact", "Equal - Exact", true, true),
+        EQUAL_WILDCARD("equal_wildcard", "Equal - Wildcard", true, false),
+        NOTEQUAL_EXACT("notequal_exact", "Not Equal - Exact", false, true),
+        NOTEQUAL_WILDCARD("notequal_wildcard", "Not Equal - Wildcard", false, false);
 
         companion object {
             fun fromIdentifier(identifier: String): SsidType {
-                return entries.find { it.id == identifier } ?: EXACT
+                return when (identifier) {
+                    "equal_exact" -> EQUAL_EXACT
+                    "equal_wildcard" -> EQUAL_WILDCARD
+                    "notequal_exact" -> NOTEQUAL_EXACT
+                    "notequal_wildcard" -> NOTEQUAL_WILDCARD
+                    // Legacy support for old format
+                    "exact" -> EQUAL_EXACT
+                    "wildcard" -> EQUAL_WILDCARD
+                    "notequal" -> NOTEQUAL_EXACT
+                    else -> EQUAL_WILDCARD
+                }
             }
         }
     }

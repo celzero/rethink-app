@@ -581,16 +581,22 @@ object WireguardManager : KoinComponent {
 
             val matchFound = ssidItems.any { ssidItem ->
                 when (ssidItem.type) {
-                    SsidItem.SsidType.EXACT -> {
+                    SsidItem.SsidType.EQUAL_EXACT -> {
                         ssidItem.name.equals(ssid, ignoreCase = true)
                     }
-                    SsidItem.SsidType.WILDCARD -> {
+                    SsidItem.SsidType.EQUAL_WILDCARD -> {
                         matchesWildcard(ssidItem.name, ssid)
+                    }
+                    SsidItem.SsidType.NOTEQUAL_EXACT -> {
+                        !ssidItem.name.equals(ssid, ignoreCase = true)
+                    }
+                    SsidItem.SsidType.NOTEQUAL_WILDCARD -> {
+                        !matchesWildcard(ssidItem.name, ssid)
                     }
                 }
             }
 
-            if (!matchFound) {
+            if (!matchFound && ssidItems.isNotEmpty()) {
                 val ssidNames = ssidItems.map { "${it.name}(${it.type.displayName})" }
                 Logger.i(LOG_TAG_PROXY, "canAdd: ssidEnabled is true, but ssid($ssid) not available, ssidList: $ssidNames")
                 return false
@@ -624,12 +630,38 @@ object WireguardManager : KoinComponent {
             return true
         }
 
-        return ssidItems.any { ssidItem ->
-            when (ssidItem.type) {
-                SsidItem.SsidType.EXACT -> {
+        // Separate EQUAL items from NOT_EQUAL items
+        val equalItems = ssidItems.filter { it.type.isEqual }
+        val notEqualItems = ssidItems.filter { !it.type.isEqual }
+
+        // Check NOT_EQUAL items first - if any match, return false
+        val notEqualMatch = notEqualItems.any { ssidItem ->
+            when {
+                ssidItem.type.isExact -> {
                     ssidItem.name.equals(ssid, ignoreCase = true)
                 }
-                SsidItem.SsidType.WILDCARD -> {
+                else -> { // wildcard
+                    matchesWildcard(ssidItem.name, ssid)
+                }
+            }
+        }
+
+        if (notEqualMatch) {
+            return false
+        }
+
+        // If there are only NOT_EQUAL items and none matched, return true
+        if (equalItems.isEmpty() && notEqualItems.isNotEmpty()) {
+            return true
+        }
+
+        // Check EQUAL items (exact or wildcard)
+        return equalItems.any { ssidItem ->
+            when {
+                ssidItem.type.isExact -> {
+                    ssidItem.name.equals(ssid, ignoreCase = true)
+                }
+                else -> { // wildcard
                     matchesWildcard(ssidItem.name, ssid)
                 }
             }
