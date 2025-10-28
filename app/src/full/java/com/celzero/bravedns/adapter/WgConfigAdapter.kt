@@ -53,6 +53,7 @@ import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.WgHopManager
 import com.celzero.bravedns.wireguard.WgInterface
+import com.celzero.firestack.backend.Backend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -372,7 +373,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
                 if (dnsStatusId != null) {
                     // check for dns failure cases and update the UI
-                    if (isDnsError(dnsStatusId)) {
+                    if (isDnsError(dnsStatusId) && statusPair.first != Backend.TPU) {
                         b.interfaceDetailCard.strokeColor =
                             fetchColor(context, R.attr.chipTextNegative)
                         val humanReadableLastOk = getHumanReadableLastOk(stats).toString()
