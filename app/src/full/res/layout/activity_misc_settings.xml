@@ -1037,7 +1037,8 @@
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
                         android:padding="10dp"
-                        android:src="@drawable/universal_firewall" />
+                        android:alpha="0.5"
+                        android:src="@drawable/ic_stability_improvement" />
 
                     <LinearLayout
                         android:id="@+id/settings_firebase_error_reporting_texts"
