@@ -1453,8 +1453,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         if (type == ScreenType.RETHINK) {
             io {
-                val url = appConfig.getRemoteRethinkEndpoint()?.url
-                val name = appConfig.getRemoteRethinkEndpoint()?.name
+                val endpoint = appConfig.getRemoteRethinkEndpoint()
+                val url = endpoint?.url
+                val name = endpoint?.name
                 intent.putExtra(RETHINK_BLOCKLIST_NAME, name)
                 intent.putExtra(RETHINK_BLOCKLIST_URL, url)
                 uiCtx { startActivity(intent) }

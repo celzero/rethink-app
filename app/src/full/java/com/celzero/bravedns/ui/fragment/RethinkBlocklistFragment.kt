@@ -49,6 +49,7 @@ import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.RethinkBlocklistManager.RethinkBlocklistType.Companion.getType
+import com.celzero.bravedns.service.RethinkBlocklistManager.getStamp
 import com.celzero.bravedns.service.RethinkBlocklistManager.getTagsFromStamp
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_NAME
@@ -186,7 +187,7 @@ class RethinkBlocklistFragment :
         selectedFileTags.observe(viewLifecycleOwner) {
             if (it == null) return@observe
 
-            io { modifiedStamp = RethinkBlocklistManager.getStamp(it, type) }
+            io { modifiedStamp = getStamp(it, type) }
         }
 
         filters.observe(viewLifecycleOwner) {
@@ -482,7 +483,7 @@ class RethinkBlocklistFragment :
         }
 
         io {
-            val blocklistCount = RethinkBlocklistManager.getTagsFromStamp(stamp, type).size
+            val blocklistCount = getTagsFromStamp(stamp, type).size
             if (type.isLocal()) {
                 persistentState.localBlocklistStamp = stamp
                 persistentState.numberOfLocalBlocklists = blocklistCount
@@ -496,6 +497,7 @@ class RethinkBlocklistFragment :
                     blocklistCount
                 )
                 appConfig.enableRethinkDnsPlus()
+                Logger.i(LOG_TAG_UI, "set stamp for remote blocklist with $stamp, $blocklistCount")
             }
         }
     }
