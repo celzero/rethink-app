@@ -23,8 +23,6 @@ import Logger.updateConfigLevel
 import android.Manifest
 import android.app.LocaleManager
 import android.content.ActivityNotFoundException
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -36,13 +34,11 @@ import android.os.Environment
 import android.os.LocaleList
 import android.provider.Settings
 import android.text.InputType
-import android.util.Base64
 import android.view.Gravity
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.ScrollView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -54,8 +50,8 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.biometric.BiometricManager
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
@@ -63,50 +59,47 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.LauncherSwitcher
+import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
+import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
 import com.celzero.bravedns.ui.bottomsheet.BackupRestoreBottomSheet
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.FirebaseErrorReporting
+import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
+import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
+import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils.openUrl
+import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
+import com.celzero.bravedns.util.Utilities.getRandomString
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.File
 import java.io.IOException
-import java.security.SecureRandom
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import androidx.core.net.toUri
-import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.ui.LauncherSwitcher
-import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
-import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
-import com.celzero.bravedns.util.NewSettingsManager
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
-import com.celzero.bravedns.util.FirebaseErrorReporting
-import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
-import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
-import com.celzero.bravedns.util.Utilities.getRandomString
-import com.celzero.firestack.backend.Backend.token
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.koin.core.component.inject
 
 
 class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) {
@@ -143,6 +136,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -440,7 +435,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showPcapOptionsDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_pcap_dialog_title))
         val items =
             arrayOf(
@@ -526,6 +521,14 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     getString(
                         R.string.settings_selected_theme,
                         getString(R.string.settings_theme_dialog_themes_6)
+                    )
+            }
+
+            Themes.DARK_FROST.id -> {
+                b.genSettingsThemeDesc.text =
+                    getString(
+                        R.string.settings_selected_theme,
+                        getString(R.string.settings_theme_dialog_themes_7)
                     )
             }
 
@@ -659,6 +662,10 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean
             ->
             persistentState.prefAutoStartBootUp = b
+            if (b) {
+                // Enable experimental-dependent settings when experimental features are enabled
+                persistentState.enableStabilityDependentSettings(this)
+            }
         }
 
         b.settingsTaskerRl.setOnClickListener {
@@ -717,7 +724,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
     private fun showGoLoggerDialog() {
         // show dialog with logger options, change log level in GoVpnAdapter based on selection
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_go_log_heading))
         val items =
             arrayOf(
@@ -749,7 +756,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
 
     private fun showBiometricDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_biometric_dialog_heading))
         // show an list of options disable, enable immediate, ask after 5 min, ask after 15 min
         val item0 = getString(R.string.settings_biometric_dialog_option_0)
@@ -875,7 +882,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showPermissionAlert() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.alert_permission_accessibility)
         builder.setMessage(R.string.alert_firewall_accessibility_explanation)
         builder.setPositiveButton(getString(R.string.univ_accessibility_dialog_positive)) { _, _ ->
@@ -902,7 +909,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun invokeChangeLocaleDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_locale_dialog_title))
         val languages = getLocaleEntries()
         val items = languages.keys.toTypedArray()
@@ -1054,9 +1061,19 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showThemeDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_theme_dialog_title))
-        val items =
+        val items = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            arrayOf(
+                getString(R.string.settings_theme_dialog_themes_1),
+                getString(R.string.settings_theme_dialog_themes_2),
+                getString(R.string.settings_theme_dialog_themes_3),
+                getString(R.string.settings_theme_dialog_themes_4),
+                getString(R.string.settings_theme_dialog_themes_5),
+                getString(R.string.settings_theme_dialog_themes_6),
+                getString(R.string.settings_theme_dialog_themes_7)
+            )
+        } else {
             arrayOf(
                 getString(R.string.settings_theme_dialog_themes_1),
                 getString(R.string.settings_theme_dialog_themes_2),
@@ -1065,6 +1082,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 getString(R.string.settings_theme_dialog_themes_5),
                 getString(R.string.settings_theme_dialog_themes_6)
             )
+        }
         val checkedItem = persistentState.theme
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             dialog.dismiss()
@@ -1096,6 +1114,9 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 Themes.DARK_PLUS.id -> {
                     setThemeRecreate(R.style.AppThemeTrueBlackPlus)
                 }
+                Themes.DARK_FROST.id -> {
+                    setThemeRecreate(R.style.AppThemeTrueBlackFrost)
+                }
             }
         }
         alertBuilder.create().show()
@@ -1107,7 +1128,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showNotificationActionDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_notification_dialog_title))
         val items =
             arrayOf(
