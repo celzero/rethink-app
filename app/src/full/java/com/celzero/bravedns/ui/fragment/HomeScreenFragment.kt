@@ -82,6 +82,7 @@ import com.celzero.bravedns.ui.bottomsheet.HomeScreenSettingBottomSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.NotificationActionType
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.UIUtils.openNetworkSettings
 import com.celzero.bravedns.util.UIUtils.openUrl
@@ -280,7 +281,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         // multiply the month with 0.60$ + 0.20$ for every month
         val amount = month * (0.60 + 0.20)
         Logger.d(LOG_TAG_UI, "Sponsor: $installTime, days/month: $days/$month, amount: $amount")
-        val alertBuilder = MaterialAlertDialogBuilder(requireContext())
+        val alertBuilder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         val inflater = LayoutInflater.from(requireContext())
         val dialogView = inflater.inflate(R.layout.dialog_sponsor_info, null)
         alertBuilder.setView(dialogView)
@@ -299,7 +300,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         sponsorBtn.setOnClickListener {
             openUrl(requireContext(), RETHINKDNS_SPONSOR_LINK)
         }
-
         dialog.show()
     }
 
@@ -545,7 +545,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     val proxyId = "${ProxyManager.ID_WG_BASE}${it.getId()}"
                     Logger.vv(LOG_TAG_UI, "$TAG init stats check for $proxyId")
                     val stats = VpnController.getProxyStats(proxyId)
-                    val status = VpnController.getProxyStatusById(proxyId).first
+                    val statusPair = VpnController.getProxyStatusById(proxyId)
+                    val status = UIUtils.ProxyStatus.entries.find { s -> s.id == statusPair.first }
+
                     // check for dns status of the wg if splitDns is enabled
                     val dnsStats = if (isSplitDns()) {
                         VpnController.getDnsStatus(proxyId)
@@ -554,34 +556,58 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     }
 
                     // Handle paused state as idle (TPU is the pause status)
-                    if (status == Backend.TPU) {
+                    if (status == UIUtils.ProxyStatus.TPU) {
                         idle++ // paused proxies are counted as idle
                         return@forEach
                     }
 
+                    // Check DNS errors first
+                    if (dnsStats != null && isDnsError(dnsStats)) {
+                        failing++
+                        return@forEach
+                    }
+
+                    // Handle null stats
                     if (stats == null) {
                         failing++
                         return@forEach
                     }
-                    if (dnsStats != null && isDnsError(dnsStats)) {
-                        failing++
-                        return@forEach
-                    } // else proceed
 
                     val lastOk = stats.lastOK
                     val since = stats.since
-                    // Only mark as failing if it has been running for a while without success
+
+                    // Check if it's been running long enough without success
                     if (now - since > WG_UPTIME_THRESHOLD && lastOk == 0L) {
                         failing++
                         return@forEach
                     }
                     
                     if (status != null) {
-                        // consider starting and up as active
                         when (status) {
-                            Backend.TZZ -> {
+                            UIUtils.ProxyStatus.TOK -> {
+                                // For TOK (connected), check if it's recently active
+                                if (lastOk > 0L && (now - lastOk < WG_HANDSHAKE_TIMEOUT)) {
+                                    active++
+                                } else if (lastOk > 0L) {
+                                    // Has connected before but not recently, consider idle
+                                    idle++
+                                } else if (now - since < WG_UPTIME_THRESHOLD) {
+                                    // Still in startup period, consider as starting (active)
+                                    active++
+                                } else {
+                                    failing++
+                                }
+                            }
+                            UIUtils.ProxyStatus.TUP -> {
+                                // Starting state - always consider as active (transitioning)
+                                active++
+                            }
+                            UIUtils.ProxyStatus.TZZ -> {
                                 // For TZZ (idle), be more lenient - consider it as idle if it has had any connection
-                                if (stats.lastOK > 0L) {
+                                if (lastOk > 0L && now - since < WG_HANDSHAKE_TIMEOUT) {
+                                    // Has had successful handshake recently, consider it connected/idle
+                                    idle++
+                                } else if (lastOk > 0L) {
                                     // Has had successful handshake before, consider it idle
                                     idle++
                                 } else if (now - since < WG_UPTIME_THRESHOLD) {
@@ -592,40 +618,26 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                                     failing++
                                 }
                             }
-                            Backend.TOK -> {
-                                // For TOK (connected), check if it's recently active
-                                if (stats.lastOK > 0L && (now - stats.lastOK < WG_HANDSHAKE_TIMEOUT)) {
-                                    active++
-                                } else if (stats.lastOK > 0L) {
-                                    // Has connected before but not recently, consider idle
-                                    idle++
-                                } else if (now - since < WG_UPTIME_THRESHOLD) {
-                                    // Still in startup period, consider as starting (active)
-                                    active++
-                                } else {
-                                    failing++
-                                }
-                            }
-                            Backend.TUP -> {
-                                // Starting state - always consider as active (transitioning)
-                                active++
-                            }
-                            Backend.TNT -> {
+                            UIUtils.ProxyStatus.TNT -> {
                                 // Waiting state - consider as idle if recently started, otherwise failing
-                                if (now - since < WG_UPTIME_THRESHOLD) {
+                                if (now - since < WG_HANDSHAKE_TIMEOUT) {
                                     idle++
                                 } else {
                                     failing++
                                 }
+                            }
+                            UIUtils.ProxyStatus.TPU -> {
+                                // Paused state - consider as idle
+                                idle++
                             }
                             else -> {
-                                // Unknown or error states
+                                // Unknown or error states (TKO, TEND, etc.)
                                 failing++
                             }
                         }
                     } else {
                         // No status available, but if we have recent stats, don't immediately mark as failing
-                        if (stats.lastOK > 0L && (now - stats.lastOK < WG_HANDSHAKE_TIMEOUT)) {
+                        if (lastOk > 0L && (now - lastOk < WG_HANDSHAKE_TIMEOUT)) {
                             idle++
                         } else {
                             failing++
@@ -1070,7 +1082,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun showBatteryOptimizationDialog() {
         if (!isAtleastN()) return
 
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         val title =
             getString(
                 R.string.battery_optimization_dialog_heading,
@@ -1113,7 +1125,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun showAlwaysOnStopDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
 
         builder.setTitle(R.string.always_on_dialog_stop_heading)
         if (VpnController.isVpnLockdown()) {
@@ -1159,7 +1171,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun showAlwaysOnDisableDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.always_on_dialog_heading)
         builder.setMessage(R.string.always_on_dialog)
         builder.setCancelable(false)
@@ -1397,7 +1409,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun showPrivateDnsDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.private_dns_dialog_heading)
         builder.setMessage(R.string.private_dns_dialog_desc)
         builder.setCancelable(false)
@@ -1540,7 +1552,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun showFirstTimeVpnDialog(prepareVpnIntent: Intent) {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.hsf_vpn_dialog_header)
         builder.setMessage(R.string.hsf_vpn_dialog_message)
         builder.setCancelable(false)
