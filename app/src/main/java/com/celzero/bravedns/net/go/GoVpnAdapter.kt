@@ -166,7 +166,7 @@ class GoVpnAdapter : KoinComponent {
         setAutoDialsParallel()
         setHappyEyeballs()
         // added for testing, use if needed
-        if (DEBUG) panicAtRandom(false) else panicAtRandom(false)
+        if (DEBUG) panicAtRandom(persistentState.panicRandom) else panicAtRandom(false)
         Logger.v(LOG_TAG_VPN, "$TAG initResolverProxiesPcap done")
     }
 
@@ -593,6 +593,9 @@ class GoVpnAdapter : KoinComponent {
     }
 
     suspend fun setRDNS() {
+        // always set the remote blocklist
+        setRDNSRemote()
+
         // Set brave dns to tunnel - Local/Remote
         Logger.d(LOG_TAG_VPN, "$TAG set brave dns to tunnel (local/remote)")
 
@@ -606,9 +609,6 @@ class GoVpnAdapter : KoinComponent {
                 Logger.i(LOG_TAG_VPN, "$TAG local-rdns disabled")
             } catch (_: Exception) { }
         }
-
-        // always set the remote blocklist
-        setRDNSRemote()
     }
 
     private suspend fun setRDNSRemote() {
@@ -2304,7 +2304,7 @@ class GoVpnAdapter : KoinComponent {
         return tunnel
     }
 
-    private suspend fun panicAtRandom(shouldPanic: Boolean) {
+    suspend fun panicAtRandom(shouldPanic: Boolean = persistentState.panicRandom) {
         if (!tunnel.isConnected) {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip panic at random")
             return

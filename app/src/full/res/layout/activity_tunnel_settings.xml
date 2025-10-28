@@ -45,11 +45,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -293,6 +289,62 @@
                 </RelativeLayout>
 
                 <RelativeLayout
+                    android:id="@+id/settings_activity_tunnel_metered_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/settings_activity_tunnel_metered_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:alpha="0.5"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_meter_mobile_only" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/settings_activity_tunnel_metered_switch"
+                        android:layout_toEndOf="@id/settings_activity_tunnel_metered_icon"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/gen_settings_tunnel_metered_txt"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_tunnel_metered"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="5dp"
+                            android:text="@string/settings_tunnel_metered_desc"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/settings_activity_tunnel_metered_switch"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:padding="10dp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
                     android:id="@+id/settings_activity_mobile_metered_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -523,64 +575,6 @@
 
                 </RelativeLayout>
 
-                <RelativeLayout
-                    android:id="@+id/settings_use_max_mtu_rl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:paddingTop="15dp"
-                    android:paddingBottom="15dp">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/settings_use_max_mtu_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:alpha="0.5"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_tun_nw_policy" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/settings_use_max_mtu_switch"
-                        android:layout_toEndOf="@id/settings_use_max_mtu_icon"
-                        android:orientation="vertical">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/settings_use_max_mtu_heading"
-                            style="@style/TextAppearance.AppCompat.Subhead"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawablePadding="10dp"
-                            android:text="@string/settings_jumbo_packets"
-                            android:textSize="@dimen/large_font_text_view" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/settings_use_max_mtu_desc"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:text="@string/settings_jumbo_packets_desc"
-                            android:textSize="@dimen/default_font_text_view" />
-                    </LinearLayout>
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/settings_use_max_mtu_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:padding="10dp" />
-
-                </RelativeLayout>
-
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -601,11 +595,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -804,11 +794,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="80dp"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true">
+            android:layout_marginBottom="80dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -1011,6 +997,64 @@
                             android:padding="5dp"
                             android:progress="0" />
                     </LinearLayout>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/settings_use_max_mtu_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/settings_use_max_mtu_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:alpha="0.5"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_tun_nw_policy" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/settings_use_max_mtu_switch"
+                        android:layout_toEndOf="@id/settings_use_max_mtu_icon"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/settings_use_max_mtu_heading"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="10dp"
+                            android:text="@string/settings_jumbo_packets"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/settings_use_max_mtu_desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="5dp"
+                            android:text="@string/settings_jumbo_packets_desc"
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/settings_use_max_mtu_switch"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:padding="10dp" />
 
                 </RelativeLayout>
 

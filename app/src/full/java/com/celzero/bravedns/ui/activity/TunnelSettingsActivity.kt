@@ -47,6 +47,7 @@ import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
@@ -59,6 +60,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -131,10 +134,24 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
         b.settingsUseMaxMtuSwitch.isChecked = persistentState.useMaxMtu
 
+        if (isAtleastQ()) {
+            b.settingsActivityTunnelMeteredRl.visibility = View.VISIBLE
+            b.settingsActivityTunnelMeteredSwitch.isChecked = persistentState.setVpnBuilderToMetered
+        } else {
+            b.settingsActivityTunnelMeteredRl.visibility = View.GONE
+        }
+
         displayDialerTimeOutUi(persistentState.dialTimeoutSec)
         displayInternetProtocolUi()
         displayRethinkInRethinkUi()
         showNwPolicyDescription(persistentState.vpnBuilderPolicy)
+        
+        // If Fixed policy is selected, disable jumbo packets and IP version settings
+        if (persistentState.vpnBuilderPolicy == 3) {
+            b.settingsUseMaxMtuRl.isEnabled = false
+            b.settingsUseMaxMtuSwitch.isEnabled = false
+            b.settingsActivityIpRl.isEnabled = false
+        }
     }
 
 
@@ -191,6 +208,9 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             _: CompoundButton,
             b: Boolean ->
             persistentState.useMultipleNetworks = b
+            if (b) {
+                persistentState.enableStabilityDependentSettings(this)
+            }
             if (!b && persistentState.routeRethinkInRethink) {
                 persistentState.routeRethinkInRethink = false
                 displayRethinkInRethinkUi()
@@ -214,7 +234,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             // rinr will not work without multiple networks
             // reason: ConnectivityManager.activeNetwork returns VPN network when rinr is enabled
             if (isChecked && !persistentState.useMultipleNetworks) {
-                val alertBuilder = MaterialAlertDialogBuilder(this)
+                val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
                 alertBuilder.setTitle(getString(R.string.settings_rinr_dialog_title))
                 val msg =
                     getString(
@@ -234,9 +254,13 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                     dialog.dismiss()
                     b.settingsRInRSwitch.isChecked = false
                 }
-                alertBuilder.create().show()
+                val dialog = alertBuilder.create()
+                dialog.show()
             } else {
                 persistentState.routeRethinkInRethink = isChecked
+                if (isChecked) {
+                    persistentState.enableStabilityDependentSettings(this)
+                }
                 displayRethinkInRethinkUi()
             }
         }
@@ -272,6 +296,9 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             _: CompoundButton,
             checked: Boolean ->
             persistentState.privateIps = checked
+            if (checked) {
+                persistentState.enableStabilityDependentSettings(this)
+            }
             b.settingsActivityLanTrafficSwitch.isEnabled = false
 
             Utilities.delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
@@ -282,6 +309,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityVpnLockdownDesc.setOnClickListener { UIUtils.openVpnProfile(this) }
 
         b.settingsActivityIpRl.setOnClickListener {
+            if (persistentState.vpnBuilderPolicy == 3) return@setOnClickListener
+
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityIpRl)
             showIpDialog()
         }
@@ -391,6 +420,16 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             persistentState.useMaxMtu = isChecked
         }
 
+        b.settingsActivityTunnelMeteredRl.setOnClickListener {
+            if (!isAtleastQ()) return@setOnClickListener
+            b.settingsActivityTunnelMeteredSwitch.isChecked = !b.settingsActivityTunnelMeteredSwitch.isChecked
+        }
+
+        b.settingsActivityTunnelMeteredSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (!isAtleastQ()) return@setOnCheckedChangeListener
+            persistentState.setVpnBuilderToMetered = isChecked
+        }
+
         b.dvTimeoutSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 updateDialerTimeOut(progress)
@@ -423,7 +462,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             return
         }*/
 
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_default_dns_heading))
         val items = Constants.DEFAULT_DNS_LIST.map { it.name }.toTypedArray()
         // get the index of the default dns url
@@ -436,7 +475,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             // update the default dns url
             persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[pos].url
         }
-        alertBuilder.create().show()
+        val dialog = alertBuilder.create()
+        dialog.show()
     }
 
     data class NetworkPolicyOption(val title: String, val description: String)
@@ -444,7 +484,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         val options = listOf(
             NetworkPolicyOption(getString(R.string.settings_ip_text_ipv46), getString(R.string.vpn_policy_auto_desc)),
             NetworkPolicyOption(getString(R.string.vpn_policy_sensitive), getString(R.string.vpn_policy_sensitive_desc)),
-            NetworkPolicyOption(getString(R.string.vpn_policy_relaxed), getString(R.string.vpn_policy_relaxed_desc))
+            NetworkPolicyOption(getString(R.string.vpn_policy_relaxed), getString(R.string.vpn_policy_relaxed_desc)),
+            NetworkPolicyOption(getString(R.string.vpn_policy_fixed), getString(R.string.vpn_policy_fixed_desc))
         )
         var currentSelection = persistentState.vpnBuilderPolicy
         val adapter = object : ArrayAdapter<NetworkPolicyOption>(
@@ -465,7 +506,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             }
         }
 
-        MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
             .setTitle(getString(R.string.vpn_policy_title))
             .setAdapter(adapter) { _, which ->
                 currentSelection = which
@@ -477,12 +518,37 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                 saveNetworkPolicy(currentSelection)
             }
             .setNegativeButton(getString(R.string.lbl_cancel), null)
-            .show()
+
+        val dialog = builder.create()
+        dialog.show()
     }
 
     private fun saveNetworkPolicy(which: Int) {
         persistentState.vpnBuilderPolicy = which
         showNwPolicyDescription(which)
+
+        // If Fixed policy is selected (index 3), enable jumbo packets and set IPv4 & IPv6
+        if (which == 3) {
+            // Enable jumbo packets
+            persistentState.useMaxMtu = true
+            b.settingsUseMaxMtuSwitch.isChecked = true
+
+            // Set IP version to IPv4 & IPv6 (ALWAYSv46)
+            persistentState.internetProtocolType = InternetProtocol.ALWAYSv46.id
+
+            // Disable both settings (jumbo packets and IP version)
+            b.settingsUseMaxMtuRl.isEnabled = false
+            b.settingsUseMaxMtuSwitch.isEnabled = false
+            b.settingsActivityIpRl.isEnabled = false
+
+            // Update UI
+            displayInternetProtocolUi()
+        } else {
+            // Enable both settings for other policies
+            b.settingsUseMaxMtuRl.isEnabled = true
+            b.settingsUseMaxMtuSwitch.isEnabled = true
+            b.settingsActivityIpRl.isEnabled = true
+        }
     }
 
     private fun showNwPolicyDescription(which: Int) {
@@ -490,11 +556,15 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             0 -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.settings_ip_text_ipv46) }
             1 -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.vpn_policy_sensitive) }
             2 -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.vpn_policy_relaxed) }
+            3 -> { b.settingsVpnNwPolicyDesc.text = getString(R.string.vpn_policy_fixed) }
         }
     }
 
     private fun showNwReachabilityCheckDialog() {
-        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        if (Themes.isFrostTheme(themeId)) {
+            themeId = R.style.App_Dialog_NoDim
+        }
         val nwReachabilityDialog = NetworkReachabilityDialog(this, persistentState, themeId)
         nwReachabilityDialog.setCanceledOnTouchOutside(true)
         nwReachabilityDialog.show()
@@ -570,7 +640,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     }
 
     private fun showIpDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_ip_dialog_title))
         val alwaysv46Txt = getString(R.string.settings_ip_text_ipv4) + " & " + getString(R.string.settings_ip_text_ipv6) + " " + getString(R.string.lbl_experimental)
         val items =
@@ -617,13 +687,20 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             val protocolType = InternetProtocol.getInternetProtocol(selectedItem)
             persistentState.internetProtocolType = protocolType.id
 
+            // Enable experimental-dependent settings for IPv6, IPv46, and ALWAYSv46 (experimental protocols)
+            if (protocolType.id == InternetProtocol.IPv6.id ||
+                protocolType.id == InternetProtocol.IPv46.id ||
+                protocolType.id == InternetProtocol.ALWAYSv46.id) {
+                persistentState.enableStabilityDependentSettings(this)
+            }
+
             displayInternetProtocolUi()
         }
         alertBuilder.create().show()
     }
 
     private fun showConnectivityChecksOptionsDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_connectivity_checks))
         val items = arrayOf(
             getString(R.string.settings_app_list_default_app),

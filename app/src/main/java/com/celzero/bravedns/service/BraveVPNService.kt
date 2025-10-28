@@ -99,6 +99,7 @@ import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIB
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
 import com.celzero.bravedns.util.Constants.Companion.PRIMARY_USER
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
+import com.celzero.bravedns.util.CrashReporter
 import com.celzero.bravedns.util.Daemons
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.IPUtil
@@ -141,6 +142,7 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.cache.RemovalCause
 import com.google.common.cache.RemovalNotification
 import com.google.common.collect.Sets
+import com.google.firebase.Firebase
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.CoroutineDispatcher
@@ -172,7 +174,6 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.random.Random
-import kotlin.text.clear
 import kotlin.time.measureTime
 
 class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge, OnSharedPreferenceChangeListener {
@@ -327,6 +328,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     @Volatile
     var overlayNetworks: OverlayNetworks = OverlayNetworks()
+
+    // marks whether the uid is included in the dns requests. universal firewall rules are enforced
+    // only when this flag is true, ensuring unknown app DNS requests are blocked and avoiding
+    // issues when Android omits uid in dns requests
+    private var isUidPresentInAnyDnsRequest: Boolean = false
 
     private var accessibilityListener: AccessibilityManager.AccessibilityStateChangeListener? = null
 
@@ -1279,10 +1285,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         tunUnderlyingNetworks = underlyingNws?.joinToString()
         logd("builder: set underlying networks: $tunUnderlyingNetworks")
 
-        // Fix - Cloud Backups were failing thinking that the VPN connection is metered.
-        // The below code will fix that.
+        // now that we set metered based on user preference, earlier it was always set to false
+        // as cloud backups were failing thinking that the VPN connection is metered
         if (isAtleastQ()) {
-            builder.setMetered(false)
+            builder.setMetered(persistentState.setVpnBuilderToMetered)
+            logd("builder: set metered: ${persistentState.setVpnBuilderToMetered}")
         }
 
         // route rethink traffic in rethink based on the user selection
@@ -2321,6 +2328,22 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                     Logger.i(LOG_TAG_VPN, "use max mtu changed, new mtu: $newMtu")
                     val reason = "useMaxMtu: ${persistentState.useMaxMtu}"
                     vpnRestartTrigger.value = reason
+                }
+            }
+            PersistentState.SET_VPN_BUILDER_TO_METERED -> {
+                io("setVpnBuilderToMetered") {
+                    Logger.i(LOG_TAG_VPN, "set vpn builder to metered: ${persistentState.setVpnBuilderToMetered}")
+                    val reason = "setVpnBuilderToMetered: ${persistentState.setVpnBuilderToMetered}"
+                    vpnRestartTrigger.value = reason
+                }
+            }
+            PersistentState.PANIC_RANDOM -> {
+                io("panicRandom") {
+                    if (DEBUG) {
+                        vpnAdapter?.panicAtRandom(persistentState.panicRandom)
+                    } else {
+                        Logger.e(LOG_TAG_VPN, "panic random change ignored, not in debug mode")
+                    }
                 }
             }
         }
@@ -3910,12 +3933,20 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
                 // app-wise trust is already checked above
                 Logger.vv(LOG_TAG_VPN, "$TAG; onQuery: no uid, univ domain blocked $fqdn")
                 makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn)
+            } else if (isUidPresentInAnyDnsRequest && persistentState.getBlockUnknownConnections()) {
+                // universal block for unknown uids if the setting is enabled
+                Logger.vv(LOG_TAG_VPN, "$TAG; onQuery: no uid, block unknown connections $fqdn")
+                makeNsOpts(uid, Pair(Backend.BlockAll, ""), fqdn)
             } else {
                 // no global rule, no app-wise trust, return the tid as it is
                 Logger.vv(LOG_TAG_VPN, "$TAG; onQuery: no uid, no global rule, use $tid for $fqdn")
                 makeNsOpts(uid, tid, fqdn)
             }
         } else {
+            if (!isUidPresentInAnyDnsRequest && uid != AndroidUidConfig.DNS.uid) {
+                isUidPresentInAnyDnsRequest = true
+                Logger.i(LOG_TAG_VPN, "$TAG; onQuery: uid present in dns request")
+            }
             val connectionStatus = FirewallManager.connectionStatus(uid)
             if (connectionStatus.blocked()) {
                 // if the app is blocked by both wifi and mobile data, then the block the request
@@ -4370,7 +4401,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         if (l.stacktrace()) {
             // disable crash logging for now
             if (false) Logger.crash(LOG_GO_LOGGER, msg) // write to in-mem db
-            FirebaseErrorReporting.recordException(RuntimeException(msg))
+            if (!isFdroidFlavour()) CrashReporter.recordGoCrash(msg)
             val token = if (isFdroidFlavour()) "fdroid" else persistentState.firebaseUserToken
             EnhancedBugReport.writeLogsToFile(this, token, msg)
         } else if (l.user()) {
@@ -4384,6 +4415,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     private fun showNwEngineNotification(msg: String) {
         if (msg.isEmpty()) {
+            Logger.e(LOG_GO_LOGGER, "empty msg with log level set as user")
             return
         }
 
