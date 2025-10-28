@@ -33,7 +33,7 @@ object CrashReporter {
         val stackTrace = msg.getOrNull(2) ?: "No stack trace"
 
         // Create a synthetic exception to preserve context
-        val syntheticException = RuntimeException("go-panic: $safeType — $safeMessage")
+        val syntheticException = RuntimeException("$safeType \n $safeMessage")
 
         // Record it as non-fatal
         FirebaseErrorReporting.recordException(syntheticException)
@@ -41,7 +41,7 @@ object CrashReporter {
         // Log stack trace in chunks to avoid truncation
         stackTrace.let { trace ->
             trace.chunked(MAX_LOG_LENGTH).forEachIndexed { index, chunk ->
-                FirebaseErrorReporting.log("StackTrace[$index]: $chunk")
+                FirebaseErrorReporting.log("trace[$index]: $chunk")
             }
         }
     }
