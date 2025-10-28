@@ -15,8 +15,11 @@
  */
 package com.celzero.bravedns.util
 
+import Logger
 import Logger.LOG_TAG_UI
 import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
@@ -28,6 +31,7 @@ import androidx.appcompat.app.AppCompatDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastS
@@ -105,6 +109,13 @@ private fun AppCompatActivity.updateWindowForBlurs(
     }
 }
 
+// small helper to grab drawable safely
+fun AppCompatActivity.windowBackgroundDrawableOrNull(): Drawable? =
+    window.decorView.background ?: runCatching {
+        AppCompatResources.getDrawable(this, R.drawable.window_background)
+    }.getOrNull()
+
+
 fun Dialog.useTransparentNoDimBackground(
     @ColorInt color: Int = android.graphics.Color.TRANSPARENT
 ) {
@@ -139,4 +150,37 @@ fun BottomSheetDialogFragment?.useTransparentNoDimBackground(
     @ColorInt color: Int = android.graphics.Color.TRANSPARENT
 ) {
     this?.dialog?.useTransparentNoDimBackground(color)
+}
+
+private var frostWasEnabled = false
+
+fun AppCompatActivity.disableFrostTemporarily() {
+    frostWasEnabled = window.attributes.flags and WindowManager.LayoutParams.FLAG_BLUR_BEHIND != 0
+
+    if (frostWasEnabled) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            window.setBackgroundBlurRadius(0)
+            window.attributes.blurBehindRadius = 0
+        }
+        window.clearFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
+        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        window.setDimAmount(0f)
+        window.setBackgroundDrawable(Color.BLACK.toDrawable())
+    }
+}
+
+fun AppCompatActivity.restoreFrost(themeId: Int) {
+    if (!frostWasEnabled) return
+
+    handleFrostEffectIfNeeded(themeId)
+}
+
+fun Fragment.disableFrostTemporarily() {
+    val activity = activity as? AppCompatActivity ?: return
+    activity.disableFrostTemporarily()
+}
+
+fun Fragment.restoreFrost(themeId: Int) {
+    val activity = activity as? AppCompatActivity ?: return
+    activity.restoreFrost(themeId)
 }

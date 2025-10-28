@@ -50,7 +50,9 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.disableFrostTemporarily
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.bravedns.util.restoreFrost
 import com.celzero.bravedns.viewmodel.ConsoleLogViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -121,6 +123,8 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
         b.searchView.setQuery("", false)
         b.searchView.clearFocus()
 
+        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        restoreFrost(themeId)
         val imm = this.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.restartInput(b.searchView)
     }
@@ -341,6 +345,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
     }
 
     private fun shareZipFileViaEmail(filePath: String) {
+        disableFrostTemporarily()
         val file = File(filePath)
         // Get the URI of the file using FileProvider
         val uri: Uri = FileProvider.getUriForFile(this, "${this.packageName}.provider", file)

@@ -68,7 +68,6 @@ class NetworkReachabilityDialog(activity: Activity,
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         binding = DialogInputIpsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        useTransparentNoDimBackground()
         setCancelable(true)
         initViews()
         setupListeners()

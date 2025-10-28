@@ -379,7 +379,6 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
 
     private fun openAppsDialog() {
         // treat proxyId and proxyName of Orbot as base
-        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         val appsAdapter =
             WgIncludeAppsAdapter(
                 requireContext(),
@@ -388,6 +387,10 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
             )
         mappingViewModel.apps.observe(this.viewLifecycleOwner) {
             appsAdapter.submitData(lifecycle, it)
+        }
+        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        if (Themes.isFrostTheme(themeId)) {
+            themeId = R.style.App_Dialog_NoDim
         }
         val includeAppsDialog =
             WgIncludeAppsDialog(

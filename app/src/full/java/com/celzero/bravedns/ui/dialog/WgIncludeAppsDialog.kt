@@ -94,7 +94,6 @@ class WgIncludeAppsDialog(
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         b = DialogWgAppsBinding.inflate(layoutInflater)
         setContentView(b.root)
-        useTransparentNoDimBackground()
         setCancelable(false)
         addAnimation()
         remakeFirewallChipsUi()

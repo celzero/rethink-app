@@ -55,7 +55,6 @@ class WgAddPeerDialog(
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         b = DialogWgAddPeerBinding.inflate(layoutInflater)
         setContentView(b.root)
-        useTransparentNoDimBackground()
         initView()
         setupClickListener()
     }

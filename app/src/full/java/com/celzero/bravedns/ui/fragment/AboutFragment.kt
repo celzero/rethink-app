@@ -68,6 +68,7 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_4
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
+import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.UIUtils.openAppInfo
@@ -81,6 +82,8 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.disableFrostTemporarily
+import com.celzero.bravedns.util.restoreFrost
 import com.celzero.firestack.intra.Intra
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -107,6 +110,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val themeId = Themes.getTheme(persistentState.theme)
+        restoreFrost(themeId)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -297,6 +306,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 }
             }
             b.aboutMail -> {
+                disableFrostTemporarily()
                 sendEmailIntent(requireContext())
             }
             b.aboutTwitter -> {
@@ -309,7 +319,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 openUrl(requireContext(), RETHINKDNS_SPONSOR_LINK)
             }
             b.mozillaImg -> {
-                openUrl(requireContext(), getString(R.string.about_mozilla_alumni_link))
+                // no-link, no action
             }
             b.fossImg -> {
                 openUrl(requireContext(), getString(R.string.about_foss_link))
@@ -598,8 +608,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.about_bug_no_log_dialog_title)
         builder.setMessage(R.string.about_bug_no_log_dialog_message)
-        builder.setPositiveButton(getString(R.string.about_bug_no_log_dialog_positive_btn)) { _, _
-            ->
+        builder.setPositiveButton(getString(R.string.about_bug_no_log_dialog_positive_btn)) { _, _ ->
             sendEmailIntent(requireContext())
         }
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ -> dialog.dismiss() }
@@ -640,12 +649,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
             .setView(binding.root)
             .setTitle(title)
-            .setPositiveButton(getString(R.string.about_dialog_positive_button)) { dialogInterface,
-                                                                                   _ ->
+            .setPositiveButton(getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
-            .setNeutralButton(getString(R.string.about_dialog_neutral_button)) { _: DialogInterface,
-                                                                                 _: Int ->
+            .setNeutralButton(getString(R.string.about_dialog_neutral_button)) { _: DialogInterface, _: Int ->
                 sendEmailIntent(requireContext())
             }
             .setCancelable(true)

@@ -41,7 +41,6 @@ class DnsCryptRelaysDialog(
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         b = DialogDnscryptRelaysBinding.inflate(layoutInflater)
         setContentView(b.root)
-        useTransparentNoDimBackground()
         initView()
     }
 

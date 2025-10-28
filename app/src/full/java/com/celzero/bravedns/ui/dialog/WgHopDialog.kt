@@ -60,7 +60,6 @@ class WgHopDialog(
         b = DialogWgHopBinding.inflate(layoutInflater)
         setContentView(b.root)
         setCancelable(false)
-        useTransparentNoDimBackground()
         addAnimation()
         init()
         setupClickListeners()

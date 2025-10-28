@@ -189,7 +189,7 @@
     <color name="buttonBackgroundBlack">#4fc3f7</color>
     <color name="textViewBackgroundBlack">#000000</color>
     <color name="tabIndicatorBlack">#4fc3f7</color>
-    <color name="btmSheetBgColorBlack">#383838</color>
+    <color name="btmSheetBgColorBlack">#121212</color>
 
     <color name="colorControlActivatedBlack">#4fc3f7</color>
     <color name="colorControlActivatedBadBlack">#DF3520</color>
