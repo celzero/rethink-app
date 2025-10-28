@@ -221,7 +221,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     fun updateTokenUi(token: String) {
-        if (isFdroidFlavour()) {
+        if (isFdroidFlavour() || !persistentState.firebaseErrorReportingEnabled) {
             b.tokenTextView.visibility = View.GONE
             return
         }
