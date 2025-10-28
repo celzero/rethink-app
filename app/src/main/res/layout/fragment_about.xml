@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/background"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     app:layout_scrollFlags="scroll|enterAlways">
 
@@ -44,9 +43,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            app:cardCornerRadius="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -706,7 +703,7 @@
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:text="Battery stats"
+                android:text="Battery"
                 android:textSize="@dimen/large_font_text_view" />
 
         </LinearLayout>
@@ -734,6 +731,14 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/about_mozilla"
                 app:srcCompat="@drawable/foss_logo" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/floss_funds_img"
+                android:layout_width="160dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/about_mozilla"
+                app:srcCompat="@drawable/ic_floss_fund_badge" />
 
         </LinearLayout>
 
