@@ -17,12 +17,10 @@ package com.celzero.bravedns.ui.fragment
 
 import Logger
 import Logger.LOG_TAG_UI
-import android.R.attr.text
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -71,11 +69,11 @@ import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_4
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.UIUtils.openAppInfo
 import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.sendEmailIntent
-import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.getRandomString
@@ -93,7 +91,6 @@ import org.koin.core.component.KoinComponent
 import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipFile
-import kotlin.text.replaceFirstChar
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
@@ -122,7 +119,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         updateTokenUi(persistentState.firebaseUserToken)
 
         b.titleStats.text = getString(R.string.title_statistics).lowercase()
-        b.aboutStats.text = getString(R.string.two_argument_space, getString(R.string.settings_general_header).replaceFirstChar(Char::titlecase), getString(R.string.title_statistics))
+        b.aboutStats.text = getString(R.string.settings_general_header).replaceFirstChar(Char::titlecase)
 
         b.aboutSponsor.setOnClickListener(this)
         b.aboutWebsite.setOnClickListener(this)
@@ -317,6 +314,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.fossImg -> {
                 openUrl(requireContext(), getString(R.string.about_foss_link))
             }
+            b.flossFundsImg -> {
+                openUrl(requireContext(), getString(R.string.about_floss_fund_link))
+            }
             b.aboutAppUpdate -> {
                 (requireContext() as HomeScreenActivity).checkForUpdate(
                     AppUpdater.UserPresent.INTERACTIVE
@@ -403,7 +403,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 tv.typeface = android.graphics.Typeface.MONOSPACE
                 val scroll = android.widget.ScrollView(requireContext())
                 scroll.addView(tv)
-                MaterialAlertDialogBuilder(requireContext())
+                MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
                     .setTitle(getString(R.string.title_statistics))
                     .setView(scroll)
                     .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
@@ -414,7 +414,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                             getString(R.string.copied_clipboard),
                             Toast.LENGTH_SHORT
                         )
-                    }
+                    }.create()
                     .show()
             }
         }
@@ -486,7 +486,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 container.addView(listView)
                 container.addView(scroll)
 
-                MaterialAlertDialogBuilder(ctx)
+                MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
                     .setTitle(getString(R.string.title_database_dump))
                     .setView(container)
                     .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }
@@ -497,7 +497,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                             getString(R.string.copied_clipboard),
                             Toast.LENGTH_SHORT
                         )
-                    }
+                    }.create()
                     .show()
             }
         }
@@ -595,7 +595,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun showNoLogDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.about_bug_no_log_dialog_title)
         builder.setMessage(R.string.about_bug_no_log_dialog_message)
         builder.setPositiveButton(getString(R.string.about_bug_no_log_dialog_positive_btn)) { _, _
@@ -637,7 +637,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         // replace the version name in the title
         val v = getVersionName().slice(0..6)
         val title = getString(R.string.about_whats_new, v)
-        MaterialAlertDialogBuilder(requireContext())
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
             .setView(binding.root)
             .setTitle(title)
             .setPositiveButton(getString(R.string.about_dialog_positive_button)) { dialogInterface,
@@ -727,10 +727,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     private fun showContributors() {
         val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
-        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
@@ -950,7 +949,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         val scroll = android.widget.ScrollView(ctx)
         scroll.addView(textView)
 
-        val dialog = MaterialAlertDialogBuilder(ctx)
+        val dialog = MaterialAlertDialogBuilder(ctx, R.style.App_Dialog_NoDim)
             .setTitle("Battery stats")
             .setView(scroll)
             .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { d, _ -> d.dismiss() }

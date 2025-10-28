@@ -41,6 +41,7 @@ import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -77,6 +78,11 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     ): View {
         _binding = BottomSheetHomeScreenBinding.inflate(inflater, container, false)
         return b.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.useTransparentNoDimBackground()
     }
 
     override fun onDestroyView() {

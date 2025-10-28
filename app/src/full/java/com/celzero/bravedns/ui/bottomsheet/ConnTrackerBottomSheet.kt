@@ -20,8 +20,13 @@ import Logger.LOG_TAG_FIREWALL
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.graphics.RenderEffect
+import android.graphics.Shader
+import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.text.Spanned
 import android.text.TextUtils
@@ -73,6 +78,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import java.util.Locale
+import androidx.core.graphics.drawable.toDrawable
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 
 class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
@@ -185,6 +192,11 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             val connStatus = FirewallManager.connectionStatus(info!!.uid)
             uiCtx { updateFirewallRulesUi(appStatus, connStatus) }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.useTransparentNoDimBackground()
     }
 
     private fun updateDnsIfAvailable() {
@@ -634,7 +646,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         if (blockedRule == null) return
 
         val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         dialog.show()

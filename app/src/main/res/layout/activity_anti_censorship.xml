@@ -50,11 +50,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <RadioGroup
                 android:id="@+id/ac_radio_group"
@@ -374,11 +370,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <RadioGroup
                 android:id="@+id/ac_retry_radio_group"

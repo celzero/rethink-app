@@ -28,7 +28,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -41,6 +40,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import org.koin.android.ext.android.inject
 
 class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
@@ -59,6 +59,8 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)

@@ -37,9 +37,9 @@ import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
-import kotlin.or
 
 class NotificationHandlerActivity: AppCompatActivity() {
 
@@ -55,6 +55,8 @@ class NotificationHandlerActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -177,7 +179,7 @@ class NotificationHandlerActivity: AppCompatActivity() {
     }
 
     private fun handleAccessibilitySettings() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.lbl_action_required)
         builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
         builder.setPositiveButton(getString(R.string.univ_accessibility_crash_dialog_positive)) {
@@ -187,7 +189,6 @@ class NotificationHandlerActivity: AppCompatActivity() {
         }
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> finish() }
         builder.setCancelable(false)
-
         builder.create().show()
     }
 
@@ -199,7 +200,7 @@ class NotificationHandlerActivity: AppCompatActivity() {
     }
 
     private fun showAppPauseDialog(trampolineType: TrampolineType, intent: Intent) {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
 
         builder.setTitle(R.string.notif_dialog_pause_dialog_title)
         builder.setMessage(R.string.notif_dialog_pause_dialog_message)

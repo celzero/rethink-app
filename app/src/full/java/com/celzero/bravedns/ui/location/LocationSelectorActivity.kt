@@ -31,6 +31,7 @@ import com.celzero.bravedns.databinding.ActivityLocationSelectorBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import androidx.core.graphics.drawable.toDrawable
 import org.koin.android.ext.android.inject
 import kotlin.getValue
 
@@ -54,6 +55,9 @@ class LocationSelectorActivity : AppCompatActivity(R.layout.activity_location_se
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)

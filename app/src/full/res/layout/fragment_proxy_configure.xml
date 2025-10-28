@@ -48,11 +48,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            android:visibility="gone"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true">
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -161,11 +157,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -252,11 +244,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -343,11 +331,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"

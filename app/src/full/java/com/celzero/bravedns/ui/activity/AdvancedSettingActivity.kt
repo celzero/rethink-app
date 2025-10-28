@@ -16,7 +16,6 @@
 package com.celzero.bravedns.ui.activity
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
@@ -29,6 +28,7 @@ import com.celzero.bravedns.databinding.ActivityAdvancedSettingBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import org.koin.android.ext.android.inject
 
 class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_setting) {
@@ -41,6 +41,8 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        handleFrostEffectIfNeeded(persistentState.theme)
+
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
 
@@ -55,15 +57,17 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
 
     private fun initView() {
 
-
         if (DEBUG) {
             b.settingsExperimentalRl.visibility = View.VISIBLE
             b.dvExperimentalSwitch.isChecked = persistentState.nwEngExperimentalFeatures
             b.settingsAutoDialRl.visibility = View.VISIBLE
             b.dvAutoDialSwitch.isChecked = persistentState.autoDialsParallel
+            b.settingsPanicRandRl.visibility = View.VISIBLE
+            b.dvPanicRandSwitch.isChecked = persistentState.panicRandom
         } else {
             b.settingsExperimentalRl.visibility = View.GONE
             b.settingsAutoDialRl.visibility = View.GONE
+            b.settingsPanicRandRl.visibility = View.GONE
         }
 
     }
@@ -89,6 +93,14 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
 
         b.dvAutoDialSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.autoDialsParallel = isChecked
+        }
+
+        b.settingsPanicRandRl.setOnClickListener {
+            b.dvPanicRandSwitch.isChecked = !b.dvPanicRandSwitch.isChecked
+        }
+
+        b.dvPanicRandSwitch.setOnCheckedChangeListener { _, isChecked ->
+            persistentState.panicRandom = isChecked
         }
     }
 

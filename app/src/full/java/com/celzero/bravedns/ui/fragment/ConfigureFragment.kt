@@ -23,9 +23,9 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.databinding.FragmentConfigureBinding
-import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.ui.activity.AdvancedSettingActivity
 import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
+import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.ui.activity.DnsDetailActivity
 import com.celzero.bravedns.ui.activity.FirewallActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity

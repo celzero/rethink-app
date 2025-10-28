@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         app:cardCornerRadius="4dp"
         android:background="?attr/selectedCardBg"
-        app:cardElevation="4dp"
         app:cardUseCompatPadding="true">
 
         <RelativeLayout

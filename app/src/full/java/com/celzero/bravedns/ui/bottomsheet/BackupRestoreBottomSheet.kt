@@ -58,6 +58,7 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
@@ -98,6 +99,11 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.useTransparentNoDimBackground()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -339,7 +345,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showBackupFailureDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.brbs_backup_dialog_failure_title)
         builder.setMessage(R.string.brbs_backup_dialog_failure_message)
         builder.setPositiveButton(getString(R.string.brbs_backup_dialog_failure_positive)) { _, _ ->
@@ -389,7 +395,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showRestoreFailureDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.brbs_restore_dialog_failure_title)
         builder.setMessage(R.string.brbs_restore_dialog_failure_message)
         builder.setPositiveButton(getString(R.string.brbs_restore_dialog_failure_positive)) { _, _
@@ -407,7 +413,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showRestoreDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.brbs_restore_dialog_title)
         builder.setMessage(R.string.brbs_restore_dialog_message)
         builder.setPositiveButton(getString(R.string.brbs_restore_dialog_positive)) { _, _ ->
@@ -424,7 +430,7 @@ class BackupRestoreBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showBackupDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.brbs_backup_dialog_title)
         builder.setMessage(R.string.brbs_backup_dialog_message)
         builder.setPositiveButton(getString(R.string.brbs_backup_dialog_positive)) { _, _ ->

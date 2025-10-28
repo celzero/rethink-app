@@ -23,9 +23,6 @@
                 android:id="@+id/interface_detail_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
-                app:cardUseCompatPadding="true"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -331,9 +328,6 @@
                 android:id="@+id/other_settings_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
-                app:cardUseCompatPadding="true"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/interface_detail_card">
 
@@ -464,9 +458,6 @@
                 android:id="@+id/mobile_ssid_settings_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
-                app:cardUseCompatPadding="true"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/other_settings_card">
 

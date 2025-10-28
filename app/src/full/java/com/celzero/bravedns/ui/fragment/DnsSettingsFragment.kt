@@ -418,6 +418,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcAlgSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcAlgSwitch)
             persistentState.enableDnsAlg = enabled
+            if (enabled) {
+                // Enable experimental-dependent settings when experimental features are enabled
+                requireContext().let { persistentState.enableStabilityDependentSettings(it) }
+            }
             updateSpiltDns()
         }
 
@@ -430,6 +434,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcFaviconSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcFaviconSwitch)
             persistentState.fetchFavIcon = enabled
+            if (enabled) {
+                // Enable experimental-dependent settings when experimental features are enabled
+                requireContext().let { persistentState.enableStabilityDependentSettings(it) }
+            }
         }
 
         b.dcPreventDnsLeaksRl.setOnClickListener {
@@ -516,6 +524,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
             if (!persistentState.enableDnsAlg) return@setOnCheckedChangeListener
 
             persistentState.bypassBlockInDns = isChecked
+            if (isChecked) {
+                // Enable experimental-dependent settings when experimental features are enabled
+                requireContext().let { persistentState.enableStabilityDependentSettings(it) }
+            }
         }
 
         b.dvBypassDnsBlockRl.setOnClickListener {
@@ -524,6 +536,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
         b.dcSplitDnsSwitch.setOnCheckedChangeListener { _, isChecked ->
             persistentState.splitDns = isChecked
+            if (isChecked) {
+                // Enable experimental-dependent settings when experimental features are enabled
+                requireContext().let { persistentState.enableStabilityDependentSettings(it) }
+            }
             updateConnectedStatus(persistentState.connectedDnsName)
         }
 
@@ -589,7 +605,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
                     stringBuilder.append(txt).append("\n")
                 }
                 val list = stringBuilder.toString()
-                val builder = MaterialAlertDialogBuilder(requireContext())
+                val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
                     .setTitle(R.string.smart_dns)
                     .setMessage(list)
                     .setCancelable(true)
@@ -616,7 +632,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     }
 
     private fun showSystemDnsDialog(dns: String) {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
             .setTitle(R.string.network_dns)
             .setMessage(dns)
             .setCancelable(true)

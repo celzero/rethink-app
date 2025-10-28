@@ -52,11 +52,12 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
+import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
@@ -97,7 +98,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-
+        handleFrostEffectIfNeeded(persistentState.theme)
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
             controller.isAppearanceLightNavigationBars = false
@@ -590,7 +591,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     }
 
     private fun showAppInfoDialog(appNames: List<String>) {
-        val builderSingle = MaterialAlertDialogBuilder(this)
+        val builderSingle = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builderSingle.setTitle(this.getString(R.string.about_settings_app_info))
 
         val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1)
@@ -828,7 +829,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
     }
 
     private fun showNoAppFoundDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.ada_noapp_dialog_title))
         builder.setMessage(getString(R.string.ada_noapp_dialog_message))
         builder.setCancelable(false)
@@ -849,7 +850,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         prevConnStat: FirewallManager.ConnectionStatus
     ) {
 
-        val builderSingle = MaterialAlertDialogBuilder(this)
+        val builderSingle = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
 
         builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
         val count = packageList.count()
@@ -886,7 +887,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
             return
         }
         Logger.v(LOG_TAG_UI, "$TAG show close connection dialog for uid: $uid")
-        val dialog = MaterialAlertDialogBuilder(this)
+        val dialog = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
             .setTitle(this.getString(R.string.close_conns_dialog_title))
             .setMessage(getString(R.string.close_conns_dialog_desc, appName))
             .setPositiveButton(R.string.lbl_proceed) { _, _ ->

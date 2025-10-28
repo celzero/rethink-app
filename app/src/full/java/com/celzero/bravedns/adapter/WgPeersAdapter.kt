@@ -108,7 +108,7 @@ class WgPeersAdapter(
     }
 
     private fun showDeleteInterfaceDialog(wgPeer: Peer) {
-        val builder = MaterialAlertDialogBuilder(context)
+        val builder = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
         val delText =
             context.getString(
                 R.string.two_argument_space,

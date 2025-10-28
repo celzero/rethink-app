@@ -38,6 +38,7 @@ import com.celzero.bravedns.ui.LauncherSwitcher
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import org.koin.android.ext.android.inject
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
@@ -64,6 +65,9 @@ class AppLockActivity : AppCompatActivity(R.layout.activity_app_lock) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
+
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
             controller.isAppearanceLightNavigationBars = false

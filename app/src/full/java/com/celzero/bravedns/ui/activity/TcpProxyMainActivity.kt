@@ -3,7 +3,6 @@ package com.celzero.bravedns.ui.activity
 import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
@@ -23,6 +22,7 @@ import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,6 +40,8 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)

@@ -56,6 +56,7 @@ import com.celzero.bravedns.util.Utilities.blocklistCanonicalPath
 import com.celzero.bravedns.util.Utilities.convertLongToTime
 import com.celzero.bravedns.util.Utilities.deleteRecursive
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -99,6 +100,11 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     ): View {
         _binding = BottomSheetLocalBlocklistsBinding.inflate(inflater, container, false)
         return b.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.useTransparentNoDimBackground()
     }
 
     override fun onDestroyView() {
@@ -241,7 +247,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showDownloadDialog(isRedownload: Boolean) {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         if (isRedownload) {
             builder.setTitle(R.string.local_blocklist_redownload)
             builder.setMessage(
@@ -264,12 +270,12 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
             downloadLocalBlocklist(isRedownload)
         }
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ -> dialog.dismiss() }
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.show()
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
 
     private fun showDeleteDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.lbl_delete)
         builder.setMessage(getString(R.string.local_blocklist_delete_desc))
         builder.setCancelable(false)
@@ -293,7 +299,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showLockdownDownloadDialog(isRedownload: Boolean) {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.lockdown_download_enable_inapp)
         builder.setMessage(R.string.lockdown_download_message)
         builder.setCancelable(true)

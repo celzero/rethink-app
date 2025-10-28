@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import android.util.Log
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.ConsoleLog
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController

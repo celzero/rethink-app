@@ -27,6 +27,7 @@ import android.view.animation.RotateAnimation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.celzero.bravedns.adapter.WgHopAdapter
 import com.celzero.bravedns.databinding.DialogWgHopBinding
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.celzero.bravedns.wireguard.Config
 import org.koin.core.component.KoinComponent
 
@@ -59,6 +60,7 @@ class WgHopDialog(
         b = DialogWgHopBinding.inflate(layoutInflater)
         setContentView(b.root)
         setCancelable(false)
+        useTransparentNoDimBackground()
         addAnimation()
         init()
         setupClickListeners()

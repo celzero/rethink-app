@@ -32,9 +32,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            app:cardCornerRadius="16dp">
 
             <RelativeLayout
                 android:id="@+id/tcp_proxy_container"
@@ -159,9 +157,7 @@
             android:id="@+id/warp_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            app:cardCornerRadius="16dp">
 
             <RelativeLayout
                 android:id="@+id/warp_top_rl"

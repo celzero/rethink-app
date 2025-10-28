@@ -44,6 +44,7 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -79,6 +80,8 @@ class AppWiseDomainLogsActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -381,7 +384,7 @@ class AppWiseDomainLogsActivity :
     }
 
     private fun showDeleteConnectionsDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.ada_delete_logs_dialog_title)
         builder.setMessage(R.string.ada_delete_logs_dialog_desc)
         builder.setCancelable(true)

@@ -8,10 +8,7 @@
         android:id="@+id/wg_hop_list_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectedCardBg"
-        app:cardCornerRadius="4dp"
-        app:cardElevation="4dp"
-        app:cardUseCompatPadding="true">
+        android:background="?attr/selectedCardBg">
 
         <RelativeLayout
             android:id="@+id/wg_hop_list_container"

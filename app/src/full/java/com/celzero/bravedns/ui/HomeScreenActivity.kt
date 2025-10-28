@@ -84,6 +84,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isWebsiteFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -112,6 +113,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        //theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
 
         if (isAtleastO_MR1()) {
@@ -135,6 +137,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             launchOnboardActivity()
             return
         }
+
+        handleFrostEffectIfNeeded(persistentState.theme)
+
         updateNewVersion()
 
         setupNavigationItemSelectedListener()
@@ -155,6 +160,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // enable in-app messaging, will be used to show in-app messages in case of billing issues
         //enableInAppMessaging()
     }
+
 
     /*private fun enableInAppMessaging() {
         initiateBillingIfNeeded()
@@ -257,7 +263,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun showRestoreDialog(uri: Uri) {
         if (!isInForeground()) return
 
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.brbs_restore_dialog_title)
         builder.setMessage(R.string.brbs_restore_dialog_message)
         builder.setPositiveButton(getString(R.string.brbs_restore_dialog_positive)) { _, _ ->
@@ -270,7 +276,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
 
         builder.setCancelable(true)
-        builder.create().show()
+        val dialog = builder.create()
+        dialog.show()
     }
 
     private fun startRestore(fileUri: Uri) {
@@ -482,11 +489,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 ) // Might be play updater or web updater
             } catch (e: Exception) {
                 Logger.crash(LOG_TAG_APP_UPDATE, "err in app update check: ${e.message}", e)
-                showDownloadDialog(
-                    AppUpdater.InstallSource.STORE,
-                    getString(R.string.download_update_dialog_failure_title),
-                    getString(R.string.download_update_dialog_failure_message)
-                )
+                runOnUiThread {
+                    showDownloadDialog(
+                        AppUpdater.InstallSource.STORE,
+                        getString(R.string.download_update_dialog_failure_title),
+                        getString(R.string.download_update_dialog_failure_message)
+                    )
+                }
             }
         } else {
             try {
@@ -498,11 +507,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     ) // Always web updater
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_APP_UPDATE, "Error in app (web) update check: ${e.message}", e)
-                showDownloadDialog(
-                    AppUpdater.InstallSource.OTHER,
-                    getString(R.string.download_update_dialog_failure_title),
-                    getString(R.string.download_update_dialog_failure_message)
-                )
+                runOnUiThread {
+                    showDownloadDialog(
+                        AppUpdater.InstallSource.OTHER,
+                        getString(R.string.download_update_dialog_failure_title),
+                        getString(R.string.download_update_dialog_failure_message)
+                    )
+                }
             }
         }
     }
@@ -609,7 +620,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     ) {
         if (!isInForeground()) return
 
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(title)
 
         // Determine dialog type based on title to decide if it should be modal
@@ -675,7 +686,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
 
         try {
-            builder.create().show()
+            val dialog = builder.create()
+            dialog.show()
         } catch (e: Exception) {
             Logger.e(LOG_TAG_UI, "err showing download dialog: ${e.message}", e)
         }

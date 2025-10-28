@@ -11,8 +11,6 @@
         android:clickable="true"
         android:focusable="true"
         app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        app:cardUseCompatPadding="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="parent"

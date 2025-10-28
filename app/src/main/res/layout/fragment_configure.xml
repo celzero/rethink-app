@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/background"
     android:fillViewport="true"
     android:orientation="vertical">
 
@@ -48,11 +47,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/fs_apps_card"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -91,11 +86,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/fs_dns_card"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -135,11 +126,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/fs_firewall_card"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -178,17 +165,13 @@
             android:id="@+id/fs_proxy_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            android:clipToPadding="true">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="20dp">
-
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/fs_proxy_icon"
@@ -222,10 +205,7 @@
             android:id="@+id/fs_network_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            android:clipToPadding="true">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -265,17 +245,13 @@
             android:id="@+id/fs_others_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            android:clipToPadding="true">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="20dp">
-
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/fs_others_icon"
@@ -308,10 +284,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/fs_logs_card"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -350,10 +323,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/fs_anti_censorship_card"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -396,10 +366,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/fs_advanced_card"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <RelativeLayout
                 android:layout_width="match_parent"

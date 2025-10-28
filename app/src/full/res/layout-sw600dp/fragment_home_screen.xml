@@ -82,9 +82,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:clipToPadding="false"
-                            app:cardCornerRadius="20dp"
-                            app:cardElevation="6dp"
-                            app:cardUseCompatPadding="true">
+                            app:cardCornerRadius="20dp">
 
                             <RelativeLayout
                                 android:layout_width="match_parent"
@@ -173,11 +171,8 @@
                             android:id="@+id/fhs_card_firewall_ll"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:clipToPadding="true"
                             android:orientation="vertical"
-                            app:cardCornerRadius="20dp"
-                            app:cardElevation="6dp"
-                            app:cardUseCompatPadding="true">
+                            app:cardCornerRadius="20dp">
 
                             <RelativeLayout
                                 android:layout_width="match_parent"
@@ -276,11 +271,8 @@
                             android:id="@+id/fhs_card_proxy_ll"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:clipToPadding="true"
                             android:orientation="vertical"
-                            app:cardCornerRadius="20dp"
-                            app:cardElevation="6dp"
-                            app:cardUseCompatPadding="true">
+                            app:cardCornerRadius="20dp">
 
                             <RelativeLayout
                                 android:layout_width="match_parent"
@@ -342,11 +334,8 @@
                             android:id="@+id/fhs_card_logs_ll"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:clipToPadding="true"
                             android:orientation="vertical"
-                            app:cardCornerRadius="20dp"
-                            app:cardElevation="6dp"
-                            app:cardUseCompatPadding="true">
+                            app:cardCornerRadius="20dp">
 
                             <RelativeLayout
                                 android:layout_width="match_parent"
@@ -437,11 +426,7 @@
                     android:id="@+id/fhs_card_apps_cv"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:clipToPadding="true"
-                    android:orientation="vertical"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="6dp"
-                    app:cardUseCompatPadding="true">
+                    android:orientation="vertical">
 
                     <RelativeLayout
                         android:layout_width="match_parent"

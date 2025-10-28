@@ -61,6 +61,7 @@ import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.celzero.bravedns.viewmodel.DomainConnectionsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
@@ -99,6 +100,11 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     ): View {
         _binding = BottomSheetDnsLogBinding.inflate(inflater, container, false)
         return b.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.useTransparentNoDimBackground()
     }
 
     // enum to represent the status of the domain in the chip (ui)
@@ -445,9 +451,8 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
     private fun showBlocklistDialog(groupNames: Multimap<String, String>) {
         val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
         val dialog = builder.create()
-        dialog.show()
         dialog.setCancelable(true)
         dialogBinding.infoRulesDialogRulesDesc.text = formatText(groupNames)
         dialogBinding.infoRulesDialogRulesTitle.visibility = View.GONE
@@ -464,7 +469,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
         val dialogBinding = DialogIpDetailsLayoutBinding.inflate(layoutInflater)
 
-        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         dialog.show()

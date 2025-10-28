@@ -294,7 +294,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     }
 
     private fun showDnsLogsDeleteDialog() {
-        MaterialAlertDialogBuilder(requireContext())
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
             .setTitle(R.string.dns_query_clear_logs_title)
             .setMessage(R.string.dns_query_clear_logs_message)
             .setCancelable(true)

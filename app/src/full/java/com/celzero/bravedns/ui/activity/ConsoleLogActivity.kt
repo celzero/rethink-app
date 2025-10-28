@@ -50,6 +50,7 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.ConsoleLogViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -86,6 +87,8 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -240,7 +243,7 @@ class ConsoleLogActivity : AppCompatActivity(R.layout.activity_console_log), and
 
     private fun showFilterDialog() {
         // show dialog with level filter
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.console_log_title))
         val items = arrayOf(
             getString(R.string.settings_gologger_dialog_option_0),

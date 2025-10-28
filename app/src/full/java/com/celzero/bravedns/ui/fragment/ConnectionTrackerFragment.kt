@@ -369,7 +369,7 @@ class ConnectionTrackerFragment :
         val rule = filterCategories.firstOrNull()
         if (fromUniversalFirewallScreen && rule != null) {
             // Rule-specific deletion for Universal Firewall Settings
-            MaterialAlertDialogBuilder(requireContext())
+            MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
                 .setTitle(R.string.conn_track_clear_rule_logs_title)
                 .setMessage(R.string.conn_track_clear_rule_logs_message)
                 .setCancelable(true)
@@ -381,7 +381,7 @@ class ConnectionTrackerFragment :
                 .show()
         } else {
             // Default deletion behavior - delete all logs
-            MaterialAlertDialogBuilder(requireContext())
+            MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
                 .setTitle(R.string.conn_track_clear_logs_title)
                 .setMessage(R.string.conn_track_clear_logs_message)
                 .setCancelable(true)

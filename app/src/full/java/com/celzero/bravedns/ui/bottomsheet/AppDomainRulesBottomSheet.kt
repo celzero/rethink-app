@@ -42,6 +42,7 @@ import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.htmlToSpannedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -122,6 +123,11 @@ class AppDomainRulesBottomSheet : BottomSheetDialogFragment(), WireguardListBtmS
         init()
         initializeClickListeners()
         setRulesUi()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.useTransparentNoDimBackground()
     }
 
     private fun init() {

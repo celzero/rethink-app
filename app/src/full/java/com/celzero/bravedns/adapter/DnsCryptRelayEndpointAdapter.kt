@@ -156,7 +156,7 @@ class DnsCryptRelayEndpointAdapter(
         }
 
         private fun showDialogExplanation(title: String, url: String, message: String?) {
-            val builder = MaterialAlertDialogBuilder(context)
+            val builder = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
             builder.setTitle(title)
             if (message != null) builder.setMessage(url + "\n\n" + relayDesc(message))
             else builder.setMessage(url)

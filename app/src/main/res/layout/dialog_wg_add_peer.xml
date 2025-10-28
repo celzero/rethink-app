@@ -9,7 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="8dp"
-        android:elevation="8dp"
         android:focusableInTouchMode="true"
         app:cardBackgroundColor="?attr/background"
         app:cardCornerRadius="16dp">

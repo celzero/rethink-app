@@ -46,4 +46,5 @@
     <attr name="background" format="reference" />
     <attr name="homeScreenBtnGradientStart" format="reference" />
     <attr name="homeScreenBtnGradientEnd" format="reference" />
+    <attr name="bottomSheetBackground" format="reference" />
 </resources>
