@@ -25,7 +25,6 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -50,6 +49,7 @@ import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.RethinkBlocklistManager.RethinkBlocklistType.Companion.getType
+import com.celzero.bravedns.service.RethinkBlocklistManager.getTagsFromStamp
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_NAME
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
@@ -215,7 +215,10 @@ class RethinkBlocklistFragment :
         b.lbBlocklistApplyBtn.text =
             getString(R.string.ct_ip_details, getString(R.string.lbl_apply), typeName)
 
-        updateFileTagList(emptySet())
+        io {
+            val flags = getTagsFromStamp(modifiedStamp, type)
+            updateFileTagList(flags)
+        }
 
         // update ui based on blocklist availability
         hasBlocklist()
@@ -373,7 +376,7 @@ class RethinkBlocklistFragment :
     }
 
     private fun showLockdownDownloadDialog(type: RethinkBlocklistManager.RethinkBlocklistType) {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.lockdown_download_enable_inapp)
         builder.setMessage(R.string.lockdown_download_message)
         builder.setCancelable(true)
@@ -387,8 +390,7 @@ class RethinkBlocklistFragment :
             // Proceed with Android download manager (useCustomDownloadManager stays false)
             proceedWithBlocklistDownload(type)
         }
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.show()
+        builder.create().show()
     }
 
     private fun proceedWithBlocklistDownload(type: RethinkBlocklistManager.RethinkBlocklistType) {
@@ -455,7 +457,7 @@ class RethinkBlocklistFragment :
     }
 
     private fun showApplyChangesDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.rt_dialog_title))
         builder.setMessage(getString(R.string.rt_dialog_message))
         builder.setCancelable(true)
