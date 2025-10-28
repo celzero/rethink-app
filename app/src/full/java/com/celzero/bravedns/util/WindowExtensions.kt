@@ -19,7 +19,6 @@ import Logger
 import Logger.LOG_TAG_UI
 import android.app.Dialog
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
@@ -97,10 +96,10 @@ private fun AppCompatActivity.updateWindowForBlurs(
     blursEnabled: Boolean,
 ) {
     windowBackgroundDrawable?.alpha =
-        if (blursEnabled && BACKGROUND_BLUR_RADIUS > 0) WINDOW_BACKGROUND_ALPHA_WITH_BLUR
+        if (blursEnabled) WINDOW_BACKGROUND_ALPHA_WITH_BLUR
         else WINDOW_BACKGROUND_ALPHA_NO_BLUR
 
-    window.setDimAmount(DIM_AMOUNT_WITH_BLUR)
+    window.setDimAmount(if (blursEnabled) DIM_AMOUNT_WITH_BLUR else DIM_AMOUNT_NO_BLUR)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         // Set the window background blur and blur behind radii
         window.setBackgroundBlurRadius(BACKGROUND_BLUR_RADIUS)
@@ -109,15 +108,8 @@ private fun AppCompatActivity.updateWindowForBlurs(
     }
 }
 
-// small helper to grab drawable safely
-fun AppCompatActivity.windowBackgroundDrawableOrNull(): Drawable? =
-    window.decorView.background ?: runCatching {
-        AppCompatResources.getDrawable(this, R.drawable.window_background)
-    }.getOrNull()
-
-
 fun Dialog.useTransparentNoDimBackground(
-    @ColorInt color: Int = android.graphics.Color.TRANSPARENT
+    @ColorInt color: Int = Color.TRANSPARENT
 ) {
     // clear the dim behind flag so the underlying activity is not dimmed
     window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
@@ -128,26 +120,26 @@ fun Dialog.useTransparentNoDimBackground(
 }
 
 fun AppCompatDialog.useTransparentNoDimBackground(
-    @ColorInt color: Int = android.graphics.Color.TRANSPARENT
+    @ColorInt color: Int = Color.TRANSPARENT
 ) {
     (this as Dialog?)?.useTransparentNoDimBackground(color)
 }
 
 fun BottomSheetDialog.useTransparentNoDimBackground(
-    @ColorInt color: Int = android.graphics.Color.TRANSPARENT
+    @ColorInt color: Int = Color.TRANSPARENT
 ) {
     (this as Dialog?)?.useTransparentNoDimBackground(color)
 }
 
 /** Allow calling the helper directly on a DialogFragment/BottomSheetDialogFragment. */
 fun DialogFragment?.useTransparentNoDimBackground(
-    @ColorInt color: Int = android.graphics.Color.TRANSPARENT
+    @ColorInt color: Int = Color.TRANSPARENT
 ) {
     this?.dialog?.useTransparentNoDimBackground(color)
 }
 
 fun BottomSheetDialogFragment?.useTransparentNoDimBackground(
-    @ColorInt color: Int = android.graphics.Color.TRANSPARENT
+    @ColorInt color: Int = Color.TRANSPARENT
 ) {
     this?.dialog?.useTransparentNoDimBackground(color)
 }

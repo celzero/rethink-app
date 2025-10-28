@@ -41,11 +41,10 @@ class AdvancedSettingActivity : AppCompatActivity(R.layout.activity_advanced_set
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        handleFrostEffectIfNeeded(persistentState.theme)
-
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
 
+        handleFrostEffectIfNeeded(persistentState.theme)
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
             controller.isAppearanceLightNavigationBars = false

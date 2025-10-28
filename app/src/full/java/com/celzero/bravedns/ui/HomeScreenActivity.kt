@@ -57,6 +57,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.service.AppUpdater
@@ -69,6 +70,7 @@ import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
 import com.celzero.bravedns.util.FirebaseErrorReporting
 import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
@@ -100,6 +102,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val appInfoDb by inject<AppInfoRepository>()
     private val appUpdateManager by inject<AppUpdater>()
     private val rdb by inject<RefreshDatabase>()
+    private val appConfig by inject<AppConfig>()
 
     // TODO: see if this can be replaced with a more robust solution
     // keep track of when app went to background
@@ -112,8 +115,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
-        //theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
+        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
 
         if (isAtleastO_MR1()) {
@@ -382,6 +384,19 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         // delete residue wgs from database, remove this post v055o
         io { WireguardManager.deleteResidueWgs() }
+        // reset the plus url to empty if it is set as /rec
+        io {
+            val rpe = appConfig.getRethinkPlusEndpoint()
+            val url = rpe?.url ?: return@io
+            if (url == "https://max.rethinkdns.com/rec" || url == "https://rplus.rethinkdns.com/rec") {
+                val newUrl = if (rpe.url.contains(MAX_ENDPOINT)) {
+                    Constants.RETHINK_BASE_URL_MAX
+                } else {
+                    Constants.RETHINK_BASE_URL_SKY
+                }
+                appConfig.updateRethinkEndpoint(Constants.RETHINK_DNS_PLUS, newUrl, 0)
+            }
+        }
     }
 
     // fixme: find a cleaner way to implement this, move this to some other place

@@ -58,7 +58,8 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     private val appConfig by inject<AppConfig>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
+        //setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
 
         handleFrostEffectIfNeeded(persistentState.theme)

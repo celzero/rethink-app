@@ -66,7 +66,7 @@ class AntiCensorshipActivity : AppCompatActivity(R.layout.activity_anti_censorsh
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
 
         handleFrostEffectIfNeeded(persistentState.theme)

@@ -49,7 +49,7 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
 
         handleFrostEffectIfNeeded(persistentState.theme)

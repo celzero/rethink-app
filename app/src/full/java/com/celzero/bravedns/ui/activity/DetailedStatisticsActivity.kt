@@ -59,7 +59,7 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
         handleFrostEffectIfNeeded(persistentState.theme)
         if (isAtleastQ()) {

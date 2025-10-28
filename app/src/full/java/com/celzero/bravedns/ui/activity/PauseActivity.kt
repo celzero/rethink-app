@@ -60,7 +60,7 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
     var lastStopActivityInvokeTime: Long = INIT_TIME_MS
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
 
         handleFrostEffectIfNeeded(persistentState.theme)
