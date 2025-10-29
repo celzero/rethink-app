@@ -254,7 +254,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             b.bsConnTrackAppInfo.text = getString(R.string.two_argument_colon, getString(FirewallRuleset.RULE12.title), info?.proxyDetails)
         } else {
             if (isInvalidProxyDetails()) {
-                b.bsConnTrackAppInfo.text = getString(getFirewallRule(FirewallRuleset.RULE1C.id)?.title ?: R.string.firewall_rule_no_rule)
+                b.bsConnTrackAppInfo.text = getString(getFirewallRule(FirewallRuleset.RULE18.id)?.title ?: R.string.firewall_rule_no_rule)
             } else {
                 b.bsConnTrackAppInfo.text = getFirewallRule(rule)?.title?.let { getString(it) }
             }

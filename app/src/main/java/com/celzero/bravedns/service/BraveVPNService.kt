@@ -4493,7 +4493,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             cm.message = s.msg
             cm.destIP = s.target
             cm.isBlocked = if (proxyRule.isEmpty()) true else cm.isBlocked
-            cm.blockedByRule = proxyRule.ifEmpty { FirewallRuleset.RULE1C.id }
+            cm.blockedByRule = proxyRule.ifEmpty { FirewallRuleset.RULE18.id }
             logd("onSocketClosed-flow/postflow: $s, pid: ${s.pid.isNullOrEmpty()}, cm: $cm")
             if (isRethink) {
                 netLogTracker.writeRethinkLog(cm)

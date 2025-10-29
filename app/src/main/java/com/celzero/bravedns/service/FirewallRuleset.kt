@@ -223,6 +223,12 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
         R.string.firewall_rule_lockdown_wg,
         R.string.firewall_rule_lockdown_wg_desc,
         R.integer.stall
+    ),
+    RULE18(
+        "Proxy Error",
+        R.string.firewall_rule_proxy_error,
+        R.string.firewall_rule_proxy_error,
+        R.integer.stall
     );
 
     companion object {
@@ -262,6 +268,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE15.id -> RULE15
                 RULE16.id -> RULE16
                 RULE17.id -> RULE17
+                RULE18.id -> RULE18
                 else -> null
             }
         }
@@ -303,6 +310,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE15.id -> R.drawable.ic_bypass
                 RULE16.id -> R.drawable.ic_proxy_white
                 RULE17.id -> R.drawable.ic_proxy_white
+                RULE18.id -> R.drawable.ic_filter_error
                 else -> R.drawable.bs_dns_home_screen
             }
         }
@@ -329,10 +337,10 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
             return rule.id == RULE12.id
         }
 
-        fun isError(rule: String?): Boolean {
+        fun isProxyError(rule: String?): Boolean {
             if (rule == null) return false
 
-            return rule == RULE1C.id
+            return rule == RULE18.id
         }
 
         fun shouldShowHint(rule: String?): Boolean {

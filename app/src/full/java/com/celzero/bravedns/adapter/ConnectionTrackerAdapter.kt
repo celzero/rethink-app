@@ -130,7 +130,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 connTracker.isBlocked
             }
             val rule = if (connTracker.blockedByRule == FirewallRuleset.RULE12.id && connTracker.proxyDetails.isEmpty()) {
-                FirewallRuleset.RULE1C.id
+                FirewallRuleset.RULE18.id
             } else {
                 connTracker.blockedByRule
             }
@@ -234,7 +234,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 // hint red when blocked
                 isBlocked -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
-                    val isError = FirewallRuleset.isError(ruleName)
+                    val isError = FirewallRuleset.isProxyError(ruleName)
                     if (isError) {
                         b.connectionStatusIndicator.setBackgroundColor(
                             UIUtils.fetchColor(context, R.attr.chipTextNeutral)
