@@ -528,22 +528,22 @@
         <item name="buttonBarNeutralButtonStyle">@style/App.AlertDialog.NeutralButton</item>
     </style>
 
-    <style name="App.AlertDialog.PositiveButton" parent="Widget.Material3.Button.TextButton.Dialog">
+    <style name="App.AlertDialog.PositiveButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/secondaryTextColor</item>
         <item name="android:textAllCaps">true</item>
-        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelLarge</item>
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Button</item>
     </style>
 
-    <style name="App.AlertDialog.NegativeButton" parent="Widget.Material3.Button.TextButton.Dialog">
+    <style name="App.AlertDialog.NegativeButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/primaryLightColorText</item>
         <item name="android:textAllCaps">true</item>
-        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelLarge</item>
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Button</item>
     </style>
 
-    <style name="App.AlertDialog.NeutralButton" parent="Widget.Material3.Button.TextButton.Dialog">
+    <style name="App.AlertDialog.NeutralButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/primaryLightColorText</item>
         <item name="android:textAllCaps">true</item>
-        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelLarge</item>
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Button</item>
     </style>
 
     <style name="BaseBottomSheetDialog" parent="@style/Theme.Design.BottomSheetDialog">
