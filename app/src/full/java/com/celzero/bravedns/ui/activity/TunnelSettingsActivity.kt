@@ -514,11 +514,6 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                 saveNetworkPolicy(which)
                 adapter.notifyDataSetChanged()
             }
-            .setPositiveButton(getString(R.string.hs_download_positive_default)) { dialog, _ ->
-                dialog.dismiss()
-                saveNetworkPolicy(currentSelection)
-            }
-            .setNegativeButton(getString(R.string.lbl_cancel), null)
 
         val dialog = builder.create()
         dialog.show()
