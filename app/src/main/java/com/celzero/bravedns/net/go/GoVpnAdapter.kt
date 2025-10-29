@@ -176,6 +176,16 @@ class GoVpnAdapter : KoinComponent {
             Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set pcap mode")
             return
         }
+
+        // validate pcap file path before setting
+        if (pcapFilePath.isNotEmpty() && pcapFilePath != "0") {
+            val file = File(pcapFilePath)
+            if (!file.exists() || !file.canWrite()) {
+                Logger.e(LOG_TAG_VPN, "$TAG invalid pcap file path, file does not exist or not writable: $pcapFilePath")
+                return
+            }
+        }
+
         try {
             Logger.i(LOG_TAG_VPN, "$TAG set pcap mode: $pcapFilePath")
             tunnel.setPcap(pcapFilePath)

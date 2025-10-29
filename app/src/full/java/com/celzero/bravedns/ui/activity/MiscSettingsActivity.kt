@@ -315,19 +315,37 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     // create folder in DOWNLOADS/Rethink
                     File(downloadsDir, Constants.PCAP_FOLDER_NAME)
                 }
+
+            // ensure directory exists
             if (!dir.exists()) {
-                dir.mkdirs()
+                val created = dir.mkdirs()
+                if (!created) {
+                    Logger.e(LOG_TAG_VPN, "failed to create pcap directory: ${dir.absolutePath}")
+                    return null
+                }
             }
+
+            // verify directory is writable
+            if (!dir.canWrite()) {
+                Logger.e(LOG_TAG_VPN, "pcap directory not writable: ${dir.absolutePath}")
+                return null
+            }
+
             // filename format (rethink_pcap_<DATE_FORMAT>.pcap)
             val pcapFileName: String =
                 Constants.PCAP_FILE_NAME_PART + sdf.format(Date()) + Constants.PCAP_FILE_EXTENSION
             val file = File(dir, pcapFileName)
-            // just in case, create the parent dir if it doesn't exist
-            if (file.parentFile?.exists() != true) file.parentFile?.mkdirs()
+
             // create the file if it doesn't exist
             if (!file.exists()) {
-                file.createNewFile()
+                val created = file.createNewFile()
+                if (!created) {
+                    Logger.e(LOG_TAG_VPN, "failed to create pcap file: ${file.absolutePath}")
+                    return null
+                }
             }
+
+            Logger.i(LOG_TAG_VPN, "pcap file created at: ${file.absolutePath}")
             file
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "error creating pcap file ${e.message}", e)
@@ -351,10 +369,21 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 showFileCreationErrorToast()
                 return
             }
+
+            // verify file was created successfully and is writable
+            if (!file.exists() || !file.canWrite()) {
+                Logger.e(LOG_TAG_VPN, "pcap file not writable: ${file.absolutePath}")
+                showFileCreationErrorToast()
+                return
+            }
+
+            Logger.i(LOG_TAG_VPN, "pcap file created successfully: ${file.absolutePath}")
             // set the file descriptor instead of fd, need to close the file descriptor
             // after tunnel creation
             appConfig.setPcap(PcapMode.EXTERNAL_FILE.id, file.absolutePath)
-        } catch (_: Exception) {
+            displayPcapUi()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "error in createAndSetPcapFile: ${e.message}", e)
             showFileCreationErrorToast()
         }
     }

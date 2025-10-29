@@ -55,6 +55,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val PROTOCOL_TRANSLATION = "protocol_translation"
         const val DEFAULT_DNS_SERVER = "default_dns_query"
         const val PCAP_MODE = "pcap_mode"
+        const val PCAP_FILE_PATH = "pcap_file_path"
         const val REMOTE_BLOCKLIST_UPDATE = "remote_block_list_downloaded_time"
         const val DNS_ALG = "dns_alg"
         const val APP_VERSION = "app_version"
@@ -281,6 +282,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // packet capture type
     var pcapMode by intPref("pcap_mode").withDefault<Int>(PcapMode.NONE.id)
+
+    // packet capture file path
+    var pcapFilePath by stringPref("pcap_file_path").withDefault<String>("")
 
     // dns caching in tunnel
     var enableDnsCache by booleanPref("dns_cache").withDefault<Boolean>(true)
