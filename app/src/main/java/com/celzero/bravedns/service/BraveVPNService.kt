@@ -243,7 +243,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
         // TODO: should be different for IPv4 and IPv6, but for now it is same
         // IPv4: 576, IPv6: 1280
         const val MIN_MTU: Int = 1280
-        private const val MAX_MTU: Int = 9000
+        private const val MAX_MTU: Int = 10000
 
         // route v4 in v6 only networks?
         const val ROUTE4IN6 = true
@@ -4327,9 +4327,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
             val v6Mobile = v6first?.capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ?: false
             val isActiveMobile = v4Mobile || (v4first == null && v6Mobile)
             Logger.i(LOG_TAG_VPN, "onProxyAdded: wg proxy $iid is added, isActiveMobile: $isActiveMobile")
-            if (!isActiveMobile) {
-                io("pauseWg") { vpnAdapter?.pauseWireguard(iid) }
-            }
         }
     }
 

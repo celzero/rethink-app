@@ -581,26 +581,46 @@ object WireguardManager : KoinComponent {
                 return true
             }
 
-            val matchFound = ssidItems.any { ssidItem ->
-                when (ssidItem.type) {
-                    SsidItem.SsidType.EQUAL_EXACT -> {
+            val notEqualItems = ssidItems.filter { !it.type.isEqual }
+            val notEqualMatch = notEqualItems.any { ssidItem ->
+                when {
+                    ssidItem.type.isExact -> {
                         ssidItem.name.equals(ssid, ignoreCase = true)
                     }
-                    SsidItem.SsidType.EQUAL_WILDCARD -> {
+
+                    else -> { // wildcard
                         matchesWildcard(ssidItem.name, ssid)
-                    }
-                    SsidItem.SsidType.NOTEQUAL_EXACT -> {
-                        !ssidItem.name.equals(ssid, ignoreCase = true)
-                    }
-                    SsidItem.SsidType.NOTEQUAL_WILDCARD -> {
-                        !matchesWildcard(ssidItem.name, ssid)
                     }
                 }
             }
 
-            if (!matchFound && ssidItems.isNotEmpty()) {
-                val ssidNames = ssidItems.map { "${it.name}(${it.type.displayName})" }
-                Logger.i(LOG_TAG_PROXY, "canAdd: ssidEnabled is true, but ssid($ssid) not available, ssidList: $ssidNames")
+            if (notEqualMatch) {
+                Logger.d(LOG_TAG_PROXY, "canAdd: ssid matched in NOT_EQUAL items, return false")
+                return false
+            }
+
+            val equalItems = ssidItems.filter { it.type.isEqual }
+            // If there are only NOT_EQUAL items and none matched, return true
+            if (equalItems.isEmpty() && notEqualItems.isNotEmpty()) {
+                Logger.d(LOG_TAG_PROXY, "canAdd: only NOT_EQUAL items present and none matched, return true")
+                return true
+            }
+
+            // Check EQUAL items (exact or wildcard)
+            val equalMatch = equalItems.any { ssidItem ->
+                when {
+                    ssidItem.type.isExact -> {
+                        ssidItem.name.equals(ssid, ignoreCase = true)
+                    }
+
+                    else -> { // wildcard
+                        matchesWildcard(ssidItem.name, ssid)
+                    }
+                }
+            }
+
+            if (!equalMatch) {
+                Logger.d(LOG_TAG_PROXY, "canAdd: ssid did not match in EQUAL items, return false")
                 return false
             }
         }

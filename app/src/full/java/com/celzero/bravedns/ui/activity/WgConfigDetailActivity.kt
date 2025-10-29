@@ -563,23 +563,25 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             )
         }
 
+        b.lockdownRl.setOnClickListener {
+            b.lockdownCheck.isChecked = !b.lockdownCheck.isChecked
+            updateLockdown(b.lockdownCheck.isChecked)
+        }
+
         b.lockdownCheck.setOnClickListener { updateLockdown(b.lockdownCheck.isChecked) }
+
+        b.catchAllRl.setOnClickListener {
+            b.catchAllCheck.isChecked = !b.catchAllCheck.isChecked
+            updateCatchAll(b.catchAllCheck.isChecked)
+        }
 
         b.catchAllCheck.setOnClickListener { updateCatchAll(b.catchAllCheck.isChecked) }
 
+        b.useMobileRl.setOnClickListener {
+            b.useMobileCheck.callOnClick()
+        }
+
         b.useMobileCheck.setOnClickListener {
-            val mapping = WireguardManager.getConfigFilesById(configId)
-            if (mapping?.ssidEnabled == true) {
-                // ssid is enabled, cannot enable mobile only
-                val msg = getString(R.string.wg_ssid_and_mobile_err, getString(R.string.wg_setting_use_on_mobile), getString(R.string.wg_setting_ssid_title))
-                Utilities.showToastUiCentered(
-                    this,
-                    msg,
-                    Toast.LENGTH_LONG
-                )
-                b.useMobileCheck.isChecked = !b.useMobileCheck.isChecked
-                return@setOnClickListener
-            }
             val sid = ID_WG_BASE + configId
             if (WgHopManager.isAlreadyHop(sid)) {
                 Utilities.showToastUiCentered(
@@ -921,17 +923,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
         sw.setOnCheckedChangeListener { _, isChecked ->
             NewSettingsManager.markSettingSeen(NewSettingsManager.WG_SSID_SETTING)
-            val mapping = WireguardManager.getConfigFilesById(configId)
-            if (mapping?.useOnlyOnMetered == true && isChecked) {
-                val msg = getString(R.string.wg_ssid_and_mobile_err, getString(R.string.wg_setting_ssid_title), getString(R.string.wg_setting_use_on_mobile))
-                Utilities.showToastUiCentered(
-                    this,
-                    msg,
-                    Toast.LENGTH_LONG
-                )
-                sw.isChecked = false
-                return@setOnCheckedChangeListener
-            }
 
             // Check current permissions and location status dynamically
             val currentHasPermissions = SsidPermissionManager.hasRequiredPermissions(this)
@@ -966,7 +957,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                     val list = SsidItem.parseStorageList(cur)
                     uiCtx {
                         if (list.isEmpty()) {
-                            val allTxt = getString(R.string.single_argument_parenthesis, getString(R.string.lbl_all))
+                            val allTxt = getString(R.string.two_argument_space, getString(R.string.lbl_all), getString(R.string.lbl_ssids))
                             valueTv.text = allTxt
                             showSsidDisplay(editGroup, displayGroup)
                         } else {

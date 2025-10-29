@@ -1156,7 +1156,7 @@ class GoVpnAdapter : KoinComponent {
                 val useOnlyOnSsid = files?.ssidEnabled == true && !files.oneWireGuard
                 val ssidList = files?.ssids?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
                 val ssidMatch = useOnlyOnSsid && WireguardManager.matchesSsidList(files.ssids, ssid) && ssid.isNotEmpty()
-                val canResumeSsidWg = useOnlyOnSsid && ssidMatch && !isMobileActive
+                val canResumeSsidWg = useOnlyOnSsid && ssidMatch
 
                 val canResume = canResumeMobileWg || canResumeSsidWg
 
@@ -1182,20 +1182,18 @@ class GoVpnAdapter : KoinComponent {
                     // or ssid change for ssidEnabled wgs
                     val res = getProxies()?.getProxy(id.togs())?.resume()
                     Logger.i(LOG_TAG_VPN, "$TAG resumed proxy: $id, res: $res")
-                } else if (isWireGuardMobileOnly && !isMobileActive) {
+                } else if (isWireGuardMobileOnly && !isMobileActive && !useOnlyOnSsid) {
                     // if the proxy is not paused, then pause it
                     // this is needed when the network is on mobile data
                     // and the wg-config is set to useOnlyOnMetered
                     val res = getProxies()?.getProxy(id.togs())?.pause()
                     Logger.i(LOG_TAG_VPN, "$TAG paused proxy (mobile): $id, res: $res")
-                } else if (useOnlyOnSsid && !ssidMatch) {
+                } else if (useOnlyOnSsid && !ssidMatch && !isWireGuardMobileOnly) {
                     // when the ssidEnabled is set and the ssid does not match
                     val res = getProxies()?.getProxy(id.togs())?.pause()
                     Logger.i(LOG_TAG_VPN, "$TAG paused proxy (ssid): $id, res: $res")
-                } else if (useOnlyOnSsid && isMobileActive) {
-                    val res = getProxies()?.getProxy(id.togs())?.pause()
-                    Logger.i(LOG_TAG_VPN, "$TAG paused proxy (ssid+mobile): $id, res: $res")
                 }
+
                 if (stats == Backend.TPU && !isWireGuardMobileOnly && !useOnlyOnSsid) {
                     // if the proxy is paused, then resume it
                     // this is needed when the tunnel is reconnected and the proxies are paused
