@@ -56,7 +56,6 @@ class WgSsidDialog(
         b = DialogWgSsidBinding.inflate(layoutInflater)
         setContentView(b.root)
         setCancelable(false)
-        useTransparentNoDimBackground()
         setupDialog()
         setupRecyclerView()
         loadCurrentSsids()
