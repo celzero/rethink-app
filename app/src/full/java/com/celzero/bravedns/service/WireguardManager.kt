@@ -949,6 +949,8 @@ object WireguardManager : KoinComponent {
         mappings.add(newMap)
         Logger.i(LOG_TAG_PROXY, "updated ssidEnabled as $ssidEnabled for config: $id, ${config.getName()}")
         if (m.isActive) {
+            // trigger connection monitor to update the SSID info
+            if (ssidEnabled) VpnController.notifyConnectionMonitor(enforcePolicyChange = true)
             VpnController.addWireGuardProxy(id = ID_WG_BASE + id)
             // Refresh proxies to immediately pause/resume based on new ssid setting and current network
             VpnController.refreshOrPauseOrResumeOrReAddProxies()

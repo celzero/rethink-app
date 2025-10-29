@@ -351,8 +351,8 @@ object VpnController : KoinComponent {
         return braveVpnService?.probeIpOrUrl(ip, useAuto)
     }
 
-    suspend fun notifyConnectionMonitor() {
-        braveVpnService?.notifyConnectionMonitor()
+    suspend fun notifyConnectionMonitor(enforcePolicyChange: Boolean = false) {
+        braveVpnService?.notifyConnectionMonitor(enforcePolicyChange)
     }
 
     suspend fun getSystemDns(): String {

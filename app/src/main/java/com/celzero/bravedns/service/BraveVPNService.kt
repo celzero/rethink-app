@@ -2505,8 +2505,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Bridge,
 
     // invoked on pref / probe-ip changes, so that the connection monitor can
     // re-initiate the connectivity checks
-    suspend fun notifyConnectionMonitor() {
-        connectionMonitor.onUserPreferenceChanged()
+    suspend fun notifyConnectionMonitor(enforcePolicyChange: Boolean = false) {
+        if (enforcePolicyChange) {
+            connectionMonitor.onPolicyChanged()
+        } else {
+            connectionMonitor.onUserPreferenceChanged()
+        }
     }
 
     private suspend fun updateDnsAlg() {
