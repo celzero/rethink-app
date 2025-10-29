@@ -713,7 +713,6 @@
                             android:fontFamily="sans-serif-light"
                             android:gravity="center_vertical"
                             android:padding="5dp"
-                            android:text="Alerts"
                             android:textColor="?attr/homeScreenHeaderTextColor"
                             android:textSize="@dimen/large_font_text_view"
                             app:drawableStartCompat="@drawable/ic_app_info_accent" />
@@ -751,7 +750,6 @@
                                 android:marqueeRepeatLimit="marquee_forever"
                                 android:padding="5dp"
                                 android:singleLine="true"
-                                android:text="past 1 hour"
                                 android:textSize="@dimen/small_font_text_view" />
 
                         </RelativeLayout>
@@ -788,7 +786,6 @@
                 android:layout_marginBottom="10dp"
                 android:alpha="0.75"
                 android:fontFamily="sans-serif-smallcaps"
-                android:text="KB/S"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/mini_font_text_view" />
 
