@@ -50,9 +50,10 @@
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/ssidConditionHeading"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/wg_ssid_condition_label"
+                    android:text="@string/fapps_filter_filter_heading"
                     android:textSize="12sp"
                     android:layout_marginBottom="8dp"
                     android:textColor="?attr/primaryLightColorText" />
