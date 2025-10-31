@@ -1159,8 +1159,15 @@ object WireguardManager : KoinComponent {
             sb.append("   tx: ${routerStats?.tx}\n")
             sb.append("   lastRx: ${getRelativeTimeSpan(routerStats?.lastRx)}\n")
             sb.append("   lastTx: ${getRelativeTimeSpan(routerStats?.lastTx)}\n")
+            sb.append("   lastGoodRx: ${getRelativeTimeSpan(routerStats?.lastGoodRx)}\n")
+            sb.append("   lastGoodTx: ${getRelativeTimeSpan(routerStats?.lastGoodTx)}\n")
             sb.append("   lastOk: ${getRelativeTimeSpan(routerStats?.lastOK)}\n")
-            sb.append("   since: ${getRelativeTimeSpan(routerStats?.since)}\n\n")
+            sb.append("   since: ${getRelativeTimeSpan(routerStats?.since)}\n")
+            sb.append("   errRx: ${routerStats?.errRx}\n")
+            sb.append("   errTx: ${routerStats?.errTx}\n\n")
+        }
+        if (sb.isEmpty()) {
+            sb.append("NA")
         }
         return sb.toString()
     }
@@ -1173,7 +1180,7 @@ object WireguardManager : KoinComponent {
         return DateUtils.getRelativeTimeSpanString(
             t,
             now,
-            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.SECOND_IN_MILLIS,
             DateUtils.FORMAT_ABBREV_RELATIVE
         )
     }
