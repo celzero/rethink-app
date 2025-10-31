@@ -1037,16 +1037,22 @@ class GoVpnAdapter : KoinComponent {
                 Logger.e(LOG_TAG_VPN, "$TAG invalid wg proxy id: $id")
                 return
             }
-            try {
-                if (!force && getProxies()?.getProxy(id.togs()) != null) {
-                    Logger.i(LOG_TAG_VPN, "$TAG wg proxy already exists in tunnel $id")
+            if (force) {
+                Logger.i(LOG_TAG_VPN, "$TAG force add, removing existing wg proxy with id: $id if any")
+                removeWgProxy(proxyId)
+            } else {
+                // check if the proxy already exists
+                val existing = try {
+                    getProxies()?.getProxy(id.togs())
+                } catch (_: Exception) {
+                    null
+                }
+                if (existing != null) {
+                    Logger.i(LOG_TAG_VPN, "$TAG wg proxy already exists with id: $id, skip adding as force is false")
                     return
                 }
-            } catch (_: Exception) {
-                Logger.i(LOG_TAG_VPN, "$TAG wg proxy not found in tunnel $id, proceed adding")
             }
 
-            val wgFiles = WireguardManager.getConfigFilesById(proxyId)
             val wgConfig = WireguardManager.getConfigById(proxyId)
             val isOneWg = WireguardManager.getOneWireGuardProxyId() == proxyId
             if (!isOneWg) checkAndAddProxyForHopIfNeeded(id)
@@ -1172,7 +1178,7 @@ class GoVpnAdapter : KoinComponent {
                     // there are cases where the proxy needs to be re-added, so pingOrReAddProxy
                     // case: some of the wg proxies are added to tunnel but erring out, so
                     // re-adding those proxies seems working, work around for now
-                    // now re-add logic is handled in go-tun
+                    // readding requires removing and adding the proxy again
                     addWgProxy(id, true)
                 }
                 if (stats == Backend.TPU && canResume) {
