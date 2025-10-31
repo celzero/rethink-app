@@ -138,12 +138,16 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            ndk {
+                // Use SYMBOL_TABLE to reduce symbol file size significantly
+                debugSymbolLevel 'SYMBOL_TABLE'
+                // Only process symbols for the most common ABIs to avoid Crashlytics index errors
+                // This reduces the total symbol data Crashlytics needs to process
+                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+            }
             if (!isFdroidBuild) {
                 firebaseCrashlytics {
                     // Enable processing and uploading of native symbols to Firebase servers.
-                    // By default, this is disabled to improve build speeds.
-                    // This flag must be enabled to see properly-symbolicated native
-                    // stack traces in the Crashlytics dashboard.
                     nativeSymbolUploadEnabled true
                 }
             }
@@ -159,6 +163,28 @@ android {
             shrinkResources true
             signingConfig signingConfigs.alpha
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    // fix: injectCrashlyticsBuildIds task has a buffer overflow bug
+    // apply crashlytics configuration to firebase builds only
+    if (!isFdroidBuild) {
+        // workaround for crashlytics gradle plugin bug with large native symbols
+        afterEvaluate {
+            tasks.configureEach { task ->
+                if (task.name.contains("injectCrashlyticsBuildIds")) {
+                    // disable the problematic task - symbols will still be uploaded via uploadCrashlyticsSymbolFile
+                    task.enabled = false
+                    logger.warn("disabled build id injection for: ${task.name} (workaround for IndexOutOfBoundsException)")
+                    logger.warn("native symbols will still be uploaded via uploadCrashlyticsSymbolFile task")
+                }
+
+                if (task.name.contains("uploadCrashlyticsSymbolFile")) {
+                    task.doFirst {
+                        logger.info("uploading crashlytics symbols: ${task.name}")
+                    }
+                }
+            }
         }
     }
 
