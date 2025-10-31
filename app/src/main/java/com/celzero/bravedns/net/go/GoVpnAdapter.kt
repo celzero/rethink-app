@@ -1154,8 +1154,8 @@ class GoVpnAdapter : KoinComponent {
                 val canResumeMobileWg = isWireGuardMobileOnly && isMobileActive
 
                 val useOnlyOnSsid = files?.ssidEnabled == true && !files.oneWireGuard
-                val ssidList = files?.ssids?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
-                val ssidMatch = useOnlyOnSsid && WireguardManager.matchesSsidList(files.ssids, ssid) && ssid.isNotEmpty()
+                val configuredSsids = files?.ssids ?: ""
+                val ssidMatch = WireguardManager.matchesSsidList(configuredSsids, ssid) && ssid.isNotEmpty()
                 val canResumeSsidWg = useOnlyOnSsid && ssidMatch
 
                 val canResume = canResumeMobileWg || canResumeSsidWg
@@ -1164,7 +1164,7 @@ class GoVpnAdapter : KoinComponent {
                     LOG_TAG_VPN,
                     "$TAG refresh proxy: $id, mobileOnly: $isWireGuardMobileOnly, " +
                         "canResumeMobileWg: $canResumeMobileWg, canResumeSsidWg: $canResumeSsidWg, isMobileActive: $isMobileActive, " +
-                        "useOnlyOnSsid: $useOnlyOnSsid, ssidMatch: $ssidMatch, ssid: $ssid, canResume: $canResume, wg-ssids: $ssidList"
+                        "useOnlyOnSsid: $useOnlyOnSsid, ssidMatch: $ssidMatch, ssid: $ssid, canResume: $canResume, wg-ssids: $configuredSsids"
                 )
                 val stats = getProxyStatusById(id).first
                 if (stats == null || stats == Backend.TNT) {
@@ -1182,13 +1182,13 @@ class GoVpnAdapter : KoinComponent {
                     // or ssid change for ssidEnabled wgs
                     val res = getProxies()?.getProxy(id.togs())?.resume()
                     Logger.i(LOG_TAG_VPN, "$TAG resumed proxy: $id, res: $res")
-                } else if (isWireGuardMobileOnly && !isMobileActive && !useOnlyOnSsid) {
+                } else if (isWireGuardMobileOnly && !isMobileActive && !canResume) {
                     // if the proxy is not paused, then pause it
                     // this is needed when the network is on mobile data
                     // and the wg-config is set to useOnlyOnMetered
                     val res = getProxies()?.getProxy(id.togs())?.pause()
                     Logger.i(LOG_TAG_VPN, "$TAG paused proxy (mobile): $id, res: $res")
-                } else if (useOnlyOnSsid && !ssidMatch && !isWireGuardMobileOnly) {
+                } else if (useOnlyOnSsid && !ssidMatch && !canResume) {
                     // when the ssidEnabled is set and the ssid does not match
                     val res = getProxies()?.getProxy(id.togs())?.pause()
                     Logger.i(LOG_TAG_VPN, "$TAG paused proxy (ssid): $id, res: $res")
