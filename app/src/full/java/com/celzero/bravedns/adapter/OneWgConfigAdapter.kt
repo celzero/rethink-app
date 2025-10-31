@@ -16,6 +16,7 @@
 package com.celzero.bravedns.adapter
 
 import Logger.LOG_TAG_PROXY
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
@@ -260,7 +261,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
         private fun getStrokeColorForStatus(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int{
             return when (status) {
-                UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) R.attr.chipTextNeutral else R.attr.accentGood
+                UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) R.attr.chipTextNegative else R.attr.accentGood
                 UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ -> R.attr.chipTextNeutral
                 else -> R.attr.chipTextNegative // TNT, TKO, TEND
             }

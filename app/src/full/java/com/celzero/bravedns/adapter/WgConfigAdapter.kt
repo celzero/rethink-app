@@ -16,6 +16,7 @@
 package com.celzero.bravedns.adapter
 
 import Logger.LOG_TAG_PROXY
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
@@ -389,6 +390,10 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                                     .replaceFirstChar(Char::titlecase), humanReadableLastOk
                             )
                         }
+                        Logger.d(
+                            LOG_TAG_UI,
+                            "$TAG DNS failing, status updated to failing with stroke color chipTextNegative, lastok:${stats?.lastOK}, since:${stats?.since}, humanReadableLastOk:$humanReadableLastOk"
+                        )
                     } else {
                         // if dns status is not failing, then update the proxy status
                         updateProxyStatusUi(statusPair, stats)
@@ -411,7 +416,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
         private fun getStrokeColorForStatus(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int {
             return when (status) {
-                UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) return R.attr.chipTextNeutral else R.attr.accentGood
+                UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) return R.attr.chipTextNegative else R.attr.accentGood
                 UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TPU -> R.attr.chipTextNeutral
                 else -> R.attr.chipTextNegative // TNT, TKO, TEND
             }
@@ -479,6 +484,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 )
             }
             b.interfaceStatus.text = statusText
+            Logger.d(LOG_TAG_UI, "$TAG status updated to $statusText (${status?.id} - ${status?.name}) with stroke color $strokeColor, lastok:${stats?.lastOK}, since:${stats?.since}, humanReadableLastOk:$humanReadableLastOk")
         }
 
         private fun isDnsError(statusId: Long?): Boolean {
