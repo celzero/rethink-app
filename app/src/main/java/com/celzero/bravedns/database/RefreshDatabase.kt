@@ -330,8 +330,10 @@ internal constructor(
             val appInfo = FirewallManager.getAppInfoByPackage(it.packageName)
             Logger.d(LOG_TAG_APP_DB, "delete app: $it, tombstone: ${appInfo?.tombstoneTs}, restore: $restore, current: $currentTime, diff: ${currentTime - (appInfo?.tombstoneTs ?: 0L)}")
             if (appInfo != null) {
-                // delete the app from the database
-                if (currentTime - appInfo.tombstoneTs > TOMBSTONE_EXPIRY_TIME_MS || restore) {
+                // delete the app from the database only if tombstone expiry time has elapsed
+                // or if restore is true or tombstone is disabled
+                val canDelete = !persistentState.tombstoneApps || restore || (appInfo.tombstoneTs > 0L && currentTime - appInfo.tombstoneTs > TOMBSTONE_EXPIRY_TIME_MS)
+                if (canDelete) {
                     // remove all the rules related to the packages
                     IpRulesManager.deleteRulesByUid(it.uid)
                     DomainRulesManager.deleteRulesByUid(it.uid)
