@@ -87,7 +87,7 @@ private fun AppCompatActivity.setupWindowBlurListener(windowBackgroundDrawable: 
 private const val BACKGROUND_BLUR_RADIUS = 80
 private const val BLUR_BEHIND_RADIUS = 80
 private const val DIM_AMOUNT_WITH_BLUR = 0.7f
-private const val DIM_AMOUNT_NO_BLUR = 0.4f
+private const val DIM_AMOUNT_NO_BLUR = 1f
 private const val WINDOW_BACKGROUND_ALPHA_WITH_BLUR = 55
 private const val WINDOW_BACKGROUND_ALPHA_NO_BLUR = 255
 
