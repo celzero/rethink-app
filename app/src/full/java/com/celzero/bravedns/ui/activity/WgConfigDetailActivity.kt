@@ -48,7 +48,6 @@ import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
 import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
-import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
@@ -322,8 +321,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                     return@uiCtx
                 } else if (statusPair.first != null) {
                     val handshakeTime = getHandshakeTime(stats).toString()
-                    val statusText = getIdleStatusText(ps, stats)
-                        .ifEmpty { getStatusText(ps, handshakeTime, stats, statusPair.second) }
+                    val statusText = getStatusText(ps, handshakeTime, stats, statusPair.second)
                     b.statusText.text = statusText
                 } else {
                     if (statusPair.second.isEmpty()) {
@@ -391,14 +389,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         } else {
             baseText
         }
-    }
-
-    private fun getIdleStatusText(status: UIUtils.ProxyStatus?, stats: RouterStats?): String {
-        if (status != UIUtils.ProxyStatus.TZZ && status != UIUtils.ProxyStatus.TNT) return ""
-        if (stats == null || stats.lastOK == 0L) return ""
-        if (System.currentTimeMillis() - stats.since >= WG_HANDSHAKE_TIMEOUT) return ""
-
-        return getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
     }
 
     private fun getHandshakeTime(stats: RouterStats?): CharSequence {

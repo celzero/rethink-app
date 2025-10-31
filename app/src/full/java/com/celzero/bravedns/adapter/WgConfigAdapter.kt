@@ -45,7 +45,6 @@ import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
-import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
@@ -464,14 +463,6 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
             }
         }
 
-        private fun getIdleStatusText(status: UIUtils.ProxyStatus?, stats: RouterStats?): String {
-            if (status != UIUtils.ProxyStatus.TZZ && status != UIUtils.ProxyStatus.TNT) return ""
-            if (stats == null || stats.lastOK == 0L) return ""
-            if (System.currentTimeMillis() - stats.since >= WG_HANDSHAKE_TIMEOUT) return ""
-
-            return context.getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
-        }
-
         private fun updateProxyStatusUi(statusPair: Pair<Long?, String>, stats: RouterStats?) {
             val status = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first } // Convert to enum
 
@@ -479,14 +470,8 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
 
             val strokeColor = getStrokeColorForStatus(status, stats)
             b.interfaceDetailCard.strokeColor = fetchColor(context, strokeColor)
-            val statusText = getIdleStatusText(status, stats).ifEmpty {
-                getStatusText(
-                    status,
-                    humanReadableLastOk,
-                    stats,
-                    statusPair.second
-                )
-            }
+            val statusText = getStatusText(status, humanReadableLastOk, stats, statusPair.second)
+
             b.interfaceStatus.text = statusText
             Logger.d(LOG_TAG_UI, "$TAG status updated to $statusText (${status?.id} - ${status?.name}) with stroke color $strokeColor, lastok:${stats?.lastOK}, since:${stats?.since}, humanReadableLastOk:$humanReadableLastOk")
         }

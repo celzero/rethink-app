@@ -53,7 +53,6 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.bottomsheet.OrbotBottomSheet
 import com.celzero.bravedns.util.Constants
@@ -458,22 +457,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     private fun getProxyStatusText(statusPair: Pair<Long?, String>, stats: RouterStats?): String {
         val status = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first }
 
-        // Check for idle status first (similar to getIdleStatusText in adapter)
-        val idleText = getIdleStatusText(status, stats)
-        if (idleText.isNotEmpty()) {
-            return idleText
-        }
-
-        // Now get the regular status text
         return getStatusText(status, stats, statusPair.second)
-    }
-
-    private fun getIdleStatusText(status: UIUtils.ProxyStatus?, stats: RouterStats?): String {
-        if (status != UIUtils.ProxyStatus.TZZ && status != UIUtils.ProxyStatus.TNT) return ""
-        if (stats == null || stats.lastOK == 0L) return ""
-        if (System.currentTimeMillis() - stats.since >= WG_HANDSHAKE_TIMEOUT) return ""
-
-        return getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
     }
 
     private fun getStatusText(

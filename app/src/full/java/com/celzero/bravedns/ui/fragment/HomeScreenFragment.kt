@@ -604,10 +604,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             }
                             UIUtils.ProxyStatus.TZZ -> {
                                 // For TZZ (idle), be more lenient - consider it as idle if it has had any connection
-                                if (lastOk > 0L && now - since < WG_HANDSHAKE_TIMEOUT) {
-                                    // Has had successful handshake recently, consider it connected/idle
-                                    idle++
-                                } else if (lastOk > 0L) {
+                                if (lastOk > 0L) {
                                     // Has had successful handshake before, consider it idle
                                     idle++
                                 } else if (now - since < WG_UPTIME_THRESHOLD) {
@@ -619,12 +616,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                                 }
                             }
                             UIUtils.ProxyStatus.TNT -> {
-                                // Waiting state - consider as idle if recently started, otherwise failing
-                                if (now - since < WG_HANDSHAKE_TIMEOUT) {
-                                    idle++
-                                } else {
-                                    failing++
-                                }
+                                // Waiting state
+                                failing++
                             }
                             UIUtils.ProxyStatus.TPU -> {
                                 // Paused state - consider as idle
@@ -636,12 +629,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             }
                         }
                     } else {
-                        // No status available, but if we have recent stats, don't immediately mark as failing
-                        if (lastOk > 0L && (now - lastOk < WG_HANDSHAKE_TIMEOUT)) {
-                            idle++
-                        } else {
-                            failing++
-                        }
+                        // No status available, mark as failing
+                        failing++
                     }
                 }
                 uiCtx {
