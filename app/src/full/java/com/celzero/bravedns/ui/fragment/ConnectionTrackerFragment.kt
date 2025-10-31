@@ -177,7 +177,11 @@ class ConnectionTrackerFragment :
             } else {
                 b.connectionListLogsDisabledTv.visibility = View.GONE
                 if (!b.recyclerConnection.isVisible) b.recyclerConnection.visibility = View.VISIBLE
-                b.connectionCardViewTop.visibility = View.VISIBLE
+                if (fromUniversalFirewallScreen || fromWireGuardScreen) {
+                    b.connectionCardViewTop.visibility = View.GONE
+                } else {
+                    b.connectionCardViewTop.visibility = View.VISIBLE
+                }
             }
         }
 

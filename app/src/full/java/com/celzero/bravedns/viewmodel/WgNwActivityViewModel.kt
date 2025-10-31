@@ -90,7 +90,7 @@ class WgNwActivityViewModel(private val dao: ConnectionTrackerDAO) : ViewModel()
     }
 
     fun setWgId(wgId: String) {
-        this.wgId = wgId
+        this.wgId = "%$wgId%"
     }
 
     val wgAppNwActivity: LiveData<PagingData<AppConnection>> = networkActivity.switchMap { _ ->

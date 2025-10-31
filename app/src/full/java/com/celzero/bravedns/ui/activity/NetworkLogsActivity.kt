@@ -132,7 +132,7 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
             return 1
         }
         if (isWireGuardLogs) {
-            return 2
+            return 3
         }
 
         var count = 0
@@ -153,7 +153,8 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
         if (isWireGuardLogs) {
             return when(position) {
                 0 -> ConnectionTrackerFragment.newInstance(searchParam)
-                1 -> WgNwStatsFragment.newInstance(searchParam)
+                1 -> DnsLogFragment.newInstance(searchParam)
+                2 -> WgNwStatsFragment.newInstance(searchParam)
                 else -> ConnectionTrackerFragment.newInstance(searchParam)
             }
         }
@@ -190,7 +191,8 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
         if (isWireGuardLogs) {
             return when(position) {
                 0 -> getString(R.string.firewall_act_network_monitor_tab)
-                1 -> getString(R.string.title_statistics)
+                1 -> getString(R.string.dns_mode_info_title)
+                2 -> getString(R.string.title_statistics)
                 else -> getString(R.string.firewall_act_network_monitor_tab)
             }
         }
