@@ -32,6 +32,10 @@ enum class VpnBuilderPolicy(
     RELAXED(
         vpnAdapterBehaviour = GoVpnAdapterBehaviour.PREFER_RESTART,
         connectionMonitorBehaviour = ConnectionMonitorBehaviour.VALIDATED_NETWORKS
+    ),
+    FIXED(
+        vpnAdapterBehaviour = GoVpnAdapterBehaviour.NEVER_RESTART,
+        connectionMonitorBehaviour = ConnectionMonitorBehaviour.TRANSPORTS
     );
 
     enum class GoVpnAdapterBehaviour {

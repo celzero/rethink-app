@@ -42,6 +42,8 @@ class Transaction {
     var upstreamBlock: Boolean = false
     var region: String = ""
     var isCached: Boolean = false
+    var dnssecOk: Boolean = false
+    var dnssecValid: Boolean = false
 
     enum class Status(val id: Long) {
         START(Backend.Start),

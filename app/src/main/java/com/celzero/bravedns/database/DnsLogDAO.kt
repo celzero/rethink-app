@@ -43,6 +43,9 @@ interface DnsLogDAO {
     )
     fun getDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
+    @Query("select * from DNSLogs where proxyId like :wgDnsId order by id desc LIMIT $MAX_LOGS")
+    fun getDnsLogsForWireGuard(wgDnsId: String): PagingSource<Int, DnsLog>
+
     @Query(
         "select * from DNSLogs where isBlocked = 0 and blockLists = '' order by id desc LIMIT $MAX_LOGS"
     )
@@ -53,7 +56,7 @@ interface DnsLogDAO {
     )
     fun getAllowedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
-    @Query("select * from DNSLogs where isBlocked = 1 order by time desc LIMIT $MAX_LOGS")
+    @Query("select * from DNSLogs where isBlocked = 1 order by id desc LIMIT $MAX_LOGS")
     fun getBlockedDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(

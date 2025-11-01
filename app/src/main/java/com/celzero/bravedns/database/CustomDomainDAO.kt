@@ -57,8 +57,21 @@ interface CustomDomainDAO {
     @Query("select * from CustomDomain where uid = :uid order by modifiedTs desc")
     fun getDomainsByUID(uid: Int): List<CustomDomain>
 
-    @Query("update CustomDomain set uid = :newUid where uid = :uid")
-    fun updateUid(uid: Int, newUid: Int)
+    @Transaction
+    fun updateUid(uid: Int, newUid: Int) {
+        // Use INSERT OR REPLACE to handle conflicts properly
+        // First, insert all entries from oldUid with newUid (this will replace any existing conflicts)
+        insertOrReplaceWithNewUid(uid, newUid)
+        // Then delete the original entries
+        deleteRulesByUid(uid)
+    }
+
+    @Query("""
+        INSERT OR REPLACE INTO CustomDomain (domain, uid, ips, status, type, proxyId, proxyCC, modifiedTs, deletedTs, version)
+        SELECT domain, :newUid, ips, status, type, proxyId, proxyCC, modifiedTs, deletedTs, version 
+        FROM CustomDomain WHERE uid = :oldUid
+    """)
+    fun insertOrReplaceWithNewUid(oldUid: Int, newUid: Int)
 
     @Query("select count(*) from CustomDomain where uid != ${Constants.UID_EVERYBODY}")
     fun getAllDomainRulesCount(): LiveData<Int>
@@ -89,7 +102,4 @@ interface CustomDomainDAO {
 
     @Query("SELECT COUNT(*) FROM CustomDomain WHERE proxyCC = :cc")
     fun getRulesCountByCC(cc: String): Int
-
-    @Query("UPDATE CustomDomain SET uid = :newUid where uid = :oldUid")
-    fun tombstoneRulesByUid(oldUid: Int, newUid: Int)
 }

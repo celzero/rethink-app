@@ -157,22 +157,27 @@
             android:name=".ui.activity.AntiCensorshipActivity"
             android:finishOnTaskLaunch="true" />
         <activity
+            android:name=".ui.TestDialogActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.AdvancedSettingActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.activity.DomainConnectionsActivity"
             android:finishOnTaskLaunch="true" />
-        <activity
+        <!--<activity
             android:name=".ui.activity.PingTestActivity"
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.RpnCountriesActivity"
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.RpnAvailabilityCheckActivity"
-            android:finishOnTaskLaunch="true" />
+            android:finishOnTaskLaunch="true" />-->
         <activity android:name=".ui.activity.FragmentHostActivity"
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.RpnWinProxyDetailsActivity"
             android:finishOnTaskLaunch="true" />
+       <!-- <activity android:name=".ui.location.LocationSelectorActivity"
+            android:finishOnTaskLaunch="true" />-->
 
         <receiver
             android:name=".receiver.BraveAutoStartReceiver"
@@ -185,6 +190,7 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <action android:name="android.intent.action.REBOOT" />
                 <action android:name="android.intent.action.USER_UNLOCKED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
         <receiver

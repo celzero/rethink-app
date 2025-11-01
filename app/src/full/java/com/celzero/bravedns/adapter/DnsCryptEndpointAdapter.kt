@@ -228,7 +228,7 @@ class DnsCryptEndpointAdapter(private val context: Context, private val appConfi
                 } else {
                     message
                 }
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 ""
             }
         }

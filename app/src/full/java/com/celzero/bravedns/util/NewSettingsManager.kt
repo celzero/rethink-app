@@ -25,63 +25,22 @@ object NewSettingsManager: KoinComponent {
     private val persistentState: PersistentState by inject<PersistentState>()
 
     private const val EXPIRY_DAYS = 7
-    // wireguard
-    const val WG_HOP_SETTING = "hop"
-    const val WG_MOBILE_SETTING = "wg_mobile"
-    const val RANDOMIZE_WG_PORT = "randomize_wg_port"
-    const val ENDPOINT_INDEPENDENT = "endpoint_independent_mapping"
 
-    // tcp
-    const val TCP_KEEP_ALIVE = "tcp_keep_alive"
-    const val TCP_IDLE_TIMEOUT = "tcp_idle_timeout"
-
-    // general
-    const val PROVIDER_INFO = "provider_info"
-    const val APP_LOGS = "app_logs"
-    const val AUTOMATION = "automation"
-
-    // dns
-    const val SMART_DNS = "smart_dns"
-    const val TREAT_DNS_FIREWALL = "treat_dns_as_firewall"
-    const val SPLIT_DNS = "split_dns"
-    const val USE_SYS_DNS_UNDELEGATED = "use_sys_dns_undelegated"
-    const val USE_FALLBACK_TO_BYPASS = "use_fallback_to_bypass"
-
-    // network
-    const val LOOP_BACK_PROXY_FORWARDER = "loop_back_proxy_forwarder"
-    const val MARK_MOBILE_METERED = "mark_mobile_metered"
-    const val DO_NOT_STALL = "do_not_stall"
-    const val PERFORM_CONNECTION_CHECK = "perform_connection_check"
-    const val TUN_NETWORK_POLICY = "tun_network_handling_policy"
-
-    const val ANTI_CENSORSHIP = "anti_censorship"
+    const val ERROR_REPORTING = "error_reporting"
+    const val WG_SSID_SETTING = "wg_ssid_settings"
+    const val TOMBSTONE_APP_SETTING = "tombstone_app_setting"
+    const val ALLOW_INCOMING_WG_PACKETS = "allow_incoming_wg_packets"
 
     private val newSettingsList = listOf(
-        WG_HOP_SETTING,
-        WG_MOBILE_SETTING,
-        RANDOMIZE_WG_PORT,
-        ENDPOINT_INDEPENDENT,
-        TCP_KEEP_ALIVE,
-        TCP_IDLE_TIMEOUT,
-        PROVIDER_INFO,
-        APP_LOGS,
-        AUTOMATION,
-        SMART_DNS,
-        TREAT_DNS_FIREWALL,
-        SPLIT_DNS,
-        USE_SYS_DNS_UNDELEGATED,
-        LOOP_BACK_PROXY_FORWARDER,
-        MARK_MOBILE_METERED,
-        DO_NOT_STALL,
-        PERFORM_CONNECTION_CHECK,
-        ANTI_CENSORSHIP,
-        TUN_NETWORK_POLICY
+        WG_SSID_SETTING,
+        ERROR_REPORTING,
+        TOMBSTONE_APP_SETTING,
+        ALLOW_INCOMING_WG_PACKETS
     )
 
     init {
         handleNewSettings()
     }
-
 
     fun shouldShowBadge(key: String): Boolean {
         val newSettings = persistentState.newSettings.split(",").filter { it.isNotEmpty() }.toSet()

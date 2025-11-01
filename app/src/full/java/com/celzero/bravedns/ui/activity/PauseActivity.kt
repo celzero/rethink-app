@@ -36,6 +36,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -59,8 +60,10 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
     var lastStopActivityInvokeTime: Long = INIT_TIME_MS
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -168,6 +171,7 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
 
         lastStopActivityInvokeTime = SystemClock.elapsedRealtime()
         val intent = Intent(this, AppLockActivity::class.java)
+        intent.setPackage(this.packageName)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()

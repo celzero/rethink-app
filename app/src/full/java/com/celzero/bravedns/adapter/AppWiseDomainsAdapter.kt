@@ -32,7 +32,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppDomainDetailsBinding
 import com.celzero.bravedns.service.DomainRulesManager
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.bottomsheet.AppDomainRulesBottomSheet
 import com.celzero.bravedns.util.UIUtils
@@ -176,12 +175,12 @@ class AppWiseDomainsAdapter(
                 return
             }
             Logger.v(LOG_TAG_UI, "$TAG show close connection dialog for uid: $uid")
-            val dialog = MaterialAlertDialogBuilder(context)
+            val dialog = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim)
                 .setTitle(context.getString(R.string.close_conns_dialog_title))
                 .setMessage(context.getString(R.string.close_conns_dialog_desc, appConn.ipAddress))
                 .setPositiveButton(R.string.lbl_proceed) { _, _ ->
                     // close the connection
-                    VpnController.closeConnectionsByUidDomain(appConn.uid, appConn.ipAddress)
+                    VpnController.closeConnectionsByUidDomain(appConn.uid, appConn.ipAddress, "app-wise-domains-manual-close")
                     Logger.i(
                         LOG_TAG_UI,
                         "$TAG closed connection for uid: ${appConn.uid}, domain: ${appConn.appOrDnsName}"
@@ -240,7 +239,8 @@ class AppWiseDomainsAdapter(
                 b.progress.visibility = View.GONE
                 return
             }
-            val status = DomainRulesManager.getDomainRule(conn.appOrDnsName, uid)
+            val status = DomainRulesManager.status(conn.appOrDnsName, uid)
+            Logger.vv(LOG_TAG_UI, "$TAG domain: ${conn.appOrDnsName}, status: $status")
             when (status) {
                 DomainRulesManager.Status.NONE -> {
                     b.progress.setIndicatorColor(

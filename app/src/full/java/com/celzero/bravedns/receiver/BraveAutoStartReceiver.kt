@@ -32,22 +32,19 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
     val persistentState by inject<PersistentState>()
 
     override fun onReceive(context: Context, intent: Intent) {
-
-        if (!persistentState.prefAutoStartBootUp) {
-            Logger.w(
-                LOG_TAG_VPN,
-                "Auto start is not enabled: ${persistentState.prefAutoStartBootUp}"
-            )
-            return
-        }
-
         if (
             Intent.ACTION_REBOOT != intent.action &&
                 Intent.ACTION_BOOT_COMPLETED != intent.action &&
                 Intent.ACTION_LOCKED_BOOT_COMPLETED != intent.action &&
-                Intent.ACTION_USER_UNLOCKED != intent.action
+                Intent.ACTION_USER_UNLOCKED != intent.action &&
+                Intent.ACTION_MY_PACKAGE_REPLACED != intent.action
         ) {
             Logger.w(LOG_TAG_VPN, "unhandled broadcast ${intent.action}")
+            return
+        }
+
+        if (!persistentState.prefAutoStartBootUp && (intent.action == Intent.ACTION_BOOT_COMPLETED || intent.action == Intent.ACTION_REBOOT || intent.action == Intent.ACTION_LOCKED_BOOT_COMPLETED)) {
+            Logger.w(LOG_TAG_VPN, "auto-start not enabled: ${persistentState.prefAutoStartBootUp}, skipping")
             return
         }
 
@@ -55,21 +52,26 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
         // but: if always-on is enabled, then back-off, since android
         // is expected to kick-start the vpn up on its own
         if (VpnController.state().activationRequested && !VpnController.isAlwaysOn(context)) {
+            val eventType = when (intent.action) {
+                Intent.ACTION_USER_UNLOCKED -> "user unlock (Private Space)"
+                Intent.ACTION_LOCKED_BOOT_COMPLETED -> "locked boot"
+                Intent.ACTION_MY_PACKAGE_REPLACED -> "app update"
+                Intent.ACTION_REBOOT -> "reboot"
+                Intent.ACTION_BOOT_COMPLETED -> "boot"
+                else -> "boot(${intent.action})"
+            }
+
             val prepareVpnIntent: Intent? =
                 try {
-                    val eventType = when (intent.action) {
-                        Intent.ACTION_USER_UNLOCKED -> "user unlock (Private Space)"
-                        else -> "boot"
-                    }
-                    Logger.i(LOG_TAG_VPN, "Attempting to auto-start VPN after $eventType")
+                    Logger.i(LOG_TAG_VPN, "attempting to auto-start VPN after $eventType")
                     VpnService.prepare(context)
-                } catch (e: NullPointerException) {
-                    Logger.w(LOG_TAG_VPN, "Device does not support system-wide VPN mode")
+                } catch (_: NullPointerException) {
+                    Logger.w(LOG_TAG_VPN, "device does not support system-wide VPN mode")
                     return
                 }
 
             if (prepareVpnIntent == null) {
-                Logger.i(LOG_TAG_VPN, "VPN is already prepared, invoking start")
+                Logger.i(LOG_TAG_VPN, "vpn auto-start, event: $eventType")
                 VpnController.start(context)
                 return
             }

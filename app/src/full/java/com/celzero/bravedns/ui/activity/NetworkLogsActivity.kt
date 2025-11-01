@@ -39,6 +39,7 @@ import com.celzero.bravedns.ui.fragment.WgNwStatsFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 
@@ -67,8 +68,10 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -129,7 +132,7 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
             return 1
         }
         if (isWireGuardLogs) {
-            return 2
+            return 3
         }
 
         var count = 0
@@ -150,7 +153,8 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
         if (isWireGuardLogs) {
             return when(position) {
                 0 -> ConnectionTrackerFragment.newInstance(searchParam)
-                1 -> WgNwStatsFragment.newInstance(searchParam)
+                1 -> DnsLogFragment.newInstance(searchParam)
+                2 -> WgNwStatsFragment.newInstance(searchParam)
                 else -> ConnectionTrackerFragment.newInstance(searchParam)
             }
         }
@@ -187,7 +191,8 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
         if (isWireGuardLogs) {
             return when(position) {
                 0 -> getString(R.string.firewall_act_network_monitor_tab)
-                1 -> getString(R.string.title_statistics)
+                1 -> getString(R.string.dns_mode_info_title)
+                2 -> getString(R.string.title_statistics)
                 else -> getString(R.string.firewall_act_network_monitor_tab)
             }
         }

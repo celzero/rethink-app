@@ -148,8 +148,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun setTotalUsagesUi(dataUsage: DataUsageSummary) {
-        val unmeteredUsage = (dataUsage.totalDownload + dataUsage.totalUpload)
-        val totalUsage = unmeteredUsage + dataUsage.meteredDataUsage
+        val totalUsage = (dataUsage.totalDownload + dataUsage.totalUpload)
+        val unmeteredUsage = totalUsage - dataUsage.meteredDataUsage
+        val meteredUsage = dataUsage.meteredDataUsage
 
         b.fssUnmeteredDataUsage.text =
             getString(
@@ -161,7 +162,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             getString(
                 R.string.two_argument_colon,
                 getString(R.string.ada_app_metered),
-                Utilities.humanReadableByteCount(dataUsage.meteredDataUsage, true)
+                Utilities.humanReadableByteCount(meteredUsage, true)
             )
         b.fssTotalDataUsage.text =
             getString(
@@ -183,7 +184,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
         // set the progress bar
         val ump = calculatePercentage(unmeteredUsage, totalUsage) // unmetered percentage
-        val mp = calculatePercentage(dataUsage.meteredDataUsage, totalUsage) // metered percentage
+        val mp = calculatePercentage(meteredUsage, totalUsage) // metered percentage
         val secondaryVal = ump + mp
 
         b.fssProgressBar.max = secondaryVal
@@ -722,6 +723,10 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 appConfig,
                 SummaryStatisticsType.MOST_CONTACTED_COUNTRIES
             )
+
+        val timeCategory = viewModel.getTimeCategory()
+        contactedCountriesAdapter?.setTimeCategory(timeCategory)
+
         viewModel.getMostContactedCountries.observe(viewLifecycleOwner) {
             contactedCountriesAdapter?.submitData(viewLifecycleOwner.lifecycle, it)
         }

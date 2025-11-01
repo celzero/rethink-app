@@ -62,7 +62,7 @@
 
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tb_logs_disabled_tv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -79,11 +79,6 @@
             android:id="@+id/tb_stats_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardBackgroundColor="?attr/background"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true"
             app:strokeColor="?attr/secondaryTextColor"
             app:strokeWidth="1dp">
 

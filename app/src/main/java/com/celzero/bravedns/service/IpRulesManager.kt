@@ -16,6 +16,7 @@
 package com.celzero.bravedns.service
 
 import Logger
+import Logger.LOG_TAG_DNS
 import Logger.LOG_TAG_FIREWALL
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -24,6 +25,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpRepository
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.celzero.bravedns.util.Utilities.togs
 import com.celzero.bravedns.util.Utilities.tos
@@ -108,6 +110,13 @@ object IpRulesManager : KoinComponent {
     suspend fun load(): Long {
         iptree.clear()
         db.getIpRules().forEach {
+            // adding as part of defensive programming, even adding these rules to cache will
+            // not cause any issues, but to avoid unnecessary entries in the trie, skipping these
+            // entries
+            if (it.uid < 0 && it.uid != Constants.UID_EVERYBODY) {
+                Logger.i(LOG_TAG_FIREWALL, "skipping ip rule for uid: ${it.uid}")
+                return@forEach
+            }
             val pair = it.getCustomIpAddress()
             if (pair == null) {
                 Logger.w(LOG_TAG_FIREWALL, "invalid ip address for rule: ${it.ipAddress}")
@@ -475,6 +484,7 @@ object IpRulesManager : KoinComponent {
         }
         db.deleteRulesByUid(uid)
         resultsCache.invalidateAll()
+        Logger.i(LOG_TAG_FIREWALL, "deleted all ip rules for uid: $uid")
     }
 
     suspend fun deleteRules(list: List<CustomIp>) {
@@ -562,8 +572,8 @@ object IpRulesManager : KoinComponent {
             }
             val pair = hostAddr(ipStr)
             return normalize(pair.first) ?: ""
-        } catch (ignored: NullPointerException) {
-            Logger.e(Logger.LOG_TAG_VPN, "Invalid IP address added", ignored)
+        } catch (e: NullPointerException) {
+            Logger.e(Logger.LOG_TAG_VPN, "Invalid IP address added", e)
         }
         return "" // empty ips mean its a port-only rule
     }
@@ -629,14 +639,24 @@ object IpRulesManager : KoinComponent {
     }
 
     suspend fun updateUids(uids: List<Int>, newUids: List<Int>) {
+        val ips = db.getIpRules()
         for (i in uids.indices) {
             val u = uids[i]
             val n = newUids[i]
-            db.updateUid(u, n)
+            if (ips.any { it.uid == u }) {
+                db.updateUid(u, n)
+            }
         }
         resultsCache.invalidateAll()
         load()
         Logger.i(LOG_TAG_FIREWALL, "ip rules updated")
+    }
+
+    suspend fun updateUid(oldUid: Int, newUid: Int) {
+        db.updateUid(oldUid, newUid)
+        resultsCache.invalidateAll()
+        load()
+        Logger.i(LOG_TAG_FIREWALL, "ip rules updated for $oldUid to $newUid")
     }
 
     suspend fun replaceIpRule(
@@ -776,7 +796,11 @@ object IpRulesManager : KoinComponent {
         // here tombstone means negating the uid of the rule
         // this is used when the app is uninstalled, so that the rules are not deleted
         // but the uid is set to (-1 * uid), so that the rules are not applied
-        val newUid = -1 * oldUid
+        val newUid = if (oldUid > 0) -1 * oldUid else oldUid
+        if (newUid == oldUid) {
+            Logger.w(LOG_TAG_FIREWALL, "tombstone: same uids, old: $oldUid, new: $newUid, no-op")
+            return
+        }
         db.tombstoneRulesByUid(oldUid, newUid)
         resultsCache.invalidateAll()
         load()

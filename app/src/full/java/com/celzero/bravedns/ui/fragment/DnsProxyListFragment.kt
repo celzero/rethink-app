@@ -86,7 +86,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
             io {
                 val appNames: MutableList<String> = ArrayList()
                 appNames.add(getString(R.string.settings_app_list_default_app))
-                appNames.addAll(FirewallManager.getAllAppNames())
+                appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(requireContext()))
                 // fetch the count from repository and increment by 1 to show the
                 // next doh name in the dialog
                 val nextIndex = appConfig.getDnsProxyCount().plus(1)
@@ -97,10 +97,9 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
 
     private fun showAddDnsProxyDialog(appNames: List<String>, nextIndex: Int) {
         val dialogBinding = DialogSetDnsProxyBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
-        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
@@ -144,27 +143,51 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
         applyURLBtn.setOnClickListener {
             var port = 0
             var isPortValid: Boolean
-            val isIpValid: Boolean
             val name = proxyNameEditText.text.toString()
             val mode = getString(R.string.cd_dns_proxy_mode_external)
-            val ip = ipAddressEditText.text.toString()
+            val ipInput = ipAddressEditText.text.toString()
 
             val appName = appNameSpinner.selectedItem.toString()
-            if (IPAddressString(ip).isIPAddress) {
-                isIpValid = true
-            } else {
+
+            // Split comma-separated IP addresses and trim whitespace
+            val ipAddresses = ipInput.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+
+            if (ipAddresses.isEmpty()) {
                 errorTxt.text = getString(R.string.cd_dns_proxy_error_text_1)
-                isIpValid = false
+                return@setOnClickListener
+            }
+
+            // Validate all IP addresses (both IPv4 and IPv6)
+            val invalidIps = mutableListOf<String>()
+            val validIps = mutableListOf<String>()
+
+            for (ip in ipAddresses) {
+                if (IPAddressString(ip).isIPAddress) {
+                    validIps.add(ip)
+                } else {
+                    invalidIps.add(ip)
+                }
+            }
+
+            if (invalidIps.isNotEmpty()) {
+                errorTxt.text = getString(R.string.cd_dns_proxy_error_text_1) + ": ${invalidIps.joinToString(", ")}"
+                return@setOnClickListener
             }
 
             try {
                 port = portEditText.text.toString().toInt() // can cause NumberFormatException
-                isPortValid =
+
+                // Validate port for each valid IP (check if LAN IP)
+                isPortValid = true
+                for (ip in validIps) {
                     if (Utilities.isLanIpv4(ip)) {
-                        Utilities.isValidLocalPort(port)
-                    } else {
-                        true
+                        if (!Utilities.isValidLocalPort(port)) {
+                            isPortValid = false
+                            break
+                        }
                     }
+                }
+
                 if (!isPortValid) {
                     errorTxt.text = getString(R.string.cd_dns_proxy_error_text_2)
                 }
@@ -174,9 +197,13 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
                 isPortValid = false
             }
 
-            if (isPortValid && isIpValid) {
-                Logger.d(Logger.LOG_TAG_UI, "new value inserted into DNSProxy")
-                io { insertDNSProxyEndpointDB(mode, name, appName, ip, port) }
+            if (isPortValid && validIps.isNotEmpty()) {
+                // Store all valid IPs as comma-separated string in one endpoint
+                val ipString = validIps.joinToString(",")
+                Logger.d(Logger.LOG_TAG_UI, "new values inserted into DNSProxy: $name with ${validIps.size} IPs")
+                io {
+                    insertDNSProxyEndpointDB(mode, name, appName, ipString, port)
+                }
                 persistentState.excludeAppsInProxy = !excludeAppCheckBox.isChecked
                 dialog.dismiss()
             } else {

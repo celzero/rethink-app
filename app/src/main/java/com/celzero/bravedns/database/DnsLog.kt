@@ -66,6 +66,8 @@ class DnsLog {
     var upstreamBlock: Boolean = false
     var region: String = ""
     var isCached: Boolean = false
+    var dnssecOk: Boolean = false
+    var dnssecValid: Boolean = false
 
     override fun equals(other: Any?): Boolean {
         if (other !is DnsLog) return false

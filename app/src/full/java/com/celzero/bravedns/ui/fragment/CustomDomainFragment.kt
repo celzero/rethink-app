@@ -213,7 +213,7 @@ class CustomDomainFragment :
      */
     private fun showAddDomainDialog() {
         val dBind = DialogAddCustomDomainBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dBind.root)
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dBind.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         dialog.show()
@@ -377,7 +377,7 @@ class CustomDomainFragment :
     }
 
     private fun showDomainRulesDeleteDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.univ_delete_domain_dialog_title))
         builder.setMessage(getString(R.string.univ_delete_domain_dialog_message))
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->

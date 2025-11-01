@@ -68,7 +68,11 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
     }
 
     suspend fun tombstoneRulesByUid(oldUid: Int, newUid: Int) {
-        customIpDao.tombstoneRulesByUid(oldUid, newUid)
+        try {
+            customIpDao.tombstoneRulesByUid(oldUid, newUid)
+        } catch (_: Exception) {
+            // catch the exception to avoid crash
+        }
     }
 
     suspend fun getRulesCountByCC(cc: String): Int {

@@ -57,6 +57,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.service.AppUpdater
@@ -69,17 +70,23 @@ import com.celzero.bravedns.ui.activity.MiscSettingsActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
+import com.celzero.bravedns.util.FirebaseErrorReporting
+import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
+import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
 import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getPackageMetadata
+import com.celzero.bravedns.util.Utilities.getRandomString
 import com.celzero.bravedns.util.Utilities.isAtleastO_MR1
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isWebsiteFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -95,6 +102,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val appInfoDb by inject<AppInfoRepository>()
     private val appUpdateManager by inject<AppUpdater>()
     private val rdb by inject<RefreshDatabase>()
+    private val appConfig by inject<AppConfig>()
 
     // TODO: see if this can be replaced with a more robust solution
     // keep track of when app went to background
@@ -107,7 +115,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
 
         if (isAtleastO_MR1()) {
@@ -131,6 +139,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             launchOnboardActivity()
             return
         }
+
+        handleFrostEffectIfNeeded(persistentState.theme)
+
         updateNewVersion()
 
         setupNavigationItemSelectedListener()
@@ -146,9 +157,12 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         NewSettingsManager.handleNewSettings()
 
+        regenerateFirebaseTokenIfNeeded()
+
         // enable in-app messaging, will be used to show in-app messages in case of billing issues
         //enableInAppMessaging()
     }
+
 
     /*private fun enableInAppMessaging() {
         initiateBillingIfNeeded()
@@ -189,7 +203,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         return try {
             val uiModeManager: UiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
             uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
@@ -230,10 +244,28 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         showRestoreDialog(uri)
     }
 
+    private fun regenerateFirebaseTokenIfNeeded() {
+        if (Utilities.isFdroidFlavour()) return
+        if (!persistentState.firebaseErrorReportingEnabled) return
+
+        val now = System.currentTimeMillis()
+        val fortyFiveDaysMs = TimeUnit.DAYS.toMillis(TOKEN_REGENERATION_PERIOD_DAYS)
+
+        var token = persistentState.firebaseUserToken
+        var ts = persistentState.firebaseUserTokenTimestamp
+        if (token.isBlank() || now - ts > fortyFiveDaysMs) {
+            token = getRandomString(TOKEN_LENGTH)
+            ts = now
+            persistentState.firebaseUserToken = token
+            persistentState.firebaseUserTokenTimestamp = ts
+            FirebaseErrorReporting.setUserId(token)
+        }
+    }
+
     private fun showRestoreDialog(uri: Uri) {
         if (!isInForeground()) return
 
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.brbs_restore_dialog_title)
         builder.setMessage(R.string.brbs_restore_dialog_message)
         builder.setPositiveButton(getString(R.string.brbs_restore_dialog_positive)) { _, _ ->
@@ -246,7 +278,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
 
         builder.setCancelable(true)
-        builder.create().show()
+        val dialog = builder.create()
+        dialog.show()
     }
 
     private fun startRestore(fileUri: Uri) {
@@ -351,6 +384,19 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         // delete residue wgs from database, remove this post v055o
         io { WireguardManager.deleteResidueWgs() }
+        // reset the plus url to empty if it is set as /rec
+        io {
+            val rpe = appConfig.getRethinkPlusEndpoint()
+            val url = rpe?.url ?: return@io
+            if (url == "https://max.rethinkdns.com/rec" || url == "https://rplus.rethinkdns.com/rec") {
+                val newUrl = if (rpe.url.contains(MAX_ENDPOINT)) {
+                    Constants.RETHINK_BASE_URL_MAX
+                } else {
+                    Constants.RETHINK_BASE_URL_SKY
+                }
+                appConfig.updateRethinkEndpoint(Constants.RETHINK_DNS_PLUS, newUrl, 0)
+            }
+        }
     }
 
     // fixme: find a cleaner way to implement this, move this to some other place
@@ -382,6 +428,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun updateNewVersion() {
         if (!isNewVersion()) return
 
+        // no need to show new settings on first time launch
         if (persistentState.appVersion != 0) {
             // if app version is not 0, then it means the app is updated
             NewSettingsManager.initializeNewSettings()
@@ -444,10 +491,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         // Check updates only for play store / website version. Not fDroid.
         if (!isPlayStoreFlavour() && !isWebsiteFlavour()) {
-            Logger.d(
-                LOG_TAG_APP_UPDATE,
-                "Check for update: Not play or website- ${BuildConfig.FLAVOR}"
-            )
+            Logger.i(LOG_TAG_APP_UPDATE, "update check not for ${BuildConfig.FLAVOR}")
             return
         }
 
@@ -460,11 +504,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 ) // Might be play updater or web updater
             } catch (e: Exception) {
                 Logger.crash(LOG_TAG_APP_UPDATE, "err in app update check: ${e.message}", e)
-                showDownloadDialog(
-                    AppUpdater.InstallSource.STORE,
-                    getString(R.string.download_update_dialog_failure_title),
-                    getString(R.string.download_update_dialog_failure_message)
-                )
+                runOnUiThread {
+                    showDownloadDialog(
+                        AppUpdater.InstallSource.STORE,
+                        getString(R.string.download_update_dialog_failure_title),
+                        getString(R.string.download_update_dialog_failure_message)
+                    )
+                }
             }
         } else {
             try {
@@ -476,11 +522,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     ) // Always web updater
             } catch (e: Exception) {
                 Logger.e(LOG_TAG_APP_UPDATE, "Error in app (web) update check: ${e.message}", e)
-                showDownloadDialog(
-                    AppUpdater.InstallSource.OTHER,
-                    getString(R.string.download_update_dialog_failure_title),
-                    getString(R.string.download_update_dialog_failure_message)
-                )
+                runOnUiThread {
+                    showDownloadDialog(
+                        AppUpdater.InstallSource.OTHER,
+                        getString(R.string.download_update_dialog_failure_title),
+                        getString(R.string.download_update_dialog_failure_message)
+                    )
+                }
             }
         }
     }
@@ -587,37 +635,77 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     ) {
         if (!isInForeground()) return
 
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(title)
-        builder.setMessage(message)
-        builder.setCancelable(false)
-        if (
-            message == getString(R.string.download_update_dialog_message_ok) ||
-            message == getString(R.string.download_update_dialog_failure_message) ||
-            message == getString(R.string.download_update_dialog_trylater_message)
-        ) {
-            builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
-                dialogInterface.dismiss()
-            }
+
+        // Determine dialog type based on title to decide if it should be modal
+        val isUpdateAvailable = title == getString(R.string.download_update_dialog_title)
+        val isUpToDate = message == getString(R.string.download_update_dialog_message_ok)
+        val isError = message == getString(R.string.download_update_dialog_failure_message)
+        val isQuotaExceeded = message == getString(R.string.download_update_dialog_trylater_message)
+
+        // Adjust message for Play Store if needed
+        if (isUpdateAvailable && source == AppUpdater.InstallSource.STORE) {
+            // Play Store updates should use native UI, but if we reach here, show appropriate message
+            builder.setMessage("A new version is available. Please update from Play Store.")
         } else {
-            if (source == AppUpdater.InstallSource.STORE) {
-                builder.setPositiveButton(getString(R.string.hs_download_positive_play_store)) { dialogInterface, _ ->
-                    appUpdateManager.completeUpdate()
-                    dialogInterface.dismiss()
+            builder.setMessage(message)
+        }
+
+        // Make dialog non-dismissible (modal) only when an actual update is available
+        // User cannot dismiss by tapping outside or pressing back button
+        // However, user can still choose "Remind me later" button
+        builder.setCancelable(!isUpdateAvailable)
+
+        when {
+            isUpdateAvailable -> {
+                // Update is available - modal dialog with explicit user choice
+                if (source == AppUpdater.InstallSource.STORE) {
+                    // For Play Store updates, this dialog rarely appears as Google's native UI handles it
+                    // But if it does appear, just show OK to dismiss (native UI should have been shown)
+                    builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
+                        appUpdateManager.completeUpdate()
+                        dialogInterface.dismiss()
+                    }
+                    builder.setNegativeButton(getString(R.string.hs_download_negative_default)) { dialogInterface, _ ->
+                        persistentState.lastAppUpdateCheck = System.currentTimeMillis()
+                        dialogInterface.dismiss()
+                    }
+                } else {
+                    // For website version, open browser to download - this is the main use case
+                    builder.setPositiveButton(getString(R.string.hs_download_positive_website)) { dialogInterface, _ ->
+                        initiateDownload()
+                        dialogInterface.dismiss()
+                    }
+                    // Negative button allows user to postpone the update
+                    builder.setNegativeButton(getString(R.string.hs_download_negative_default)) { dialogInterface, _ ->
+                        persistentState.lastAppUpdateCheck = System.currentTimeMillis()
+                        dialogInterface.dismiss()
+                    }
                 }
-            } else {
-                builder.setPositiveButton(getString(R.string.hs_download_positive_website)) { dialogInterface, _ ->
-                    initiateDownload()
+            }
+            isUpToDate || isError || isQuotaExceeded -> {
+                // Informational dialogs - dismissible with OK button
+                builder.setCancelable(true)
+                builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
                     dialogInterface.dismiss()
                 }
             }
-            builder.setNegativeButton(getString(R.string.hs_download_negative_default)) { dialogInterface, _ ->
-                persistentState.lastAppUpdateCheck = System.currentTimeMillis()
-                dialogInterface.dismiss()
+            else -> {
+                // Fallback for any other case - make it dismissible
+                builder.setCancelable(true)
+                builder.setPositiveButton(getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
+                    dialogInterface.dismiss()
+                }
             }
         }
 
-        builder.create().show()
+        try {
+            val dialog = builder.create()
+            dialog.show()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_UI, "err showing download dialog: ${e.message}", e)
+        }
     }
 
     private fun initiateDownload() {

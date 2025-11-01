@@ -9,7 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="8dp"
-        android:elevation="8dp"
         android:focusableInTouchMode="true"
         app:cardBackgroundColor="?attr/background"
         app:cardCornerRadius="16dp">
@@ -174,7 +173,12 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:imeOptions="actionDone"
-                        android:inputType="textNoSuggestions|textVisiblePassword" />
+                        android:gravity="top|start"
+                        android:maxLines="4"
+                        android:minLines="1"
+                        android:overScrollMode="ifContentScrolls"
+                        android:scrollbars="vertical"
+                        android:inputType="textMultiLine|textNoSuggestions|textVisiblePassword" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
@@ -200,6 +204,7 @@
                     android:text="@string/lbl_dismiss"
                     android:textColor="?attr/accentGood"
                     android:textSize="@dimen/large_font_text_view"
+                    android:background="?attr/colorPrimary"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toLeftOf="@+id/guideline"
                     app:layout_constraintTop_toBottomOf="@+id/custom_dialog_ok_button" />
@@ -213,6 +218,7 @@
                     android:text="@string/lbl_save"
                     android:textColor="?attr/accentGood"
                     android:textSize="@dimen/large_font_text_view"
+                    android:background="?attr/colorPrimary"
                     app:layout_constraintLeft_toRightOf="@+id/guideline"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/save_tunnel" />

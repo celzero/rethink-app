@@ -16,10 +16,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -71,6 +68,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
+                    android:paddingTop="10dp"
                     android:scrollbars="none">
 
                     <com.google.android.material.chip.ChipGroup
@@ -85,7 +83,7 @@
                         app:singleSelection="true" />
                 </HorizontalScrollView>
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/firewall_app_label_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

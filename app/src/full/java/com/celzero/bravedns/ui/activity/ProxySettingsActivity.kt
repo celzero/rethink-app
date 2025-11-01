@@ -23,6 +23,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.Animation
@@ -45,12 +46,14 @@ import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint.Companion.DEFAULT_PROXY_TYPE
 import com.celzero.bravedns.databinding.DialogSetProxyBinding
 import com.celzero.bravedns.databinding.FragmentProxyConfigureBinding
+import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.bottomsheet.OrbotBottomSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
@@ -62,6 +65,9 @@ import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isValidPort
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.backend.RouterStats
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -93,8 +99,10 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -194,12 +202,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 if (m?.isCustomSocks5() == true) {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    appNames.addAll(FirewallManager.getAllAppNames())
+                    appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(this@ProxySettingsActivity))
                     uiCtx { showSocks5ProxyDialog(endpoint, appNames, app) }
                 } else {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    appNames.addAll(FirewallManager.getAllAppNames())
+                    appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(this@ProxySettingsActivity))
                     uiCtx { showSocks5ProxyDialog(endpoint, appNames, app) }
                 }
             }
@@ -250,12 +258,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 if (m?.isCustomHttp() == true) {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    appNames.addAll(FirewallManager.getAllAppNames())
+                    appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(this@ProxySettingsActivity))
                     uiCtx { showHttpProxyDialog(endpoint, appNames, app?.appName) }
                 } else {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    appNames.addAll(FirewallManager.getAllAppNames())
+                    appNames.addAll(FirewallManager.getAllAppNamesSortedByVpnPermission(this@ProxySettingsActivity))
                     uiCtx { showHttpProxyDialog(endpoint, appNames, app?.appName) }
                 }
             }
@@ -276,7 +284,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
 
     /** Prompt user to download the Orbot app based on the current BUILDCONFIG flavor. */
     private fun showOrbotInstallDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.orbot_install_dialog_title)
         builder.setMessage(R.string.orbot_install_dialog_message)
         builder.setPositiveButton(getString(R.string.orbot_install_dialog_positive)) { _, _ ->
@@ -286,7 +294,8 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         builder.setNeutralButton(getString(R.string.orbot_install_dialog_neutral)) { _, _ ->
             launchOrbotWebsite()
         }
-        builder.create().show()
+        val dialog = builder.create()
+        dialog.show()
     }
 
     private fun launchOrbotWebsite() {
@@ -407,34 +416,89 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             activeWgs.forEach {
                 val id = ProxyManager.ID_WG_BASE + it.getId()
                 val statusPair = VpnController.getProxyStatusById(id)
-                uiCtx {
-                    if (statusPair.first != null) {
-                        val resId = UIUtils.getProxyStatusStringRes(statusPair.first)
-                        val s = getString(resId).replaceFirstChar(Char::titlecase)
-                        wgStatus += getString(
-                            R.string.ci_ip_label,
-                            it.getName(),
-                            s.padStart(1, ' ')
-                        ) + "\n"
-                        Logger.d(LOG_TAG_PROXY, "current proxy status for $id: $s")
-                    } else {
-                        wgStatus +=
-                            getString(
-                                R.string.ci_ip_label,
-                                it.getName(),
-                                getString(R.string.status_waiting)
-                                    .replaceFirstChar(Char::titlecase)
-                                    .padStart(1, ' ')
-                            ) + "\n"
-                        Logger.d(LOG_TAG_PROXY, "current proxy status is null for $id")
-                    }
+                val stats = VpnController.getProxyStats(id)
+                val dnsStatusId = VpnController.getDnsStatus(id)
 
+
+                val statusText = if (statusPair.first == Backend.TPU) {
+                    getString(UIUtils.getProxyStatusStringRes(UIUtils.ProxyStatus.TPU.id)).replaceFirstChar(Char::titlecase)
+                } else if (dnsStatusId != null && isDnsError(dnsStatusId)) {
+                    // DNS is failing, show failing status
+                    getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
+                } else {
+                    // DNS is okay, show proxy status
+                    getProxyStatusText(statusPair, stats)
                 }
+
+                wgStatus += getString(
+                    R.string.ci_ip_label,
+                    it.getName(),
+                    statusText.padStart(1, ' ')
+                ) + "\n"
+                Logger.d(LOG_TAG_PROXY, "current proxy status for $id: $statusText")
             }
             wgStatus = wgStatus.trimEnd()
             uiCtx {
                 b.settingsActivityWireguardDesc.text = wgStatus
             }
+        }
+    }
+
+    private fun isDnsError(statusId: Long?): Boolean {
+        if (statusId == null) return true
+
+        val s = Transaction.Status.fromId(statusId)
+        return s == Transaction.Status.BAD_QUERY || s == Transaction.Status.BAD_RESPONSE ||
+               s == Transaction.Status.NO_RESPONSE || s == Transaction.Status.SEND_FAIL ||
+               s == Transaction.Status.CLIENT_ERROR || s == Transaction.Status.INTERNAL_ERROR ||
+               s == Transaction.Status.TRANSPORT_ERROR
+    }
+
+    private fun getProxyStatusText(statusPair: Pair<Long?, String>, stats: RouterStats?): String {
+        val status = UIUtils.ProxyStatus.entries.find { it.id == statusPair.first }
+
+        return getStatusText(status, stats, statusPair.second)
+    }
+
+    private fun getStatusText(
+        status: UIUtils.ProxyStatus?,
+        stats: RouterStats?,
+        errMsg: String?
+    ): String {
+        if (status == null) {
+            val txt = if (errMsg != null && errMsg.isNotEmpty()) {
+                getString(R.string.status_waiting) + " ($errMsg)"
+            } else {
+                getString(R.string.status_waiting)
+            }
+            return txt.replaceFirstChar(Char::titlecase)
+        }
+
+        val now = System.currentTimeMillis()
+        val lastOk = stats?.lastOK ?: 0L
+        val since = stats?.since ?: 0L
+        if (now - since > WG_UPTIME_THRESHOLD && lastOk == 0L) {
+            return getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
+        }
+
+        val baseText = getString(UIUtils.getProxyStatusStringRes(status.id))
+            .replaceFirstChar(Char::titlecase)
+
+        val handshakeTime = if (stats != null && stats.lastOK > 0L) {
+            DateUtils.getRelativeTimeSpanString(
+                stats.lastOK,
+                now,
+                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE
+            ).toString()
+        } else {
+            null
+        }
+
+        return if (stats?.lastOK != 0L && handshakeTime != null) {
+            getString(R.string.about_version_install_source, baseText, handshakeTime)
+        } else {
+            baseText
         }
     }
 
@@ -560,10 +624,9 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         appName: String
     ) {
         val dialogBinding = DialogSetProxyBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(this).setView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
-        dialog.show()
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
@@ -756,7 +819,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         val defaultHost = "http://127.0.0.1:8118"
         var host: String
         val dialogBinding = DialogSetProxyBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(this).setView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         dialog.show()

@@ -311,7 +311,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                     output.flush()
                     output.close()
                 }
-            } catch (ignored: IOException) {
+            } catch (_: IOException) {
                 // no-op
             }
         }

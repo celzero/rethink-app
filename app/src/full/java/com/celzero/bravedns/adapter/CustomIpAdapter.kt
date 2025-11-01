@@ -526,7 +526,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
     private fun showEditIpDialog(customIp: CustomIp) {
         val dBind =
             DialogAddCustomIpBinding.inflate((context as CustomRulesActivity).layoutInflater)
-        val builder = MaterialAlertDialogBuilder(context).setView(dBind.root)
+        val builder = MaterialAlertDialogBuilder(context, R.style.App_Dialog_NoDim).setView(dBind.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         dialog.show()

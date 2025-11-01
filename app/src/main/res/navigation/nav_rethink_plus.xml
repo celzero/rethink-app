@@ -5,7 +5,7 @@
     android:id="@+id/nav_rethink_plus"
     app:startDestination="@id/rethinkPlus">
 
-    <fragment
+    <!--<fragment
         android:id="@+id/rethinkPlus"
         android:name="com.celzero.bravedns.ui.fragment.RethinkPlusFragment"
         android:label="Rethink Plus" >
@@ -17,5 +17,5 @@
     <fragment
         android:id="@+id/rethinkPlusDashboardFragment"
         android:name="com.celzero.bravedns.ui.fragment.RethinkPlusDashboardFragment"
-        android:label="Rethink Plus Dashboard" />
+        android:label="Rethink Plus Dashboard" />-->
 </navigation>

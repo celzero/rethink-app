@@ -46,8 +46,8 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.WgConfigViewModel
-import com.celzero.bravedns.wireguard.WgHopManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.qrcode.QRCodeReader
@@ -153,8 +153,11 @@ class WgMainActivity :
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
+
         init()
 
         if (isAtleastQ()) {
@@ -366,7 +369,7 @@ class WgMainActivity :
 
     private fun showDisableDialog(isOneWgToggle: Boolean) {
         // show alert dialog with don't show again toggle in it
-        MaterialAlertDialogBuilder(this)
+        MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
             .setTitle(getString(R.string.wireguard_disable_title))
             .setMessage(getString(R.string.wireguard_disable_message))
             .setPositiveButton(getString(R.string.always_on_dialog_positive)) { _, _ ->

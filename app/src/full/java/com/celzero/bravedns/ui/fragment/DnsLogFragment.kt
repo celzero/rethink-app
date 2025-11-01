@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.fragment
 
+import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
@@ -35,14 +36,19 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
 import com.celzero.bravedns.ui.activity.UniversalFirewallSettingsActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -56,6 +62,8 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     private val viewModel: DnsLogViewModel by viewModel()
     private var filterValue: String = ""
     private var filterType = DnsLogFilter.ALL
+
+    private var fromWireGuardScreen: Boolean = false
 
     private val dnsLogRepository by inject<DnsLogRepository>()
     private val persistentState by inject<PersistentState>()
@@ -85,13 +93,25 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         super.onViewCreated(view, savedInstanceState)
         initView()
         if (arguments != null) {
-            val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
-            if (query.contains(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)) {
-                // do nothing, as the search is for the firewall rules and not for the dns
-                return
+            val query = arguments?.getString(Constants.SEARCH_QUERY) ?: ""
+            fromWireGuardScreen = query.contains(RULES_SEARCH_ID_WIREGUARD)
+            if (fromWireGuardScreen) {
+                val wgId = query.substringAfter(RULES_SEARCH_ID_WIREGUARD)
+                hideSearchLayout()
+                viewModel.setIsWireGuardLogs(true, wgId)
+            } else {
+                if (query.isEmpty()) return
+                if (query.contains(UniversalFirewallSettingsActivity.RULES_SEARCH_ID)) {
+                    // do nothing, as the search is for the firewall rules and not for the dns
+                    return
+                }
+                b.queryListSearch.setQuery(query, true)
             }
-            b.queryListSearch.setQuery(query, true)
         }
+    }
+
+    private fun hideSearchLayout() {
+        b.queryListCardViewTop.visibility = View.GONE
     }
 
     private fun initView() {
@@ -106,6 +126,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         displayPerDnsUi()
         setupClickListeners()
         remakeFilterChipsUi()
+        setQueryFilter()
     }
 
     override fun onResume() {
@@ -114,12 +135,13 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         // some ROMs kill or freeze the keyboard/IME process to save memory or battery,
         // causing SearchView to stop receiving input events
         // this is a workaround to restart the IME process
-        b.queryListSearch.setQuery("", false)
         b.queryListSearch.clearFocus()
 
         val imm = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.restartInput(b.queryListSearch)
         b.topRl.requestFocus()
+
+        viewModel.setFilter(filterValue, filterType)
     }
 
     private fun setupClickListeners() {
@@ -141,17 +163,39 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
 
         b.recyclerQuery.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(requireContext())
+        layoutManager?.isItemPrefetchEnabled = true
         b.recyclerQuery.layoutManager = layoutManager
 
         val favIcon = persistentState.fetchFavIcon
         val isRethinkDns = appConfig.isRethinkDnsConnected()
         val recyclerAdapter = DnsLogAdapter(requireContext(), favIcon, isRethinkDns)
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.dnsLogsList.observe(viewLifecycleOwner) {
-                recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        recyclerAdapter.stateRestorationPolicy =
+                    RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        b.recyclerQuery.adapter = recyclerAdapter
+        viewModel.dnsLogsList.observe(viewLifecycleOwner) {
+            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        }
+
+        recyclerAdapter.addLoadStateListener { loadState ->
+            val isEmpty = recyclerAdapter.itemCount < 1
+            if (loadState.append.endOfPaginationReached && isEmpty) {
+                viewModel.dnsLogsList.removeObservers(this)
+                b.recyclerQuery.visibility = View.GONE
+            } else {
+                if (!b.recyclerQuery.isVisible) b.recyclerQuery.visibility = View.VISIBLE
             }
         }
-        b.recyclerQuery.adapter = recyclerAdapter
+
+        b.recyclerQuery.post {
+            try {
+                if (recyclerAdapter.itemCount > 0) {
+                    recyclerAdapter.stateRestorationPolicy =
+                        RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+                }
+            } catch (_: Exception) {
+                Logger.e(LOG_TAG_UI, "err in setting the recycler restoration policy")
+            }
+        }
 
         val scrollListener =
             object : RecyclerView.OnScrollListener() {
@@ -266,7 +310,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     }
 
     private fun showDnsLogsDeleteDialog() {
-        MaterialAlertDialogBuilder(requireContext())
+        MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
             .setTitle(R.string.dns_query_clear_logs_title)
             .setMessage(R.string.dns_query_clear_logs_message)
             .setCancelable(true)
@@ -282,22 +326,26 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
-            if (this.isAdded) {
-                this.filterValue = query
-                viewModel.setFilter(filterValue, filterType)
-            }
-        }
+        searchQuery.value = query
         return true
     }
 
-    override fun onQueryTextChange(query: String): Boolean {
-        Utilities.delay(QUERY_TEXT_DELAY, lifecycleScope) {
-            if (this.isAdded) {
-                this.filterValue = query
-                viewModel.setFilter(filterValue, filterType)
-            }
+    @OptIn(FlowPreview::class)
+    private fun setQueryFilter() {
+        lifecycleScope.launch {
+            searchQuery
+                .debounce(QUERY_TEXT_DELAY)
+                .distinctUntilChanged()
+                .collect { query ->
+                    filterValue = query
+                    viewModel.setFilter(filterValue, filterType)
+                }
         }
+    }
+
+    val searchQuery = MutableStateFlow("")
+    override fun onQueryTextChange(query: String): Boolean {
+        searchQuery.value = query
         return true
     }
 

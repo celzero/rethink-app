@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/background"
     android:fillViewport="true"
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -70,9 +69,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:clipToPadding="false"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="4dp"
-                        app:cardUseCompatPadding="true">
+                        app:cardCornerRadius="16dp">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
@@ -170,11 +167,8 @@
                         android:id="@+id/fhs_card_firewall_ll"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:clipToPadding="true"
                         android:orientation="vertical"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="4dp"
-                        app:cardUseCompatPadding="true">
+                        app:cardCornerRadius="16dp">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
@@ -281,11 +275,8 @@
                         android:id="@+id/fhs_card_proxy_ll"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:clipToPadding="true"
                         android:orientation="vertical"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="4dp"
-                        app:cardUseCompatPadding="true">
+                        app:cardCornerRadius="16dp">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
@@ -354,11 +345,8 @@
                         android:id="@+id/fhs_card_logs_ll"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:clipToPadding="true"
                         android:orientation="vertical"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="4dp"
-                        app:cardUseCompatPadding="true">
+                        app:cardCornerRadius="16dp">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
@@ -455,11 +443,8 @@
                 android:id="@+id/fhs_card_apps_cv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:clipToPadding="true"
                 android:orientation="vertical"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:cardUseCompatPadding="true">
+                app:cardCornerRadius="16dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -728,7 +713,6 @@
                             android:fontFamily="sans-serif-light"
                             android:gravity="center_vertical"
                             android:padding="5dp"
-                            android:text="Alerts"
                             android:textColor="?attr/homeScreenHeaderTextColor"
                             android:textSize="@dimen/large_font_text_view"
                             app:drawableStartCompat="@drawable/ic_app_info_accent" />
@@ -766,7 +750,6 @@
                                 android:marqueeRepeatLimit="marquee_forever"
                                 android:padding="5dp"
                                 android:singleLine="true"
-                                android:text="past 1 hour"
                                 android:textSize="@dimen/small_font_text_view" />
 
                         </RelativeLayout>
@@ -803,7 +786,6 @@
                 android:layout_marginBottom="10dp"
                 android:alpha="0.75"
                 android:fontFamily="sans-serif-smallcaps"
-                android:text="KB/S"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/mini_font_text_view" />
 

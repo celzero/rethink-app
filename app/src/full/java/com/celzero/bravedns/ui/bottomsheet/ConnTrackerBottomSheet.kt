@@ -38,7 +38,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
-import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
@@ -61,6 +60,7 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
@@ -186,6 +186,11 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        dialog?.useTransparentNoDimBackground()
+    }
+
     private fun updateDnsIfAvailable() {
         val domain = info?.dnsQuery
         val uid = info?.uid
@@ -246,10 +251,10 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             return
         } else if (!info?.proxyDetails.isNullOrEmpty() && isIpnProxy) {
             // add the proxy id to the chip text if available
-            b.bsConnTrackAppInfo.text = getString(R.string.two_argument_colon, getFirewallRule(rule)?.title?.let { getString(it) }, info?.proxyDetails)
+            b.bsConnTrackAppInfo.text = getString(R.string.two_argument_colon, getString(FirewallRuleset.RULE12.title), info?.proxyDetails)
         } else {
             if (isInvalidProxyDetails()) {
-                b.bsConnTrackAppInfo.text = getString(getFirewallRule(FirewallRuleset.RULE1C.id)?.title ?: R.string.firewall_rule_no_rule)
+                b.bsConnTrackAppInfo.text = getString(getFirewallRule(FirewallRuleset.RULE18.id)?.title ?: R.string.firewall_rule_no_rule)
             } else {
                 b.bsConnTrackAppInfo.text = getFirewallRule(rule)?.title?.let { getString(it) }
             }
@@ -633,7 +638,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         if (blockedRule == null) return
 
         val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dialogBinding.root)
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dialogBinding.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         dialog.show()
@@ -735,13 +740,6 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun applyIpRule(ipRuleStatus: IpRulesManager.IpRuleStatus) {
-        val proto = Protocol.getProtocolName(info!!.protocol).name
-        val cr = ConnectionRules(info!!.ipAddress, info!!.port, proto)
-
-        Logger.i(
-            LOG_TAG_FIREWALL,
-            "Apply ip rule for ${cr.ipAddress}, ${FirewallRuleset.RULE2.name}"
-        )
         io {
             // no need to apply rule, prev selection and current selection are same
             if (
@@ -753,6 +751,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             val ipPair = IpRulesManager.getIpNetPort(info!!.ipAddress)
             val ip = ipPair.first ?: return@io
             IpRulesManager.addIpRule(info!!.uid, ip, /*wildcard-port*/ 0, ipRuleStatus, proxyId = "", proxyCC = "")
+            Logger.i(LOG_TAG_FIREWALL, "apply ip-rule for ${info!!.uid}, $ip, ${ipRuleStatus.name}")
         }
     }
 

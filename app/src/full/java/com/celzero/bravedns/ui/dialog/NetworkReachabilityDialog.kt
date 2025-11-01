@@ -36,6 +36,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.button.MaterialButton
 import inet.ipaddr.IPAddress.IPVersion
 import inet.ipaddr.IPAddressString
@@ -67,7 +68,6 @@ class NetworkReachabilityDialog(activity: Activity,
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         binding = DialogInputIpsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         setCancelable(true)
         initViews()
         setupListeners()

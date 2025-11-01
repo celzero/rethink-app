@@ -11,8 +11,6 @@
         android:clickable="true"
         android:focusable="true"
         app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        app:cardUseCompatPadding="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="parent"
@@ -47,8 +45,13 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginStart="3dp"
-                        android:ellipsize="end"
-                        android:maxLength="16"
+                        android:ellipsize="marquee"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:singleLine="true"
+                        android:scrollHorizontally="true"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:ems="10"
                         android:padding="5dp"
                         android:textAppearance="?attr/textAppearanceHeadline6" />
 
@@ -162,9 +165,23 @@
                         app:chipStrokeColor="?attr/colorPrimary"
                         app:chipStrokeWidth="1.5dp" />
 
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_properties"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.8"
+                        android:checked="true"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
+                        app:chipStrokeColor="?attr/colorPrimary"
+                        app:chipStrokeWidth="1.5dp" />
+
                 </com.google.android.material.chip.ChipGroup>
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/interface_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -176,7 +193,7 @@
                     android:textStyle="italic"
                     android:visibility="gone" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/interface_apps_count"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -186,38 +203,27 @@
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
 
-                <TextView
-                    android:id="@+id/interface_config_status"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="3dp"
-                    android:layout_marginEnd="5dp"
-                    android:padding="5dp"
-                    android:textColor="?attr/primaryLightColorText"
-                    android:textSize="@dimen/default_font_text_view"
-                    android:visibility="gone" />
-
                 <RelativeLayout
                     android:id="@+id/interface_active_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/interface_active_uptime"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_marginStart="3dp"
                         android:layout_marginEnd="5dp"
-                        android:layout_toEndOf="@id/interface_active_rx_tx"
+                        android:layout_toStartOf="@id/interface_active_rx_tx"
                         android:ellipsize="marquee"
                         android:padding="5dp"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/default_font_text_view"
                         android:visibility="visible" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/interface_active_rx_tx"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

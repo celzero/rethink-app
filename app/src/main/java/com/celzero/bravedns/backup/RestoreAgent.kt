@@ -347,21 +347,21 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             stream = file.inputStream()
             val metadata = stream.bufferedReader().use { it.readText() }
             isVersionSupported(metadata)
-        } catch (ignored: Exception) {
+        } catch (ex: Exception) {
             Logger.crash(
                 LOG_TAG_BACKUP_RESTORE,
-                "error while restoring metadata, reason? ${ignored.message}",
-                ignored
+                "err while restoring metadata, reason? ${ex.message}",
+                ex
             )
             false
         } finally {
             try {
                 stream?.close()
-            } catch (ignored: IOException) {
+            } catch (ex: IOException) {
                 Logger.e(
                     LOG_TAG_BACKUP_RESTORE,
-                    "error while restoring metadata, reason? ${ignored.message}",
-                    ignored
+                    "err while restoring metadata, reason? ${ex.message}",
+                    ex
                 )
             }
         }

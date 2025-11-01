@@ -1,25 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <locale-config xmlns:android="http://schemas.android.com/apk/res/android">
     <locale android:name="en-US" /> <!-- English (United States) -->
+    <locale android:name="ab" /> <!-- Abkhazian -->
     <locale android:name="ar" /> <!-- Arabic -->
     <locale android:name="bn" /> <!-- Bengali -->
     <locale android:name="zh-CN" /> <!-- Chinese (Simplified) -->
     <locale android:name="zh-TW" /> <!-- Chinese (Traditional) -->
     <locale android:name="zh-HK" /> <!-- Chinese (Hong Kong) -->
+    <locale android:name="cs" /> <!-- Czech -->
+    <locale android:name="nl" /> <!-- Dutch -->
     <locale android:name="fr" /> <!-- French (France) -->
     <locale android:name="de" /> <!-- German -->
+    <locale android:name="iw" /> <!-- Hebrew -->
     <locale android:name="hi" /> <!-- Hindi -->
-    <locale android:name="in" /> <!-- Indonesian -->
+    <locale android:name="hu" /> <!-- Hungarian -->
+    <locale android:name="id" /> <!-- Indonesian -->
     <locale android:name="it" /> <!-- Italian -->
     <locale android:name="ja" /> <!-- Japanese -->
+    <locale android:name="ko" /> <!-- Korean -->
     <locale android:name="lt" /> <!-- Lithuanian -->
     <locale android:name="pl" /> <!-- Polish -->
     <locale android:name="pt-BR" /> <!-- Portuguese (Brazil) -->
     <locale android:name="pt-PT" /> <!-- Portuguese (Portugal) -->
+    <locale android:name="ro" /> <!-- Romanian -->
     <locale android:name="ru" /> <!-- Russian -->
+    <locale android:name="sr" /> <!-- Serbian (Cyrillic) -->
     <locale android:name="es" /> <!-- Spanish (Spain) -->
     <locale android:name="ta" /> <!-- Tamil -->
+    <locale android:name="th" /> <!-- Thai -->
     <locale android:name="tr" /> <!-- Turkish -->
+    <locale android:name="uk" /> <!-- Ukrainian -->
+    <locale android:name="vi" /> <!-- Vietnamese -->
 
     <!--
     below has the whole list of languages with the locale name, the locale added above are the

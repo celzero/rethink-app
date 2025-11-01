@@ -135,11 +135,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/aad_app_settings_card"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
@@ -276,11 +272,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5"
-                        android:clipToPadding="true"
-                        android:layout_marginStart="10dp"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="8dp"
-                        app:cardUseCompatPadding="true">
+                        android:layout_marginStart="10dp">
 
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
@@ -323,11 +315,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5"
-                        android:layout_marginEnd="10dp"
-                        android:clipToPadding="true"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="8dp"
-                        app:cardUseCompatPadding="true">
+                        android:layout_marginEnd="10dp">
 
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
@@ -432,9 +420,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:visibility="gone"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp">
+            android:visibility="gone">
 
             <RelativeLayout
                 android:layout_width="match_parent"

@@ -78,7 +78,7 @@ class ScheduleManager(val context: Context) {
         WorkManager.getInstance(context)
             .enqueueUniquePeriodicWork(
                 REFRESH_APPS_JOB_TAG,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.REPLACE,
                 refreshAppsJob
             )
     }

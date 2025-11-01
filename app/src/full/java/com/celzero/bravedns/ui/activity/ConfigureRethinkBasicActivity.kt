@@ -31,6 +31,7 @@ import com.celzero.bravedns.ui.fragment.RethinkListFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import org.koin.android.ext.android.inject
 
 class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethink_basic) {
@@ -51,8 +52,10 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)

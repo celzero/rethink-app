@@ -15,11 +15,15 @@
  */
 package com.celzero.bravedns
 
+import Logger.LOG_TAG_SCHEDULER
 import android.app.Application
 import android.content.pm.ApplicationInfo
+import com.celzero.bravedns.battery.BatteryStatsLogger
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
+import com.celzero.bravedns.util.FirebaseErrorReporting
+import com.celzero.bravedns.util.GlobalExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -38,6 +42,7 @@ class RethinkDnsApplicationPlay : Application() {
             applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE ==
                     ApplicationInfo.FLAG_DEBUGGABLE
 
+
         startKoin {
             if (BuildConfig.DEBUG) androidLogger()
             androidContext(this@RethinkDnsApplicationPlay)
@@ -51,6 +56,16 @@ class RethinkDnsApplicationPlay : Application() {
                     }
                 )
             )
+        }
+
+        // Initialize global exception handler
+        GlobalExceptionHandler.initialize(this)
+        FirebaseErrorReporting.initialize()
+        // initialize battery stats provider (facebook battery-metrics)
+        try {
+            BatteryStatsLogger.start(this)
+        } catch (e: Exception) {
+            Logger.w(LOG_TAG_SCHEDULER, "battery-stats-init-failed: ${e.message}", e)
         }
 
         CoroutineScope(SupervisorJob()).launch {

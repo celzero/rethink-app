@@ -56,6 +56,7 @@ import com.celzero.bravedns.util.Utilities.blocklistCanonicalPath
 import com.celzero.bravedns.util.Utilities.convertLongToTime
 import com.celzero.bravedns.util.Utilities.deleteRecursive
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -99,6 +100,11 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     ): View {
         _binding = BottomSheetLocalBlocklistsBinding.inflate(inflater, container, false)
         return b.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.useTransparentNoDimBackground()
     }
 
     override fun onDestroyView() {
@@ -241,7 +247,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showDownloadDialog(isRedownload: Boolean) {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         if (isRedownload) {
             builder.setTitle(R.string.local_blocklist_redownload)
             builder.setMessage(
@@ -264,12 +270,12 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
             downloadLocalBlocklist(isRedownload)
         }
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ -> dialog.dismiss() }
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.show()
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
 
     private fun showDeleteDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.lbl_delete)
         builder.setMessage(getString(R.string.local_blocklist_delete_desc))
         builder.setCancelable(false)
@@ -283,6 +289,35 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun downloadLocalBlocklist(isRedownload: Boolean) {
+        // Check if VPN is in lockdown mode and custom download manager is disabled
+        if (VpnController.isVpnLockdown() && !persistentState.useCustomDownloadManager) {
+            showLockdownDownloadDialog(isRedownload)
+            return
+        }
+
+        proceedWithDownload(isRedownload)
+    }
+
+    private fun showLockdownDownloadDialog(isRedownload: Boolean) {
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
+        builder.setTitle(R.string.lockdown_download_enable_inapp)
+        builder.setMessage(R.string.lockdown_download_message)
+        builder.setCancelable(true)
+        builder.setPositiveButton(R.string.lockdown_download_enable_inapp) { _, _ ->
+            // Enable in-app downloader and proceed with download
+            persistentState.useCustomDownloadManager = true
+            downloadLocalBlocklist(isRedownload)
+        }
+        builder.setNegativeButton(R.string.lbl_cancel) { dialog, _ ->
+            dialog.dismiss()
+            // Proceed with Android download manager (useCustomDownloadManager stays false)
+            proceedWithDownload(isRedownload)
+        }
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.show()
+    }
+
+    private fun proceedWithDownload(isRedownload: Boolean) {
         ui {
             var status = AppDownloadManager.DownloadManagerStatus.NOT_STARTED
             b.lbbsDownload.isEnabled = false
@@ -481,6 +516,15 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
             return
         }
 
+        if (!VpnController.hasTunnel()) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.ssv_toast_start_rethink),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+
         ui {
             val blocklistsExist =
                 withContext(Dispatchers.Default) {
@@ -608,7 +652,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         ) { workInfoList ->
             if (workInfoList != null && workInfoList.isNotEmpty()) {
                 val workInfo = workInfoList[0]
-                if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
+                if (workInfo.state == WorkInfo.State.SUCCEEDED) {
                     Logger.i(
                         Logger.LOG_TAG_DOWNLOAD,
                         "AppDownloadManager Work Manager completed - ${DownloadConstants.FILE_TAG}"
@@ -616,9 +660,8 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
                     onDownloadSuccess()
                     workManager.pruneWork()
                 } else if (
-                    workInfo != null &&
-                        (workInfo.state == WorkInfo.State.CANCELLED ||
-                            workInfo.state == WorkInfo.State.FAILED)
+                    workInfo.state == WorkInfo.State.CANCELLED ||
+                    workInfo.state == WorkInfo.State.FAILED
                 ) {
                     onDownloadFail()
                     workManager.pruneWork()

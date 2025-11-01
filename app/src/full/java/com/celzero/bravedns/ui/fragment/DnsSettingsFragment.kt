@@ -45,10 +45,8 @@ import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.activity.DnsListActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.bottomsheet.LocalBlocklistsBottomSheet
-import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
@@ -96,21 +94,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         updateSelectedDns()
         // update local blocklist ui
         updateLocalBlocklistUi()
-        showNewBadgeIfNeeded()
-    }
-
-    private fun showNewBadgeIfNeeded() {
-        val smart = NewSettingsManager.shouldShowBadge(NewSettingsManager.SMART_DNS)
-        val treatDnsFirewall = NewSettingsManager.shouldShowBadge(NewSettingsManager.TREAT_DNS_FIREWALL)
-        val splitDns = NewSettingsManager.shouldShowBadge(NewSettingsManager.SPLIT_DNS)
-        val useSysDnsUndelegated = NewSettingsManager.shouldShowBadge(NewSettingsManager.USE_SYS_DNS_UNDELEGATED)
-        val useFallbackDnsToBypass = NewSettingsManager.shouldShowBadge(NewSettingsManager.USE_FALLBACK_TO_BYPASS)
-
-        b.smartDnsRb.setBadgeDotVisible(requireContext(), smart)
-        b.dvBypassDnsBlockTxt.setBadgeDotVisible(requireContext(), treatDnsFirewall)
-        b.dcSplitDnsTxt.setBadgeDotVisible(requireContext(), splitDns)
-        b.dcUndelegatedDomainsHeading.setBadgeDotVisible(requireContext(), useSysDnsUndelegated)
-        b.dcUseFallbackToBypassHeading.setBadgeDotVisible(requireContext(), useFallbackDnsToBypass)
     }
 
     private fun initView() {
@@ -133,7 +116,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         // use system dns for undelegated domains
         b.dcUndelegatedDomainsSwitch.isChecked = persistentState.useSystemDnsForUndelegatedDomains
         b.connectedStatusTitle.text = getConnectedDnsType()
-        b.dvBypassDnsBlockSwitch.isChecked = persistentState.bypassBlockInDns
         b.dcUseFallbackToBypassSwitch.isChecked = persistentState.useFallbackDnsToBypass
         showSplitDnsUi()
     }
@@ -206,6 +188,13 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     }
 
     private fun showSplitDnsUi() {
+        if (persistentState.enableDnsAlg) {
+            b.dvBypassDnsBlockRl.visibility = View.VISIBLE
+            b.dvBypassDnsBlockSwitch.isChecked = persistentState.bypassBlockInDns
+        } else {
+            b.dvBypassDnsBlockRl.visibility = View.GONE
+        }
+
         if (isAtleastR()) {
             // show split dns by default only if the device is running on Android 12 or above
             b.dcSplitDnsRl.visibility = View.VISIBLE
@@ -216,7 +205,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
                 b.dcSplitDnsSwitch.isChecked = persistentState.splitDns
             } else {
                 b.dcSplitDnsRl.visibility = View.GONE
-                b.dcSplitDnsSwitch.isChecked = false
             }
         }
     }
@@ -430,6 +418,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcAlgSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcAlgSwitch)
             persistentState.enableDnsAlg = enabled
+            if (enabled) {
+                // Enable experimental-dependent settings when experimental features are enabled
+                requireContext().let { persistentState.enableStabilityDependentSettings(it) }
+            }
             updateSpiltDns()
         }
 
@@ -442,6 +434,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcFaviconSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcFaviconSwitch)
             persistentState.fetchFavIcon = enabled
+            if (enabled) {
+                // Enable experimental-dependent settings when experimental features are enabled
+                requireContext().let { persistentState.enableStabilityDependentSettings(it) }
+            }
         }
 
         b.dcPreventDnsLeaksRl.setOnClickListener {
@@ -481,7 +477,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
 
         b.smartDnsRb.setOnCheckedChangeListener(null)
         b.smartDnsRb.setOnClickListener {
-            NewSettingsManager.markSettingSeen(NewSettingsManager.SMART_DNS)
             setSmartDns()
         }
 
@@ -526,8 +521,13 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         }
 
         b.dvBypassDnsBlockSwitch.setOnCheckedChangeListener { _, isChecked ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.TREAT_DNS_FIREWALL)
+            if (!persistentState.enableDnsAlg) return@setOnCheckedChangeListener
+
             persistentState.bypassBlockInDns = isChecked
+            if (isChecked) {
+                // Enable experimental-dependent settings when experimental features are enabled
+                requireContext().let { persistentState.enableStabilityDependentSettings(it) }
+            }
         }
 
         b.dvBypassDnsBlockRl.setOnClickListener {
@@ -535,8 +535,11 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         }
 
         b.dcSplitDnsSwitch.setOnCheckedChangeListener { _, isChecked ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.SPLIT_DNS)
             persistentState.splitDns = isChecked
+            if (isChecked) {
+                // Enable experimental-dependent settings when experimental features are enabled
+                requireContext().let { persistentState.enableStabilityDependentSettings(it) }
+            }
             updateConnectedStatus(persistentState.connectedDnsName)
         }
 
@@ -552,7 +555,6 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         }
 
         b.smartDnsInfo.setOnClickListener {
-            NewSettingsManager.markSettingSeen(NewSettingsManager.SMART_DNS)
             showSmartDnsInfoDialog()
         }
 
@@ -561,12 +563,10 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         }
 
         b.dcUndelegatedDomainsSwitch.setOnCheckedChangeListener { _, isChecked ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.USE_SYS_DNS_UNDELEGATED)
             persistentState.useSystemDnsForUndelegatedDomains = isChecked
         }
 
         b.dcUseFallbackToBypassSwitch.setOnCheckedChangeListener { _, isChecked ->
-            NewSettingsManager.markSettingSeen(NewSettingsManager.USE_FALLBACK_TO_BYPASS)
             persistentState.useFallbackDnsToBypass = isChecked
         }
 
@@ -605,7 +605,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
                     stringBuilder.append(txt).append("\n")
                 }
                 val list = stringBuilder.toString()
-                val builder = MaterialAlertDialogBuilder(requireContext())
+                val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
                     .setTitle(R.string.smart_dns)
                     .setMessage(list)
                     .setCancelable(true)
@@ -632,7 +632,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
     }
 
     private fun showSystemDnsDialog(dns: String) {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
             .setTitle(R.string.network_dns)
             .setMessage(dns)
             .setCancelable(true)
@@ -719,5 +719,7 @@ class DnsSettingsFragment : Fragment(R.layout.fragment_dns_configure),
         if (!isAdded) return
 
         updateLocalBlocklistUi()
+        // update custom download manager switch
+        b.dcDownloaderSwitch.isChecked = persistentState.useCustomDownloadManager
     }
 }
