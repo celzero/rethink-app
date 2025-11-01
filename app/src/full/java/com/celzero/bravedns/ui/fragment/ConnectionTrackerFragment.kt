@@ -395,7 +395,7 @@ class ConnectionTrackerFragment :
                 .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
                 .create()
                 .show()
-        }}
+        }
     }
 
     private fun remakeChildFilterChipsUi(categories: List<FirewallRuleset>) {

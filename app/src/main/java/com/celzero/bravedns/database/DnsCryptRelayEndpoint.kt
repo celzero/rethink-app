@@ -44,7 +44,7 @@ class DnsCryptRelayEndpoint {
         id: Int,
         dnsCryptRelayName: String,
         dnsCryptRelayURL: String,
-        dnsCryptRelayExplanation: String?,
+        dnsCryptRelayExplanation: String,
         isSelected: Boolean,
         isCustom: Boolean,
         modifiedDataTime: Long,
