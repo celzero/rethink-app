@@ -53,7 +53,7 @@ import com.celzero.bravedns.util.Constants
         SubscriptionStatus::class,
         SubscriptionStateHistory::class
     ],
-    version = 26,
+    version = 27,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -100,6 +100,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_23_24)
                 .addMigrations(MIGRATION_24_25)
                 .addMigrations(MIGRATION_25_26)
+                .addMigrations(MIGRATION_26_27)
                 .build()
 
         private val roomCallback: Callback =
@@ -1072,6 +1073,34 @@ abstract class AppDatabase : RoomDatabase() {
                         Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: ssids already exists")
                     }
                     Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: added ssidEnabled & ssids columns")
+                }
+            }
+
+        private val MIGRATION_26_27: Migration =
+            object : Migration(26, 27) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    // ProxyEndpoint
+                    db.execSQL("UPDATE ProxyEndpoint SET proxyAppName = '' WHERE proxyAppName IS NULL")
+                    db.execSQL("UPDATE ProxyEndpoint SET proxyIP = '' WHERE proxyIP IS NULL")
+                    db.execSQL("UPDATE ProxyEndpoint SET userName = '' WHERE userName IS NULL")
+                    db.execSQL("UPDATE ProxyEndpoint SET password = '' WHERE password IS NULL")
+                        
+                    // DoHEndpoint
+                    db.execSQL("UPDATE DoHEndpoint SET dohExplanation = '' WHERE dohExplanation IS NULL")
+                    // DoTEndpoint
+                    db.execSQL("UPDATE DoTEndpoint SET desc = '' WHERE desc IS NULL")
+                    // ODoHEndpoint
+                    db.execSQL("UPDATE ODoHEndpoint SET desc = '' WHERE desc IS NULL")
+                    // DNSCryptEndpoint
+                    db.execSQL("UPDATE DNSCryptEndpoint SET dnsCryptExplanation = '' WHERE dnsCryptExplanation IS NULL")
+                    // DNSCryptRelayEndpoint
+                    db.execSQL("UPDATE DNSCryptRelayEndpoint SET dnsCryptRelayExplanation = '' WHERE dnsCryptRelayExplanation IS NULL")
+                    // DNSProxyEndpoint
+                    db.execSQL("UPDATE DNSProxyEndpoint SET proxyAppName = '' WHERE proxyAppName IS NULL")
+                    db.execSQL("UPDATE DNSProxyEndpoint SET proxyIP = '' WHERE proxyIP IS NULL")
+                    
+                    Logger.i(LOG_TAG_APP_DB, "MIGRATION_25_26: Updated ProxyEndpoint, DNSCryptEndpoint, DNSCryptRelayEndpoint, DNSProxyEndpoint, DoHEndpoint, DoTEndpoint, ODoHEndpoint to replace NULL with empty strings")
+    
                 }
             }
 
