@@ -1167,7 +1167,7 @@ object WireguardManager : KoinComponent {
             sb.append("   errTx: ${routerStats?.errTx}\n\n")
         }
         if (sb.isEmpty()) {
-            sb.append("NA")
+            sb.append("   N/A")
         }
         return sb.toString()
     }
