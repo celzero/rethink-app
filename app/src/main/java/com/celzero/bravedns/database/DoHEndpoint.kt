@@ -49,7 +49,7 @@ class DoHEndpoint {
         id: Int,
         dohName: String,
         dohURL: String,
-        dohExplanation: String?,
+        dohExplanation: String,
         isSelected: Boolean,
         isCustom: Boolean,
         isSecure: Boolean,
