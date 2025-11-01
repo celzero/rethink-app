@@ -617,7 +617,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                             }
                             UIUtils.ProxyStatus.TNT -> {
                                 // Waiting state
-                                failing++
+                                // see WgConfigAdapter#getStrokeColorForStatus for details
+                                idle++
                             }
                             UIUtils.ProxyStatus.TPU -> {
                                 // Paused state - consider as idle

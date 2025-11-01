@@ -415,7 +415,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         val isFailing = now - since > WG_UPTIME_THRESHOLD && lastOk == 0L
         return when (status) {
             UIUtils.ProxyStatus.TOK -> if (isFailing) R.attr.chipTextNegative else R.attr.accentGood
-            UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ -> if (isFailing) R.attr.chipTextNegative else R.attr.chipTextNeutral
+            UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> if (isFailing) R.attr.chipTextNegative else R.attr.chipTextNeutral
             else -> R.attr.chipTextNegative // TNT, TKO, TEND
         }
     }
