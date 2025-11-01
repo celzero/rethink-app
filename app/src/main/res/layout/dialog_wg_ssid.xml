@@ -53,7 +53,7 @@
                     android:id="@+id/ssidConditionHeading"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/fapps_filter_filter_heading"
+                    android:text="@string/lbl_action"
                     android:textSize="12sp"
                     android:layout_marginBottom="8dp"
                     android:textColor="?attr/primaryLightColorText" />
@@ -71,21 +71,21 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:checked="true"
-                        android:text="@string/wg_ssid_condition_equal" />
+                        android:text="@string/lbl_connect" />
 
                     <RadioButton
                         android:id="@+id/radioNotEqual"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/wg_ssid_type_not_equal" />
+                        android:text="@string/notification_action_pause_vpn" />
 
                 </RadioGroup>
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/wg_ssid_match_type_label"
+                    android:text="@string/lbl_criteria"
                     android:textSize="12sp"
                     android:layout_marginBottom="8dp"
                     android:textColor="?attr/primaryLightColorText" />
@@ -109,7 +109,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:checked="true"
-                        android:text="@string/lbl_wildcard" />
+                        android:text="@string/wg_ssid_type_wildcard" />
 
                 </RadioGroup>
 

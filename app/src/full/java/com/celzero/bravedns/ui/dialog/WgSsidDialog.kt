@@ -75,13 +75,26 @@ class WgSsidDialog(
             insets
         }
 
-        b.descriptionTextView.text = context.getString(R.string.wg_ssid_dialog_description, context.getString(R.string.lbl_ssids))
+        b.descriptionTextView.text = getDescTxt()
         b.ssidTextInputLayout.hint = context.getString(R.string.wg_ssid_input_hint, context.getString(R.string.lbl_ssids))
+        b.radioNotEqual.text = context.getString(R.string.notification_action_pause_vpn).lowercase().replaceFirstChar { it.uppercase() }
 
         // set initial state of add button to disabled
         b.addSsidBtn.isEnabled = false
         b.addSsidBtn.isClickable = false
         b.addSsidBtn.setTextColor(UIUtils.fetchColor(context, R.attr.primaryLightColorText))
+    }
+
+    private fun getDescTxt(): String {
+        val pauseTxt = context.getString(R.string.notification_action_pause_vpn).lowercase().replaceFirstChar { it.uppercase() }
+        val connectTxt = context.getString(R.string.lbl_connect).lowercase().replaceFirstChar { it.uppercase() }
+        val firstArg = context.getString(R.string.two_argument, pauseTxt, connectTxt)
+        val secArg = context.getString(R.string.lbl_ssid)
+
+        val exactMatchTxt = context.getString(R.string.wg_ssid_type_exact).lowercase()
+        val partialMatchTxt = context.getString(R.string.wg_ssid_type_wildcard).lowercase()
+        val thirdArg = context.getString(R.string.two_argument, exactMatchTxt, partialMatchTxt)
+        return context.getString(R.string.wg_ssid_dialog_description, firstArg, secArg, thirdArg)
     }
 
     private fun setupRecyclerView() {
