@@ -15,10 +15,10 @@ class SsidAdapter(
 
     class SsidViewHolder(private val binding: ItemSsidBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(ssidItem: SsidItem, onDeleteClick: (SsidItem) -> Unit) {
-            binding.ssidNameText.text = ssidItem.name
-            binding.ssidTypeText.text = ssidItem.type.displayName
-
             val context = binding.root.context
+            binding.ssidNameText.text = ssidItem.name
+            binding.ssidTypeText.text = ssidItem.type.getDisplayName(context)
+
             val color = UIUtils.fetchColor(context, R.attr.accentBad)
             binding.ssidTypeText.setTextColor(color)
 

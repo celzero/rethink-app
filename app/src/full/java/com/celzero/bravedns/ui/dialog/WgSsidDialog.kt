@@ -23,7 +23,6 @@ import android.view.Window
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.addTextChangedListener
@@ -34,7 +33,6 @@ import com.celzero.bravedns.data.SsidItem
 import com.celzero.bravedns.databinding.DialogWgSsidBinding
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.text.replaceFirstChar
 
@@ -83,18 +81,34 @@ class WgSsidDialog(
         b.addSsidBtn.isEnabled = false
         b.addSsidBtn.isClickable = false
         b.addSsidBtn.setTextColor(UIUtils.fetchColor(context, R.attr.primaryLightColorText))
+
+        // listeners to update description text when radio buttons change
+        b.ssidConditionRadioGroup.setOnCheckedChangeListener { _, _ ->
+            updateDescriptionText()
+        }
+
+        b.ssidMatchTypeRadioGroup.setOnCheckedChangeListener { _, _ ->
+            updateDescriptionText()
+        }
     }
 
     private fun getDescTxt(): String {
+        val isEqual = b.radioEqual.isChecked
+        val isExact = b.radioExact.isChecked
+
         val pauseTxt = context.getString(R.string.notification_action_pause_vpn).lowercase().replaceFirstChar { it.uppercase() }
         val connectTxt = context.getString(R.string.lbl_connect).lowercase().replaceFirstChar { it.uppercase() }
-        val firstArg = context.getString(R.string.two_argument, pauseTxt, connectTxt)
+        val firstArg = if (isEqual) connectTxt else pauseTxt
         val secArg = context.getString(R.string.lbl_ssid)
 
         val exactMatchTxt = context.getString(R.string.wg_ssid_type_exact).lowercase()
         val partialMatchTxt = context.getString(R.string.wg_ssid_type_wildcard).lowercase()
-        val thirdArg = context.getString(R.string.two_argument, exactMatchTxt, partialMatchTxt)
+        val thirdArg = if (isExact) exactMatchTxt else partialMatchTxt
         return context.getString(R.string.wg_ssid_dialog_description, firstArg, secArg, thirdArg)
+    }
+
+    private fun updateDescriptionText() {
+        b.descriptionTextView.text = getDescTxt()
     }
 
     private fun setupRecyclerView() {

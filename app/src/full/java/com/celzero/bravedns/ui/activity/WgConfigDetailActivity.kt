@@ -414,9 +414,9 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         val since = stats?.since ?: 0L
         val isFailing = now - since > WG_UPTIME_THRESHOLD && lastOk == 0L
         return when (status) {
-            UIUtils.ProxyStatus.TOK -> if (isFailing) R.attr.chipTextNegative else R.attr.accentGood
-            UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> if (isFailing) R.attr.chipTextNegative else R.attr.chipTextNeutral
-            else -> R.attr.chipTextNegative // TNT, TKO, TEND
+            UIUtils.ProxyStatus.TOK -> if (isFailing) R.attr.chipTextNeutral else R.attr.accentGood
+            UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
+            else -> R.attr.chipTextNegative // TKO, TEND
         }
     }
 
@@ -902,7 +902,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 showSsidDisplay(editGroup, displayGroup)
             } else {
                 val displayText =
-                    ssidItems.joinToString(", ") { "${it.name} (${it.type.displayName})" }
+                    ssidItems.joinToString(", ") { "${it.name} (${it.type.getDisplayName(this)})" }
                 valueTv.text = displayText
                 showSsidDisplay(editGroup, displayGroup)
             }
@@ -956,7 +956,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                             showSsidDisplay(editGroup, displayGroup)
                         } else {
                             val displayText =
-                                list.joinToString(", ") { "${it.name} (${it.type.displayName})" }
+                                list.joinToString(", ") { "${it.name} (${it.type.getDisplayName(this@WgConfigDetailActivity)})" }
                             valueTv.text = displayText
                             showSsidDisplay(editGroup, displayGroup)
                         }

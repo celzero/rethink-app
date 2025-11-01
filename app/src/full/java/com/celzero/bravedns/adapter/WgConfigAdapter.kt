@@ -422,7 +422,7 @@ class WgConfigAdapter(private val context: Context, private val listener: DnsSta
                 UIUtils.ProxyStatus.TOK -> if (isFailing) R.attr.chipTextNegative else R.attr.accentGood
                 // treat TNT as neutral, for v055u (until fixed in go), as there is a scenario
                 // where idle is behaving as waiting
-                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> if (isFailing) R.attr.chipTextNegative else R.attr.chipTextNeutral
+                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
                 else -> R.attr.chipTextNegative // TKO, TEND
             }
         }

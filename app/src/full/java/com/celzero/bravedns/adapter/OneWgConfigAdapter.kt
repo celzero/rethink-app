@@ -264,9 +264,9 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             val since = stats?.since ?: 0L
             val isFailing = now - since > WG_UPTIME_THRESHOLD && lastOk == 0L
             return when (status) {
-                UIUtils.ProxyStatus.TOK -> if (isFailing) R.attr.chipTextNegative else R.attr.accentGood
-                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> if (isFailing) R.attr.chipTextNegative else R.attr.chipTextNeutral
-                else -> R.attr.chipTextNegative // TNT, TKO, TEND
+                UIUtils.ProxyStatus.TOK -> if (isFailing) R.attr.chipTextNeutral else R.attr.accentGood
+                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
+                else -> R.attr.chipTextNegative // TKO, TEND
             }
         }
 

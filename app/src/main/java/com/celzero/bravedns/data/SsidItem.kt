@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.data
 
+import android.content.Context
+import com.celzero.bravedns.R
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -23,11 +25,28 @@ data class SsidItem(
     val type: SsidType
 ) {
     // [{"name":"pgdd","type":"equal_wildcard"},{"name":"hhjhy","type":"equal_exact"},{"name":"test","type":"notequal_exact"}]
-    enum class SsidType(val id: String, val displayName: String, val isEqual: Boolean, val isExact: Boolean) {
-        EQUAL_EXACT("equal_exact", "Equal - Exact", true, true),
-        EQUAL_WILDCARD("equal_wildcard", "Equal - Wildcard", true, false),
-        NOTEQUAL_EXACT("notequal_exact", "Not Equal - Exact", false, true),
-        NOTEQUAL_WILDCARD("notequal_wildcard", "Not Equal - Wildcard", false, false);
+    enum class SsidType(val id: String, val isEqual: Boolean, val isExact: Boolean) {
+        EQUAL_EXACT("equal_exact", true, true),
+        EQUAL_WILDCARD("equal_wildcard", true, false),
+        NOTEQUAL_EXACT("notequal_exact", false, true),
+        NOTEQUAL_WILDCARD("notequal_wildcard", false, false);
+
+        fun getDisplayName(context: Context): String {
+            val actionText = if (isEqual) {
+                context.getString(R.string.lbl_connect)
+            } else {
+                context.getString(R.string.notification_action_pause_vpn).lowercase()
+                    .replaceFirstChar { it.uppercase() }
+            }
+
+            val matchTypeText = if (isExact) {
+                context.getString(R.string.wg_ssid_type_exact)
+            } else {
+                context.getString(R.string.wg_ssid_type_wildcard)
+            }
+
+            return "$actionText - $matchTypeText"
+        }
 
         companion object {
             fun fromIdentifier(identifier: String): SsidType {
