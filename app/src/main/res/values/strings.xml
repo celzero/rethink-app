@@ -1785,8 +1785,8 @@
     <string name="vpn_policy_sensitive_desc" translatable="true">Reacts to all network and connectivity changes.</string>
     <string name="vpn_policy_relaxed" translatable="true">Relaxed</string>
     <string name="vpn_policy_relaxed_desc" translatable="true">Reacts to interesting connectivity changes.</string>
-    <string name="vpn_policy_fixed" translatable="true">Fixed</string>
-    <string name="vpn_policy_fixed_desc" translatable="true">Uses fixed settings with jumbo packets and dual-stack IPv4 &amp; IPv6.</string>
+    <string name="vpn_policy_fixed" translatable="true">Conservative</string>
+    <string name="vpn_policy_fixed_desc" translatable="true">Reacts minimally to network changes.</string>
 
     <string name="vpn_policy_title" translatable="true">Connection change policy</string>
 
@@ -1887,11 +1887,11 @@
     <string name="wg_ssid_and_mobile_err" translatable="true">Cannot use both "%1$s" and "%2$s"</string>
 
     <!-- New SSID Dialog strings -->
-    <!--[Pause / Connect] this WireGuard VPN when active Wi-Fi Identifier (SSID) [matches exactly / matches partially]. -->
-    <string name="wg_ssid_dialog_description" translatable="true">[%1$s] this WireGuard VPN when <i>active</i> Wi-Fi Identifier (%2$s) [%3$s].</string>
+    <!--[Pause / Connect] this WireGuard VPN when active Wi-Fi Identifier (SSID) [exactly / partially]. -->
+    <string name="wg_ssid_dialog_description" translatable="true">%1$s this WireGuard VPN when <i>active</i> Wi-Fi Identifier (%2$s) %3$s.</string>
     <string name="wg_ssid_input_hint" translatable="true">Enter Wi-Fi identifier (%1$s)</string>
-    <string name="wg_ssid_type_exact" translatable="true">Matches exactly</string>
-    <string name="wg_ssid_type_wildcard" translatable="true">Matches partially</string>
+    <string name="wg_ssid_type_exact" translatable="true">Exactly</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Partially</string>
     <string name="wg_ssid_invalid_error" translatable="true">Wi-Fi identifiers (%1$s) must be 32 characters or less.</string>
     <string name="wg_ssid_delete_confirmation" translatable="true">Delete "%1$s"?</string>
 
