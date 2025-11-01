@@ -404,7 +404,9 @@ class ConnectionTrackerAdapter(private val context: Context) :
             if (ruleName == null) return false
             val rule = FirewallRuleset.getFirewallRule(ruleName) ?: return false
             val proxy = ProxyManager.isNotLocalAndRpnProxy(proxyDetails)
-            return FirewallRuleset.isProxied(rule) && proxyDetails.isNotEmpty() && proxy
+            // show key symbol in case of proxy error too
+            val isProxyError = FirewallRuleset.isProxyError(ruleName)
+            return (FirewallRuleset.isProxied(rule) && proxyDetails.isNotEmpty() && proxy) || isProxyError
         }
 
         private fun isRpnProxy(pid: String): Boolean {
