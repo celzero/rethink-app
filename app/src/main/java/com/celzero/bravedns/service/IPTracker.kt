@@ -209,7 +209,12 @@ internal constructor(
             val appInfo = Utilities.getApplicationInfo(ctx, packageName) ?: return ""
 
             Logger.i(LOG_TAG_FIREWALL, "app, $appName, not tracked by FirewallManager")
-            appName = ctx.packageManager.getApplicationLabel(appInfo).toString()
+            appName = try {
+                ctx.packageManager.getApplicationLabel(appInfo).toString()
+            } catch (_: Exception) {
+                // fallback if base.apk is not accessible
+                ctx.getString(R.string.network_log_app_name_unnamed, uid.toString())
+            }
         }
         return appName
     }

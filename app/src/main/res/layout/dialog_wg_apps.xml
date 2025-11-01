@@ -6,7 +6,7 @@
     android:background="?attr/background"
     android:padding="5dp">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/wg_include_app_dialog_heading"
         style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"
@@ -99,7 +99,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/wg_include_app_select_all_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

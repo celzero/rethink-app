@@ -31,6 +31,7 @@ import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
@@ -73,6 +74,11 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
     ): View {
         _binding = BottomSheetCustomIpsBinding.inflate(inflater, container, false)
         return b.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.useTransparentNoDimBackground()
     }
 
     override fun onDestroyView() {
@@ -476,7 +482,7 @@ class CustomIpRulesBtmSheet(private var ci: CustomIp) :
     }
 
     private fun showDialogForDelete() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.univ_firewall_dialog_title)
         builder.setMessage(R.string.univ_firewall_dialog_message)
         builder.setCancelable(true)

@@ -26,6 +26,8 @@ import com.android.billingclient.api.QueryProductDetailsParams
 import com.celzero.bravedns.iab.InAppBillingHandler.BestPlan
 import com.celzero.bravedns.iab.InAppBillingHandler.fetchPurchases
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.collections.filter
+import kotlin.collections.find
 import kotlin.coroutines.resume
 
 internal class QueryUtils(private val billingClient: BillingClient) {

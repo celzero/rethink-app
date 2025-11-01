@@ -16,6 +16,7 @@
 package com.celzero.bravedns.adapter
 
 import Logger.LOG_TAG_PROXY
+import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
@@ -42,7 +43,6 @@ import com.celzero.bravedns.service.WireguardManager.ERR_CODE_OTHER_WG_ACTIVE
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_ACTIVE
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_VPN_NOT_FULL
 import com.celzero.bravedns.service.WireguardManager.ERR_CODE_WG_INVALID
-import com.celzero.bravedns.service.WireguardManager.WG_HANDSHAKE_TIMEOUT
 import com.celzero.bravedns.service.WireguardManager.WG_UPTIME_THRESHOLD
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
@@ -66,8 +66,8 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
     }
 
     companion object {
-        private const val ONE_SEC = 1500L
-        private const val TAG = "OneWgConfigAdapter"
+        private const val DELAY_MS = 1500L
+        private const val TAG = "OneWgCfgAdapter"
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
 
@@ -115,7 +115,8 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         private var job: Job? = null
 
         fun update(config: WgConfigFiles) {
-            b.interfaceNameText.text = config.name.take(12)
+            b.interfaceNameText.text = config.name
+            b.interfaceNameText.isSelected = true
             b.interfaceIdText.text = context.getString(R.string.single_argument_parenthesis, config.id.toString())
             val isWgActive = config.isActive && VpnController.hasTunnel()
             b.oneWgCheck.isChecked = isWgActive
@@ -138,7 +139,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             job = io {
                 while (true) {
                     updateStatus(config)
-                    delay(ONE_SEC)
+                    delay(DELAY_MS)
                 }
             }
         }
@@ -258,10 +259,14 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
         }
 
         private fun getStrokeColorForStatus(status: UIUtils.ProxyStatus?, stats: RouterStats?): Int{
+            val now = System.currentTimeMillis()
+            val lastOk = stats?.lastOK ?: 0L
+            val since = stats?.since ?: 0L
+            val isFailing = now - since > WG_UPTIME_THRESHOLD && lastOk == 0L
             return when (status) {
-                UIUtils.ProxyStatus.TOK -> if (stats?.lastOK == 0L) R.attr.chipTextNeutral else R.attr.accentGood
-                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ -> R.attr.chipTextNeutral
-                else -> R.attr.chipTextNegative // TNT, TKO, TEND
+                UIUtils.ProxyStatus.TOK -> if (isFailing) R.attr.chipTextNeutral else R.attr.accentGood
+                UIUtils.ProxyStatus.TUP, UIUtils.ProxyStatus.TZZ, UIUtils.ProxyStatus.TNT -> R.attr.chipTextNeutral
+                else -> R.attr.chipTextNegative // TKO, TEND
             }
         }
 
@@ -297,14 +302,6 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
             }
         }
 
-        private fun getIdleStatusText(status: UIUtils.ProxyStatus?, stats: RouterStats?): String {
-            if (status != UIUtils.ProxyStatus.TZZ && status != UIUtils.ProxyStatus.TNT) return ""
-            if (stats == null || stats.lastOK == 0L) return ""
-            if (System.currentTimeMillis() - stats.since >= WG_HANDSHAKE_TIMEOUT) return ""
-
-            return context.getString(R.string.dns_connected).replaceFirstChar(Char::titlecase)
-        }
-
         private fun updateProxyStatusUi(statusPair: Pair<Long?, String>, stats: RouterStats?) {
             val status =
                 UIUtils.ProxyStatus.entries.find { it.id == statusPair.first } // Convert to enum
@@ -313,14 +310,7 @@ class OneWgConfigAdapter(private val context: Context, private val listener: Dns
 
             val strokeColor = getStrokeColorForStatus(status, stats)
             b.interfaceDetailCard.strokeColor = fetchColor(context, strokeColor)
-            val statusText = getIdleStatusText(status, stats).ifEmpty {
-                getStatusText(
-                    status,
-                    handshakeTime,
-                    stats,
-                    statusPair.second
-                )
-            }
+            val statusText = getStatusText(status, handshakeTime, stats, statusPair.second)
             b.interfaceStatus.text = statusText
         }
 

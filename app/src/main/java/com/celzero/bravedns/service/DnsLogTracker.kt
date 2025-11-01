@@ -90,7 +90,7 @@ internal constructor(
             } else {
                 summary.uid.toInt()
             }
-        } catch (ignored: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             Logger.w(LOG_TAG_VPN, "onQuery: invalid uid: ${summary.uid}, using default uid: $uid")
         }
 
@@ -117,6 +117,8 @@ internal constructor(
         transaction.upstreamBlock = summary.upstreamBlocks
         transaction.region = summary.region
         transaction.isCached = summary.cached
+        transaction.dnssecOk = summary.`do`
+        transaction.dnssecValid = summary.ad
         return transaction
     }
 
@@ -140,6 +142,8 @@ internal constructor(
         dnsLog.upstreamBlock = transaction.upstreamBlock
         dnsLog.region = transaction.region
         dnsLog.isCached = transaction.isCached
+        dnsLog.dnssecOk = transaction.dnssecOk
+        dnsLog.dnssecValid = transaction.dnssecValid
         val typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt())
         if (typeName == ResourceRecordTypes.UNKNOWN) {
             dnsLog.typeName = transaction.type.toString()

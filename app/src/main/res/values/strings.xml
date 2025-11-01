@@ -112,6 +112,10 @@
     <string name="lbl_ipinfo_inc" translatable="false">IPinfo Inc.</string>
     <string name="lbl_manual" translatable="true">Manual</string>
     <string name="lbl_fallback" translatable="true">Fallback</string>
+    <string name="lbl_default" translatable="true">Default</string>
+    <string name="lbl_action" translatable="true">Action</string>
+    <string name="lbl_connect" translatable="true">Connect</string>
+    <string name="lbl_criteria" translatable="true">Criteria</string>
 
     <string name="memory_notification_text">Rethink is experiencing low memory. System actions may be limited.</string>
 
@@ -149,8 +153,12 @@
     <string name="symbol_sky" translatable="false">⛅</string>
     <string name="symbol_max" translatable="false">🪂</string>
     <string name="symbol_duck" translatable="false">🦆</string>
-    <string name="symbol_mobile" translatable="false">📶</string>
+    <string name="symbol_diamond" translatable="false">🔷</string>
+    <string name="symbol_mobile" translatable="false">📱</string>
     <string name="symbol_satellite" translatable="false">🛰️</string>
+    <string name="symbol_id" translatable="false">🆔</string>
+    <string name="symbol_lock" translatable="false">🔒</string>
+    <string name="symbol_unlock" translatable="false">🔓</string>
 
     <string name="numeric_one" translatable="false">1</string>
     <string name="numeric_twenty_four" translatable="false">24</string>
@@ -628,6 +636,7 @@
     <string name="settings_theme_dialog_themes_4" translatable="true">True Black</string>
     <string name="settings_theme_dialog_themes_5" translatable="true">Light Plus</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">Dark Plus</string>
+    <string name="settings_theme_dialog_themes_7" translatable="true">Frost</string>
 
     <string name="settings_ip_dialog_title" translatable="true">Choose IP version</string>
     <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (default)</string>
@@ -721,7 +730,7 @@
     <string name="hsf_start_btn_state" translatable="true">start</string>
     <string name="hsf_stop_btn_state" translatable="true">stop</string>
 
-    <string name="hsf_uptime" translatable="false">(active %1$s; protos: %2$s; %3$s; mtu: %4$s)</string>
+    <string name="hsf_uptime" translatable="false">(active %1$s; protos: %2$s; %3$s; mtu: %4$s; ssid: %5$s)</string>
     <string name="hsf_downtime" translatable="true">(inactive since %1$s)</string>
 
     <string name="logs_card_duration" translatable="true">since %1$s</string>
@@ -756,7 +765,6 @@
     <string name="hsf_chip_appearance" translatable="true">Theme: %1$s</string>
     <string name="hsf_pause_vpn_failure" translatable="true">Cannot pause: Rethink not active</string>
 
-    <string name="lbl_background_data" translatable="true">Restricting Background data</string>
     <string name="lbl_battery_optimization" translatable="true">Battery optimization</string>
     <string name="battery_optimization_dialog_heading" translatable="true">Disable %1$s</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> may result in connectivity loss. Change setting to let Rethink use data and other resources when in background.</string>
@@ -822,7 +830,7 @@
     <string name="about_settings_notification" translatable="true">Notification Settings</string>
     <string name="about_whats_new" translatable="true">What\'s new in %1$s</string>
     <string name="about_twitter" translatable="true">Follow us on Twitter</string>
-    <string name="about_mozilla" translatable="true">Rethink is supported by Mozilla Builders, FOSS United Foundation.</string>
+    <string name="about_mozilla" translatable="true">Rethink is supported by Mozilla Builders, FOSS United Foundation, FLOSS/fund.</string>
     <string name="about_app_update_check" translatable="true">Check for app updates</string>
     <string name="about_app_contributors" translatable="true">Authors</string>
     <string name="about_app_translate" translatable="true">Translate</string>
@@ -841,6 +849,7 @@
     <string name="about_website_link" translatable="false">https://www.rethinkdns.com/</string>
     <string name="about_mozilla_alumni_link" translatable="false">https://builders.mozilla.community/old/alumni.html</string>
     <string name="about_foss_link" translatable="false">https://fossunited.org/grants</string>
+    <string name="about_floss_fund_link" translatable="false">https://floss.fund/projects/2025</string>
     <string name="about_translate_link" translatable="false">https://svc.rethinkdns.com/r/translate</string>
     <string name="about_privacy_policy_link" translatable="false">https://www.rethinkdns.com/privacy</string>
     <string name="about_terms_link" translatable="false">https://rethinkdns.com/terms</string>
@@ -1215,6 +1224,7 @@
     <string name="firewall_rule_bypass_proxy" translatable="true">Bypass Proxy</string>
     <string name="firewall_rule_paused_app" translatable="true">App Paused</string>
     <string name="firewall_rule_lockdown_wg" translatable="true">Lockdown Proxy</string>
+    <string name="firewall_rule_proxy_error" translatable="true">Proxy Error</string>
 
     <string name="firewall_rule_no_rule_desc" translatable="true">No firewall rules matched this connection.</string>
     <string name="firewall_rule_block_app_desc" translatable="true"><![CDATA[A user-set firewall rule blocked this <i>app</i>.<br/><br/> To change go to <i>All Apps</i> tab.]]></string>
@@ -1248,6 +1258,7 @@
     <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[This connection was allowed because the <i>source app</i> is set to <i>bypass proxy</i> rules.<br/><br/> To change go to <i>App-specific Firewall</i> screen.]]></string>
     <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[This connection was allowed because the <i>app</i> is in <i>paused</i> state.]]></string>
     <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[This connection was blocked because WireGuard is in <i>lockdown</i> mode.<br/><br/> To change go to <i>WireGuard</i> screen.]]></string>
+    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[This connection was blocked because the <i>proxy</i> selected for the app is not chosen.<br/><br/> To change go to <i>Proxy</i> from <i>Configure</i> screen.]]></string>
 
     <!-- New app install Notification -->
     <string name="new_app_bulk_notification_title" translatable="true">Attention</string>
@@ -1681,7 +1692,7 @@
 
     <string name="hop_error_toast_msg_1" translatable="true">Cannot relay, already %1$s</string>
     <string name="hop_error_toast_msg_2" translatable="true">No WireGuard available for relay; please add more.</string>
-    <string name="hop_error_toast_msg_3" translatable="true">Disable Mobile only to use Relays</string>
+    <string name="hop_error_toast_msg_3" translatable="true">Disable Mobile only or SSID to use Relays</string>
 
     <string name="mode_change_error_proxy_enabled" translatable="true">Cannot change modes when proxies are in use. Tap to &lt;u&gt;edit proxy settings&lt;/u&gt;.</string>
 
@@ -1703,7 +1714,7 @@
     <string name="hop_failure_notification_title" translatable="false">Relay Failure Notifications</string>
 
     <string name="wg_setting_use_on_mobile" translatable="true">Mobile only</string>
-    <string name="wg_setting_use_on_mobile_desc" translatable="true">Use this WireGuard exclusively over mobile data.</string>
+    <string name="wg_setting_use_on_mobile_desc" translatable="true">Use this WireGuard VPN over mobile data.</string>
 
     <string name="hop_add_remove_title" translatable="true">Add / Remove Relay</string>
 
@@ -1774,6 +1785,8 @@
     <string name="vpn_policy_sensitive_desc" translatable="true">Reacts to all network and connectivity changes.</string>
     <string name="vpn_policy_relaxed" translatable="true">Relaxed</string>
     <string name="vpn_policy_relaxed_desc" translatable="true">Reacts to interesting connectivity changes.</string>
+    <string name="vpn_policy_fixed" translatable="true">Conservative</string>
+    <string name="vpn_policy_fixed_desc" translatable="true">Reacts minimally to network changes.</string>
 
     <string name="vpn_policy_title" translatable="true">Connection change policy</string>
 
@@ -1858,6 +1871,50 @@
     <string name="alert_message_ip_domain_blocked" translatable="true">Rethink is blocking a connection</string>
     <string name="alert_actions_ip_domain_blocked" translatable="true">View</string>
     <string name="alert_solution_ip_domain_blocked" translatable="true">Rethink is blocking a connection</string>-->
-    <string name="title_database_dump" translatable="true">Database state</string>
+    <string name="title_database_dump" translatable="true">Database</string>
     <string name="copied_clipboard" translatable="true">Copied</string>
+
+    <string name="lbl_ssids" translatable="false">SSIDs</string>
+    <string name="lbl_ssid" translatable="false">SSID</string>
+
+    <string name="wg_setting_ssid_title" translatable="true">Wi‑Fi only</string>
+    <string name="wg_setting_ssid_desc" translatable="true">Enable this WireGuard VPN only when connected to Wi-Fi or specified WiFi identifiers (%1$s).</string>
+    <string name="ssid_permission_explanation" translatable="true">Rethink needs location permission to access Wi‑Fi identifiers (%1$s).</string>
+    <string name="location_enable_explanation" translatable="true">To access Wi‑Fi identifiers (%1$s), turn on Location service.</string>
+    <string name="ssid_location_error" translatable="true">Enable Location service</string>
+    <string name="ssid_permission_error_action" translatable="true">Grant permission</string>
+    <string name="ssid_location_error_action" translatable="true">Enable location</string>
+    <string name="wg_ssid_and_mobile_err" translatable="true">Cannot use both "%1$s" and "%2$s"</string>
+
+    <!-- New SSID Dialog strings -->
+    <!--[Pause / Connect] this WireGuard VPN when active Wi-Fi Identifier (SSID) [exactly / partially]. -->
+    <string name="wg_ssid_dialog_description" translatable="true">%1$s this WireGuard VPN when <i>active</i> Wi-Fi Identifier (%2$s) %3$s.</string>
+    <string name="wg_ssid_input_hint" translatable="true">Enter Wi-Fi identifier (%1$s)</string>
+    <string name="wg_ssid_type_exact" translatable="true">Exactly</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Partially</string>
+    <string name="wg_ssid_invalid_error" translatable="true">Wi-Fi identifiers (%1$s) must be 32 characters or less.</string>
+    <string name="wg_ssid_delete_confirmation" translatable="true">Delete "%1$s"?</string>
+
+    <string name="settings_firebase_error_reporting_heading" translatable="true">Stability program</string>
+    <string name="settings_firebase_error_reporting_desc" translatable="true">Capture error logs to help improve stability. </string>
+
+    <string name="tombstone_app_title" translatable="true">Remember uninstalled apps</string>
+    <string name="tombstone_app_desc" translatable="true">When enabled, keep app rules for 7 days.</string>
+
+    <string name="settings_locale_dialog_default" translatable="true">System default</string>
+
+    <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P</string>
+    <string name="settings_allow_incoming_wg_packets_desc" translatable="true">When enabled, allow incoming connections initiated by WireGuard peers.</string>
+
+    <string name="lockdown_download_message" translatable="true">Android\'s built-in <i>Download Manager</i> may fail as VPN is in <i>Lockdown</i> mode. Enable Rethink\'s downloader instead?</string>
+    <string name="lockdown_download_enable_inapp" translatable="true">Enable Downloader</string>
+
+    <string name="settings_jumbo_packets" translatable="true">Bandwidth booster</string>
+    <string name="settings_jumbo_packets_desc" translatable="true">Uses <i>jumbo packets</i> within Rethink\'s VPN tunnel.</string>
+
+    <string name="settings_tunnel_metered" translatable="true">Always metered</string>
+    <string name="settings_tunnel_metered_desc" translatable="true">Mark Rethink\'s VPN tunnel as metered to instruct apps to consume less data. Caution: This may cause apps to pause large uploads &amp; downloads, like backups.</string>
+
+    <string name="stability_program_toast" translatable="true">Enrolled to the <i>stability program</i> for <i>experimental features</i>.</string>
+
 </resources>

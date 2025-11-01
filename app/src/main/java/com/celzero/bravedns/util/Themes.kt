@@ -15,7 +15,24 @@
  */
 package com.celzero.bravedns.util
 
+import Logger.LOG_TAG_UI
+import android.app.Dialog
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
+import android.os.Build
+import android.view.View
+import android.view.WindowManager
+import androidx.annotation.ColorInt
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDialog
+import androidx.appcompat.content.res.AppCompatResources
 import com.celzero.bravedns.R
+import com.celzero.bravedns.util.Utilities.isAtleastR
+import com.celzero.bravedns.util.Utilities.isAtleastS
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import java.util.function.Consumer
+import androidx.core.graphics.drawable.toDrawable
 
 // Application themes enum
 enum class Themes(val id: Int) {
@@ -24,11 +41,32 @@ enum class Themes(val id: Int) {
     DARK(2),
     TRUE_BLACK(3),
     LIGHT_PLUS(4),
-    DARK_PLUS(5);
+    DARK_PLUS(5),
+    DARK_FROST(6);
 
     companion object {
         fun getThemeCount(): Int {
             return entries.count()
+        }
+
+        fun getAvailableThemeCount(): Int {
+            return if (isAtleastS()) {
+                entries.count()
+            } else {
+                // Exclude LIGHT_FROST and DARK_FROST for pre-Android S devices
+                entries.count() - 2
+            }
+        }
+
+        fun isFrostTheme(id: Int): Boolean {
+            return id == DARK_FROST.id
+        }
+
+        fun isThemeAvailable(id: Int): Boolean {
+            if (isFrostTheme(id)) {
+                return isAtleastS()
+            }
+            return true
         }
 
         fun getTheme(id: Int): Int {
@@ -39,6 +77,7 @@ enum class Themes(val id: Int) {
                 TRUE_BLACK.id -> R.style.AppThemeTrueBlack
                 LIGHT_PLUS.id -> R.style.AppThemeWhitePlus
                 DARK_PLUS.id -> R.style.AppThemeTrueBlackPlus
+                DARK_FROST.id -> R.style.AppThemeTrueBlackFrost
                 else -> 0
             }
         }
@@ -51,11 +90,18 @@ enum class Themes(val id: Int) {
                 TRUE_BLACK.id -> R.style.BottomSheetDialogThemeTrueBlack
                 LIGHT_PLUS.id -> R.style.BottomSheetDialogThemeWhitePlus
                 DARK_PLUS.id -> R.style.BottomSheetDialogThemeTrueBlackPlus
+                // for now use same as dark, can be changed later
+                DARK_FROST.id -> R.style.BottomSheetDialogThemeTrueBlack
                 else -> 0
             }
         }
 
         fun getCurrentTheme(isDarkThemeOn: Boolean, theme: Int): Int {
+            // If Frost themes are requested on pre-Android S, fallback to appropriate theme
+            if (isFrostTheme(theme) && !isAtleastS()) {
+                return getTheme(DARK_FROST.id)
+            }
+
             return if (theme == SYSTEM_DEFAULT.id) {
                 if (isDarkThemeOn) {
                     getTheme(TRUE_BLACK.id)
@@ -70,12 +116,19 @@ enum class Themes(val id: Int) {
                 getTheme(theme)
             } else if (theme == DARK_PLUS.id) {
                 getTheme(theme)
+            } else if (theme == DARK_FROST.id) {
+                getTheme(theme)
             } else {
                 getTheme(TRUE_BLACK.id)
             }
         }
 
         fun getBottomsheetCurrentTheme(isDarkThemeOn: Boolean, theme: Int): Int {
+            // If Frost themes are requested on pre-Android S, fallback to appropriate theme
+            if (isFrostTheme(theme) && !isAtleastS()) {
+                return getBottomSheetTheme(TRUE_BLACK.id)
+            }
+
             return if (theme == SYSTEM_DEFAULT.id) {
                 if (isDarkThemeOn) {
                     getBottomSheetTheme(TRUE_BLACK.id)
@@ -89,6 +142,8 @@ enum class Themes(val id: Int) {
             } else if (theme == LIGHT_PLUS.id) {
                 getBottomSheetTheme(theme)
             } else if (theme == DARK_PLUS.id) {
+                getBottomSheetTheme(theme)
+            } else if (theme == DARK_FROST.id) {
                 getBottomSheetTheme(theme)
             } else {
                 getBottomSheetTheme(TRUE_BLACK.id)

@@ -8,10 +8,7 @@
         android:id="@+id/wg_hop_list_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectedCardBg"
-        app:cardCornerRadius="4dp"
-        app:cardElevation="4dp"
-        app:cardUseCompatPadding="true">
+        android:background="?attr/selectedCardBg">
 
         <RelativeLayout
             android:id="@+id/wg_hop_list_container"
@@ -30,7 +27,7 @@
                 android:layout_toStartOf="@id/wg_hop_list_checkbox"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/wg_hop_list_name_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -41,7 +38,7 @@
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/wg_hop_list_desc_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -127,7 +124,7 @@
                         android:layout_height="wrap_content"
                         android:alpha="0.8"
                         android:checked="true"
-                        android:text="@string/lbl_hop"
+                        android:text="@string/lbl_hopping"
                         android:textAlignment="center"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"
@@ -142,7 +139,22 @@
                         android:layout_height="wrap_content"
                         android:alpha="0.8"
                         android:checked="true"
-                        android:text="@string/lbl_hopping"
+                        android:text="@string/cd_dns_crypt_relay_heading"
+                        android:textAlignment="center"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/small_font_text_view"
+                        android:visibility="gone"
+                        app:chipStrokeColor="?attr/accentGood"
+                        app:chipStrokeWidth="1.5dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_properties"
+                        style="@style/ThinnerChip.Action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.8"
+                        android:checked="true"
+                        android:text="@string/settings_ip_text_ipv4"
                         android:textAlignment="center"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/small_font_text_view"

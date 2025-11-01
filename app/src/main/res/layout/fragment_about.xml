@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/background"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     app:layout_scrollFlags="scroll|enterAlways">
 
@@ -43,10 +42,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -208,7 +204,7 @@
                         android:layout_centerVertical="true"
                         android:padding="2dp" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
@@ -622,6 +618,46 @@
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_app_notification"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_notification"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_settings_notification"
+                android:textSize="@dimen/large_font_text_view" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/title_stats"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="54dp"
+                android:fontFamily="sans-serif-smallcaps"
+                android:gravity="center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/title_statistics"
+                android:textColor="?attr/accentGood"
+                android:textSize="@dimen/extra_large_font_text_view"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/about_stats"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
@@ -654,21 +690,20 @@
                 android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/about_app_notification"
+                android:id="@+id/about_battery_stats"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:background="?android:attr/selectableItemBackground"
-                android:drawableStart="@drawable/ic_notification"
+                android:drawableStart="@drawable/ic_battery_stats"
                 android:drawablePadding="20dp"
                 android:gravity="start|center_vertical"
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
-                android:text="@string/about_settings_notification"
+                android:text="Battery"
                 android:textSize="@dimen/large_font_text_view" />
-
 
         </LinearLayout>
 
@@ -696,6 +731,14 @@
                 android:contentDescription="@string/about_mozilla"
                 app:srcCompat="@drawable/foss_logo" />
 
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/floss_funds_img"
+                android:layout_width="160dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/about_mozilla"
+                app:srcCompat="@drawable/ic_floss_fund_badge" />
+
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -721,6 +764,20 @@
             android:textIsSelectable="true"
             android:textSize="@dimen/small_font_text_view"
             android:typeface="monospace" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/token_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:alpha="0.75"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textIsSelectable="true"
+            android:typeface="monospace"
+            android:textSize="@dimen/small_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/about_license"

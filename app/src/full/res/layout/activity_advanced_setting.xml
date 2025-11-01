@@ -13,7 +13,7 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/settings_heading"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
@@ -31,10 +31,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true">
+            android:clipToPadding="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -42,63 +39,6 @@
                 android:orientation="vertical"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp">
-
-                <RelativeLayout
-                    android:id="@+id/settings_anti_censorship_rl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:paddingTop="15dp"
-                    android:paddingBottom="15dp">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/settings_anti_censorship_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_anti_dpi" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/settings_activity_anti_censorship_img"
-                        android:layout_toEndOf="@id/settings_anti_censorship_icon"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/gen_settings_anti_censorship_txt"
-                            style="@style/TextAppearance.AppCompat.Subhead"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/anti_censorship_title"
-                            android:textSize="@dimen/large_font_text_view" />
-
-                        <TextView
-                            android:id="@+id/gen_settings_anti_censorship_desc"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:text="@string/anti_censorship_desc"
-                            android:textSize="@dimen/default_font_text_view" />
-                    </LinearLayout>
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/settings_activity_anti_censorship_img"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginEnd="10dp"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_right_arrow_white" />
-
-                </RelativeLayout>
 
                 <RelativeLayout
                     android:id="@+id/settings_experimental_rl"
@@ -128,7 +68,7 @@
                         android:layout_toEndOf="@id/settings_experimental_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_experimental_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -136,7 +76,7 @@
                             android:text="@string/adv_set_experimental_title"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_experimental_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -185,7 +125,7 @@
                         android:layout_toEndOf="@id/settings_auto_dial_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_auto_dial_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -193,7 +133,7 @@
                             android:text="@string/set_auto_dial_title"
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_auto_dial_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -213,17 +153,69 @@
 
                 </RelativeLayout>
 
+                <RelativeLayout
+                    android:id="@+id/settings_panic_rand_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/settings_panic_rand_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_filter_error" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/dv_panic_rand_switch"
+                        android:layout_toEndOf="@id/settings_panic_rand_icon"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/settings_panic_rand_txt"
+                            style="@style/TextAppearance.AppCompat.Subhead"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Randomly Panic"
+                            android:textSize="@dimen/large_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/settings_panic_rand_desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="5dp"
+                            android:text="Enable random panic in tunnel."
+                            android:textSize="@dimen/default_font_text_view" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/dv_panic_rand_switch"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:padding="10dp" />
+
+                </RelativeLayout>
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
-            android:visibility="gone"
-            app:cardUseCompatPadding="true">
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -262,7 +254,7 @@
                         android:layout_toEndOf="@id/settings_clear_residue_icon"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_clear_residue_txt"
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
@@ -270,7 +262,7 @@
                             android:text=""
                             android:textSize="@dimen/large_font_text_view" />
 
-                        <TextView
+                        <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/gen_settings_clear_residue_desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

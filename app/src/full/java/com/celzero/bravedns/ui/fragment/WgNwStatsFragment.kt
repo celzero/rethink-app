@@ -27,16 +27,11 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgNwStatsAdapter
 import com.celzero.bravedns.data.DataUsageSummary
-import com.celzero.bravedns.databinding.FragmentDnsCryptListBinding
 import com.celzero.bravedns.databinding.FragmentWgNwStatsBinding
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity.Companion.RULES_SEARCH_ID_WIREGUARD
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import com.celzero.bravedns.viewmodel.WgNwActivityViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -228,7 +223,7 @@ class WgNwStatsFragment : Fragment(R.layout.fragment_wg_nw_stats) {
 
     private fun showErrorDialog() {
         // Show error dialog
-        val dialog = MaterialAlertDialogBuilder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
             .setTitle(getString(R.string.lbl_wireguard))
             .setMessage(getString(R.string.config_invalid_desc))
             .setPositiveButton(R.string.fapps_info_dialog_positive_btn) { _, _ ->

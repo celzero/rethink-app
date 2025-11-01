@@ -48,6 +48,7 @@ import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.useTransparentNoDimBackground
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -81,6 +82,11 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
     ): View {
         _binding = BottomSheetOrbotBinding.inflate(inflater, container, false)
         return b.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.useTransparentNoDimBackground()
     }
 
     override fun onDestroyView() {
@@ -373,7 +379,6 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
 
     private fun openAppsDialog() {
         // treat proxyId and proxyName of Orbot as base
-        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         val appsAdapter =
             WgIncludeAppsAdapter(
                 requireContext(),
@@ -382,6 +387,10 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
             )
         mappingViewModel.apps.observe(this.viewLifecycleOwner) {
             appsAdapter.submitData(lifecycle, it)
+        }
+        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        if (Themes.isFrostTheme(themeId)) {
+            themeId = R.style.App_Dialog_NoDim
         }
         val includeAppsDialog =
             WgIncludeAppsDialog(
@@ -519,7 +528,7 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showStopOrbotDialog(isOrbotDns: Boolean) {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(getString(R.string.orbot_stop_dialog_title))
 
         builder.setCancelable(true)

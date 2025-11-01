@@ -74,7 +74,7 @@
                     android:layout_weight="0.65"
                     android:orientation="horizontal">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/dns_query_type"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -193,7 +193,7 @@
                     android:layout_weight="0.20"
                     android:orientation="vertical">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/dns_wall_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -263,7 +263,7 @@
                     android:layout_weight="0.2"
                     android:orientation="vertical">
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/dns_latency"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -300,7 +300,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?attr/divider" />

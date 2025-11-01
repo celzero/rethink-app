@@ -14,12 +14,47 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.rpnproxy
+/*
+import Logger.LOG_TAG_PROXY
+import android.content.Context
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.database.RpnProxy
+import com.celzero.bravedns.database.RpnProxyRepository
+import kotlin.collections.find
 
+import com.celzero.bravedns.database.SubscriptionStateHistoryDao
+import com.celzero.bravedns.database.SubscriptionStatus
+import com.celzero.bravedns.database.SubscriptionStatusRepository
+import com.celzero.bravedns.iab.InAppBillingHandler
+import com.celzero.bravedns.iab.PurchaseDetail
+import com.celzero.bravedns.scheduler.WorkScheduler
+import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.EncryptedFileManager
+import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.subscription.StateMachineStatistics
+import com.celzero.bravedns.subscription.SubscriptionStateMachineV2
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.RPN_PROXY_FOLDER_NAME
+import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.Utilities
+import com.celzero.firestack.backend.Backend
+import com.celzero.firestack.backend.RpnServers
+import com.celzero.firestack.settings.Settings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
+import org.json.JSONObject
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import java.io.File
+import java.time.Instant
+import java.util.concurrent.CopyOnWriteArraySet
 
 object RpnProxyManager : KoinComponent {
-/*
-
     private val applicationContext: Context by inject()
 
     private const val TAG = "RpnMgr"
@@ -602,13 +637,13 @@ object RpnProxyManager : KoinComponent {
         return sb.toString()
     }
 
-    */
-/**
+
+    /**
      * Validate the payload received from Play Billing.
      * The payload is expected to be in the format: "accountId:session_token"
      * where accountId is the account ID from PipKeyManager and hashkey represents the user
      * session_token created during the purchase by server
-     *//*
+     */
 
     suspend fun isValidPayload(payload: String): Boolean {
         if (payload.isEmpty()) {
@@ -894,6 +929,10 @@ object RpnProxyManager : KoinComponent {
     }
 
     fun hasValidSubscription(): Boolean {
+        if (DEBUG) {
+            persistentState.rpnState = RpnState.ENABLED.id
+            return true // temporarily always return true
+        }
         val valid = subscriptionStateMachine.hasValidSubscription()
         Logger.i(LOG_TAG_PROXY, "$TAG; using state machine for subscription check, valid: $valid")
         return valid
@@ -1051,6 +1090,7 @@ object RpnProxyManager : KoinComponent {
     private fun io(f: suspend () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch { f() }
     }
-*/
+
 
 }
+*/

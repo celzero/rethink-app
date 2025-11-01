@@ -64,8 +64,9 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                 override fun areItemsTheSame(prev: DnsLog, curr: DnsLog) =
                     prev.id == curr.id
 
-                override fun areContentsTheSame(prev: DnsLog, curr: DnsLog) =
-                    prev == curr
+                override fun areContentsTheSame(prev: DnsLog, curr: DnsLog): Boolean {
+                    return prev == curr
+                }
             }
     }
 
@@ -183,7 +184,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                         b.dnsUnicodeHint.text,
                         context.getString(R.string.symbol_bunny)
                     )
-            } else if (isConnectionProxied(log.resolver)) {
+            } else if (isConnectionProxied(log.proxyId)) {
                 b.dnsUnicodeHint.text =
                     context.getString(
                         R.string.ci_desc,
@@ -200,13 +201,21 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                         b.dnsUnicodeHint.text,
                         getRethinkUnicode(log)
                     )
-            } else if (isInternalResolverUsed(log)) {
+            } else if (isGoosOrSystemUsed(log)) {
                 // show duck icon in case of system or goos transport
                 b.dnsUnicodeHint.text =
                     context.getString(
                         R.string.ci_desc,
                         b.dnsUnicodeHint.text,
                         context.getString(R.string.symbol_duck)
+                    )
+            } else if (isDefaultResolverUsed(log)) {
+                // show globe icon in case of default or bootstrap resolver
+                b.dnsUnicodeHint.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.dnsUnicodeHint.text,
+                        context.getString(R.string.symbol_diamond)
                     )
             } else if (containsMultipleIPs(log)) {
                 b.dnsUnicodeHint.text =
@@ -217,11 +226,43 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                     )
             }
 
+            if (dnssecIndicatorRequired(log)) {
+                if (dnssecOk(log)) {
+                    b.dnsUnicodeHint.text =
+                        context.getString(
+                            R.string.ci_desc,
+                            b.dnsUnicodeHint.text,
+                            context.getString(R.string.symbol_lock)
+                        )
+                } else {
+                    b.dnsUnicodeHint.text =
+                        context.getString(
+                            R.string.ci_desc,
+                            b.dnsUnicodeHint.text,
+                            context.getString(R.string.symbol_unlock)
+                        )
+                }
+            }
+
             if (b.dnsUnicodeHint.text.isEmpty() && b.dnsQueryType.text.isEmpty()) {
                 b.dnsSummaryLl.visibility = View.GONE
             } else {
                 b.dnsSummaryLl.visibility = View.VISIBLE
             }
+        }
+
+        private fun dnssecIndicatorRequired(log: DnsLog): Boolean {
+            // dnssec indicator is shown only for complete transactions
+            if (log.status != Transaction.Status.COMPLETE.name) {
+                return false
+            }
+
+            return log.dnssecOk || log.dnssecValid
+        }
+
+        private fun dnssecOk(log: DnsLog): Boolean {
+            // dnssec ok is true only when both dnssecOk and dnssecValid are true
+            return log.dnssecOk && log.dnssecValid
         }
 
         private fun isRoundTripShorter(rtt: Long, blocked: Boolean): Boolean {
@@ -235,7 +276,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
         private fun isConnectionProxied(proxy: String?): Boolean {
             if (proxy.isNullOrEmpty()) return false
 
-            return !ProxyManager.isNotLocalAndRpnProxy(proxy)
+            return ProxyManager.isNotLocalAndRpnProxy(proxy)
         }
 
         private fun containsMultipleIPs(log: DnsLog): Boolean {
@@ -257,13 +298,21 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
             }
         }
 
-        private fun isInternalResolverUsed(log: DnsLog): Boolean {
+        private fun isGoosOrSystemUsed(log: DnsLog): Boolean {
             if (log.status != Transaction.Status.COMPLETE.name) {
                 return false
             }
 
-            return log.resolverId.contains(Backend.Goos) || log.resolverId.contains(Backend.Default) ||
-                    log.resolverId.contains(Backend.System) || log.resolverId.contains(Backend.Bootstrap)
+            return log.resolverId.contains(Backend.Goos) || log.resolverId.contains(Backend.System)
+        }
+
+        private fun isDefaultResolverUsed(log: DnsLog): Boolean {
+            if (log.status != Transaction.Status.COMPLETE.name) {
+                return false
+            }
+
+            // ideally bootstrap will not be sent from go-tun, just in case check for it
+            return log.resolverId.contains(Backend.Default) || log.resolverId.contains(Backend.Bootstrap)
         }
 
         private fun getRethinkUnicode(log: DnsLog): String {
@@ -393,8 +442,8 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                             }
                         }
                     )
-            } catch (ignored: Exception) {
-                Logger.d(LOG_TAG_DNS, "Error loading icon, load flag instead")
+            } catch (_: Exception) {
+                Logger.d(LOG_TAG_DNS, "err loading icon, load flag instead")
                 displayDuckduckgoFavIcon(duckduckGoUrl, duckduckgoDomainURL)
             }
         }
@@ -440,7 +489,7 @@ class DnsLogAdapter(val context: Context, val loadFavIcon: Boolean, val isRethin
                             }
                         }
                     )
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 Logger.d(LOG_TAG_DNS, "$TAG err loading icon, load flag instead")
                 showFlag()
                 hideFavIcon()

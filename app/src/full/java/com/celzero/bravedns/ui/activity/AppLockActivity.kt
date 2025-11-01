@@ -38,6 +38,7 @@ import com.celzero.bravedns.ui.LauncherSwitcher
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import org.koin.android.ext.android.inject
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
@@ -62,8 +63,11 @@ class AppLockActivity : AppCompatActivity(R.layout.activity_app_lock) {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
+
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
             controller.isAppearanceLightNavigationBars = false
@@ -160,6 +164,7 @@ class AppLockActivity : AppCompatActivity(R.layout.activity_app_lock) {
         val intent = Intent(this, HomeScreenActivity::class.java)
         // Use a specific combination of flags that will maintain the proper back stack
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        intent.setPackage(this.packageName)
         intent.putExtras(this.intent)
         startActivity(intent)
         finish()
@@ -176,7 +181,7 @@ class AppLockActivity : AppCompatActivity(R.layout.activity_app_lock) {
         return try {
             val uiModeManager: UiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
             uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             false
         }
     }

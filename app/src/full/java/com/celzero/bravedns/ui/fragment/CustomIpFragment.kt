@@ -38,7 +38,6 @@ import com.celzero.bravedns.databinding.FragmentCustomIpBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
-import com.celzero.bravedns.ui.bottomsheet.CustomIpRulesBtmSheet
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.CustomLinearLayoutManager
@@ -218,7 +217,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
      */
     private fun showAddIpDialog() {
         val dBind = DialogAddCustomIpBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext()).setView(dBind.root)
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim).setView(dBind.root)
         val lp = WindowManager.LayoutParams()
         val dialog = builder.create()
         dialog.show()
@@ -324,7 +323,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     }
 
     private fun showIpRulesDeleteDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.univ_delete_firewall_dialog_title)
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->

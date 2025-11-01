@@ -76,6 +76,10 @@ class ProxyAppMappingRepository(
     }
 
     suspend fun tombstoneApp(oldUid: Int, newUid: Int) {
-        proxyApplicationMappingDAO.tombstoneApp(oldUid, newUid)
+        try {
+            proxyApplicationMappingDAO.tombstoneApp(oldUid, newUid)
+        } catch (_: Exception) {
+            // catch the exception to avoid crash
+        }
     }
 }

@@ -16,6 +16,9 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
@@ -52,6 +55,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val PROTOCOL_TRANSLATION = "protocol_translation"
         const val DEFAULT_DNS_SERVER = "default_dns_query"
         const val PCAP_MODE = "pcap_mode"
+        const val PCAP_FILE_PATH = "pcap_file_path"
         const val REMOTE_BLOCKLIST_UPDATE = "remote_block_list_downloaded_time"
         const val DNS_ALG = "dns_alg"
         const val APP_VERSION = "app_version"
@@ -74,6 +78,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val AUTO_DIALS_PARALLEL = "auto_dials_parallel"
         const val STALL_ON_NO_NETWORK = "fail_open_on_no_network"
         const val TUN_NETWORK_POLICY = "tun_network_handling_policy"
+        const val USE_MAX_MTU = "use_max_mtu"
+        const val SET_VPN_BUILDER_TO_METERED = "set_vpn_builder_to_metered"
+        const val PANIC_RANDOM = "panic_random"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -213,6 +220,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var customDownloaderLastGeneratedId by
         longPref("custom_downloader_last_generated_id").withDefault<Long>(0)
 
+    // android download manager's active download ids (comma-separated)
+    var androidDownloadManagerIds by
+        stringPref("android_download_manager_ids").withDefault<String>("")
+
     // local timestamp for which the update is available
     var newestLocalBlocklistTimestamp by
         longPref("local_blocklist_update_ts").withDefault<Long>(INIT_TIME_MS)
@@ -271,6 +282,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // packet capture type
     var pcapMode by intPref("pcap_mode").withDefault<Int>(PcapMode.NONE.id)
+
+    // packet capture file path
+    var pcapFilePath by stringPref("pcap_file_path").withDefault<String>("")
 
     // dns caching in tunnel
     var enableDnsCache by booleanPref("dns_cache").withDefault<Boolean>(true)
@@ -381,11 +395,30 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var newSettingsSeen by stringPref("new_settings_seen").withDefault<String>("")
     var appUpdateTimeTs by longPref("app_update_time_ts").withDefault<Long>(INIT_TIME_MS)
 
-    // 0 - auto, 1 - relaxed, 2 - aggressive
+    // 0 - auto, 1 - relaxed, 2 - aggressive, 3 - fixed
     var vpnBuilderPolicy by intPref("tun_network_handling_policy").withDefault<Int>(0)
 
     // whether to use default dns for trusted ips and domains
     var useFallbackDnsToBypass by booleanPref("use_fallback_dns_to_bypass").withDefault<Boolean>(true)
+
+    // Firebase error reporting enabled (only for play and website variants)
+    var firebaseErrorReportingEnabled by booleanPref("firebase_error_reporting").withDefault<Boolean>(Utilities.isPlayStoreFlavour())
+
+    // setting to enable/disable tombstone apps feature
+    var tombstoneApps by booleanPref("tombstone_apps").withDefault<Boolean>(false)
+
+    // Token for Firebase userId
+    var firebaseUserToken by stringPref("firebase_user_token").withDefault("")
+    var firebaseUserTokenTimestamp by longPref("firebase_user_token_timestamp").withDefault(0L)
+
+    // experimental feature to use max mtu
+    var useMaxMtu by booleanPref("use_max_mtu").withDefault<Boolean>(false)
+
+    // set vpn builder to metered/unmetered
+    var setVpnBuilderToMetered by booleanPref("set_vpn_builder_to_metered").withDefault<Boolean>(false)
+
+    // debug settings, panic random
+    var panicRandom by booleanPref("panic_random").withDefault<Boolean>(false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
@@ -555,5 +588,26 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
             }
         proxyStatus.postValue(status)
         return proxyStatus
+    }
+
+    /**
+     * Enable settings which are dependent on stability program participation.
+     * Currently, only Firebase error reporting is enabled here.
+     */
+    fun enableStabilityDependentSettings(context: Context) {
+        // Skip for fdroid flavor
+        if (Utilities.isFdroidFlavour()) {
+            return
+        }
+
+        // Enable Firebase error reporting for play and website variants
+        if (!firebaseErrorReportingEnabled) {
+            firebaseErrorReportingEnabled = true
+            Handler(Looper.getMainLooper()).post {
+                Toast.makeText(context, context.getString(R.string.stability_program_toast), Toast.LENGTH_LONG).show()
+            }
+        }
+
+        return
     }
 }

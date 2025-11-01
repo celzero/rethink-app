@@ -14,7 +14,7 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/info_rules_dialog_rules_desc"
             style="@style/Widget.AppCompat.TextView.SpinnerItem"
             android:layout_width="wrap_content"
@@ -33,7 +33,7 @@
             android:layout_marginTop="5dp"
             android:background="?attr/primaryLightColorText" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -46,7 +46,7 @@
             android:textSize="@dimen/large_font_text_view"
             app:drawableStartCompat="@drawable/ic_firewall_wifi_on_grey" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -59,7 +59,7 @@
             android:textSize="@dimen/large_font_text_view"
             app:drawableStartCompat="@drawable/ic_firewall_data_on_grey" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -72,7 +72,7 @@
             android:textSize="@dimen/large_font_text_view"
             app:drawableStartCompat="@drawable/ic_firewall_bypass_off" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -85,7 +85,7 @@
             android:textSize="@dimen/large_font_text_view"
             app:drawableStartCompat="@drawable/ic_bypass_dns_firewall_off" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -98,7 +98,7 @@
             android:textSize="@dimen/large_font_text_view"
             app:drawableStartCompat="@drawable/ic_firewall_exclude_off" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"

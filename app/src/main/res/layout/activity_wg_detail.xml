@@ -23,9 +23,6 @@
                 android:id="@+id/interface_detail_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
-                app:cardUseCompatPadding="true"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -42,27 +39,34 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:baselineAligned="false"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent">
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/config_name_text"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:paddingTop="5dp"
-                            android:text=""
                             android:textAppearance="?attr/textAppearanceHeadline6"
-                            android:textColor="?attr/primaryTextColor" />
+                            android:textColor="?attr/primaryTextColor"
+                            android:ellipsize="none"
+                            android:singleLine="false"
+                            android:scrollHorizontally="false"
+                            android:inputType="textMultiLine" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/config_id_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
+                            android:layout_gravity="center_vertical"
                             android:layout_marginStart="2dp"
                             android:layout_marginEnd="3dp"
                             android:alpha="0.7"
-                            android:maxLength="5" />
+                            android:maxEms="5"
+                            android:ellipsize="end"
+                            android:singleLine="true" />
 
                     </LinearLayout>
 
@@ -207,6 +211,73 @@
                         app:layout_constraintTop_toBottomOf="@+id/mtu_label"
                         tools:text="1500" />
 
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/applications_btn"
+                        style="@style/Widget.AppCompat.Button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginEnd="15dp"
+                        android:alpha="0.75"
+                        android:background="@drawable/rectangle_border_background"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center"
+                        android:padding="15dp"
+                        android:text="@string/add_remove_apps"
+                        android:textColor="?attr/secondaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/mtu_text"
+                        app:rippleColor="?attr/secondaryTextColor" />
+
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/hop_btn"
+                        style="@style/Widget.AppCompat.Button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="15dp"
+                        android:alpha="0.75"
+                        android:background="@drawable/rectangle_border_background"
+                        android:drawablePadding="10dp"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:foregroundGravity="center"
+                        android:gravity="center"
+                        android:padding="15dp"
+                        android:text="@string/hop_add_remove_title"
+                        android:textColor="?attr/secondaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/applications_btn" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/logs_btn"
+                        style="@style/Widget.AppCompat.Button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="15dp"
+                        android:alpha="0.75"
+                        android:background="@drawable/rectangle_border_background"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center"
+                        android:padding="15dp"
+                        android:text="@string/lbl_logs"
+                        android:textColor="?attr/secondaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/hop_btn"
+                        app:rippleColor="?attr/secondaryTextColor" />
+
                     <LinearLayout
                         android:id="@+id/edit_delete_layout"
                         android:layout_width="match_parent"
@@ -217,7 +288,7 @@
                         android:orientation="horizontal"
                         android:weightSum="1"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/mtu_text">
+                        app:layout_constraintTop_toBottomOf="@id/logs_btn">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/edit_btn"
@@ -227,12 +298,11 @@
                             android:layout_marginEnd="5dp"
                             android:layout_weight="0.5"
                             android:background="@drawable/rectangle_border_background"
-                            android:fontFamily="sans-serif-smallcaps"
                             android:foreground="?attr/selectableItemBackground"
                             android:gravity="center"
                             android:padding="10dp"
                             android:text="@string/rt_edit_dialog_positive"
-                            android:textColor="?attr/primaryTextColor"
+                            android:textColor="?attr/primaryLightColorText"
                             android:textSize="@dimen/heading_font_text_view" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -243,16 +313,13 @@
                             android:layout_marginStart="5dp"
                             android:layout_weight="0.5"
                             android:background="@drawable/rectangle_border_background"
-                            android:fontFamily="sans-serif-smallcaps"
                             android:foreground="?attr/selectableItemBackground"
                             android:gravity="center"
                             android:padding="10dp"
                             android:text="@string/ci_delete"
                             android:textColor="?attr/accentBad"
                             android:textSize="@dimen/heading_font_text_view" />
-
                     </LinearLayout>
-
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -261,9 +328,6 @@
                 android:id="@+id/other_settings_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
-                app:cardUseCompatPadding="true"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/interface_detail_card">
 
@@ -301,7 +365,7 @@
                             android:layout_toStartOf="@id/lockdown_check"
                             android:orientation="vertical">
 
-                            <TextView
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/global_lockdown_title_tv"
                                 style="@style/TextAppearance.AppCompat.Subhead"
                                 android:layout_width="wrap_content"
@@ -309,7 +373,7 @@
                                 android:text="@string/firewall_rule_global_lockdown"
                                 android:textSize="@dimen/large_font_text_view" />
 
-                            <TextView
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="5dp"
@@ -346,7 +410,7 @@
                             android:layout_toStartOf="@id/catch_all_check"
                             android:orientation="vertical">
 
-                            <TextView
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/catch_all_title_tv"
                                 style="@style/TextAppearance.AppCompat.Subhead"
                                 android:layout_width="wrap_content"
@@ -354,7 +418,7 @@
                                 android:text="@string/catch_all_wg_dialog_title"
                                 android:textSize="@dimen/large_font_text_view" />
 
-                            <TextView
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingTop="5dp"
@@ -372,6 +436,47 @@
                             android:layout_centerVertical="true" />
 
                     </RelativeLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/one_wg_info_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:text="@string/one_wg_dialog_desc"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view" />
+
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/mobile_ssid_settings_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/other_settings_card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="20dp">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/ms_wg_header_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:paddingTop="15dp"
+                        android:text="@string/adv_taster_title"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textColor="?attr/primaryTextColor" />
 
                     <RelativeLayout
                         android:id="@+id/use_mobile_rl"
@@ -418,87 +523,189 @@
 
                     </RelativeLayout>
 
-                    <TextView
-                        android:id="@+id/one_wg_info_tv"
+                    <!-- New SSID restriction layout inserted here -->
+                    <RelativeLayout
+                        android:id="@+id/ssid_filter_rl"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
                         android:layout_marginEnd="15dp"
+                        android:background="?android:attr/selectableItemBackground"
                         android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
-                        android:text="@string/one_wg_dialog_desc"
-                        android:textColor="?attr/primaryLightColorText"
-                        android:textSize="@dimen/default_font_text_view" />
+                        android:paddingBottom="10dp">
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/applications_btn"
-                        style="@style/Widget.AppCompat.Button"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="30dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="30dp"
-                        android:alpha="0.75"
-                        android:background="@drawable/rectangle_border_background"
-                        android:foreground="?attr/selectableItemBackground"
-                        android:gravity="center"
-                        android:padding="15dp"
-                        android:text="@string/add_remove_apps"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:textSize="@dimen/large_font_text_view"
-                        app:rippleColor="?attr/secondaryTextColor" />
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="30dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="30dp"
-                        android:background="@drawable/rectangle_border_background"
-                        android:gravity="center_vertical">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/hop_btn"
-                            style="@style/Widget.AppCompat.Button"
-                            android:background="@null"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_centerInParent="true"
-                            android:foregroundGravity="center"
-                            android:alpha="0.75"
-                            android:drawablePadding="10dp"
-                            android:foreground="?attr/selectableItemBackground"
-                            android:gravity="center"
-                            android:padding="15dp"
-                            android:text="@string/hop_add_remove_title"
-                            android:textColor="?attr/secondaryTextColor"
-                            android:textSize="@dimen/large_font_text_view" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@id/ssid_check"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/ssid_title_tv"
+                                style="@style/TextAppearance.AppCompat.Subhead"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/wg_setting_ssid_title"
+                                android:textSize="@dimen/large_font_text_view" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/ssid_desc_tv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="5dp"
+                                android:text="@string/wg_setting_ssid_desc"
+                                android:textColor="?attr/primaryLightColorText"
+                                android:textSize="@dimen/default_font_text_view" />
+
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/ssid_check"
+                            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true" />
+
                     </RelativeLayout>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/logs_btn"
-                        style="@style/Widget.AppCompat.Button"
+                    <LinearLayout
+                        android:id="@+id/ssid_edit_group"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="30dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="30dp"
-                        android:alpha="0.75"
-                        android:background="@drawable/rectangle_border_background"
-                        android:foreground="?attr/selectableItemBackground"
-                        android:gravity="center"
-                        android:padding="15dp"
-                        android:text="@string/lbl_logs"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:textSize="@dimen/large_font_text_view"
-                        app:rippleColor="?attr/secondaryTextColor" />
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:orientation="horizontal"
+                        android:visibility="visible">
 
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/ssid_edit_text"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/edittext_default"
+                            android:imeOptions="actionDone"
+                            android:inputType="text"
+                            android:maxLines="4"
+                            android:minLines="1"
+                            android:padding="8dp"
+                            android:textColor="?attr/primaryTextColor"
+                            android:textColorHint="?attr/primaryLightColorText" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ssid_ok_btn"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="8dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/lbl_save"
+                            android:src="@drawable/ic_tick" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ssid_display_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/ssid_value_tv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="8dp"
+                            android:textColor="?attr/primaryTextColor"
+                            tools:text="HomeWiFi,Office,MyHotspot" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ssid_edit_btn"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="8dp"
+                            android:alpha="0.5"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/rt_edit_dialog_positive"
+                            android:src="@drawable/ic_edit_icon_grey" />
+                    </LinearLayout>
+
+                    <!-- SSID Permission Error Section -->
+                    <LinearLayout
+                        android:id="@+id/ssid_permission_error_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="15dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:orientation="horizontal"
+                        android:padding="8dp"
+                        android:visibility="gone">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/ssid_permission_error_text"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textColor="?attr/accentBad"
+                            android:textSize="@dimen/default_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/ssid_permission_error_action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="4dp"
+                            android:text="@string/ssid_permission_error_action"
+                            android:textColor="?attr/accentGood"
+                            android:textSize="@dimen/default_font_text_view"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <!-- SSID Location Error Section -->
+                    <LinearLayout
+                        android:id="@+id/ssid_location_error_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="15dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:orientation="horizontal"
+                        android:padding="8dp"
+                        android:visibility="gone">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/ssid_location_error_text"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/ssid_location_error"
+                            android:textColor="?attr/accentBad"
+                            android:textSize="@dimen/default_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/ssid_location_error_action"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="4dp"
+                            android:text="@string/ssid_location_error_action"
+                            android:textColor="?attr/accentGood"
+                            android:textSize="@dimen/default_font_text_view"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -507,7 +714,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/other_settings_card" />
+                app:layout_constraintTop_toBottomOf="@+id/mobile_ssid_settings_card" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

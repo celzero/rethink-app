@@ -82,7 +82,7 @@ class BackupHelper {
         const val CREATED_TIME = "createdTs"
 
         fun getTempDir(context: Context): File {
-            // temp dir (files/RethinkDns/)
+            // temp dir (files/Rethink/)
             val backupDirectoryPath: String =
                 context.filesDir.absolutePath +
                     File.separator +

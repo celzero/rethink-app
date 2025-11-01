@@ -3,7 +3,6 @@ package com.celzero.bravedns.ui.activity
 import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
@@ -16,15 +15,14 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityTcpProxyBinding
-import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
-import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,8 +38,10 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
     private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -161,11 +161,14 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
     }
 
     private fun openAppsDialog() {
-        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         val proxyId = ProxyManager.ID_TCP_BASE
         val proxyName = ProxyManager.TCP_PROXY_NAME
         val appsAdapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
         mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
+        var themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        if (Themes.isFrostTheme(themeId)) {
+            themeId = R.style.App_Dialog_NoDim
+        }
         val includeAppsDialog =
             WgIncludeAppsDialog(this, appsAdapter, mappingViewModel, themeId, proxyId, proxyName)
         includeAppsDialog.setCanceledOnTouchOutside(false)

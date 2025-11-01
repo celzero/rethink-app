@@ -66,8 +66,8 @@ class BlocklistDownloadHelper {
                         0
                     }
                 result = Constants.ONDEVICE_BLOCKLISTS_ADM.count() == total
-            } catch (ignored: Exception) {
-                logw("Local block list validation failed: ${ignored.message}", ignored)
+            } catch (e: Exception) {
+                logw("Local block list validation failed: ${e.message}", e)
             }
 
             logd("on-device blocklist($timestamp) download? $result, files: $total, dir? ${dir?.isDirectory}")

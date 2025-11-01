@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui.activity
 
+import Logger
 import Logger.LOG_TAG_UI
 import android.content.Context
 import android.content.res.Configuration
@@ -33,6 +34,7 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,8 +59,11 @@ class RpnWinProxyDetailsActivity: AppCompatActivity(R.layout.activity_rpn_win_pr
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
+
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
             controller.isAppearanceLightNavigationBars = false
@@ -104,7 +109,7 @@ class RpnWinProxyDetailsActivity: AppCompatActivity(R.layout.activity_rpn_win_pr
     }
 
     private fun showNoProxyFoundDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle("No proxy found")
         builder.setMessage("Proxy information is missing for this proxy id.Please ensure that the proxy is configured correctly and try again.")
         builder.setCancelable(false)

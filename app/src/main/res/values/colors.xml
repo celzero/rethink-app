@@ -57,13 +57,14 @@
     <color name="textViewBackground">#1A000000</color>
     <color name="buttonBackground">#006f67</color>
     <color name="chipBackgroundColor">#006f67</color>
+    <color name="btmSheetBgColor">#636363</color>
 
     <color name="tabIndicator">#18ffff</color>
     <color name="colorControlActivated">#FF18ffff</color>
     <color name="colorControlActivatedBad">#DF3520</color>
     <color name="colorSwitchThumbNormal">#959595</color>
     <color name="switchNormal">#959595</color>
-    <color name="colorSurface">#444444</color>
+    <color name="colorSurface">#393939</color>
 
     <color name="chipBgPositive">#3380CBC4</color>
     <color name="chipTextPositive">#18ffff</color>
@@ -118,12 +119,14 @@
     <color name="homeScreenBtnBackgroundLight">#F0005cb2</color>
     <color name="buttonBackgroundLight">#F0005cb2</color>
     <color name="tabIndicatorLight">#ff4081</color>
+    <color name="cardBackgroundLight">#FFFFFFFF</color>
+    <color name="btmSheetBgColorLight">#ececec</color>
 
     <color name="switchNormalLight">#757575</color>
     <color name="colorControlActivatedLight">#1e88e5</color>
     <color name="colorControlActivatedBadLight">#ff1744</color>
     <color name="colorSwitchThumbNormalLight">#757575</color>
-    <color name="colorSurfaceLight">#FFFFFF</color>
+    <color name="colorSurfaceLight">#fafafa</color>
 
     <color name="chipBackgroundColorLight">#CCC5E1A5</color>
 
@@ -186,12 +189,13 @@
     <color name="buttonBackgroundBlack">#4fc3f7</color>
     <color name="textViewBackgroundBlack">#000000</color>
     <color name="tabIndicatorBlack">#4fc3f7</color>
+    <color name="btmSheetBgColorBlack">#121212</color>
 
     <color name="colorControlActivatedBlack">#4fc3f7</color>
     <color name="colorControlActivatedBadBlack">#DF3520</color>
     <color name="colorSwitchThumbNormalBlack">#959595</color>
     <color name="switchNormalBlack">#959595</color>
-    <color name="colorSurfaceBlack">#000000</color>
+    <color name="colorSurfaceBlack">#121212</color>
 
     <color name="strokeBlack">#FFFFFF</color>
     <color name="fillBlack">#00000000</color>
@@ -234,7 +238,7 @@
     <color name="colorSecondaryLightPlus">#1b8078</color>
     <color name="colorBackgroundFloatingLightPlus">#e6f4f2</color>
 
-    <color name="navBarColorLightPlus">#FFFFFF</color>
+    <color name="navBarColorLightPlus">#f0fbfa</color>
 
     <color name="accentGoodLightPlus">#21a095</color>
     <color name="accentBadLightPlus">#ff4b5c</color>
@@ -246,12 +250,14 @@
     <color name="homeScreenBtnBackgroundLightPlus">#daf3f0</color>
     <color name="buttonBackgroundLightPlus">#21a095</color>
     <color name="tabIndicatorLightPlus">#ff6f6f</color>
+    <color name="cardBackgroundLightPlus">#FFFFFF</color>
+    <color name="btmSheetBgColorLightPlus">#d2fff5</color>
 
     <color name="switchNormalLightPlus">#b3b3b3</color>
     <color name="colorControlActivatedLightPlus">#21a095</color>
     <color name="colorControlActivatedBadLightPlus">#ff4b5c</color>
     <color name="colorSwitchThumbNormalLightPlus">#b3b3b3</color>
-    <color name="colorSurfaceLightPlus">#FFFFFF</color>
+    <color name="colorSurfaceLightPlus">#f0fbfa</color>
 
     <color name="chipBackgroundColorLightPlus">#c8edea</color>
 
@@ -316,6 +322,7 @@
     <color name="buttonBackgroundBlackPlus">#00A859</color>
     <color name="textViewBackgroundBlackPlus">#1C2A34</color>
     <color name="tabIndicatorBlackPlus">#00A859</color>
+    <color name="btmSheetBgColorBlackPlus">#2D404E</color>
 
     <color name="colorControlActivatedBlackPlus">#00A859</color>
     <color name="colorControlActivatedBadBlackPlus">#FF5A5E</color>
@@ -360,5 +367,68 @@
     <color name="firewallExcludeToggleBtnBgBlackPlus">#8A2D49</color>
     <color name="defaultToggleBtnTxtBlackPlus">#D0E1F2</color>
     <color name="defaultToggleBtnBgBlackPlus">#0E1B21</color>
+
+    <!-- theme dark frost -->
+    <color name="colorPrimaryBG">#383838</color>
+    <color name="colorPrimaryDarkBG">#1b1818</color>
+    <color name="colorSecondaryBG">#4fc3f7</color>
+    <color name="colorBackgroundFloatingBG">#383838</color>
+
+    <color name="navBarColorBG">#000000</color>
+
+    <color name="accentGoodBG">#4fc3f7</color>
+    <color name="accentBadBG">#ff4081</color>
+
+    <color name="chipBackgroundColorBG">#4fc3f7</color>
+    <color name="backgroundBG">#80FFFFFF</color>
+    <color name="cardBackgroundBG">#AA1e1e1e</color>
+    <color name="dividerBG">#000000</color>
+    <color name="borderBG">#77959595</color>
+    <color name="homeScreenBtnBackgroundBG">#402e2c2c</color>
+    <color name="buttonBackgroundBG">#4fc3f7</color>
+    <color name="textViewBackgroundBG">#000000</color>
+    <color name="tabIndicatorBG">#4fc3f7</color>
+    <color name="btmSheetBgColorBG">#1e1e1e</color>
+
+    <color name="colorControlActivatedBG">#4fc3f7</color>
+    <color name="colorControlActivatedBadBG">#DF3520</color>
+    <color name="colorSwitchThumbNormalBG">#959595</color>
+    <color name="switchNormalBG">#959595</color>
+    <color name="colorSurfaceBG">#000000</color>
+
+    <color name="strokeBG">#FFFFFF</color>
+    <color name="fillBG">#00000000</color>
+
+    <color name="primaryTextBG">#FDFDFD</color>
+    <color name="primaryLightColorTextBG">#BFFDFDFD</color>
+    <color name="chipTextColorBG">#ececec</color>
+    <color name="invertedPrimaryTextBG">#4fc3f7</color>
+    <color name="secondaryTextBG">#4fc3f7</color>
+    <color name="textColorAccentBadBG">#CCFF5252</color>
+    <color name="homeScreenHeaderTextColorBG">#FDFDFD</color>
+
+    <color name="chipBgPositiveBG">#33004D40</color>
+    <color name="chipTextPositiveBG">#CC1DE9B6</color>
+    <color name="chipBgNegativeBG">#33B71C1C</color>
+    <color name="chipTextNegativeBG">#CCFF5252</color>
+    <color name="chipColorBgNormalBG">#444444</color>
+    <color name="chipColorBgHighlightBG">#904fc3f7</color>
+    <color name="chipBgNeutralBG">#33c17900</color>
+    <color name="chipTextNeutralBG">#CCffd149</color>
+
+    <color name="fabBackgroundBG">#77959595</color>
+
+    <color name="selectedCardBgBG">#282525</color>
+
+    <color name="firewallNoRuleToggleBtnTxtBG">#C5E1A5</color>
+    <color name="firewallNoRuleToggleBtnBgBG">#33691E</color>
+    <color name="firewallBlockToggleBtnTxtBG">#C51162</color>
+    <color name="firewallBlockToggleBtnBgBG">#F48FB1</color>
+    <color name="firewallWhiteListToggleBtnTxtBG">#c17900</color>
+    <color name="firewallWhiteListToggleBtnBgBG">#ffd149</color>
+    <color name="firewallExcludeToggleBtnTxtBG">#ffbcd7</color>
+    <color name="firewallExcludeToggleBtnBgBG">#CCffbcd7</color>
+    <color name="defaultToggleBtnTxtBG">#FDFDFD</color>
+    <color name="defaultToggleBtnBgBG">#1e1e1e</color>
 
 </resources>

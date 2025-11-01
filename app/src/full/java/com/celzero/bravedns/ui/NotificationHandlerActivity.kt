@@ -16,37 +16,47 @@
 package com.celzero.bravedns.ui
 
 import Logger
+import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.WindowInsetsControllerCompat
 import com.celzero.bravedns.R
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.INTENT_UID
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
+import com.celzero.bravedns.ui.activity.MiscSettingsActivity.BioMetricType
 import com.celzero.bravedns.ui.activity.PauseActivity
+import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.koin.android.ext.android.inject
 
-class NotificationHandlerActivity : AppCompatActivity() {
+class NotificationHandlerActivity: AppCompatActivity() {
+
+    private val persistentState by inject<PersistentState>()
     enum class TrampolineType {
         ACCESSIBILITY_SERVICE_FAILURE_DIALOG,
         NEW_APP_INSTALL_DIALOG,
         HOME_SCREEN_ACTIVITY,
         PAUSE_ACTIVITY,
+        WIREGUARD_ACTIVITY,
         NONE
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -54,6 +64,10 @@ class NotificationHandlerActivity : AppCompatActivity() {
             window.isNavigationBarContrastEnforced = false
         }
         handleNotificationIntent(intent)
+    }
+
+    companion object {
+        private const val SCHEME_PACKAGE = "package"
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -70,6 +84,11 @@ class NotificationHandlerActivity : AppCompatActivity() {
             return
         }
 
+        if (isAppLocked()) {
+            trampoline(TrampolineType.NONE, intent)
+            return
+        }
+
         if (VpnController.isAppPaused()) {
             trampoline(TrampolineType.PAUSE_ACTIVITY, intent)
             return
@@ -80,6 +99,8 @@ class NotificationHandlerActivity : AppCompatActivity() {
                 TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG
             } else if (isNewAppInstalledIntent(intent)) {
                 TrampolineType.NEW_APP_INSTALL_DIALOG
+            } else if (isWireGuardIntent(intent)) {
+                TrampolineType.WIREGUARD_ACTIVITY
             } else {
                 TrampolineType.NONE
             }
@@ -87,7 +108,7 @@ class NotificationHandlerActivity : AppCompatActivity() {
     }
 
     private fun trampoline(trampolineType: TrampolineType, intent: Intent) {
-        Logger.i(LOG_TAG_VPN, "act on notification, notification type: $trampolineType")
+        Logger.i(LOG_TAG_UI, "act on notification, notification type: $trampolineType")
         when (trampolineType) {
             TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG -> {
                 handleAccessibilitySettings()
@@ -102,15 +123,40 @@ class NotificationHandlerActivity : AppCompatActivity() {
             TrampolineType.PAUSE_ACTIVITY -> {
                 showAppPauseDialog(trampolineType, intent)
             }
+            TrampolineType.WIREGUARD_ACTIVITY -> {
+                launchWireGuardActivityAndFinish()
+            }
             TrampolineType.NONE -> {
                 launchHomeScreenAndFinish()
             }
         }
     }
 
+    private fun isAppLocked(): Boolean {
+        val authType = persistentState.biometricAuthType
+        if (authType == BioMetricType.OFF.action) return false
+
+        val lastAuthTime = persistentState.biometricAuthTime
+        if (BioMetricType.FIVE_MIN.action == authType) {
+            if (System.currentTimeMillis() - lastAuthTime < 5 * 60 * 1000) return false
+        } else if (BioMetricType.FIFTEEN_MIN.action == authType) {
+            if (System.currentTimeMillis() - lastAuthTime < 15 * 60 * 1000) return false
+        }
+
+        return true
+    }
+
     private fun launchHomeScreenAndFinish() {
         // handle the app lock state then launch home screen
         val intent = Intent(this, AppLockActivity::class.java)
+        intent.setPackage(this.packageName)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+
+    private fun launchWireGuardActivityAndFinish() {
+        val intent = Intent(this, WgMainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
@@ -133,7 +179,7 @@ class NotificationHandlerActivity : AppCompatActivity() {
     }
 
     private fun handleAccessibilitySettings() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.lbl_action_required)
         builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
         builder.setPositiveButton(getString(R.string.univ_accessibility_crash_dialog_positive)) {
@@ -143,19 +189,18 @@ class NotificationHandlerActivity : AppCompatActivity() {
         }
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> finish() }
         builder.setCancelable(false)
-
         builder.create().show()
     }
 
     private fun openRethinkAppInfo(context: Context) {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val packageName = context.packageName
-        intent.data = Uri.parse("package:$packageName")
-        ContextCompat.startActivity(context, intent, null)
+        intent.data = "$SCHEME_PACKAGE:$packageName".toUri()
+        startActivity(intent)
     }
 
     private fun showAppPauseDialog(trampolineType: TrampolineType, intent: Intent) {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
 
         builder.setTitle(R.string.notif_dialog_pause_dialog_title)
         builder.setMessage(R.string.notif_dialog_pause_dialog_message)
@@ -191,5 +236,12 @@ class NotificationHandlerActivity : AppCompatActivity() {
 
         val what = intent.extras?.getString(Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME)
         return Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE == what
+    }
+
+    private fun isWireGuardIntent(intent: Intent): Boolean {
+        if (intent.extras == null) return false
+
+        val what = intent.extras?.getString(Constants.NOTIF_WG_PERMISSION_NAME)
+        return Constants.NOTIF_WG_PERMISSION_VALUE == what
     }
 }

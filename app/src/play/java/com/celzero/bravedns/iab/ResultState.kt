@@ -1,14 +1,10 @@
 package com.celzero.bravedns.iab
 
 /*
+
 enum class ResultState(val message: String, val priority: InAppBillingHandler.Priority = InAppBillingHandler.Priority.LOW) {
 
     NONE("Not Started"),
-
-    */
-/* ------------------------------------------------------ New ------------------------------------------------------ *//*
-
-
     ACTIVITY_REFERENCE_NOT_FOUND("Activity reference is null", InAppBillingHandler.Priority.HIGH),
 
     // Connections
@@ -64,5 +60,4 @@ enum class ResultState(val message: String, val priority: InAppBillingHandler.Pr
     PURCHASE_ACK_PENDING("Purchase confirmation is pending", InAppBillingHandler.Priority.MEDIUM),
     PURCHASE_FAILURE("Failed to consume product", InAppBillingHandler.Priority.HIGH),
 }
-
 */

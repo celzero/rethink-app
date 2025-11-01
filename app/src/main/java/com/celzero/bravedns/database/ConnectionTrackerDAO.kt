@@ -198,17 +198,17 @@ interface ConnectionTrackerDAO {
     @Query(
         "SELECT uid, SUM(uploadBytes) AS uploadBytes, SUM(downloadBytes) AS downloadBytes FROM ConnectionTracker where timeStamp >= :from and timeStamp <= :to GROUP BY uid"
     )
-    fun getDataUsage(from: Long, to: Long): List<DataUsage>
+    fun getDataUsage(from: Long, to: Long): List<DataUsage>?
 
     @Query(
-        "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, ict.meteredDataUsage as meteredDataUsage from ConnectionTracker as ct join (select sum(downloadBytes + uploadBytes) as meteredDataUsage from ConnectionTracker where connType like :meteredTxt and timeStamp > :to) as ict where timeStamp > :to"
+        "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, (select sum(downloadBytes + uploadBytes) from ConnectionTracker where connType = :meteredTxt and timeStamp > :to) as meteredDataUsage from ConnectionTracker as ct where ct.timeStamp > :to"
     )
     fun getTotalUsages(to: Long, meteredTxt: String): DataUsageSummary
 
     @Query("select * from ConnectionTracker where blockedByRule in ('Rule #1B', 'Rule #1F', 'Rule #3', 'Rule #4', 'Rule #5', 'Rule #6', 'Rule #7', 'Http block', 'Universal Lockdown')")
     fun getBlockedUniversalRulesCount(): List<ConnectionTracker>
 
-    @Query("SELECT uid AS uid, '' AS ipAddress, 0 AS port, COUNT(id) AS count, flag AS flag, 0 AS blocked, appName AS appOrDnsName, SUM(downloadBytes) AS downloadBytes, SUM(uploadBytes) AS uploadBytes, SUM(uploadBytes + downloadBytes) AS totalBytes FROM ConnectionTracker WHERE proxyDetails = :wgId AND timeStamp > :to GROUP BY appName ORDER BY totalBytes DESC")
+    @Query("SELECT uid AS uid, '' AS ipAddress, 0 AS port, COUNT(id) AS count, flag AS flag, 0 AS blocked, appName AS appOrDnsName, SUM(downloadBytes) AS downloadBytes, SUM(uploadBytes) AS uploadBytes, SUM(uploadBytes + downloadBytes) AS totalBytes FROM ConnectionTracker WHERE proxyDetails like :wgId AND timeStamp > :to GROUP BY appName ORDER BY totalBytes DESC")
     fun getWgAppNetworkActivity(wgId: String, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
@@ -216,9 +216,9 @@ interface ConnectionTrackerDAO {
     )
     fun getTotalUsagesByWgId(to: Long, meteredTxt: String, wgId: String): DataUsageSummary
 
-    @Query("update ConnectionTracker set message = 'manual-close', duration = 0 where connId in (:connIds)")
-    fun closeConnections(connIds: List<String>)
+    @Query("update ConnectionTracker set message = :reason, duration = 0 where connId in (:connIds) and message = '' and uploadBytes = 0 and downloadBytes = 0 and synack = 0")
+    fun closeConnections(connIds: List<String>, reason: String)
 
-    @Query("update ConnectionTracker set message = 'manual-close', duration = 0 where uid in (:uids)")
-    fun closeConnectionForUids( uids: List<Int> )
+    @Query("update ConnectionTracker set message = :reason, duration = 0 where uid in (:uids) and message = '' and uploadBytes = 0 and downloadBytes = 0 and synack = 0")
+    fun closeConnectionForUids( uids: List<Int>, reason: String)
 }

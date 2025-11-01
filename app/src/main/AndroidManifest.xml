@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.celzero.bravedns"
-    android:versionCode="51"
-    android:versionName="v055t"> <!-- 51 for v055t -->
+    android:versionCode="53"
+    android:versionName="v055u"> <!-- 53 for v055u -->
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
@@ -18,6 +17,12 @@
     <!-- Allows applications to change network connectivity state -->
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- WiFi and Location permissions required for SSID access -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    
     <!-- Android 11 introduces changes related to package visibility. These changes affect
     apps only if they target Android 11.
     https://developer.android.com/training/package-visibility -->
@@ -61,6 +66,9 @@
             </intent-filter>
             <meta-data
                 android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
+                android:value="true" />
+            <meta-data
+                android:name="android.net.VpnService.SUPPORTS_LOCKDOWN"
                 android:value="true" />
         </service>
         <service

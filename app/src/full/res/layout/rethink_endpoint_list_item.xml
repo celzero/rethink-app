@@ -23,7 +23,7 @@
             android:layout_toStartOf="@id/rethink_endpoint_list_action_image"
             android:orientation="vertical">
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/rethink_endpoint_list_url_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/rethink_endpoint_list_url_explanation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

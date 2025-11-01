@@ -51,6 +51,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.biometric.BiometricManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
@@ -58,25 +59,38 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
 import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.LauncherSwitcher
+import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
+import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
 import com.celzero.bravedns.ui.bottomsheet.BackupRestoreBottomSheet
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.FirebaseErrorReporting
+import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_LENGTH
+import com.celzero.bravedns.util.FirebaseErrorReporting.TOKEN_REGENERATION_PERIOD_DAYS
+import com.celzero.bravedns.util.NewSettingsManager
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils.openUrl
+import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
+import com.celzero.bravedns.util.Utilities.getRandomString
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
@@ -86,12 +100,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import androidx.core.net.toUri
-import com.celzero.bravedns.ui.LauncherSwitcher
-import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.APP_LOCK_ALIAS
-import com.celzero.bravedns.ui.activity.AppLockActivity.Companion.HOME_ALIAS
-import com.celzero.bravedns.util.NewSettingsManager
-import com.celzero.bravedns.util.UIUtils.setBadgeDotVisible
 
 
 class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) {
@@ -99,6 +107,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
+    private val rdb by inject<RefreshDatabase>()
 
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
 
@@ -125,8 +134,10 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -143,6 +154,16 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
         if (isFdroidFlavour()) {
             b.settingsActivityCheckUpdateRl.visibility = View.GONE
+            // Hide Firebase error reporting for F-Droid variant
+            b.settingsFirebaseErrorReportingRl.visibility = View.GONE
+        } else {
+            // Show Firebase error reporting for play and website variants
+            b.settingsFirebaseErrorReportingRl.visibility = View.VISIBLE
+            // Firebase error reporting
+            b.settingsFirebaseErrorReportingSwitch.isChecked = persistentState.firebaseErrorReportingEnabled
+            b.settingsActivityCheckUpdateRl.visibility = View.VISIBLE
+            // check for app updates
+            b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
         }
 
         // add ipInfo inc to the desc
@@ -156,21 +177,32 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt()).name.lowercase()
                 .replaceFirstChar(Char::titlecase).replace("_", " ")
 
-        // check for app updates
-        b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
         // camera and microphone access
         b.settingsMicCamAccessSwitch.isChecked = persistentState.micCamAccess
 
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {
-            val currentAppLocales: LocaleList =
-                getSystemService(LocaleManager::class.java).applicationLocales
-            b.settingsLocaleDesc.text =
-                currentAppLocales[0]?.displayName ?: getString(R.string.settings_locale_desc)
+            try {
+                val localeManager = getSystemService(LocaleManager::class.java)
+                val currentAppLocales: LocaleList = localeManager?.applicationLocales ?: LocaleList.getEmptyLocaleList()
+                b.settingsLocaleDesc.text =
+                    if (currentAppLocales.isEmpty) {
+                        getString(R.string.settings_locale_desc)
+                    } else {
+                        currentAppLocales[0]?.displayName ?: getString(R.string.settings_locale_desc)
+                    }
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_UI, "error getting app locales for Android T+", e)
+                b.settingsLocaleDesc.text = getString(R.string.settings_locale_desc)
+            }
         } else {
+            val appLocales = AppCompatDelegate.getApplicationLocales()
             b.settingsLocaleDesc.text =
-                AppCompatDelegate.getApplicationLocales().get(0)?.displayName
-                    ?: getString(R.string.settings_locale_desc)
+                if (appLocales.isEmpty) {
+                    getString(R.string.settings_locale_desc)
+                } else {
+                    appLocales.get(0)?.displayName ?: getString(R.string.settings_locale_desc)
+                }
         }
         // biometric authentication
         if (
@@ -178,13 +210,40 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) ==
             BiometricManager.BIOMETRIC_SUCCESS
         ) {
-            val txt =
-                getString(
-                    R.string.two_argument_colon,
-                    getString(R.string.settings_biometric_desc),
-                    BioMetricType.fromValue(persistentState.biometricAuthType).name
-                )
-            b.settingsBiometricDesc.text = txt
+            val bioMetricType = BioMetricType.fromValue(persistentState.biometricAuthType)
+            when (bioMetricType) {
+                BioMetricType.OFF -> {
+                    val txt = getString(
+                        R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_0)
+                    )
+                    b.settingsBiometricDesc.text = txt
+                }
+
+                BioMetricType.IMMEDIATE -> {
+                    val txt = getString(
+                        R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_1)
+                    )
+                    b.settingsBiometricDesc.text = txt
+                }
+
+                BioMetricType.FIVE_MIN -> {
+                    val txt = getString(
+                        R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_2)
+                    )
+                    b.settingsBiometricDesc.text = txt
+                }
+
+                BioMetricType.FIFTEEN_MIN -> {
+                    val txt = getString(
+                        R.string.two_argument_colon, getString(R.string.settings_biometric_desc),
+                        getString(R.string.settings_biometric_dialog_option_3)
+                    )
+                    b.settingsBiometricDesc.text = txt
+                }
+            }
         } else {
             b.settingsBiometricRl.visibility = View.GONE
         }
@@ -193,9 +252,12 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
         b.dvIpInfoSwitch.isChecked = persistentState.downloadIpInfo
 
+        b.tombstoneAppSwitch.isChecked = persistentState.tombstoneApps
+
         displayPcapUi()
         displayAppThemeUi()
         displayNotificationActionUi()
+        setupTokenUi()
     }
 
     private fun displayNotificationActionUi() {
@@ -253,19 +315,37 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     // create folder in DOWNLOADS/Rethink
                     File(downloadsDir, Constants.PCAP_FOLDER_NAME)
                 }
+
+            // ensure directory exists
             if (!dir.exists()) {
-                dir.mkdirs()
+                val created = dir.mkdirs()
+                if (!created) {
+                    Logger.e(LOG_TAG_VPN, "failed to create pcap directory: ${dir.absolutePath}")
+                    return null
+                }
             }
+
+            // verify directory is writable
+            if (!dir.canWrite()) {
+                Logger.e(LOG_TAG_VPN, "pcap directory not writable: ${dir.absolutePath}")
+                return null
+            }
+
             // filename format (rethink_pcap_<DATE_FORMAT>.pcap)
             val pcapFileName: String =
                 Constants.PCAP_FILE_NAME_PART + sdf.format(Date()) + Constants.PCAP_FILE_EXTENSION
             val file = File(dir, pcapFileName)
-            // just in case, create the parent dir if it doesn't exist
-            if (file.parentFile?.exists() != true) file.parentFile?.mkdirs()
+
             // create the file if it doesn't exist
             if (!file.exists()) {
-                file.createNewFile()
+                val created = file.createNewFile()
+                if (!created) {
+                    Logger.e(LOG_TAG_VPN, "failed to create pcap file: ${file.absolutePath}")
+                    return null
+                }
             }
+
+            Logger.i(LOG_TAG_VPN, "pcap file created at: ${file.absolutePath}")
             file
         } catch (e: Exception) {
             Logger.e(LOG_TAG_VPN, "error creating pcap file ${e.message}", e)
@@ -289,10 +369,21 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 showFileCreationErrorToast()
                 return
             }
+
+            // verify file was created successfully and is writable
+            if (!file.exists() || !file.canWrite()) {
+                Logger.e(LOG_TAG_VPN, "pcap file not writable: ${file.absolutePath}")
+                showFileCreationErrorToast()
+                return
+            }
+
+            Logger.i(LOG_TAG_VPN, "pcap file created successfully: ${file.absolutePath}")
             // set the file descriptor instead of fd, need to close the file descriptor
             // after tunnel creation
             appConfig.setPcap(PcapMode.EXTERNAL_FILE.id, file.absolutePath)
-        } catch (ignored: Exception) {
+            displayPcapUi()
+        } catch (e: Exception) {
+            Logger.e(LOG_TAG_VPN, "error in createAndSetPcapFile: ${e.message}", e)
             showFileCreationErrorToast()
         }
     }
@@ -339,7 +430,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 val uri = Uri.fromParts(SCHEME_PACKAGE, this.packageName, null)
                 intent.data = uri
                 storageActivityResultLauncher.launch(intent)
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 val intent = Intent()
                 intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
                 storageActivityResultLauncher.launch(intent)
@@ -373,7 +464,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showPcapOptionsDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_pcap_dialog_title))
         val items =
             arrayOf(
@@ -459,6 +550,14 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     getString(
                         R.string.settings_selected_theme,
                         getString(R.string.settings_theme_dialog_themes_6)
+                    )
+            }
+
+            Themes.DARK_FROST.id -> {
+                b.genSettingsThemeDesc.text =
+                    getString(
+                        R.string.settings_selected_theme,
+                        getString(R.string.settings_theme_dialog_themes_7)
                     )
             }
 
@@ -592,6 +691,10 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean
             ->
             persistentState.prefAutoStartBootUp = b
+            if (b) {
+                // Enable experimental-dependent settings when experimental features are enabled
+                persistentState.enableStabilityDependentSettings(this)
+            }
         }
 
         b.settingsTaskerRl.setOnClickListener {
@@ -608,11 +711,49 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             persistentState.downloadIpInfo = isChecked
         }
 
+        // Firebase error reporting toggle
+        b.settingsFirebaseErrorReportingRl.setOnClickListener {
+            NewSettingsManager.markSettingSeen(NewSettingsManager.ERROR_REPORTING)
+            b.settingsFirebaseErrorReportingSwitch.isChecked =
+                !b.settingsFirebaseErrorReportingSwitch.isChecked
+        }
+
+        b.settingsFirebaseErrorReportingSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.ERROR_REPORTING)
+            handleFirebaseErrorReportingToggle(isChecked)
+        }
+
+        b.tombstoneAppRl.setOnClickListener {
+            NewSettingsManager.markSettingSeen(NewSettingsManager.TOMBSTONE_APP_SETTING)
+            b.tombstoneAppSwitch.isChecked = !b.tombstoneAppSwitch.isChecked
+        }
+
+        b.tombstoneAppSwitch.setOnCheckedChangeListener { _, isChecked ->
+            NewSettingsManager.markSettingSeen(NewSettingsManager.TOMBSTONE_APP_SETTING)
+            persistentState.tombstoneApps = isChecked
+            io { rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE) }
+        }
+
+    }
+
+    private fun handleFirebaseErrorReportingToggle(isChecked: Boolean) {
+        if (isChecked) {
+            // enable firebase error reporting
+            FirebaseErrorReporting.setEnabled(true)
+            b.settingsFirebaseErrorReportingSwitch.isChecked = true
+            persistentState.firebaseErrorReportingEnabled = true
+            setFirebaseUserId(persistentState.firebaseUserToken)
+        } else {
+            // disable firebase error reporting
+            FirebaseErrorReporting.setEnabled(false)
+            b.settingsFirebaseErrorReportingSwitch.isChecked = false
+            persistentState.firebaseErrorReportingEnabled = false
+        }
     }
 
     private fun showGoLoggerDialog() {
         // show dialog with logger options, change log level in GoVpnAdapter based on selection
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_go_log_heading))
         val items =
             arrayOf(
@@ -635,8 +776,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             persistentState.goLoggerLevel = which.toLong()
             GoVpnAdapter.setLogLevel(persistentState.goLoggerLevel.toInt())
             updateConfigLevel(persistentState.goLoggerLevel)
-            b.genSettingsGoLogDesc.text =
-                Logger.LoggerLevel.fromId(persistentState.goLoggerLevel.toInt()).name.lowercase()
+            val logLevel = if (persistentState.goLoggerLevel.toInt() == 7) 8 else persistentState.goLoggerLevel.toInt()
+            b.genSettingsGoLogDesc.text = Logger.LoggerLevel.fromId(logLevel).name.lowercase()
                     .replaceFirstChar(Char::titlecase).replace("_", " ")
         }
         alertBuilder.create().show()
@@ -644,7 +785,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
 
     private fun showBiometricDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_biometric_dialog_heading))
         // show an list of options disable, enable immediate, ask after 5 min, ask after 15 min
         val item0 = getString(R.string.settings_biometric_dialog_option_0)
@@ -770,7 +911,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showPermissionAlert() {
-        val builder = MaterialAlertDialogBuilder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         builder.setTitle(R.string.alert_permission_accessibility)
         builder.setMessage(R.string.alert_firewall_accessibility_explanation)
         builder.setPositiveButton(getString(R.string.univ_accessibility_dialog_positive)) { _, _ ->
@@ -797,11 +938,14 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun invokeChangeLocaleDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_locale_dialog_title))
         val languages = getLocaleEntries()
         val items = languages.keys.toTypedArray()
-        val selectedKey = AppCompatDelegate.getApplicationLocales().get(0)?.toLanguageTag()
+        val selectedKey = AppCompatDelegate.getApplicationLocales()
+            .takeIf { !it.isEmpty }
+            ?.get(0)
+            ?.toLanguageTag()
         var checkedItem = 0
         languages.values.forEachIndexed { index, s ->
             if (s == selectedKey) {
@@ -811,9 +955,14 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             dialog.dismiss()
             val item = items[which]
-            // https://developer.android.com/guide/topics/resources/app-languages#app-language-settings
-            val locale = Locale.forLanguageTag(languages.getOrDefault(item, "en-US"))
-            AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(locale))
+            val tag = languages[item] ?: ""
+            if (tag.isBlank()) {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
+            } else {
+                // https://developer.android.com/guide/topics/resources/app-languages#app-language-settings
+                val locale = Locale.forLanguageTag(languages.getOrDefault(item, "en-US"))
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(locale))
+            }
         }
         alertBuilder.setNeutralButton(getString(R.string.settings_locale_dialog_neutral)) { dialog, _ ->
             dialog.dismiss()
@@ -831,102 +980,108 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 if (xpp.eventType == XmlPullParser.START_TAG) {
                     if (xpp.name == "locale") {
                         tagsList.add(xpp.getAttributeValue(0))
-                    }
-                }
-                xpp.next()
-            }
-        } catch (e: XmlPullParserException) {
-            Logger.e(LOG_TAG_UI, "error parsing locale_config.xml", e)
-        } catch (e: IOException) {
-            Logger.e(LOG_TAG_UI, "error parsing locale_config.xml", e)
-        }
+                      }
+                  }
+                  xpp.next()
+              }
+          } catch (e: XmlPullParserException) {
+              Logger.e(LOG_TAG_UI, "error parsing locale_config.xml", e)
+          } catch (e: IOException) {
+              Logger.e(LOG_TAG_UI, "error parsing locale_config.xml", e)
+          }
 
-        return LocaleListCompat.forLanguageTags(tagsList.joinToString(","))
-    }
+          return LocaleListCompat.forLanguageTags(tagsList.joinToString(","))
+      }
 
-    private fun getLocaleEntries(): Map<String, String> {
-        val localeList = getLocalesFromLocaleConfig()
-        val map = mutableMapOf<String, String>()
+      private fun getLocaleEntries(): Map<String, String> {
+          val localeList = getLocalesFromLocaleConfig()
+          val map = mutableMapOf<String, String>()
 
-        for (a in 0 until localeList.size()) {
-            localeList[a].let { it?.let { it1 -> map.put(it1.displayName, it1.toLanguageTag()) } }
-        }
-        return map
-    }
+          // Add default/system locale option first
+          map[getString(R.string.settings_locale_dialog_default)] = ""
+          
+          // Add all available locales from locale_config.xml
+          for (i in 0 until localeList.size()) {
+              localeList[i]?.let { locale ->
+                  map[locale.displayName] = locale.toLanguageTag()
+              }
+          }
+          return map
+      }
 
-    private fun invokeImportExport() {
-        if (this.isFinishing || this.isDestroyed) {
-            Logger.w(LOG_TAG_UI, "err opening bkup btmsheet, activity is destroyed")
-            return
-        }
+      private fun invokeImportExport() {
+          if (this.isFinishing || this.isDestroyed) {
+              Logger.w(LOG_TAG_UI, "err opening bkup btmsheet, activity is destroyed")
+              return
+          }
 
-        val bottomSheetFragment = BackupRestoreBottomSheet()
-        bottomSheetFragment.show(this.supportFragmentManager, bottomSheetFragment.tag)
-    }
+          val bottomSheetFragment = BackupRestoreBottomSheet()
+          bottomSheetFragment.show(this.supportFragmentManager, bottomSheetFragment.tag)
+      }
 
-    private fun openConsoleLogActivity() {
-        try {
-            val intent = Intent(this, ConsoleLogActivity::class.java)
-            startActivity(intent)
-        } catch (e: Exception) {
-            Logger.e(LOG_TAG_UI, "err opening console log activity ${e.message}", e)
-        }
-    }
+      private fun openConsoleLogActivity() {
+          try {
+              val intent = Intent(this, ConsoleLogActivity::class.java)
+              startActivity(intent)
+          } catch (e: Exception) {
+              Logger.e(LOG_TAG_UI, "err opening console log activity ${e.message}", e)
+          }
+      }
 
-    fun showAppTriggerPackageDialog(context: Context, onPackageSet: (String) -> Unit) {
-        val editText = AppCompatEditText(context).apply {
-            hint = context.getString(R.string.adv_tasker_dialog_edit_hint)
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-            setHorizontallyScrolling(true)
-            if (persistentState.appTriggerPackages.isNotEmpty()) {
-                setText(persistentState.appTriggerPackages)
-            }
-            setPadding(50, 40, 50, 40)
-            gravity = Gravity.TOP or Gravity.START
-            android.R.style.Widget_Material_EditText
-        }
+      fun showAppTriggerPackageDialog(context: Context, onPackageSet: (String) -> Unit) {
+          val editText = AppCompatEditText(context).apply {
+              hint = context.getString(R.string.adv_tasker_dialog_edit_hint)
+              inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+              setHorizontallyScrolling(true)
+              if (persistentState.appTriggerPackages.isNotEmpty()) {
+                  setText(persistentState.appTriggerPackages)
+              }
+              setPadding(50, 40, 50, 40)
+              gravity = Gravity.TOP or Gravity.START
+              android.R.style.Widget_Material_EditText
+          }
 
-        val selectableTextView = AppCompatTextView(context).apply {
-            text = context.getString(R.string.adv_tasker_dialog_msg)
-            setTextIsSelectable(true)
-            setPadding(50, 40, 50, 0)
-            textSize = 16f
-        }
+          val selectableTextView = AppCompatTextView(context).apply {
+              text = context.getString(R.string.adv_tasker_dialog_msg)
+              setTextIsSelectable(true)
+              setPadding(50, 40, 50, 0)
+              textSize = 16f
+          }
 
-        val instructionsTextView = AppCompatTextView(context).apply {
-            text = context.getString(R.string.adv_tasker_dialog_instructions)
-            setTextIsSelectable(true)
-            setPadding(50, 40, 50, 0)
-            textSize = 16f
-        }
+          val instructionsTextView = AppCompatTextView(context).apply {
+              text = context.getString(R.string.adv_tasker_dialog_instructions)
+              setTextIsSelectable(true)
+              setPadding(50, 40, 50, 0)
+              textSize = 16f
+          }
 
-        // add a LinearLayout as the single child of the ScrollView, then add the text view and
-        // edit text to the LinearLayout.
-        val linearLayout = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            addView(selectableTextView)
-            addView(editText)
-            addView(instructionsTextView)
-        }
+          // add a LinearLayout as the single child of the ScrollView, then add the text view and
+          // edit text to the LinearLayout.
+          val linearLayout = LinearLayout(context).apply {
+              orientation = LinearLayout.VERTICAL
+              addView(selectableTextView)
+              addView(editText)
+              addView(instructionsTextView)
+          }
 
-        val scrollView = ScrollView(context).apply {
-            setPadding(40, 10, 40, 0)
-            addView(linearLayout)
-        }
+          val scrollView = ScrollView(context).apply {
+              setPadding(40, 10, 40, 0)
+              addView(linearLayout)
+          }
 
-        AlertDialog.Builder(context)
-            .setTitle(context.getString(R.string.adv_taster_title))
-            .setView(scrollView)
-            .setPositiveButton(context.getString(R.string.lbl_save)) { dialog, _ ->
-                val pkgName = editText.text.toString().trim()
-                if (pkgName.isNotEmpty()) {
-                    onPackageSet(pkgName)
-                }
-                dialog.dismiss()
-            }
-            .setNegativeButton(context.getString(R.string.lbl_cancel)) { dialog, _ -> dialog.cancel() }
-            .show()
-    }
+          AlertDialog.Builder(context)
+              .setTitle(context.getString(R.string.adv_taster_title))
+              .setView(scrollView)
+              .setPositiveButton(context.getString(R.string.lbl_save)) { dialog, _ ->
+                  val pkgName = editText.text.toString().trim()
+                  if (pkgName.isNotEmpty()) {
+                      onPackageSet(pkgName)
+                  }
+                  dialog.dismiss()
+              }
+              .setNegativeButton(context.getString(R.string.lbl_cancel)) { dialog, _ -> dialog.cancel() }
+              .show()
+      }
 
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -935,9 +1090,19 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showThemeDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_theme_dialog_title))
-        val items =
+        val items = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            arrayOf(
+                getString(R.string.settings_theme_dialog_themes_1),
+                getString(R.string.settings_theme_dialog_themes_2),
+                getString(R.string.settings_theme_dialog_themes_3),
+                getString(R.string.settings_theme_dialog_themes_4),
+                getString(R.string.settings_theme_dialog_themes_5),
+                getString(R.string.settings_theme_dialog_themes_6),
+                getString(R.string.settings_theme_dialog_themes_7)
+            )
+        } else {
             arrayOf(
                 getString(R.string.settings_theme_dialog_themes_1),
                 getString(R.string.settings_theme_dialog_themes_2),
@@ -946,6 +1111,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 getString(R.string.settings_theme_dialog_themes_5),
                 getString(R.string.settings_theme_dialog_themes_6)
             )
+        }
         val checkedItem = persistentState.theme
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             dialog.dismiss()
@@ -977,6 +1143,9 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 Themes.DARK_PLUS.id -> {
                     setThemeRecreate(R.style.AppThemeTrueBlackPlus)
                 }
+                Themes.DARK_FROST.id -> {
+                    setThemeRecreate(R.style.AppThemeTrueBlackFrost)
+                }
             }
         }
         alertBuilder.create().show()
@@ -988,7 +1157,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showNotificationActionDialog() {
-        val alertBuilder = MaterialAlertDialogBuilder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this, R.style.App_Dialog_NoDim)
         alertBuilder.setTitle(getString(R.string.settings_notification_dialog_title))
         val items =
             arrayOf(
@@ -1037,6 +1206,27 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         alertBuilder.create().show()
     }
 
+    fun setFirebaseUserId(token: String) {
+        try {
+            FirebaseErrorReporting.setUserId(token)
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun setupTokenUi() {
+        val now = System.currentTimeMillis()
+        val fortyFiveDaysMs = TimeUnit.DAYS.toMillis(TOKEN_REGENERATION_PERIOD_DAYS)
+
+        var token = persistentState.firebaseUserToken
+        var ts = persistentState.firebaseUserTokenTimestamp
+        if (token.isBlank() || now - ts > fortyFiveDaysMs) {
+            token = getRandomString(TOKEN_LENGTH)
+            ts = now
+            persistentState.firebaseUserToken = token
+            persistentState.firebaseUserTokenTimestamp = ts
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         // app notification permission android 13
@@ -1046,13 +1236,10 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showNewBadgeIfNeeded() {
-        val providerInfo = NewSettingsManager.shouldShowBadge(NewSettingsManager.PROVIDER_INFO)
-        val appLogs = NewSettingsManager.shouldShowBadge(NewSettingsManager.APP_LOGS)
-        val automation = NewSettingsManager.shouldShowBadge(NewSettingsManager.AUTOMATION)
-
-        b.genSettingsIpInfoTxt.setBadgeDotVisible(this, providerInfo)
-        b.genSettingsConsoleLogTxt.setBadgeDotVisible(this, appLogs)
-        b.genSettingsTaskerTxt.setBadgeDotVisible(this, automation)
+        val errorReporting = NewSettingsManager.shouldShowBadge(NewSettingsManager.ERROR_REPORTING)
+        b.genSettingsFirebaseErrorReportingTxt.setBadgeDotVisible(this, errorReporting)
+        val tombstoneSetting = NewSettingsManager.shouldShowBadge(NewSettingsManager.TOMBSTONE_APP_SETTING)
+        b.tombstoneAppTxt.setBadgeDotVisible(this, tombstoneSetting)
     }
 
     private fun registerForActivityResult() {
@@ -1151,4 +1338,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
         delay(ms, lifecycleScope) { for (v in views) v.isEnabled = true }
     }
+
+    private fun io(f: suspend () -> Unit) = lifecycleScope.launch(Dispatchers.IO) { f() }
 }

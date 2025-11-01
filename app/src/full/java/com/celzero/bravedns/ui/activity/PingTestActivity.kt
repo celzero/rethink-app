@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.activity
-
+/*
 import Logger
 import android.content.Context
 import android.content.res.Configuration
@@ -40,7 +40,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class PingTestActivity: AppCompatActivity(R.layout.activity_ping_test) {
-    /*private val b by viewBinding(ActivityPingTestBinding::bind)
+    private val b by viewBinding(ActivityPingTestBinding::bind)
 
     private val persistentState by inject<PersistentState>()
 
@@ -58,7 +58,7 @@ class PingTestActivity: AppCompatActivity(R.layout.activity_ping_test) {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
 
         if (isAtleastQ()) {
@@ -238,8 +238,8 @@ class PingTestActivity: AppCompatActivity(R.layout.activity_ping_test) {
     private suspend fun getProxiesStatus(csv: String): List<Boolean> {
         if (proxiesStatus.isNotEmpty()) return proxiesStatus
 
-        val warp = VpnController.isProxyReachable(Backend.RpnWg, csv)
-        val amz = VpnController.isProxyReachable(Backend.RpnAmz, csv)
+        val warp = VpnController.isProxyReachable(Backend.RpnWin, csv)
+        val amz = VpnController.isProxyReachable(Backend.RpnWin, csv)
         val win = VpnController.isProxyReachable(Backend.RpnWin, csv)
         val se = VpnController.isProxyReachable(Backend.RpnSE, csv)
         val w64 = VpnController.isProxyReachable(Backend.Rpn64, csv)
@@ -260,5 +260,6 @@ class PingTestActivity: AppCompatActivity(R.layout.activity_ping_test) {
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
-    }*/
+    }
 }
+*/

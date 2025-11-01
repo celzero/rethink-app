@@ -811,10 +811,10 @@ interface StatsSummaryDao {
               appOrDnsName AS appOrDnsName, 
               Sum(uploadbytes) AS uploadBytes, 
               Sum(downloadbytes) AS downloadBytes, 
-              0 AS totalBytes 
+              Sum(uploadBytes + downloadBytes) AS totalBytes 
             FROM 
               (
-                -- From DnsLogs
+                -- From ConnectionTracker
                 SELECT uid, 
                   appName AS appOrDnsName, 
                   COUNT(id) AS count, 
@@ -829,7 +829,7 @@ interface StatsSummaryDao {
                 
                 UNION ALL 
                 
-                -- From ConnectionTracker
+                -- From DnsLogs
                 SELECT uid, 
                   appName AS appOrDnsName, 
                   COUNT(id) AS count, 

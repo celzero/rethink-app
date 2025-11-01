@@ -53,7 +53,7 @@ class ODoHEndpoint {
         proxy: String,
         resolver: String,
         proxyIps: String,
-        desc: String,
+        desc: String?,
         isSelected: Boolean,
         isCustom: Boolean,
         modifiedDataTime: Long,

@@ -57,11 +57,18 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     }
 
     suspend fun tombstoneApp(oldUid: Int, newUid: Int, packageName: String?, tombstoneTs: Long) {
-        if (packageName == null) {
-            appInfoDAO.tombstoneApp(oldUid, newUid, tombstoneTs)
-            return
+        try {
+            if (packageName == null) {
+                appInfoDAO.tombstoneApp(oldUid, newUid, tombstoneTs)
+                return
+            }
+            appInfoDAO.tombstoneApp(oldUid, newUid, packageName, tombstoneTs)
+        } catch (_: Exception) {
+            // tombstoneApp is called when there is a package name change or uid change
+            // in both the cases, we try to update the existing record with new uid or package name
+            // if the record is not present, it throws exception, which we catch here
+            // no need to log this exception
         }
-        appInfoDAO.tombstoneApp(oldUid, newUid, packageName, tombstoneTs)
     }
 
     suspend fun getAppInfo(): List<AppInfo> {

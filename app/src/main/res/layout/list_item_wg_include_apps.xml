@@ -9,9 +9,7 @@
         android:id="@+id/wg_include_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="?attr/background"
         app:cardCornerRadius="2dp"
-        app:cardElevation="2dp"
         app:cardUseCompatPadding="true">
 
         <RelativeLayout
@@ -44,7 +42,7 @@
                 android:layout_toEndOf="@id/wg_include_app_list_apk_icon_iv"
                 android:orientation="vertical">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/wg_include_app_list_apk_label_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -55,7 +53,7 @@
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/wg_include_app_app_desc_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

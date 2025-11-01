@@ -1,18 +1,18 @@
 /*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.ui.activity
 
 import android.content.Context
@@ -28,7 +28,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -41,12 +40,13 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import org.koin.android.ext.android.inject
 
 class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
 
     private val b by viewBinding(ActivityWelcomeBinding::bind)
-    private lateinit var dots: Array<TextView?>
+    private lateinit var dots: Array<androidx.appcompat.widget.AppCompatTextView?>
     private val layouts: IntArray = intArrayOf(
         R.layout.welcome_slide1,
         R.layout.welcome_slide2,
@@ -57,8 +57,10 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
     private val persistentState by inject<PersistentState>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        theme.applyStyle(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
         super.onCreate(savedInstanceState)
+
+        handleFrostEffectIfNeeded(persistentState.theme)
 
         if (isAtleastQ()) {
             val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -146,7 +148,7 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
         b.layoutDots.removeAllViews()
 
         for (i in dots.indices) {
-            dots[i] = TextView(this)
+            dots[i] = androidx.appcompat.widget.AppCompatTextView(this)
             dots[i]?.text = updateHtmlEncodedText("&#8226;")
             dots[i]?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30F)
             dots[i]?.setTextColor(colorInActive[currentPage])
@@ -172,7 +174,9 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
 
     private fun launchHomeScreen() {
         persistentState.firstTimeLaunch = false
-        startActivity(Intent(this, HomeScreenActivity::class.java))
+        val intent = Intent(this, HomeScreenActivity::class.java)
+        intent.setPackage(this.packageName)
+        startActivity(intent)
         finish()
     }
 

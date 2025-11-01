@@ -62,26 +62,30 @@ object EnhancedBugReport {
                             inputStream.copyTo(zipOutputStream)
                         }
                     } catch (e: FileNotFoundException) {
-                        Log.e(LOG_TAG_BUG_REPORT, "file not found: ${file.name}, ${e.message}", e)
+                        Log.e(LOG_TAG_BUG_REPORT, "file not found: ${file.name}, ${e.message}")
                     } catch (e: Exception) {
-                        Log.e(LOG_TAG_BUG_REPORT, "err adding file to zip: ${file.name}, ${e.message}", e)
+                        Log.e(LOG_TAG_BUG_REPORT, "err adding file to zip: ${file.name}, ${e.message}")
                     }
                 }
             }
             Log.i(LOG_TAG_BUG_REPORT, "zip file created: ${zipFilePath.absolutePath}")
         } catch (e: FileNotFoundException) {
-            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}")
         } catch (e: ZipException) {
-            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}")
         } catch (e: Exception) {
-            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}", e)
+            Log.e(LOG_TAG_BUG_REPORT, "err adding logs to zip file: ${e.message}")
         } finally {
 
         }
         Log.i(LOG_TAG_BUG_REPORT, "logs added to zip file")
     }
 
-    fun writeLogsToFile(context: Context, logs: String) {
+    fun writeLogsToFile(context: Context?, token: String, logs: String) {
+        if (context == null) {
+            Log.e(LOG_TAG_BUG_REPORT, "context is null, cannot write logs to file")
+            return
+        }
         try {
             val file = getFileToWrite(context)
             if (file == null) {
@@ -89,7 +93,7 @@ object EnhancedBugReport {
                 return
             }
             val time = Utilities.convertLongToTime(System.currentTimeMillis(), Constants.TIME_FORMAT_3)
-            val l = "\n$time: $logs"
+            val l = "\n$time \nToken: $token\n$logs"
             file.appendText(l, Charset.defaultCharset())
             Log.v(LOG_TAG_BUG_REPORT, "logs written to file: ${file.absolutePath}")
         } catch (e: Exception) {

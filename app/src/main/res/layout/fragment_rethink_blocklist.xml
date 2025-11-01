@@ -91,7 +91,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:elevation="8dp"
                 android:focusableInTouchMode="true"
                 app:cardCornerRadius="16dp">
 
@@ -144,7 +143,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/lb_advanced_filter_label_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
