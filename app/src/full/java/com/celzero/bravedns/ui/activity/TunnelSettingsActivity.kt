@@ -95,6 +95,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         val text = getString(R.string.two_argument, getString(R.string.orbot_status_arg_2).lowercase(), getString(R.string.lbl_ip))
         b.settingsActivityTcpText.text = text.lowercase()
         b.dvWgAllowIncomingTxt.text = getString(R.string.two_argument_space, getString(R.string.settings_allow_incoming_wg_packets), getString(R.string.lbl_experimental))
+        b.settingsUseMaxMtuHeading.text = getString(R.string.two_argument_space, getString(R.string.settings_jumbo_packets), getString(R.string.lbl_experimental))
 
         b.settingsActivityAllowBypassProgress.visibility = View.GONE
         displayAllowBypassUi()
@@ -482,11 +483,12 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
 
     data class NetworkPolicyOption(val title: String, val description: String)
     private fun showTunNetworkPolicyDialog() {
+        val conservativeTxt = getString(R.string.two_argument_space, getString(R.string.vpn_policy_fixed), getString(R.string.lbl_experimental))
         val options = listOf(
             NetworkPolicyOption(getString(R.string.settings_ip_text_ipv46), getString(R.string.vpn_policy_auto_desc)),
             NetworkPolicyOption(getString(R.string.vpn_policy_sensitive), getString(R.string.vpn_policy_sensitive_desc)),
             NetworkPolicyOption(getString(R.string.vpn_policy_relaxed), getString(R.string.vpn_policy_relaxed_desc)),
-            NetworkPolicyOption(getString(R.string.vpn_policy_fixed), getString(R.string.vpn_policy_fixed_desc))
+            NetworkPolicyOption(conservativeTxt, getString(R.string.vpn_policy_fixed_desc))
         )
         var currentSelection = persistentState.vpnBuilderPolicy
         val adapter = object : ArrayAdapter<NetworkPolicyOption>(
@@ -511,6 +513,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             .setTitle(getString(R.string.vpn_policy_title))
             .setAdapter(adapter) { _, which ->
                 currentSelection = which
+                if (currentSelection == 3) {
+                    // enable experimental settings prompt
+                    persistentState.enableStabilityDependentSettings(this)
+                }
                 saveNetworkPolicy(which)
                 adapter.notifyDataSetChanged()
             }
