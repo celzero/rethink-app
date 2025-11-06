@@ -27,7 +27,7 @@ class ODoHEndpoint {
     var proxy: String = ""
     var resolver: String = ""
     var proxyIps: String = ""
-    var desc: String = ""
+    var desc: String? = null
     var isSelected: Boolean = true
     var isCustom: Boolean = true
     var modifiedDataTime: Long = INIT_TIME_MS
@@ -53,7 +53,7 @@ class ODoHEndpoint {
         proxy: String,
         resolver: String,
         proxyIps: String,
-        desc: String,
+        desc: String?,
         isSelected: Boolean,
         isCustom: Boolean,
         modifiedDataTime: Long,

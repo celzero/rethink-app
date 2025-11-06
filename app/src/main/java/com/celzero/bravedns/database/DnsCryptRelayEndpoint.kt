@@ -24,7 +24,7 @@ class DnsCryptRelayEndpoint {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var dnsCryptRelayName: String = ""
     var dnsCryptRelayURL: String = ""
-    var dnsCryptRelayExplanation: String = ""
+    var dnsCryptRelayExplanation: String? = null
     var isSelected: Boolean = true
     var isCustom: Boolean = true
     var modifiedDataTime: Long = INIT_TIME_MS
@@ -44,7 +44,7 @@ class DnsCryptRelayEndpoint {
         id: Int,
         dnsCryptRelayName: String,
         dnsCryptRelayURL: String,
-        dnsCryptRelayExplanation: String,
+        dnsCryptRelayExplanation: String?,
         isSelected: Boolean,
         isCustom: Boolean,
         modifiedDataTime: Long,
