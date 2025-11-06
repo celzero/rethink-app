@@ -25,7 +25,7 @@ class DoHEndpoint {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var dohName: String = ""
     var dohURL: String = ""
-    var dohExplanation: String = ""
+    var dohExplanation: String? = null
     var isSelected: Boolean = true
     var isCustom: Boolean = true
     var isSecure: Boolean = true
@@ -49,7 +49,7 @@ class DoHEndpoint {
         id: Int,
         dohName: String,
         dohURL: String,
-        dohExplanation: String,
+        dohExplanation: String?,
         isSelected: Boolean,
         isCustom: Boolean,
         isSecure: Boolean,

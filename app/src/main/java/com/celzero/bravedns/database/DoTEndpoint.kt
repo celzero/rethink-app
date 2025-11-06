@@ -25,7 +25,7 @@ class DoTEndpoint {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var name: String = ""
     var url: String = ""
-    var desc: String = ""
+    var desc: String? = null
     var isSelected: Boolean = true
     var isCustom: Boolean = true
     var isSecure: Boolean = true
@@ -49,7 +49,7 @@ class DoTEndpoint {
         id: Int,
         name: String,
         url: String,
-        desc: String,
+        desc: String?,
         isSelected: Boolean,
         isCustom: Boolean,
         isSecure: Boolean,

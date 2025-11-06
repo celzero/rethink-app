@@ -24,7 +24,7 @@ class DnsCryptEndpoint {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var dnsCryptName: String = ""
     var dnsCryptURL: String = ""
-    var dnsCryptExplanation: String = ""
+    var dnsCryptExplanation: String? = null
     var isSelected: Boolean = true
     var isCustom: Boolean = true
     var modifiedDataTime: Long = INIT_TIME_MS
@@ -44,7 +44,7 @@ class DnsCryptEndpoint {
         id: Int,
         dnsCryptName: String,
         dnsCryptURL: String,
-        dnsCryptExplanation: String,
+        dnsCryptExplanation: String?,
         isSelected: Boolean,
         isCustom: Boolean,
         modifiedDataTime: Long,

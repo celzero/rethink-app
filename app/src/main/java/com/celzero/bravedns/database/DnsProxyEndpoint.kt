@@ -26,8 +26,8 @@ class DnsProxyEndpoint {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var proxyName: String = ""
     var proxyType: String = ""
-    var proxyAppName: String = ""
-    var proxyIP: String = ""
+    var proxyAppName: String? = null
+    var proxyIP: String? = null
     var proxyPort: Int = 0
     var isSelected: Boolean = true
     var isCustom: Boolean = true
@@ -48,8 +48,8 @@ class DnsProxyEndpoint {
         id: Int,
         proxyName: String,
         proxyType: String,
-        proxyAppName: String,
-        proxyIP: String,
+        proxyAppName: String?,
+        proxyIP: String?,
         proxyPort: Int,
         isSelected: Boolean,
         isCustom: Boolean,
