@@ -30,7 +30,7 @@
     <string name="accessibility_service_description">RethinkDNS از سرویس دسترس پذیری برای شناسایی و فایروال برنامه های پس زمینه استفاده می کند. RethinkDNS هیچ اطلاعاتی را جمع آوری یا نمی فروشد.</string>
     <string name="status_protected_with_http_private_dns">محافظت شده با پروکسی http و dns خصوصی</string>
     <string name="slide_2_desc">RethinkDNS ساده ترین راه برای نظارت بر فعالیت شبکه، دور زدن سانسور اینترنت و برنامه های فایروال در دستگاه اندرویدی شما است.</string>
-    <string name="slide_1_desc">Rethink یک نرم‌افزار متن باز است که توسط برنامه Mozilla Builders MVP حمایت می‌شود.</string>
+    <string name="slide_1_desc">Rethink یک نرم‌افزار متن‌باز است که توسط برنامه Mozilla Builders MVP و FOSS United Foundation پشتیبانی می‌شود.</string>
     <string name="status_protected_with_proxy_private_dns">محافظت شده با پروکسی و dns خصوصی</string>
     <string name="slide_1_title">رایگان و متن‌باز</string>
     <string name="hybrid_mode_info_title">DNS + دیوار آتش</string>
@@ -115,7 +115,7 @@
     <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">سرویس دسترسی RethinkDNS متوقف شده یا از کار افتاده است. <i><b>به تنظیمات رفته و RethinkDNS را اجباراً متوقف کنید</b></i> و دوباره آن را برای استفاده از <i>ویژگی مسدود کردن هر برنامه‌ای که از آن</i> استفاده نمی‌کنید، راه‌اندازی کنید.
 \n
 \nRethinkDNS از سرویس دسترسی برای ردیابی برنامه هایی که در حال استفاده هستند (پیش زمینه) در برابر برنامه هایی که در حال استفاده نیستند (پس زمینه) استفاده می کند.</string>
-    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: اتصال یک برنامه به اینترنت را مسدود می‌کند. \n <u>#2</u>: اتصال هر برنامه ای را به یک IP خاص مسدود می کند. \n <u>#3</u>: وقتی دستگاه قفل است، همه اتصالات را مسدود می‌کند (دیوار آتش کلی). \n <u>#4</u>: هر برنامه ای را که استفاده نمی شود، مسدود می کند (دیوار آتش کلی). \n <u>#5</u>: هنگامی که منبع برنامه ناشناخته باشد، اتصالات را مسدود می کند (دیوار آتش کلی). \n <u>#6</u>: تمام ترافیک UDP به جز DNS (دیوار آتش کلی) را مسدود می کند. \n <u>#7</u>: هنگامی که DNS دور زده می‌شود، اتصالات را مسدود کنید (دیوار آتش کلی).</string>
+    <string name="bsct_conn_rule_explanation" translatable="true">&lt;u&gt;#1&lt;/u&gt;: اتصال یک برنامه به اینترنت را مسدود می‌کند.\n.&lt;/u&gt;&lt;u&gt;#2&lt;/u&gt;: اتصال هر برنامه ای را به یک IP خاص مسدود می کند.\n.&lt;u&gt;#3&lt;/u&gt;: وقتی دستگاه قفل است، همه اتصالات را مسدود می‌کند (دیوار آتش کلی).\n.&lt;u&gt;#4&lt;/u&gt;: هر برنامه ای را که استفاده نمی شود، مسدود می کند (دیوار آتش کلی).\n.&lt;u&gt;#5&lt;/u&gt;: هنگامی که منبع برنامه ناشناخته باشد، اتصالات را مسدود می کند (دیوار آتش کلی). \n.&lt;u&gt;#6&lt;/u&gt;: تمام ترافیک UDP به جز DNS (دیوار آتش کلی) را مسدود می کند.\n.&lt;u&gt;#7&lt;/u&gt;: هنگامی که DNS دور زده می‌شود، اتصالات را مسدود کنید (دیوار آتش کلی).</string>
     <string name="always_on_dialog_stop_message" translatable="true">VPN همیشه روشن برای Rethink فعال است. آیا مطمئنید که در هر صورت می‌خواهید Rethink را متوقف کنید؟</string>
     <string name="always_on_dialog_positive" translatable="true">توقف</string>
     <string name="dns_crypt_url_remove_success" translatable="true">برطرف کننده DNSCrypt حذف شد.</string>
@@ -438,7 +438,7 @@
     <string name="hsf_notification_permission_failure" translatable="true">فعال کردن مجوز اعلان از صفحه تنظیمات</string>
     <string name="hsf_blocklist_updating_text" translatable="true">فعال کردن…</string>
     <string name="hsf_chip_appearance" translatable="true">تم: %1$s</string>
-    <string name="dc_custom_dns_radio" translatable="true">Other DNS</string>
+    <string name="dc_custom_dns_radio" translatable="true">دی‌ان‌ اس سایر</string>
     <string name="about_bug_no_log_dialog_positive_btn" translatable="true">ارسال ایمیل</string>
     <string name="about_website" translatable="true">بازدید rethinkdns.com</string>
     <string name="about_faq" translatable="true">مشاهده سوالات متداول</string>
@@ -454,7 +454,7 @@
     <string name="about_bravedns_toreport_text" translatable="true">کمک و بازخورد</string>
     <string name="about_privacy_policy" translatable="true">سیاست حفظ حریم خصوصی را بخوانید</string>
     <string name="rules_card_domain_count" translatable="true">قانون(های) دامنه %1$s</string>
-    <string name="logs_card_dns_count" translatable="true">%1$s queries</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s پرس‌وجو</string>
     <string name="dc_dns_leaks_desc" translatable="true">وقتی فعال باشد، Rethink تمام بسته‌های روی پورت ۵۳ را ضبط کرده و به یک نقطه پایانی دی ان اس تنظیم شده توسط کاربر ارسال می‌کند.</string>
     <string name="dc_dns_leaks_heading" translatable="true">جلوگیری از نشت دی ان اس</string>
     <string name="dc_proxy_dns_heading" translatable="true">هرگز دی ان اس را پروکسی نکنید</string>
@@ -467,7 +467,7 @@
     <string name="about_app" translatable="true">برنامه</string>
     <string name="about_web" translatable="true">لینک ها</string>
     <string name="settings_notification_desc" translatable="true">دکمه‌های عملیاتی برای نمایش با اعلان Rethink: %1$s</string>
-    <string name="settings_pcap_heading" translatable="true">Packet capture</string>
+    <string name="settings_pcap_heading" translatable="true">ضبط بسته</string>
     <string name="firewall_status_block_metered" translatable="true">در شبکه‌های محدود شده (موبایل) مسدود شده است</string>
     <string name="hs_biometeric_failed" translatable="true">احراز هویت بیومتریک ناموفق بود</string>
     <string name="hs_biometeric_error" translatable="true">خطای احراز هویت بیومتریک</string>
@@ -480,8 +480,8 @@
     <string name="battery_optimization_dialog_heading" translatable="true">غیرفعال کردن %1$s</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> ممکن است منجر به قطع اتصال شود. تنظیمات را تغییر دهید تا Rethink در پس‌زمینه از داده‌ها و سایر منابع استفاده کند.</string>
     <string name="dc_block_heading" translatable="true">قوانین</string>
-    <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
-    <string name="dc_entries" translatable="true">%1$s entries »</string>
+    <string name="dc_rethink_dns_radio" translatable="true">دی‌ان‌اس Rethink</string>
+    <string name="dc_entries" translatable="true">%1$s ورودی »</string>
     <string name="dc_local_block_heading" translatable="true">لیست‌های مسدود شده روی دستگاه</string>
     <string name="dc_custom_block_heading" translatable="true">قوانین دامنه</string>
     <string name="dc_check_update_heading" translatable="true">درخواست به‌روزرسانی‌های لیست مسدودیت</string>
@@ -491,27 +491,70 @@
     <string name="about_bug_report" translatable="true">گزارش اشکال</string>
     <string name="about_bug_no_log_dialog_title" translatable="true">گزارش اشکال</string>
     <string name="about_whats_new" translatable="true">چه چیزهایی در %1$s جدید است</string>
-    <string name="about_mozilla" translatable="true">Rethink is supported by Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
-    <string name="hsf_blocklist_chip_text_no_data" translatable="true">Enable RDNS+</string>
+    <string name="about_mozilla" translatable="true">Rethink توسط Mozilla Builders، بنیاد FOSS United و FLOSS/fund پشتیبانی می‌شود.</string>
+    <string name="hsf_blocklist_chip_text_no_data" translatable="true">فعال کردن RDNS+</string>
     <string name="hsf_proxy_chip_removed_toast" translatable="true">پروکسی حذف شد</string>
     <string name="pcap_failure_toast" translatable="true">خطا در ایجاد فایلpcap، دوباره امتحان کنید!</string>
     <string name="dc_local_block_desc_1" translatable="true">از بین بیش از ۱۹۵ لیست مسدودکننده انتخاب کنید. برای دانلود یا پیکربندی لیست‌های مسدودکننده اینجا کلیک کنید.</string>
     <string name="hsf_exclude_error" translatable="true">در حالت قفل وی پی ان، امکان حذف وجود ندارد</string>
     <string name="dc_dns_website_desc" translatable="true">آیکون‌های وب‌سایت را از <i>nextdns.io</i> و <i>duckduckgo.com</i> دریافت می‌کند. تا ۳۵۰ مگابایت از فضای دیسک را اشغال می‌کند</string>
     <string name="hsf_proxy_chip_text" translatable="true">پروکسی فعال است</string>
-    <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Packet capture disabled</string>
+    <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">ضبط بسته غیرفعال است</string>
     <string name="hsf_whats_new_chip_text" translatable="true">جدید چی هست</string>
     <string name="hsf_proxy_chip_remove_text" translatable="true">متوقف کردن…</string>
-    <string name="hsf_packet_capture_chip_text" translatable="true">Packet capture active</string>
+    <string name="hsf_packet_capture_chip_text" translatable="true">ضبط بسته فعال است</string>
     <string name="firewall_status_whitelisted" translatable="true">قوانین جهانی فایروال را دور می‌زند</string>
     <string name="ct_bs_app_info_error" translatable="true">اطلاعات برنامه یافت نشد</string>
     <string name="firewall_status_bypass_dns_firewall" translatable="true">قوانین دی ان اس و فایروال را دور می‌زند</string>
     <string name="firewall_status_block_unmetered" translatable="true">مسدود شدن در شبکه‌های نامحدود (وای‌فای)</string>
     <string name="apps_card_ips_count" translatable="true">%1$s قانون(های) آی‌پی و پورت</string>
-    <string name="hsf_vpn_dialog_message" translatable="true">Rethink برای راه‌اندازی وی پی ان محلی جهت رمزگذاری درخواست‌های دی ان اس دستگاه، پیاده‌سازی مانیتور شبکه و اعمال قوانین فایروال به مجوز نیاز دارد..\n\nRethink به هیچ وجه هیچ اطلاعاتی را جمع‌آوری یا از شما جاسوسی نمی‌کند.</string>
+    <string name="hsf_vpn_dialog_message" translatable="true">Rethink برای راه‌اندازی VPN محلی جهت رمزگذاری درخواست‌های DNS دستگاه، پیاده‌سازی مانیتور شبکه و اجرای قوانین دیوار‌آتش به مجوز نیاز دارد.\n\nRethink هیچ اطلاعاتی را جمع‌آوری نمی‌کند و به هیچ وجه از شما جاسوسی نمی‌کند.</string>
     <string name="dc_other_dns_heading" translatable="true">نوع</string>
     <string name="about_github" translatable="true">مشارکت در گیت‌هاب</string>
     <string name="about_twitter" translatable="true">ما را در توییتر دنبال کنید</string>
     <string name="settings_pcap_dialog_option_3" translatable="true">خروجی به پوشه دانلودها</string>
     <string name="lbl_protos" translatable="true"><a href="https://hosted.weblate.org/engage/rethink-dns-firewall/">\n<img src="https://hosted.weblate.org/widget/rethink-dns-firewall/android/peo/svg-badge.svg" alt="Translation status"/>\n</a></string>
+    <string name="lbl_test" translatable="true">آزمایش</string>
+    <string name="lbl_experimental" translatable="true">(آزمایشی)</string>
+    <string name="lbl_service_providers" translatable="true">ارائه دهندگان خدمات</string>
+    <string name="lbl_hop" translatable="true">رله‌ها</string>
+    <string name="lbl_manual" translatable="true">دستی</string>
+    <string name="lbl_fallback" translatable="true">عقب‌گرد</string>
+    <string name="lbl_default" translatable="true">پیش‌فرض</string>
+    <string name="lbl_action" translatable="true">عمل</string>
+    <string name="lbl_connect" translatable="true">اتصال</string>
+    <string name="lbl_criteria" translatable="true">معیارها</string>
+    <string name="wireguard_title" translatable="true">اینترنت امن با وایرگارد</string>
+    <string name="wireguard_desc" translatable="true">ترافیک اینترنت خود را با WireGuard رمزگذاری کنید. برای برنامه‌های مختلف، مسیرهای مختلفی انتخاب کنید.</string>
+    <string name="firewall_title" translatable="true">با دیوار‌آتش از اندروید خود محافظت کنید</string>
+    <string name="firewall_desc" translatable="true">کنترل استفاده از اینترنت توسط برنامه‌ها؛ محدود کردن اتصالات بر اساس فعالیت برنامه یا شبکه.</string>
+    <string name="dns_title" translatable="true">‫مسدود کردن تبلیغات و بدافزارها با DNS</string>
+    <string name="dns_desc" translatable="true">برای متوقف کردن تبلیغات، ردیاب‌ها و بدافزارها، از بین بیش از ۱۹۰ لیست، یکی را انتخاب کنید.</string>
+    <string name="status_no_network" translatable="true">بدون شبکه</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">گزارش‌های مربوط به این قانون حذف شود؟</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">این فقط گزارش‌های شبکه را برای قانون دیوار‌آتش مشاهده شده فعلی حذف می‌کند. این عملیات قابل برگشت نیست. آیا می‌خواهید ادامه دهید؟</string>
+    <string name="settings_mobile_metered_heading" translatable="true">شبکه‌های موبایل اندازه‌گیری شده</string>
+    <string name="settings_mobile_metered_desc" translatable="true">فقط شبکه‌های تلفن همراه را به صورت اندازه‌گیری‌شده در نظر بگیرید، بقیه را بدون اندازه‌گیری در نظر بگیرید.</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">روشن اضافی</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">تاریک اضافی</string>
+    <string name="settings_theme_dialog_themes_7" translatable="true">یخی</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">احراز هویت بیومتریک</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">هیچکدام</string>
+    <string name="settings_biometric_dialog_option_1" translatable="true">فوری</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">بعد از ۵ دقیقه</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">بعد از ۱۵ دقیقه</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">شما <b>%1$s روز</b> از Rethink استفاده کرده‌اید که به معنای هزینه استفاده <b>$%2$s</b> است. آیا برای ادامه توسعه آن، حمایت مالی را در نظر می‌گیرید؟</string>
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">از DNS سیستم برای دامنه‌های واگذار نشده استفاده کنید</string>
+    <string name="dc_use_sys_dns_undelegated_desc" translatable="true">برای دامنه‌های بدون مجوز مانند <i>.Lan</i>، <i>.داخلی</i> و غیره از DNS سیستم استفاده کنید.</string>
+    <string name="dc_filtering_heading" translatable="true">فیلتر کردن</string>
+    <string name="about_app_contributors" translatable="true">سازندگان</string>
+    <string name="about_app_translate" translatable="true">ترجمه</string>
+    <string name="about_dialog_positive_button" translatable="true">بزن بریم</string>
+    <string name="about_mail_to" translatable="true">hello@celzero.com</string>
+    <string name="about_mail_to_string" translatable="true">ایمیل به:</string>
+    <string name="about_mail_subject" translatable="true">[Rethink]:</string>
+    <string name="about_mail_bugreport_subject" translatable="true">[Rethink]: گزارش خطا</string>
+    <string name="about_mail_bugreport_text" translatable="true">این ایمیل را به آدرس: hello@celzero.com ارسال کنید.</string>
+    <string name="about_mail_bugreport_share_title" translatable="true">انتخاب ارائه‌دهنده ایمیل</string>
+    <string name="about_dialog_neutral_button" translatable="true">ویژگی‌های پیشنهادی</string>
 </resources>
