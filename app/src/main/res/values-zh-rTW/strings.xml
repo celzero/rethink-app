@@ -217,7 +217,7 @@
     <string name="settings_check_update_desc">每週一次自動檢查應用程式是否有可用更新。</string>
     <string name="hs_download_positive_website">瀏覽網站</string>
     <string name="hsf_proxy_chip_text">已啟用代理</string>
-    <string name="dns_btm_latency_ms">%1$sms</string>
+    <string name="dns_btm_latency_ms">%1$s秒</string>
     <string name="dc_rethink_dns_radio">Rethink DNS</string>
     <string name="firewall_rule_unknown_desc">此連線因無法得知<i>來源應用程式</i>而被攔截。<br/><br/>若需變更此行爲，請至<i>全局</i>選項卡。</string>
     <string name="new_app_bulk_notification_title">注意</string>
@@ -497,7 +497,7 @@
     <string name="about_settings_notification">通知設定</string>
     <string name="about_whats_new">%1$s 的新內容</string>
     <string name="about_twitter">在 Twitter 上追蹤我們</string>
-    <string name="about_mozilla">Rethink 受來自 Mozilla Builders 、 FOSS United 基金會與 OSOM Products Inc 的支援。</string>
+    <string name="about_mozilla">Rethink 受來自 Mozilla Builders 、 FOSS United 基金會的支援</string>
     <string name="about_app_update_check">檢查應用程式更新</string>
     <string name="about_app_contributors">作者</string>
     <string name="about_dialog_positive_button">一起出發</string>
@@ -1006,5 +1006,14 @@
     <string name="lbl_experimental" translatable="true">（實驗性）</string>
     <string name="lbl_hop" translatable="true">中繼</string>
     <string name="lbl_fallback" translatable="true">備用</string>
-    <string name="dc_filtering_heading" translatable="true">不篩選</string>
+    <string name="dc_filtering_heading" translatable="true">篩選</string>
+    <string name="lbl_protos" translatable="true">協定</string>
+    <string name="wireguard_title" translatable="true">使用WireGuard安全的連線至網際網路</string>
+    <string name="firewall_title" translatable="true">使用防火牆來保護你的Android裝置</string>
+    <string name="dns_title" translatable="true">通過DNS封鎖廣告和惡意應用程式</string>
+    <string name="status_no_network" translatable="true">沒有網際網路連線</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">生物辨識認證</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">你使用Rethink已經<b>%1$s天</b>,折合使用成本大約為<b>$%2$s</b>。你是否願意通過捐贈來支援Rethink的持續開發?</string>
+    <string name="cd_split_dns_desc" translatable="true">將代理應用程式的DNS請求轉發給代理伺服器的DNS服務。</string>
+    <string name="univ_firewall_rule_11" translatable="true">攔截全部的本地連線</string>
 </resources>
