@@ -624,7 +624,7 @@
     <string name="search_firewall_all_apps"><font size="12">以 UID / 应用名搜索应用</font></string>
     <string name="orbot_explanation">Orbot 是一款能让其他程序更<u>安全</u>地连接到互联网的免费代理应用。 \nOrbot 使用 <u>Tor（洋葱路由）</u> 来加密您的网络流量，助您<u>突破网络审查</u>，抵御威胁个人自由与隐私的<u>网络监控</u>。\n<u>TCP 代理</u>： Rethink 只将<i>已纳入</i>应用的 TCP 连接转发至 Orbot 。 \n<u>HTTP 代理</u>： Rethink 向 Orbot <i>建立</i> HTTP CONNECT 隧道，並仅转发<i>包含的</i>应用的 TCP 连接。</string>
     <string name="dc_dns_leaks_heading">防止 DNS 泄漏</string>
-    <string name="about_mozilla">Rethink 受 Mozilla Builders 、 FOSS United 基金会的支持。</string>
+    <string name="about_mozilla">Rethink 受 Mozilla Builders 、 FOSS United 基金会、FLOSS/ 基金的支持。</string>
     <string name="http_proxy_dialog_heading">设置 HTTP(S) CONNECT 代理</string>
     <string name="search_dns_logs"><font size="12">搜索域名或 IP</font></string>
     <string name="whats_new_version_update">&lt;b&gt;无需惊慌 2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. 新增：在用户错误报告中捕获网络引擎错误。&lt;br/&gt; 2. 新增：当且仅当“防止DNS泄漏”功能开启时，对未委派域名使用系统DNS。&lt;br/&gt; 3. 优化：WireGuard的双栈（IPv4 + IPv6）连接支持。&lt;br/&gt; 4. 优化：当网络引擎无响应时，避免阻塞UI元素。&lt;br/&gt; 5. 修复：开启“高级DNS过滤”时出现的连接超时问题。&lt;br/&gt; 6. 修复：使用域名的WireGuard对等节点端点在网络变化时出现的卡顿问题。&lt;br/&gt;&lt;br/&gt;&lt;a href=https://svc.rethinkdns.com/r/translate&gt;帮助翻译此应用&lt;/a&gt;</string>
@@ -1127,4 +1127,5 @@
     <string name="univ_delete_domain_dialog_message" translatable="true">删除这些规则将允许任何应用程序连接到当前被拦截的域名。</string>
     <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[此连接正在尝试寻找不存在的<i>私人DNS</i>服务器。]]></string>
     <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[此连接因<i>源应用</i>设置为<i>绕过代理</i>规则而被放行。<br/><br/>若需更改，请移步<i>分应用防火墙</i>设置界面。]]></string>
+    <string name="lbl_background_data" translatable="true">限制后台数据</string>
 </resources>
