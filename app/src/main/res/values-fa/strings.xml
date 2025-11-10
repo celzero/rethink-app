@@ -557,4 +557,189 @@
     <string name="about_mail_bugreport_text" translatable="true">این ایمیل را به آدرس: hello@celzero.com ارسال کنید.</string>
     <string name="about_mail_bugreport_share_title" translatable="true">انتخاب ارائه‌دهنده ایمیل</string>
     <string name="about_dialog_neutral_button" translatable="true">ویژگی‌های پیشنهادی</string>
+    <string name="app_info_error" translatable="true">راه‌اندازی اطلاعات برنامه ممکن نبود.</string>
+    <string name="vpn_profile_error" translatable="true">امکان راه‌اندازی پروفایل VPN وجود ندارد.</string>
+    <string name="private_dns_error" translatable="true">صفحه DNS خصوصی باز نشد.</string>
+    <string name="notification_screen_error" translatable="true">صفحه اعلان‌های برنامه باز نشد.</string>
+    <string name="intent_launch_error" translatable="true">%1$s باز نشد.</string>
+    <string name="no_browser_error" translatable="true">امکان باز کردن صفحه وب از مرورگر وجود ندارد.</string>
+    <string name="log_file_not_available" translatable="true">گزارش خرابی یافت نشد.</string>
+    <string name="error_loading_log_file" translatable="true">خطا در بارگیری فایل گزارش</string>
+    <string name="collecting_logs_progress_text" translatable="true">در حال ضبط…</string>
+    <string name="logs_disclaimer" translatable="true">نمایش ۲۰٬۰۰۰ کاراکتر اول</string>
+    <string name="contributors_list" translatable="true">سازندگان<![CDATA[پروژه متن‌باز <i>Rethink</i> وجود خود را مدیون این داوطلبان است
+که ساعت‌های بی‌شماری را صرف توسعهٔ آن می‌کنند.<br/> <br/>🛡️ برنامه اندروید <br/>
+<a href="https://github.com/anthonyryan1">Anthony Ryan</a> / <a
+href="https://github.com/BayLee4">BayLee4</a> / <a
+href="https://github.com/Ch4t4r">Ch4t4r</a> / <a
+href="https://github.com/samthesamman">CodingAttack</a> / <a
+href="https://github.com/HrBDev">HrBDev</a> / <a
+href="https://github.com/hussainmohd-a">hussainmohd-a</a> / <a
+href="https://github.com/ignoramous">ignoramous</a> / <a
+href="https://github.com/ironveil">ironveil</a> / <a
+href="https://github.com/markwmuller">markwmuller</a> / <a
+href="https://github.com/mohammaduvez">Mohammaduvez</a> / <a
+href="https://github.com/Mygod">Mygod</a> / <a
+href="https://github.com/Poussinou">Poussinou</a> / <a
+href="https://github.com/pjosingh">pjosingh</a> / <a
+href="https://github.com/RohitSurwase">RohitSurwase</a> / <a
+href="https://github.com/ShantanuVichare">Shantanu</a> / <a
+href="https://github.com/Uldiniad">Uldiniad</a><br/> / <a
+href="https://github.com/yurtpage">yurtpage</a><br/> <br/>🚂 موتور شبکه <br/> <a
+href="https://github.com/alalamav">alalamav</a> / <a
+href="https://github.com/bemasc">bemasc</a> / <a
+href="https://github.com/dmcardle">dmcardle</a> / <a
+href="https://github.com/fortuna">fortuna</a> / <a
+href="https://github.com/ignoramous">ignoramous</a> / <a
+href="https://github.com/PeterDaveHello">PeterDaveHello</a> / <a
+href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> / <a
+href="https://github.com/SeanBurford">SeanBurford</a><br/> <br/>📚 تفکیک‌کننده
+(Resolver) <br/> <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> / <a
+href="https://github.com/amithm7">amithm7</a> / <a
+href="https://github.com/arfshl">arfshl</a> / <a
+href="https://github.com/badmojr">badmojr</a> / <a
+href="https://github.com/bongochong">bongochong</a> / <a
+href="https://github.com/elliotwutingfeng">elliotwutingfeng</a> / <a
+href="https://github.com/georgyo">georgyo</a> / <a
+href="https://github.com/GiddyGoatGaming">GiddyGoatGaming</a> / <a
+href="https://github.com/Harish-Narayan">Harish-Narayan</a> / <a
+href="https://github.com/ignoramous">ignoramous</a> / <a
+href="https://github.com/JakeChampion">JakeChampion</a> / <a
+href="https://github.com/MasterKia">MasterKia</a> / <a
+href="https://github.com/mtxadmin">mtxadmin</a> / <a
+href="https://github.com/neneeen">neneeen</a> / <a
+href="https://github.com/PeterDaveHello">PeterDaveHello</a> / <a
+href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> / <a
+href="https://github.com/shruuub">shruuub</a> / <a
+href="https://github.com/shuvashish76">shuvashish76</a><br/> <br/>⚜ مدیران انجمن
+<br/> <a href="https://t.me/amithm7">amithm7</a> / <a
+href="https://t.me/TronSlayer">Andersen</a> / <a
+href="https://t.me/ppatra">ppatra</a> / <a
+href="https://t.me/InFamous23">InFamous23</a> / <a
+href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a> / <a
+href="https://t.me/Ch4t4r">Ch4t4r</a> / <a
+href="https://t.me/Billi_ance">Billi_ance</a> / <a
+href="https://t.me/kaliangel">kaliangel</a> / <a
+href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/> <br/>📌
+موقعیت جغرافیایی IP <br/> <a href="https://db-ip.com">db-ip.com</a> / <a
+href="https://ipinfo.io/lite">IPinfo Lite</a><br/> <br/>❇ ترجمه‌ها <br/> <a
+href="https://weblate.org/en/">Weblate</a><br/> <br/>🦆 آیکون‌ها <br/> <a
+href="https://github.com/celzero/rethink-app/issues/346">Icons</a><br/> <br/>📦
+سرورهای ساخت <br/> <a href="https://jitpack.io/">JitPack</a> / <a
+href="https://github.com/">GitHub</a> / <a
+href="https://central.sonatype.com/">Sonatype</a><br/> ]]></string>
+    <string name="cd_dns_crypt_title" translatable="true">تفکیک‌کننده‌ها</string>
+    <string name="cd_custom_doh_dialog_title" translatable="true">نشانی سرور سفارشی</string>
+    <string name="cd_custom_doh_url_name_default" translatable="true">DoH</string>
+    <string name="cd_custom_doh_url_name" translatable="true">DoH %1$s</string>
+    <string name="cd_custom_dns_proxy_title" translatable="true">پروکسی DNS سفارشی</string>
+    <string name="cd_custom_dns_proxy_name_default" translatable="true">پروکسی</string>
+    <string name="cd_custom_dns_proxy_name" translatable="true">پروکسی %1$s</string>
+    <string name="cd_custom_dns_proxy_default_app" translatable="true">هیچکدام</string>
+    <string name="cd_dns_proxy_mode_internal" translatable="true">داخلی</string>
+    <string name="cd_dns_proxy_mode_external" translatable="true">خارجی</string>
+    <string name="cd_dns_proxy_error_text_1" translatable="true">آدرس آی‌پی نامعتبر است</string>
+    <string name="cd_dns_proxy_error_text_2" translatable="true">محدوده پورت باید از 1024 تا 65535 باشد.</string>
+    <string name="cd_dns_proxy_error_text_3" translatable="true">پورت نامعتبر است</string>
+    <string name="cd_dns_crypt_dialog_title" translatable="true">DNSCrypt Resolver یا Relay را اضافه کنید</string>
+    <string name="cd_dns_crypt_name_default" translatable="true">DNSCrypt</string>
+    <string name="cd_dns_crypt_name" translatable="true">DNSCrypt %1$s</string>
+    <string name="cd_dns_crypt_relay_name" translatable="true">DNSRelay %1$s</string>
+    <string name="cd_dns_crypt_dialog_heading" translatable="true">DNSCrypt Resolver یا Relay را اضافه کنید</string>
+    <string name="cd_dns_crypt_resolver_heading" translatable="true">حل کننده</string>
+    <string name="cd_dns_crypt_relay_heading" translatable="true">رله</string>
+    <string name="cd_dns_crypt_dialog_name" translatable="true">نام</string>
+    <string name="cd_dns_crypt_dialog_stamp" translatable="true">مُهر</string>
+    <string name="cd_dns_crypt_dialog_desc" translatable="true">توضیحات (اختیاری)</string>
+    <string name="cd_dns_crypt_error_text_1" translatable="true">مُهر نمی‌تواند خالی باشد</string>
+    <string name="cd_doh_dialog_heading" translatable="true">افزودن DNS بر بستر HTTPS</string>
+    <string name="cd_doh_dialog_resolver_name" translatable="true">نام حل‌کننده</string>
+    <string name="univ_firewall_rule_11" translatable="true">تمام اتصالات میزبان محلی را مسدود کنید</string>
+    <string name="univ_view_blocked_ip" translatable="true">قوانین آی پی و پورت</string>
+    <string name="univ_view_blocked_ip_desc" translatable="true">ویرایش قواعد دامنه، آی‌پی / پورت مسدود یا مورد اعتماد.</string>
+    <string name="univ_ip_delete_individual_toast" translatable="true">%1$s حذف شد.</string>
+    <string name="univ_ip_delete_dialog_positive" translatable="true">حذف همه</string>
+    <string name="univ_ip_delete_toast_success" translatable="true">تمام قوانین IP حذف شد.</string>
+    <string name="univ_delete_firewall_dialog_title" translatable="true">آیا تمام قوانین IP حذف شود؟</string>
+    <string name="univ_delete_firewall_dialog_message" translatable="true">حذف این قوانین به هر اپلیکیشنی اجازه می‌دهد به IPهایی که در حال حاضر مسدود هستند، متصل شود.</string>
+    <string name="univ_delete_domain_dialog_title" translatable="true">حذف تمام قوانین دامنه؟?</string>
+    <string name="univ_delete_domain_dialog_message" translatable="true">حذف این قوانین به هر برنامه‌ای اجازه می‌دهد به دامنه‌های مسدودشده فعلی متصل شود.</string>
+    <string name="univ_accessibility_crash_dialog_positive" translatable="true">به تنظیمات بروید</string>
+    <string name="univ_accessibility_dialog_positive" translatable="true">اعطا کردن</string>
+    <string name="univ_accessibility_dialog_negative" translatable="true">رد کردن</string>
+    <string name="univ_firewall_heading" translatable="true">قوانین فراگیر فایروال</string>
+    <string name="app_ip_domain_rules" translatable="true">قوانین آی‌پی / دامنه برای هر برنامه</string>
+    <string name="contributors_dialog_title" translatable="true">نویسندگان</string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true">گواهی‌های TLS سرور را اعتبارسنجی نکنید (فقط در صورتی فعال کنید که می‌دانید چه می‌کنید)</string>
+    <string name="cd_dnscrypt_relay_heading" translatable="true">رله‌ها</string>
+    <string name="cd_dns_alg_heading" translatable="true">فیلترینگ پیشرفته DNS (آزمایشی)</string>
+    <string name="cd_dns_alg_desc" translatable="true">به ازای هر درخواست DNS، یک IP منحصربه‌فرد تخصیص دهید.</string>
+    <string name="cd_split_dns_heading" translatable="true">DNS تفکیک‌شده (آزمایشی)</string>
+    <string name="cd_split_dns_desc" translatable="true">هدایت پرس‌وجوهای DNS از برنامه‌های تحت پروکسی به سرورهای DNSِ پروکسی.</string>
+    <string name="cd_treat_dns_rules_firewall_heading" translatable="true">برخورد با قواعد DNS به عنوان قواعد فایروال (آزمایشی)</string>
+    <string name="cd_treat_dns_rules_firewall_desc" translatable="true">مسدودسازی DNS در زمان تحلیل نام دور زده خواهد شد؛ تصمیم در زمان اتصال اتخاذ خواهد شد.</string>
+    <string name="ctbs_app_info_not_available_toast" translatable="true">صفحه تنظیمات برنامه یافت نشد</string>
+    <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s برنامهٔ دیگر</string>
+    <string name="ctbs_block_other_apps" translatable="true">قواعدی که برای %1$s اعمال می‌شود، برای %2$s برنامه دیگر نیز اعمال خواهد شد.</string>
+    <string name="ctbs_dialog_negative_btn" translatable="true">بازگشت</string>
+    <string name="dns_log_dialog_positive" translatable="true">حذف لاگ‌ها</string>
+    <string name="dns_btm_sheet_dialog_message" translatable="true"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s فهرست مسدودی</h3>%3$s.<br/><br/>]]></Data></string>
+    <string name="dns_btm_sheet_dialog_ips" translatable="true"><Data> %1$s %2$s &lt;br/&gt;</Data></string>
+    <string name="dns_btm_sheet_chip" translatable="true">+%1$s IP دیگر</string>
+    <string name="dns_btm_sheet_chip_no_answer" translatable="true">بی‌پاسخ</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">به‌صورت ناشناس در %1$s توسط %2$s از طریق %3$s حل شد</string>
+    <string name="dns_btm_resolved_doh" translatable="true">%1$s توسط %2$s حل شد</string>
+    <string name="dns_btm_resolved_doh_no_server" translatable="true">%1$s حل شد</string>
+    <string name="dns_btm_latency_ms" translatable="true">%1$s ها</string>
+    <string name="dns_btm_record_type" translatable="true">نوع پرس و جو: %1$s</string>
+    <string name="hs_download_positive_default" translatable="true">باشه</string>
+    <string name="hs_download_positive_play_store" translatable="true">به‌روزرسانی کامل</string>
+    <string name="hs_download_positive_website" translatable="true">دیدن وبسایت</string>
+    <string name="hs_download_negative_default" translatable="true">بعداً یادم بیار</string>
+    <string name="univ_firewall_rule_1" translatable="true">مسدود کردن همهٔ برنامه‌ها هنگام قفل بودن دستگاه</string>
+    <string name="univ_firewall_rule_2" translatable="true">برنامه‌های غیرفعال را مسدود کنید</string>
+    <string name="univ_firewall_rule_3" translatable="true">در صورت ناشناس بودن برنامهٔ مبدأ، مسدود شود</string>
+    <string name="univ_firewall_rule_4" translatable="true">مسدودسازی UDP به استثنای DNS و NTP</string>
+    <string name="univ_firewall_rule_5" translatable="true">مسدودسازی در صورت دور زدن DNS</string>
+    <string name="univ_firewall_rule_6" translatable="true">مسدود کردن برنامه‌های تازه نصب‌شده به‌طور پیش‌فرض</string>
+    <string name="univ_firewall_rule_7" translatable="true">مسدود کردن IPv4 در IPv6 (آزمایشی)</string>
+    <string name="univ_firewall_rule_8" translatable="true">مسدود کردن ترافیک پورت ۸۰ (HTTP ناامن)</string>
+    <string name="univ_firewall_rule_9" translatable="true">مسدود کردن در شبکه حجمی (موبایل)</string>
+    <string name="univ_firewall_rule_10" translatable="true">مسدود کردن همه به جز برنامه‌ها و آی‌پی‌های مجاز</string>
+    <string name="app_ip_domain_rules_desc" translatable="true">اصلاح قوانین IP / دامنه بر اساس برنامه</string>
+    <string name="dns_connected_rethink_plus" translatable="true">متصل. %1$s لیست انسداد فعال</string>
+    <string name="dns_connected_no_count" translatable="true">متصل</string>
+    <string name="dns_connected" translatable="true">متصل</string>
+    <string name="dns_info_positive" translatable="true">باشه</string>
+    <string name="dns_info_neutral" translatable="true">کپی</string>
+    <string name="dns_crypt_relay_error_toast" translatable="true">هیچ حل کننده ای انتخاب نشده است</string>
+    <string name="dns_proxy_dialog_message" translatable="true">نام برنامه: %1$s\n\nآدرس آیپی: %2$s\n\nشماره پورت: %3$s</string>
+    <string name="dns_proxy_dialog_message_no_app" translatable="true">آدرس آیپی: %1$s\n\nشماره پورت: %2$s</string>
+    <string name="dns_query_latency" translatable="true">%1$s میلی‌ثانیه</string>
+    <string name="dns_proxy_dialog_header_dns" translatable="true">افزودن پروکسی DNS</string>
+    <string name="dns_proxy_name" translatable="true">نام پروکسی</string>
+    <string name="dns_proxy_app" translatable="true">برنامه</string>
+    <string name="dns_proxy_ip_address" translatable="true">آدرس آی پی</string>
+    <string name="dns_proxy_port" translatable="true">شماره پورت</string>
+    <string name="fapps_filter_filter_heading" translatable="true">نوع</string>
+    <string name="fapps_filter_categories_heading" translatable="true">دسته‌ها</string>
+    <string name="fapps_filter_clear_btn" translatable="true">پاک کردن</string>
+    <string name="fapps_filter_parent_installed" translatable="true">نصب شده</string>
+    <string name="fapps_filter_parent_system" translatable="true">سیستم</string>
+    <string name="fapps_firewall_filter_bypass_universal" translatable="true">دور زده شده</string>
+    <string name="fapps_firewall_filter_excluded" translatable="true">مستثنی شده</string>
+    <string name="fapps_firewall_filter_isolate" translatable="true">جدا شده</string>
+    <string name="fapps_info_dialog_message" translatable="true">اتصال برنامه‌ها به اینترنت را مسدود کنید. محدود کردن دسترسی به اینترنت، به جلوگیری از مصرف بی‌مورد داده و همچنین صرفه‌جویی در مصرف باتری کمک می‌کند.</string>
+    <string name="fapps_info_unmetered_msg" translatable="true">اجازه / مسدودسازی در شبکه نامحدود (وای‌فای)</string>
+    <string name="fapps_info_metered_msg" translatable="true">اجازه دادن / مسدود کردن در شبکه حجمی (موبایل)</string>
+    <string name="fapps_info_bypass_msg" translatable="true">دور زدن قوانین سراسری فایروال</string>
+    <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">دور زدن قوانین DNS و فایروال</string>
+    <string name="fapps_info_exclude_msg" translatable="true">از هر دو DNS و فایروال مستثنی شود.</string>
+    <string name="fapps_info_isolate_msg" translatable="true">همه را به جز آی‌پی‌های مورد اعتماد مسدود کنید.</string>
+    <string name="fapps_info_dialog_positive_btn" translatable="true">باشه</string>
+    <string name="fapps_unmetered_unblock_dialog_title" translatable="true">مجاز در شبکه نامحدود</string>
+    <string name="fapps_unmetered_block_dialog_title" translatable="true">مسدودسازی در اتصال شبکه نامحدود</string>
+    <string name="fapps_unmetered_block_dialog_message" translatable="true">اتصالات برنامه‌های <i>فهرست‌شده</i> در شبکه‌ی بدون محدودیت حجمی (وای‌فای) مسدود شود؟</string>
+    <string name="fapps_unmetered_unblock_dialog_message">اتصال برنامه‌های <i>فهرست‌شده</i> در شبکهٔ نامحدود (وای‌فای) مجاز شود؟</string>
+    <string name="fapps_metered_block_dialog_title" translatable="true">مسدودسازی در اتصال محدود</string>
 </resources>
