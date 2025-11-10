@@ -1032,4 +1032,8 @@
     <string name="settings_tunnel_metered" translatable="true">Toujours mesuré</string>
     <string name="settings_tunnel_metered_desc" translatable="true">Marquez le tunnel VPN comme mesuré afin d\'indiquer aux applications de consommer moins de données. Attention : cela peut entraîner la mise en pause des téléchargements et chargements volumineux, tels que les sauvegardes.</string>
     <string name="stability_program_toast" translatable="true">Inscrit au <i>programme de stabilité</i> pour les <i>fonctionnalités expérimentales</i>.</string>
+    <string name="lbl_protos" translatable="true">protos</string>
+    <string name="lbl_experimental" translatable="true">(expérimental)</string>
+    <string name="lbl_service_providers" translatable="true">Fournisseurs de service</string>
+    <string name="lbl_hop" translatable="true">Relais</string>
 </resources>
