@@ -531,7 +531,7 @@
     <string name="about_email">Sende uns eine E-Mail</string>
     <string name="about_sponsor_link_text">Sponsor</string>
     <string name="about_twitter">Folge uns auf Twitter</string>
-    <string name="about_mozilla">Rethink wird von Mozilla Builders und FOSS United Foundation unterstützt.</string>
+    <string name="about_mozilla">Rethink wird von Mozilla Builders, FOSS United Foundation und FLOSS/fund unterstützt.</string>
     <string name="about_dialog_positive_button">Los geht\'s</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
     <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
@@ -1191,4 +1191,10 @@
     <string name="copied_clipboard" translatable="true">Kopiert</string>
     <string name="conn_track_clear_rule_logs_title" translatable="true">Protokolle für diese Regel löschen?</string>
     <string name="conn_track_clear_rule_logs_message" translatable="true">Dies löscht nur die Netzwerkprotokolle für die aktuell angezeigte Firewall-Regel. Diese Operation kann nicht rückgängig gemacht werden. Fortfahren?</string>
+    <string name="lbl_default" translatable="true">Standard</string>
+    <string name="lbl_action" translatable="true">Aktion</string>
+    <string name="lbl_connect" translatable="true">Verbinden</string>
+    <string name="lbl_criteria" translatable="true">Kriterien</string>
+    <string name="settings_theme_dialog_themes_7" translatable="true">Frost</string>
+    <string name="firewall_rule_proxy_error" translatable="true">Proxy Fehler</string>
 </resources>
