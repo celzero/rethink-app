@@ -205,7 +205,7 @@
     <string name="orbot_bs_status_trying_connect">正在設定 Orbot ……</string>
     <string name="orbot_status_arg_3">DNS 與 TCP</string>
     <string name="orbot_stop_dialog_neutral">更改 DNS</string>
-    <string name="orbot_explanation">Orbot 是一款能讓其他程式更<u>安全</u>地連線到互聯網的免費代理應用程式。 \nOrbot 使用 <u>Tor</u> 來加密您的網路流量，幫您<u>繞過網路審查</u>，並抵禦威脅個人自由及隱私的<u>網路監視</u>。 \n<u>TCP 代理</u>： Rethink 只將<i>包含的</i>應用程式的 TCP 連線轉送至 Orbot 。 \n<u>HTTP 代理</u>： Rethink 向 Orbot <i>建立</i> HTTP CONNECT 隧道，並只轉送<i>包含的</i>應用程式的 TCP 連線。</string>
+    <string name="orbot_explanation">Orbot 是一款能讓其他程式更<u>安全</u>地連線到互聯網的免費代理應用程式。 \nOrbot 使用 <u>Tor</u> 來加密您的網路流量，助您<u>突破網路審查</u>，並抵禦威脅個人自由及隱私的<u>網路監視</u>。 \n<u>TCP 代理</u>： Rethink 只將<i>已包含</i>應用程式的 TCP 連線轉送至 Orbot 。 \n<u>HTTP 代理</u>： Rethink 向 Orbot <i>建立</i> HTTP CONNECT 隧道，並僅轉送<i>包含的</i>應用程式的 TCP 連線。</string>
     <string name="orbot_install_dialog_message">Orbot 將 Tor 的特性與功能帶入 Android 。</string>
     <string name="orbot_install_dialog_positive">安裝</string>
     <string name="orbot_install_activity_error">似乎出了一些問題，請稍後再試</string>
@@ -217,7 +217,7 @@
     <string name="settings_check_update_desc">每週一次自動檢查應用程式是否有可用更新。</string>
     <string name="hs_download_positive_website">瀏覽網站</string>
     <string name="hsf_proxy_chip_text">已啟用代理</string>
-    <string name="dns_btm_latency_ms">%1$s秒</string>
+    <string name="dns_btm_latency_ms">%1$s 秒</string>
     <string name="dc_rethink_dns_radio">Rethink DNS</string>
     <string name="firewall_rule_unknown_desc">此連線因無法得知<i>來源應用程式</i>而被攔截。<br/><br/>若需變更此行爲，請至<i>全局</i>選項卡。</string>
     <string name="new_app_bulk_notification_title">注意</string>
@@ -443,9 +443,7 @@
     <string name="hsf_uptime">（自%1$s啓動；協定：%2$s；類型：%3$s）</string>
     <string name="hsf_downtime">（自%1$s起停用）</string>
     <string name="hsf_vpn_dialog_header">注意！</string>
-    <string name="hsf_vpn_dialog_message">Rethink 需要設定本地 VPN 的權限，以加密裝置的 DNS 請求、實現網路監測與執行防火牆規則。
-\n
-\nRethink 並不會收集任何資料，且不會以任何方式監視您。</string>
+    <string name="hsf_vpn_dialog_message">Rethink 需要設定本機 VPN 的權限，以加密裝置的 DNS 請求、實現網路監測與執行防火牆規則。 \n \nRethink 並不會收集任何資料，且不會以任何方式監視您。</string>
     <string name="lbl_proceed">繼續</string>
     <string name="hsf_vpn_prepare_failure">可能是遺失 VPN 權限，亦可能是另一應用程式正處於永久連線 VPN 模式中。</string>
     <string name="hsf_start_dialog_message">您距安全的 Android 系統僅有一步之遙：即時查看網路活動，攔截網站、 IP 與不聽話的應用程式。</string>
@@ -497,7 +495,7 @@
     <string name="about_settings_notification">通知設定</string>
     <string name="about_whats_new">%1$s 的新內容</string>
     <string name="about_twitter">在 Twitter 上追蹤我們</string>
-    <string name="about_mozilla">Rethink 受來自 Mozilla Builders 、 FOSS United 基金會的支援</string>
+    <string name="about_mozilla">Rethink 受來自 Mozilla Builders 、 FOSS United 基金會與 FLOSS/fund 基金的支援。</string>
     <string name="about_app_update_check">檢查應用程式更新</string>
     <string name="about_app_contributors">作者</string>
     <string name="about_dialog_positive_button">一起出發</string>
@@ -818,7 +816,7 @@
     <string name="brbs_backup_restore_desc" translatable="true">無法跨版本使用</string>
     <string name="lbl_maybe_blocked" translatable="true">或已攔截</string>
     <string name="settings_allow_lan_heading" translatable="true">勿路由專有 IP （實驗性）</string>
-    <string name="settings_allow_lan_desc" translatable="true">將 LAN 、環回、多播與本機鏈路路由排除於 Rethink 的 VPN 隧道外。</string>
+    <string name="settings_allow_lan_desc" translatable="true">將 LAN 、回送、多播與本機鏈路路由排除於 Rethink 的 VPN 隧道外。</string>
     <string name="bypass_dns_firewall_tooltip">%1$s 僅於 Rethink 的 DNS 上生效</string>
     <string name="lbl_network" translatable="true">網路</string>
     <string name="http_proxy_dialog_desc" translatable="true">設定符合下述格式的 URL ： &lt;協定&gt;://&lt;帳號&gt;:&lt;密碼&gt;@&lt;網域或 IP&gt;:&lt;埠&gt;&lt;路徑&gt; 。例如：http://proxy.example.com:8080/</string>
@@ -994,7 +992,7 @@
     <string name="exclude_apps_from_proxy">為應用程式繞行所有代理</string>
     <string name="exclude_apps_from_proxy_failure_toast">此應用程式繞行代理</string>
     <string name="settings_connectivity_checks_desc" translatable="true">發送連線檢查以確保網路連通性。</string>
-    <string name="settings_exclude_proxy_apps_desc" translatable="true">停用後，將轉送代理（SOCKS5、HTTP、DNS）應用程式從 Rethink 的 VPN 隧道中排除。</string>
+    <string name="settings_exclude_proxy_apps_desc" translatable="true">停用後，將轉送代理（ SOCKS5、HTTP、DNS ）應用程式從 Rethink 的 VPN 隧道中排除。</string>
     <string name="settings_exclude_proxy_apps_heading" translatable="true">環回轉送代理應用程式</string>
     <string name="restrict_dialog_message" translatable="true"><i>%1$s</i> 可能導致連線遺失。 變更設定以允許 Rethink 於背景使用資料和其他資源。</string>
     <string name="toast_allow_bypass_disabled" translatable="true">因已啟用代理， %1$s 已被停用</string>
@@ -1005,15 +1003,15 @@
     <string name="lbl_test" translatable="true">測試</string>
     <string name="lbl_experimental" translatable="true">（實驗性）</string>
     <string name="lbl_hop" translatable="true">中繼</string>
-    <string name="lbl_fallback" translatable="true">備用</string>
+    <string name="lbl_fallback" translatable="true">後備</string>
     <string name="dc_filtering_heading" translatable="true">篩選</string>
     <string name="lbl_protos" translatable="true">協定</string>
-    <string name="wireguard_title" translatable="true">使用WireGuard安全的連線至網際網路</string>
-    <string name="firewall_title" translatable="true">使用防火牆來保護你的Android裝置</string>
-    <string name="dns_title" translatable="true">通過DNS封鎖廣告和惡意應用程式</string>
-    <string name="status_no_network" translatable="true">沒有網際網路連線</string>
+    <string name="wireguard_title" translatable="true">使用 WireGuard 安全連線</string>
+    <string name="firewall_title" translatable="true">用防火牆保護您的 Android 裝置</string>
+    <string name="dns_title" translatable="true">通過 DNS 攔截廣告和惡意軟體</string>
+    <string name="status_no_network" translatable="true">無網路連線</string>
     <string name="settings_biometric_dialog_heading" translatable="true">生物辨識認證</string>
-    <string name="sponser_dialog_usage_msg" translatable="true">你使用Rethink已經<b>%1$s天</b>,折合使用成本大約為<b>$%2$s</b>。你是否願意通過捐贈來支援Rethink的持續開發?</string>
-    <string name="cd_split_dns_desc" translatable="true">將代理應用程式的DNS請求轉發給代理伺服器的DNS服務。</string>
-    <string name="univ_firewall_rule_11" translatable="true">攔截全部的本地連線</string>
+    <string name="sponser_dialog_usage_msg" translatable="true">您已使用 Rethink <b>%1$s 天</b>，折合使用成本約為 <b>$%2$s</b> 。您是否願意通過捐贈來支援它的持續開發呢?</string>
+    <string name="cd_split_dns_desc" translatable="true">將代理應用程式的 DNS 請求轉送至代理的 DNS 伺服器。</string>
+    <string name="univ_firewall_rule_11" translatable="true">攔截全部本機連線</string>
 </resources>
