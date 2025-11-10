@@ -557,7 +557,7 @@
 \n
 \n端口： %3$s</string>
     <string name="fapps_metered_unblock_dialog_title">于计费网络放行</string>
-    <string name="fapps_firewall_filter_desc_category"><![CDATA[正显示 <u>%1$s</u> %2$s 个应用于分类：%3$s]]></string>
+    <string name="fapps_firewall_filter_desc_category"><![CDATA[正显示 <u>%1$s</u> %2$s个应用于分类： %3$s 中]]></string>
     <string name="settings_local_blocklist_version">版本： v%1$s</string>
     <string name="firewall_rule_block_metered">计费网络（移动数据）</string>
     <string name="firewall_rule_block_ip">IP / 端口（应用）</string>
@@ -637,8 +637,8 @@
     <string name="cd_custom_doh_url_name">DoH %1$s</string>
     <string name="settings_custom_downloader_heading">使用应用内附下载器</string>
     <string name="settings_notification_dialog_option_2">\nDNS / DNS + 防火墙：\n显示两个按钮来快速在省电的 DNS 模式和普通的 DNS + 防火墙模式间切换。</string>
-    <string name="contributors_list"><![CDATA[Rethink 开源项目</i>的存在归功于这些在其开发工作上倾泻大量时间的志愿者。<br/>
-                                              <br/>🛡️ Android 应用程序 <br/>
+    <string name="contributors_list"><![CDATA[The <i>Rethink 开源项目</i> 没有这些在其开发上贡献了不计其数时间的志愿者们根本不可能存在。<br/>
+                                              <br/>🛡️ Android 应用 <br/>
                                               <a href="https://github.com/anthonyryan1">Anthony Ryan</a> /
                                               <a href="https://github.com/BayLee4">BayLee4</a> /
                                               <a href="https://github.com/Ch4t4r">Ch4t4r</a> /
@@ -665,7 +665,7 @@
                                               <a href="https://github.com/PeterDaveHello">PeterDaveHello</a> /
                                               <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
                                               <a href="https://github.com/SeanBurford">SeanBurford</a><br/>
-                                              <br/>📚 解析服务 <br/>
+                                              <br/>📚 解析器 <br/>
                                               <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a> /
                                               <a href="https://github.com/amithm7">amithm7</a> /
                                               <a href="https://github.com/arfshl">arfshl</a> /
@@ -684,7 +684,7 @@
                                               <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a> /
                                               <a href="https://github.com/shruuub">shruuub</a> /
                                               <a href="https://github.com/shuvashish76">shuvashish76</a><br/>
-                                              <br/>⚜ 社区协管 <br/>
+                                              <br/>⚜ 社区管理 <br/>
                                               <a href="https://t.me/amithm7">amithm7</a> /
                                               <a href="https://t.me/TronSlayer">Andersen</a> /
                                               <a href="https://t.me/ppatra">ppatra</a> /
@@ -694,7 +694,7 @@
                                               <a href="https://t.me/Billi_ance">Billi_ance</a> /
                                               <a href="https://t.me/kaliangel">kaliangel</a> /
                                               <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
-                                              <br/>📌 IP 地理位置数据库 <br/>
+                                              <br/>📌 Geo-IP 库<br/>
                                               <a href="https://db-ip.com">db-ip.com</a> / <a href="https://ipinfo.io/lite">IPinfo Lite</a><br/>
                                               <br/>❇ 翻译 <br/>
                                               <a href="https://weblate.org/en/">Weblate</a><br/>
