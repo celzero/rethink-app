@@ -1006,4 +1006,5 @@
     <string name="lbl_experimental" translatable="true">（實驗性）</string>
     <string name="lbl_hop" translatable="true">中繼</string>
     <string name="lbl_fallback" translatable="true">備用</string>
+    <string name="dc_filtering_heading" translatable="true">不篩選</string>
 </resources>
