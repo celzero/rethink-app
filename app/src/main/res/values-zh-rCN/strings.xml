@@ -252,7 +252,7 @@
     <string name="dns_info_neutral">复制</string>
     <string name="fapps_filter_parent_system">系统</string>
     <string name="unicode_question_sign">❔</string>
-    <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[此连接因正在设置<i>一键 Tor 代理</i>而放行。]]></string>
+    <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[此连接被放行因为通过 Orbot 的<i>一键 Tor 代理</i> 设置正在进行中。]]></string>
     <string name="cd_dialog_title">添加域名规则</string>
     <string name="ada_app_status_block">已拦截</string>
     <string name="status_dns_server_down">DNS 服务器离线</string>
@@ -493,7 +493,7 @@
     <string name="firewall_rule_block_dns_bypass">已绕过 DNS</string>
     <string name="firewall_rule_no_rule_desc">此连接无匹配的防火墙规则。</string>
     <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[此 DNS 连接已代理并转发至用户选择的 DNS 端点。<br/><br/>若需更改，请移步 DNS <i>配置</i>屏，并停用<i>防止 DNS 泄漏</i>。]]></string>
-    <string name="firewall_rule_block_http_desc"><![CDATA[此连接因疑似使用<i>不安全 HTTP</i> 而被拦截。<br/><br/>若需更改，请至<i>全局</i>选项卡。]]></string>
+    <string name="firewall_rule_block_http_desc"><![CDATA[此连接被拦截因为它可能使用了 <i>不安全的 HTTP</i>。<br/><br/> 要更改，请转到<i>全局</i> 选项卡。]]></string>
     <string name="notif_dialog_pause_dialog_positive">恢复</string>
     <string name="cd_dialog_desc">一个 URL 或域名，可带有通配符，如 *.test.com 或 test.com/test</string>
     <string name="ci_no_rule_initial">无</string>
@@ -889,7 +889,7 @@
     <string name="firewall_rule_domain_blocked_univ" translatable="true">域名（通用）</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">信任域名（通用）</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[此连接因<i>来源应用</i><i>绕行 DNS 及防火墙</i>规则而被放行。<br/><br/>若需更改，请移步<i>分应用防火墙</i>屏幕。]]></string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[此连接的<i>域名</i>被用户所偏好的 DNS 拦截。<br/><br/>若需变更此行为，请移步 <i>DNS 配置</i>选项卡。]]></string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[此连接被拦截因为<i>域名</i> 被用户的首选 DNS 更改。<br/><br/> 要更改此行为，请转到 <i>配置 DNS</i> 选项卡。]]></string>
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[此连接因<i>域名</i>被全局域名规则拦截而被拦截。<br/><br/>若需变更此行为，请移步 <i>DNS 配置</i>选项卡。]]></string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[此连接因<i>域名</i>被全局域名规则信任而被放行。<br/><br/>若需变更此行为，请移步 <i>DNS 配置</i>选项卡。]]></string>
     <string name="dc_setting_dns_cache_heading" translatable="true">DNS 加速器</string>
