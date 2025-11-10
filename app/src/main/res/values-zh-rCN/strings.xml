@@ -1127,5 +1127,4 @@
     <string name="univ_delete_domain_dialog_message" translatable="true">删除这些规则将允许任何应用程序连接到当前被拦截的域名。</string>
     <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[此连接正在尝试寻找不存在的<i>私人DNS</i>服务器。]]></string>
     <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[此连接因<i>源应用</i>设置为<i>绕过代理</i>规则而被放行。<br/><br/>若需更改，请移步<i>分应用防火墙</i>设置界面。]]></string>
-    <string name="lbl_background_data" translatable="true">限制后台数据</string>
 </resources>

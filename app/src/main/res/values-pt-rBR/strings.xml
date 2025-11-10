@@ -1056,5 +1056,4 @@
     <string name="firewall_rule_lockdown_wg" translatable="true">Proxy de bloqueio</string>
     <string name="settings_theme_dialog_themes_5" translatable="true">Luz Plus</string>
     <string name="settings_theme_dialog_themes_6" translatable="true">Escuro Plus</string>
-    <string name="lbl_background_data" translatable="true">Restringir dados de fundo</string>
 </resources>
