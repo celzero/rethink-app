@@ -1002,4 +1002,8 @@
     <string name="memory_notification_text">Rethink 目前可用記憶體空間過少。系統操作可能受限。</string>
     <string name="dc_proxy_dns_desc" translatable="true">勿由永久連線的 WireGuard 、 SOCKS5 、 HTTP 代理來代理 DNS 。</string>
     <string name="lbl_unselected" translatable="true">未選</string>
+    <string name="lbl_test" translatable="true">測試</string>
+    <string name="lbl_experimental" translatable="true">（實驗性）</string>
+    <string name="lbl_hop" translatable="true">中繼</string>
+    <string name="lbl_fallback" translatable="true">備用</string>
 </resources>
