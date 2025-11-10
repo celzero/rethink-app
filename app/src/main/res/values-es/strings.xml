@@ -801,7 +801,7 @@
     <string name="logs_card_network_count" translatable="true">%1$s conexiones</string>
     <string name="logs_card_dns_count" translatable="true">%1$s consultas</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">Captura de paquetes activada</string>
-    <string name="cd_dns_alg_desc" translatable="true">Asignar una IP única por solicitud DNS</string>
+    <string name="cd_dns_alg_desc" translatable="true">Asignar una IP única por solicitud DNS.</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS bloqueado</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Dominio (Univ)</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Se permitió esta conexión porque la <i>aplicación de origen</i> está configurada para <i>omitir las reglas de dns y cortafuegos</i>.<br/><br/> Para cambiar, vaya a la pantalla <i>Cortafuegos específico de la aplicación</i>.</string>
@@ -1063,4 +1063,8 @@
     <string name="vpn_policy_relaxed" translatable="true">Relajado</string>
     <string name="copied_clipboard" translatable="true">Copiado</string>
     <string name="conn_track_clear_rule_logs_message" translatable="true">Esto solo borrará los registros de red para la regla del firewall que se está viendo actualmente. Esta operación no es reversible. ¿Desea continuar?</string>
+    <string name="settings_mobile_metered_heading" translatable="true">Medir redes móviles</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Considera solo las redes móviles como medidas, el resto como no medidas.</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">Ninguna</string>
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Usar el DNS del sistema para dominios no delegados</string>
 </resources>
