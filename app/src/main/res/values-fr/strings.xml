@@ -8,7 +8,7 @@
     <string name="pause_title_desc">faire une sieste…</string>
     <string name="notification_action_resume_vpn">REPRENDRE</string>
     <string name="slide_1_title">Libre et Open Source</string>
-    <string name="slide_1_desc">Rethink est un logiciel open source soutenu par le programme Mozilla Builders MVP.</string>
+    <string name="slide_1_desc">Rethink est un logiciel open source soutenu par le programme Mozilla Builders MVP, Fondation FOSS United.</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="block">bloquer</string>
     <string name="isolate">confiner</string>
@@ -369,7 +369,7 @@
     <string name="orbot_bs_status_1">Transfert de %1$s connexions à Orbot.</string>
     <string name="about_bug_no_log_dialog_title">Rapport de bogue</string>
     <string name="about_sponsor_link_text">Soutenir</string>
-    <string name="dns_btm_latency_ms">%1$sms</string>
+    <string name="dns_btm_latency_ms">%1$ss</string>
     <string name="hs_download_positive_website">Visitez le site web</string>
     <string name="univ_firewall_rule_3">Bloquer les applications dont la source est inconnue</string>
     <string name="univ_firewall_rule_8">Bloquer le trafic du port 80 (HTTP non sécurisé)</string>
@@ -833,7 +833,7 @@
     <string name="logs_card_network_count" translatable="true">%1$s connexions</string>
     <string name="logs_card_dns_count" translatable="true">%1$s demandes de renseignements</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">Capture de paquets active</string>
-    <string name="cd_dns_alg_desc" translatable="true">Attribution d\'une IP unique par requête DNS</string>
+    <string name="cd_dns_alg_desc" translatable="true">Attribution d\'une IP unique par requête DNS.</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Domaine de confiance (Univ)</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Cette connexion a été autorisée car <i>l’application source</i> est configurée pour <i>contourner les règles du pare-feu global</i>.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Cette connexion a été bloquée parce que le domaine <i/> est défini comme bloqué dans les règles de domaine universel.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.</string>
@@ -1027,4 +1027,9 @@
     <string name="lbl_notification" translatable="true">notification</string>
     <string name="memory_notification_text">Rethink connaît une mémoire insuffisante. Les actions du système peuvent être limitées.</string>
     <string name="lbl_test" translatable="true">test</string>
+    <string name="settings_jumbo_packets" translatable="true">Amplificateur de bande passante</string>
+    <string name="settings_jumbo_packets_desc" translatable="true">Utilise des <i>paquets jumbo</i> dans le tunnel VPN de Rethink.</string>
+    <string name="settings_tunnel_metered" translatable="true">Toujours mesuré</string>
+    <string name="settings_tunnel_metered_desc" translatable="true">Marquez le tunnel VPN comme mesuré afin d\'indiquer aux applications de consommer moins de données. Attention : cela peut entraîner la mise en pause des téléchargements et chargements volumineux, tels que les sauvegardes.</string>
+    <string name="stability_program_toast" translatable="true">Inscrit au <i>programme de stabilité</i> pour les <i>fonctionnalités expérimentales</i>.</string>
 </resources>
