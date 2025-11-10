@@ -1151,7 +1151,7 @@
     <string name="adv_set_dial_timeout_desc" translatable="true">Schließe inaktive TCP- und UDP-Sockets nach dieser Dauer.</string>
     <string name="no_stats_available" translatable="true">Keine Statistiken</string>
     <string name="wg_setting_use_on_mobile" translatable="true">Nur mobil</string>
-    <string name="wg_setting_use_on_mobile_desc" translatable="true">Diese WireGuard ausschließlich über mobile Daten nutzen.</string>
+    <string name="wg_setting_use_on_mobile_desc" translatable="true">Dieses WireGuard VPN über mobile Daten nutzen.</string>
     <string name="hop_add_remove_title" translatable="true">Relay hinzufügen / entfernen</string>
     <string name="about_terms_of_service" translatable="true">Nutzungsbedingungen</string>
     <string name="bypasses_network_restrictions" translatable="true">Erreichbarkeitsprüfungen umgehen alle Netzwerkbeschränkungen. Im <i>Auto</i>-Modus verwendet Rethink zufällig zuvor verbundene IPs und Hostnamen.</string>
@@ -1187,7 +1187,7 @@
     <string name="vpn_policy_title" translatable="true">Verbindungsänderungsrichtlinie</string>
     <string name="use_fallback_dns_to_bypass" translatable="true">Fallback-DNS als Umgehung verwenden</string>
     <string name="use_fallback_dns_to_bypass_desc" translatable="true">Wenn aktiviert, immer Fallback-DNS für umgangene Apps, Domains und IPs verwenden.</string>
-    <string name="title_database_dump" translatable="true">Datenbankstatus</string>
+    <string name="title_database_dump" translatable="true">Datenbank</string>
     <string name="copied_clipboard" translatable="true">Kopiert</string>
     <string name="conn_track_clear_rule_logs_title" translatable="true">Protokolle für diese Regel löschen?</string>
     <string name="conn_track_clear_rule_logs_message" translatable="true">Dies löscht nur die Netzwerkprotokolle für die aktuell angezeigte Firewall-Regel. Diese Operation kann nicht rückgängig gemacht werden. Fortfahren?</string>
@@ -1197,4 +1197,27 @@
     <string name="lbl_criteria" translatable="true">Kriterien</string>
     <string name="settings_theme_dialog_themes_7" translatable="true">Frost</string>
     <string name="firewall_rule_proxy_error" translatable="true">Proxy Fehler</string>
+    <string name="settings_jumbo_packets" translatable="true">Bandbreiten-Booster</string>
+    <string name="vpn_policy_fixed" translatable="true">Konservativ</string>
+    <string name="vpn_policy_fixed_desc" translatable="true">Reagiert nur minimal auf Netzwerkänderungen.</string>
+    <string name="wg_setting_ssid_title" translatable="true">Nur WLAN</string>
+    <string name="wg_setting_ssid_desc" translatable="true">Dieses WireGuard-VPN nur aktivieren, wenn eine Verbindung zu WLAN oder bestimmten WLAN-Kennungen (%1$s) besteht.</string>
+    <string name="ssid_permission_explanation" translatable="true">Rethink benötigt Standortberechtigungen, um auf WLAN-Kennungen (%1$s) zugreifen zu können.</string>
+    <string name="location_enable_explanation" translatable="true">Aktiviere den Standortdienst, um auf WLAN-Kennungen (%1$s) zugreifen zu können.</string>
+    <string name="ssid_location_error" translatable="true">Standortdienst aktivieren</string>
+    <string name="ssid_permission_error_action" translatable="true">Berechtigung gewähren</string>
+    <string name="ssid_location_error_action" translatable="true">Standort aktivieren</string>
+    <string name="wg_ssid_and_mobile_err" translatable="true">%1$s und %2$s können nicht gleichzeitig verwendet werden</string>
+    <string name="wg_ssid_input_hint" translatable="true">WLAN-Kennung eingeben (%1$s)</string>
+    <string name="wg_ssid_type_exact" translatable="true">Genau</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Teilweise</string>
+    <string name="wg_ssid_invalid_error" translatable="true">Wi-Fi-Kennungen (%1$s) dürfen maximal 32 Zeichen lang sein.</string>
+    <string name="wg_ssid_delete_confirmation" translatable="true">%1$s löschen?</string>
+    <string name="settings_firebase_error_reporting_heading" translatable="true">Stabilitätsprogramm</string>
+    <string name="settings_firebase_error_reporting_desc" translatable="true">Fehlerprotokolle erfassen, um die Stabilität zu verbessern.</string>
+    <string name="tombstone_app_title" translatable="true">Deinstallierte Apps merken</string>
+    <string name="tombstone_app_desc" translatable="true">Wenn aktiviert, werden die App-Regeln 7 Tage lang beibehalten.</string>
+    <string name="settings_locale_dialog_default" translatable="true">Systemvorgabe</string>
+    <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P</string>
+    <string name="settings_allow_incoming_wg_packets_desc" translatable="true">Wenn aktiviert, werden eingehende Verbindungen von WireGuard-Peers zugelassen.</string>
 </resources>
