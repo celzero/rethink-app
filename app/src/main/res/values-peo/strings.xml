@@ -17,4 +17,24 @@
     <string name="lbl_blocked" translatable="true">مسدود</string>
     <string name="lbl_disabled" translatable="true">قطع شده</string>
     <string name="lbl_domain" translatable="true">دامین</string>
+    <string name="title_settings" translatable="true">تنظیمات</string>
+    <string name="title_statistics" translatable="true">آمار</string>
+    <string name="pause_title_desc" translatable="true">توقف موقت</string>
+    <string name="lbl_wildcard" translatable="true">کاراکتر جانشین</string>
+    <string name="lbl_action_required" translatable="true">اقدام لازم</string>
+    <string name="lbl_rules" translatable="true">قوانین</string>
+    <string name="lbl_configure" translatable="true">پیکربندی</string>
+    <string name="lbl_logs" translatable="true">گزارش ها</string>
+    <string name="lbl_network" translatable="true">شبکه</string>
+    <string name="lbl_create" translatable="true">ایجاد</string>
+    <string name="lbl_qr_code" translatable="true">کد QR</string>
+    <string name="lbl_import" translatable="true">وارد کردن</string>
+    <string name="lbl_wireguard" translatable="true">وایرگارد</string>
+    <string name="lbl_public_key" translatable="true">کلید عمومی</string>
+    <string name="lbl_addresses" translatable="true">آدرس ها</string>
+    <string name="lbl_dns_servers" translatable="true">DNS سرورهای</string>
+    <string name="lbl_applications" translatable="true">برنامه ها</string>
+    <string name="lbl_ip_rules" translatable="true">قوانین IP</string>
+    <string name="lbl_domain_rules" translatable="true">قوانین دامنه</string>
+    <string name="lbl_delete" translatable="true">حذف</string>
 </resources>
