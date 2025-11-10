@@ -1,1 +1,1 @@
-Applications pare-feu, utilisation du VPN WireGuard, surveillance du réseau, blocage des logiciels malveillants, modification du DNS.
+Apps pare-feu, utiliser WireGuardVPN, surveiller réseau, bloquer malware, changer DNS.
