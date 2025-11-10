@@ -10,7 +10,7 @@
     <string name="skip">Atla</string>
     <string name="finish">Bitir</string>
     <string name="slide_1_title">Ücretsiz ve Açık Kaynaklı</string>
-    <string name="slide_1_desc">Rethink, Mozilla Builders MVP programı tarafından desteklenen açık kaynaklı bir yazılımdır.</string>
+    <string name="slide_1_desc">Rethink, Mozilla Builders MVP programı ve FOSS United Foundation tarafından desteklenen açık kaynaklı bir yazılımdır.</string>
     <string name="untracked">izlenmiyor</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Uyarı: Rethink devre dışı bırakıldı</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Koruma ayarını değiştirmek için dokunun</string>
@@ -1036,4 +1036,14 @@
     <string name="lbl_service_providers" translatable="true">Hizmet Sağlayıcıları</string>
     <string name="lbl_hop" translatable="true">Aktarıcılar</string>
     <string name="lbl_manual" translatable="true">Talimatlar</string>
+    <string name="wireguard_title" translatable="true">WireGuard ile Güvenli İnternet</string>
+    <string name="wireguard_desc" translatable="true">WireGuard ile internet bağlantını şifrele. Farklı uygulamalar için farklı bağlantı yolları seç.</string>
+    <string name="firewall_title" translatable="true">Güvenlik Duvarı ile Android Cihazını Koru</string>
+    <string name="firewall_desc" translatable="true">Uygulama internet kullanımını kontrol et; internet kullanımı veya uygulamaya göre bağlantıyı kısıtla.</string>
+    <string name="dns_title" translatable="true">DNS ile Reklamları ve Kötücül Yazılımları Engelle</string>
+    <string name="dns_desc" translatable="true">Reklamlar, izleyiciler ve kötücül yazılımları engellemek için 190+ listeden seçimini yap.</string>
+    <string name="status_no_network" translatable="true">bağlantı yok</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Sadece mobil veriyi sınırlı sayıp gerisini sınırsız algıla.</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">5 dakika sonra</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">15 dakika sonra</string>
 </resources>
