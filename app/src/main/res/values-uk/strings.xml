@@ -744,7 +744,7 @@
     <string name="about_bug_no_log_dialog_message" translatable="true">Не вдалося отримати журнал збоїв. Бажаєте повідомити про помилку вручну?</string>
     <string name="about_twitter" translatable="true">Слідкуйте у Твіттері</string>
     <string name="about_mail_subject" translatable="true">[Rethink]:</string>
-    <string name="about_mozilla" translatable="true">Rethink підтримується Mozilla Builders та FOSS United Foundation.</string>
+    <string name="about_mozilla" translatable="true">Rethink підтримується Mozilla Builders, FOSS United Foundation, FLOSS/fund.</string>
     <string name="about_mail_to" translatable="true">hello@celzero.com</string>
     <string name="about_mail_bugreport_share_title" translatable="true">Оберіть провайдера e-mail</string>
     <string name="intent_launch_error" translatable="true">Не вдалося запустити %1$s</string>
@@ -1133,7 +1133,7 @@
     <string name="no_stats_available" translatable="true">Немає статистики</string>
     <string name="hop_failure_toast" translatable="true">Помилка реле: %1$s -&gt; %2$s</string>
     <string name="wg_setting_use_on_mobile" translatable="true">Тільки для мобільних пристроїв</string>
-    <string name="wg_setting_use_on_mobile_desc" translatable="true">Використовуйте цей WireGuard виключно через мобільні дані.</string>
+    <string name="wg_setting_use_on_mobile_desc" translatable="true">Використовуйте цей VPN WireGuard через мобільні дані.</string>
     <string name="hop_add_remove_title" translatable="true">Додати /Вилучити реле</string>
     <string name="about_terms_of_service" translatable="true">Умови надання послуг</string>
     <string name="bypasses_network_restrictions" translatable="true">Перевірки досяжності обходять усі мережеві обмеження. В режимі <i>Auto</i> Rethink випадковим чином використовує раніше підключені IP-адреси та імена хостів.</string>
@@ -1159,7 +1159,7 @@
     <string name="processing_dialog_title" translatable="true">Обробка</string>
     <string name="processing_dialog_desc" translatable="true">Будь ласка, зачекайте, поки ми обробимо ваш запит.</string>
     <string name="smart_dns_desc" translatable="true"><i>Smart DNS</i> випадковим чином використовує будь-який з цих DNS-резолверів:</string>
-    <string name="hop_error_toast_msg_3" translatable="true">Вимкніть режим \"Тільки мобільні пристрої\", щоб використовувати реле</string>
+    <string name="hop_error_toast_msg_3" translatable="true">Вимкніть опцію \"Тільки мобільні пристрої\" або \"SSID\", щоб використовувати реле</string>
     <string name="wg_mobile_only_hop_err" translatable="true">Режим \"лише для мобільних пристроїв\" не підтримується для реле</string>
     <string name="lbl_fallback" translatable="true">Резервний варіант</string>
     <string name="univ_delete_domain_dialog_title" translatable="true">Видалити всі правила домену?</string>
@@ -1172,8 +1172,45 @@
     <string name="vpn_policy_title" translatable="true">Політика зміни підключення</string>
     <string name="use_fallback_dns_to_bypass" translatable="true">Використовувати резервний DNS як обхідний</string>
     <string name="use_fallback_dns_to_bypass_desc" translatable="true">Якщо ввімкнено, завжди використовується резервний DNS для обійдених програм, доменів та IP-адрес.</string>
-    <string name="title_database_dump" translatable="true">Стан бази даних</string>
+    <string name="title_database_dump" translatable="true">База даних</string>
     <string name="copied_clipboard" translatable="true">Скопійовано</string>
     <string name="conn_track_clear_rule_logs_title" translatable="true">Видалити журнали для цього правила?</string>
     <string name="conn_track_clear_rule_logs_message" translatable="true">Це видалить лише мережеві журнали для поточного правила брандмауера. Цю операцію неможливо скасувати. Продовжити?</string>
+    <string name="lbl_default" translatable="true">За замовчуванням</string>
+    <string name="lbl_action" translatable="true">Дія</string>
+    <string name="lbl_connect" translatable="true">Підключитися</string>
+    <string name="lbl_criteria" translatable="true">Критерії</string>
+    <string name="settings_theme_dialog_themes_7" translatable="true">Мороз</string>
+    <string name="firewall_rule_proxy_error" translatable="true">Помилка проксі-сервера</string>
+    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Це з’єднання було заблоковано, оскільки не вибрано <i>проксі</i>, вибраний для програми.<br/><br/> Щоб змінити, перейдіть до розділу <i>Проксі</i> на екрані <i>Налаштування</i>.]]></string>
+    <string name="vpn_policy_fixed" translatable="true">Консервативний</string>
+    <string name="vpn_policy_fixed_desc" translatable="true">Мінімально реагує на зміни в мережі.</string>
+    <string name="wg_setting_ssid_title" translatable="true">Тільки Wi-Fi</string>
+    <string name="wg_setting_ssid_desc" translatable="true">Увімкніть цю VPN WireGuard лише під час підключення до Wi-Fi або вказаних ідентифікаторів Wi-Fi (%1$s).</string>
+    <string name="ssid_permission_explanation" translatable="true">Rethink потребує дозволу на геодані для доступу до ідентифікаторів Wi-Fi (%1$s).</string>
+    <string name="location_enable_explanation" translatable="true">Щоб отримати доступ до ідентифікаторів Wi-Fi (%1$s), увімкніть службу визначення місцезнаходження.</string>
+    <string name="ssid_location_error" translatable="true">Увімкнути службу визначення місцезнаходження</string>
+    <string name="ssid_permission_error_action" translatable="true">Надати дозвіл</string>
+    <string name="ssid_location_error_action" translatable="true">Увімкнути геодані</string>
+    <string name="wg_ssid_and_mobile_err" translatable="true">Не можна використовувати одночасно %1$s та %2$s</string>
+    <string name="wg_ssid_dialog_description" translatable="true">%1$s ця VPN-мережа WireGuard, коли <i>активна</i>. Ідентифікатор Wi-Fi (%2$s) %3$s.</string>
+    <string name="wg_ssid_input_hint" translatable="true">Введіть ідентифікатор Wi-Fi (%1$s)</string>
+    <string name="wg_ssid_type_exact" translatable="true">Точно</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Частково</string>
+    <string name="wg_ssid_invalid_error" translatable="true">Ідентифікатори Wi-Fi (%1$s) повинні містити 32 символи або менше.</string>
+    <string name="wg_ssid_delete_confirmation" translatable="true">Видалити %1$s?</string>
+    <string name="settings_firebase_error_reporting_heading" translatable="true">Програма стабільності</string>
+    <string name="settings_firebase_error_reporting_desc" translatable="true">Зберігайте журнали помилок для покращення стабільності.</string>
+    <string name="tombstone_app_title" translatable="true">Запам\'ятати видалені програми</string>
+    <string name="tombstone_app_desc" translatable="true">Якщо ввімкнено, зберігати правила програми протягом 7 днів.</string>
+    <string name="settings_locale_dialog_default" translatable="true">Системні за замовчуванням</string>
+    <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P</string>
+    <string name="settings_allow_incoming_wg_packets_desc" translatable="true">Якщо ввімкнено, дозволяється вхідні з’єднання, ініційовані вузлами WireGuard.</string>
+    <string name="lockdown_download_message" translatable="true">Вбудований в Android <i>Менеджер завантажень</i> може не працювати, оскільки VPN перебуває в режимі <i>Блокування</i>. Увімкнути завантажувач Rethink?</string>
+    <string name="lockdown_download_enable_inapp" translatable="true">Увімкнути завантажувач</string>
+    <string name="settings_jumbo_packets" translatable="true">Підсилювач пропускної здатності</string>
+    <string name="settings_jumbo_packets_desc" translatable="true">Використовує <i>jumbo-пакети</i> в VPN-тунелі Rethink.</string>
+    <string name="settings_tunnel_metered" translatable="true">Завжди з обліком</string>
+    <string name="settings_tunnel_metered_desc" translatable="true">Позначте VPN-тунель Rethink як лімітований, щоб програми споживали менше даних. Увага: це може призвести до того, що програми призупинять великі завантаження та вивантаження, такі як резервні копії.</string>
+    <string name="stability_program_toast" translatable="true">Зареєстровано в <i>програмі стабільності</i> для <i>експериментальних функцій</i>.</string>
 </resources>
