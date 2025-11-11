@@ -550,8 +550,8 @@
     <string name="fapps_metered_block_dialog_message">Bloquear conexões em redes móveis para aplicativos <i>listados</i>\?</string>
     <string name="fapps_metered_unblock_dialog_title">Permitir em redes móveis</string>
     <string name="fapps_metered_unblock_dialog_message">Permitir conexões em redes móveis para aplicativos <i>listados</i>\?</string>
-    <string name="fapps_firewall_filter_desc">Mostrando aplicativos: <u>%1$s</u>, %2$s</string>
-    <string name="fapps_firewall_filter_desc_category">Mostrando aplicativos (<u>%1$s</u>, %2$s) nas categorias: %3$s</string>
+    <string name="fapps_firewall_filter_desc"><![CDATA[Exibindo <u>%1$s</u> %2$s aplicativos]]></string>
+    <string name="fapps_firewall_filter_desc_category"><![CDATA[Exibindo <u>%1$s</u> %2$s aplicativos nas categorias: %3$s]]></string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
@@ -1054,4 +1054,6 @@
     <string name="firewall_rule_bypass_proxy" translatable="true">Ignorar proxy</string>
     <string name="firewall_rule_paused_app" translatable="true">Aplicativo pausado</string>
     <string name="firewall_rule_lockdown_wg" translatable="true">Proxy de bloqueio</string>
+    <string name="settings_theme_dialog_themes_5" translatable="true">Luz Plus</string>
+    <string name="settings_theme_dialog_themes_6" translatable="true">Escuro Plus</string>
 </resources>

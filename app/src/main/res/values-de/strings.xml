@@ -17,13 +17,13 @@
     <string name="slide_2_desc">Rethink ist das einfachste Mittel, um Netzwerkaktivitäten zu überwachen, Internetzensur zu umgehen und Apps auf deinem Android-Gerät mit einer Firewall einzudämmen.</string>
     <string name="slide_1_desc">Rethink ist eine Open-Source-Software, die vom Mozilla Builders MVP-Programm und der FOSS United Foundation unterstützt wird.</string>
     <string name="rdns_plus">RDNS Plus</string>
-    <string name="block">blockiert</string>
+    <string name="block">blocken</string>
     <string name="untracked">nicht verfolgt</string>
     <string name="dns_mode_notification_title">Geschützt! Verbunden mit schnellem und sicherem DNS.</string>
     <string name="firewall_mode_notification_title">Geschützt! Verbunden mit der Firewall.</string>
     <string name="hybrid_mode_notification_title">Geschützt! Verbunden mit DNS + Firewall.</string>
     <string name="pause_mode_notification_title">Pausiert! Blockierte Apps werden weiterhin mit einer Firewall geschützt.</string>
-    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">warten</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">warte</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">ausfallend</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">geschützt</string>
     <string name="status_protected_with_tor">geschützt mit Tor</string>
@@ -233,7 +233,7 @@
     <string name="settings_notification_desc1">Pause / Stopp (Standard)</string>
     <string name="settings_notification_desc2">DNS / DNS + Firewall</string>
     <string name="settings_notification_dialog_title">Benachrichtigungsaktion auswählen</string>
-    <string name="settings_notification_dialog_option_1">\nPause / Stopp (Standard):\n\nZeigt zwei Schaltflächen, um Rethink schnell anzuhalten oder zu beenden.</string>
+    <string name="settings_notification_dialog_option_1">\nPause / Stopp (Standard):\nZeigt zwei Schaltflächen, um Rethink schnell anzuhalten oder zu beenden.</string>
     <string name="settings_notification_dialog_option_3">\nKeine:\nZeigt keine Schaltfläche an.\n</string>
     <string name="pause_text">pausiert</string>
     <string name="pause_desc">Hinweis: %1$s blockierte Anwendungen werden weiterhin mit einer Firewall versehen.</string>
@@ -531,7 +531,7 @@
     <string name="about_email">Sende uns eine E-Mail</string>
     <string name="about_sponsor_link_text">Sponsor</string>
     <string name="about_twitter">Folge uns auf Twitter</string>
-    <string name="about_mozilla">Rethink wird von Mozilla Builders und FOSS United Foundation unterstützt.</string>
+    <string name="about_mozilla">Rethink wird von Mozilla Builders, FOSS United Foundation und FLOSS/fund unterstützt.</string>
     <string name="about_dialog_positive_button">Los geht\'s</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
     <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
@@ -821,9 +821,9 @@
     <string name="fapps_unmetered_block_dialog_title" translatable="true">Blockieren auf nicht getakteten Verbindung</string>
     <string name="fapps_info_metered_msg" translatable="true">Zulassen / Blockieren in gebührenpflichtigen Netzen (mobile Netze).</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Starten Sie Rethink, um fortzufahren</string>
-    <string name="lbl_wildcard" translatable="true">Wildcard</string>
+    <string name="lbl_wildcard" translatable="true">Platzhalter</string>
     <string name="lbl_allowed" translatable="true">Erlaubt</string>
-    <string name="lbl_blocked" translatable="true">Geblockt</string>
+    <string name="lbl_blocked" translatable="true">Blockiert</string>
     <string name="lbl_disabled" translatable="true">Deaktiviert</string>
     <string name="lbl_action_required" translatable="true">Aktion erforderlich</string>
     <string name="lbl_domain" translatable="true">Domain</string>
@@ -932,7 +932,7 @@
     <string name="setup_wireguard" translatable="true">WireGuard einrichten</string>
     <string name="key_length_explanation_hex" translatable="true">: WireGuard Hex-Schlüssel müssen 64 Zeichen (32 Bytes) lang sein</string>
     <string name="crypt_relay_singapore" translatable="true">Anonymisiertes DNS-Relay, gehostet in Singapur.</string>
-    <string name="lbl_hour" translatable="true">Std.</string>
+    <string name="lbl_hour" translatable="true">Std</string>
     <string name="wireguard_enabled_failure">Schalten Sie andere aktive Proxys aus, um WireGuard zu aktivieren</string>
     <string name="lbl_save" translatable="true">speichern</string>
     <string name="cd_deleted_toast" translatable="true">Alle Domain-Regeln gelöscht</string>
@@ -961,7 +961,7 @@
     <string name="config_add_success_toast">Konfiguration hinzugefügt</string>
     <string name="key_contents_error" translatable="true">Falsche Zeichen im Schlüssel</string>
     <string name="lbl_insecure" translatable="true">(unsicher)</string>
-    <string name="lbl_min" translatable="true">Min.</string>
+    <string name="lbl_min" translatable="true">min</string>
     <string name="lbl_preshared_key" translatable="true">Vorher geteilter Schlüssel</string>
     <string name="bad_config_reason_unknown_section" translatable="true">Unbekannte Sektion</string>
     <string name="crypt_relay_netherlands" translatable="true">Anonymisiertes DNS-Relay, gehostet in den Niederlanden</string>
@@ -1000,10 +1000,10 @@
     <string name="lbl_on_device" translatable="true">auf dem Gerät</string>
     <string name="lbl_cache" translatable="true">Cache</string>
     <string name="lbl_starting" translatable="true">Wird gestartet</string>
-    <string name="failed_using_default" translatable="true">Fehler: Verwenden des Fallback DNS</string>
+    <string name="failed_using_default" translatable="true">Fehler: Verwende Fallback DNS</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">DoT Endpunkt löschen?</string>
     <string name="memory_notification_text">Rethink hat gerade nur wenig Speicher zur Verfügung. Einige Funktionen könnten eingeschränkt sein.</string>
-    <string name="lbl_persistent_keepalive" translatable="true">Aufrechterhaltung der Verbindung</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Anhaltende Aufrechterhaltung der Verbindung</string>
     <string name="hybrid_mode_with_proxy_notification_title" translatable="true">Geschützt! Verbunden mit DNS + Firewall + Proxy.</string>
     <string name="lbl_peer" translatable="true">Peer</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (experimentell)</string>
@@ -1025,7 +1025,7 @@
     <string name="lbl_battery_optimization" translatable="true">Akkuoptimierung</string>
     <string name="dc_proxy_dns_heading" translatable="true">DNS niemals durch Proxy leiten</string>
     <string name="dc_proxy_dns_desc" translatable="true">DNS nicht über Always-on WireGuard, SOCKS5, HTTP-Proxies leiten.</string>
-    <string name="firewall_rule_proxied" translatable="true">Proxied</string>
+    <string name="firewall_rule_proxied" translatable="true">via Proxy</string>
     <string name="one_wg_apps_added" translatable="true">Weiterleitung aller Anwendungen</string>
     <string name="wg_lockdown_dialog_title" translatable="true">Lockdown</string>
     <string name="import_error" translatable="true">Tunnel kann nicht importiert werden: %s</string>
@@ -1101,7 +1101,7 @@
     <string name="lbl_always" translatable="true">Immer</string>
     <string name="hop_failure_toast" translatable="true">Relay-Fehler: %1$s -&gt; %2$s</string>
     <string name="wg_mobile_only_hop_err" translatable="true">Mobile-only-Modus wird für Relays nicht unterstützt</string>
-    <string name="hop_error_toast_msg_3" translatable="true">Deaktiviere den Mobile-only-Modus, um Relays zu nutzen</string>
+    <string name="hop_error_toast_msg_3" translatable="true">Deaktiviere den Mobile-only-oder-SSID-Modus, um Relays zu nutzen</string>
     <string name="lbl_fallback" translatable="true">Fallback</string>
     <string name="dc_filtering_heading" translatable="true">Filterung</string>
     <string name="cd_treat_dns_rules_firewall_desc" translatable="true">DNS-Blockierung wird während der Auflösung umgangen; die Entscheidung wird zum Zeitpunkt der Verbindung getroffen.</string>
@@ -1151,7 +1151,7 @@
     <string name="adv_set_dial_timeout_desc" translatable="true">Schließe inaktive TCP- und UDP-Sockets nach dieser Dauer.</string>
     <string name="no_stats_available" translatable="true">Keine Statistiken</string>
     <string name="wg_setting_use_on_mobile" translatable="true">Nur mobil</string>
-    <string name="wg_setting_use_on_mobile_desc" translatable="true">Diese WireGuard ausschließlich über mobile Daten nutzen.</string>
+    <string name="wg_setting_use_on_mobile_desc" translatable="true">Dieses WireGuard VPN über mobile Daten nutzen.</string>
     <string name="hop_add_remove_title" translatable="true">Relay hinzufügen / entfernen</string>
     <string name="about_terms_of_service" translatable="true">Nutzungsbedingungen</string>
     <string name="bypasses_network_restrictions" translatable="true">Erreichbarkeitsprüfungen umgehen alle Netzwerkbeschränkungen. Im <i>Auto</i>-Modus verwendet Rethink zufällig zuvor verbundene IPs und Hostnamen.</string>
@@ -1187,8 +1187,45 @@
     <string name="vpn_policy_title" translatable="true">Verbindungsänderungsrichtlinie</string>
     <string name="use_fallback_dns_to_bypass" translatable="true">Fallback-DNS als Umgehung verwenden</string>
     <string name="use_fallback_dns_to_bypass_desc" translatable="true">Wenn aktiviert, immer Fallback-DNS für umgangene Apps, Domains und IPs verwenden.</string>
-    <string name="title_database_dump" translatable="true">Datenbankstatus</string>
+    <string name="title_database_dump" translatable="true">Datenbank</string>
     <string name="copied_clipboard" translatable="true">Kopiert</string>
     <string name="conn_track_clear_rule_logs_title" translatable="true">Protokolle für diese Regel löschen?</string>
     <string name="conn_track_clear_rule_logs_message" translatable="true">Dies löscht nur die Netzwerkprotokolle für die aktuell angezeigte Firewall-Regel. Diese Operation kann nicht rückgängig gemacht werden. Fortfahren?</string>
+    <string name="lbl_default" translatable="true">Standard</string>
+    <string name="lbl_action" translatable="true">Aktion</string>
+    <string name="lbl_connect" translatable="true">Verbinden</string>
+    <string name="lbl_criteria" translatable="true">Kriterien</string>
+    <string name="settings_theme_dialog_themes_7" translatable="true">Frost</string>
+    <string name="firewall_rule_proxy_error" translatable="true">Proxy Fehler</string>
+    <string name="settings_jumbo_packets" translatable="true">Bandbreiten-Booster</string>
+    <string name="vpn_policy_fixed" translatable="true">Konservativ</string>
+    <string name="vpn_policy_fixed_desc" translatable="true">Reagiert nur minimal auf Netzwerkänderungen.</string>
+    <string name="wg_setting_ssid_title" translatable="true">Nur WLAN</string>
+    <string name="wg_setting_ssid_desc" translatable="true">Dieses WireGuard-VPN nur aktivieren, wenn eine Verbindung zu WLAN oder bestimmten WLAN-Kennungen (%1$s) besteht.</string>
+    <string name="ssid_permission_explanation" translatable="true">Rethink benötigt Standortberechtigungen, um auf WLAN-Kennungen (%1$s) zugreifen zu können.</string>
+    <string name="location_enable_explanation" translatable="true">Aktiviere den Standortdienst, um auf WLAN-Kennungen (%1$s) zugreifen zu können.</string>
+    <string name="ssid_location_error" translatable="true">Standortdienst aktivieren</string>
+    <string name="ssid_permission_error_action" translatable="true">Berechtigung gewähren</string>
+    <string name="ssid_location_error_action" translatable="true">Standort aktivieren</string>
+    <string name="wg_ssid_and_mobile_err" translatable="true">%1$s und %2$s können nicht gleichzeitig verwendet werden</string>
+    <string name="wg_ssid_input_hint" translatable="true">WLAN-Kennung eingeben (%1$s)</string>
+    <string name="wg_ssid_type_exact" translatable="true">Genau</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Teilweise</string>
+    <string name="wg_ssid_invalid_error" translatable="true">Wi-Fi-Kennungen (%1$s) dürfen maximal 32 Zeichen lang sein.</string>
+    <string name="wg_ssid_delete_confirmation" translatable="true">%1$s löschen?</string>
+    <string name="settings_firebase_error_reporting_heading" translatable="true">Stabilitätsprogramm</string>
+    <string name="settings_firebase_error_reporting_desc" translatable="true">Fehlerprotokolle erfassen, um die Stabilität zu verbessern.</string>
+    <string name="tombstone_app_title" translatable="true">Deinstallierte Apps merken</string>
+    <string name="tombstone_app_desc" translatable="true">Wenn aktiviert, werden die App-Regeln 7 Tage lang beibehalten.</string>
+    <string name="settings_locale_dialog_default" translatable="true">Systemvorgabe</string>
+    <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P</string>
+    <string name="settings_allow_incoming_wg_packets_desc" translatable="true">Wenn aktiviert, werden eingehende Verbindungen von WireGuard-Peers zugelassen.</string>
+    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Diese Verbindung wurde blockiert, da der für die App ausgewählte <i>Proxy</i> nicht ausgewählt wurde.<br/><br/> Um dies zu ändern, gehe auf dem Bildschirm <i>Konfigurieren</i> zu <i>Proxy</i>.]]></string>
+    <string name="wg_ssid_dialog_description" translatable="true">%1$s dieses WireGuard-VPN, wenn <i>aktiv</i> WLAN-Kennung (%2$s) %3$s.</string>
+    <string name="lockdown_download_message" translatable="true">Der in Android integrierte <i>Download-Manager</i> funktioniert möglicherweise nicht, da sich das VPN im <i>Lockdown</i>-Modus befindet. Möchtest du stattdessen den Downloader von Rethink aktivieren?</string>
+    <string name="lockdown_download_enable_inapp" translatable="true">Downloader aktivieren</string>
+    <string name="settings_jumbo_packets_desc" translatable="true">Verwendet <i>Jumbo-Pakete</i> innerhalb des VPN-Tunnels von Rethink.</string>
+    <string name="settings_tunnel_metered" translatable="true">Immer getaktet</string>
+    <string name="settings_tunnel_metered_desc" translatable="true">Markiere den VPN-Tunnel als getaktet, um Apps anzuweisen, weniger Daten zu verbrauchen. Achtung: Dies kann dazu führen, dass Apps große Uploads und Downloads, wie z. B. Backups, unterbrechen.</string>
+    <string name="stability_program_toast" translatable="true">Für das <i>Stabilitätsprogramm</i> für <i>experimentelle Funktionen</i> angemeldet.</string>
 </resources>
