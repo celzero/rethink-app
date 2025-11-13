@@ -75,7 +75,7 @@ jobs:
         env:
           COMMIT: ${{ env.COMMIT }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          REPO: ${{ github.event.inputs.repo }}
+          REPO: ${{ github.event.inputs.repo || 'maven' }}
           
 
 
