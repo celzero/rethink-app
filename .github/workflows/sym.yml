@@ -66,7 +66,7 @@ jobs:
             wget $wgetopts "https://jitpack.io/com/github/celzero/firestack/${COMMIT:0:10}/firestack-${COMMIT:0:10}-debug.aar" -O "firestack.aar"
           else
             # ex: https://repo1.maven.org/maven2/com/celzero/firestack/30c7f27122/
-            wget #wgetopts "https://repo1.maven.org/maven2/com/celzero/firestack/${COMMIT:0:10}/firestack-${COMMIT:0:10}-debug.aar" -O "firestack.aar"
+            wget $wgetopts "https://repo1.maven.org/maven2/com/celzero/firestack/${COMMIT:0:10}/firestack-${COMMIT:0:10}-debug.aar" -O "firestack.aar"
           fi
           ls -ltr .
           unzip ./firestack.aar
