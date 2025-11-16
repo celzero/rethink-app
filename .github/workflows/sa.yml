@@ -8,6 +8,8 @@ jobs:
   detekt:
     name: detekt
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
 
     steps:
       - name: 🥏 Checkout
@@ -25,8 +27,8 @@ jobs:
         run: |
           # from: github.com/natiginfo/action-detekt-all
           wget https://github.com/detekt/detekt/releases/download/v${DETEKT_VER}/detekt-cli-${DETEKT_VER}-all.jar -O detekt-cli-all.jar
-          chmod +x detekt-cli-all.jar
-          # detekt.github.io/detekt/cli.html#use-the-cli 
+
+          # detekt.github.io/detekt/cli.html#use-the-cli
           java -jar detekt-cli-all.jar \
               --build-upon-default-config true \
               --config .github/detekt-config.yml \
