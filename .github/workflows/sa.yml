@@ -35,7 +35,7 @@ jobs:
               --api-version ${KOTLIN_VER} \
               --jvm-target ${JVM_TARGET} \
               --language-version ${KOTLIN_VER} \
-              -- parallel true
+              --parallel true
               # docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/sarif-support-for-code-scanning
               --report sarif:rethink-app-detekt-${RUNID}.sarif -r xml:reports/detekt.xml
         shell:
