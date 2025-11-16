@@ -38,8 +38,7 @@ jobs:
               --parallel true
               # docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/sarif-support-for-code-scanning
               --report sarif:rethink-app-detekt-${RUNID}.sarif -r xml:reports/detekt.xml
-        shell:
-          bash
+        shell: bash
         env:
           RUNID: ${{ github.run_id }}
           # recommended versions: github.com/detekt/detekt?tab=readme-ov-file#executing-detekt
