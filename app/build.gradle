@@ -292,8 +292,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.13.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.1.0'
 
-    fullImplementation 'com.squareup.okhttp3:okhttp:5.2.1'
-    fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.2.1'
+    fullImplementation 'com.squareup.okhttp3:okhttp:5.3.0'
+    fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:5.3.0'
 
     fullImplementation 'com.squareup.retrofit2:retrofit:3.0.0'
     fullImplementation 'com.squareup.retrofit2:converter-gson:3.0.0'
