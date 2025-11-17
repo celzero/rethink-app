@@ -29,6 +29,7 @@ import com.celzero.firestack.backend.RDNS
 import com.celzero.firestack.backend.RouterStats
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConsoleLog
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Utilities
 import com.celzero.firestack.backend.DNSTransport
@@ -395,10 +396,10 @@ object VpnController : KoinComponent {
         return braveVpnService?.removeHop(src) ?: Pair(false, "vpn service not available")
     }
 
-    /*suspend fun getRpnProps(type: RpnProxyManager.RpnType): Pair<RpnProxyManager.RpnProps?, String?> {
+    suspend fun getRpnProps(type: RpnProxyManager.RpnType): Pair<RpnProxyManager.RpnProps?, String?> {
         return braveVpnService?.getRpnProps(type) ?: Pair(null, null)
     }
-*/
+
     suspend fun vpnStats(): String? {
         return braveVpnService?.vpnStats()
     }
