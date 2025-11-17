@@ -176,8 +176,12 @@
             android:finishOnTaskLaunch="true" />
         <activity android:name=".ui.activity.RpnWinProxyDetailsActivity"
             android:finishOnTaskLaunch="true" />
-       <!-- <activity android:name=".ui.location.LocationSelectorActivity"
-            android:finishOnTaskLaunch="true" />-->
+        <activity android:name=".ui.location.LocationSelectorActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.ServerSelectionActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity android:name=".ui.activity.ServerWgConfigDetailActivity"
+            android:finishOnTaskLaunch="true" />
 
         <receiver
             android:name=".receiver.BraveAutoStartReceiver"
