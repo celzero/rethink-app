@@ -30,7 +30,7 @@
                 android:alpha="0.5"
                 android:paddingStart="7dp"
                 android:paddingEnd="7dp"
-                android:text="" />
+                android:text="@string/rethink_plus_title" />
 
             <!-- @string/rethink_plus_title_desc" -->
             <androidx.appcompat.widget.AppCompatTextView
@@ -41,7 +41,7 @@
                 android:alpha="0.5"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                android:text="" />
+                android:text="@string/rethink_plus_title_desc" />
 
         </LinearLayout>
 
@@ -142,7 +142,7 @@
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
                             android:paddingEnd="5dp"
-                            android:text=""
+                            android:text="@string/rethink_off"
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
@@ -152,7 +152,7 @@
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
                             android:paddingEnd="5dp"
-                            android:text=""
+                            android:text="@string/rethink_off_desc"
                             android:textColor="?attr/primaryLightColorText"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
@@ -286,7 +286,7 @@
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
                             android:paddingEnd="5dp"
-                            android:text=""
+                            android:text="@string/rethink_plus_hide_ip_title"
                             android:textColor="?attr/primaryTextColor"
                             android:textSize="@dimen/large_font_text_view" />
 
@@ -296,7 +296,7 @@
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
                             android:paddingEnd="5dp"
-                            android:text=""
+                            android:text="@string/rethink_plus_hide_ip_desc"
                             android:textColor="?attr/primaryLightColorText"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
@@ -384,7 +384,7 @@
             android:fontFamily="sans-serif-smallcaps"
             android:lineSpacingExtra="5dp"
             android:padding="5dp"
-            android:text=""
+            android:text="@string/rethink_plus_troubleshoot_title"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
@@ -433,7 +433,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="10dp"
-                            android:text=""
+                            android:text="@string/rethink_plus_perform_test"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <!-- @string/rethink_plus_test_desc -->
@@ -443,7 +443,7 @@
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
-                            android:text=""
+                            android:text="@string/rethink_plus_test_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
@@ -494,7 +494,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="10dp"
-                            android:text=""
+                            android:text="@string/manage_subscription_title"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <!-- @string/manage_subscription_title -->
@@ -504,7 +504,7 @@
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
-                            android:text=""
+                            android:text="@string/manage_subscription_title"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
@@ -555,7 +555,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="10dp"
-                            android:text=""
+                            android:text="@string/payment_history_title"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <!-- @string/payment_history_title -->
@@ -565,7 +565,7 @@
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
-                            android:text=""
+                            android:text="@string/payment_history_title"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
@@ -616,7 +616,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="10dp"
-                            android:text=""
+                            android:text="@string/rethink_plus_report_issue"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <!-- @string/rethink_plus_report_desc -->
@@ -626,7 +626,7 @@
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
-                            android:text=""
+                            android:text="@string/rethink_plus_report_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 

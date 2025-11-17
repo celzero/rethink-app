@@ -8,7 +8,6 @@
     android:padding="12dp"
     android:gravity="center_vertical"
     android:foreground="?android:attr/selectableItemBackground"
-    android:background="?attr/background"
     android:clickable="true"
     android:focusable="true">
 
@@ -43,7 +42,7 @@
         android:id="@+id/cb_server_selected"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:buttonTint="?attr/colorPrimary"
+        android:buttonTint="?attr/accentGood"
         android:clickable="false"
         android:focusable="false" />
 

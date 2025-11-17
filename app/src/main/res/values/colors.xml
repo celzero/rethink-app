@@ -101,6 +101,11 @@
     <color name="defaultToggleBtnTxt">#FDFDFD</color>
     <color name="defaultToggleBtnBg">#393939</color>
 
+    <!-- VPN header gradient - default dark theme -->
+    <color name="vpnHeaderGradientStart">#006f67</color>
+    <color name="vpnHeaderGradientCenter">#18ffff</color>
+    <color name="vpnHeaderGradientEnd">#80CBC4</color>
+
     <!-- theme light -->
     <color name="colorPrimaryLight">#ececec</color>
     <color name="colorPrimaryDarkLight">#1e88e5</color>
@@ -170,6 +175,11 @@
     <color name="defaultToggleBtnTxtLight">#000000</color>
     <color name="defaultToggleBtnBgLight">#fafafa</color>
 
+    <!-- VPN header gradient - light theme -->
+    <color name="vpnHeaderGradientStartLight">#0277BD</color>
+    <color name="vpnHeaderGradientCenterLight">#039BE5</color>
+    <color name="vpnHeaderGradientEndLight">#29B6F6</color>
+
     <!-- theme dark -->
     <color name="colorPrimaryBlack">#383838</color>
     <color name="colorPrimaryDarkBlack">#1b1818</color>
@@ -231,6 +241,11 @@
     <color name="firewallExcludeToggleBtnBgBlack">#CCffbcd7</color>
     <color name="defaultToggleBtnTxtBlack">#FDFDFD</color>
     <color name="defaultToggleBtnBgBlack">#121212</color>
+
+    <!-- VPN header gradient - true black theme -->
+    <color name="vpnHeaderGradientStartBlack">#004D40</color>
+    <color name="vpnHeaderGradientCenterBlack">#00897B</color>
+    <color name="vpnHeaderGradientEndBlack">#4fc3f7</color>
 
     <!-- light theme plus -->
     <color name="colorPrimaryLightPlus">#d2fff5</color>
@@ -302,6 +317,10 @@
     <color name="defaultToggleBtnTxtLightPlus">#000000</color>
     <color name="defaultToggleBtnBgLightPlus">#e6f4f2</color>
 
+    <!-- VPN header gradient - light theme plus -->
+    <color name="vpnHeaderGradientStartLightPlus">#00796B</color>
+    <color name="vpnHeaderGradientCenterLightPlus">#21a095</color>
+    <color name="vpnHeaderGradientEndLightPlus">#4DB6AC</color>
 
     <!-- dark theme plus -->
     <color name="colorPrimaryBlackPlus">#2D404E</color>
@@ -367,6 +386,11 @@
     <color name="firewallExcludeToggleBtnBgBlackPlus">#8A2D49</color>
     <color name="defaultToggleBtnTxtBlackPlus">#D0E1F2</color>
     <color name="defaultToggleBtnBgBlackPlus">#0E1B21</color>
+
+    <!-- VPN header gradient - black theme plus -->
+    <color name="vpnHeaderGradientStartBlackPlus">#004D40</color>
+    <color name="vpnHeaderGradientCenterBlackPlus">#00695C</color>
+    <color name="vpnHeaderGradientEndBlackPlus">#00A859</color>
 
     <!-- theme dark frost -->
     <color name="colorPrimaryBG">#383838</color>

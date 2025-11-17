@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardBackgroundColor="?attr/chipBgColorNeutral"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Peer Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/peer_name_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="Peer 1" />
+
+        </LinearLayout>
+
+        <!-- Public Key -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="8dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lbl_public_key"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="11sp" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/peer_public_key_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="middle"
+                android:fontFamily="monospace"
+                android:singleLine="true"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="12sp"
+                tools:text="XyZ9876543210ZyXwVuTsRqPoNmLkJiHgFeDcBa=" />
+
+        </LinearLayout>
+
+        <!-- Endpoint -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="8dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/parse_error_inet_endpoint"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="11sp" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/peer_endpoint_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="monospace"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="12sp"
+                tools:text="192.168.1.1:51820" />
+
+        </LinearLayout>
+
+        <!-- Allowed IPs -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="8dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lbl_allowed_ips"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="11sp" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/peer_allowed_ips_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="monospace"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="12sp"
+                tools:text="0.0.0.0/0, ::/0" />
+
+        </LinearLayout>
+
+        <!-- Persistent Keepalive -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lbl_persistent_keepalive"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="11sp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/keepalive_input_layout"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:hint="@string/hint_seconds"
+                    app:boxBackgroundColor="?attr/background"
+                    app:boxBackgroundMode="filled"
+                    app:boxCornerRadiusBottomEnd="6dp"
+                    app:boxCornerRadiusBottomStart="6dp"
+                    app:boxCornerRadiusTopEnd="6dp"
+                    app:boxCornerRadiusTopStart="6dp"
+                    app:hintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/peer_keepalive_edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:textSize="13sp"
+                        tools:text="25" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
+

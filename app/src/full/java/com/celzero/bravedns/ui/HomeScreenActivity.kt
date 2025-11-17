@@ -760,15 +760,32 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         )
     }
 
-    /*private fun updateRethinkPlusHighlight() {
-        val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
-        val rethinkPlusItem = btmNavView.menu.findItem(R.id.rethinkPlus)
-        rethinkPlusItem.setIcon(R.drawable.ic_rethink_plus_sparkle)
-        btmNavView.removeBadge(R.id.rethinkPlus)
-    }*/
+    private fun updateRethinkPlusHighlight() {
+        val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view) ?: run {
+            Logger.w(LOG_TAG_UI, "BottomNavigationView (R.id.nav_view) not found")
+            return
+        }
+
+        val menu = btmNavView.menu
+        val rethinkPlusItem = menu.findItem(R.id.rethinkPlus)
+        if (rethinkPlusItem != null) {
+            try {
+                rethinkPlusItem.setIcon(R.drawable.ic_rethink_plus_sparkle)
+                btmNavView.removeBadge(R.id.rethinkPlus)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_UI, "Failed to update rethinkPlus icon/badge: ${e.message}", e)
+            }
+        } else {
+            Logger.w(LOG_TAG_UI, "Menu item R.id.rethinkPlus not present in BottomNavigationView")
+        }
+    }
 
     private fun setupNavigationItemSelectedListener() {
-        val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
+        val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view) ?: run {
+            Logger.w(LOG_TAG_UI, "setupNavigationItemSelectedListener: BottomNavigationView not found")
+            return
+        }
+
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container) as? NavHostFragment
         val navController = navHostFragment?.navController
@@ -778,31 +795,18 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
             when (item.itemId) {
                 R.id.rethinkPlus -> {
-                    showToastUiCentered(this, "Coming soon!", Toast.LENGTH_SHORT)
+                    // Navigate to rethinkPlus fragment regardless of subscription status
+                    // The fragment itself will handle redirecting to dashboard if needed
+                    if (navController?.currentDestination?.id != R.id.rethinkPlus) {
+                        navController?.navigate(
+                            R.id.rethinkPlus,
+                            null,
+                            NavOptions.Builder().setPopUpTo(homeId, false).build()
+                        )
+                    }
+                    // safe-check before marking checked
+                    btmNavView.menu.findItem(R.id.rethinkPlus)?.isChecked = true
                     true
-                    /*if (RpnProxyManager.hasValidSubscription()) {
-                        // Navigate to rethinkPlusDashboardFragment
-                        if (navController?.currentDestination?.id != R.id.rethinkPlusDashboardFragment) {
-                            navController?.navigate(
-                                R.id.rethinkPlusDashboardFragment,
-                                null,
-                                NavOptions.Builder().setPopUpTo(homeId, false).build()
-                            )
-                        }
-                        btmNavView.menu.findItem(R.id.rethinkPlus)?.isChecked = true
-                        true
-                    } else {
-                        // Navigate to rethinkPlus fragment
-                        if (navController?.currentDestination?.id != R.id.rethinkPlus) {
-                            navController?.navigate(
-                                R.id.rethinkPlus,
-                                null,
-                                NavOptions.Builder().setPopUpTo(homeId, false).build()
-                            )
-                        }
-                        btmNavView.menu.findItem(R.id.rethinkPlus)?.isChecked = true
-                        true
-                    }*/
                 }
 
                 homeId -> {
@@ -833,11 +837,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             }
         }
 
-        // Optionally sync the bottom nav highlight with nav changes
-        /*navController?.addOnDestinationChangedListener { _, destination, _ ->
-            // Update Rethink Plus badge or icon here if needed
+        // Sync highlight with nav changes, guard call to update method
+        navController?.addOnDestinationChangedListener { _, _, _ ->
             updateRethinkPlusHighlight()
-        }*/
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

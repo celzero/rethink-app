@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="15dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="15dp"
+            android:paddingBottom="12dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/peer_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/lbl_peer"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                android:textColor="?attr/primaryTextColor"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@id/expand_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/expand_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_arrow_down_small"
+                android:contentDescription="@string/lbl_configure"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/public_key_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:labelFor="@+id/public_key_text"
+                android:text="@string/lbl_public_key"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/peer_title" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/public_key_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/public_key_label"
+                tools:text="wOs2eguFEohqIZxlSJ1CAT9584tc6ejj9hfGFsoBVkA=" />
+
+            <!-- Expanded Details Layout -->
+            <LinearLayout
+                android:id="@+id/expanded_details_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/public_key_text">
+
+                <!-- Allowed IPs -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/allowed_ips_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@+id/allowed_ips_text"
+                    android:text="@string/lbl_allowed_ips"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="12sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/allowed_ips_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="13sp"
+                    tools:text="0.0.0.0/5, 8.0.0.0/7, 11.0.0.0/8" />
+
+                <!-- Endpoint -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/endpoint_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/parse_error_inet_endpoint"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="12sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/endpoint_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="13sp"
+                    tools:text="192.168.0.1:51820" />
+
+                <!-- Persistent Keepalive -->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/persistent_keepalive_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:labelFor="@+id/persistent_keepalive_text"
+                    android:text="@string/lbl_persistent_keepalive"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="12sp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/persistent_keepalive_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="13sp"
+                    tools:text="every 3 seconds" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>
+

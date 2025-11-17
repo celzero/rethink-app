@@ -5,7 +5,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.celzero.bravedns.database.RpnWinServerEntity
+import com.celzero.bravedns.database.RpnWinServer
 import com.celzero.bravedns.database.RpnWinServerDAO
 import com.celzero.bravedns.database.RpnWinServerRepository
 import kotlinx.coroutines.runBlocking
@@ -25,7 +25,7 @@ import org.junit.runner.RunWith
 class RpnWinServerRepositoryHarness {
 
     // Minimal Room database for testing just RpnWinServerDAO
-    @Database(entities = [RpnWinServerEntity::class], version = 1, exportSchema = false)
+    @Database(entities = [RpnWinServer::class], version = 1, exportSchema = false)
     abstract class TestRpnDb : RoomDatabase() {
         abstract fun rpnWinServerDAO(): RpnWinServerDAO
     }
@@ -58,7 +58,7 @@ class RpnWinServerRepositoryHarness {
         link: Int,
         count: Int,
         active: Boolean = true
-    ): RpnWinServerEntity = RpnWinServerEntity(
+    ): RpnWinServer = RpnWinServer(
         id = "$cc-$city-$key",
         name = name,
         countryCode = cc,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.fragment
-/*
+
 import Logger
 import Logger.LOG_TAG_UI
 import android.content.ClipData
@@ -57,6 +57,7 @@ import com.celzero.bravedns.subscription.SubscriptionStateMachineV2
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.activity.PingTestActivity
 import com.celzero.bravedns.ui.activity.RpnWinProxyDetailsActivity
+import com.celzero.bravedns.ui.activity.ServerSelectionActivity
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.ui.location.LocationSelectorActivity
@@ -80,6 +81,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.getValue
+import kotlin.jvm.java
 
 class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_dashboard) {
     private val b by viewBinding(ActivityRethinkPlusDashboardBinding::bind)
@@ -714,7 +716,7 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
             return@io
         }*/
 
-        val intent = Intent(requireContext(), LocationSelectorActivity::class.java)
+        val intent = Intent(requireContext(), ServerSelectionActivity::class.java)
         startActivity(intent)
     }
 
@@ -931,4 +933,3 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
         lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 }
-*/
