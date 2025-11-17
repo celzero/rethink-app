@@ -60,7 +60,6 @@ import com.celzero.bravedns.ui.activity.RpnWinProxyDetailsActivity
 import com.celzero.bravedns.ui.activity.ServerSelectionActivity
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
-import com.celzero.bravedns.ui.location.LocationSelectorActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -80,8 +79,6 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.util.concurrent.TimeUnit
-import kotlin.getValue
-import kotlin.jvm.java
 
 class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_dashboard) {
     private val b by viewBinding(ActivityRethinkPlusDashboardBinding::bind)
