@@ -742,4 +742,94 @@ href="https://central.sonatype.com/">Sonatype</a><br/> ]]></string>
     <string name="fapps_unmetered_block_dialog_message" translatable="true">اتصالات برنامه‌های <i>فهرست‌شده</i> در شبکه‌ی بدون محدودیت حجمی (وای‌فای) مسدود شود؟</string>
     <string name="fapps_unmetered_unblock_dialog_message">اتصال برنامه‌های <i>فهرست‌شده</i> در شبکهٔ نامحدود (وای‌فای) مجاز شود؟</string>
     <string name="fapps_metered_block_dialog_title" translatable="true">مسدودسازی در اتصال محدود</string>
+    <string name="cd_no_rules_text" translatable="true">بدون قوانین دامنه</string>
+    <string name="cd_no_rule_txt" translatable="true">بدون قوانین</string>
+    <string name="cd_remove_dialog_message" translatable="true">دامنه را از پیکربندی ذخیره شده حذف کنید.</string>
+    <string name="cd_remove_dialog_title" translatable="true">دامنه حذف شود؟</string>
+    <string name="cd_toast_added" translatable="true">دامنه با موفقیت اضافه شد</string>
+    <string name="cd_toast_deleted" translatable="true">دامنه از لیست سفارشی حذف شد</string>
+    <string name="ci_dialog_added_success" translatable="true">آی پی به لیست اضافه شد</string>
+    <string name="ci_trust_rule" translatable="true">اعتماد</string>
+    <string name="ci_trust_txt" translatable="true">مورد اعتماد</string>
+    <string name="coming_soon_toast" translatable="true">بزودی</string>
+    <string name="config_invalid_desc" translatable="true">پیکربندی WireGuard نامعتبر است</string>
+    <string name="config_delete_dialog_desc" translatable="true">آیا مطمئن هستید که می‌خواهید این پیکربندی WireGuard VPN را حذف کنید؟</string>
+    <string name="close_all" translatable="true">بستن همه</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">فیلتر بزرگسالان دسترسی به تمام سایت‌های بزرگسالان، مستهجن و سایت‌های با محتوای نامناسب را مسدود می‌کند. این فیلتر، پروکسی یا VPN و سایت‌های با محتوای ترکیبی را مسدود نمی‌کند. سایت‌هایی مانند Reddit مجاز هستند. گوگل و بینگ در حالت ایمن (Safe Mode) تنظیم شده‌اند.</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">فیلتر خانواده دسترسی به تمام سایت‌های بزرگسالان، مستهجن و سایت‌های حاوی محتوای نامناسب را مسدود می‌کند. همچنین دامنه‌های پروکسی و VPN را که می‌توانند برای دور زدن فیلترهای ما استفاده شوند، مسدود می‌کند. سایت‌های محتوای ترکیبی (مانند ردیت) نیز مسدود شده‌اند. گوگل، بینگ و یوتیوب در حالت ایمن تنظیم شده‌اند.</string>
+    <string name="ci_dialog_error_invalid_ip" translatable="true">آدرس IP، subnet یا port نامعتبر است.</string>
+    <string name="ci_delete" translatable="true">حذف</string>
+    <string name="ci_dialog_title" translatable="true">اضافه کردن قانون IP/پورت</string>
+    <string name="close_conns_dialog_desc" translatable="true">تمام اتصالات برای %1$s بسته شود؟</string>
+    <string name="close_conns_dialog_title" translatable="true">بستن اتصالات</string>
+    <string name="cloudflare_dns_desc" translatable="true">هیچ درخواست DNS را مسدود نمی‌کند. از نقطه پایانی DNS 1.1.1.1 کلودفلر استفاده می‌کند.</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">بدافزارها و محتوای بزرگسالان را مسدود می‌کند. از نقطه پایانی DNS 1.1.1.3 کلودفلر استفاده می‌کند.</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">محتوای مخرب را مسدود می‌کند. از نقطه پایانی DNS 1.1.1.2 کلودفلر استفاده می‌کند.</string>
+    <string name="bad_config_explanation_pka" translatable="true">: باید مثبت باشد و بیشتر از ۶۵۵۳۵ نباشد</string>
+    <string name="bad_config_explanation_positive_number" translatable="true">: باید مثبت باشد</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">: باید یک شماره پورت UDP معتبر باشد</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">کلید نامعتبر</string>
+    <string name="bad_config_reason_invalid_number" translatable="true">شماره نامعتبر است</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">مقدار نامعتبر</string>
+    <string name="bad_config_reason_missing_attribute" translatable="true">ویژگی از دست رفته</string>
+    <string name="bad_config_reason_missing_section" translatable="true">بخش گمشده</string>
+    <string name="bad_config_reason_syntax_error" translatable="true">خطای Syntax</string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true">ویژگی ناشناخته</string>
+    <string name="bad_config_reason_unknown_section" translatable="true">بخش ناشناخته</string>
+    <string name="blocklist_not_available_toast" translatable="true">برای به‌روزرسانی لیست‌های مسدود شده، آخرین نسخه برنامه را دانلود کنید.</string>
+    <string name="brbs_backup_complete_toast" translatable="true">پشتیبان گیری تکمیل شد</string>
+    <string name="brbs_backup_desc" translatable="true">پشتیبان‌گیری از تنظیمات برنامه، شبکه و لاگ‌های DNS</string>
+    <string name="brbs_backup_dialog_failure_message" translatable="true">پشتیبان‌گیری انجام نشد. دوباره امتحان میکنید؟</string>
+    <string name="brbs_backup_dialog_failure_positive" translatable="true">دوباره نسخه پشتیبان تهیه کنید</string>
+    <string name="brbs_backup_dialog_failure_title" translatable="true">پشتیبان گیری ناموفق بود</string>
+    <string name="brbs_backup_dialog_message" translatable="true">تنظیمات برنامه، شبکه و گزارش‌های DNS را در یک فایل پشتیبان‌گیری می‌کند. این کار VPN را مجدداً راه‌اندازی می‌کند.</string>
+    <string name="brbs_backup_dialog_positive" translatable="true">پشتیبان گیری</string>
+    <string name="brbs_backup_dialog_title" translatable="true">پشتیبان بگیرید</string>
+    <string name="brbs_backup_restore_desc" translatable="true">در نسخه‌های مختلف برنامه کار نمی‌کند</string>
+    <string name="brbs_backup_title" translatable="true">پشتیبان گیری</string>
+    <string name="brbs_restore_complete_toast" translatable="true">بازیابی تکمیل شد، برنامه مجدداً راه‌اندازی می‌شود…</string>
+    <string name="brbs_restore_desc" translatable="true">بازیابی از یک فایل پشتیبان</string>
+    <string name="brbs_restore_dialog_failure_message" translatable="true">بازیابی انجام نشد. دوباره امتحان میکنید؟</string>
+    <string name="brbs_restore_dialog_failure_positive" translatable="true">دوباره بازیابی کنید</string>
+    <string name="brbs_restore_dialog_failure_title" translatable="true">بازیابی ناموفق بود</string>
+    <string name="brbs_restore_dialog_message" translatable="true">تنظیمات برنامه، شبکه و گزارش‌های DNS را از یک فایل پشتیبان بازیابی کنید. این کار برنامه را مجدداً راه‌اندازی می‌کند.</string>
+    <string name="brbs_restore_dialog_positive" translatable="true">بازیابی</string>
+    <string name="brbs_restore_dialog_title" translatable="true">بازیابی نسخه پشتیبان</string>
+    <string name="brbs_restore_no_uri_toast" translatable="true">بازیابی ناموفق بود؛ دوباره امتحان کنید</string>
+    <string name="brbs_restore_title" translatable="true">بازیابی</string>
+    <string name="brbs_title" translatable="true">پشتیبان‌گیری و بازیابی</string>
+    <string name="bsac_title_desc" translatable="true">قوانین فقط برای این برنامه اعمال می‌شود.</string>
+    <string name="bsdl_block_desc" translatable="true">مسدود کردن، اعتماد به <u>این دامنه</u></string>
+    <string name="bsrf_clear_filter" translatable="true">پاک کردن</string>
+    <string name="build__flavor_website" translatable="true">وب‌سایت</string>
+    <string name="bsrf_sub_group_heading" translatable="true">زیرگروه</string>
+    <string name="build__flavor_play_store" translatable="true">پلی استور</string>
+    <string name="bsdl_blocked_desc" translatable="true">%1$s توسط %2$s مسدود شد</string>
+    <string name="build__flavor_fdroid" translatable="true">fdroid</string>
+    <string name="bypass_dns_firewall_tooltip">%1$s فقط با DNS شرکت Rethink کار می‌کند</string>
+    <string name="bypasses_network_restrictions" translatable="true">بررسی‌های دسترسی‌پذیری از تمام محدودیت‌های شبکه عبور می‌کنند. در حالت <i>خودکار</i>، رسینک به طور تصادفی از IPها و نام‌های میزبان قبلاً متصل شده استفاده می‌کند.</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">تمام اتصالات و برنامه‌هایی که توسط سایر VPN های WireGuard مسیریابی نمی‌شوند، توسط این یکی مسیریابی خواهند شد.</string>
+    <string name="category_name_sys_components" translatable="true">اجزای سیستم</string>
+    <string name="category_name_sys_apps" translatable="true">برنامه‌های سیستمی</string>
+    <string name="category_name_others" translatable="true">دیگر</string>
+    <string name="category_name_installed" translatable="true">برنامه‌های نصب‌شده</string>
+    <string name="category_name_non_app_sys" translatable="true">خدمات سیستم</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">همیشه روشن</string>
+    <string name="cd_doh_dialog_resolver_url" translatable="true">Resolver URL</string>
+    <string name="fapps_metered_block_dialog_message" translatable="true">آیا اتصالات در شبکه‌ی محدود (موبایل) برای برنامه‌های <i>لیست‌شده</i> مسدود می‌شود؟</string>
+    <string name="fapps_metered_unblock_dialog_title" translatable="true">اجازه در metered</string>
+    <string name="fapps_metered_unblock_dialog_message" translatable="true">اتصالات در شبکه اندازه‌گیری شده (موبایل) برای برنامه‌های <i>فهرست</i> مجاز باشد؟</string>
+    <string name="fapps_bypass_block_dialog_title" translatable="true">دور زدن برنامه ها</string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true">قوانین فایروال جهانی برای برنامه های <i>لیست شده</i> را دور بزنید؟</string>
+    <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">دور زدن برنامه ها</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">قوانین فایروال DNS &amp; جهانی را برای برنامه های فهرست شده <i/> دور بزنید؟</string>
+    <string name="fapps_unblock_dialog_title" translatable="true">برنامه ها را مجاز کنید</string>
+    <string name="fapps_unblock_dialog_message" translatable="true">اتصالات برای برنامه های <i>فهرست شده</i> مجاز باشد؟</string>
+    <string name="fapps_exclude_block_dialog_title" translatable="true">حذف برنامه ها</string>
+    <string name="fapps_exclude_block_dialog_message" translatable="true">برنامه‌های <i>لیست شده</i> از DNS و فایروال مستثنی شوند؟</string>
+    <string name="fapps_isolate_block_dialog_title" translatable="true">برنامه ها را ایزوله کنید</string>
+    <string name="fapps_firewall_filter_hint" translatable="true">نمایش همه برنامه‌ها</string>
+    <string name="dns_crypt_connection_failure" translatable="true">خطا در اتصال به سرور DNSCrypt.</string>
+    <string name="update_complete_snack_message" translatable="true">نسخه جدید دانلود شد.</string>
+    <string name="accessibility_failure_toast" translatable="true">Rethink سرویس دسترسی دوباره متوقف شده یا از کار افتاده است. دیگر برنامه‌های پس‌زمینه را مسدود نمی‌کند.</string>
 </resources>
