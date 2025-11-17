@@ -344,11 +344,31 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
 
         b.aadAppSettingsBlockWifi.setOnClickListener {
+            if (!::appInfo.isInitialized) {
+                Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in aadAppSettingsBlockWifi click listener, using uid: $uid")
+                showToastUiCentered(
+                    this,
+                    this.getString(R.string.ctbs_app_info_not_available_toast),
+                    Toast.LENGTH_SHORT
+                )
+                return@setOnClickListener
+            }
+
             toggleWifi(appInfo)
             updateFirewallStatusUi(appStatus, connStatus)
         }
 
         b.aadAppSettingsBlockMd.setOnClickListener {
+            if (!::appInfo.isInitialized) {
+                Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in aadAppSettingsBlockMd click listener, using uid: $uid")
+                showToastUiCentered(
+                    this,
+                    this.getString(R.string.ctbs_app_info_not_available_toast),
+                    Toast.LENGTH_SHORT
+                )
+                return@setOnClickListener
+            }
+
             toggleMobileData(appInfo)
             updateFirewallStatusUi(appStatus, connStatus)
         }
