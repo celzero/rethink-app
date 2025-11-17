@@ -13,59 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.activity
+package com.celzero.bravedns.ui.fragment
 
 import Logger
 import Logger.LOG_TAG_UI
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
-import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.RpnWinServer
-import com.celzero.bravedns.databinding.ActivityServerSelectionBinding
+import com.celzero.bravedns.databinding.FragmentServerSelectionBinding
 import com.celzero.bravedns.rpnproxy.RpnProxyManager
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.adapter.VpnServerAdapter
-import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities.isAtleastQ
-import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
 import kotlin.math.abs
 
 /**
- * Activity for selecting VPN servers from a list
+ * Fragment for selecting VPN servers from a list
  * Features:
  * - Search/filter servers
  * - Select/deselect servers
  * - Display server information (latency, speeds, features)
  * - Material Design 3 UI with dark/light mode support
  */
-class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selection),
+class ServerSelectionFragment : Fragment(R.layout.fragment_server_selection),
     VpnServerAdapter.ServerSelectionListener {
 
-    private val b by viewBinding(ActivityServerSelectionBinding::bind)
-    private val persistentState by inject<PersistentState>()
+    private val b by viewBinding(FragmentServerSelectionBinding::bind)
     private lateinit var serverAdapter: VpnServerAdapter
     private lateinit var selectedAdapter: VpnServerAdapter
     private val allServers = mutableListOf<RpnWinServer>()
@@ -73,46 +64,34 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
     private val selectedServers = mutableListOf<RpnWinServer>()
     private var selectedServerIds = mutableSetOf<String>()
 
-    private val activityScope = CoroutineScope(Dispatchers.Main + Job())
+    private val fragmentScope = CoroutineScope(Dispatchers.Main + Job())
     private var statusUpdateJob: Job? = null
 
     companion object {
         private const val MAX_SELECTIONS = 5
         const val EXTRA_SELECTED_SERVERS = "selected_servers"
-        private const val TAG = "ServerSelectionActivity"
+        private const val TAG = "ServerSelectionFragment"
     }
 
-    private fun Context.isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-                Configuration.UI_MODE_NIGHT_YES
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        theme.applyStyle(getCurrentTheme(isDarkThemeOn(), persistentState.theme), true)
-        super.onCreate(savedInstanceState)
-
-        handleFrostEffectIfNeeded(persistentState.theme)
-
-        if (isAtleastQ()) {
-            val controller = WindowInsetsControllerCompat(window, window.decorView)
-            controller.isAppearanceLightNavigationBars = false
-            window.isNavigationBarContrastEnforced = false
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         setupToolbar()
         setupRecyclerViews()
         setupSearchBar()
         setupHeaderUI()
+
         // load servers asynchronously from RpnProxyManager
-        activityScope.launch(Dispatchers.IO) {
+        fragmentScope.launch(Dispatchers.IO) {
             val servers = RpnProxyManager.getWinServers()
             Logger.v(LOG_TAG_UI, "$TAG; fetched ${servers.size} servers from RPN")
             withContext(Dispatchers.Main) {
-                initServers(servers)
+                if (isAdded) {
+                    initServers(servers)
+                }
             }
         }
-        // Don't call updateSelectionCount() here - lists are empty!
-        // It will be called from initServers() after data is loaded
+
         animateHeaderEntry()
     }
 
@@ -130,13 +109,8 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
         unselectedServers.addAll(allServers.filter { !it.isSelected })
 
         Logger.v(LOG_TAG_UI, "$TAG.initServers: selected=${selectedServers.size}, unselected=${unselectedServers.size}")
-        Logger.v(LOG_TAG_UI, "$TAG.initServers: selectedServers=${selectedServers.map { it.countryName }}")
-        Logger.v(LOG_TAG_UI, "$TAG.initServers: unselectedServers=${unselectedServers.map { it.countryName }}")
 
-        Logger.v(LOG_TAG_UI, "$TAG.initServers: calling selectedAdapter.updateServers with ${selectedServers.size} items")
         selectedAdapter.updateServers(selectedServers)
-
-        Logger.v(LOG_TAG_UI, "$TAG.initServers: calling serverAdapter.updateServers with ${unselectedServers.size} items")
         serverAdapter.updateServers(unselectedServers)
 
         updateSelectedSectionVisibility()
@@ -156,11 +130,8 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(b.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowTitleEnabled(false) // Don't show title in toolbar itself
         b.toolbar.setNavigationOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         // Show title only when AppBar is collapsed
@@ -188,15 +159,19 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
         updateVpnStatus()
 
         // Periodically update VPN status (every 3 seconds)
-        statusUpdateJob = activityScope.launch {
+        statusUpdateJob = fragmentScope.launch {
             while (true) {
                 delay(3000)
-                updateVpnStatus()
+                if (isAdded) {
+                    updateVpnStatus()
+                }
             }
         }
     }
 
     private fun updateVpnStatus() {
+        if (!isAdded) return
+
         val isConnected = VpnController.state().on
         updateConnectionStatus(isConnected)
 
@@ -218,7 +193,7 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
         }
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         // Cancel all animations to prevent callbacks from accessing destroyed view binding
         try {
             b.statusIndicator.animate().cancel()
@@ -230,17 +205,16 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
         }
 
         statusUpdateJob?.cancel()
-        super.onDestroy()
+        super.onDestroyView()
     }
 
     private fun updateConnectionStatus(isConnected: Boolean) {
-        // Check if activity is still valid before accessing view binding
-        if (isDestroyed || isFinishing) return
+        if (!isAdded) return
 
         if (isConnected) {
             b.tvConnectionStatus.text = getString(R.string.vpn_status_connected)
-            b.tvConnectionStatus.setTextColor(ContextCompat.getColor(this, R.color.accentGood))
-            b.statusIndicator.backgroundTintList = ContextCompat.getColorStateList(this, R.color.accentGood)
+            b.tvConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.accentGood))
+            b.statusIndicator.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.accentGood)
 
             // Pulse animation for connected indicator
             b.statusIndicator.animate()
@@ -248,8 +222,7 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
                 .scaleY(1.3f)
                 .setDuration(500)
                 .withEndAction {
-                    // Check if activity is still valid before continuing animation
-                    if (!isDestroyed && !isFinishing) {
+                    if (isAdded) {
                         b.statusIndicator.animate()
                             .scaleX(1f)
                             .scaleY(1f)
@@ -260,14 +233,13 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
                 .start()
         } else {
             b.tvConnectionStatus.text = getString(R.string.vpn_status_disconnected)
-            b.tvConnectionStatus.setTextColor(ContextCompat.getColor(this, R.color.accentBad))
-            b.statusIndicator.backgroundTintList = ContextCompat.getColorStateList(this, R.color.accentBad)
+            b.tvConnectionStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.accentBad))
+            b.statusIndicator.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.accentBad)
         }
     }
 
     private fun updateCurrentLocation(countryFlag: String, countryName: String, locationName: String) {
-        // Check if activity is still valid before accessing view binding
-        if (isDestroyed || isFinishing) return
+        if (!isAdded) return
 
         b.tvCurrentCountryFlag.text = countryFlag
         b.tvCurrentCountry.text = countryName
@@ -275,14 +247,13 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
     }
 
     private fun animateHeaderEntry() {
-        // Check if activity is still valid before accessing view binding
-        if (isDestroyed || isFinishing) return
+        if (!isAdded) return
 
         // Animate the status card with a subtle scale and fade in
         b.statusCard.alpha = 0f
         b.statusCard.scaleX = 0.9f
         b.statusCard.scaleY = 0.9f
-        b.statusCard.translationZ = 2f // Ensure it stays below toolbar (12dp)
+        b.statusCard.translationZ = 2f
 
         b.statusCard.animate()
             .alpha(1f)
@@ -293,12 +264,10 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
             .start()
     }
 
-    // setup both lists
     private fun setupRecyclerViews() {
         Logger.v(LOG_TAG_UI, "$TAG.setupRecyclerViews: initializing adapters")
-        Logger.v(LOG_TAG_UI, "$TAG.setupRecyclerViews: unselectedServers.size=${unselectedServers.size}, selectedServers.size=${selectedServers.size}")
 
-        b.rvServers.layoutManager = LinearLayoutManager(this)
+        b.rvServers.layoutManager = LinearLayoutManager(requireContext())
         serverAdapter = VpnServerAdapter(unselectedServers, this)
         b.rvServers.adapter = serverAdapter
         Logger.v(LOG_TAG_UI, "$TAG.setupRecyclerViews: serverAdapter created and set, itemCount=${serverAdapter.itemCount}")
@@ -311,7 +280,7 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
             removeDuration = 300
         }
 
-        b.rvSelectedServers.layoutManager = LinearLayoutManager(this)
+        b.rvSelectedServers.layoutManager = LinearLayoutManager(requireContext())
         selectedAdapter = VpnServerAdapter(selectedServers, this)
         b.rvSelectedServers.adapter = selectedAdapter
         Logger.v(LOG_TAG_UI, "$TAG.setupRecyclerViews: selectedAdapter created and set, itemCount=${selectedAdapter.itemCount}")
@@ -360,8 +329,7 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
     }
 
     private fun animateSearchClearButton(show: Boolean) {
-        // Check if activity is still valid before accessing view binding
-        if (isDestroyed || isFinishing) return
+        if (!isAdded) return
 
         if (show && b.searchClearBtn.visibility != View.VISIBLE) {
             b.searchClearBtn.visibility = View.VISIBLE
@@ -383,8 +351,7 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
                 .setDuration(200)
                 .setInterpolator(AccelerateDecelerateInterpolator())
                 .withEndAction {
-                    // Check if activity is still valid before accessing view binding
-                    if (!isDestroyed && !isFinishing) {
+                    if (isAdded) {
                         b.searchClearBtn.visibility = View.GONE
                     }
                 }
@@ -408,13 +375,15 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
     }
 
     override fun onServerSelected(server: RpnWinServer, isSelected: Boolean) {
+        if (!isAdded) return
+
         b.root.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
 
         if (isSelected) {
             if (selectedServerIds.size >= MAX_SELECTIONS) {
                 b.root.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
                 Toast.makeText(
-                    this,
+                    requireContext(),
                     getString(R.string.server_selection_max_reached, MAX_SELECTIONS),
                     Toast.LENGTH_SHORT
                 ).show()
@@ -521,4 +490,6 @@ class ServerSelectionActivity : AppCompatActivity(R.layout.activity_server_selec
             b.emptyStateLayout.visibility = View.GONE
         }
     }
+
 }
+

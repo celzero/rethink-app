@@ -57,7 +57,6 @@ import com.celzero.bravedns.subscription.SubscriptionStateMachineV2
 import com.celzero.bravedns.ui.activity.FragmentHostActivity
 import com.celzero.bravedns.ui.activity.PingTestActivity
 import com.celzero.bravedns.ui.activity.RpnWinProxyDetailsActivity
-import com.celzero.bravedns.ui.activity.ServerSelectionActivity
 import com.celzero.bravedns.ui.dialog.SubscriptionAnimDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Constants
@@ -79,6 +78,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.util.concurrent.TimeUnit
+import kotlin.jvm.java
 
 class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_dashboard) {
     private val b by viewBinding(ActivityRethinkPlusDashboardBinding::bind)
@@ -712,9 +712,6 @@ class RethinkPlusDashboardFragment : Fragment(R.layout.activity_rethink_plus_das
             }
             return@io
         }*/
-
-        val intent = Intent(requireContext(), ServerSelectionActivity::class.java)
-        startActivity(intent)
     }
 
     private fun showInfoDialog(type: RpnProxyManager.RpnType,prop: RpnProxyManager.RpnProps) {
