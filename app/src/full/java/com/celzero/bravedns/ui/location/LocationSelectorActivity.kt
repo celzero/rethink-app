@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.location
-/*
+
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
@@ -32,6 +32,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import androidx.core.graphics.drawable.toDrawable
+import com.celzero.bravedns.util.handleFrostEffectIfNeeded
 import org.koin.android.ext.android.inject
 import kotlin.getValue
 
@@ -86,7 +87,7 @@ class LocationSelectorActivity : AppCompatActivity(R.layout.activity_location_se
             return
         }
 
-        if (isSelected && currentSelectionCount == 0) {
+        if (!isSelected && currentSelectionCount == 0) {
             Toast.makeText(this, "At least one server should be selected", Toast.LENGTH_SHORT).show()
             return
         }
@@ -189,4 +190,3 @@ class LocationSelectorActivity : AppCompatActivity(R.layout.activity_location_se
         countryAdapter.notifyItemRangeInserted(0, countries.size)
     }
 }
-*/

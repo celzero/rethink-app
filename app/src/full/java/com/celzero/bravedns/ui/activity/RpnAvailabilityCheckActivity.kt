@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.activity
-/*
+
 
 import Logger
 import android.content.Context
@@ -130,4 +130,3 @@ class RpnAvailabilityCheckActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 }
-*/

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.subscription
-/*
+
 import Logger.LOG_IAB
 import com.android.billingclient.api.BillingResult
 import com.celzero.bravedns.database.SubscriptionStateHistory
@@ -402,4 +402,3 @@ class StateMachineDatabaseSyncService : KoinComponent {
         val timestamp: Long
     )
 }
-*/

@@ -10,11 +10,11 @@
         android:icon="@drawable/ic_statistics"
         android:title="@string/title_statistics" />
 
-   <!-- <item
+   <item
         android:id="@+id/rethinkPlus"
         android:icon="@drawable/ic_rethink_plus_sparkle"
         app:showAsAction="always"
-        android:title="@string/rethink_plus_title" />-->
+        android:title="@string/rethink_plus_title" />
 
     <item
         android:id="@+id/configureFragment"

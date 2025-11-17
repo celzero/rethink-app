@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.activity
-/*
+
 import Logger
 import android.content.Context
 import android.content.res.Configuration
@@ -262,4 +262,3 @@ class PingTestActivity: AppCompatActivity(R.layout.activity_ping_test) {
         lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }
-*/

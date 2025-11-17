@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.ui.location
-/*
+
 data class ServerLocation(
     val id: String,
     val name: String,
     val latency: String,
     var isSelected: Boolean = false
-)*/
+)

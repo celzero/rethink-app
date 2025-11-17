@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package com.celzero.bravedns.iab
-/*
+
 import Logger
 import Logger.LOG_IAB
 import com.android.billingclient.api.AcknowledgePurchaseParams
@@ -144,4 +144,4 @@ internal class QueryUtils(private val billingClient: BillingClient) {
             if (map.values.all { it }) callback(BillingResponse(result.responseCode).isOk)
         }
     }
-}*/
+}

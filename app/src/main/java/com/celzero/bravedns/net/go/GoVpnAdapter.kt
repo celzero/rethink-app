@@ -37,10 +37,12 @@ import com.celzero.bravedns.data.AppConfig.Companion.DOH_INDEX
 import com.celzero.bravedns.data.AppConfig.Companion.DOT_INDEX
 import com.celzero.bravedns.data.AppConfig.Companion.FALLBACK_DNS_IF_NET_DNS_EMPTY
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
+import com.celzero.bravedns.database.RpnWinServerEntity
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.net.doh.Transaction
+import com.celzero.bravedns.rpnproxy.RpnProxyManager
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.BraveVPNService.Companion.FIRESTACK_MUST_DUP_TUNFD
 import com.celzero.bravedns.service.BraveVPNService.Companion.NW_ENGINE_NOTIFICATION_ID
@@ -49,6 +51,7 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.ui.activity.AntiCensorshipActivity
 import com.celzero.bravedns.ui.activity.AppLockActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
@@ -80,6 +83,7 @@ import com.celzero.firestack.backend.NetStat
 import com.celzero.firestack.backend.Proxies
 import com.celzero.firestack.backend.RDNS
 import com.celzero.firestack.backend.RouterStats
+import com.celzero.firestack.backend.RpnProxy
 import com.celzero.firestack.intra.Controller
 import com.celzero.firestack.intra.DefaultDNS
 import com.celzero.firestack.intra.Intra
@@ -162,7 +166,7 @@ class GoVpnAdapter : KoinComponent {
         setDialStrategy()
         setTransparency()
         undelegatedDomains()
-        setExperimentalSettings()
+        setExperimentalWireGuardSettings()
         setAutoDialsParallel()
         setHappyEyeballs()
         // added for testing, use if needed
@@ -1887,7 +1891,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    /*suspend fun getRpnProps(rpnType: RpnProxyManager.RpnType): Pair<RpnProxyManager.RpnProps?, String?> {
+    suspend fun getRpnProps(rpnType: RpnProxyManager.RpnType): Pair<RpnProxyManager.RpnProps?, String?> {
         try {
             var errMsg: String? = ""
             val rpn: RpnProxy? = try {
@@ -1924,7 +1928,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.w(LOG_TAG_PROXY, "$TAG err rpn props($rpnType): ${e.message}")
             return Pair(null, e.message)
         }
-    }*/
+    }
 
     suspend fun testRpnProxy(proxyId: String): Boolean {
         if (!tunnel.isConnected) {
@@ -2010,7 +2014,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    /*suspend fun addNewWinServer(server: RpnProxyManager.RpnWinServer): Pair<Boolean, String> {
+    suspend fun addNewWinServer(server: RpnWinServerEntity): Pair<Boolean, String> {
         if (!tunnel.isConnected) {
             Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip add new win(rpn) server")
             return Pair(false, "No tunnel connected")
@@ -2035,7 +2039,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.e(LOG_TAG_PROXY, "$TAG err add new win(rpn) server: ${e.message}", e)
             Pair(false, e.message ?: "Error adding new server")
         }
-    }*/
+    }
 
     suspend fun unregisterWin(): Boolean {
         if (!tunnel.isConnected) {
@@ -2052,7 +2056,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    /*suspend fun setRpnAutoMode(): Boolean {
+    suspend fun setRpnAutoMode(): Boolean {
         if (!tunnel.isConnected) {
             Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip set rpn auto mode")
             return false
@@ -2080,7 +2084,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.e(LOG_TAG_PROXY, "$TAG err set rpn auto mode: ${e.message}", e)
             false
         }
-    }*/
+    }
 
     suspend fun isProxyReachable(
         proxyId: String,
@@ -2100,18 +2104,19 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun setExperimentalSettings(value: Boolean = persistentState.nwEngExperimentalFeatures) {
+    suspend fun setExperimentalWireGuardSettings(value: Boolean = persistentState.nwEngExperimentalFeatures) {
         if (!tunnel.isConnected) {
-            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set experimental settings")
+            Logger.e(LOG_TAG_VPN, "$TAG no tunnel, skip set experimental wg settings")
             return
         }
         try {
-            Intra.experimental(value)
+            // modified from overall experimental settings to only wireguard experimental settings
+            Intra.experimentalWireGuard(value)
             // refresh proxies on experimental settings change (required for wireguard)
             //refreshOrReAddProxies()
-            Logger.i(LOG_TAG_VPN, "$TAG set experimental settings: $value")
+            Logger.i(LOG_TAG_VPN, "$TAG set experimental wg settings: $value")
         } catch (e: Exception) {
-            Logger.e(LOG_TAG_VPN, "$TAG err set experimental settings: ${e.message}", e)
+            Logger.e(LOG_TAG_VPN, "$TAG err set experimental wg settings: ${e.message}", e)
         }
     }
 
@@ -2161,7 +2166,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    /*suspend fun updateRpnProxy(type: RpnProxyManager.RpnType): ByteArray? {
+    suspend fun updateRpnProxy(type: RpnProxyManager.RpnType): ByteArray? {
         if (!tunnel.isConnected) {
             Logger.i(LOG_TAG_PROXY, "$TAG no tunnel, skip update rpn proxy")
             return null
@@ -2183,7 +2188,7 @@ class GoVpnAdapter : KoinComponent {
             Logger.w(LOG_TAG_PROXY, "$TAG err update rpn proxy($type): ${e.message}")
             null
         }
-    }*/
+    }
 
     suspend fun addMultipleDnsAsPlus() {
         if (!tunnel.isConnected) {

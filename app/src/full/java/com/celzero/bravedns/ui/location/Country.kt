@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.ui.location
 
-/*data class Country(
+data class Country(
     val id: String,
     val name: String,
     val flagResource: String,
@@ -28,4 +28,3 @@ package com.celzero.bravedns.ui.location
     val selectedServerCount: Int
         get() = servers.count { it.isSelected }
 }
-*/
