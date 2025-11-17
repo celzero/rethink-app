@@ -323,6 +323,16 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         TooltipCompat.setTooltipText(b.aadCloseConnsChip, getString(R.string.close_conns_dialog_title))
 
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
+            if (!::appInfo.isInitialized) {
+                Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in aadAppSettingsBypassDnsFirewall click listener, using uid: $uid")
+                showToastUiCentered(
+                    this,
+                    this.getString(R.string.ctbs_app_info_not_available_toast),
+                    Toast.LENGTH_SHORT
+                )
+                return@setOnClickListener
+            }
+
             // show the tooltip only once when app is not bypassed (dns + firewall) earlier
             if (showBypassToolTip && appStatus == FirewallManager.FirewallStatus.NONE) {
                 b.aadAppSettingsBypassDnsFirewall.performLongClick()
@@ -374,6 +384,16 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
 
         b.aadAppSettingsBypassUniv.setOnClickListener {
+            if (!::appInfo.isInitialized) {
+                Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in aadAppSettingsBypassUniv click listener, using uid: $uid")
+                showToastUiCentered(
+                    this,
+                    this.getString(R.string.ctbs_app_info_not_available_toast),
+                    Toast.LENGTH_SHORT
+                )
+                return@setOnClickListener
+            }
+
             // change the status to allowed if already app is bypassed
             if (appStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL) {
                 updateFirewallStatus(
@@ -389,6 +409,16 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
 
         b.aadAppSettingsExclude.setOnClickListener {
+            if (!::appInfo.isInitialized) {
+                Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in aadAppSettingsExclude click listener, using uid: $uid")
+                showToastUiCentered(
+                    this,
+                    this.getString(R.string.ctbs_app_info_not_available_toast),
+                    Toast.LENGTH_SHORT
+                )
+                return@setOnClickListener
+            }
+
             if (VpnController.isVpnLockdown()) {
                 showToastUiCentered(this, getString(R.string.hsf_exclude_error), Toast.LENGTH_SHORT)
                 return@setOnClickListener
@@ -422,6 +452,16 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details) {
         }
 
         b.aadAppSettingsIsolate.setOnClickListener {
+            if (!::appInfo.isInitialized) {
+                Logger.w(LOG_TAG_UI, "AppInfo not initialized yet in aadAppSettingsIsolate click listener, using uid: $uid")
+                showToastUiCentered(
+                    this,
+                    this.getString(R.string.ctbs_app_info_not_available_toast),
+                    Toast.LENGTH_SHORT
+                )
+                return@setOnClickListener
+            }
+
             // change the status to allowed if already app is isolated
             if (appStatus == FirewallManager.FirewallStatus.ISOLATE) {
                 updateFirewallStatus(
