@@ -775,6 +775,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
             val p50 = VpnController.p50(dnsId)
             uiCtx {
+                if (!isVisible || !isAdded) return@uiCtx
                 when (p50) {
                     in 0L..19L -> {
                         val string =
