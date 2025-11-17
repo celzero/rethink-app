@@ -7,7 +7,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.celzero.bravedns.database.RpnWinServerEntity
 import com.celzero.bravedns.database.RpnWinServerDAO
-import com.celzero.bravedns.database.RpnWinServerRepo
+import com.celzero.bravedns.database.RpnWinServerRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -32,7 +32,7 @@ class RpnWinServerRepositoryHarness {
 
     private lateinit var db: TestRpnDb
     private lateinit var dao: RpnWinServerDAO
-    private lateinit var repo: RpnWinServerRepo
+    private lateinit var repo: RpnWinServerRepository
 
     @Before
     fun setup() {
@@ -41,7 +41,7 @@ class RpnWinServerRepositoryHarness {
             .allowMainThreadQueries()
             .build()
         dao = db.rpnWinServerDAO()
-        repo = RpnWinServerRepo(dao)
+        repo = RpnWinServerRepository(dao)
     }
 
     @After
