@@ -1,0 +1,31 @@
+Découvrez un Android plus sûr, transparent et sécurisé.
+
+VPN : se connecte à plusieurs VPN WireGuard de votre choix.
+
+Sûr : révèle l'activité réseau des applications installées et vous permet de les désactiver, de les désinstaller ou de les bloquer par un pare-feu.
+
+Sécurisé : première ligne de défense contre les logiciels espions, les ransomwares et les logiciels malveillants qui volent des informations personnelles et prennent le contrôle des comptes. Protège contre la manipulation DNS généralement utilisée pour censurer les sites web, les réseaux sociaux et les applications de messagerie.
+
+Rapide : serveurs DNS déployés dans plus de 300 emplacements à travers le monde pour garantir que votre connexion Internet est aussi rapide et disponible que possible.
+
+Ouvert : open source et sans aucun traceur.
+
+***Fonctionnalités***
+
+Pare-feu : empêche les applications de se connecter à Internet. Bloque les logiciels espions, les logiciels malveillants, les ransomwares et plus encore.
+     
+Un pare-feu bloque toute application se connectant à Internet via le Wi-Fi ou les données mobiles. Étant donné que la plupart des formes de surveillance nécessitent que les données soient envoyées au réseau vers un serveur, le pare-feu atténue efficacement la menace (les gestionnaires de fichiers, les réveils, les calculatrices sont quelques exemples d'applications qui ne nécessitent pas d'accès à Internet pour fonctionner). La fonctionnalité de pare-feu utilise le service d'accessibilité pour détecter et bloquer les applications en arrière-plan.
+
+Surveillance : surveillez le trafic Internet entrant et sortant. 
+
+Si cette fonction est activée, les journaux de connectivité sont collectés et analysés. Des rapports automatisés signalent les connexions inconnues ou suspectes et révèlent l'ampleur des tentatives de vol de données par les réseaux de logiciels espions. Lors de nos tests, environ 60 % du trafic a été signalé comme provenant de logiciels espions connus. Les journaux générés sont mis à la disposition de l'utilisateur en temps quasi réel pour qu'il puisse les analyser.
+
+WireGuard : sécurisez le trafic Internet sortant.
+
+L'application utilise le protocole WireGuard, rapide, moderne, léger et sécurisé, pour crypter les connexions sortantes vers n'importe quel fournisseur VPN compatible de votre choix.
+
+Anti-censure : 
+
+L'application crypte votre connexion Internet vers le serveur DNS (Domain Name System) géré par Rethink et présent dans plus de 300 sites à travers le monde. Les serveurs DNS sont le carnet d'adresses d'Internet : un serveur DNS fournit les adresses exactes dont vous avez besoin pour visiter un site web ou ouvrir une application.
+
+Data Monitor : Suivez l'utilisation des données mobiles ou WiFi par application et par connexion.

@@ -9,9 +9,7 @@
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_status_arg_3">DNS 同 TCP</string>
     <string name="orbot_http_desc">同 Orbot 嘅 HTTP 代理起條隧道。</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">Rethink 嘅無障礙服務停咗或者 hang 咗。如果您要繼續用<i>攔截未使用應用</i>呢個功能，<i><b>請去系統設定度強制停止並再次啓動</b></i> Rethink。
-\n
-\nRethink 用咗無障礙服務嚟追蹤你用緊嘅 app（前景）同唔係用緊嘅 app（背景）。</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">Rethink 嘅無障礙服務停咗或者 hang 咗。<i><b>請去系統設定度強制停止</b></i>並再次啓動 Rethink ，嚟繼續用<i>攔截未使用應用</i>呢個功能。 \n \nRethink 用咗無障礙服務嚟追蹤你用緊嘅 app（前景）同唔係用緊嘅 app（背景）。</string>
     <string name="status_protected_with_http_private_dns">被 HTTP 代理同私人 DNS 保護住</string>
     <string name="notification_action_dns_firewall_mode">DNS + 防火牆</string>
     <string name="settings_socks5_dialog_hint_ip">IP 地址</string>
@@ -396,8 +394,8 @@
     <string name="ctbs_block_other_apps">應用喺 %1$s 嘅規則亦會應用喺其他 %2$s 個應用程式</string>
     <string name="ctbs_dialog_negative_btn">返回</string>
     <string name="dns_log_dialog_positive">刪除日誌</string>
-    <string name="dns_btm_sheet_dialog_message"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>：%2$s 份攔截清單</h3>%3$s。<br/><br/>]]></Data> \u0020</string>
-    <string name="dns_btm_sheet_dialog_ips"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_message"><Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>：%2$s 份攔截清單</h3>%3$s。<br/><br/>]]></Data></string>
+    <string name="dns_btm_sheet_dialog_ips"><Data><![CDATA[ %1$s %2$s <br/>]]></Data></string>
     <string name="dns_btm_sheet_chip">+%1$s 個其他 IP</string>
     <string name="dns_btm_resolved_crypt">%1$s 由 %2$s 自 %3$s <u>匿名</u>解析</string>
     <string name="dns_btm_resolved_doh">%1$s 由 %2$s 解析</string>

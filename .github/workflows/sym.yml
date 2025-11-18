@@ -11,8 +11,16 @@ on:
     # github.blog/changelog/2020-07-06-github-actions-manual-triggers-with-workflow_dispatch/
     # docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#inputs
     inputs:
+      repo:
+        description: 'repo'
+        default: 'maven'
+        required: true
+        type: choice
+        options:
+        - maven
+        - jitpack
       commit:
-        description: 'commit sha'
+        description: 'firestack version'
         default: ''
         required: true
 
@@ -54,7 +62,12 @@ jobs:
         run: |
           # wget opts: superuser.com/a/689340
           wgetopts="--tries=3 --retry-on-http-error=404 --waitretry=3 --no-dns-cache"
-          wget $wgetopts "https://jitpack.io/com/github/celzero/firestack/${COMMIT:0:10}/firestack-${COMMIT:0:10}-debug.aar" -O "firestack.aar"
+          if [ "$REPO" = 'jitpack' ]; then
+            wget $wgetopts "https://jitpack.io/com/github/celzero/firestack/${COMMIT:0:10}/firestack-${COMMIT:0:10}-debug.aar" -O "firestack.aar"
+          else
+            # ex: https://repo1.maven.org/maven2/com/celzero/firestack/30c7f27122/
+            wget $wgetopts "https://repo1.maven.org/maven2/com/celzero/firestack/${COMMIT:0:10}/firestack-${COMMIT:0:10}-debug.aar" -O "firestack.aar"
+          fi
           ls -ltr .
           unzip ./firestack.aar
           firebase crashlytics:symbols:upload --app=${{ secrets.FIREBASE_APP_ID_ANDROID }} --debug jni/
@@ -62,6 +75,7 @@ jobs:
         env:
           COMMIT: ${{ env.COMMIT }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          REPO: ${{ github.event.inputs.repo || 'maven' }}
           
 
 

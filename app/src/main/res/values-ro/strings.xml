@@ -486,7 +486,7 @@
     <string name="about_settings_notification" translatable="true">Setări Notificare</string>
     <string name="about_whats_new" translatable="true">Ce e nou în %1$s</string>
     <string name="about_twitter" translatable="true">Urmărește-ne pe Twitter</string>
-    <string name="about_mozilla" translatable="true">Rethink este susținut de Mozilla Builders, FOSS United Foundation.</string>
+    <string name="about_mozilla" translatable="true">Rethink este susținut de Mozilla Builders, FOSS United Foundation, FLOSS/fund.</string>
     <string name="about_app_update_check" translatable="true">Verifică pentru actualizări ale aplicației</string>
     <string name="about_app_translate" translatable="true">Traduceți</string>
     <string name="about_mail_to" translatable="true">hello@celzero.com</string>
@@ -1108,7 +1108,7 @@
     <string name="exclude_no_package_err_toast" translatable="true">Pentru a exclude aplicații, se cere un nume de pachet.</string>
     <string name="hop_error_toast_msg_1" translatable="true">Nu poate fi retransmis, este deja %1$s</string>
     <string name="hop_error_toast_msg_2" translatable="true">WireGuard indisponibil pentru retransmitere; te rog adaugă.</string>
-    <string name="hop_error_toast_msg_3" translatable="true">Pentru utilizarea releelor, dezactivează \"Numai date mobile\"</string>
+    <string name="hop_error_toast_msg_3" translatable="true">Pentru utilizarea releelor, dezactivează \"Numai date mobile\" sau SSID</string>
     <string name="mode_change_error_proxy_enabled" translatable="true">Nu se poate schimba modul când proxy este în uz. Apasă pentru <u>editarea setărilor proxy</u>.</string>
     <string name="blocklist_not_available_toast" translatable="true">Pentru actualizarea listelor, descarcă ultima versiune a aplicației.</string>
     <string name="lbl_ultra_secure" translatable="true">ultra securizat</string>
@@ -1117,7 +1117,7 @@
     <string name="no_stats_available" translatable="true">Fără statistici</string>
     <string name="hop_failure_toast" translatable="true">Eroare retransmitere: %1$s -&gt; %2$s</string>
     <string name="wg_setting_use_on_mobile" translatable="true">Numai pe date mobile</string>
-    <string name="wg_setting_use_on_mobile_desc" translatable="true">Utilizează acest WireGuard numai cu date mobile.</string>
+    <string name="wg_setting_use_on_mobile_desc" translatable="true">Utilizează acest VPN WireGuard cu date mobile.</string>
     <string name="hop_add_remove_title" translatable="true">Adaugă / Elimină releu</string>
     <string name="about_terms_of_service" translatable="true">Termeni serviciu</string>
     <string name="bypasses_network_restrictions" translatable="true">Verificările de accesibilitate ocolesc toate restricțiile de rețea. În modul <i>Auto</i> , Rethink utilizează la întâmplare IP-uri și nume-gazdă conectate anterior.</string>
@@ -1152,6 +1152,43 @@
     <string name="vpn_policy_title" translatable="true">Politica la schimbările de conexiune</string>
     <string name="use_fallback_dns_to_bypass" translatable="true">Folosește DNS de rezervă pentru ocolire</string>
     <string name="use_fallback_dns_to_bypass_desc" translatable="true">Când este activat, folosește întotdeauna DNS de rezervă la ocolire pentru aplicații , domenii și ISP.</string>
-    <string name="title_database_dump" translatable="true">Stare bază date</string>
+    <string name="title_database_dump" translatable="true">Bază date</string>
     <string name="copied_clipboard" translatable="true">Copiat</string>
+    <string name="lbl_default" translatable="true">Prestabilit</string>
+    <string name="lbl_action" translatable="true">Acțiune</string>
+    <string name="lbl_connect" translatable="true">Conectare</string>
+    <string name="lbl_criteria" translatable="true">Criteriu</string>
+    <string name="settings_theme_dialog_themes_7" translatable="true">Înghețat</string>
+    <string name="firewall_rule_proxy_error" translatable="true">Eroare Proxy</string>
+    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Această conexiune a fost blocată pentru că <i>proxy-ul</i> selectat pentru aplicație nu a fost ales.<br/><br/> Pentru a modifica mergi la <i>Proxy</i> din ecranul <i>Configurare</i>.]]></string>
+    <string name="vpn_policy_fixed" translatable="true">Conservator</string>
+    <string name="vpn_policy_fixed_desc" translatable="true">Reacționează minim la schimbările rețelei.</string>
+    <string name="wg_setting_ssid_title" translatable="true">Numai Wi-Fi</string>
+    <string name="wg_setting_ssid_desc" translatable="true">Activează acest VPN Wireguard numai la conexiunile Wi-Fi sau anumiți identificatori Wi-Fi (%1$s).</string>
+    <string name="ssid_permission_explanation" translatable="true">Rethink are nevoie de permisiune pentru locație pentru a accesa identificatori Wi-Fi (%1$s).</string>
+    <string name="location_enable_explanation" translatable="true">Pentru accesarea identificatorilor Wi-Fi (%1$s), pornește serviciul Locație.</string>
+    <string name="ssid_location_error" translatable="true">Activare serviciul Locație</string>
+    <string name="ssid_permission_error_action" translatable="true">Acordă permisiune</string>
+    <string name="ssid_location_error_action" translatable="true">Activează locația</string>
+    <string name="wg_ssid_and_mobile_err" translatable="true">Nu se pot utiliza ambele %1$s și %2$s</string>
+    <string name="wg_ssid_dialog_description" translatable="true">%1$s această VPN Wireguard când este <i>activ</i> identificatorul Wi-Fi (%2$s) %3$s.</string>
+    <string name="wg_ssid_input_hint" translatable="true">Introdu identificatorul Wi-Fi (%1$s)</string>
+    <string name="wg_ssid_type_exact" translatable="true">Precis</string>
+    <string name="wg_ssid_type_wildcard" translatable="true">Parțial</string>
+    <string name="wg_ssid_invalid_error" translatable="true">Identificatorii Wi-Fi (%1$s) trebuie să conțină cel mult 32 caractere..</string>
+    <string name="wg_ssid_delete_confirmation" translatable="true">Ștergi %1$s?</string>
+    <string name="settings_firebase_error_reporting_heading" translatable="true">Program stabilitate</string>
+    <string name="settings_firebase_error_reporting_desc" translatable="true">Capturează înregistrările erorilor pentru îmbunătățirea stabilității.</string>
+    <string name="tombstone_app_title" translatable="true">Nu uita de aplicațiile dezinstalate</string>
+    <string name="tombstone_app_desc" translatable="true">Odată activate, păstrează regulile pe aplicații timp de 7 zile.</string>
+    <string name="settings_locale_dialog_default" translatable="true">Prestabilit de sistem</string>
+    <string name="settings_allow_incoming_wg_packets" translatable="true">WireGuard P2P</string>
+    <string name="settings_allow_incoming_wg_packets_desc" translatable="true">Odată activate, permite intrarea conexiunile inițiate de perechile Wireguard.</string>
+    <string name="lockdown_download_message" translatable="true">E posibil ca <i>Download Manager-ul</i> din Android să nu poată funcționa când VPN este în modul <i>Lockdown</i>. Activezi downloader-ul Rethink\'s în loc?</string>
+    <string name="lockdown_download_enable_inapp" translatable="true">Activează Downloader-ul</string>
+    <string name="settings_jumbo_packets" translatable="true">Extindere lățime de bandă</string>
+    <string name="settings_jumbo_packets_desc" translatable="true">Folosește <i>pachete jumbo</i> în tunelul VPN al Rethink.</string>
+    <string name="settings_tunnel_metered" translatable="true">Contorizat întotdeauna</string>
+    <string name="settings_tunnel_metered_desc" translatable="true">Marchează tunelul VPN al Rethink ca și contorizat pentru ca aplicațiile să folosească mai puține date mobile. Atenție: Asta poate determina aplicațiile să oprească descărcările și încărcările masive, cum ar fi copiile de rezervă.</string>
+    <string name="stability_program_toast" translatable="true">Înscris în <i>programul de stabilitate</i> pentru <i>caracteristici experimentale</i>.</string>
 </resources>

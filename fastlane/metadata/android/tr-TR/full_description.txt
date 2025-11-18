@@ -1,0 +1,31 @@
+Daha güvenli, şeffaf ve korunaklı bir Android cihaza merhaba deyin
+
+VPN: Tercihinize göre birden fazla WireGuard VPN'e bağlanır.
+
+Güvenli: Yüklü uygulamaların internet ile etkileşimini görmenizi ve kapatmanızı, silmenizi ya da engellemenizi sağlar.
+
+Korunaklı: Casus yazılımlara, fidye yazılımlara ve kişisel bilgilerinizi çalıp hesaplarınıza el koyabilecek art niyetli yazılımlara karşı ilk savunma hattı.
+
+Hızlı: İnternetinizin olabildiğince güvenli ve erişilebilir olabilmesi için dünya çapında 300'den fazla DNS sunucusu mevcut.
+
+Açık: Açık kaynak kodlu ve izleyicilerden uzak
+
+**Özellikler**
+
+Güvenlik Duvarı: Uygulamaların internete erişmesini engelleyin. Art niyetli yazılımları ve daha fazlasını engelleyin.
+
+Bir güvenlik duvarı herhangi bir uygulamanın WiFi ya da mobil veri üzerinden internete erişmesini engeller. Çoğu gözlem tekniklerinin sunucuya ağ aracılığıyla veri gönderilmesine ihtiyaç duyduğundan dolayı, uygulamayı engellemek tehlikeyi azaltır (Dosya Yöneticileri, Saat, Hesap Makinesi çalışmak için internete hiç ihtiyaç duymayan uygulamalardan birkaç tanesidir).
+
+Denetim: Giden ve gelen internet alışverişini ölçün.
+
+Etkinleştirilirse tüm bağlantı günlükleri toplanır ve analize edilir. Otomatik raporlar bilinmeyen veya şüpheli bağlantıları saptar ve casus yazılımların ne noktaya kadar veri çalmaya çalıştığını gösterir. Testlerimizde, ağ alışverişinin yaklaşık %60'ı bilinen casus yazılımlar tarafından başlatılmış olarak algılanıp saptandı. Kullanıcının kendisi kontrol etmesi için neredeyse gerçek zamanlı günlükler mevcut hale getirilir.
+
+WireGuard: Korunaklı veri gönderimi.
+
+Uygulama, giden bağlantıları şifrelemek için tercihinizce herhangi uyumlu VPN sağlayıcısı ile hızlı, modern, hafif ve korunaklı Wireguard protokolünü kullanır.
+
+Sansür Karşıtı:
+
+Uygulama, internet bağlantınızı dünya çapında 300'den fazla konumda bulunan, Rethink tarafından yürütülen DNS sunucularına bağlar. DNS sunucuları internetin telefon rehberi gibidir; bir DNS sunucusu herhangi bir websiteye bağlanmak veya bir uygulama açarken bağlanmanız gereken spesifik "telefon numarası"nı sunar.
+
+Veri Denetleyicisi: Uygulama başı ve bağlantı başı mobil veri veya WiFi veri kullanımını denetle.

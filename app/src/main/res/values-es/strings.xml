@@ -801,7 +801,7 @@
     <string name="logs_card_network_count" translatable="true">%1$s conexiones</string>
     <string name="logs_card_dns_count" translatable="true">%1$s consultas</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">Captura de paquetes activada</string>
-    <string name="cd_dns_alg_desc" translatable="true">Asignar una IP única por solicitud DNS</string>
+    <string name="cd_dns_alg_desc" translatable="true">Asignar una IP única por solicitud DNS.</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS bloqueado</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Dominio (Univ)</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Se permitió esta conexión porque la <i>aplicación de origen</i> está configurada para <i>omitir las reglas de dns y cortafuegos</i>.<br/><br/> Para cambiar, vaya a la pantalla <i>Cortafuegos específico de la aplicación</i>.</string>
@@ -1029,4 +1029,42 @@
     <string name="dns_title" translatable="true">Bloquear anuncios y malware con DNS</string>
     <string name="dns_desc" translatable="true">Elige entre más de 190 listas para bloquear anuncios, rastreadores y malware.</string>
     <string name="settings_biometric_dialog_option_1" translatable="true">Inmediatamente</string>
+    <string name="status_no_network" translatable="true">sin conexión</string>
+    <string name="conn_track_clear_rule_logs_title" translatable="true">¿Eliminar registros para esta regla?</string>
+    <string name="settings_biometric_dialog_heading" translatable="true">Autenticación Biométrica</string>
+    <string name="settings_biometric_dialog_option_2" translatable="true">Después de 5 minutos</string>
+    <string name="settings_biometric_dialog_option_3" translatable="true">Después de 15 minutos</string>
+    <string name="dc_filtering_heading" translatable="true">filtrando</string>
+    <string name="univ_delete_domain_dialog_title" translatable="true">¿Eliminar todas las Reglas de Dominio?</string>
+    <string name="firewall_rule_private_dns" translatable="true">DNS Privado</string>
+    <string name="firewall_rule_paused_app" translatable="true">Aplicación Pausada</string>
+    <string name="config_invalid_desc" translatable="true">Configuración de WireGuard inválida</string>
+    <string name="console_log_desc" translatable="true">Los registros pueden contener información sensible.</string>
+    <string name="anti_censorship_title" translatable="true">Anti-censura</string>
+    <string name="ac_title" translatable="true">anti-censura</string>
+    <string name="ac_desc" translatable="true">Las herramientas contra la censura pueden conceder libertad en Internet, pero puede que no funcionen en todas partes. Solo lo intentan en conexiones sin proxy.</string>
+    <string name="ac_split_tcp" translatable="true">TCP</string>
+    <string name="ac_retry_options_title" translatable="true">estrategia</string>
+    <string name="lbl_always" translatable="true">Siempre</string>
+    <string name="ac_retry_options_after_split_desc" translatable="true">Siempre aplicar técnicas anti-censura.</string>
+    <string name="lbl_ultra_secure" translatable="true">ultra seguro</string>
+    <string name="blocklist_not_available_toast" translatable="true">Para actualizar las listas de bloqueo, descarga la última versión de la app.</string>
+    <string name="about_terms_of_service" translatable="true">Términos de Servicio</string>
+    <string name="most_contacted_asn" translatable="true">proveedores más contactados</string>
+    <string name="most_blocked_asn" translatable="true">proveedores más bloqueados</string>
+    <string name="download_ip_info_title" translatable="true">Mostrar información del proveedor</string>
+    <string name="adv_taster_title" translatable="true">Automatización</string>
+    <string name="adv_taster_desc" translatable="true">Configurar aplicaciones que pueden iniciar o detener Rethink.</string>
+    <string name="close_conns_dialog_title" translatable="true">Cerrar Conexiones</string>
+    <string name="close_conns_dialog_desc" translatable="true">¿Cerrar todas las conexiones para %1$s?</string>
+    <string name="about_license" translatable="true">Licencia bajo Apache-2.0</string>
+    <string name="smart_dns" translatable="true">DNS Inteligente</string>
+    <string name="processing_dialog_title" translatable="true">Procesando</string>
+    <string name="vpn_policy_relaxed" translatable="true">Relajado</string>
+    <string name="copied_clipboard" translatable="true">Copiado</string>
+    <string name="conn_track_clear_rule_logs_message" translatable="true">Esto solo borrará los registros de red para la regla del firewall que se está viendo actualmente. Esta operación no es reversible. ¿Desea continuar?</string>
+    <string name="settings_mobile_metered_heading" translatable="true">Medir redes móviles</string>
+    <string name="settings_mobile_metered_desc" translatable="true">Considera solo las redes móviles como medidas, el resto como no medidas.</string>
+    <string name="settings_biometric_dialog_option_0" translatable="true">Ninguna</string>
+    <string name="dc_use_sys_dns_undelegated_heading" translatable="true">Usar el DNS del sistema para dominios no delegados</string>
 </resources>
