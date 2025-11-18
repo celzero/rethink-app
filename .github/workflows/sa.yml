@@ -30,7 +30,7 @@ jobs:
 
           # detekt.github.io/detekt/cli.html#use-the-cli
           java -jar detekt-cli-all.jar \
-              --build-upon-default-config true \
+              --build-upon-default-config \
               --config .github/detekt-config.yml \
               --fail-on-severity ${SEV} \
               --analysis-mode full \
@@ -49,6 +49,7 @@ jobs:
           JVM_TARGET: 17
           # one of: [Error, Warning, Info, Never]
           SEV: "Warning"
+          # WARNING: Keep this value in sync with build.gradle (ext.kotlin_version, line 4)!
           # github.com/celzero/rethink-app/blob/0478aba823b6/build.gradle#L4
           KOTLIN_VER: "2.1.20"
       - name: 📤 Upload
