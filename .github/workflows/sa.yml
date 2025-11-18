@@ -25,8 +25,9 @@ jobs:
           distribution: 'temurin'
       - name: 🤺 Detekt
         run: |
+          set -euo pipefail
           # from: github.com/natiginfo/action-detekt-all
-          wget https://github.com/detekt/detekt/releases/download/v${DETEKT_VER}/detekt-cli-${DETEKT_VER}-all.jar -O detekt-cli-all.jar
+          wget -q https://github.com/detekt/detekt/releases/download/v${DETEKT_VER}/detekt-cli-${DETEKT_VER}-all.jar -O detekt-cli-all.jar
 
           # detekt.github.io/detekt/cli.html#use-the-cli
           java -jar detekt-cli-all.jar \
@@ -44,13 +45,14 @@ jobs:
           RUNID: ${{ github.run_id }}
           # recommended versions: github.com/detekt/detekt?tab=readme-ov-file#executing-detekt
           DETEKT_VER: "2.0.0-alpha.1"
-          # github.com/celzero/rethink-app/blob/0478aba823b62474d84ffb040188ec99b3c5e4d0/app/build.gradle#L199
+          # github.com/celzero/rethink-app/blob/main/app/build.gradle#L199
           # one of:  [1.6, 1.8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
-          JVM_TARGET: 17
+          JVM_TARGET: "17"
           # one of: [Error, Warning, Info, Never]
           SEV: "Warning"
-          # WARNING: Keep major.minor version in sync with build.gradle (ext.kotlin_version, line 4)!
-          # github.com/celzero/rethink-app/blob/0478aba823b6/build.gradle#L4
+          # WARNING: Keep major.minor version (e.g., "2.1") in sync with build.gradle (ext.kotlin_version, line 4)!
+          # Only the major.minor part is required here, not the full version (e.g., "2.1.20").
+          # github.com/celzero/rethink-app/blob/main/build.gradle#L4
           KOTLIN_VER: "2.1"
       - name: 📤 Upload
         if: always()
