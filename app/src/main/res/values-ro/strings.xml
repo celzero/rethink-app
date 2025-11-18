@@ -1073,7 +1073,7 @@
     <string name="firewall_rule_paused_app" translatable="true">Aplicație în repaus</string>
     <string name="firewall_rule_lockdown_wg" translatable="true">Proxy izolat</string>
     <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[Această conexiune caută un server <i>DNS privat</i> care nu există]]></string>
-    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Această conexiune a fost permisă pentru că <i>aplicația solicitantă</i> este setată să <i>ocolească regulile</i>.<br/><br/> Pentru a modifica , mergi la setările de <i>Firewall ale aplicației.</i>]]></string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Această conexiune a fost permisă pentru că <i>aplicația solicitantă</i> este setată să <i>ocolească regulile</i>.<br/><br/> Pentru a modifica, mergi la setările de <i>Firewall ale aplicației.</i>]]></string>
     <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Această conexiune a fost permisă pentru că <i>aplicația</i>este în stare de <i>repaus</i>.]]></string>
     <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Această conexiune a fost blocată pentru că WireGuard este pus în <i>izolare</i>.<br/><br/> Pentru a modifica, mergi la setările <i>WireGuard</i>.]]></string>
     <string name="wireguard_disable_failure_relay" translatable="true">\"Releul WireGuard\" nu poate fi închis</string>
@@ -1120,7 +1120,7 @@
     <string name="wg_setting_use_on_mobile_desc" translatable="true">Utilizează acest VPN WireGuard cu date mobile.</string>
     <string name="hop_add_remove_title" translatable="true">Adaugă / Elimină releu</string>
     <string name="about_terms_of_service" translatable="true">Termeni serviciu</string>
-    <string name="bypasses_network_restrictions" translatable="true">Verificările de accesibilitate ocolesc toate restricțiile de rețea. În modul <i>Auto</i> , Rethink utilizează la întâmplare IP-uri și nume-gazdă conectate anterior.</string>
+    <string name="bypasses_network_restrictions" translatable="true">Verificările de accesibilitate ocolesc toate restricțiile de rețea. În modul <i>Auto</i>, Rethink utilizează la întâmplare IP-uri și nume-gazdă conectate anterior.</string>
     <string name="most_contacted_asn" translatable="true">cei mai contactați ISP</string>
     <string name="most_blocked_asn" translatable="true">cei mai blocați ISP</string>
     <string name="adv_tasker_dialog_msg" translatable="true">Introdu numele pachetelor (separate prin virgulă) admise să pornească sau să oprească Rethink.</string>
@@ -1136,7 +1136,7 @@
     <string name="close_conns_dialog_desc" translatable="true">Închizi toate conexiunile pentru %1$s?</string>
     <string name="local_blocklist_delete_desc" translatable="true">Ștergi listele de blocat de pe dispozitiv?</string>
     <string name="fail_open_network_title" translatable="true">Blocaj la pierderea rețelei</string>
-    <string name="fail_open_network_desc" translatable="true">Când este activat, Rethink blochează toate datele când conectivitatea este întreruptă, ca în <i>Modul Avione</i>.</string>
+    <string name="fail_open_network_desc" translatable="true">Când este activat, Rethink blochează toate datele când conectivitatea este întreruptă, ca în <i>Modul Avion</i>.</string>
     <string name="about_license" translatable="true">Licențiat sub Apache-2.0</string>
     <string name="close_all" translatable="true">Închide tot</string>
     <string name="smart_dns" translatable="true">Smart DNS</string>
@@ -1151,7 +1151,7 @@
     <string name="vpn_policy_relaxed_desc" translatable="true">Reacționează la schimbările interesante ale rețelei și conectivității.</string>
     <string name="vpn_policy_title" translatable="true">Politica la schimbările de conexiune</string>
     <string name="use_fallback_dns_to_bypass" translatable="true">Folosește DNS de rezervă pentru ocolire</string>
-    <string name="use_fallback_dns_to_bypass_desc" translatable="true">Când este activat, folosește întotdeauna DNS de rezervă la ocolire pentru aplicații , domenii și ISP.</string>
+    <string name="use_fallback_dns_to_bypass_desc" translatable="true">Când este activat, folosește întotdeauna DNS de rezervă la ocolire pentru aplicații, domenii și ISP.</string>
     <string name="title_database_dump" translatable="true">Bază date</string>
     <string name="copied_clipboard" translatable="true">Copiat</string>
     <string name="lbl_default" translatable="true">Prestabilit</string>
