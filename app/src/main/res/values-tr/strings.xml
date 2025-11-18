@@ -196,7 +196,7 @@
     <string name="settings_local_blocklist_version">Sürüm: %1$s</string>
     <string name="hs_btm_sheet_lock_down">VPN <i>kilidi</i> modunda iken modlar değiştirilemez. &lt;u&gt;VPN ayarlarını düzenlemek&lt;/u&gt; için dokunun.</string>
     <string name="firewall_rule_block_unmetered">Ölçümsüz (WiFi)</string>
-    <string name="firewall_rule_isolate_desc"><![CDATA[uygulama _atlanan IP'ler_ dışındaki adreslere bağlanıyor. Değiştirmek için _Tüm Uygulamalar_ sekmesine gidin.]]></string>
+    <string name="firewall_rule_isolate_desc"><![CDATA[uygulama _atlanan IP\'ler_ dışındaki adreslere bağlanıyor. Değiştirmek için _Tüm Uygulamalar_ sekmesine gidin.]]></string>
     <string name="ci_dialog_title">IP / Port Kuralı Ekle</string>
     <string name="ci_block">Engelle</string>
     <string name="ada_network_log_title">bu uygulama için ağ günlüğü</string>
@@ -416,7 +416,7 @@
     <string name="ctbs_app_info_not_available_toast">Uygulama ayarları sayfası bulunamadı</string>
     <string name="fapps_metered_block_dialog_title">Ölçülen üzerinde blok</string>
     <string name="pause_desc">Not: %1$s engellenen uygulamalar güvenlik duvarına takılmaya devam edecektir.</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[Bu DNS bağlantısı proxy'lendi ve kullanıcının tercih ettiği DNS uç noktasına yönlendirildi. Değiştirmek için DNS <i>Yapılandır</i> ekranından <i>DNS sızıntılarını önle</i> seçeneğini devre dışı bırakın.]]></string>
+    <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[Bu DNS bağlantısı proxy\'lendi ve kullanıcının tercih ettiği DNS uç noktasına yönlendirildi. Değiştirmek için DNS <i>Yapılandır</i> ekranından <i>DNS sızıntılarını önle</i> seçeneğini devre dışı bırakın.]]></string>
     <string name="ada_ip_connection_count">%1$s IP adres(ler)ine bağlandı</string>
     <string name="rt_re_download">Blok listelerini yeniden indirin</string>
     <string name="lbbs_enabled">Etkin</string>
@@ -466,7 +466,7 @@
     <string name="rules_load_failure_heading">Not</string>
     <string name="pause_text">duraklatıldı</string>
     <string name="firewall_rule_global_lockdown">Kilitlenme</string>
-    <string name="firewall_rule_bypass_universal_ip_desc"><![CDATA[Bu bağlantıya izin verildi çünkü <i>hedef IP</i> tüm evrensel güvenlik duvarı kurallarını atla olarak ayarlandı. Değiştirmek için <i>Evrensel</i> sekmesindeki <i>IP Kuralları</i>'na gidin.]]></string>
+    <string name="firewall_rule_bypass_universal_ip_desc"><![CDATA[Bu bağlantıya izin verildi çünkü <i>hedef IP</i> tüm evrensel güvenlik duvarı kurallarını atla olarak ayarlandı. Değiştirmek için <i>Evrensel</i> sekmesindeki <i>IP Kuralları</i>\'na gidin.]]></string>
     <string name="new_app_notification_action_deny">Engellemeye devam et</string>
     <string name="notif_dialog_pause_dialog_negative">Görmezden gel</string>
     <string name="cd_dialog_title">Etki alanı kuralı ekle</string>
@@ -736,7 +736,7 @@
     <string name="other_dns_list_tab1">DoH</string>
     <string name="firewall_rule_no_rule">Kural Yok</string>
     <string name="firewall_rule_device_lock_desc"><![CDATA[Bu bağlantı güvenlik duvarı tarafından engellendi çünkü o sırada <i>cihaz kilitliydi</i>. Bu davranışı değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
-    <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[Bu bağlantı engellendi çünkü <i>kaynak uygulama</i> kullanıcının tercih ettiği DNS'i atladı. Bu davranışı değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
+    <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[Bu bağlantı engellendi çünkü <i>kaynak uygulama</i> kullanıcının tercih ettiği DNS\'i atladı. Bu davranışı değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
     <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[Bu bağlantıya izin verildi çünkü Orbot üzerinden <i>tek tıkla Tor-proxy</i> kurulumu devam ediyordu.]]></string>
     <string name="firewall_rule_block_http_desc"><![CDATA[Bu bağlantı engellendi çünkü muhtemelen <i>güvensiz HTTP</i> kullandı. Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
     <string name="firewall_rule_new_app_desc"><![CDATA[Bu uygulama <i>ilk</i> kez bağlantı kurdu. Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
@@ -854,7 +854,7 @@
     <string name="hsf_packet_capture_chip_text" translatable="true">Paket yakalama etkin</string>
     <string name="cloudflare_security_dns_desc" translatable="true">Kötü amaçlı içeriği engeller. Cloudflare\'in 1.1.1.2 DNS uç noktasını kullanır.</string>
     <string name="rules_card_domain_count" translatable="true">%1$s alan adı kuralları</string>
-    <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[Bu bağlantı kullanıcının tercih ettiği Proxy'ye yönlendirildi. Değiştirmek için <i>Yapılandır</i> ekranından <i>Proxy</i>'ye gidin.]]></string>
+    <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[Bu bağlantı kullanıcının tercih ettiği Proxy\'ye yönlendirildi. Değiştirmek için <i>Yapılandır</i> ekranından <i>Proxy</i>\'ye gidin.]]></string>
     <string name="lbl_import" translatable="true">İçe Aktar</string>
     <string name="lbl_allowed_ips" translatable="true">İzin Verilen IP\'ler</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
@@ -1144,10 +1144,10 @@
     <string name="firewall_rule_lockdown_wg" translatable="true">Proxy Kilidi</string>
     <string name="firewall_rule_proxy_error" translatable="true">Proxy Hatası</string>
     <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[Bu bağlantı var olmayan bir <i>Özel DNS</i> sunucusu arıyor.]]></string>
-    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Bu bağlantıya izin verildi çünkü <i>kaynak uygulama</i> <i>proxy'yi atla</i> kuralları olarak ayarlandı. Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.]]></string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Bu bağlantıya izin verildi çünkü <i>kaynak uygulama</i> <i>proxy\'yi atla</i> kuralları olarak ayarlandı. Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.]]></string>
     <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Bu bağlantıya izin verildi çünkü <i>uygulama</i> <i>duraklatılmış</i> durumda.]]></string>
     <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Bu bağlantı engellendi çünkü WireGuard <i>kilitleme</i> modunda. Değiştirmek için <i>WireGuard</i> ekranına gidin.]]></string>
-    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Bu bağlantı engellendi çünkü uygulama için seçilen <i>proxy</i> belirlenmedi. Değiştirmek için <i>Yapılandır</i> ekranından <i>Proxy</i>'ye gidin.]]></string>
+    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Bu bağlantı engellendi çünkü uygulama için seçilen <i>proxy</i> belirlenmedi. Değiştirmek için <i>Yapılandır</i> ekranından <i>Proxy</i>\'ye gidin.]]></string>
     <string name="wireguard_disable_failure_relay" translatable="true">\"Relay WireGuard\" kapatılamaz</string>
     <string name="config_invalid_desc" translatable="true">Geçersiz WireGuard yapılandırması</string>
     <string name="console_log_title" translatable="true">Uygulama Günlükleri</string>
