@@ -37,7 +37,7 @@ jobs:
               --api-version ${KOTLIN_VER} \
               --jvm-target ${JVM_TARGET} \
               --language-version ${KOTLIN_VER} \
-              --parallel true \
+              --parallel \
               --report sarif:rethink-app-detekt-${RUNID}.sarif
         shell: bash
         env:
@@ -51,7 +51,7 @@ jobs:
           SEV: "Warning"
           # WARNING: Keep this value in sync with build.gradle (ext.kotlin_version, line 4)!
           # github.com/celzero/rethink-app/blob/0478aba823b6/build.gradle#L4
-          KOTLIN_VER: "2.1.20"
+          KOTLIN_VER: "2.1"
       - name: 📤 Upload
         # TODO: docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/configuring-advanced-setup-for-code-scanning
         # docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/sarif-support-for-code-scanning
