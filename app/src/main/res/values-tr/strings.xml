@@ -538,7 +538,7 @@
     <string name="dns_btm_resolved_crypt">çözüldü <u>anonim olarak</u> %1$s tarafından %2$s aracılığıyla %3$s</string>
     <string name="dns_connected">Bağlandı</string>
     <string name="fapps_filter_categories_heading">Kategoriler</string>
-    <string name="firewall_rule_block_ip_desc"><![CDATA[Kullanıcı tarafından belirlenen güvenlik duvarı kuralı <i>hedef IP'yi</i> engelledi.<br/><br/> Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.]]></string>
+    <string name="firewall_rule_block_ip_desc"><![CDATA[Kullanıcı tarafından belirlenen güvenlik duvarı kuralı <i>hedef IP\'yi</i> engelledi.<br/><br/> Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.]]></string>
     <string name="firewall_rule_block_udp_ntp_desc"><![CDATA[Kullanıcı tarafından belirlenen güvenlik duvarı kuralı bu <i>UDP</i> bağlantısını engelledi. Değiştirmek için <i>Evrensel</i> sekmesine gidin.]]></string>
     <string name="category_name_sys_components">Sistem Bileşenleri</string>
     <string name="cd_dialog_desc">Bir URL veya bir opsiyonel joker karakteri olan bir etki alanı adı: *.test.com, test.com/test</string>

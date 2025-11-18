@@ -836,9 +836,9 @@
     <string name="cd_dns_alg_desc" translatable="true">Attribution d\'une IP unique par requête DNS.</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Domaine de confiance (Univ)</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true"><![CDATA[Cette connexion a été autorisée car <i>l’application source</i> est configurée pour <i>contourner les règles du pare-feu global</i>.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i>.]]></string>
-    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[Cette connexion a été bloquée parce que le domaine <i/> est défini comme bloqué dans les règles de domaine universel.<br/><br/> Pour modifier ce comportement, allez sur l'onglet <i>Configure DNS</i>.]]></string>
-    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Cette connexion a été bloquée parce que le domaine <i/> est bloqué par le DNS préféré de l'utilisateur.<br/><br/> Pour modifier ce comportement, allez sur l'onglet <i>Configure DNS</i>.]]></string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Cette connexion a été bloquée parce que le domaine <i/> est défini comme étant de confiance dans les règles du domaine universel.<br/><br/> Pour modifier ce comportement, allez sur l'onglet <i>Configure DNS</i>.]]></string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[Cette connexion a été bloquée parce que le domaine <i/> est défini comme bloqué dans les règles de domaine universel.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.]]></string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[Cette connexion a été bloquée parce que le domaine <i/> est bloqué par le DNS préféré de l\'utilisateur.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.]]></string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[Cette connexion a été bloquée parce que le domaine <i/> est défini comme étant de confiance dans les règles du domaine universel.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.]]></string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">contournera les règles universelles de DNS et de pare-feu</string>
     <string name="lbl_network" translatable="true">réseau</string>
     <string name="lbl_maybe_blocked" translatable="true">Peut-être bloqué</string>
@@ -897,7 +897,7 @@
     <string name="quad9_dns_desc" translatable="true">Quad9 dirige vos requêtes DNS via un réseau sécurisé de serveurs à travers le monde.</string>
     <string name="univ_firewall_heading" translatable="true">Règles universelles du pare-feu</string>
     <string name="cloudflare_security_dns_desc" translatable="true">Bloque le contenu malveillant. Utilise le paramètre DNS 1.1.1.2 de Cloudflare.</string>
-    <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[Cette connexion a été transmise à Proxy <br/><br/> Pour changer, allez à <i>Proxy</i> de l'écran <i>Configure</i>.]]></string>
+    <string name="firewall_rule_proxied_desc" translatable="true"><![CDATA[Cette connexion a été transmise à Proxy <br/><br/> Pour changer, allez à <i>Proxy</i> de l\'écran <i>Configure</i>.]]></string>
     <string name="lbl_allowed_ips" translatable="true">IP autorisées</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
     <string name="lbl_http" translatable="true">HTTP</string>
@@ -1085,7 +1085,7 @@
     <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Cette connexion a été autorisée car <i>l\'application source</i> est configurée pour <i>contourner les règles de proxy</i>.<br/><br/> Pour modifier ce paramètre, accédez à l\'écran Pare-feu spécifique à l\'application.]]></string>
     <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Cette connexion a été autorisée car <i>\'application</i> est en état de <i>pause</i>.]]></string>
     <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Cette connexion a été bloquée car WireGuard est en mode <i>verrouillage</i>.<br/><br/> Pour modifier ce mode, accédez à l\'écran <i>WireGuard</i>.]]></string>
-    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Cette connexion a été bloquée car le <i>proxy</i> sélectionné pour l\'application n'est pas choisi.<br/><br/> Pour le modifier, accédez à <i>Proxy</i> depuis l\'écran <i>Configurer</i>.]]></string>
+    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Cette connexion a été bloquée car le <i>proxy</i> sélectionné pour l\'application n\'est pas choisi.<br/><br/> Pour le modifier, accédez à <i>Proxy</i> depuis l\'écran <i>Configurer</i>.]]></string>
     <string name="wireguard_disable_failure_relay" translatable="true">« Relai WireGuard » ne peut pas être désactivé</string>
     <string name="config_invalid_desc" translatable="true">Configuration WireGuard invalide</string>
     <string name="console_log_title" translatable="true">Journaux de l\'application</string>
