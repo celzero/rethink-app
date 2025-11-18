@@ -1082,10 +1082,10 @@
     <string name="firewall_rule_lockdown_wg" translatable="true">Proxy de verrouillage</string>
     <string name="firewall_rule_proxy_error" translatable="true">Erreur de Proxy</string>
     <string name="firewall_rule_private_dns_desc" translatable="true"><![CDATA[Cette connexion recherche un serveur <i>DNS privé</i> qui n\'existe pas.]]></string>
-    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Cette connexion a été autorisée car <i>l'application source</i> est configurée pour <i>contourner les règles de proxy</i>.<br/><br/> Pour modifier ce paramètre, accédez à l'écran Pare-feu spécifique à l'application.]]></string>
-    <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Cette connexion a été autorisée car <i>l'application</i> est en état de <i>pause</i>.]]></string>
-    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Cette connexion a été bloquée car WireGuard est en mode <i>verrouillage</i>.<br/><br/> Pour modifier ce mode, accédez à l'écran <i>WireGuard</i>.]]></string>
-    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Cette connexion a été bloquée car le <i>proxy</i> sélectionné pour l'application n'est pas choisi.<br/><br/> Pour le modifier, accédez à <i>Proxy</i> depuis l'écran <i>Configurer</i>.]]></string>
+    <string name="firewall_rule_bypass_proxy_desc" translatable="true"><![CDATA[Cette connexion a été autorisée car <i>l\'application source</i> est configurée pour <i>contourner les règles de proxy</i>.<br/><br/> Pour modifier ce paramètre, accédez à l\'écran Pare-feu spécifique à l\'application.]]></string>
+    <string name="firewall_rule_paused_app_desc" translatable="true"><![CDATA[Cette connexion a été autorisée car <i>\'application</i> est en état de <i>pause</i>.]]></string>
+    <string name="firewall_rule_lockdown_wg_desc" translatable="true"><![CDATA[Cette connexion a été bloquée car WireGuard est en mode <i>verrouillage</i>.<br/><br/> Pour modifier ce mode, accédez à l\'écran <i>WireGuard</i>.]]></string>
+    <string name="firewall_rule_proxy_error_desc" translatable="true"><![CDATA[Cette connexion a été bloquée car le <i>proxy</i> sélectionné pour l\'application n'est pas choisi.<br/><br/> Pour le modifier, accédez à <i>Proxy</i> depuis l\'écran <i>Configurer</i>.]]></string>
     <string name="wireguard_disable_failure_relay" translatable="true">« Relai WireGuard » ne peut pas être désactivé</string>
     <string name="config_invalid_desc" translatable="true">Configuration WireGuard invalide</string>
     <string name="console_log_title" translatable="true">Journaux de l\'application</string>
