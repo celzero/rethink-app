@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui.activity
 
 import Logger
 import Logger.LOG_TAG_PROXY
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -331,15 +332,31 @@ class WgMainActivity :
             }
         }
         b.importFab.setOnClickListener {
-            tunnelFileImportResultLauncher.launch(IMPORT_LAUNCH_INPUT)
+            try {
+                tunnelFileImportResultLauncher.launch(IMPORT_LAUNCH_INPUT)
+            } catch (e: ActivityNotFoundException) {
+                Logger.e(LOG_TAG_PROXY, "err; anf; while launching file import: ${e.message}", e)
+                Utilities.showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_PROXY, "err while launching file import: ${e.message}", e)
+                Utilities.showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+            }
         }
         b.qrCodeFab.setOnClickListener {
-            qrImportResultLauncher.launch(
-                ScanOptions()
-                    .setOrientationLocked(false)
-                    .setBeepEnabled(false)
-                    .setPrompt(resources.getString(R.string.lbl_qr_code))
-            )
+            try {
+                qrImportResultLauncher.launch(
+                    ScanOptions()
+                        .setOrientationLocked(false)
+                        .setBeepEnabled(false)
+                        .setPrompt(resources.getString(R.string.lbl_qr_code))
+                )
+            } catch (e: ActivityNotFoundException) {
+                Logger.e(LOG_TAG_PROXY, "err; anf while launching QR scanner: ${e.message}", e)
+                Utilities.showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_PROXY, "err while launching QR scanner: ${e.message}", e)
+                Utilities.showToastUiCentered(this, getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+            }
         }
         b.createFab.setOnClickListener { openTunnelEditorActivity() }
 

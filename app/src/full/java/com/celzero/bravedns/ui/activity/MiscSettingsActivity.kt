@@ -21,6 +21,7 @@ import Logger.LOG_TAG_UI
 import Logger.LOG_TAG_VPN
 import Logger.updateConfigLevel
 import android.Manifest
+import android.R.attr.theme
 import android.app.LocaleManager
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -88,10 +89,12 @@ import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.util.handleFrostEffectIfNeeded
+import com.google.android.gms.common.wrappers.Wrappers.packageManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.java.KoinJavaComponent.inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.File
@@ -429,11 +432,40 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 intent.action = Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
                 val uri = Uri.fromParts(SCHEME_PACKAGE, this.packageName, null)
                 intent.data = uri
-                storageActivityResultLauncher.launch(intent)
-            } catch (_: Exception) {
-                val intent = Intent()
-                intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-                storageActivityResultLauncher.launch(intent)
+
+                // Check if there's an activity that can handle this intent
+                if (intent.resolveActivity(packageManager) != null) {
+                    storageActivityResultLauncher.launch(intent)
+                } else {
+                    // Fallback to general settings
+                    throw ActivityNotFoundException("No activity found for app-specific storage settings")
+                }
+            } catch (e: Exception) {
+                Logger.e(LOG_TAG_VPN, "Error launching app-specific storage settings: ${e.message}")
+                try {
+                    val intent = Intent()
+                    intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+
+                    // Check if there's an activity that can handle the fallback intent
+                    if (intent.resolveActivity(packageManager) != null) {
+                        storageActivityResultLauncher.launch(intent)
+                    } else {
+                        // No activity available to handle storage permission
+                        Logger.e(LOG_TAG_VPN, "No activity found to handle storage permission request")
+                        showToastUiCentered(
+                            this,
+                            getString(R.string.pcap_failure_toast),
+                            Toast.LENGTH_LONG
+                        )
+                    }
+                } catch (fallbackException: Exception) {
+                    Logger.e(LOG_TAG_VPN, "Error launching storage settings: ${fallbackException.message}", fallbackException)
+                    showToastUiCentered(
+                        this,
+                        getString(R.string.pcap_failure_toast),
+                        Toast.LENGTH_LONG
+                    )
+                }
             }
         } else {
             // below version 11
@@ -1275,7 +1307,33 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             return
         }
 
-        notificationPermissionResult.launch(Manifest.permission.POST_NOTIFICATIONS)
+        try {
+            notificationPermissionResult.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } catch (e: ActivityNotFoundException) {
+            Logger.e(
+                LOG_TAG_VPN,
+                "ActivityNotFoundException while requesting notification permission: ${e.message}",
+                e
+            )
+            showToastUiCentered(
+                this,
+                getString(R.string.blocklist_update_check_failure),
+                Toast.LENGTH_SHORT
+            )
+            // Fallback: try opening notification settings directly
+            invokeAndroidNotificationSetting()
+        } catch (e: Exception) {
+            Logger.e(
+                LOG_TAG_VPN,
+                "Exception while requesting notification permission: ${e.message}",
+                e
+            )
+            showToastUiCentered(
+                this,
+                getString(R.string.blocklist_update_check_failure),
+                Toast.LENGTH_SHORT
+            )
+        }
     }
 
     private fun invokeAndroidNotificationSetting() {
