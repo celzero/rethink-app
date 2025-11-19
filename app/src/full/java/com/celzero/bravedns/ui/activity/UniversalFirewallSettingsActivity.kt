@@ -56,7 +56,7 @@ class UniversalFirewallSettingsActivity :
     private val persistentState by inject<PersistentState>()
     private val connTrackerRepository by inject<ConnectionTrackerRepository>()
 
-    private lateinit var blockedUniversalRules : List<ConnectionTracker>
+    private var blockedUniversalRules : List<ConnectionTracker> = emptyList()
 
     companion object {
         const val RULES_SEARCH_ID = "R:"
