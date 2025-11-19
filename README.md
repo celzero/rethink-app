@@ -8,7 +8,7 @@ A [WireGuard](https://github.com/wireguard/wireguard-go) client, an [OpenSnitch]
      alt="Get it on Google Play"
      height="70">](https://play.google.com/store/apps/details?id=com.celzero.bravedns)
 [<img src="https://raw.githubusercontent.com/ImranR98/Obtainium/b1c8ac6f2ab08497189721a788a5763e28ff64cd/assets/graphics/badge_obtainium.png"
-     alt="Get it with Obtanium"
+     alt="Get it with Obtainium"
      height="70">](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/celzero/rethink-app)
 
 <sup>*Release certificate SHA-256 digest*: `1f32d432e81a1dc5c00aafeb0c6636cd7819965d174420e59db9675dff7a88e9`.</sup>
@@ -31,7 +31,7 @@ The firewall doesn't really care about the connections per se rather what's maki
 Currently, per-app connection mapping is implemented by capturing `udp` and `tcp` connections managed by [`firestack`](https://github.com/celzero/firestack) (written in golang) and asking [ConnectivityService for the owner](https://developer.android.com/about/versions/10/privacy/changes#proc-net-filesystem), an API available only on Android 10 or higher. `procfs` (`/proc/net/tcp` and `/proc/net/udp`) is read on-demand to track per-app connections like [NetGuard](https://github.com/M66B/NetGuard/) or OpenSnitch do, on Android 9 and lower versions.
 
 ### Network Monitor
-A network monitor is a per-app report-card of sorts on when connections were made, how many were made, and to where. Tracking UDP / TCP (and DNS on Android 12+) has is straight-forward. DNS are trickier to track on Android 11 and below, and so a rough heuristic is used for now, which may not hold good in all cases.
+A network monitor is a per-app report-card of sorts on when connections were made, how many were made, and to where. Tracking UDP / TCP (and DNS on Android 12+) is straight-forward. DNS are trickier to track on Android 11 and below, and so a rough heuristic is used for now, which may not hold good in all cases.
 
 ### DNS over HTTPS client
 Almost all of the network related code (`firestack`), including DNS over HTTPS split-tunnel, is a hard fork of [Jigsaw-Code/outline-go-tun2socks](https://github.com/Jigsaw-Code/outline-go-tun2socks) written in golang. The UI is vastly different but borrows minimally from [Jigsaw-Code/Intra](https://github.com/Jigsaw-Code/Intra/). A split-tunnel traps requests sent to the VPN's DNS endpoint and relays it to a DNS-over-HTTPS / DNS-over-TLS / DNSCrypt endpoint of the user's choosing, logging the end-to-end latency, time of request, the dns request query itself, and its answer.
@@ -41,7 +41,7 @@ A malware and ad-blocking DNS over HTTPS resolver at `https://sky.rethinkdns.com
 
 The resolver, sponsored by [FLOSS/fund](https://floss.fund/), is deployed to [Fly.io](https://fly.io/) at `max.rethinkdns.com`, and [Deno Deploy](https://deno.com/deploy) at `rdns.deno.dev` too, apart from the default deployment on [Cloudflare Workers](https://workers.dev).
 
-The resolver is open source software [serverless-dns](https://github.com/serverless-dns/serverless-dns).
+The resolver is open source software: [serverless-dns](https://github.com/serverless-dns/serverless-dns).
 
 ### The Rethink Proxy Network
 RPN is a multi-party relay, with connections hopping over serverless proxy (hosted on Cloudflare Workers) exiting through Windscribe. Users would be able to self-host the first hop or use the ones run by us. At launch in Dec 2025, this service would cost $3/month for unlimited bandwidth.
